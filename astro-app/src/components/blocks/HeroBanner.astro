@@ -1,0 +1,70 @@
+---
+import type { HeroBannerBlock } from '../../lib/types';
+import { Section, SectionContent, SectionActions } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+
+interface Props {
+  block: HeroBannerBlock;
+}
+
+const { block } = Astro.props;
+const isCentered = block.layout === 'centered';
+const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
+---
+
+<Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
+  {hasCarousel && (
+    <div class="hero-carousel absolute inset-0" data-carousel>
+      {block.backgroundImages!.map((image, index) => (
+        <div
+          class={`hero-carousel-slide absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100' : 'opacity-0'}`}
+          data-slide={index}
+        >
+          <img
+            src={image.url}
+            alt={image.alt || `Slide ${index + 1}`}
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-foreground/60"></div>
+        </div>
+      ))}
+      <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {block.backgroundImages!.map((_, index) => (
+          <button
+            class={`hero-carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${index === 0 ? 'bg-primary w-8' : 'bg-background/50 hover:bg-background/80'}`}
+            data-dot={index}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  )}
+
+  <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
+    <span class="label-caps text-primary tracking-widest">NJIT Ying Wu College of Computing</span>
+
+    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
+      {block.headline}
+    </h1>
+
+    {block.subheadline && (
+      <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
+        {block.subheadline}
+      </p>
+    )}
+
+    {(block.ctaText || block.secondaryCtaText) && (
+      <SectionActions class={isCentered ? 'justify-center' : ''}>
+        {block.ctaText && block.ctaUrl && (
+          <Button href={block.ctaUrl}>{block.ctaText}</Button>
+        )}
+        {block.secondaryCtaText && block.secondaryCtaUrl && (
+          <Button variant="outline" href={block.secondaryCtaUrl} class="bg-transparent border-background text-background hover:bg-background hover:text-foreground">
+            {block.secondaryCtaText}
+          </Button>
+        )}
+      </SectionActions>
+    )}
+  </SectionContent>
+  <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
+</Section>

@@ -1,0 +1,52 @@
+---
+import type { PageBlock } from '../lib/types';
+import HeroBanner from './blocks/HeroBanner.astro';
+import StatsRow from './blocks/StatsRow.astro';
+import FeatureGrid from './blocks/FeatureGrid.astro';
+import FaqSection from './blocks/FaqSection.astro';
+import CtaBanner from './blocks/CtaBanner.astro';
+import SponsorCards from './blocks/SponsorCards.astro';
+import Timeline from './blocks/Timeline.astro';
+import TeamGrid from './blocks/TeamGrid.astro';
+import LogoCloud from './blocks/LogoCloud.astro';
+import TextWithImage from './blocks/TextWithImage.astro';
+import ContactForm from './blocks/ContactForm.astro';
+import RichText from './blocks/RichText.astro';
+
+interface Props {
+  blocks: PageBlock[];
+}
+
+const { blocks } = Astro.props;
+---
+
+{blocks.map((block) => {
+  switch (block._type) {
+    case 'heroBanner':
+      return <HeroBanner block={block} />;
+    case 'statsRow':
+      return <StatsRow block={block} />;
+    case 'featureGrid':
+      return <FeatureGrid block={block} />;
+    case 'faqSection':
+      return <FaqSection block={block} />;
+    case 'ctaBanner':
+      return <CtaBanner block={block} />;
+    case 'sponsorCards':
+      return <SponsorCards block={block} />;
+    case 'timeline':
+      return <Timeline block={block} />;
+    case 'teamGrid':
+      return <TeamGrid block={block} />;
+    case 'logoCloud':
+      return <LogoCloud block={block} />;
+    case 'textWithImage':
+      return <TextWithImage block={block} />;
+    case 'contactForm':
+      return <ContactForm block={block} />;
+    case 'richText':
+      return <RichText block={block} />;
+    default:
+      return null;
+  }
+})}

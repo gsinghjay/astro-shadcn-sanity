@@ -1,0 +1,47 @@
+---
+import type { TimelineBlock } from '../../lib/types';
+import { Section, SectionContent } from '@/components/ui/section';
+
+interface Props {
+  block: TimelineBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<Section class="bg-muted" data-animate>
+  {(block.label || block.headline) && (
+    <SectionContent class="max-w-3xl">
+      {block.label && (
+        <span class="label-caps text-primary">{block.label}</span>
+      )}
+      {block.headline && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{block.headline}</h2>
+      )}
+    </SectionContent>
+  )}
+
+  <div class="relative">
+    <div class="absolute left-[19px] md:left-1/2 top-0 bottom-0 w-0.5 bg-border md:-translate-x-px"></div>
+    <div class="space-y-0">
+      {block.events.map((event, i) => {
+        const isLeft = i % 2 === 0;
+        return (
+          <div class="relative grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-16 pb-12 last:pb-0">
+            <div class="absolute left-[12px] md:left-1/2 md:-translate-x-1/2 top-0 z-10">
+              <div class="w-4 h-4 bg-primary border-4 border-background"></div>
+            </div>
+            <div class={`pl-12 md:pl-0 ${isLeft ? 'md:text-right md:pr-16' : 'md:col-start-2 md:pl-16'}`}>
+              <span class="label-caps text-primary mb-2 block">{event.date}</span>
+              <h3 class="text-xl font-bold tracking-[-0.01em] mb-2">{event.title}</h3>
+              {event.description && (
+                <p class="text-sm text-muted-foreground leading-relaxed">{event.description}</p>
+              )}
+            </div>
+            {isLeft && <div class="hidden md:block" />}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</Section>

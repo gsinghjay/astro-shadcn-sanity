@@ -1,0 +1,94 @@
+# generated: 2026-02-07
+# updated: 2026-02-07 (Sprint Change Proposal approved - reference project migration)
+# project: astro-shadcn-sanity
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /home/jay/github/astro-shadcn-sanity/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+#
+# CHANGE LOG:
+# ===========
+# 2026-02-07: Sprint Change Proposal approved
+#   - Story 1.2 replaced: schema-infrastructure → migrate-reference-project
+#   - Story 1.3 added (was 1.2): schema-infrastructure (renumbered)
+#   - Story 1.4 replaced: mobile-navigation-and-breadcrumbs → storybook-setup
+#   - Original 1.3 (layout/header/footer) absorbed into 1.2 migration
+#   - Original 1.4 (mobile-nav/breadcrumbs) absorbed into 1.2 migration
+#   - Epic 2 refocused: block schemas + Sanity integration (frontend from migration)
+#   - Story 2.1 replaced: core-block-schemas (combines original 2.1-2.4 schema work)
+#   - Story 2.2 replaced: groq-queries-and-page-data-fetching (new)
+#   - Story 2.3 retained: page-composition-system
+#   - Story 2.4 removed: absorbed into 2.1
+#   - Epics 3-4 compressed: schema/GROQ focus only (frontend already migrated)
+#   - Block naming: architecture camelCase names retained (heroBanner, ctaBanner, etc.)
+#   - P0 blocks promoted: statsRow, textWithImage, teamGrid moved from P1 to P0
+
+generated: 2026-02-07
+project: astro-shadcn-sanity
+project_key: NOKEY
+tracking_system: file-system
+story_location: /home/jay/github/astro-shadcn-sanity/_bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: in-progress
+  1-1-reconfigure-starter-and-set-up-design-system: done
+  1-2-migrate-reference-project: review
+  1-3-schema-infrastructure: backlog
+  1-4-storybook-setup: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-core-block-schemas: backlog
+  2-2-groq-queries-and-page-data-fetching: backlog
+  2-3-page-composition-system: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-sponsor-document-schema-and-studio-management: backlog
+  3-2-sponsor-cards-block-and-listing-page: backlog
+  3-3-sponsor-detail-pages: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-project-and-team-document-schemas: backlog
+  4-2-event-document-schema-and-timeline-block: backlog
+  4-3-project-listing-and-cross-reference-navigation: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-seo-metadata-and-sitemap: backlog
+  5-2-analytics-monitoring-and-production-deploy: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-submission-schema-and-cloudflare-infrastructure: backlog
+  6-2-contact-form-block: backlog
+  epic-6-retrospective: optional

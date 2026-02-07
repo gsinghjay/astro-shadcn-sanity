@@ -1,0 +1,56 @@
+---
+import { Icon as AstroIcon } from "astro-icon/components"
+import type { HTMLAttributes } from "astro/types"
+
+interface Props extends Omit<HTMLAttributes<"svg">, "name" | "href"> {
+  href?: HTMLAttributes<"a">["href"]
+  name?: string
+}
+
+const { name, href, class: className } = Astro.props
+
+const hrefMap: Record<string, string> = {
+  "x.com": "simple-icons:x",
+  twitter: "simple-icons:x",
+  facebook: "simple-icons:facebook",
+  instagram: "simple-icons:instagram",
+  pinterest: "simple-icons:pinterest",
+  youtube: "simple-icons:youtube",
+  tiktok: "simple-icons:tiktok",
+  snapchat: "simple-icons:snapchat",
+  reddit: "simple-icons:reddit",
+  tumblr: "simple-icons:tumblr",
+  "wa.me": "simple-icons:whatsapp",
+  telegram: "simple-icons:telegram",
+  discord: "simple-icons:discord",
+  vimeo: "simple-icons:vimeo",
+  flickr: "simple-icons:flickr",
+  yelp: "simple-icons:yelp",
+  spotify: "simple-icons:spotify",
+  behance: "simple-icons:behance",
+  dribbble: "simple-icons:dribbble",
+  soundcloud: "simple-icons:soundcloud",
+  github: "simple-icons:github",
+  twitch: "simple-icons:twitch",
+  "tel:": "lucide:phone",
+  "mailto:": "lucide:mail",
+  "maps.app.goo.gl": "lucide:map-pin",
+  linkedin: "simple-icons:linkedin",
+}
+
+function resolveIconName(): string | undefined {
+  if (name) {
+    if (name.includes(":")) return name
+    return `lucide:${name}`
+  }
+  if (href) {
+    const hrefKey = Object.keys(hrefMap).find((key) => href.toString().includes(key))
+    if (hrefKey) return hrefMap[hrefKey]
+  }
+  return undefined
+}
+
+const iconName = resolveIconName()
+---
+
+{iconName && <AstroIcon name={iconName} class:list={["size-[1em] text-base", className]} />}

@@ -1,0 +1,9 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { aboutPage } from '../lib/data';
+---
+
+<Layout title={aboutPage.title} description={aboutPage.description}>
+  <BlockRenderer blocks={aboutPage.blocks} />
+</Layout>

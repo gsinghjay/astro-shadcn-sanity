@@ -1,0 +1,54 @@
+---
+import type { CtaBannerBlock } from '../../lib/types';
+import { Section, SectionContent, SectionActions } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+
+interface Props {
+  block: CtaBannerBlock;
+}
+
+const { block } = Astro.props;
+
+const bgClasses: Record<string, string> = {
+  light: 'bg-muted',
+  dark: 'bg-foreground text-background',
+  red: 'bg-primary text-primary-foreground',
+};
+
+const primaryBtnClasses: Record<string, string> = {
+  light: '',
+  dark: '',
+  red: 'bg-background text-primary hover:bg-background/90',
+};
+
+const secondaryBtnClasses: Record<string, string> = {
+  light: '',
+  dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  red: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
+};
+
+const variant = block.variant || 'dark';
+---
+
+<Section class={bgClasses[variant]} data-animate>
+  <SectionContent class="items-center text-center max-w-3xl mx-auto">
+    <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+      {block.headline}
+    </h2>
+
+    {block.body && (
+      <p class="text-lg leading-relaxed max-w-2xl opacity-80">{block.body}</p>
+    )}
+
+    <SectionActions class="justify-center">
+      <Button href={block.ctaUrl} class={primaryBtnClasses[variant]}>
+        {block.ctaText}
+      </Button>
+      {block.secondaryCtaText && block.secondaryCtaUrl && (
+        <Button href={block.secondaryCtaUrl} variant="outline" class={secondaryBtnClasses[variant]}>
+          {block.secondaryCtaText}
+        </Button>
+      )}
+    </SectionActions>
+  </SectionContent>
+</Section>

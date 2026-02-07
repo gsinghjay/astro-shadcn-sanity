@@ -1,0 +1,17 @@
+---
+import type { HTMLAttributes } from "astro/types"
+import { Icon } from "astro-icon/components"
+
+import { cn } from "@/lib/utils"
+
+interface Props extends HTMLAttributes<"svg"> {}
+
+const { class: className } = Astro.props
+---
+
+<Icon
+  name="lucide:loader-2"
+  class={cn("size-4 animate-spin", className)}
+  role="status"
+  aria-label="Loading"
+/>

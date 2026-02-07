@@ -1,0 +1,51 @@
+---
+import type { FeatureGridBlock } from '../../lib/types';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Badge } from '@/components/ui/badge';
+
+interface Props {
+  block: FeatureGridBlock;
+}
+
+const { block } = Astro.props;
+const cols = block.columns || 3;
+const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
+---
+
+<Section data-animate>
+  {(block.label || block.headline) && (
+    <SectionContent class="max-w-3xl">
+      {block.label && (
+        <span class="label-caps text-primary">{block.label}</span>
+      )}
+      {block.headline && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{block.headline}</h2>
+      )}
+      {block.subtitle && (
+        <p class="text-lg text-muted-foreground leading-relaxed">{block.subtitle}</p>
+      )}
+    </SectionContent>
+  )}
+
+  <SectionGrid size={gridSize}>
+    {block.features.map((feature, i) => (
+      <Tile variant="floating">
+        <TileContent>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+              <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            </div>
+            <TileTitle>{feature.title}</TileTitle>
+          </div>
+          <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+          {feature.stat && (
+            <Badge variant="secondary" class="w-fit">{feature.stat}</Badge>
+          )}
+        </TileContent>
+      </Tile>
+    ))}
+  </SectionGrid>
+</Section>

@@ -1,0 +1,87 @@
+---
+import type { SponsorCardsBlock } from '../../lib/types';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Badge } from '@/components/ui/badge';
+
+interface Props {
+  block: SponsorCardsBlock;
+}
+
+const { block } = Astro.props;
+
+const tierStyles: Record<string, { border: string; badge: string }> = {
+  platinum: { border: 'border-foreground', badge: 'bg-foreground text-background border-foreground' },
+  gold: { border: 'border-njit-gold', badge: 'bg-njit-gold text-foreground border-njit-gold' },
+  silver: { border: 'border-muted-foreground', badge: 'bg-muted-foreground text-background border-muted-foreground' },
+};
+---
+
+<Section data-animate>
+  {(block.label || block.headline) && (
+    <SectionContent>
+      {block.label && (
+        <span class="label-caps text-primary">{block.label}</span>
+      )}
+      {block.headline && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{block.headline}</h2>
+      )}
+    </SectionContent>
+  )}
+
+  <SectionGrid size="lg">
+    {block.sponsors.map((sponsor) => {
+      const tier = tierStyles[sponsor.tier || 'silver'];
+      return (
+        <Tile variant="floating" class={`${tier.border} border-2 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-150`}>
+          <TileContent>
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border">
+                  <span class="text-lg font-bold text-muted-foreground">
+                    {sponsor.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                  </span>
+                </div>
+                <div>
+                  <TileTitle class="text-xl">{sponsor.name}</TileTitle>
+                  {sponsor.yearJoined && (
+                    <span class="text-xs text-muted-foreground">Partner since {sponsor.yearJoined}</span>
+                  )}
+                </div>
+              </div>
+              {sponsor.tier && (
+                <Badge class={tier.badge}>{sponsor.tier}</Badge>
+              )}
+            </div>
+
+            {sponsor.description && (
+              <TileDescription>{sponsor.description}</TileDescription>
+            )}
+
+            {sponsor.projectThemes && sponsor.projectThemes.length > 0 && (
+              <div class="flex flex-wrap gap-2">
+                {sponsor.projectThemes.map((theme: string) => (
+                  <Badge variant="secondary">{theme}</Badge>
+                ))}
+              </div>
+            )}
+
+            {sponsor.website && (
+              <a
+                href={sponsor.website}
+                target="_blank"
+                rel="noopener"
+                class="text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 inline-flex items-center gap-2"
+              >
+                Visit Website
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
+                </svg>
+              </a>
+            )}
+          </TileContent>
+        </Tile>
+      );
+    })}
+  </SectionGrid>
+</Section>

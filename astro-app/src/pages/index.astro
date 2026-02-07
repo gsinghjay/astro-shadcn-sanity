@@ -1,14 +1,9 @@
 ---
-import Card from "../components/Card.astro";
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
-import { getPosts } from "../utils/sanity";
-
-const posts = await getPosts();
+import Layout from '../layouts/Layout.astro';
+import BlockRenderer from '../components/BlockRenderer.astro';
+import { homePage } from '../lib/data';
 ---
 
-<Layout title="Welcome to Astro.">
-  <section>
-    {posts.length ? posts.map((post) => <Card post={post} />) : <Welcome />}
-  </section>
+<Layout title={homePage.title} description={homePage.description}>
+  <BlockRenderer blocks={homePage.blocks} />
 </Layout>

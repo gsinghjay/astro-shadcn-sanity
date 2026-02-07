@@ -1,0 +1,30 @@
+---
+import type { StatsRowBlock } from '../../lib/types';
+import { Section } from '@/components/ui/section';
+
+interface Props {
+  block: StatsRowBlock;
+}
+
+const { block } = Astro.props;
+const isDark = block.variant === 'dark';
+---
+
+<Section
+  size="sm"
+  class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
+  data-animate
+>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+    {block.stats.map((stat) => (
+      <div class="text-center">
+        <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
+          {stat.value}
+        </div>
+        <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+          {stat.label}
+        </div>
+      </div>
+    ))}
+  </div>
+</Section>

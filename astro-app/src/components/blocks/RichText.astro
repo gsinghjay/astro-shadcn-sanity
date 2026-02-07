@@ -1,0 +1,25 @@
+---
+import type { RichTextBlock } from '../../lib/types';
+import { Section, SectionProse } from '@/components/ui/section';
+
+interface Props {
+  block: RichTextBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<Section data-animate>
+  <SectionProse>
+    {block.content.map((b) => {
+      if (b._type !== 'block') return null;
+      const text = b.children.map((c) => c.text).join('');
+      switch (b.style) {
+        case 'h2': return <h2>{text}</h2>;
+        case 'h3': return <h3>{text}</h3>;
+        case 'h4': return <h4>{text}</h4>;
+        default: return <p>{text}</p>;
+      }
+    })}
+  </SectionProse>
+</Section>

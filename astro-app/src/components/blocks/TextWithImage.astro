@@ -1,0 +1,42 @@
+---
+import type { TextWithImageBlock } from '../../lib/types';
+import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+
+interface Props {
+  block: TextWithImageBlock;
+}
+
+const { block } = Astro.props;
+const isRight = block.imagePosition !== 'left';
+---
+
+<Section data-animate>
+  <SectionSplit class={!isRight ? '@lg:direction-rtl @lg:[&>*]:direction-ltr' : ''}>
+    <SectionContent class="justify-center">
+      {block.label && (
+        <span class="label-caps text-primary">{block.label}</span>
+      )}
+      {block.headline && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{block.headline}</h2>
+      )}
+      {block.body && (
+        <p class="text-muted-foreground leading-relaxed">{block.body}</p>
+      )}
+      {block.ctaText && block.ctaUrl && (
+        <Button variant="outline" href={block.ctaUrl}>{block.ctaText}</Button>
+      )}
+    </SectionContent>
+
+    <SectionMedia class="aspect-[4/3]">
+      {block.imageUrl && (
+        <img
+          src={block.imageUrl}
+          alt={block.headline || ''}
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+      )}
+    </SectionMedia>
+  </SectionSplit>
+</Section>

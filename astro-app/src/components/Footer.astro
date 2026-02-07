@@ -1,0 +1,139 @@
+---
+import { siteSettings } from '../lib/data';
+import {
+  Footer as FooterUI,
+  FooterDescription,
+  FooterGroup,
+  FooterGroupLabel,
+  FooterMenu,
+  FooterMenuItem,
+  FooterMenuLink,
+  FooterCopyright,
+  FooterSpread,
+} from '@/components/ui/footer';
+import { Logo, LogoText } from '@/components/ui/logo';
+
+const { navigation, footerText } = siteSettings;
+---
+
+<FooterUI class="bg-foreground text-background">
+  <!-- Main Footer Content -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+    <!-- About Section - Takes more space on desktop -->
+    <div class="lg:col-span-4">
+      <Logo href="/" class="mb-6">
+        <div class="w-10 h-10 bg-primary flex items-center justify-center">
+          <span class="text-primary-foreground font-bold text-sm leading-none">YW</span>
+        </div>
+        <LogoText class="text-background">
+          <span class="flex flex-col">
+            <span class="text-sm font-bold uppercase tracking-widest leading-tight">YWCC</span>
+            <span class="text-xs uppercase tracking-wider leading-tight opacity-60">Industry Capstone</span>
+          </span>
+        </LogoText>
+      </Logo>
+      <FooterDescription class="text-background/60 leading-relaxed">
+        {footerText}. Connecting top computing talent with industry partners to solve real-world challenges through applied research and development.
+      </FooterDescription>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="lg:col-span-2">
+      <FooterGroup>
+        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Navigation</FooterGroupLabel>
+        <FooterMenu>
+          <FooterMenuItem>
+            <FooterMenuLink href="/" class="text-background/80 hover:text-background transition-colors">Home</FooterMenuLink>
+          </FooterMenuItem>
+          {navigation.map((item) => (
+            <FooterMenuItem>
+              <FooterMenuLink href={item.href} class="text-background/80 hover:text-background transition-colors">{item.label}</FooterMenuLink>
+            </FooterMenuItem>
+          ))}
+        </FooterMenu>
+      </FooterGroup>
+    </div>
+
+    <!-- Programs Section -->
+    <div class="lg:col-span-2">
+      <FooterGroup>
+        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Programs</FooterGroupLabel>
+        <FooterMenu>
+          <FooterMenuItem>
+            <FooterMenuLink href="/projects" class="text-background/80 hover:text-background transition-colors">Current Projects</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="/sponsors" class="text-background/80 hover:text-background transition-colors">Our Sponsors</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="/about" class="text-background/80 hover:text-background transition-colors">Team</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="/contact" class="text-background/80 hover:text-background transition-colors">Get Involved</FooterMenuLink>
+          </FooterMenuItem>
+        </FooterMenu>
+      </FooterGroup>
+    </div>
+
+    <!-- Resources Section -->
+    <div class="lg:col-span-2">
+      <FooterGroup>
+        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Resources</FooterGroupLabel>
+        <FooterMenu>
+          <FooterMenuItem>
+            <FooterMenuLink href="https://njit.edu" target="_blank" rel="noopener" class="text-background/80 hover:text-background transition-colors">NJIT Website</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Student Portal</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Partner Login</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Documentation</FooterMenuLink>
+          </FooterMenuItem>
+        </FooterMenu>
+      </FooterGroup>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="lg:col-span-2">
+      <FooterGroup>
+        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Contact</FooterGroupLabel>
+        <FooterMenu>
+          <FooterMenuItem>
+            <span class="text-background/60 text-sm leading-relaxed">GITC Building, Room 4400</span>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <span class="text-background/60 text-sm leading-relaxed">Newark, NJ 07102</span>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="mailto:capstone@njit.edu" class="text-background/80 hover:text-background transition-colors">capstone@njit.edu</FooterMenuLink>
+          </FooterMenuItem>
+          <FooterMenuItem>
+            <FooterMenuLink href="tel:+19735963366" class="text-background/60 hover:text-background/80 text-sm transition-colors">(973) 596-3366</FooterMenuLink>
+          </FooterMenuItem>
+        </FooterMenu>
+      </FooterGroup>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <FooterSpread class="border-t border-background/10 pt-8 mt-12">
+    <FooterCopyright class="text-background/40 text-sm">&copy; 2026 New Jersey Institute of Technology. All rights reserved.</FooterCopyright>
+    <FooterMenu orientation="horizontal" class="flex-wrap justify-center md:justify-end">
+      <FooterMenuItem>
+        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Privacy Policy</FooterMenuLink>
+      </FooterMenuItem>
+      <FooterMenuItem>
+        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Terms of Service</FooterMenuLink>
+      </FooterMenuItem>
+      <FooterMenuItem>
+        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Accessibility</FooterMenuLink>
+      </FooterMenuItem>
+      <FooterMenuItem>
+        <FooterMenuLink href="https://njit.edu" target="_blank" rel="noopener" class="text-background/40 hover:text-background text-xs transition-colors">NJIT.edu</FooterMenuLink>
+      </FooterMenuItem>
+    </FooterMenu>
+  </FooterSpread>
+</FooterUI>

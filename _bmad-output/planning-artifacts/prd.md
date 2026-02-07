@@ -27,7 +27,7 @@ The YWCC Capstone Sponsors platform is a modular, CMS-driven static website for 
 
 **Differentiator:** A toolkit-not-website approach — content editors compose pages by stacking reusable UI blocks in Sanity Studio with zero code required. The block library maps editor-friendly names to shadcn/ui component internals, making the design system invisible to non-technical users.
 
-**Tech Stack:** Astro (SSG) + Sanity.io (headless CMS) + Tailwind CSS/shadcn/ui (styling) + vanilla JS (interactivity) + Cloudflare Pages (hosting) + Cloudflare Worker (form proxy).
+**Tech Stack:** Astro (SSG) + Sanity.io (headless CMS) + Tailwind CSS/shadcn/ui (styling) + vanilla JS (interactivity) + Storybook via storybook-astro (component development) + Cloudflare Pages (hosting) + Cloudflare Worker (form proxy).
 
 **Target Users:**
 - Industry sponsors and prospective sponsors (site visitors)
@@ -184,7 +184,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 
 | Capability | Rationale |
 |---|---|
-| 9 P0 Blocks (Hero, Feature Grid, Sponsor Cards, Rich Text, CTA Banner, FAQ, Contact Form, Timeline, Logo Cloud) | Minimum set to reproduce all reference site pages |
+| 12 P0 Blocks (Hero Banner, Feature Grid, Sponsor Cards, Rich Text, CTA Banner, FAQ, Contact Form, Timeline, Logo Cloud, Stats Row, Team Grid, Text With Image) | Full set to reproduce all reference site pages. Stats Row, Team Grid, and Text With Image promoted from P1 (already implemented in reference project). |
 | Shared block base schema (background, spacing, max-width) | Consistent block behavior foundation |
 | BlockRenderer + flat block array architecture | Core page builder pattern |
 | 7 Sanity document types (page, sponsor, project, team, event, submission, siteSettings) | Content model for all core data |
@@ -198,7 +198,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 
 ### Phase 2 — Growth
 
-- 5 P1 blocks: Tabbed Content, Testimonials, Stats Row, Data Table, Team Grid
+- 3 P1 blocks: Tabbed Content, Testimonials, Data Table (Stats Row, Team Grid promoted to P0)
 - CarouselWrapper as reusable layout variant
 - Client-side filtering on Sponsor Cards (tier, industry) and Projects (semester, tech)
 - GA4 consent mode (cookieless pings until opt-in)
@@ -222,7 +222,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 | Sanity schema breaking builds | TypeScript schemas + GROQ query validation in CI |
 | Editor adoption | Editor-friendly naming, constrained presets, no shadcn jargon |
 | Sponsor engagement | Clear CTA paths, professional design matching reference site |
-| Solo developer | Formulaic block pattern (schema + component + BlockRenderer). All blocks follow same structure. |
+| Solo developer | Formulaic block pattern (schema + component + BlockRenderer). All blocks follow same structure. Storybook enables isolated component development and documentation. |
 | Time constraints | Cut P0 to 6 essential blocks (Hero, Rich Text, CTA, Contact Form, Sponsor Cards, FAQ). Remaining 3 follow immediately. |
 
 ## Functional Requirements
@@ -274,6 +274,11 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 - **FR28:** Contact Form blocks render with configurable fields and server-side submission
 - **FR29:** Timeline blocks render with date-ordered milestones and current-phase highlighting
 - **FR30:** Logo Cloud blocks render from sponsor document logos
+- **FR41:** Stats Row blocks render with configurable stat value/label pairs in a responsive row layout
+- **FR42:** Team Grid blocks render team member cards with photos, names, roles, and optional LinkedIn links
+- **FR43:** Text With Image blocks render rich text content alongside a positioned image (left/right)
+
+> **Change Log (2026-02-07):** FR41-FR43 added. Stats Row, Team Grid, and Text With Image promoted from P1 to P0 per Sprint Change Proposal — these blocks already exist in the reference implementation.
 
 ### Site Navigation & Layout
 

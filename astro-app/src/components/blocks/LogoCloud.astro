@@ -1,0 +1,40 @@
+---
+import type { LogoCloudBlock } from '../../lib/types';
+import { Section } from '@/components/ui/section';
+
+interface Props {
+  block: LogoCloudBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<Section size="sm" class="bg-muted border-y border-border" data-animate>
+  {block.label && (
+    <div class="text-center">
+      <span class="label-caps text-muted-foreground">{block.label}</span>
+    </div>
+  )}
+
+  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
+    {block.logos.map((logo) => {
+      const content = (
+        <div class="bg-muted p-6 flex items-center justify-center h-24 hover:bg-background transition-colors duration-200">
+          {logo.logoUrl ? (
+            <img src={logo.logoUrl} alt={logo.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" />
+          ) : (
+            <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{logo.name}</span>
+          )}
+        </div>
+      );
+
+      return logo.website ? (
+        <a href={logo.website} target="_blank" rel="noopener">
+          {content}
+        </a>
+      ) : (
+        content
+      );
+    })}
+  </div>
+</Section>

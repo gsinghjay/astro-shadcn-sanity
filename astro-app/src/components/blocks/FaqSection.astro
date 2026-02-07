@@ -1,0 +1,42 @@
+---
+import type { FaqSectionBlock } from '../../lib/types';
+import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+
+interface Props {
+  block: FaqSectionBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<Section data-animate>
+  <SectionSplit>
+    <SectionContent>
+      {block.label && (
+        <span class="label-caps text-primary">{block.label}</span>
+      )}
+      {block.headline && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{block.headline}</h2>
+      )}
+    </SectionContent>
+
+    <Accordion>
+      {block.items.map((item, i) => (
+        <AccordionItem>
+          <AccordionTrigger>
+            <span class="flex items-start gap-4">
+              <span class="text-xs font-bold text-muted-foreground mt-0.5 flex-shrink-0">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span>{item.question}</span>
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  </SectionSplit>
+</Section>

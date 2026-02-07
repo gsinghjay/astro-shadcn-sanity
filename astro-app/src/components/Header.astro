@@ -1,0 +1,73 @@
+---
+import { siteSettings } from '../lib/data';
+import { Header as HeaderUI, HeaderActions } from '@/components/ui/header';
+import { Logo, LogoText } from '@/components/ui/logo';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Icon } from '@/components/ui/icon';
+import { Separator } from '@/components/ui/separator';
+
+const { navigation } = siteSettings;
+const currentPath = Astro.url.pathname;
+---
+
+<HeaderUI class="border-b-2 border-foreground">
+  <Logo href="/">
+    <div class="w-8 h-8 bg-primary flex items-center justify-center">
+      <span class="text-primary-foreground font-bold text-xs leading-none">YW</span>
+    </div>
+    <LogoText>
+      <span class="flex flex-col">
+        <span class="text-xs font-bold uppercase tracking-widest leading-tight">YWCC</span>
+        <span class="text-[0.625rem] uppercase tracking-wider leading-tight text-muted-foreground">Industry Capstone</span>
+      </span>
+    </LogoText>
+  </Logo>
+
+  <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+    {navigation.map((item) => (
+      <a
+        href={item.href}
+        class:list={[
+          'text-xs font-bold uppercase tracking-widest transition-colors duration-150',
+          currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
+            ? 'text-primary'
+            : 'text-foreground hover:text-primary',
+        ]}
+      >
+        {item.label}
+      </a>
+    ))}
+  </nav>
+
+  <HeaderActions>
+    <Button href="/contact" class="hidden md:inline-flex">Become a Sponsor</Button>
+    <div class="md:hidden">
+      <Sheet>
+        <SheetTrigger variant="ghost" size="icon">
+          <Icon name="menu" />
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Navigation</SheetTitle>
+          </SheetHeader>
+          <nav class="flex flex-col gap-2 p-4">
+            {navigation.map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  'text-lg font-bold uppercase tracking-wider py-2',
+                  currentPath === item.href ? 'text-primary' : 'text-foreground',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))}
+            <Separator class="my-2" />
+            <Button href="/contact" class="w-full justify-center">Become a Sponsor</Button>
+          </nav>
+        </SheetContent>
+      </Sheet>
+    </div>
+  </HeaderActions>
+</HeaderUI>

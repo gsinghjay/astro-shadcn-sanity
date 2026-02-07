@@ -36,13 +36,13 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 - Primary domain: Static web (SSG) with headless CMS
 - Complexity level: Low-Medium
-- Estimated architectural components: ~30 (17 block components + 7 document schemas + layout components + utilities)
+- Estimated architectural components: ~30 (17 block components [12 P0 + 2 P1 + 3 P2] + 7 document schemas + layout components + utilities)
 
 ### Technical Constraints & Dependencies
 
 - **$0/month operating cost** — all services must stay within free tiers (Sanity 100K API/month, GitHub Pages unlimited bandwidth)
 - **Zero framework runtime** — no React, Vue, or Alpine.js in production bundle. Vanilla JS only.
-- **Static output** — Astro SSG mode with `output: 'static'`. No serverless adapter until forms phase.
+- **Static output** — Astro 5.x SSG mode with `output: 'static'` (v5 merged the old `hybrid` mode into `static` — any page can opt out of prerendering with `export const prerender = false`). No serverless adapter until forms phase.
 - **Monorepo structure** — `astro-app/` (frontend) + `studio/` (Sanity Studio) already initialized as separate workspaces
 - **GitHub Pages (initial)** — static hosting via GitHub Actions. Migrates to Cloudflare Pages when forms are implemented (last priority).
 - **Forms are last** — Contact Form block, Cloudflare Worker, and `@astrojs/cloudflare` adapter all deferred until final implementation phase. This keeps the architecture pure SSG until then.
@@ -100,18 +100,20 @@ The project has already been initialized from this starter. It provides the mono
 **Remove (misaligned with architecture):**
 - `@astrojs/vercel` adapter — replacing with `output: 'static'` for GitHub Pages
 - `@astrojs/react` + `react` + `react-dom` from `astro-app` — zero framework runtime requirement. React stays in `studio/` only.
-- `output: 'hybrid'` — switching to `output: 'static'`
+- `output: 'hybrid'` — no longer exists in Astro 5.x (its behavior is now the default under `output: 'static'`)
 - Sample schemas (`post`, `blockContent`) — replaced by project document types and block schemas
 
 **Add (required by architecture):**
-- Tailwind CSS + `@astrojs/tailwind` integration
-- shadcn/ui CSS variables and component patterns (adapted for Astro, not React)
-- NJIT brand color tokens in Tailwind config
+- Tailwind CSS v4 + `@tailwindcss/vite` plugin (NOT the legacy `@astrojs/tailwind` which is Tailwind v3)
+- fulldev/ui component library ([ui.full.dev](https://ui.full.dev)) — vanilla `.astro` components installed via shadcn CLI with `@fulldev` registry. Provides accessible, Tailwind v4-styled UI primitives (Button, Accordion, Input, etc.) without any framework runtime. Block components compose from these primitives.
+- `components.json` with `@fulldev` registry configuration for CLI-based component installation
+- NJIT brand color tokens defined via CSS custom properties in `global.css` (Tailwind v4 CSS-first configuration — no `tailwind.config.mjs`)
 - Block component directory structure (`src/components/blocks/`)
 - `BlockRenderer.astro` dispatch component
 - All 7 document schemas + 17 block schemas + shared base schema
 - GitHub Actions workflow for deploy to GitHub Pages
 - Sanity webhook configuration for rebuild triggers
+- `storybook-astro` + Storybook 10 for native Astro component development and documentation (devDependencies: `storybook-astro`, `storybook`, `@storybook/addon-docs`, `@storybook/builder-vite`)
 
 **Note:** Project initialization is already complete. First implementation work is reconfiguring the starter to match the target architecture.
 
@@ -122,7 +124,7 @@ The project has already been initialized from this starter. It provides the mono
 **Critical Decisions (Block Implementation):**
 - Shared base schema pattern: `defineBlock` helper function
 - BlockRenderer dispatch: Explicit imports + conditional rendering
-- CSS architecture: shadcn CSS variables + Astro components with Tailwind utilities
+- CSS architecture: fulldev/ui components + shadcn CSS variables + Tailwind v4 utilities
 - Vanilla JS strategy: Inline `<script>` colocated in block components
 
 **Important Decisions (Shape Architecture):**
@@ -139,7 +141,7 @@ The project has already been initialized from this starter. It provides the mono
 | Decision | Choice | Rationale |
 |---|---|---|
 | Schema inheritance | `defineBlock` helper function | Wraps `defineType` and merges shared base fields (background, spacing, maxWidth) into every block. Keeps schemas DRY. Provides a single pattern for AI agents to follow. |
-| Content model | 7 document types + 17 block types | page, sponsor, project, team, event, submission, siteSettings. Blocks defined as Sanity object types referenced in page `blocks[]` array. |
+| Content model | 7 document types + 17 block types (12 P0 + 2 P1 + 3 P2) | page, sponsor, project, team, event, submission, siteSettings. 12 P0 blocks: heroBanner, featureGrid, sponsorCards, richText, ctaBanner, faqSection, contactForm, timeline, logoCloud, statsRow, teamGrid, textWithImage. Blocks defined as Sanity object types referenced in page `blocks[]` array. |
 | Data validation | Sanity schema validation rules | `defineField` with `validation: (Rule) => ...` for required fields, string lengths, slug uniqueness. |
 | Query language | GROQ | Build-time queries via `@sanity/astro` client. No GraphQL. |
 
@@ -163,9 +165,10 @@ No user authentication required. Security concerns limited to:
 | Decision | Choice | Rationale |
 |---|---|---|
 | BlockRenderer | Explicit imports + conditional rendering | All block components imported at top of `BlockRenderer.astro`. Template uses `{block._type === 'hero' && <Hero {...block} />}` pattern. Type-safe, no magic, idiomatic Astro. |
-| CSS system | shadcn CSS variables + Tailwind utilities | Copy shadcn's CSS custom properties (`--background`, `--primary`, etc.) into `global.css`. Write `.astro` components using same Tailwind class patterns as shadcn React components. NJIT brand colors mapped to CSS variables. |
+| UI primitives | fulldev/ui via shadcn CLI | Vanilla `.astro` components (Button, Accordion, Input, Badge, Card, etc.) installed via `npx shadcn@latest add @fulldev/{name}`. Zero framework runtime. Components land in `src/components/ui/` and are owned/customizable. |
+| CSS system | shadcn CSS variables + Tailwind v4 utilities | Tailwind v4 CSS-first configuration in `global.css` — all theme tokens (colors, spacing, fonts) defined via `@theme` block and CSS custom properties. shadcn's CSS custom properties (`--background`, `--primary`, etc.) and NJIT brand colors defined in CSS. No `tailwind.config.mjs`. |
 | Vanilla JS | Inline `<script>` in `.astro` components | Astro automatically bundles, deduplicates, and optimizes inline scripts. Each interactive block (FAQ, tabs, mobile nav, carousel, form) contains its own `<script>` tag. Data-attribute driven event delegation. |
-| Component format | `.astro` files only | No `.tsx` or `.jsx` in frontend. React exists only in `studio/` workspace. |
+| Component format | `.astro` files only | No `.tsx` or `.jsx` in frontend. React exists only in `studio/` workspace. fulldev/ui components are pure `.astro`. |
 | State management | None | Static site — no client-side state. All data resolved at build time. |
 | Routing | File-based + `[...slug].astro` | Astro file-based routing. Dynamic catch-all for CMS-built pages. Explicit routes for sponsor/project detail pages. |
 
@@ -183,8 +186,8 @@ No user authentication required. Security concerns limited to:
 ### Decision Impact Analysis
 
 **Implementation Sequence:**
-1. Reconfigure starter (remove React/Vercel, add Tailwind, set `output: 'static'`)
-2. Set up shadcn CSS variables + Tailwind theme with NJIT brand tokens
+1. Reconfigure starter (remove React/Vercel, add Tailwind v4 via `@tailwindcss/vite`, set `output: 'static'`)
+2. Initialize shadcn CLI + fulldev/ui registry (`components.json`), install base UI primitives, set up Tailwind v4 CSS-first theme with shadcn CSS variables + NJIT brand tokens in `global.css`
 3. Create `defineBlock` helper + shared base schema
 4. Build document schemas (page, sponsor, project, team, event, siteSettings)
 5. Build block schemas (P0 first, then P1, then P2)
@@ -197,7 +200,7 @@ No user authentication required. Security concerns limited to:
 
 **Cross-Component Dependencies:**
 - `defineBlock` helper must exist before any block schema
-- shadcn CSS variables must exist before any block component
+- fulldev/ui primitives + shadcn CSS variables and Tailwind v4 theme in `global.css` must exist before any block component
 - BlockRenderer must be updated each time a new block is added
 - Page schema must reference all block types in its `blocks[]` array
 - GROQ queries must project all fields consumed by block components
@@ -222,8 +225,9 @@ No user authentication required. Security concerns limited to:
 - Layout components directory: `src/components/` (top-level for shared layout pieces)
 - Utility files: `camelCase.ts` — e.g., `sanity.ts`, `image.ts`
 
-**CSS/Tailwind Naming:**
+**CSS/Tailwind v4 Naming:**
 - CSS custom properties: `--{category}-{name}` following shadcn convention — e.g., `--background`, `--primary`, `--muted-foreground`
+- Theme tokens defined in `global.css` via `@theme` block (Tailwind v4 CSS-first configuration)
 - No arbitrary Tailwind values (e.g., `bg-[#ff0000]`) — always use design tokens
 - Responsive prefixes: mobile-first, use `md:` and `lg:` breakpoints
 
@@ -253,7 +257,14 @@ studio/src/schemaTypes/
 ```
 astro-app/src/
   components/
-    blocks/         # One .astro file per block (matches schema 1:1)
+    ui/             # fulldev/ui primitives (installed via shadcn CLI, owned code)
+      button.astro
+      accordion.astro
+      badge.astro
+      card.astro
+      input.astro
+      ...             # Added as needed: npx shadcn@latest add @fulldev/{name}
+    blocks/         # One .astro file per block (matches schema 1:1, composes from ui/)
       HeroBanner.astro
       FeatureGrid.astro
       ...
@@ -279,7 +290,7 @@ astro-app/src/
     global.css      # Tailwind imports + shadcn CSS variables
 ```
 
-**Key rule:** Every block has exactly 2 files — one schema in `studio/src/schemaTypes/blocks/`, one component in `astro-app/src/components/blocks/`. Plus a registration line in `BlockRenderer.astro` and `schemaTypes/index.ts`.
+**Key rule:** Every block has exactly 2 files — one schema in `studio/src/schemaTypes/blocks/`, one component in `astro-app/src/components/blocks/`. Plus a registration line in `BlockRenderer.astro` and `schemaTypes/index.ts`. Block components compose from fulldev/ui primitives in `src/components/ui/` — they do NOT reimplement buttons, accordions, inputs, etc.
 
 ### Format Patterns
 
@@ -302,6 +313,7 @@ export const heroBanner = defineBlock({
 ---
 // astro-app/src/components/blocks/HeroBanner.astro
 import type { HeroBannerBlock } from '../../lib/sanity'
+import { Button } from '../ui/button'  // fulldev/ui primitives
 
 interface Props {
   block: HeroBannerBlock
@@ -320,7 +332,10 @@ const { backgroundVariant = 'white', spacing = 'default', maxWidth = 'default' }
     `max-w-${maxWidth}`,
   ]}
 >
-  <!-- Block content using Tailwind utilities -->
+  <!-- Block content composing fulldev/ui primitives + Tailwind utilities -->
+  {block.buttons?.map((btn) => (
+    <Button variant={btn.variant}>{btn.text}</Button>
+  ))}
 </section>
 
 <script>
@@ -387,10 +402,11 @@ const pageQuery = groq`
 **Adding a New Block (checklist for any agent):**
 1. Create schema file: `studio/src/schemaTypes/blocks/{block-name}.ts` using `defineBlock`
 2. Register in `studio/src/schemaTypes/index.ts`
-3. Create component: `astro-app/src/components/blocks/{BlockName}.astro`
-4. Add import + conditional in `BlockRenderer.astro`
-5. Add GROQ projection in the page query in `src/lib/sanity.ts`
-6. Add type to page schema's `blocks[]` array `of` list
+3. Install any needed fulldev/ui primitives: `npx shadcn@latest add @fulldev/{name}` (if not already in `src/components/ui/`)
+4. Create component: `astro-app/src/components/blocks/{BlockName}.astro` (composing from `ui/` primitives)
+5. Add import + conditional in `BlockRenderer.astro`
+6. Add GROQ projection in the page query in `src/lib/sanity.ts`
+7. Add type to page schema's `blocks[]` array `of` list
 
 **Vanilla JS Pattern (interactive blocks):**
 ```html
@@ -432,6 +448,8 @@ import { urlFor } from '../lib/image'
 **All AI Agents MUST:**
 - Use `defineBlock` for every block schema — never raw `defineType` for blocks
 - Include all three base fields (backgroundVariant, spacing, maxWidth) in every block component's wrapper
+- Use fulldev/ui primitives from `src/components/ui/` for standard UI elements (buttons, badges, cards, inputs, accordions, etc.) — never hand-roll these
+- Install new fulldev/ui components via `npx shadcn@latest add @fulldev/{name}` — never copy/paste from external sources
 - Add ARIA attributes to all interactive elements
 - Use the image helper for all Sanity images — never construct CDN URLs manually
 - Place all GROQ queries in `src/lib/sanity.ts` — never inline queries in page/component files
@@ -441,6 +459,7 @@ import { urlFor } from '../lib/image'
 - Arbitrary Tailwind values (`bg-[#cc0000]`) — use design tokens
 - Inline styles — use Tailwind utilities
 - React/JSX in `astro-app/` — use `.astro` only
+- Hand-rolling UI primitives (buttons, inputs, cards, etc.) — use fulldev/ui from `src/components/ui/`
 - Nested blocks (block containing another block array)
 - Runtime API calls to Sanity — all data at build time
 - CSS class toggling for JS state — use `data-*` attributes
@@ -460,11 +479,14 @@ astro-shadcn-sanity/
 │
 ├── astro-app/                      # Frontend workspace
 │   ├── package.json
-│   ├── astro.config.mjs            # output: 'static', @astrojs/tailwind, @sanity/astro
-│   ├── tailwind.config.mjs         # shadcn theme tokens, NJIT brand colors
+│   ├── astro.config.mjs            # output: 'static', @tailwindcss/vite plugin, @sanity/astro
+│   ├── components.json             # shadcn CLI config with @fulldev registry
 │   ├── tsconfig.json
 │   ├── .env                        # PUBLIC_SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_STUDIO_DATASET
 │   ├── .env.example
+│   ├── .storybook/
+│   │   ├── main.ts                 # storybook-astro framework config
+│   │   └── preview.ts              # Global CSS import for Storybook
 │   ├── public/
 │   │   └── fonts/                  # NJIT brand font (if not system stack)
 │   └── src/
@@ -479,11 +501,12 @@ astro-shadcn-sanity/
 │       │   │   ├── ContactForm.astro          # FR28 (deferred)
 │       │   │   ├── Timeline.astro             # FR29
 │       │   │   ├── LogoCloud.astro            # FR30
+│       │   │   ├── StatsRow.astro             # P0 (promoted from P1)
+│       │   │   ├── TeamGrid.astro             # P0 (promoted from P1)
+│       │   │   ├── TextWithImage.astro        # P0 (promoted from P1)
 │       │   │   ├── TabbedContent.astro        # P1
 │       │   │   ├── Testimonials.astro         # P1
-│       │   │   ├── StatsRow.astro             # P1
 │       │   │   ├── DataTable.astro            # P1
-│       │   │   ├── TeamGrid.astro             # P1
 │       │   │   ├── ImageGallery.astro         # P2
 │       │   │   ├── VideoEmbed.astro           # P2
 │       │   │   └── AlertNotice.astro          # P2
@@ -506,7 +529,7 @@ astro-shadcn-sanity/
 │       │   └── projects/
 │       │       └── index.astro       # Project showcase (FR12)
 │       └── styles/
-│           └── global.css            # @tailwind imports + shadcn CSS variables
+│           └── global.css            # @import "tailwindcss" + @theme block + shadcn CSS variables + NJIT brand tokens (Tailwind v4 CSS-first config)
 │
 └── studio/                          # Sanity Studio workspace
     ├── package.json
@@ -542,11 +565,12 @@ astro-shadcn-sanity/
                 ├── contact-form.ts    # FR28 (deferred)
                 ├── timeline.ts        # FR29
                 ├── logo-cloud.ts      # FR30
+                ├── stats-row.ts       # P0 (promoted from P1)
+                ├── team-grid.ts       # P0 (promoted from P1)
+                ├── text-with-image.ts # P0 (promoted from P1)
                 ├── tabbed-content.ts   # P1
                 ├── testimonials.ts     # P1
-                ├── stats-row.ts        # P1
                 ├── data-table.ts       # P1
-                ├── team-grid.ts        # P1
                 ├── image-gallery.ts    # P2
                 ├── video-embed.ts      # P2
                 └── alert-notice.ts     # P2
@@ -569,7 +593,8 @@ astro-shadcn-sanity/
 **Component Boundaries:**
 - `Layout.astro` owns `<head>`, global nav, and footer. Pages slot into it.
 - `BlockRenderer.astro` is the single entry point for all block rendering. Pages pass `blocks[]` to it.
-- Block components are leaf nodes — they receive props and render HTML. No upward communication.
+- Block components (`src/components/blocks/`) are leaf nodes — they receive props and render HTML. No upward communication. They compose from fulldev/ui primitives (`src/components/ui/`).
+- UI primitives (`src/components/ui/`) are generic, reusable, data-agnostic. They know nothing about Sanity or block schemas. Block components adapt Sanity data into primitive props.
 - Layout components (Header, Footer, MobileNav, Breadcrumb) receive site settings as props from Layout.
 
 ### Requirements to Structure Mapping
@@ -627,6 +652,8 @@ GitHub Pages (served to visitors)
 **External Integrations:**
 - Sanity Content Lake — GROQ queries at build time (`lib/sanity.ts`)
 - Sanity Image CDN — responsive images via `@sanity/image-url` (`lib/image.ts`)
+- fulldev/ui — component registry at `https://ui.full.dev/r/{name}.json`, installed via shadcn CLI at dev time (not a runtime dependency)
+- Storybook — native Astro component development via `storybook-astro` (devDependency, `.storybook/` config)
 - GitHub Actions — CI/CD pipeline (`.github/workflows/deploy.yml`, deferred)
 - GA4 — async script in `Layout.astro` (FR38)
 - Monsido — async script in `Layout.astro` (FR39)
@@ -637,7 +664,7 @@ GitHub Pages (served to visitors)
 ### Coherence Validation
 
 **Decision Compatibility:**
-All technology choices are compatible. Astro SSG + Sanity + Tailwind + vanilla JS is a well-trodden combination. No version conflicts — Astro 4.x works with `@sanity/astro` 3.x, Tailwind 3.x/4.x, and TypeScript 5.x. The `output: 'static'` mode eliminates any adapter complexity.
+All technology choices are compatible. Astro 5.x SSG + Sanity + Tailwind v4 + fulldev/ui + vanilla JS is a well-trodden combination. No version conflicts — Astro 5.x works with `@sanity/astro`, Tailwind CSS v4 (via `@tailwindcss/vite`), fulldev/ui (pure `.astro` components via shadcn CLI), and TypeScript 5.x. The `output: 'static'` mode (which now includes the old hybrid rendering capability) eliminates any adapter complexity. fulldev/ui adds zero runtime cost — components are vanilla Astro, no framework dependencies.
 
 **Pattern Consistency:**
 Naming conventions are coherent — camelCase for Sanity (schema types, field names), PascalCase for Astro components, kebab-case for schema files. All patterns align with their respective ecosystem conventions. The `defineBlock` helper enforces the shared base schema pattern consistently.
@@ -656,7 +683,7 @@ The monorepo structure cleanly separates concerns. The 1:1 mapping between schem
 | FR10-FR13 (Project/Team) | project.ts + team.ts + project pages + GROQ cross-refs | Covered |
 | FR14-FR16 (Program Info) | event.ts + Timeline block | Covered |
 | FR17-FR21 (Forms) | submission.ts + ContactForm + CF Worker | Deferred (by design) |
-| FR22-FR30 (P0 Blocks) | 9 block schemas + 9 Astro components | Covered |
+| FR22-FR30 (P0 Blocks) | 12 P0 block schemas + 12 Astro components (9 original + statsRow, teamGrid, textWithImage promoted) | Covered |
 | FR31-FR34 (Navigation/Layout) | Header, Footer, MobileNav, Breadcrumb + Layout.astro | Covered |
 | FR35-FR37 (SEO) | seo.ts object + Layout.astro `<head>` + @astrojs/sitemap | Covered |
 | FR38-FR39 (Analytics) | GA4 + Monsido async scripts in Layout.astro | Covered |
@@ -672,7 +699,7 @@ The monorepo structure cleanly separates concerns. The 1:1 mapping between schem
 | Security (NFR9-12) | Token isolation via CF Worker (deferred), no client-side PII, CSP meta tags | Covered |
 | Accessibility (NFR13-19) | ARIA patterns in all interactive blocks, enforced alt text in schemas, skip-link in Layout | Covered |
 | Integration (NFR20-24) | Build-time only fetching, GA4/Monsido async loading | Covered |
-| Maintainability (NFR25-28) | 3-file block pattern, TypeScript schemas, consistent conventions | Covered |
+| Maintainability (NFR25-28) | 2-file block pattern (schema + component composing fulldev/ui primitives), TypeScript schemas, consistent conventions | Covered |
 
 ### Implementation Readiness Validation
 
@@ -731,9 +758,10 @@ No critical gaps found.
 **Confidence Level:** High
 
 **Key Strengths:**
-- Formulaic block pattern (schema + component + registration) makes implementation highly parallelizable
+- Formulaic block pattern (schema + component composing fulldev/ui primitives + registration) makes implementation highly parallelizable
+- fulldev/ui provides accessible, pre-built Astro primitives — eliminates manual porting of shadcn patterns while maintaining zero framework runtime
 - Zero-runtime constraint eliminates entire categories of architectural complexity
-- Clear boundaries between CMS and frontend workspaces
+- Clear boundaries between CMS and frontend workspaces (ui/ primitives → blocks/ composition → BlockRenderer dispatch)
 - Every requirement explicitly mapped to files and directories
 
 **Areas for Future Enhancement:**
@@ -751,4 +779,4 @@ No critical gaps found.
 - Refer to this document for all architectural questions
 
 **First Implementation Priority:**
-Reconfigure the starter — remove React/Vercel adapter, add Tailwind, set `output: 'static'`, create directory structure, set up shadcn CSS variables.
+Reconfigure the starter — remove React/Vercel adapter, add Tailwind v4 via `@tailwindcss/vite`, set `output: 'static'`, initialize shadcn CLI with fulldev/ui `@fulldev` registry (`components.json`), install base UI primitives, create directory structure, set up shadcn CSS variables and NJIT brand tokens in `global.css` (CSS-first configuration, no `tailwind.config.mjs`).

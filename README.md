@@ -31,7 +31,7 @@ flowchart LR
 
 ## Overview
 
-The platform connects industry sponsors with capstone teams by showcasing sponsor organizations, project proposals, team rosters, and program information. It uses a **toolkit-not-website** approach — a block library maps editor-friendly names to [shadcn/ui](https://ui.shadcn.com/) component internals, making the design system invisible to non-technical users.
+The platform connects industry sponsors with capstone teams by showcasing sponsor organizations, project proposals, team rosters, and program information. It uses a **toolkit-not-website** approach — a block library maps editor-friendly names to [fulldev/ui](https://ui.full.dev) component internals (vanilla Astro components via the shadcn CLI), making the design system invisible to non-technical users.
 
 **Key goals:**
 
@@ -47,12 +47,14 @@ The platform connects industry sponsors with capstone teams by showcasing sponso
 
 | Layer | Technology |
 |---|---|
-| Frontend | [Astro](https://astro.build/) (SSG) |
+| Frontend | [Astro 5.x](https://astro.build/) (SSG, `output: 'static'`) |
 | CMS | [Sanity.io](https://www.sanity.io/) (headless) |
-| Styling | [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) |
-| Interactivity | Vanilla JS (< 2KB total) |
-| Hosting | [Cloudflare Pages](https://pages.cloudflare.com/) |
-| Form Proxy | [Cloudflare Worker](https://workers.cloudflare.com/) |
+| UI Components | [fulldev/ui](https://ui.full.dev) — vanilla `.astro` components via shadcn CLI |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) (`@tailwindcss/vite`, CSS-first config) |
+| Interactivity | Vanilla JS (< 5KB total) |
+| Hosting (initial) | [GitHub Pages](https://pages.github.com/) |
+| Hosting (future) | [Cloudflare Pages](https://pages.cloudflare.com/) (when forms are added) |
+| Form Proxy | [Cloudflare Worker](https://workers.cloudflare.com/) (deferred) |
 | Analytics | GA4 + Monsido |
 
 The build bakes all content into static HTML — zero runtime API calls.
@@ -61,16 +63,28 @@ The build bakes all content into static HTML — zero runtime API calls.
 
 ```text
 astro-shadcn-sanity/
-├── astro-app/           # Astro frontend (SSG)
+├── astro-app/                # Astro frontend (SSG)
+│   ├── astro.config.mjs      # output: 'static', @tailwindcss/vite, @sanity/astro
+│   ├── components.json       # shadcn CLI config with @fulldev registry
 │   ├── src/
-│   │   ├── components/  # Astro + shadcn/ui block components
-│   │   ├── layouts/     # Page layouts (nav, footer, breadcrumb)
-│   │   └── pages/       # Astro page routes
+│   │   ├── components/
+│   │   │   ├── ui/           # fulldev/ui primitives (installed via shadcn CLI)
+│   │   │   ├── blocks/       # Block components (compose from ui/ primitives)
+│   │   │   └── *.astro       # Layout components (Header, Footer, etc.)
+│   │   ├── layouts/          # Base HTML layout
+│   │   ├── lib/              # Sanity client, GROQ queries, image helpers
+│   │   ├── pages/            # Astro page routes
+│   │   └── styles/
+│   │       └── global.css    # @import "tailwindcss" + theme + CSS variables
 │   └── package.json
-├── studio/              # Sanity Studio (CMS)
+├── studio/                   # Sanity Studio (CMS)
 │   └── src/
-│       └── schemaTypes/  # Sanity document and block schemas
-├── package.json         # Root workspace config
+│       └── schemaTypes/
+│           ├── blocks/       # Block object schemas (one per block)
+│           ├── documents/    # Document schemas (page, sponsor, etc.)
+│           ├── objects/      # Shared objects (SEO, button, portable text)
+│           └── helpers/      # defineBlock helper
+├── package.json              # Root workspace config
 └── README.md
 ```
 
@@ -78,10 +92,11 @@ This is an **npm workspaces** monorepo with two packages: `astro-app` and `studi
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or later
-- npm v9 or later
+- [Node.js](https://nodejs.org/) v24 or later
+- npm v10 or later
 - A [Sanity.io](https://www.sanity.io/) account (free tier)
-- A [Cloudflare](https://www.cloudflare.com/) account (free tier, for deployment)
+- A [GitHub](https://github.com/) account (for GitHub Pages deployment)
+- A [Cloudflare](https://www.cloudflare.com/) account (free tier, for future forms deployment)
 
 ## Getting Started
 
@@ -247,56 +262,66 @@ erDiagram
 
 ## Adding a New Block
 
-Every block follows the same three-file pattern:
+Every block follows this checklist:
 
 ### 1. Create the Sanity schema
 
-Add a schema file in `studio/src/schemaTypes/` that inherits the shared base schema:
+Use the `defineBlock` helper (merges shared base fields automatically):
 
 ```typescript
-// studio/src/schemaTypes/yourBlock.ts
-import { defineType, defineField } from 'sanity'
+// studio/src/schemaTypes/blocks/your-block.ts
+import { defineBlock } from '../helpers/defineBlock'
 
-export default defineType({
+export const yourBlock = defineBlock({
   name: 'yourBlock',
   title: 'Your Block',
-  type: 'object',
   fields: [
-    // Shared base fields (background, spacing, maxWidth) inherited
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-    }),
-    // Add block-specific fields
+    // Block-specific fields only — base fields added by defineBlock
   ],
 })
 ```
 
-### 2. Create the Astro component
+### 2. Register the schema
 
-Add a `.astro` component in `astro-app/src/components/`:
+Add to `studio/src/schemaTypes/index.ts` and the page schema's `blocks[]` array.
+
+### 3. Install needed fulldev/ui primitives
+
+```bash
+npx shadcn@latest add @fulldev/button @fulldev/badge  # whatever the block needs
+```
+
+### 4. Create the Astro component
+
+Compose from fulldev/ui primitives in `src/components/ui/`:
 
 ```astro
 ---
-// astro-app/src/components/YourBlock.astro
-const { heading } = Astro.props;
+// astro-app/src/components/blocks/YourBlock.astro
+import type { YourBlockBlock } from '../../lib/sanity'
+import { Button } from '../ui/button'
+
+interface Props {
+  block: YourBlockBlock
+}
+
+const { block } = Astro.props
+const { backgroundVariant = 'white', spacing = 'default', maxWidth = 'default' } = block
 ---
 
-<section>
-  <h2>{heading}</h2>
-  <!-- Render block content with Tailwind utilities -->
+<section class:list={['block-wrapper', `bg-${backgroundVariant}`, `spacing-${spacing}`, `max-w-${maxWidth}`]}>
+  <h2>{block.heading}</h2>
+  <!-- Compose from ui/ primitives + Tailwind utilities -->
 </section>
 ```
 
-### 3. Register in BlockRenderer
+### 5. Register in BlockRenderer
 
-Add the mapping from Sanity `_type` to your Astro component in the BlockRenderer:
+Add the import and conditional in `BlockRenderer.astro`.
 
-```typescript
-// In BlockRenderer mapping
-'yourBlock': YourBlock,
-```
+### 6. Add GROQ projection
+
+Add the type-specific projection in `src/lib/sanity.ts`.
 
 Build and verify Lighthouse scores hold at 90+.
 
@@ -342,7 +367,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Follow the [three-file block pattern](#adding-a-new-block) for new blocks
+3. Follow the [block checklist](#adding-a-new-block) for new blocks
 4. Verify Lighthouse scores hold at 90+ across all categories
 5. Commit your changes (`git commit -m 'Add your feature'`)
 6. Push to the branch (`git push origin feature/your-feature`)
@@ -350,17 +375,20 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 
 ### Code conventions
 
-- **Sanity schemas:** TypeScript with `defineType` / `defineField`
-- **Astro components:** Tailwind utility classes, no framework runtime
+- **Sanity schemas:** TypeScript with `defineBlock` helper (blocks) or `defineType`/`defineField` (documents)
+- **UI primitives:** fulldev/ui components in `src/components/ui/` — install via `npx shadcn@latest add @fulldev/{name}`
+- **Block components:** `.astro` files in `src/components/blocks/` composing from `ui/` primitives
+- **Styling:** Tailwind v4 utility classes, CSS-first config in `global.css`, no `tailwind.config.mjs`
 - **Interactivity:** Vanilla JS with data-attribute driven event delegation, each handler under 50 lines
 - **Block architecture:** Flat array only — no nested blocks
+- **No React/JSX** in `astro-app/` — fulldev/ui components are pure `.astro`
 
 ## Resources
 
-- [Sanity documentation](https://www.sanity.io/docs/)
 - [Astro documentation](https://docs.astro.build/)
-- [shadcn/ui documentation](https://ui.shadcn.com/)
-- [Tailwind CSS documentation](https://tailwindcss.com/docs)
+- [Sanity documentation](https://www.sanity.io/docs/)
+- [fulldev/ui documentation](https://ui.full.dev/docs)
+- [Tailwind CSS v4 documentation](https://tailwindcss.com/docs)
 - [Cloudflare Pages documentation](https://developers.cloudflare.com/pages/)
 - [Sanity Community Slack](https://slack.sanity.io)
 
