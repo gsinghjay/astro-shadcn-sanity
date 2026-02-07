@@ -1,6 +1,6 @@
 # Story 1.2: Migrate Reference Project
 
-Status: review
+Status: done
 
 ## Story
 
@@ -458,3 +458,46 @@ Claude Opus 4.6 (claude-opus-4-6)
 
 **Deleted files:**
 - reference-project/ (entire directory)
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Jay (via Claude Opus 4.6)
+**Date:** 2026-02-07
+**Outcome:** Approved with fixes applied
+
+### Issues Found: 3 High, 4 Medium, 2 Low — All HIGH/MEDIUM fixed
+
+#### Fixed Issues
+
+| ID | Severity | Description | Fix |
+|---|---|---|---|
+| H1 | HIGH | `field-error.astro` was empty (0 bytes) | Created proper FieldError component with `role="alert"`, added barrel export |
+| H2 | HIGH | `main.ts` carousel used `classList.add/remove` (architecture anti-pattern) | Refactored to `data-state` attributes with CSS selectors |
+| H3 | HIGH | Build fails without `.env` — `@sanity/astro` requires projectId | Added fallback `"placeholder"` in `astro.config.mjs` |
+| M1 | MEDIUM | `Header.astro` used arbitrary Tailwind `text-[0.625rem]` | Added `--font-size-2xs` design token, used `text-2xs` class |
+| M2 | MEDIUM | `ContactForm.astro` used `style="display: none;"` inline style | Replaced with CSS-driven `data-form-state` pattern |
+| M3 | MEDIUM | `main.ts` form handler used `style.display` for toggling | Replaced with `dataset.formState = 'success'` |
+| M4 | MEDIUM | `SponsorCards.astro` and `ContactForm.astro` used inline SVGs | Replaced with `astro-icon` (`lucide:arrow-up-right`, `lucide:check`) |
+
+#### Accepted (Low — not fixed)
+
+| ID | Severity | Description | Rationale |
+|---|---|---|---|
+| L1 | LOW | Git history is single "scaffold" commit — no per-task traceability | Process observation, code is correct |
+| L2 | LOW | Story counted `field-error.astro` in "11 files" despite being empty | Fixed by H1 |
+
+### Files Modified by Review
+
+- `astro-app/src/components/ui/field/field-error.astro` (implemented)
+- `astro-app/src/components/ui/field/index.ts` (added FieldError export)
+- `astro-app/src/scripts/main.ts` (carousel: data-state; form: data-form-state)
+- `astro-app/src/components/blocks/HeroBanner.astro` (data-state on slides/dots)
+- `astro-app/src/components/blocks/ContactForm.astro` (removed inline style, added Icon)
+- `astro-app/src/components/blocks/SponsorCards.astro` (replaced inline SVG with Icon)
+- `astro-app/src/styles/global.css` (data-state CSS rules, text-2xs token, form-state rules)
+- `astro-app/astro.config.mjs` (fallback projectId/dataset)
+- `astro-app/src/components/Header.astro` (text-2xs token)
+
+### Build Verification
+
+Post-fix build: `astro build` — 5 pages built, 0 errors, 0 warnings. Complete.

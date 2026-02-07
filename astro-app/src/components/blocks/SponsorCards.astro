@@ -3,6 +3,7 @@ import type { SponsorCardsBlock } from '../../lib/types';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
 import { Badge } from '@/components/ui/badge';
+import { Icon } from '@/components/ui/icon';
 
 interface Props {
   block: SponsorCardsBlock;
@@ -74,9 +75,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
                 class="text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 inline-flex items-center gap-2"
               >
                 Visit Website
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7v10" />
-                </svg>
+                <Icon name="lucide:arrow-up-right" class="w-3.5 h-3.5" />
               </a>
             )}
           </TileContent>

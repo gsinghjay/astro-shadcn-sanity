@@ -17,8 +17,9 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
     <div class="hero-carousel absolute inset-0" data-carousel>
       {block.backgroundImages!.map((image, index) => (
         <div
-          class={`hero-carousel-slide absolute inset-0 transition-opacity duration-1000 ${index === 0 ? 'opacity-100' : 'opacity-0'}`}
+          class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
           data-slide={index}
+          data-state={index === 0 ? 'active' : 'inactive'}
         >
           <img
             src={image.url}
@@ -31,8 +32,9 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
       <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {block.backgroundImages!.map((_, index) => (
           <button
-            class={`hero-carousel-dot w-2 h-2 rounded-full transition-all duration-300 ${index === 0 ? 'bg-primary w-8' : 'bg-background/50 hover:bg-background/80'}`}
+            class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
             data-dot={index}
+            data-state={index === 0 ? 'active' : 'inactive'}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

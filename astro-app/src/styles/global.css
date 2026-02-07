@@ -8,6 +8,7 @@
 @theme {
   --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-mono: 'Courier New', Courier, monospace;
+  --font-size-2xs: 0.625rem;
 
   --color-swiss-red: #E30613;
   --color-swiss-red-dark: #B00510;
@@ -188,6 +189,11 @@
 @layer components {
   .hero-carousel-slide {
     will-change: opacity;
+    opacity: 0;
+  }
+
+  .hero-carousel-slide[data-state="active"] {
+    opacity: 1;
   }
 
   .hero-carousel-nav {
@@ -195,10 +201,30 @@
   }
 
   .hero-carousel-dot {
+    width: 0.5rem;
+    background-color: color-mix(in srgb, var(--background) 50%, transparent);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-carousel-dot[data-state="active"] {
+    width: 2rem;
+    background-color: var(--primary);
   }
 
   .hero-carousel-dot:hover {
     transform: scale(1.2);
+  }
+
+  /* Contact form data-state driven visibility */
+  [data-contact-form][data-form-state="success"] [data-form-fields] {
+    display: none;
+  }
+
+  [data-contact-form] [data-form-success] {
+    display: none;
+  }
+
+  [data-contact-form][data-form-state="success"] [data-form-success] {
+    display: block;
   }
 }

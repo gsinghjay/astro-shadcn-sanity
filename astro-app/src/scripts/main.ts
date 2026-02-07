@@ -38,12 +38,7 @@ function initContactForm(): void {
     }
 
     setTimeout(() => {
-      if (successMsg) {
-        form.querySelectorAll('[data-form-fields]').forEach((el) => {
-          (el as HTMLElement).style.display = 'none';
-        });
-        successMsg.style.display = 'block';
-      }
+      form.dataset.formState = 'success';
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Submit';
@@ -65,17 +60,13 @@ function initCarousel(): void {
   let intervalId: number | null = null;
 
   const goToSlide = (index: number): void => {
-    slides[currentIndex]?.classList.remove('opacity-100');
-    slides[currentIndex]?.classList.add('opacity-0');
-    dots[currentIndex]?.classList.remove('bg-primary', 'w-8');
-    dots[currentIndex]?.classList.add('bg-background/50');
+    slides[currentIndex]?.setAttribute('data-state', 'inactive');
+    dots[currentIndex]?.setAttribute('data-state', 'inactive');
 
     currentIndex = index;
 
-    slides[currentIndex]?.classList.remove('opacity-0');
-    slides[currentIndex]?.classList.add('opacity-100');
-    dots[currentIndex]?.classList.remove('bg-background/50');
-    dots[currentIndex]?.classList.add('bg-primary', 'w-8');
+    slides[currentIndex]?.setAttribute('data-state', 'active');
+    dots[currentIndex]?.setAttribute('data-state', 'active');
   };
 
   const nextSlide = (): void => {

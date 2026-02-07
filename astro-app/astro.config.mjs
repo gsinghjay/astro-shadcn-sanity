@@ -11,8 +11,9 @@ const {
   PUBLIC_SANITY_DATASET,
 } = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
-const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID;
-const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET;
+// Fallback to placeholder values so builds succeed with placeholder data when .env is missing
+const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID || "placeholder";
+const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET || "production";
 
 export default defineConfig({
   output: "static",
