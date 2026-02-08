@@ -1,22 +1,30 @@
 /**
- * Story 1-3: Schema Infrastructure — ATDD Integration Tests (RED PHASE)
+ * Story 1-3: Schema Infrastructure — ATDD Integration Tests (GREEN PHASE)
  *
  * These tests validate the Sanity schema infrastructure defined in Story 1-3.
- * All tests use test.skip() because the schema files do not exist yet (TDD red phase).
- *
- * To enter GREEN phase:
- * 1. Implement the schema files per Story 1-3 acceptance criteria
- * 2. Remove test.skip() from each test
- * 3. Run: npx playwright test tests/integration/schema-infrastructure.spec.ts
- * 4. All tests should pass
+ * Uses static imports so Playwright's TS transformer can resolve them.
  *
  * @story 1-3
- * @phase RED
+ * @phase GREEN
  */
 import { test, expect } from '@playwright/test'
 import { execSync } from 'child_process'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
+import { defineField } from 'sanity'
 
+// Schema imports — static so Playwright transforms them
+import { defineBlock } from '../../studio/src/schemaTypes/helpers/defineBlock'
+import { blockBaseFields } from '../../studio/src/schemaTypes/objects/block-base'
+import { seo } from '../../studio/src/schemaTypes/objects/seo'
+import { button } from '../../studio/src/schemaTypes/objects/button'
+import { portableText } from '../../studio/src/schemaTypes/objects/portable-text'
+import { page as pageSchema } from '../../studio/src/schemaTypes/documents/page'
+import { siteSettings } from '../../studio/src/schemaTypes/documents/site-settings'
+import { schemaTypes } from '../../studio/src/schemaTypes/index'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 const STUDIO_ROOT = path.resolve(__dirname, '../../studio')
 
 test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
@@ -24,14 +32,11 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC1: defineBlock helper
   // ---------------------------------------------------------------------------
   test.describe('AC1: defineBlock Helper', () => {
-    test.skip('[P0] 1.3-INT-001 — defineBlock exports a function', async () => {
-      const mod = await import('../../studio/src/schemaTypes/helpers/defineBlock')
-      expect(typeof mod.defineBlock).toBe('function')
+    test('[P0] 1.3-INT-001 — defineBlock exports a function', async () => {
+      expect(typeof defineBlock).toBe('function')
     })
 
-    test.skip('[P0] 1.3-INT-002 — defineBlock merges base fields into block schema', async () => {
-      const { defineBlock } = await import('../../studio/src/schemaTypes/helpers/defineBlock')
-
+    test('[P0] 1.3-INT-002 — defineBlock merges base fields into block schema', async () => {
       const result = defineBlock({
         name: 'testBlock',
         title: 'Test Block',
@@ -47,10 +52,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('maxWidth')
     })
 
-    test.skip('[P0] 1.3-INT-003 — defineBlock places base fields before block-specific fields', async () => {
-      const { defineBlock } = await import('../../studio/src/schemaTypes/helpers/defineBlock')
-      const { defineField } = await import('sanity')
-
+    test('[P0] 1.3-INT-003 — defineBlock places base fields before block-specific fields', async () => {
       const result = defineBlock({
         name: 'testBlock',
         title: 'Test Block',
@@ -73,9 +75,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC2: block-base shared fields
   // ---------------------------------------------------------------------------
   test.describe('AC2: Block Base Fields', () => {
-    test.skip('[P0] 1.3-INT-004 — blockBaseFields contains backgroundVariant with constrained presets', async () => {
-      const { blockBaseFields } = await import('../../studio/src/schemaTypes/objects/block-base')
-
+    test('[P0] 1.3-INT-004 — blockBaseFields contains backgroundVariant with constrained presets', async () => {
       const bgField = blockBaseFields.find((f: any) => f.name === 'backgroundVariant')
       expect(bgField).toBeDefined()
       expect(bgField!.type).toBe('string')
@@ -85,9 +85,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(options).toHaveLength(4)
     })
 
-    test.skip('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', async () => {
-      const { blockBaseFields } = await import('../../studio/src/schemaTypes/objects/block-base')
-
+    test('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', async () => {
       const spacingField = blockBaseFields.find((f: any) => f.name === 'spacing')
       expect(spacingField).toBeDefined()
       expect(spacingField!.type).toBe('string')
@@ -97,9 +95,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(options).toHaveLength(4)
     })
 
-    test.skip('[P0] 1.3-INT-006 — blockBaseFields contains maxWidth with constrained presets', async () => {
-      const { blockBaseFields } = await import('../../studio/src/schemaTypes/objects/block-base')
-
+    test('[P0] 1.3-INT-006 — blockBaseFields contains maxWidth with constrained presets', async () => {
       const maxWidthField = blockBaseFields.find((f: any) => f.name === 'maxWidth')
       expect(maxWidthField).toBeDefined()
       expect(maxWidthField!.type).toBe('string')
@@ -114,9 +110,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC3: SEO object schema
   // ---------------------------------------------------------------------------
   test.describe('AC3: SEO Object Schema', () => {
-    test.skip('[P1] 1.3-INT-007 — seo schema has metaTitle, metaDescription, ogImage fields', async () => {
-      const { seo } = await import('../../studio/src/schemaTypes/objects/seo')
-
+    test('[P1] 1.3-INT-007 — seo schema has metaTitle, metaDescription, ogImage fields', async () => {
       expect(seo.name).toBe('seo')
       expect(seo.type).toBe('object')
 
@@ -126,27 +120,21 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('ogImage')
     })
 
-    test.skip('[P1] 1.3-INT-008 — seo metaTitle has max length validation', async () => {
-      const { seo } = await import('../../studio/src/schemaTypes/objects/seo')
-
+    test('[P1] 1.3-INT-008 — seo metaTitle has max length validation', async () => {
       const metaTitle = (seo as any).fields.find((f: any) => f.name === 'metaTitle')
       expect(metaTitle).toBeDefined()
       expect(metaTitle.type).toBe('string')
       expect(metaTitle.validation).toBeDefined()
     })
 
-    test.skip('[P1] 1.3-INT-009 — seo metaDescription is text type with max length validation', async () => {
-      const { seo } = await import('../../studio/src/schemaTypes/objects/seo')
-
+    test('[P1] 1.3-INT-009 — seo metaDescription is text type with max length validation', async () => {
       const metaDesc = (seo as any).fields.find((f: any) => f.name === 'metaDescription')
       expect(metaDesc).toBeDefined()
       expect(metaDesc.type).toBe('text')
       expect(metaDesc.validation).toBeDefined()
     })
 
-    test.skip('[P1] 1.3-INT-010 — seo ogImage has alt text field', async () => {
-      const { seo } = await import('../../studio/src/schemaTypes/objects/seo')
-
+    test('[P1] 1.3-INT-010 — seo ogImage has alt text field', async () => {
       const ogImage = (seo as any).fields.find((f: any) => f.name === 'ogImage')
       expect(ogImage).toBeDefined()
       expect(ogImage.type).toBe('image')
@@ -161,9 +149,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC4: Button object schema
   // ---------------------------------------------------------------------------
   test.describe('AC4: Button Object Schema', () => {
-    test.skip('[P1] 1.3-INT-011 — button schema has text, url, variant fields', async () => {
-      const { button } = await import('../../studio/src/schemaTypes/objects/button')
-
+    test('[P1] 1.3-INT-011 — button schema has text, url, variant fields', async () => {
       expect(button.name).toBe('button')
       expect(button.type).toBe('object')
 
@@ -173,27 +159,21 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('variant')
     })
 
-    test.skip('[P1] 1.3-INT-012 — button text is required string', async () => {
-      const { button } = await import('../../studio/src/schemaTypes/objects/button')
-
+    test('[P1] 1.3-INT-012 — button text is required string', async () => {
       const textField = (button as any).fields.find((f: any) => f.name === 'text')
       expect(textField).toBeDefined()
       expect(textField.type).toBe('string')
       expect(textField.validation).toBeDefined()
     })
 
-    test.skip('[P1] 1.3-INT-013 — button url is required url type', async () => {
-      const { button } = await import('../../studio/src/schemaTypes/objects/button')
-
+    test('[P1] 1.3-INT-013 — button url is required url type', async () => {
       const urlField = (button as any).fields.find((f: any) => f.name === 'url')
       expect(urlField).toBeDefined()
       expect(urlField.type).toBe('url')
       expect(urlField.validation).toBeDefined()
     })
 
-    test.skip('[P1] 1.3-INT-014 — button variant has constrained options', async () => {
-      const { button } = await import('../../studio/src/schemaTypes/objects/button')
-
+    test('[P1] 1.3-INT-014 — button variant has constrained options', async () => {
       const variantField = (button as any).fields.find((f: any) => f.name === 'variant')
       expect(variantField).toBeDefined()
       expect(variantField.type).toBe('string')
@@ -209,9 +189,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC5: Portable Text schema
   // ---------------------------------------------------------------------------
   test.describe('AC5: Portable Text Schema', () => {
-    test.skip('[P1] 1.3-INT-015 — portableText is array type with block, image, callout members', async () => {
-      const { portableText } = await import('../../studio/src/schemaTypes/objects/portable-text')
-
+    test('[P1] 1.3-INT-015 — portableText is array type with block, image, callout members', async () => {
       expect(portableText.name).toBe('portableText')
       expect(portableText.type).toBe('array')
 
@@ -225,9 +203,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(hasCallout).toBe(true)
     })
 
-    test.skip('[P1] 1.3-INT-016 — portableText block has expected styles', async () => {
-      const { portableText } = await import('../../studio/src/schemaTypes/objects/portable-text')
-
+    test('[P1] 1.3-INT-016 — portableText block has expected styles', async () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       expect(blockMember).toBeDefined()
 
@@ -239,9 +215,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(styleValues).toContain('blockquote')
     })
 
-    test.skip('[P1] 1.3-INT-017 — portableText block has strong, em, code, underline decorators', async () => {
-      const { portableText } = await import('../../studio/src/schemaTypes/objects/portable-text')
-
+    test('[P1] 1.3-INT-017 — portableText block has strong, em, code, underline decorators', async () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       const decorators = blockMember.marks.decorators.map((d: any) => d.value)
       expect(decorators).toContain('strong')
@@ -250,18 +224,14 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(decorators).toContain('underline')
     })
 
-    test.skip('[P1] 1.3-INT-018 — portableText block has link and internalLink annotations', async () => {
-      const { portableText } = await import('../../studio/src/schemaTypes/objects/portable-text')
-
+    test('[P1] 1.3-INT-018 — portableText block has link and internalLink annotations', async () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       const annotationNames = blockMember.marks.annotations.map((a: any) => a.name)
       expect(annotationNames).toContain('link')
       expect(annotationNames).toContain('internalLink')
     })
 
-    test.skip('[P1] 1.3-INT-019 — portableText image member has required alt text (NFR16)', async () => {
-      const { portableText } = await import('../../studio/src/schemaTypes/objects/portable-text')
-
+    test('[P1] 1.3-INT-019 — portableText image member has required alt text (NFR16)', async () => {
       const imageMember = (portableText as any).of.find((m: any) => m.type === 'image')
       expect(imageMember).toBeDefined()
 
@@ -275,9 +245,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC6: Page document schema
   // ---------------------------------------------------------------------------
   test.describe('AC6: Page Document Schema', () => {
-    test.skip('[P0] 1.3-INT-020 — page schema has title, slug, seo, blocks fields', async () => {
-      const { page: pageSchema } = await import('../../studio/src/schemaTypes/documents/page')
-
+    test('[P0] 1.3-INT-020 — page schema has title, slug, seo, blocks fields', async () => {
       expect(pageSchema.name).toBe('page')
       expect(pageSchema.type).toBe('document')
 
@@ -288,9 +256,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('blocks')
     })
 
-    test.skip('[P0] 1.3-INT-021 — page blocks array accepts all 12 P0 block types', async () => {
-      const { page: pageSchema } = await import('../../studio/src/schemaTypes/documents/page')
-
+    test('[P0] 1.3-INT-021 — page blocks array accepts all 12 P0 block types', async () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       expect(blocksField).toBeDefined()
       expect(blocksField.type).toBe('array')
@@ -308,18 +274,14 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(blockTypeNames).toHaveLength(12)
     })
 
-    test.skip('[P0] 1.3-INT-022 — page title is required string', async () => {
-      const { page: pageSchema } = await import('../../studio/src/schemaTypes/documents/page')
-
+    test('[P0] 1.3-INT-022 — page title is required string', async () => {
       const titleField = (pageSchema as any).fields.find((f: any) => f.name === 'title')
       expect(titleField).toBeDefined()
       expect(titleField.type).toBe('string')
       expect(titleField.validation).toBeDefined()
     })
 
-    test.skip('[P0] 1.3-INT-023 — page slug is required and sourced from title', async () => {
-      const { page: pageSchema } = await import('../../studio/src/schemaTypes/documents/page')
-
+    test('[P0] 1.3-INT-023 — page slug is required and sourced from title', async () => {
       const slugField = (pageSchema as any).fields.find((f: any) => f.name === 'slug')
       expect(slugField).toBeDefined()
       expect(slugField.type).toBe('slug')
@@ -332,9 +294,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC7: Site Settings document schema
   // ---------------------------------------------------------------------------
   test.describe('AC7: Site Settings Document Schema', () => {
-    test.skip('[P0] 1.3-INT-024 — siteSettings schema has all required fields', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P0] 1.3-INT-024 — siteSettings schema has all required fields', async () => {
       expect(siteSettings.name).toBe('siteSettings')
       expect(siteSettings.type).toBe('document')
 
@@ -347,18 +307,14 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('currentSemester')
     })
 
-    test.skip('[P0] 1.3-INT-025 — siteSettings siteName is required', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P0] 1.3-INT-025 — siteSettings siteName is required', async () => {
       const siteNameField = (siteSettings as any).fields.find((f: any) => f.name === 'siteName')
       expect(siteNameField).toBeDefined()
       expect(siteNameField.type).toBe('string')
       expect(siteNameField.validation).toBeDefined()
     })
 
-    test.skip('[P0] 1.3-INT-026 — siteSettings logo has alt text field', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P0] 1.3-INT-026 — siteSettings logo has alt text field', async () => {
       const logoField = (siteSettings as any).fields.find((f: any) => f.name === 'logo')
       expect(logoField).toBeDefined()
       expect(logoField.type).toBe('image')
@@ -367,9 +323,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(altField).toBeDefined()
     })
 
-    test.skip('[P1] 1.3-INT-027 — siteSettings navigationItems supports one level of nesting', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P1] 1.3-INT-027 — siteSettings navigationItems supports one level of nesting', async () => {
       const navField = (siteSettings as any).fields.find((f: any) => f.name === 'navigationItems')
       expect(navField).toBeDefined()
       expect(navField.type).toBe('array')
@@ -384,9 +338,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(navItemFieldNames).toContain('children')
     })
 
-    test.skip('[P1] 1.3-INT-028 — siteSettings socialLinks has platform options', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P1] 1.3-INT-028 — siteSettings socialLinks has platform options', async () => {
       const socialField = (siteSettings as any).fields.find((f: any) => f.name === 'socialLinks')
       expect(socialField).toBeDefined()
       expect(socialField.type).toBe('array')
@@ -404,9 +356,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       )
     })
 
-    test.skip('[P1] 1.3-INT-029 — siteSettings currentSemester is a string field', async () => {
-      const { siteSettings } = await import('../../studio/src/schemaTypes/documents/site-settings')
-
+    test('[P1] 1.3-INT-029 — siteSettings currentSemester is a string field', async () => {
       const semesterField = (siteSettings as any).fields.find(
         (f: any) => f.name === 'currentSemester',
       )
@@ -419,9 +369,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC8: Schema Registration
   // ---------------------------------------------------------------------------
   test.describe('AC8: Schema Registration', () => {
-    test.skip('[P0] 1.3-INT-030 — schemaTypes array contains all registered schemas', async () => {
-      const { schemaTypes } = await import('../../studio/src/schemaTypes/index')
-
+    test('[P0] 1.3-INT-030 — schemaTypes array contains all registered schemas', async () => {
       const typeNames = schemaTypes.map((s: any) => s.name)
 
       // Object schemas
@@ -437,9 +385,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(schemaTypes.length).toBeGreaterThanOrEqual(5)
     })
 
-    test.skip('[P0] 1.3-INT-031 — blockBaseFields is NOT registered as a standalone schema', async () => {
-      const { schemaTypes } = await import('../../studio/src/schemaTypes/index')
-
+    test('[P0] 1.3-INT-031 — blockBaseFields is NOT registered as a standalone schema', async () => {
       const typeNames = schemaTypes.map((s: any) => s.name)
       expect(typeNames).not.toContain('blockBase')
       expect(typeNames).not.toContain('block-base')
@@ -450,9 +396,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC9: Schema Quality (defineType/defineField usage)
   // ---------------------------------------------------------------------------
   test.describe('AC9: Schema Quality', () => {
-    test.skip('[P1] 1.3-INT-032 — all schemas have a name property', async () => {
-      const { schemaTypes } = await import('../../studio/src/schemaTypes/index')
-
+    test('[P1] 1.3-INT-032 — all schemas have a name property', async () => {
       for (const schema of schemaTypes) {
         expect(schema, `Schema missing name`).toHaveProperty('name')
         expect(typeof (schema as any).name).toBe('string')
@@ -460,9 +404,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       }
     })
 
-    test.skip('[P1] 1.3-INT-033 — all schemas have typed fields', async () => {
-      const { schemaTypes } = await import('../../studio/src/schemaTypes/index')
-
+    test('[P1] 1.3-INT-033 — all schemas have typed fields', async () => {
       for (const schema of schemaTypes) {
         const s = schema as any
         if (s.fields) {
@@ -479,9 +421,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC10: Studio Build Verification
   // ---------------------------------------------------------------------------
   test.describe('AC10: Studio Build Verification', () => {
-    test.skip('[P0] 1.3-INT-034 — studio builds without schema errors', async () => {
-      // This test verifies that `sanity build` succeeds with the schema infrastructure.
-      // It is the ultimate integration test: if schemas are malformed, this fails.
+    test('[P0] 1.3-INT-034 — studio builds without schema errors', async () => {
       const result = execSync('npm run build', {
         cwd: STUDIO_ROOT,
         encoding: 'utf-8',
@@ -495,7 +435,6 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         },
       })
 
-      // execSync throws on non-zero exit code, so reaching here means success
       expect(result).toBeDefined()
     })
   })

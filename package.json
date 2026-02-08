@@ -7,7 +7,8 @@
     "test:ui": "npx playwright test --ui",
     "test:chromium": "npx playwright test --project=chromium",
     "test:e2e": "npx playwright test",
-    "test:headed": "npx playwright test --headed --project=chromium"
+    "test:headed": "npx playwright test --headed --project=chromium",
+    "test:integration": "npx playwright test --config=playwright.integration.config.ts"
   },
   "keywords": [
     "Sanity",

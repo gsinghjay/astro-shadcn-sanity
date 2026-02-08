@@ -61,7 +61,7 @@ development_status:
   epic-1: in-progress
   1-1-reconfigure-starter-and-set-up-design-system: done
   1-2-migrate-reference-project: done
-  1-3-schema-infrastructure: ready-for-dev
+  1-3-schema-infrastructure: done
   1-4-storybook-setup: backlog
   epic-1-retrospective: optional
 

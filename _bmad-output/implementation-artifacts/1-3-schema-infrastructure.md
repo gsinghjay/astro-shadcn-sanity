@@ -1,6 +1,6 @@
 # Story 1.3: Schema Infrastructure
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -23,33 +23,33 @@ So that all future block and document schemas follow a consistent, type-safe pat
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create directory structure (AC: all)
-  - [ ] 1.1 Create `studio/src/schemaTypes/helpers/`
-  - [ ] 1.2 Create `studio/src/schemaTypes/objects/`
-  - [ ] 1.3 Create `studio/src/schemaTypes/documents/`
-  - [ ] 1.4 Create `studio/src/schemaTypes/blocks/` (empty — blocks created in Story 2.1, but dir needed now)
+- [x] Task 1: Create directory structure (AC: all)
+  - [x] 1.1 Create `studio/src/schemaTypes/helpers/`
+  - [x] 1.2 Create `studio/src/schemaTypes/objects/`
+  - [x] 1.3 Create `studio/src/schemaTypes/documents/`
+  - [x] 1.4 Create `studio/src/schemaTypes/blocks/` (empty — blocks created in Story 2.1, but dir needed now)
 
-- [ ] Task 2: Create `defineBlock` helper (AC: #1)
-  - [ ] 2.1 Create `studio/src/schemaTypes/helpers/defineBlock.ts`
-  - [ ] 2.2 Import `defineType`, `defineField` from `'sanity'`
-  - [ ] 2.3 Implement `defineBlock` function that accepts a config object (`name`, `title`, `fields`, optional `preview`, `icon`) and returns `defineType(...)` with `type: 'object'`, merging base fields BEFORE block-specific fields
-  - [ ] 2.4 Base fields to merge: `backgroundVariant`, `spacing`, `maxWidth` (imported from `block-base.ts` or defined inline as field definitions)
-  - [ ] 2.5 Export the function as named export
+- [x] Task 2: Create `defineBlock` helper (AC: #1)
+  - [x] 2.1 Create `studio/src/schemaTypes/helpers/defineBlock.ts`
+  - [x] 2.2 Import `defineType`, `defineField` from `'sanity'`
+  - [x] 2.3 Implement `defineBlock` function that accepts a config object (`name`, `title`, `fields`, optional `preview`, `icon`) and returns `defineType(...)` with `type: 'object'`, merging base fields BEFORE block-specific fields
+  - [x] 2.4 Base fields to merge: `backgroundVariant`, `spacing`, `maxWidth` (imported from `block-base.ts` or defined inline as field definitions)
+  - [x] 2.5 Export the function as named export
 
-- [ ] Task 3: Create shared object schemas (AC: #2, #3, #4, #5)
-  - [ ] 3.1 Create `studio/src/schemaTypes/objects/block-base.ts` — define the three base fields as an exportable array of `defineField` results:
+- [x] Task 3: Create shared object schemas (AC: #2, #3, #4, #5)
+  - [x] 3.1 Create `studio/src/schemaTypes/objects/block-base.ts` — define the three base fields as an exportable array of `defineField` results:
     - `backgroundVariant`: string, options list `['white', 'light', 'dark', 'primary']`, default `'white'`
     - `spacing`: string, options list `['none', 'small', 'default', 'large']`, default `'default'`
     - `maxWidth`: string, options list `['narrow', 'default', 'full']`, default `'default'`
-  - [ ] 3.2 Create `studio/src/schemaTypes/objects/seo.ts` — object type `seo`:
+  - [x] 3.2 Create `studio/src/schemaTypes/objects/seo.ts` — object type `seo`:
     - `metaTitle`: string, max 60 chars validation
     - `metaDescription`: text, max 160 chars validation
     - `ogImage`: image with alt text field, description "1200x630 recommended"
-  - [ ] 3.3 Create `studio/src/schemaTypes/objects/button.ts` — object type `button`:
+  - [x] 3.3 Create `studio/src/schemaTypes/objects/button.ts` — object type `button`:
     - `text`: string, required
     - `url`: url, required, validation for http/https/mailto/tel schemes
     - `variant`: string, options list `['default', 'secondary', 'outline', 'ghost']`
-  - [ ] 3.4 Create `studio/src/schemaTypes/objects/portable-text.ts` — object type `portableText`:
+  - [x] 3.4 Create `studio/src/schemaTypes/objects/portable-text.ts` — object type `portableText`:
     - Array of `block` type with decorators (strong, em, code, underline)
     - Annotations: external link (href url), internal link (reference to page)
     - Styles: normal, h2, h3, h4, blockquote
@@ -57,14 +57,14 @@ So that all future block and document schemas follow a consistent, type-safe pat
     - Inline image type with required alt text field (NFR16)
     - Callout box type (object with `tone`: info/warning/success, `text`: text)
 
-- [ ] Task 4: Create foundational document schemas (AC: #6, #7)
-  - [ ] 4.1 Create `studio/src/schemaTypes/documents/page.ts` — document type `page`:
+- [x] Task 4: Create foundational document schemas (AC: #6, #7)
+  - [x] 4.1 Create `studio/src/schemaTypes/documents/page.ts` — document type `page`:
     - `title`: string, required
     - `slug`: slug, required, sourced from title, unique
     - `seo`: object of type `seo`
     - `blocks`: array accepting all 12 P0 block types by name (heroBanner, featureGrid, sponsorCards, richText, ctaBanner, faqSection, contactForm, timeline, logoCloud, statsRow, teamGrid, textWithImage)
     - **IMPORTANT:** The blocks array references block type names that DON'T EXIST YET (created in Story 2.1). Use string type names in the `of` array. Studio will show warnings for unregistered types, which is expected and acceptable — they resolve when Story 2.1 adds the block schemas.
-  - [ ] 4.2 Create `studio/src/schemaTypes/documents/site-settings.ts` — singleton document type `siteSettings`:
+  - [x] 4.2 Create `studio/src/schemaTypes/documents/site-settings.ts` — singleton document type `siteSettings`:
     - `siteName`: string, required
     - `logo`: image with alt text
     - `navigationItems`: array of objects with `label` (string, required), `href` (string, required), `children` (array of same shape — one level of nesting)
@@ -73,19 +73,19 @@ So that all future block and document schemas follow a consistent, type-safe pat
     - `currentSemester`: string (e.g., "Fall 2026")
     - Use Sanity singleton pattern: add `__experimental_actions` or use `structureTool` desk structure to limit to single document
 
-- [ ] Task 5: Register all schemas in index.ts (AC: #8)
-  - [ ] 5.1 Import all object schemas (seo, button, portableText) and document schemas (page, siteSettings)
-  - [ ] 5.2 Export them in the `schemaTypes` array
-  - [ ] 5.3 Do NOT import block schemas yet (they don't exist) — leave comment indicating where block imports go
-  - [ ] 5.4 Do NOT import `blockBase` as a standalone schema — its fields are consumed by `defineBlock` helper, not registered independently
+- [x] Task 5: Register all schemas in index.ts (AC: #8)
+  - [x] 5.1 Import all object schemas (seo, button, portableText) and document schemas (page, siteSettings)
+  - [x] 5.2 Export them in the `schemaTypes` array
+  - [x] 5.3 Do NOT import block schemas yet (they don't exist) — leave comment indicating where block imports go
+  - [x] 5.4 Do NOT import `blockBase` as a standalone schema — its fields are consumed by `defineBlock` helper, not registered independently
 
-- [ ] Task 6: Verify Studio starts (AC: #10)
-  - [ ] 6.1 Run `npm run dev` from the studio workspace
-  - [ ] 6.2 Verify Studio loads without schema errors in console
-  - [ ] 6.3 Verify page document type appears in Studio with title, slug, seo, and blocks fields
-  - [ ] 6.4 Verify siteSettings document type appears in Studio
-  - [ ] 6.5 Verify blocks[] array field is present on page type (it will show "Unknown type" for unregistered block types — this is expected)
-  - [ ] 6.6 Run `npm run build` from root — verify build succeeds
+- [x] Task 6: Verify Studio starts (AC: #10)
+  - [x] 6.1 Run `npm run dev` from the studio workspace
+  - [x] 6.2 Verify Studio loads without schema errors in console
+  - [x] 6.3 Verify page document type appears in Studio with title, slug, seo, and blocks fields
+  - [x] 6.4 Verify siteSettings document type appears in Studio
+  - [x] 6.5 Verify blocks[] array field is present on page type (it will show "Unknown type" for unregistered block types — this is expected)
+  - [x] 6.6 Run `npm run build` from root — verify build succeeds
 
 ## Dev Notes
 
@@ -419,10 +419,67 @@ studio/src/schemaTypes/
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Claude Opus 4.6
 
 ### Debug Log References
 
+- Playwright integration tests required separate config (`playwright.integration.config.ts`) — main config has `webServer` block that triggers full astro-app build + server startup, causing hangs for schema-only tests
+- Dynamic `await import()` in tests failed with `SyntaxError: Cannot use import statement outside a module` — Playwright's TS transformer only handles static imports in test files, not dynamically imported `.ts` modules
+- Fixed by switching tests to static `import` statements and adding `"type": "module"` to `studio/package.json`
+- ~~Added `tsx` as devDependency~~ — removed during code review (unused, dead weight)
+
 ### Completion Notes List
 
+- All 34 ATDD tests pass (34/34 green)
+- `sanity build` succeeds with all schemas registered
+- `astro-app` build passes (5 pages, 0 errors)
+- All schemas follow `defineType`/`defineField`/`defineArrayMember` patterns from `'sanity'`
+- `defineBlock` helper merges `blockBaseFields` before block-specific fields
+- `blockBaseFields` is NOT registered as a standalone schema type
+- Page schema references all 12 P0 block type names (unregistered — expected until Story 2.1)
+- Site settings includes all FR40 fields: siteName, logo, nav, footer, social, currentSemester
+- Portable text includes block styles, decorators, annotations, inline image (NFR16 alt text), callout box
+- Test infrastructure: added `playwright.integration.config.ts` for schema tests, `test:integration` npm script
+
 ### File List
+
+- `studio/src/schemaTypes/helpers/defineBlock.ts` — NEW
+- `studio/src/schemaTypes/objects/block-base.ts` — NEW
+- `studio/src/schemaTypes/objects/seo.ts` — NEW
+- `studio/src/schemaTypes/objects/button.ts` — NEW
+- `studio/src/schemaTypes/objects/portable-text.ts` — NEW
+- `studio/src/schemaTypes/documents/page.ts` — NEW
+- `studio/src/schemaTypes/documents/site-settings.ts` — NEW
+- `studio/src/schemaTypes/blocks/` — NEW (empty directory)
+- `studio/src/schemaTypes/index.ts` — MODIFIED (registered all schemas)
+- `studio/package.json` — MODIFIED (added `"type": "module"`)
+- `tests/integration/schema-infrastructure.spec.ts` — MODIFIED (unskipped all tests, switched to static imports, ESM fix)
+- `playwright.integration.config.ts` — NEW (integration test config without webServer)
+- `package.json` — MODIFIED (added `test:integration` script; `tsx` removed during review)
+- `studio/sanity.config.ts` — MODIFIED (singleton pattern for siteSettings via structure builder)
+
+### Senior Developer Review (AI)
+
+**Reviewer:** Jay (via Claude Opus 4.6)
+**Date:** 2026-02-07
+**Outcome:** Approved with fixes applied
+
+**Findings (7 total: 1 High, 3 Medium, 3 Low):**
+
+**Fixed (4):**
+- [H1] Removed dead `tsx` devDependency — never used in any script
+- [M1] Replaced `any` types in `DefineBlockConfig` with Sanity-derived types (`SchemaDefinition['preview']`, `SchemaDefinition['icon']`)
+- [M2] Implemented siteSettings singleton pattern — customized `structureTool` with fixed document ID and filtered `newDocumentOptions` in `sanity.config.ts`
+- [M3] Added custom validation on `navigationItems` href fields — accepts relative paths (`/about`) and full URLs (`https://...`), rejects garbage input
+
+**Accepted as-is (3 Low):**
+- [L1] Sanity version mismatch warning (`^4.11.0` installed vs `4.22.0` runtime) — non-blocking, can be updated separately
+- [L2] Portable text annotations use raw object literals instead of `defineArrayMember` — matches the story spec's own code example; Sanity handles annotations separately from array `of` members
+- [L3] Completion notes claim astro-app build passes — misleading since Story 1.3 doesn't modify astro-app, but harmless
+
+**All ACs verified implemented. 34/34 integration tests pass. Studio builds successfully.**
+
+### Change Log
+
+- 2026-02-07: Story created and implemented (Claude Opus 4.6)
+- 2026-02-07: Code review — 4 fixes applied (H1, M1, M2, M3), status → done

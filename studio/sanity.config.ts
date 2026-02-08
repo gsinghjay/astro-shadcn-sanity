@@ -7,13 +7,42 @@ import {schemaTypes} from './src/schemaTypes'
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
+// Singleton document types — only one instance allowed
+const singletonTypes = new Set(['siteSettings'])
+
 export default defineConfig({
   name: 'sanity-template-astro-clean',
   title: 'Sanity Astro Starter',
   projectId,
   dataset,
-  plugins: [structureTool(), visionTool()],
+  plugins: [
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title('Content')
+          .items([
+            // Singleton: Site Settings (fixed document ID)
+            S.listItem()
+              .title('Site Settings')
+              .id('siteSettings')
+              .child(
+                S.document().schemaType('siteSettings').documentId('siteSettings'),
+              ),
+            S.divider(),
+            // All other document types (excluding singletons)
+            ...S.documentTypeListItems().filter(
+              (listItem) => !singletonTypes.has(listItem.getId()!),
+            ),
+          ]),
+    }),
+    visionTool(),
+  ],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    // Prevent creating new documents for singleton types
+    newDocumentOptions: (prev) =>
+      prev.filter((templateItem) => !singletonTypes.has(templateItem.templateId)),
   },
 })
