@@ -1,0 +1,42 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { sanityClient, allPageSlugsQuery, pageBySlugQuery } from '@/lib/sanity';
+
+import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
+import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
+import LandingTemplate from '@/layouts/templates/LandingTemplate.astro';
+import SidebarTemplate from '@/layouts/templates/SidebarTemplate.astro';
+import TwoColumnTemplate from '@/layouts/templates/TwoColumnTemplate.astro';
+
+const templates = {
+  default: DefaultTemplate,
+  fullWidth: FullWidthTemplate,
+  landing: LandingTemplate,
+  sidebar: SidebarTemplate,
+  twoColumn: TwoColumnTemplate,
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const pages = await sanityClient.fetch<Array<{ slug: string }>>(allPageSlugsQuery);
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+  }));
+};
+
+const { slug } = Astro.params;
+const page = await sanityClient.fetch(pageBySlugQuery, { slug });
+
+if (!page) {
+  return Astro.redirect('/404');
+}
+
+const TemplateComponent = templates[page.template as keyof typeof templates] ?? DefaultTemplate;
+---
+
+<Layout title={page.title} description={page.description} hideNav={page.template === 'landing'}>
+  <TemplateComponent>
+    <BlockRenderer blocks={page.blocks ?? []} />
+  </TemplateComponent>
+</Layout>

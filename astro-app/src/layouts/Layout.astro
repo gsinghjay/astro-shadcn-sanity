@@ -6,11 +6,13 @@ import Footer from "../components/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  hideNav?: boolean;
 }
 
 const {
   title = "YWCC Industry Capstone Program",
   description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+  hideNav = false,
 } = Astro.props;
 
 const fullTitle =
@@ -30,11 +32,11 @@ const fullTitle =
     <title>{fullTitle}</title>
   </head>
   <body class="antialiased">
-    <Header />
+    {!hideNav && <Header />}
     <main>
       <slot />
     </main>
-    <Footer />
+    {!hideNav && <Footer />}
     <script src="../scripts/main.ts"></script>
   </body>
 </html>
