@@ -2,12 +2,12 @@ import type { SiteSettings } from '../types';
 
 export const siteSettings: SiteSettings = {
   title: 'YWCC Industry Capstone',
-  description: 'NJIT Ying Wu College of Computing Industry Capstone Program',
+  description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt',
   navigation: [
     { label: 'Program', href: '/about' },
     { label: 'Sponsors', href: '/sponsors' },
     { label: 'Projects', href: '/projects' },
     { label: 'Contact', href: '/contact' },
   ],
-  footerText: 'Ying Wu College of Computing, New Jersey Institute of Technology',
+  footerText: 'Lorem Ipsum University, Department of Dolor Sit Amet',
 };

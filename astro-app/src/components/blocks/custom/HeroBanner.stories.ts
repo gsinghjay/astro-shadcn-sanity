@@ -12,8 +12,8 @@ export const Default = {
     block: {
       _type: 'heroBanner',
       _key: 'story-hero-1',
-      headline: 'Welcome to YWCC Capstone',
-      subheadline: 'Building real-world solutions with industry partners',
+      headline: 'Lorem Ipsum Dolor Sit',
+      subheadline: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
       layout: 'centered',
       ctaText: 'Learn More',
       ctaUrl: '/about',
@@ -28,14 +28,14 @@ export const WithBackgroundImages = {
     block: {
       _type: 'heroBanner',
       _key: 'story-hero-2',
-      headline: 'Innovation Starts Here',
-      subheadline: 'Connecting students with real-world challenges',
+      headline: 'Consectetur Adipiscing Elit',
+      subheadline: 'Ut enim ad minim veniam quis nostrud exercitation ullamco',
       layout: 'centered',
       ctaText: 'Get Started',
       ctaUrl: '/apply',
       backgroundImages: [
-        { url: 'https://placehold.co/1920x1080/1a1a2e/ffffff?text=Slide+1', alt: 'Campus view' },
-        { url: 'https://placehold.co/1920x1080/2a2a3e/ffffff?text=Slide+2', alt: 'Students working' },
+        { url: 'https://placehold.co/1920x1080/1a1a2e/ffffff?text=Slide+1', alt: 'Placeholder slide 1' },
+        { url: 'https://placehold.co/1920x1080/2a2a3e/ffffff?text=Slide+2', alt: 'Placeholder slide 2' },
       ],
     },
   },
@@ -46,7 +46,7 @@ export const Minimal = {
     block: {
       _type: 'heroBanner',
       _key: 'story-hero-3',
-      headline: 'Capstone Projects',
+      headline: 'Amet Consectetur',
       layout: 'full',
     },
   },

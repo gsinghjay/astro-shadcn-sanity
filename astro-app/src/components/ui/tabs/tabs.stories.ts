@@ -9,20 +9,20 @@ export default {
 export const Default = {
   args: {
     tabs: [
-      { value: 'overview', label: 'Overview', content: 'The YWCC Capstone program pairs students with industry sponsors to deliver production-quality software.' },
-      { value: 'requirements', label: 'Requirements', content: 'Students must have completed core CS coursework including data structures and algorithms.' },
-      { value: 'timeline', label: 'Timeline', content: 'The program runs for one full academic semester, typically 15 weeks.' },
+      { value: 'tab-one', label: 'Tab One', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.' },
+      { value: 'tab-two', label: 'Tab Two', content: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip.' },
+      { value: 'tab-three', label: 'Tab Three', content: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.' },
     ],
-    defaultValue: 'overview',
+    defaultValue: 'tab-one',
   },
 }
 
 export const TwoTabs = {
   args: {
     tabs: [
-      { value: 'students', label: 'For Students', content: 'Gain real-world experience by working on production applications with industry mentors.' },
-      { value: 'sponsors', label: 'For Sponsors', content: 'Access emerging talent and get fresh perspectives on your business challenges.' },
+      { value: 'tab-one', label: 'Tab One', content: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque.' },
+      { value: 'tab-two', label: 'Tab Two', content: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.' },
     ],
-    defaultValue: 'students',
+    defaultValue: 'tab-one',
   },
 }

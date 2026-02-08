@@ -12,9 +12,9 @@ export const Default = {
     block: {
       _type: 'ctaBanner',
       _key: 'story-cta-1',
-      headline: 'Ready to Partner With Us?',
-      body: 'Join our sponsor program and connect with emerging talent while solving real business challenges.',
-      ctaText: 'Become a Sponsor',
+      headline: 'Lorem Ipsum Dolor Sit Amet?',
+      body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
+      ctaText: 'Get Started',
       ctaUrl: '/sponsors',
       secondaryCtaText: 'Learn More',
       secondaryCtaUrl: '/about',
@@ -28,7 +28,7 @@ export const Minimal = {
     block: {
       _type: 'ctaBanner',
       _key: 'story-cta-2',
-      headline: 'Get In Touch',
+      headline: 'Consectetur Adipiscing',
       ctaText: 'Contact Us',
       ctaUrl: '/contact',
       variant: 'light',

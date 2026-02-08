@@ -21,7 +21,7 @@ export const ScrollLeft = {
 
 export const ScrollRight = {
   args: {
-    items: ['Prudential', 'ADP', 'Verizon', 'Panasonic', 'BD', 'Cognizant'],
+    items: ['Acme Corp', 'Ipsum Solutions', 'Dolor Tech', 'Sit Amet Inc', 'Magna Global', 'Aliqua Systems'],
     direction: 'right',
     pauseOnHover: false,
   },
