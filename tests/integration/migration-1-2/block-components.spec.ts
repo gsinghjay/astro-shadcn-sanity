@@ -21,8 +21,8 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
   // AC1: Block Components
   // ---------------------------------------------------------------------------
   test.describe('AC1: Block Components', () => {
-    test('[P0] 1.2-INT-001 — All 12 block .astro files exist with PascalCase names', async () => {
-      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks')
+    test('[P0] 1.2-INT-001 — All 13 block .astro files exist with PascalCase names', async () => {
+      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks/custom')
 
       for (const name of BLOCK_NAMES) {
         const filePath = path.join(blocksDir, `${name}.astro`)

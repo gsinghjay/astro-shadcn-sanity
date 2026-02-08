@@ -72,8 +72,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // AC5: Block Stories
   // ---------------------------------------------------------------------------
   test.describe('AC5: Block Stories', () => {
-    test('[P0] 1.4-INT-004 — All 12 block story files exist', async () => {
-      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks')
+    test('[P0] 1.4-INT-004 — All 13 block story files exist', async () => {
+      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks/custom')
 
       for (const storyFile of BLOCK_STORY_FILES) {
         const filePath = path.join(blocksDir, storyFile)
@@ -85,7 +85,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
     })
 
     test('[P1] 1.4-INT-005 — Each block story exports meta with title/component and at least one named story', async () => {
-      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks')
+      const blocksDir = path.join(ASTRO_APP, 'src/components/blocks/custom')
 
       for (const storyFile of BLOCK_STORY_FILES) {
         const filePath = path.join(blocksDir, storyFile)
