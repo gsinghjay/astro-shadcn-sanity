@@ -1,0 +1,26 @@
+---
+import NativeCarousel from './native-carousel.astro'
+import NativeCarouselContent from './native-carousel-content.astro'
+import NativeCarouselItem from './native-carousel-item.astro'
+import NativeCarouselPrevious from './native-carousel-previous.astro'
+import NativeCarouselNext from './native-carousel-next.astro'
+
+interface Props {
+  slides?: string[]
+}
+
+const { slides = ['Slide 1', 'Slide 2', 'Slide 3', 'Slide 4'] } = Astro.props
+---
+<NativeCarousel class="mx-auto w-full max-w-2xl">
+  <NativeCarouselContent>
+    {slides.map((slide) => (
+      <NativeCarouselItem>
+        <div class="bg-muted flex aspect-video items-center justify-center rounded-md">
+          <span class="text-lg font-semibold text-muted-foreground">{slide}</span>
+        </div>
+      </NativeCarouselItem>
+    ))}
+  </NativeCarouselContent>
+  <NativeCarouselPrevious />
+  <NativeCarouselNext />
+</NativeCarousel>

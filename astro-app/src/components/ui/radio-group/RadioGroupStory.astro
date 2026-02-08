@@ -1,0 +1,27 @@
+---
+import RadioGroup from './radio-group.astro'
+import RadioGroupItem from './radio-group-item.astro'
+import Label from '../label/label.astro'
+
+interface Props {
+  options?: Array<{ value: string; label: string }>
+  name?: string
+}
+
+const {
+  options = [
+    { value: 'platinum', label: 'Platinum' },
+    { value: 'gold', label: 'Gold' },
+    { value: 'silver', label: 'Silver' },
+  ],
+  name = 'tier',
+} = Astro.props
+---
+<RadioGroup>
+  {options.map((opt) => (
+    <div class="flex items-center gap-2">
+      <RadioGroupItem id={opt.value} name={name} value={opt.value} />
+      <Label for={opt.value}>{opt.label}</Label>
+    </div>
+  ))}
+</RadioGroup>

@@ -1,0 +1,11 @@
+---
+import Badge from './badge.astro'
+
+interface Props {
+  text?: string
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline'
+}
+
+const { text = 'Badge', ...rest } = Astro.props
+---
+<Badge {...rest}>{text}</Badge>

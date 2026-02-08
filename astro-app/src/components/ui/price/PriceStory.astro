@@ -1,0 +1,18 @@
+---
+import Price from './price.astro'
+import PriceValue from './price-value.astro'
+import PriceUnit from './price-unit.astro'
+
+interface Props {
+  price?: number
+  currency?: string
+  unit?: string
+  variant?: 'default' | 'sale'
+}
+
+const { price = 99, currency = 'USD', unit = '/month', variant = 'default' } = Astro.props
+---
+<Price>
+  <PriceValue price={price} currency={currency} variant={variant} />
+  <PriceUnit>{unit}</PriceUnit>
+</Price>

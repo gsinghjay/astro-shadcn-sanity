@@ -1,0 +1,35 @@
+---
+import Field from './field.astro'
+import FieldLabel from './field-label.astro'
+import FieldContent from './field-content.astro'
+import FieldDescription from './field-description.astro'
+import Input from '../input/input.astro'
+import Textarea from '../textarea/textarea.astro'
+
+interface Props {
+  label?: string
+  description?: string
+  placeholder?: string
+  orientation?: 'vertical' | 'horizontal' | 'responsive'
+  inputType?: 'text' | 'email' | 'textarea'
+}
+
+const {
+  label = 'Email Address',
+  description,
+  placeholder = 'you@example.com',
+  orientation = 'vertical',
+  inputType = 'email',
+} = Astro.props
+---
+<Field orientation={orientation}>
+  <FieldLabel>{label}</FieldLabel>
+  <FieldContent>
+    {inputType === 'textarea' ? (
+      <Textarea placeholder={placeholder} rows={4} />
+    ) : (
+      <Input type={inputType === 'email' ? 'email' : 'text'} placeholder={placeholder} />
+    )}
+  </FieldContent>
+  {description && <FieldDescription>{description}</FieldDescription>}
+</Field>

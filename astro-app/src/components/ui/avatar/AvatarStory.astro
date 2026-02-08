@@ -1,0 +1,19 @@
+---
+import Avatar from './avatar.astro'
+import AvatarFallback from './avatar-fallback.astro'
+
+interface Props {
+  src?: string
+  alt?: string
+  fallback?: string
+}
+
+const { src, alt = '', fallback = 'JD' } = Astro.props
+---
+<Avatar>
+  {src ? (
+    <img src={src} alt={alt} class="aspect-square size-full" />
+  ) : (
+    <AvatarFallback>{fallback}</AvatarFallback>
+  )}
+</Avatar>

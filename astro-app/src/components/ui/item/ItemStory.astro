@@ -1,0 +1,36 @@
+---
+import Item from './item.astro'
+import ItemContent from './item-content.astro'
+import ItemTitle from './item-title.astro'
+import ItemDescription from './item-description.astro'
+import ItemMedia from './item-media.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  variant?: 'default' | 'outline' | 'muted'
+  href?: string
+  showMedia?: boolean
+}
+
+const {
+  title = 'Item Title',
+  description = 'A brief description of this item.',
+  variant = 'default',
+  href,
+  showMedia = false,
+} = Astro.props
+---
+<Item variant={variant} href={href}>
+  {showMedia && (
+    <ItemMedia variant="icon">
+      <div class="w-10 h-10 bg-primary/10 rounded flex items-center justify-center">
+        <span class="text-primary font-bold">A</span>
+      </div>
+    </ItemMedia>
+  )}
+  <ItemContent>
+    <ItemTitle>{title}</ItemTitle>
+    <ItemDescription>{description}</ItemDescription>
+  </ItemContent>
+</Item>

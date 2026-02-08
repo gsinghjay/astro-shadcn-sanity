@@ -1,0 +1,28 @@
+---
+import Sheet from './sheet.astro'
+import SheetTrigger from './sheet-trigger.astro'
+import SheetContent from './sheet-content.astro'
+import SheetHeader from './sheet-header.astro'
+import SheetTitle from './sheet-title.astro'
+
+interface Props {
+  side?: 'right' | 'left' | 'top' | 'bottom'
+  title?: string
+}
+
+const { side = 'right', title = 'Navigation' } = Astro.props
+---
+<Sheet>
+  <SheetTrigger variant="outline">Open Sheet</SheetTrigger>
+  <SheetContent side={side}>
+    <SheetHeader>
+      <SheetTitle>{title}</SheetTitle>
+    </SheetHeader>
+    <nav class="flex flex-col gap-4 px-4">
+      <a href="/about" class="text-sm font-medium hover:text-primary transition-colors">About</a>
+      <a href="/projects" class="text-sm font-medium hover:text-primary transition-colors">Projects</a>
+      <a href="/sponsors" class="text-sm font-medium hover:text-primary transition-colors">Sponsors</a>
+      <a href="/contact" class="text-sm font-medium hover:text-primary transition-colors">Contact</a>
+    </nav>
+  </SheetContent>
+</Sheet>

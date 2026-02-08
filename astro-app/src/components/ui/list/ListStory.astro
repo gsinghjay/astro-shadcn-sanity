@@ -1,0 +1,15 @@
+---
+import List from './list.astro'
+import ListItem from './list-item.astro'
+
+interface Props {
+  items?: string[]
+}
+
+const { items = ['First item', 'Second item', 'Third item'] } = Astro.props
+---
+<List>
+  {items.map((item) => (
+    <ListItem>{item}</ListItem>
+  ))}
+</List>

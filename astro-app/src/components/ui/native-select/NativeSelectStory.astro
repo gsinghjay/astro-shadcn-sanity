@@ -1,0 +1,20 @@
+---
+import NativeSelect from './native-select.astro'
+import NativeSelectOption from './native-select-option.astro'
+
+interface Props {
+  options?: string[]
+  placeholder?: string
+}
+
+const {
+  options = ['Option A', 'Option B', 'Option C'],
+  placeholder = 'Select an option',
+} = Astro.props
+---
+<NativeSelect>
+  <NativeSelectOption value="">{placeholder}</NativeSelectOption>
+  {options.map((opt) => (
+    <NativeSelectOption value={opt}>{opt}</NativeSelectOption>
+  ))}
+</NativeSelect>

@@ -1,0 +1,27 @@
+---
+import Header from './header.astro'
+import HeaderActions from './header-actions.astro'
+import Logo from '../logo/logo.astro'
+import LogoText from '../logo/logo-text.astro'
+import Button from '../button/button.astro'
+
+interface Props {
+  variant?: 'default' | 'floating'
+  siteName?: string
+}
+
+const { variant = 'default', siteName = 'YWCC Capstone' } = Astro.props
+---
+<Header variant={variant}>
+  <Logo href="/">
+    <LogoText>{siteName}</LogoText>
+  </Logo>
+  <HeaderActions>
+    <nav class="hidden md:flex items-center gap-6">
+      <a href="/about" class="text-sm font-medium hover:text-primary transition-colors">About</a>
+      <a href="/projects" class="text-sm font-medium hover:text-primary transition-colors">Projects</a>
+      <a href="/sponsors" class="text-sm font-medium hover:text-primary transition-colors">Sponsors</a>
+    </nav>
+    <Button variant="outline" href="/contact">Contact</Button>
+  </HeaderActions>
+</Header>

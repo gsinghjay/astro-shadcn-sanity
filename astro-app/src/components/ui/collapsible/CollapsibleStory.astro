@@ -1,0 +1,19 @@
+---
+import Collapsible from './collapsible.astro'
+import CollapsibleTrigger from './collapsible-trigger.astro'
+import CollapsibleContent from './collapsible-content.astro'
+
+interface Props {
+  triggerText?: string
+  content?: string
+  open?: boolean
+}
+
+const { triggerText = 'Show more details', content = 'This is the collapsible content that is hidden by default. Click the trigger to toggle visibility.', open = false } = Astro.props
+---
+<Collapsible open={open}>
+  <CollapsibleTrigger>{triggerText}</CollapsibleTrigger>
+  <CollapsibleContent>
+    <p class="text-sm text-muted-foreground">{content}</p>
+  </CollapsibleContent>
+</Collapsible>

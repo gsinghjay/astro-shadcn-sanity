@@ -1,0 +1,29 @@
+---
+import Empty from './empty.astro'
+import EmptyHeader from './empty-header.astro'
+import EmptyMedia from './empty-media.astro'
+import EmptyTitle from './empty-title.astro'
+import EmptyDescription from './empty-description.astro'
+import EmptyContent from './empty-content.astro'
+import Button from '../button/button.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  buttonText?: string
+}
+
+const { title = 'No projects found', description = 'There are no projects matching your criteria.', buttonText = 'View all projects' } = Astro.props
+---
+<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    </EmptyMedia>
+    <EmptyTitle>{title}</EmptyTitle>
+    <EmptyDescription>{description}</EmptyDescription>
+  </EmptyHeader>
+  <EmptyContent>
+    <Button size="sm" variant="outline">{buttonText}</Button>
+  </EmptyContent>
+</Empty>

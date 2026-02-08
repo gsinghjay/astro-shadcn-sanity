@@ -1,0 +1,10 @@
+---
+import Label from './label.astro'
+
+interface Props {
+  text?: string
+}
+
+const { text = 'Label', ...rest } = Astro.props
+---
+<Label {...rest}>{text}</Label>

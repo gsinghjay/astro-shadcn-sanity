@@ -1,0 +1,14 @@
+---
+import Logo from './logo.astro'
+import LogoText from './logo-text.astro'
+
+interface Props {
+  text?: string
+  href?: string
+}
+
+const { text = 'YWCC Capstone', href } = Astro.props
+---
+<Logo href={href}>
+  <LogoText>{text}</LogoText>
+</Logo>

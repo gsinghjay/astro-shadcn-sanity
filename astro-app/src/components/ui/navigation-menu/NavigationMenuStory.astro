@@ -1,0 +1,48 @@
+---
+import NavigationMenu from './navigation-menu.astro'
+import NavigationMenuList from './navigation-menu-list.astro'
+import NavigationMenuItem from './navigation-menu-item.astro'
+import NavigationMenuLink from './navigation-menu-link.astro'
+import NavigationMenuTrigger from './navigation-menu-trigger.astro'
+import NavigationMenuContent from './navigation-menu-content.astro'
+import NavigationMenuSub from './navigation-menu-sub.astro'
+import NavigationMenuSubItem from './navigation-menu-sub-item.astro'
+import NavigationMenuSubLink from './navigation-menu-sub-link.astro'
+
+interface Props {
+  showDropdown?: boolean
+}
+
+const { showDropdown = true } = Astro.props
+---
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/about">About</NavigationMenuLink>
+    </NavigationMenuItem>
+    {showDropdown && (
+      <NavigationMenuItem>
+        <NavigationMenuTrigger>Program</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <NavigationMenuSub>
+            <NavigationMenuSubItem>
+              <NavigationMenuSubLink href="/projects">Projects</NavigationMenuSubLink>
+            </NavigationMenuSubItem>
+            <NavigationMenuSubItem>
+              <NavigationMenuSubLink href="/teams">Teams</NavigationMenuSubLink>
+            </NavigationMenuSubItem>
+            <NavigationMenuSubItem>
+              <NavigationMenuSubLink href="/timeline">Timeline</NavigationMenuSubLink>
+            </NavigationMenuSubItem>
+          </NavigationMenuSub>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    )}
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/sponsors">Sponsors</NavigationMenuLink>
+    </NavigationMenuItem>
+    <NavigationMenuItem>
+      <NavigationMenuLink href="/contact">Contact</NavigationMenuLink>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>

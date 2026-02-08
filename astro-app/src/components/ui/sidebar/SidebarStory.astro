@@ -1,0 +1,40 @@
+---
+import SidebarMenu from './sidebar-menu.astro'
+import SidebarMenuItem from './sidebar-menu-item.astro'
+import SidebarMenuButton from './sidebar-menu-button.astro'
+import SidebarMenuSub from './sidebar-menu-sub.astro'
+import SidebarMenuSubItem from './sidebar-menu-sub-item.astro'
+import SidebarMenuSubButton from './sidebar-menu-sub-button.astro'
+
+interface Props {
+  showSubMenu?: boolean
+}
+
+const { showSubMenu = true } = Astro.props
+---
+<div class="w-64 border-r p-4">
+  <SidebarMenu>
+    <SidebarMenuItem>
+      <SidebarMenuButton href="/" active={true}>Dashboard</SidebarMenuButton>
+    </SidebarMenuItem>
+    <SidebarMenuItem>
+      <SidebarMenuButton href="/projects">Projects</SidebarMenuButton>
+      {showSubMenu && (
+        <SidebarMenuSub>
+          <SidebarMenuSubItem>
+            <SidebarMenuSubButton href="/projects/active">Active</SidebarMenuSubButton>
+          </SidebarMenuSubItem>
+          <SidebarMenuSubItem>
+            <SidebarMenuSubButton href="/projects/archived">Archived</SidebarMenuSubButton>
+          </SidebarMenuSubItem>
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
+    <SidebarMenuItem>
+      <SidebarMenuButton href="/teams">Teams</SidebarMenuButton>
+    </SidebarMenuItem>
+    <SidebarMenuItem>
+      <SidebarMenuButton href="/settings" variant="outline">Settings</SidebarMenuButton>
+    </SidebarMenuItem>
+  </SidebarMenu>
+</div>

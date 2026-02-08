@@ -1,0 +1,46 @@
+---
+import Footer from './footer.astro'
+import FooterContent from './footer-content.astro'
+import FooterSpread from './footer-spread.astro'
+import FooterGroup from './footer-group.astro'
+import FooterGroupLabel from './footer-group-label.astro'
+import FooterMenu from './footer-menu.astro'
+import FooterMenuItem from './footer-menu-item.astro'
+import FooterMenuLink from './footer-menu-link.astro'
+import FooterCopyright from './footer-copyright.astro'
+import Logo from '../logo/logo.astro'
+import LogoText from '../logo/logo-text.astro'
+
+interface Props {
+  variant?: 'default' | 'floating'
+}
+
+const { variant = 'default' } = Astro.props
+---
+<Footer variant={variant}>
+  <FooterContent>
+    <FooterSpread>
+      <Logo href="/">
+        <LogoText>YWCC Capstone</LogoText>
+      </Logo>
+      <div class="flex gap-8">
+        <FooterGroup>
+          <FooterGroupLabel>Program</FooterGroupLabel>
+          <FooterMenu>
+            <FooterMenuItem><FooterMenuLink href="/about">About</FooterMenuLink></FooterMenuItem>
+            <FooterMenuItem><FooterMenuLink href="/projects">Projects</FooterMenuLink></FooterMenuItem>
+            <FooterMenuItem><FooterMenuLink href="/sponsors">Sponsors</FooterMenuLink></FooterMenuItem>
+          </FooterMenu>
+        </FooterGroup>
+        <FooterGroup>
+          <FooterGroupLabel>Resources</FooterGroupLabel>
+          <FooterMenu>
+            <FooterMenuItem><FooterMenuLink href="/faq">FAQ</FooterMenuLink></FooterMenuItem>
+            <FooterMenuItem><FooterMenuLink href="/contact">Contact</FooterMenuLink></FooterMenuItem>
+          </FooterMenu>
+        </FooterGroup>
+      </div>
+    </FooterSpread>
+    <FooterCopyright>&copy; 2027 YWCC Capstone Program. All rights reserved.</FooterCopyright>
+  </FooterContent>
+</Footer>

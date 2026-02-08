@@ -1,0 +1,17 @@
+---
+import Banner from './banner.astro'
+import BannerContent from './banner-content.astro'
+import BannerTitle from './banner-title.astro'
+
+interface Props {
+  title?: string
+  variant?: 'default' | 'floating'
+}
+
+const { title = 'Applications for Spring 2027 are now open!', variant = 'default' } = Astro.props
+---
+<Banner variant={variant}>
+  <BannerContent>
+    <BannerTitle>{title}</BannerTitle>
+  </BannerContent>
+</Banner>

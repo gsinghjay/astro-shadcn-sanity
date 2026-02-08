@@ -10,7 +10,24 @@
       "Bash(npx playwright install:*)",
       "Bash(npx playwright test:*)",
       "Bash(kill:*)",
-      "Bash(npm run test:integration:*)"
+      "Bash(npm run test:integration:*)",
+      "WebFetch(domain:github.com)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "WebSearch",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(npm view:*)",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "Bash(ls:*)",
+      "Bash(npx storybook build:*)",
+      "Bash(npm run build:*)",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx shadcn@latest:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs:*)",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot"
     ]
   },
   "outputStyle": "default"

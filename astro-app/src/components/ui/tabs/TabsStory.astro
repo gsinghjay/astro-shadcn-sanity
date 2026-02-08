@@ -1,0 +1,32 @@
+---
+import Tabs from './tabs.astro'
+import TabsList from './tabs-list.astro'
+import TabsTrigger from './tabs-trigger.astro'
+import TabsContent from './tabs-content.astro'
+
+interface Props {
+  tabs?: Array<{ value: string; label: string; content: string }>
+  defaultValue?: string
+}
+
+const {
+  tabs = [
+    { value: 'overview', label: 'Overview', content: 'The YWCC Capstone program pairs students with industry sponsors to deliver production-quality software.' },
+    { value: 'requirements', label: 'Requirements', content: 'Students must have completed core CS coursework including data structures and algorithms.' },
+    { value: 'timeline', label: 'Timeline', content: 'The program runs for one full academic semester, typically 15 weeks.' },
+  ],
+  defaultValue = 'overview',
+} = Astro.props
+---
+<Tabs defaultValue={defaultValue}>
+  <TabsList>
+    {tabs.map((tab) => (
+      <TabsTrigger value={tab.value}>{tab.label}</TabsTrigger>
+    ))}
+  </TabsList>
+  {tabs.map((tab) => (
+    <TabsContent value={tab.value}>
+      <p class="text-sm text-muted-foreground">{tab.content}</p>
+    </TabsContent>
+  ))}
+</Tabs>

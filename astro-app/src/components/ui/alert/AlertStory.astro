@@ -1,0 +1,17 @@
+---
+import Alert from './alert.astro'
+import AlertTitle from './alert-title.astro'
+import AlertDescription from './alert-description.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  variant?: 'default' | 'destructive'
+}
+
+const { title = 'Heads up!', description = 'You can add components to your app using the CLI.', variant = 'default' } = Astro.props
+---
+<Alert variant={variant}>
+  <AlertTitle>{title}</AlertTitle>
+  <AlertDescription>{description}</AlertDescription>
+</Alert>

@@ -1,0 +1,45 @@
+---
+import Table from './table.astro'
+import TableHeader from './table-header.astro'
+import TableBody from './table-body.astro'
+import TableRow from './table-row.astro'
+import TableHead from './table-head.astro'
+import TableCell from './table-cell.astro'
+import TableCaption from './table-caption.astro'
+
+interface Props {
+  caption?: string
+  rows?: Array<{ team: string; sponsor: string; members: number; status: string }>
+}
+
+const {
+  caption,
+  rows = [
+    { team: 'Team Alpha', sponsor: 'Prudential', members: 5, status: 'Active' },
+    { team: 'Team Beta', sponsor: 'ADP', members: 4, status: 'Active' },
+    { team: 'Team Gamma', sponsor: 'Verizon', members: 5, status: 'Planning' },
+    { team: 'Team Delta', sponsor: 'Panasonic', members: 4, status: 'Completed' },
+  ],
+} = Astro.props
+---
+<Table>
+  {caption && <TableCaption>{caption}</TableCaption>}
+  <TableHeader>
+    <TableRow>
+      <TableHead>Team</TableHead>
+      <TableHead>Sponsor</TableHead>
+      <TableHead>Members</TableHead>
+      <TableHead>Status</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {rows.map((row) => (
+      <TableRow>
+        <TableCell class="font-medium">{row.team}</TableCell>
+        <TableCell>{row.sponsor}</TableCell>
+        <TableCell>{row.members}</TableCell>
+        <TableCell>{row.status}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+</Table>

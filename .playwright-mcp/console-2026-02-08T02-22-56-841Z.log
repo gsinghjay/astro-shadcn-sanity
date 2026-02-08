@@ -1,0 +1,3 @@
+[  204438ms] [ERROR] WebSocket connection to 'ws://localhost:6006/storybook-server-channel' failed:  @ http://localhost:6006/node_modules/.cache/storybook/10.2.7/579ffcc2898a10827afa67cdb3ed9a486c31d8a8a9ab01340c36774f793f852f/sb-vite/deps/storybook_internal_preview_runtime.js?v=d02ae3a2:15075
+[  204438ms] [ERROR] WebSocket connection to 'ws://localhost:6006/?token=VXMPWYu0z_WQ' failed:  @ http://localhost:6006/@vite/client:744
+[  204438ms] [ERROR] WebSocket connection to 'ws://localhost:6006/storybook-server-channel' failed:  @ http://localhost:6006/sb-manager/globals-runtime.js:33405

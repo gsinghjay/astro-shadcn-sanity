@@ -1,0 +1,13 @@
+---
+import Button from './button.astro'
+
+interface Props {
+  text?: string
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'
+  href?: string
+}
+
+const { text = 'Button', ...rest } = Astro.props
+---
+<Button {...rest}>{text}</Button>

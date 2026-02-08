@@ -1,0 +1,36 @@
+---
+import Tile from './tile.astro'
+import TileContent from './tile-content.astro'
+import TileTitle from './tile-title.astro'
+import TileDescription from './tile-description.astro'
+import TileMedia from './tile-media.astro'
+
+interface Props {
+  title?: string
+  description?: string
+  variant?: 'default' | 'floating'
+  href?: string
+  showMedia?: boolean
+}
+
+const {
+  title = 'Tile Title',
+  description = 'A brief description of this tile content.',
+  variant = 'default',
+  href,
+  showMedia = true,
+} = Astro.props
+---
+<div style="max-width: 400px;">
+  <Tile variant={variant} href={href}>
+    {showMedia && (
+      <TileMedia>
+        <img src="https://placehold.co/400x200/e2e8f0/475569?text=Media" alt="Placeholder" class="w-full h-full object-cover" />
+      </TileMedia>
+    )}
+    <TileContent>
+      <TileTitle>{title}</TileTitle>
+      <TileDescription>{description}</TileDescription>
+    </TileContent>
+  </Tile>
+</div>

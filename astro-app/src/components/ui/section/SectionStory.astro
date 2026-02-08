@@ -1,0 +1,60 @@
+---
+import Section from './section.astro'
+import SectionContent from './section-content.astro'
+import SectionGrid from './section-grid.astro'
+import SectionSplit from './section-split.astro'
+import SectionMedia from './section-media.astro'
+import SectionProse from './section-prose.astro'
+
+interface Props {
+  layout?: 'content' | 'grid' | 'split' | 'prose'
+  variant?: 'default' | 'floating'
+  size?: 'sm' | 'default' | 'lg'
+}
+
+const { layout = 'content', variant = 'default', size = 'default' } = Astro.props
+---
+{layout === 'content' && (
+  <Section variant={variant} size={size}>
+    <SectionContent>
+      <span class="label-caps text-primary">Label</span>
+      <h2 class="text-4xl font-bold tracking-tight">Section Heading</h2>
+      <p class="text-muted-foreground leading-relaxed">This demonstrates the default content layout with a label, heading, and body text stacked vertically.</p>
+    </SectionContent>
+  </Section>
+)}
+{layout === 'grid' && (
+  <Section variant={variant} size={size}>
+    <SectionContent>
+      <h2 class="text-4xl font-bold tracking-tight">Grid Layout</h2>
+    </SectionContent>
+    <SectionGrid>
+      <div class="bg-muted p-6 border">Grid Item 1</div>
+      <div class="bg-muted p-6 border">Grid Item 2</div>
+      <div class="bg-muted p-6 border">Grid Item 3</div>
+    </SectionGrid>
+  </Section>
+)}
+{layout === 'split' && (
+  <Section variant={variant} size={size}>
+    <SectionSplit>
+      <SectionContent class="justify-center">
+        <h2 class="text-3xl font-bold tracking-tight">Split Layout</h2>
+        <p class="text-muted-foreground leading-relaxed">Content on one side, media on the other. Used by TextWithImage, FaqSection, and ContactForm blocks.</p>
+      </SectionContent>
+      <SectionMedia class="aspect-[4/3]">
+        <img src="https://placehold.co/600x400/e2e8f0/475569?text=Media" alt="Placeholder" class="w-full h-full object-cover" />
+      </SectionMedia>
+    </SectionSplit>
+  </Section>
+)}
+{layout === 'prose' && (
+  <Section variant={variant} size={size}>
+    <SectionProse>
+      <h2>Prose Layout</h2>
+      <p>This demonstrates the prose section with automatic typography styling. It handles headings, paragraphs, links, lists, and other content elements with consistent design.</p>
+      <h3>Subheading Example</h3>
+      <p>Perfect for long-form content like articles, documentation, or rich text from a CMS. The typography plugin handles spacing, font sizes, and hierarchy automatically.</p>
+    </SectionProse>
+  </Section>
+)}
