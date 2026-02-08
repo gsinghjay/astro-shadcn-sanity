@@ -29,6 +29,8 @@ jobs:
       - run: npm ci
 
       - run: npm run build-storybook --workspace=astro-app
+        env:
+          STORYBOOK_BASE_PATH: /astro-shadcn-sanity/
 
       - uses: actions/configure-pages@v5
 
