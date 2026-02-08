@@ -2,7 +2,12 @@
   "name": "ywcc-capstone-template",
   "description": "Minimal Astro site with Sanity Studio",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\""
+    "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
+    "test": "npx playwright test",
+    "test:ui": "npx playwright test --ui",
+    "test:chromium": "npx playwright test --project=chromium",
+    "test:e2e": "npx playwright test",
+    "test:headed": "npx playwright test --headed --project=chromium"
   },
   "keywords": [
     "Sanity",
@@ -21,6 +26,9 @@
     "astro-app"
   ],
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.58.2",
+    "@seontechnologies/playwright-utils": "^3.13.1",
     "concurrently": "^9.1.0"
   },
   "type": "module"
