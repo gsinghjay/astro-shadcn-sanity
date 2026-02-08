@@ -1,0 +1,18 @@
+---
+interface Props {
+  block?: string
+  [key: string]: any
+}
+
+const { block: blockName, ...props } = Astro.props
+
+const allBlocks = import.meta.glob('./blocks/*.astro', { eager: true })
+
+const matchedEntry = blockName
+  ? Object.entries(allBlocks).find(([path]) => path.includes(`/${blockName}.astro`))
+  : undefined
+
+const BlockComponent = matchedEntry ? (matchedEntry[1] as any).default : undefined
+---
+
+{BlockComponent && <BlockComponent {...props} />}

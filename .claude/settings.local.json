@@ -27,7 +27,26 @@
       "Bash(npx shadcn@latest:*)",
       "Bash(lsof:*)",
       "Bash(xargs:*)",
-      "mcp__plugin_playwright_playwright__browser_take_screenshot"
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "WebFetch(domain:ui.full.dev)",
+      "Bash(done)",
+      "Bash(gh api:*)",
+      "Bash(# Check what hero-1.astro actually has for props - notice the spec says \"\"title, description, links[], image\"\" # but the actual source has different prop names gh api repos/fulldotdev/ui/contents/src/components/blocks/hero-1.astro --jq ''.content'' | base64 -d)",
+      "Bash(git -C /home/jay/github/astro-shadcn-sanity rev-parse HEAD)",
+      "Bash(grep:*)",
+      "Bash(for f in astro-app/src/components/blocks/custom/{HeroBanner,StatsRow,FeatureGrid,FaqSection,CtaBanner,SponsorCards,Timeline,TeamGrid,LogoCloud,TextWithImage,ContactForm,RichText}.astro)",
+      "Bash(do sed -i \"s|from ''../../lib/types''|from ''@/lib/types''|\" \"$f\")",
+      "Bash(git -C /home/jay/github/astro-shadcn-sanity log --oneline -1 -- \"astro-app/src/components/blocks/blocks-2.astro\" \"astro-app/src/components/blocks/blocks-3.astro\" \"astro-app/src/components/blocks/blocks-4.astro\")",
+      "Bash(git -C /home/jay/github/astro-shadcn-sanity status astro-app/src/components/blocks/blocks-2.astro)",
+      "Bash(while read f)",
+      "Bash(do basename:*)",
+      "Bash(git add:*)",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "Bash(file:*)",
+      "Bash(git commit:*)",
+      "Bash(npx storybook dev:*)",
+      "WebFetch(domain:ywcccapstone1.com)",
+      "Bash(npx astro check:*)"
     ]
   },
   "outputStyle": "default"

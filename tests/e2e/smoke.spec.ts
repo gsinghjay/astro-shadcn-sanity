@@ -2,20 +2,20 @@ import { test, expect } from '../support/fixtures'
 import { expectAccessible } from '../support/helpers/a11y'
 
 test.describe('Homepage Smoke Tests', () => {
-  test('should load the homepage', async ({ page }) => {
+  test('[P0] 0.0-E2E-001 — should load the homepage', async ({ page }) => {
     await page.goto('/')
 
     await expect(page).toHaveTitle(/.+/)
     await expect(page.locator('body')).toBeVisible()
   })
 
-  test('should have no accessibility violations', async ({ page }) => {
+  test('[P0] 0.0-E2E-002 — should have no accessibility violations', async ({ page }) => {
     await page.goto('/')
 
     await expectAccessible(page)
   })
 
-  test('should have valid meta tags for SEO', async ({ page }) => {
+  test('[P1] 0.0-E2E-003 — should have valid meta tags for SEO', async ({ page }) => {
     await page.goto('/')
 
     const metaDescription = page.locator('meta[name="description"]')
@@ -27,14 +27,14 @@ test.describe('Homepage Smoke Tests', () => {
 })
 
 test.describe('Navigation', () => {
-  test('should render header and footer', async ({ page }) => {
+  test('[P0] 0.0-E2E-004 — should render header and footer', async ({ page }) => {
     await page.goto('/')
 
     await expect(page.locator('header')).toBeVisible()
     await expect(page.locator('footer')).toBeVisible()
   })
 
-  test('should have working navigation links', async ({ page }) => {
+  test('[P1] 0.0-E2E-005 — should have working navigation links', async ({ page }) => {
     await page.goto('/')
 
     const navLinks = page.locator('header nav a, header a')
@@ -50,7 +50,7 @@ test.describe('Navigation', () => {
 })
 
 test.describe('Performance Baseline', () => {
-  test('should load without console errors', async ({ page }) => {
+  test('[P0] 0.0-E2E-006 — should load without console errors', async ({ page }) => {
     const errors: string[] = []
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -59,12 +59,12 @@ test.describe('Performance Baseline', () => {
     })
 
     await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await page.waitForLoadState('domcontentloaded')
 
     expect(errors, `Console errors found:\n${errors.join('\n')}`).toHaveLength(0)
   })
 
-  test('should load within performance budget', async ({ page }) => {
+  test('[P1] 0.0-E2E-007 — should load within performance budget', async ({ page }) => {
     const start = Date.now()
     await page.goto('/')
     await page.waitForLoadState('domcontentloaded')

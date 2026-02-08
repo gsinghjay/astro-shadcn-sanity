@@ -1,0 +1,2 @@
+[    1041ms] [ERROR] Access to fetch at 'https://tags.srv.stackadapt.com/sa.jpeg' from origin 'https://computing.njit.edu' has been blocked by CORS policy: The 'Access-Control-Allow-Origin' header has a value 'https://www.njit.edu' that is not equal to the supplied origin. Have the server send the header with a valid value. @ https://computing.njit.edu/:0
+[    1041ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://tags.srv.stackadapt.com/sa.jpeg:0
