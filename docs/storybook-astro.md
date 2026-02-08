@@ -348,6 +348,68 @@ Run `npm run build-storybook` to see detailed error messages. Common issues:
 - Invalid component syntax
 - Circular imports
 
+## Known Issues (astro-shadcn-sanity project)
+
+> `storybook-astro` is very new (v0.1.0, [ThinkOodle/storybook-astro](https://github.com/ThinkOodle/storybook-astro)). The issues below are tracked for our project and may be resolved upstream.
+
+### 1. Production build produces empty iframe (BLOCKING)
+
+**Status**: Unresolved
+**Impact**: `storybook build` output contains no stories — only 3 modules transformed, empty `iframe` chunk
+
+**Symptoms**:
+- `storybook dev` works perfectly (all 385+ stories render)
+- `storybook build` completes "successfully" but the output has zero story content
+- Vite warns: `Generated an empty chunk: "iframe"`
+- Chromatic rejects the build as invalid (no `iframe.html`, no story content)
+
+**Root cause**: Unknown. The `storybook-astro` framework preset likely doesn't register story files correctly during Vite's production build. The Astro Vite plugins may behave differently in dev vs build mode.
+
+**Workaround**: The existing `storybook-static/` folder was built when it was working. Preserve it and deploy from that pre-built output. Do not delete it.
+
+**To investigate**:
+- Check if `storybook-astro` has an open issue for this upstream
+- Compare Vite plugin loading between `storybook dev` and `storybook build`
+- Try pinning specific Astro/Vite versions that the preset was tested against
+
+### 2. Vite peer dependency conflict
+
+**Status**: Known limitation
+**Impact**: `npm install` (without lock file) fails with ERESOLVE
+
+**Details**: `storybook-astro@0.1.0` declares `peer vite@"^5.0.0 || ^6.0.0"` but Astro 5.x uses Vite 7.x. The existing `package-lock.json` has this resolved — `npm ci` works, but `npm install` without the lock file fails.
+
+**Workaround**: Always use `npm ci` in CI. Never delete `package-lock.json`. If the lock file is regenerated, use `npm install --legacy-peer-deps`.
+
+**To fix long-term**: Wait for `storybook-astro` to release a version with `peer vite@"^5.0.0 || ^6.0.0 || ^7.0.0"`, or fork and patch.
+
+### 3. Monorepo workspace hoisting
+
+**Status**: Resolved (use `npm ci`)
+**Impact**: `npm install` may not hoist `storybook-astro` correctly in monorepos
+
+**Details**: The `storybook` binary gets hoisted to root `node_modules` but `storybook-astro` may stay in `astro-app/node_modules`. When Storybook tries to load the `storybook-astro/preset`, it resolves from the root and fails with `ERR_MODULE_NOT_FOUND`.
+
+**Workaround**: `npm ci` (from the lock file) installs everything correctly. Avoid `npm install` without the lock file.
+
+### 4. Chromatic incompatibility with Storybook 10
+
+**Status**: External blocker
+**Impact**: Cannot publish to Chromatic's cloud platform
+
+**Details**: Chromatic validates the build by checking for `iframe.html`, which Storybook 10 no longer produces. Chromatic also misdetects the builder as `webpack4` instead of `@storybook/builder-vite`.
+
+**Workaround**: Deploy to GitHub Pages or other static hosting instead. Monitor Chromatic's Storybook 10 support status.
+
+### 5. CI build strategy
+
+**Status**: Documented
+**Impact**: GitHub Actions workflow needs special handling
+
+**Current approach**: Manual `workflow_dispatch` trigger deploys a pre-built `storybook-static/` folder to GitHub Pages. Once issue #1 (empty build) is resolved, switch to building in CI.
+
+**Workflow file**: `.github/workflows/deploy-storybook.yml`
+
 ## Disclaimer
 
 This project is not affiliated with, endorsed by, or sponsored by [Astro](https://astro.build) or [Storybook](https://storybook.js.org). All trademarks belong to their respective owners.

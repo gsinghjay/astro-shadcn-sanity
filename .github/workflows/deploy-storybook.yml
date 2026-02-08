@@ -21,16 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - run: npm ci
-
-      - run: npm run build-storybook --workspace=astro-app
-        env:
-          STORYBOOK_BASE_PATH: /astro-shadcn-sanity/
+      # NOTE: Deploying pre-built storybook-static/ because storybook-astro
+      # v0.1.0 produces empty builds (see docs/storybook-astro.md "Known Issues").
+      # Once the upstream build issue is resolved, replace this with:
+      #   - uses: actions/setup-node@v4
+      #     with: { node-version: 22, cache: npm }
+      #   - run: npm ci
+      #   - run: npm run build-storybook --workspace=astro-app
 
       - uses: actions/configure-pages@v5
 
