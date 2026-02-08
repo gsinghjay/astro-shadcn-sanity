@@ -125,18 +125,54 @@ export const homePage: Page = {
       ],
     },
     {
-      _type: 'timeline',
-      _key: 'timeline-1',
-      label: 'Timeline',
-      headline: 'Program Schedule',
-      events: [
-        { _key: 't1', date: 'January 2025', title: 'Lorem Ipsum Kickoff', description: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.' },
-        { _key: 't2', date: 'March 2025', title: 'Dolor Sit Formation', description: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit sed quia consequuntur.' },
-        { _key: 't3', date: 'May 2025', title: 'Amet Design Phase', description: 'Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam nisi ut aliquid.' },
-        { _key: 't4', date: 'July 2025', title: 'Consectetur Review', description: 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.' },
-        { _key: 't5', date: 'September 2025', title: 'Adipiscing Presentation', description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum.' },
-        { _key: 't6', date: 'November 2025', title: 'Elit Delivery', description: 'Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime.' },
-        { _key: 't7', date: 'December 2025', title: 'Tempor Showcase', description: 'Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates.' },
+      _type: 'sponsorSteps',
+      _key: 'sponsor-steps-1',
+      headline: 'How to Become a Sponsor',
+      subtitle: 'Follow these steps to begin your sponsorship journey with YWCC Capstone.',
+      items: [
+        {
+          _key: 'ss1',
+          title: 'Initial Inquiry',
+          description: 'Submit your interest through our sponsorship form or contact our program director.',
+          list: [
+            'Provide company information',
+            'Indicate areas of interest',
+            'Describe your technical challenges',
+          ],
+        },
+        {
+          _key: 'ss2',
+          title: 'Consultation Meeting',
+          description: 'Schedule a meeting with our sponsorship team to discuss:',
+          list: [
+            'Your technical challenges and goals',
+            'Available student teams and expertise',
+            'Timeline and expectations',
+            'Sponsorship benefits and commitments',
+          ],
+        },
+        {
+          _key: 'ss3',
+          title: 'Project Proposal',
+          description: 'Work with our team to develop a project proposal including:',
+          list: [
+            'Clear problem statement',
+            'Desired outcomes and deliverables',
+            'Technical requirements',
+            'Resource commitments',
+          ],
+        },
+        {
+          _key: 'ss4',
+          title: 'Agreement Signing',
+          description: 'Complete the sponsorship process:',
+          list: [
+            'Review and sign sponsorship agreement',
+            'Complete NDA if required',
+            'No monetary cost — sponsorship is free',
+            'Receive sponsor portal access',
+          ],
+        },
       ],
     },
     {

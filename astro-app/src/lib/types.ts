@@ -106,6 +106,22 @@ export interface TimelineBlock {
   events: TimelineEvent[];
 }
 
+export interface SponsorStepsItem {
+  _key: string;
+  title: string;
+  description: string;
+  list?: string[];
+}
+
+export interface SponsorStepsBlock {
+  _type: 'sponsorSteps';
+  _key: string;
+  headline?: string;
+  subtitle?: string;
+  items: SponsorStepsItem[];
+  links?: Array<{ icon?: string; text?: string; href?: string; target?: string }>;
+}
+
 export interface StatItem {
   _key: string;
   value: string;
@@ -198,6 +214,7 @@ export type PageBlock =
   | CtaBannerBlock
   | SponsorCardsBlock
   | TimelineBlock
+  | SponsorStepsBlock
   | StatsRowBlock
   | TeamGridBlock
   | RichTextBlock

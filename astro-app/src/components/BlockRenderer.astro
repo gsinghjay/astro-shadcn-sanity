@@ -9,6 +9,7 @@ import FaqSection from './blocks/custom/FaqSection.astro';
 import CtaBanner from './blocks/custom/CtaBanner.astro';
 import SponsorCards from './blocks/custom/SponsorCards.astro';
 import Timeline from './blocks/custom/Timeline.astro';
+import SponsorSteps from './blocks/custom/SponsorSteps.astro';
 import TeamGrid from './blocks/custom/TeamGrid.astro';
 import LogoCloud from './blocks/custom/LogoCloud.astro';
 import TextWithImage from './blocks/custom/TextWithImage.astro';
@@ -249,6 +250,8 @@ const { blocks } = Astro.props;
       return <SponsorCards block={block} />;
     case 'timeline':
       return <Timeline block={block} />;
+    case 'sponsorSteps':
+      return <SponsorSteps block={block} />;
     case 'teamGrid':
       return <TeamGrid block={block} />;
     case 'logoCloud':
