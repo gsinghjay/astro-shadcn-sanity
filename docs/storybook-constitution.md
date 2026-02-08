@@ -20,6 +20,7 @@ The `viteFinal` hook is where all the Astro↔Storybook compatibility lives:
 |---|---|
 | **`@/` path alias** | `resolve.alias` mapping `@` → `../src` |
 | **Tailwind v4 CSS** | `@tailwindcss/vite` plugin — without this, no utility classes render |
+| **`astro:assets` Image** | `astroAssetsStub()` plugin (`enforce: 'pre'`) intercepts `astro:assets` before Astro's Vite plugin and provides a plain `<img>` component — no image service needed |
 | **Astro virtual modules** | `astroVirtualModuleStubs()` plugin stubs `virtual:astro-icon` (with real icon data), `virtual:astro:assets/fonts/runtime`, and `virtual:astro:assets/fonts/internal` |
 | **`lucide-static` SVGs** | `lucideStaticSvgStub()` plugin intercepts `.svg` imports and renders inline, bypassing `createSvgComponent` which crashes in SSR |
 | **CJS/ESM interop** | `debug` in `optimizeDeps.include` — `astro-icon` depends on it |
@@ -61,7 +62,7 @@ src/components/blocks/
 - **DON'T** install a separate `vite` version — Storybook uses the project's `vite@7.x` via `@storybook/builder-vite`
 - **DON'T** use `.stories.tsx` files — no JSX. Use `.stories.ts` with CSF3 `args` objects
 - **DON'T** import `astro-icon` `Icon` component in `*Story.astro` wrappers — use inline SVGs instead. Block components that use `Icon` internally work fine because the stub loads real icon data from `@iconify-json/lucide` and `@iconify-json/simple-icons`
-- **DON'T** import `AvatarImage` or anything that chains to `astro:assets` `Image` — use plain `<img>` tags in story wrappers
+- **DON'T** worry about `astro:assets` `Image` — the `astroAssetsStub()` plugin handles it. Components using `Image`, `AvatarImage`, and `LogoImage` work directly in Storybook
 - **DON'T** use `// @ts-ignore` on `.astro` imports in story files — the TS errors are expected and harmless
 - **DON'T** add stories to the `stories/` glob that import components with deep Astro integration dependencies (Sanity client, `astro:content`, etc.) without first stubbing those modules
 - **DON'T** forget `--legacy-peer-deps` when installing — `storybook-astro` declares `vite: ^5 || ^6` but we use vite 7
@@ -134,8 +135,8 @@ The `shadcn` CLI (v3.8.4) fails with `.astro` file parsing errors. Use the regis
 
 1. Read the component source — identify props vs slots
 2. If slot-based → create `ComponentNameStory.astro` wrapper
-3. Check for `astro-icon`, `astro:assets`, `lucide-static`, or other virtual module imports in the dependency chain
-4. If virtual module dependency → use alternatives in the wrapper (inline SVG, plain `<img>`)
+3. Check for `astro-icon`, `lucide-static`, or other virtual module imports in the dependency chain
+4. If virtual module dependency → use alternatives in the wrapper (inline SVG for `astro-icon` in wrappers). `astro:assets` and `lucide-static` are already stubbed and work directly
 5. Components using `lucide-static` work directly — the `lucideStaticSvgStub()` plugin handles SVG processing
 6. Create `.stories.ts` with CSF3 format, `argTypes` for enum controls
 7. Verify with `npm run storybook`

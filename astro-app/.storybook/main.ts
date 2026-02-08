@@ -50,6 +50,42 @@ export default Component;
 }
 
 /**
+ * Stub astro:assets with a plain <img> component so the image
+ * service (which doesn't exist outside Astro's build) isn't loaded.
+ * Must run before Astro's own Vite plugin resolves the import.
+ */
+function astroAssetsStub(): Plugin {
+  // Stub all known astro:assets exports. Only Image is used today;
+  // the rest prevent silent undefined if future code imports them.
+  const code = `
+import { createComponent, render, spreadAttributes } from 'astro/runtime/server/index.js';
+export const Image = createComponent((_, props) => {
+  const { inferSize, widths, densities, sizes, priority, quality, format, ...imgProps } = props;
+  if (priority) { imgProps.loading = 'eager'; imgProps.fetchpriority = 'high'; }
+  return render\`<img\${spreadAttributes(imgProps)} />\`;
+});
+export const Picture = Image;
+export async function getImage(options) {
+  const src = typeof options.src === 'string' ? options.src : options.src?.src || '';
+  return { src, attributes: { src } };
+}
+export async function inferRemoteSize() { return { width: 0, height: 0 }; }
+export function getConfiguredImageService() { return {}; }
+export function isLocalService() { return false; }
+`
+  return {
+    name: 'storybook-astro-assets-stub',
+    enforce: 'pre',
+    resolveId(id) {
+      if (id === 'astro:assets') return '\0astro:assets'
+    },
+    load(id) {
+      if (id === '\0astro:assets') return code
+    },
+  }
+}
+
+/**
  * Stub Astro virtual modules that aren't available outside
  * Astro's build pipeline (astro-icon, astro:assets fonts).
  *
@@ -100,6 +136,7 @@ const config = {
     }
     config.plugins = config.plugins || []
     config.plugins.push(tailwindcss())
+    config.plugins.push(astroAssetsStub())
     config.plugins.push(astroVirtualModuleStubs())
     config.plugins.push(lucideStaticSvgStub())
     // Pre-bundle CJS deps that fail ESM interop
