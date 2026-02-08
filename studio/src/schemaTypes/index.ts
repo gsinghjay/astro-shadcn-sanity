@@ -9,9 +9,20 @@ import {portableText} from './objects/portable-text'
 import {page} from './documents/page'
 import {siteSettings} from './documents/site-settings'
 
-// Block schemas — added in Story 2.1
-// import { heroBanner } from './blocks/hero-banner'
-// ...
+// Block schemas — homepage (Story 2.1)
+import {heroBanner} from './blocks/hero-banner'
+import {featureGrid} from './blocks/feature-grid'
+import {ctaBanner} from './blocks/cta-banner'
+import {statsRow} from './blocks/stats-row'
+import {textWithImage} from './blocks/text-with-image'
+import {logoCloud} from './blocks/logo-cloud'
+// Block schemas — remaining (Story 2.1b)
+import {richText} from './blocks/rich-text'
+import {faqSection} from './blocks/faq-section'
+import {contactForm} from './blocks/contact-form'
+import {sponsorCards} from './blocks/sponsor-cards'
+import {timeline} from './blocks/timeline'
+import {teamGrid} from './blocks/team-grid'
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Objects
@@ -21,4 +32,18 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Documents
   page,
   siteSettings,
+  // Blocks — homepage
+  heroBanner,
+  featureGrid,
+  ctaBanner,
+  statsRow,
+  textWithImage,
+  logoCloud,
+  // Blocks — remaining
+  richText,
+  faqSection,
+  contactForm,
+  sponsorCards,
+  timeline,
+  teamGrid,
 ]

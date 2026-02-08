@@ -75,8 +75,8 @@ development_status:
 
   epic-2: in-progress
   2-0-template-layout-system: done
-  2-1-homepage-block-schemas: review
-  2-1b-remaining-block-schemas: review
+  2-1-homepage-block-schemas: done
+  2-1b-remaining-block-schemas: done
   2-2-homepage-data-fetching: ready-for-dev
   2-2b-remaining-pages-data-fetching: backlog
   2-3-page-composition-system: backlog
