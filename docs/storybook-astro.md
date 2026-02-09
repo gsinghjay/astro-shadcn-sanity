@@ -394,7 +394,7 @@ Run `npm run build-storybook` to see detailed error messages. Common issues:
 **Status**: External blocker
 **Impact**: Cannot publish to Chromatic's cloud platform
 
-**Details**: Chromatic validates the build by checking for `iframe.html`, which Storybook 10 no longer produces. Chromatic also misdetects the builder as `webpack4` instead of `@storybook/builder-vite`.
+**Details**: Storybook 10 with our `storybook-astro` setup does produce `iframe.html` (confirmed by Story 1.5 fix), but Chromatic misdetects the builder as `webpack4` instead of `@storybook/builder-vite`, causing upload failures.
 
 **Workaround**: Deploy to GitHub Pages or other static hosting instead. Monitor Chromatic's Storybook 10 support status.
 

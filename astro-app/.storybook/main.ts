@@ -166,12 +166,14 @@ const config = {
       },
       resolveId(id: string) {
         if (!isBuild) return
+        // Exact match handles the resolved absolute path. The endsWith fallback
+        // catches the bare specifier before Vite resolves it to an absolute path
+        // (e.g. when referenced via previewAnnotations in the storybook-astro preset).
         if (id === originalEntry || id.endsWith('storybook-astro/dist/renderer/entry-preview.js')) {
           return patchedEntry
         }
       },
     })
-    config.plugins = config.plugins || []
     config.plugins.push(tailwindcss())
     config.plugins.push(astroAssetsStub())
     config.plugins.push(astroVirtualModuleStubs())

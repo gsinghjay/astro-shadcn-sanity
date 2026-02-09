@@ -77,8 +77,8 @@ development_status:
   1-2-migrate-reference-project: done
   1-3-schema-infrastructure: done
   1-4-storybook-setup: done
-  1-5-storybook-production-build: review
-  1-6-storybook-github-pages-deploy: backlog  # blocked by 1.5
+  1-5-storybook-production-build: done
+  1-6-storybook-github-pages-deploy: review
   epic-1-retrospective: optional
 
   epic-2: in-progress

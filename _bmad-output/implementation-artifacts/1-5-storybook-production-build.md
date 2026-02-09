@@ -1,6 +1,6 @@
 # Story 1.5: Storybook Production Build Fix
 
-Status: review
+Status: done
 
 ## Story
 
@@ -68,6 +68,15 @@ So that stories can be deployed to GitHub Pages (or any static host) and viewed 
   - [x] 4.1 Update `docs/storybook-astro.md` Known Issue #1 with resolution and fix applied
   - [x] 4.2 Update Known Issue #5 (CI build strategy) to reflect that CI can now build Storybook
   - [x] 4.3 Document the patching strategy and how to sync with upstream updates
+
+### Review Follow-ups (AI)
+
+- [x] [AI-Review][MEDIUM] Add build output validation to existing `1.4-INT-011` test — assert `storybook-static/iframe.html` exists and is > 1KB (not empty chunk). Currently only verifies build doesn't throw. [tests/integration/storybook-1-4.spec.ts:213]
+- [x] [AI-Review][MEDIUM] Fix Known Issue #4 doc inconsistency — text claims "Storybook 10 no longer produces iframe.html" but this fix makes it produce iframe.html. Update to note iframe.html IS produced but Chromatic may still fail for other reasons (webpack4 misdetection). [docs/storybook-astro.md:395]
+- [x] [AI-Review][MEDIUM] Update stale CI workflow comment — says "Once the upstream build issue is resolved..." but it IS resolved. Update comment or defer explicitly to Story 1.6. [.github/workflows/deploy-storybook.yml:25]
+- [x] [AI-Review][LOW] Remove dead code — `config.plugins = config.plugins || []` on line 174 is unreachable since `config.plugins` is already used on lines 137-141 and 161. [astro-app/.storybook/main.ts:174]
+- [x] [AI-Review][LOW] Add console.warn for silent empty render — if `renderToString` returns non-string, component silently renders empty HTML. Add `console.warn` fallback. [astro-app/.storybook/patched-entry-preview.ts:203]
+- [x] [AI-Review][LOW] Document or tighten resolveId suffix match — `id.endsWith(...)` is a broad suffix match. The `id === originalEntry` check handles the resolved path; the suffix fallback could be documented or narrowed. [astro-app/.storybook/main.ts:169]
 
 ## Dev Notes
 
@@ -245,13 +254,24 @@ All 4 tasks complete. Production build fix verified end-to-end:
 - **Dev mode**: No regressions — HeroBanner renders via WebSocket on port 6008
 - **Documentation**: Known Issues #1 (resolved), #5 (updated), #6 (new — patch sync strategy)
 
+Review follow-ups (6/6 resolved):
+- Resolved review finding [MEDIUM]: Added iframe.html validation to 1.4-INT-011 — asserts file exists and > 1KB
+- Resolved review finding [MEDIUM]: Fixed Known Issue #4 — corrected stale claim that iframe.html isn't produced
+- Resolved review finding [MEDIUM]: Updated CI workflow comment — references Story 1.6 (hook auto-upgraded to fresh build)
+- Resolved review finding [LOW]: Removed dead `config.plugins = config.plugins || []` line
+- Resolved review finding [LOW]: Added console.warn when renderToString returns non-string
+- Resolved review finding [LOW]: Documented resolveId suffix match fallback with inline comment
+
 ## File List
 
-- `astro-app/.storybook/main.ts` — added astro:html filter + renderer redirect plugin
-- `astro-app/.storybook/patched-entry-preview.ts` — NEW: production-compatible renderer
+- `astro-app/.storybook/main.ts` — added astro:html filter + renderer redirect plugin; removed dead code; documented resolveId fallback
+- `astro-app/.storybook/patched-entry-preview.ts` — NEW: production-compatible renderer; added console.warn for non-string render output
 - `astro-app/src/components/blocks/skeletons-1.astro` — fixed invalid glob pattern
 - `astro-app/src/components/blocks/blocks-1.astro` — fixed invalid glob pattern
-- `docs/storybook-astro.md` — updated Known Issues #1 (resolved), #5 (CI builds), #6 (new: patch sync)
+- `docs/storybook-astro.md` — updated Known Issues #1 (resolved), #4 (iframe.html correction), #5 (CI builds), #6 (new: patch sync)
+- `.github/workflows/deploy-storybook.yml` — updated stale comment to reference Story 1.6 (hook upgraded to fresh CI build)
+- `tests/integration/storybook-1-4.spec.ts` — added iframe.html existence + size assertions to 1.4-INT-011
+- `.gitignore` — added `astro-app/storybook-static` to ignore build output
 
 ## Change Log
 
@@ -264,3 +284,6 @@ All 4 tasks complete. Production build fix verified end-to-end:
 - 2026-02-09: Task 3 partially validated — sidebar, block stories confirmed working in static build
 - 2026-02-09: Task 3 fully validated — docs page renders, storybook dev works, no regressions
 - 2026-02-09: Task 4 complete — documentation updated (Known Issues #1, #5, #6)
+- 2026-02-08: Code review — 3 MEDIUM + 3 LOW findings. 6 action items created. Status → in-progress
+- 2026-02-08: Addressed code review findings — 6 items resolved (3 MEDIUM, 3 LOW). All 175 integration tests pass. Status → review
+- 2026-02-09: Second code review — all fixes verified, .gitignore added to File List. Status → done

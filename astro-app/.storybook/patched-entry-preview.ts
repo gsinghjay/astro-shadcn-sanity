@@ -200,6 +200,9 @@ async function renderAstroComponent(
   try {
     const result = createSSRResult()
     const rendered = await renderToString(result, component, props, slots)
+    if (typeof rendered !== 'string') {
+      console.warn('[storybook-patch-renderer] renderToString returned non-string:', typeof rendered)
+    }
     const html = typeof rendered === 'string' ? rendered : ''
 
     canvasElement.innerHTML = html
