@@ -178,6 +178,15 @@ const config = {
     config.plugins.push(astroAssetsStub())
     config.plugins.push(astroVirtualModuleStubs())
     config.plugins.push(lucideStaticSvgStub())
+    // Externalize /@react-refresh — @astrojs/react injects this via
+    // astro:scripts/before-hydration.js but it only exists in Vite dev
+    // mode. Without this, Rollup fails to resolve it during Storybook builds.
+    config.build = config.build || {}
+    config.build.rollupOptions = config.build.rollupOptions || {}
+    config.build.rollupOptions.external = [
+      ...(config.build.rollupOptions.external || []),
+      '/@react-refresh',
+    ]
     // Pre-bundle CJS deps that fail ESM interop
     config.optimizeDeps = config.optimizeDeps || {}
     config.optimizeDeps.include = [
