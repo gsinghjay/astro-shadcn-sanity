@@ -1,10 +1,12 @@
 import { dirname, resolve } from 'node:path'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { createRequire } from 'node:module'
 import tailwindcss from '@tailwindcss/vite'
 import type { Plugin } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const require = createRequire(import.meta.url)
 
 /**
  * Intercept lucide-static SVG imports and provide Astro components
@@ -129,6 +131,21 @@ const config = {
     builder: '@storybook/builder-vite',
   },
   viteFinal: (config: any) => {
+    // Fix 1: Remove astro:html plugin — it intercepts Storybook's iframe.html
+    // entry during production builds, preventing Vite from extracting the
+    // script imports and resulting in an empty iframe chunk.
+    if (config.plugins) {
+      config.plugins = config.plugins.flat().filter((p: any) => {
+        const name = p?.name || ''
+        return name !== 'astro:html'
+      })
+    }
+    // Fix 2: Replace storybook-astro's renderer with a patched version that
+    // can render Astro components directly in production (no WebSocket/HMR).
+    const originalEntry = resolve(
+      dirname(require.resolve('storybook-astro/package.json')),
+      'dist', 'renderer', 'entry-preview.js',
+    )
     if (process.env.STORYBOOK_BASE_PATH) {
       config.base = process.env.STORYBOOK_BASE_PATH
     }
@@ -137,7 +154,26 @@ const config = {
       ...config.resolve.alias,
       '@': resolve(__dirname, '../src'),
     }
-    config.plugins = config.plugins || []
+    // Vite plugin to redirect storybook-astro renderer to patched version.
+    // Only active in build mode — dev mode uses the original WebSocket renderer.
+    const patchedEntry = resolve(__dirname, 'patched-entry-preview.ts')
+    let isBuild = false
+    config.plugins.push({
+      name: 'storybook-patch-renderer',
+      enforce: 'pre' as const,
+      configResolved(resolved: any) {
+        isBuild = resolved.command === 'build'
+      },
+      resolveId(id: string) {
+        if (!isBuild) return
+        // Exact match handles the resolved absolute path. The endsWith fallback
+        // catches the bare specifier before Vite resolves it to an absolute path
+        // (e.g. when referenced via previewAnnotations in the storybook-astro preset).
+        if (id === originalEntry || id.endsWith('storybook-astro/dist/renderer/entry-preview.js')) {
+          return patchedEntry
+        }
+      },
+    })
     config.plugins.push(tailwindcss())
     config.plugins.push(astroAssetsStub())
     config.plugins.push(astroVirtualModuleStubs())

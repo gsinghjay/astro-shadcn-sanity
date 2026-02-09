@@ -58,6 +58,12 @@
 #   - Story 2.2b added: remaining pages GROQ queries and data fetching
 #   - Story 3.1 created: sponsor document schema (homepage dependency for logoCloud)
 #   - Homepage demo path: 2.1 → 3.1 → 2.2
+#
+# 2026-02-08: Storybook production build stories added
+#   - Story 1.5 added: storybook-production-build (fix empty iframe in storybook build)
+#   - Story 1.6 added: storybook-github-pages-deploy (deploy working build to GH Pages)
+#   - Epic 1 reopened: in-progress (was done, new stories added)
+#   - Story 1.6 blocked by 1.5
 
 generated: 2026-02-08
 project: astro-shadcn-sanity
@@ -66,11 +72,13 @@ tracking_system: file-system
 story_location: /home/jay/github/astro-shadcn-sanity/_bmad-output/implementation-artifacts
 
 development_status:
-  epic-1: done
+  epic-1: in-progress
   1-1-reconfigure-starter-and-set-up-design-system: done
   1-2-migrate-reference-project: done
   1-3-schema-infrastructure: done
   1-4-storybook-setup: done
+  1-5-storybook-production-build: done
+  1-6-storybook-github-pages-deploy: review
   epic-1-retrospective: optional
 
   epic-2: in-progress

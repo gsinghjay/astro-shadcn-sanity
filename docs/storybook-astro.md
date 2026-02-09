@@ -352,25 +352,22 @@ Run `npm run build-storybook` to see detailed error messages. Common issues:
 
 > `storybook-astro` is very new (v0.1.0, [ThinkOodle/storybook-astro](https://github.com/ThinkOodle/storybook-astro)). The issues below are tracked for our project and may be resolved upstream.
 
-### 1. Production build produces empty iframe (BLOCKING)
+### 1. Production build produces empty iframe (RESOLVED)
 
-**Status**: Unresolved
-**Impact**: `storybook build` output contains no stories — only 3 modules transformed, empty `iframe` chunk
+**Status**: Resolved (Story 1.5)
+**Impact**: Previously, `storybook build` output contained no stories — only 3 modules transformed, empty `iframe` chunk. Now fixed.
 
-**Symptoms**:
-- `storybook dev` works perfectly (all 385+ stories render)
-- `storybook build` completes "successfully" but the output has zero story content
-- Vite warns: `Generated an empty chunk: "iframe"`
-- Chromatic rejects the build as invalid (no `iframe.html`, no story content)
+**Root causes identified and fixed**:
 
-**Root cause**: Unknown. The `storybook-astro` framework preset likely doesn't register story files correctly during Vite's production build. The Astro Vite plugins may behave differently in dev vs build mode.
+1. **`astro:html` plugin hijacks iframe.html** — The `storybook-astro` preset injects 15 Vite plugins including `astro:html`, which intercepts ALL HTML file processing during the build, preventing Vite from extracting `<script>` imports from Storybook's `iframe.html` entry point. **Fix**: Filter out `astro:html` in `viteFinal` (`.storybook/main.ts`).
 
-**Workaround**: The existing `storybook-static/` folder was built when it was working. Preserve it and deploy from that pre-built output. Do not delete it.
+2. **Renderer requires WebSocket** — The `renderToCanvas` function in `storybook-astro` depends on `import.meta.hot.send()` for WebSocket communication with the dev server. In production builds, `import.meta.hot` is `undefined`, so stories fail to render. **Fix**: Created `.storybook/patched-entry-preview.ts` — a production-only renderer that uses Astro's runtime `renderToString` directly in the browser (zero Node.js dependencies). A Vite `resolveId` plugin redirects imports only in build mode.
 
-**To investigate**:
-- Check if `storybook-astro` has an open issue for this upstream
-- Compare Vite plugin loading between `storybook dev` and `storybook build`
-- Try pinning specific Astro/Vite versions that the preset was tested against
+3. **Invalid glob patterns** — Two components used `import.meta.glob("src/...")` which is invalid for Vite (must start with `./` or `/`). Fixed in `blocks-1.astro` and `skeletons-1.astro`.
+
+**Result**: Build produces 784+ modules, valid iframe.html, stories render correctly in static output. `storybook dev` continues to work via the original WebSocket renderer (patch is build-only).
+
+**Files changed**: `.storybook/main.ts`, `.storybook/patched-entry-preview.ts` (new), `src/components/blocks/blocks-1.astro`, `src/components/blocks/skeletons-1.astro`
 
 ### 2. Vite peer dependency conflict
 
@@ -397,18 +394,38 @@ Run `npm run build-storybook` to see detailed error messages. Common issues:
 **Status**: External blocker
 **Impact**: Cannot publish to Chromatic's cloud platform
 
-**Details**: Chromatic validates the build by checking for `iframe.html`, which Storybook 10 no longer produces. Chromatic also misdetects the builder as `webpack4` instead of `@storybook/builder-vite`.
+**Details**: Storybook 10 with our `storybook-astro` setup does produce `iframe.html` (confirmed by Story 1.5 fix), but Chromatic misdetects the builder as `webpack4` instead of `@storybook/builder-vite`, causing upload failures.
 
 **Workaround**: Deploy to GitHub Pages or other static hosting instead. Monitor Chromatic's Storybook 10 support status.
 
 ### 5. CI build strategy
 
-**Status**: Documented
-**Impact**: GitHub Actions workflow needs special handling
+**Status**: Updated (issue #1 resolved)
+**Impact**: CI can now build Storybook directly
 
-**Current approach**: Manual `workflow_dispatch` trigger deploys a pre-built `storybook-static/` folder to GitHub Pages. Once issue #1 (empty build) is resolved, switch to building in CI.
+**Current approach**: With issue #1 resolved, `npm run build-storybook` produces a working `storybook-static/` directory in CI. The GitHub Actions workflow can now build fresh instead of deploying a pre-built artifact.
 
 **Workflow file**: `.github/workflows/deploy-storybook.yml`
+
+### 6. Patched renderer — upstream sync strategy
+
+**Status**: Documented
+**Impact**: Local patch must be maintained until upstream fixes production builds
+
+**Details**: The patched renderer (`.storybook/patched-entry-preview.ts`) replaces `storybook-astro`'s `entry-preview.js` during production builds only. It renders Astro components using the Astro runtime's `renderToString` directly in the browser — the runtime functions are pure JavaScript with zero Node.js dependencies.
+
+**How it works**:
+- A Vite `resolveId` plugin in `.storybook/main.ts` intercepts imports of `storybook-astro/dist/renderer/entry-preview.js`
+- The plugin uses `configResolved` to only activate in build mode (`resolved.command === 'build'`)
+- Dev mode is unaffected — the original WebSocket-based renderer runs as before
+
+**When to remove**: When `storybook-astro` releases a version that supports production builds natively. Monitor [ThinkOodle/storybook-astro](https://github.com/ThinkOodle/storybook-astro) for updates.
+
+**How to sync with upstream**:
+1. Update `storybook-astro` package version
+2. Run `storybook build` — if it produces valid output without the patch, remove the `resolveId` plugin and `patched-entry-preview.ts`
+3. If still broken, verify the patch still works with the new version (Astro runtime API may change)
+4. The `astro:html` filter in `viteFinal` should also be tested — upstream may fix this independently
 
 ## Disclaimer
 

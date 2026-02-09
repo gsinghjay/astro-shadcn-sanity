@@ -210,7 +210,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // AC8: Build Verification
   // ---------------------------------------------------------------------------
   test.describe('AC8: Build Verification', () => {
-    test('[P0] 1.4-INT-011 — storybook build succeeds without errors', async () => {
+    test('[P0] 1.4-INT-011 — storybook build succeeds and produces valid iframe.html', async () => {
       let result: string
 
       try {
@@ -232,6 +232,19 @@ test.describe('Story 1-4: Storybook Setup', () => {
       }
 
       expect(result).toBeDefined()
+
+      // Verify iframe.html exists and is not an empty chunk (Story 1.5 fix)
+      const iframePath = path.join(ASTRO_APP, 'storybook-static', 'iframe.html')
+      expect(
+        fs.existsSync(iframePath),
+        'storybook-static/iframe.html must exist (not empty chunk)',
+      ).toBe(true)
+
+      const iframeSize = fs.statSync(iframePath).size
+      expect(
+        iframeSize,
+        `iframe.html must be > 1KB (got ${iframeSize} bytes — likely empty chunk)`,
+      ).toBeGreaterThan(1024)
     })
   })
 })
