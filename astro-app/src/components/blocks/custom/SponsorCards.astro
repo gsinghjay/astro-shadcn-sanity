@@ -38,10 +38,14 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
           <TileContent>
             <div class="flex items-start justify-between gap-4">
               <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border">
-                  <span class="text-lg font-bold text-muted-foreground">
-                    {sponsor.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
-                  </span>
+                <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
+                  {sponsor.logoUrl ? (
+                    <img src={sponsor.logoUrl} alt={`${sponsor.name} logo`} class="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <span class="text-lg font-bold text-muted-foreground">
+                      {sponsor.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <TileTitle class="text-xl">{sponsor.name}</TileTitle>

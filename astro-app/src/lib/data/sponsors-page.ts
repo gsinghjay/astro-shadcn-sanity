@@ -22,6 +22,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sp1',
           name: 'Acme Corp',
+          logoUrl: 'https://placehold.co/56x56/1a1a1a/ffffff?text=AC',
           description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua veniam.',
           website: 'https://example.com',
           tier: 'platinum',
@@ -31,6 +32,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sp2',
           name: 'Lorem Industries',
+          logoUrl: 'https://placehold.co/56x56/003366/ffffff?text=LI',
           description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure.',
           website: 'https://example.com',
           tier: 'platinum',
@@ -47,6 +49,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sg1',
           name: 'Ipsum Solutions',
+          logoUrl: 'https://placehold.co/56x56/e89b32/ffffff?text=IS',
           description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat.',
           website: 'https://example.com',
           tier: 'gold',
@@ -56,6 +59,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sg2',
           name: 'Dolor Tech',
+          logoUrl: 'https://placehold.co/56x56/d22630/ffffff?text=DT',
           description: 'Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum sed ut.',
           website: 'https://example.com',
           tier: 'gold',
@@ -65,6 +69,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sg3',
           name: 'Sit Amet Inc',
+          logoUrl: 'https://placehold.co/56x56/2563eb/ffffff?text=SA',
           description: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.',
           website: 'https://example.com',
           tier: 'gold',
@@ -74,6 +79,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'sg4',
           name: 'Aliqua Systems',
+          logoUrl: 'https://placehold.co/56x56/059669/ffffff?text=AS',
           description: 'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi.',
           website: 'https://example.com',
           tier: 'gold',
@@ -90,6 +96,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'ss1',
           name: 'Magna Global',
+          logoUrl: 'https://placehold.co/56x56/7c3aed/ffffff?text=MG',
           description: 'Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur vel illum qui dolorem.',
           website: 'https://example.com',
           tier: 'silver',
@@ -99,6 +106,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'ss2',
           name: 'Veniam Group',
+          logoUrl: 'https://placehold.co/56x56/db2777/ffffff?text=VG',
           description: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores.',
           website: 'https://example.com',
           tier: 'silver',
@@ -108,6 +116,7 @@ export const sponsorsPage: Page = {
         {
           _key: 'ss3',
           name: 'Tempor Holdings',
+          logoUrl: 'https://placehold.co/56x56/0891b2/ffffff?text=TH',
           description: 'Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus.',
           website: 'https://example.com',
           tier: 'silver',
