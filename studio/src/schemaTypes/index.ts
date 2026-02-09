@@ -17,13 +17,13 @@ import {ctaBanner} from './blocks/cta-banner'
 import {statsRow} from './blocks/stats-row'
 import {textWithImage} from './blocks/text-with-image'
 import {logoCloud} from './blocks/logo-cloud'
+import {sponsorSteps} from './blocks/sponsor-steps'
 // Block schemas — remaining (Story 2.1b)
 import {richText} from './blocks/rich-text'
 import {faqSection} from './blocks/faq-section'
 import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
-import {timeline} from './blocks/timeline'
-import {teamGrid} from './blocks/team-grid'
+// timeline and teamGrid removed — depend on event/team document types (Story 2.1b)
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Objects
@@ -41,11 +41,10 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   statsRow,
   textWithImage,
   logoCloud,
+  sponsorSteps,
   // Blocks — remaining
   richText,
   faqSection,
   contactForm,
   sponsorCards,
-  timeline,
-  teamGrid,
 ]

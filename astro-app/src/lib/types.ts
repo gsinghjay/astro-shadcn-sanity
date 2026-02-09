@@ -4,6 +4,12 @@ export interface SanityImage {
   alt?: string;
 }
 
+export interface SanityImageWithAlt {
+  _key?: string;
+  asset: { _id: string; url: string };
+  alt?: string;
+}
+
 export interface PortableTextBlock {
   _type: 'block';
   _key: string;
@@ -12,18 +18,27 @@ export interface PortableTextBlock {
   markDefs?: Array<{ _key: string; _type: string; href?: string }>;
 }
 
-export interface HeroBannerBlock {
+export interface ButtonObject {
+  _key: string;
+  text: string;
+  url: string;
+  variant?: 'default' | 'secondary' | 'outline' | 'ghost';
+}
+
+export interface BlockBase {
+  backgroundVariant?: 'white' | 'light' | 'dark' | 'primary';
+  spacing?: 'none' | 'small' | 'default' | 'large';
+  maxWidth?: 'narrow' | 'default' | 'full';
+}
+
+export interface HeroBannerBlock extends BlockBase {
   _type: 'heroBanner';
   _key: string;
-  headline: string;
-  subheadline?: string;
-  ctaText?: string;
-  ctaUrl?: string;
-  secondaryCtaText?: string;
-  secondaryCtaUrl?: string;
-  backgroundImage?: SanityImage;
-  backgroundImages?: Array<{ url: string; alt?: string }>;
-  layout?: 'full' | 'split' | 'centered';
+  heading: string;
+  subheading?: string;
+  ctaButtons?: ButtonObject[];
+  backgroundImages?: SanityImageWithAlt[];
+  alignment?: 'left' | 'center' | 'right';
 }
 
 export interface FeatureItem {
@@ -31,16 +46,14 @@ export interface FeatureItem {
   title: string;
   description: string;
   icon?: string;
-  stat?: string;
+  image?: SanityImageWithAlt;
 }
 
-export interface FeatureGridBlock {
+export interface FeatureGridBlock extends BlockBase {
   _type: 'featureGrid';
   _key: string;
-  label?: string;
-  headline?: string;
-  subtitle?: string;
-  features: FeatureItem[];
+  heading?: string;
+  items: FeatureItem[];
   columns?: 2 | 3 | 4;
 }
 
@@ -58,16 +71,12 @@ export interface FaqSectionBlock {
   items: FaqItem[];
 }
 
-export interface CtaBannerBlock {
+export interface CtaBannerBlock extends BlockBase {
   _type: 'ctaBanner';
   _key: string;
-  headline: string;
-  body?: string;
-  ctaText: string;
-  ctaUrl: string;
-  secondaryCtaText?: string;
-  secondaryCtaUrl?: string;
-  variant?: 'light' | 'dark' | 'red';
+  heading: string;
+  description?: string;
+  ctaButtons?: ButtonObject[];
 }
 
 export interface Sponsor {
@@ -113,26 +122,27 @@ export interface SponsorStepsItem {
   list?: string[];
 }
 
-export interface SponsorStepsBlock {
+export interface SponsorStepsBlock extends BlockBase {
   _type: 'sponsorSteps';
   _key: string;
-  headline?: string;
-  subtitle?: string;
+  heading?: string;
+  subheading?: string;
   items: SponsorStepsItem[];
-  links?: Array<{ icon?: string; text?: string; href?: string; target?: string }>;
+  ctaButtons?: ButtonObject[];
 }
 
 export interface StatItem {
   _key: string;
   value: string;
   label: string;
+  description?: string;
 }
 
-export interface StatsRowBlock {
+export interface StatsRowBlock extends BlockBase {
   _type: 'statsRow';
   _key: string;
+  heading?: string;
   stats: StatItem[];
-  variant?: 'light' | 'dark';
 }
 
 export interface TeamMember {
@@ -187,24 +197,29 @@ export interface FormField {
   placeholder?: string;
 }
 
-export interface LogoCloudBlock {
-  _type: 'logoCloud';
-  _key: string;
-  label?: string;
-  logos: Array<{ _key: string; name: string; logoUrl?: string; logo?: SanityImage; website?: string }>;
+export interface SponsorRef {
+  _id: string;
+  name: string;
+  slug?: string;
+  logo?: SanityImageWithAlt;
+  website?: string;
 }
 
-export interface TextWithImageBlock {
+export interface LogoCloudBlock extends BlockBase {
+  _type: 'logoCloud';
+  _key: string;
+  heading?: string;
+  autoPopulate?: boolean;
+  sponsors: SponsorRef[];
+}
+
+export interface TextWithImageBlock extends BlockBase {
   _type: 'textWithImage';
   _key: string;
-  label?: string;
-  headline?: string;
-  body?: string;
-  image?: SanityImage;
-  imageUrl?: string;
+  heading?: string;
+  content?: PortableTextBlock[];
+  image?: SanityImageWithAlt;
   imagePosition?: 'left' | 'right';
-  ctaText?: string;
-  ctaUrl?: string;
 }
 
 export type PageBlock =

@@ -1,7 +1,7 @@
 ---
 import type { TextWithImageBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
-import { Button } from '@/components/ui/button';
+import { PortableText } from 'astro-portabletext';
 
 interface Props {
   block: TextWithImageBlock;
@@ -9,30 +9,27 @@ interface Props {
 
 const { block } = Astro.props;
 const isRight = block.imagePosition !== 'left';
+const imgSrc = block.image?.asset?.url;
 ---
 
 <Section data-animate>
   <SectionSplit class={!isRight ? '@lg:direction-rtl @lg:[&>*]:direction-ltr' : ''}>
     <SectionContent class="justify-center">
-      {block.label && (
-        <span class="label-caps text-primary">{block.label}</span>
+      {block.heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{block.heading}</h2>
       )}
-      {block.headline && (
-        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{block.headline}</h2>
-      )}
-      {block.body && (
-        <p class="text-muted-foreground leading-relaxed">{block.body}</p>
-      )}
-      {block.ctaText && block.ctaUrl && (
-        <Button variant="outline" href={block.ctaUrl}>{block.ctaText}</Button>
+      {block.content && (
+        <div class="text-muted-foreground leading-relaxed prose">
+          <PortableText value={block.content} />
+        </div>
       )}
     </SectionContent>
 
     <SectionMedia class="aspect-[4/3]">
-      {block.imageUrl && (
+      {imgSrc && (
         <img
-          src={block.imageUrl}
-          alt={block.headline || ''}
+          src={imgSrc}
+          alt={block.image?.alt || block.heading || ''}
           class="w-full h-full object-cover"
           loading="lazy"
         />

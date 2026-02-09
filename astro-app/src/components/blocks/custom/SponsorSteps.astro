@@ -2,7 +2,6 @@
 import type { SponsorStepsBlock } from '@/lib/types';
 import CircleCheck from 'lucide-static/icons/circle-check.svg';
 import { Button } from '@/components/ui/button';
-import { Icon } from '@/components/ui/icon';
 import { List, ListItem } from '@/components/ui/list';
 import {
   Section,
@@ -28,18 +27,17 @@ const { block } = Astro.props;
 
 <Section>
   <SectionContent>
-    {(block.headline || block.subtitle) && (
+    {(block.heading || block.subheading) && (
       <SectionProse>
-        {block.headline && <h2>{block.headline}</h2>}
-        {block.subtitle && <p>{block.subtitle}</p>}
+        {block.heading && <h2>{block.heading}</h2>}
+        {block.subheading && <p>{block.subheading}</p>}
       </SectionProse>
     )}
     <SectionActions>
       {
-        block.links?.map(({ icon, text, ...link }, i) => (
-          <Button variant={i === 0 ? 'default' : 'outline'} {...link}>
-            {icon && <Icon name={icon} />}
-            {text}
+        block.ctaButtons?.map((btn, i) => (
+          <Button variant={i === 0 ? 'default' : 'outline'} href={btn.url}>
+            {btn.text}
           </Button>
         ))
       }

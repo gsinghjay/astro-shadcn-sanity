@@ -9,9 +9,9 @@ export const projectsPage: Page = {
     {
       _type: 'heroBanner',
       _key: 'hero-1',
-      headline: 'Projects & Teams',
-      subheadline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-      layout: 'centered',
+      heading: 'Projects & Teams',
+      subheading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      alignment: 'center',
     },
     {
       _type: 'teamGrid',
@@ -75,11 +75,10 @@ export const projectsPage: Page = {
     {
       _type: 'ctaBanner',
       _key: 'cta-1',
-      headline: 'Lorem Ipsum Dolor Sit Amet?',
-      body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
-      ctaText: 'Get Started',
-      ctaUrl: '/contact',
-      variant: 'dark',
+      heading: 'Lorem Ipsum Dolor Sit Amet?',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
+      ctaButtons: [{ _key: 'b1', text: 'Get Started', url: '/contact' }],
+      backgroundVariant: 'dark',
     },
   ],
 };

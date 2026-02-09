@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { block } = Astro.props;
-const isCentered = block.layout === 'centered';
+const isCentered = block.alignment === 'center';
 const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
 ---
 
@@ -22,7 +22,7 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
           data-state={index === 0 ? 'active' : 'inactive'}
         >
           <img
-            src={image.url}
+            src={image.asset?.url || ''}
             alt={image.alt || `Slide ${index + 1}`}
             class="w-full h-full object-cover"
           />
@@ -43,28 +43,27 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
   )}
 
   <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
-    <span class="label-caps text-primary tracking-widest">Lorem Ipsum Dolor Sit Amet</span>
-
     <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
-      {block.headline}
+      {block.heading}
     </h1>
 
-    {block.subheadline && (
+    {block.subheading && (
       <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
-        {block.subheadline}
+        {block.subheading}
       </p>
     )}
 
-    {(block.ctaText || block.secondaryCtaText) && (
+    {block.ctaButtons && block.ctaButtons.length > 0 && (
       <SectionActions class={isCentered ? 'justify-center' : ''}>
-        {block.ctaText && block.ctaUrl && (
-          <Button href={block.ctaUrl}>{block.ctaText}</Button>
-        )}
-        {block.secondaryCtaText && block.secondaryCtaUrl && (
-          <Button variant="outline" href={block.secondaryCtaUrl} class="bg-transparent border-background text-background hover:bg-background hover:text-foreground">
-            {block.secondaryCtaText}
+        {block.ctaButtons.map((btn, i) => (
+          <Button
+            href={btn.url}
+            variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+            class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+          >
+            {btn.text}
           </Button>
-        )}
+        ))}
       </SectionActions>
     )}
   </SectionContent>

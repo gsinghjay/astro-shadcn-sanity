@@ -9,9 +9,9 @@ export const sponsorsPage: Page = {
     {
       _type: 'heroBanner',
       _key: 'hero-1',
-      headline: 'Our Sponsors',
-      subheadline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-      layout: 'centered',
+      heading: 'Our Sponsors',
+      subheading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      alignment: 'center',
     },
     {
       _type: 'sponsorCards',
@@ -119,7 +119,7 @@ export const sponsorsPage: Page = {
     {
       _type: 'statsRow',
       _key: 'stats-1',
-      variant: 'light',
+      backgroundVariant: 'light',
       stats: [
         { _key: 's1', value: '95%', label: 'Lorem Ipsum' },
         { _key: 's2', value: '4.8/5', label: 'Dolor Sit' },
@@ -130,11 +130,10 @@ export const sponsorsPage: Page = {
     {
       _type: 'ctaBanner',
       _key: 'cta-1',
-      headline: 'Lorem Ipsum Dolor Sit Amet',
-      body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
-      ctaText: 'Get Started',
-      ctaUrl: '/contact',
-      variant: 'dark',
+      heading: 'Lorem Ipsum Dolor Sit Amet',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
+      ctaButtons: [{ _key: 'b1', text: 'Get Started', url: '/contact' }],
+      backgroundVariant: 'dark',
     },
   ],
 };

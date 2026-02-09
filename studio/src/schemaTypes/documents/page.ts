@@ -11,8 +11,6 @@ export const wideBlockWarnings: Record<string, string[]> = {
   statsRow: ['sidebar'],
   logoCloud: ['sidebar'],
   sponsorCards: ['sidebar'],
-  timeline: ['sidebar', 'twoColumn'],
-  teamGrid: ['sidebar'],
 }
 
 /**
@@ -99,10 +97,9 @@ export const page = defineType({
         {type: 'ctaBanner'},
         {type: 'faqSection'},
         {type: 'contactForm'},
-        {type: 'timeline'},
         {type: 'logoCloud'},
         {type: 'statsRow'},
-        {type: 'teamGrid'},
+        {type: 'sponsorSteps'},
         {type: 'textWithImage'},
       ],
       validation: (Rule) =>
@@ -121,14 +118,14 @@ export const page = defineType({
             {
               name: 'content',
               title: 'Content',
-              of: ['richText', 'textWithImage', 'faqSection', 'timeline'],
+              of: ['richText', 'textWithImage', 'faqSection'],
             },
             {
               name: 'media',
               title: 'Media & Stats',
-              of: ['statsRow', 'featureGrid', 'teamGrid'],
+              of: ['statsRow', 'featureGrid'],
             },
-            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'logoCloud']},
+            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'logoCloud', 'sponsorSteps']},
             {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm']},
           ],
           views: [

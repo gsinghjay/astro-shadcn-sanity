@@ -1,16 +1,15 @@
 import {defineField} from 'sanity'
 import {defineBlock} from '../helpers/defineBlock'
 
-export const heroBanner = defineBlock({
-  name: 'heroBanner',
-  title: 'Hero Banner',
+export const sponsorSteps = defineBlock({
+  name: 'sponsorSteps',
+  title: 'Sponsor Steps',
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'subheading',
@@ -18,19 +17,30 @@ export const heroBanner = defineBlock({
       type: 'string',
     }),
     defineField({
-      name: 'backgroundImages',
-      title: 'Background Images',
+      name: 'items',
+      title: 'Steps',
       type: 'array',
       of: [
         {
-          type: 'image',
-          options: {hotspot: true},
+          type: 'object',
+          preview: {select: {title: 'title'}},
           fields: [
             defineField({
-              name: 'alt',
-              title: 'Alt Text',
+              name: 'title',
+              title: 'Title',
               type: 'string',
               validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+            }),
+            defineField({
+              name: 'list',
+              title: 'Bullet Points',
+              type: 'array',
+              of: [{type: 'string'}],
             }),
           ],
         },
@@ -41,15 +51,6 @@ export const heroBanner = defineBlock({
       title: 'CTA Buttons',
       type: 'array',
       of: [{type: 'button'}],
-    }),
-    defineField({
-      name: 'alignment',
-      title: 'Alignment',
-      type: 'string',
-      options: {
-        list: ['left', 'center', 'right'],
-      },
-      initialValue: 'center',
     }),
   ],
 })

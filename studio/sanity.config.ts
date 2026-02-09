@@ -1,7 +1,9 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
+import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './src/schemaTypes'
+import {resolve} from './src/presentation/resolve'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
@@ -34,6 +36,14 @@ export default defineConfig({
               (listItem) => !singletonTypes.has(listItem.getId()!),
             ),
           ]),
+    }),
+    presentationTool({
+      resolve,
+      previewUrl: {
+        origin:
+          process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:4321',
+        preview: '/',
+      },
     }),
     visionTool(),
   ],

@@ -111,9 +111,9 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
       expect(fs.existsSync(indexPath), 'data/index.ts missing').toBe(true)
 
       const indexContent = fs.readFileSync(indexPath, 'utf-8')
+      // home-page is no longer barrel-exported (homepage now fetches from Sanity)
       const expectedExports = [
         'site-settings',
-        'home-page',
         'about-page',
         'projects-page',
         'sponsors-page',

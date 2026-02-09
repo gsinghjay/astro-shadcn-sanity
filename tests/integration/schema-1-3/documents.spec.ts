@@ -29,7 +29,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('blocks')
     })
 
-    test('[P0] 1.3-INT-021 — page blocks array accepts all 12 P0 block types', async () => {
+    test('[P0] 1.3-INT-021 — page blocks array accepts all registered block types', async () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       expect(blocksField).toBeDefined()
       expect(blocksField.type).toBe('array')
@@ -39,12 +39,13 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         'heroBanner', 'featureGrid', 'sponsorCards', 'richText',
         'ctaBanner', 'faqSection', 'contactForm', 'timeline',
         'logoCloud', 'statsRow', 'teamGrid', 'textWithImage',
+        'sponsorSteps',
       ]
 
       for (const type of expectedTypes) {
         expect(blockTypeNames, `Missing block type: ${type}`).toContain(type)
       }
-      expect(blockTypeNames).toHaveLength(12)
+      expect(blockTypeNames).toHaveLength(13)
     })
 
     test('[P0] 1.3-INT-022 — page title is required string', async () => {

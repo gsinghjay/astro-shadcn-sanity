@@ -9,26 +9,23 @@ export const aboutPage: Page = {
     {
       _type: 'heroBanner',
       _key: 'hero-1',
-      headline: 'About Us',
-      subheadline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-      layout: 'centered',
+      heading: 'About Us',
+      subheading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      alignment: 'center',
     },
     {
       _type: 'textWithImage',
       _key: 'twi-1',
-      label: 'Overview',
-      headline: 'Lorem Ipsum Dolor Sit Amet',
-      body: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
-      imageUrl: 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=800',
+      heading: 'Lorem Ipsum Dolor Sit Amet',
+      image: { asset: { _id: '', url: 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=800' }, alt: 'Overview' },
       imagePosition: 'right',
     },
     {
       _type: 'featureGrid',
       _key: 'features-1',
-      label: 'Process',
-      headline: 'How It Works',
+      heading: 'How It Works',
       columns: 2,
-      features: [
+      items: [
         {
           _key: 'f1',
           title: 'Lorem Ipsum',
@@ -97,11 +94,10 @@ export const aboutPage: Page = {
     {
       _type: 'ctaBanner',
       _key: 'cta-1',
-      headline: 'Lorem Ipsum Dolor Sit?',
-      body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
-      ctaText: 'Contact Us',
-      ctaUrl: '/contact',
-      variant: 'light',
+      heading: 'Lorem Ipsum Dolor Sit?',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
+      ctaButtons: [{ _key: 'b1', text: 'Contact Us', url: '/contact' }],
+      backgroundVariant: 'light',
     },
   ],
 };

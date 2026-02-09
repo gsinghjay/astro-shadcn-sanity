@@ -9,46 +9,52 @@ interface Props {
 
 const { block } = Astro.props;
 
-const bgClasses: Record<string, string> = {
-  light: 'bg-muted',
+const bgMap: Record<string, string> = {
+  primary: 'bg-primary text-primary-foreground',
   dark: 'bg-foreground text-background',
-  red: 'bg-primary text-primary-foreground',
+  light: 'bg-muted',
+  white: '',
 };
 
-const primaryBtnClasses: Record<string, string> = {
-  light: '',
+const primaryBtnMap: Record<string, string> = {
+  primary: 'bg-background text-primary hover:bg-background/90',
   dark: '',
-  red: 'bg-background text-primary hover:bg-background/90',
-};
-
-const secondaryBtnClasses: Record<string, string> = {
   light: '',
-  dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
-  red: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
+  white: '',
 };
 
-const variant = block.variant || 'dark';
+const secondaryBtnMap: Record<string, string> = {
+  primary: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
+  dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  light: '',
+  white: '',
+};
+
+const variant = block.backgroundVariant || 'dark';
 ---
 
-<Section class={bgClasses[variant]} data-animate>
+<Section class={bgMap[variant]} data-animate>
   <SectionContent class="items-center text-center max-w-3xl mx-auto">
     <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
-      {block.headline}
+      {block.heading}
     </h2>
 
-    {block.body && (
-      <p class="text-lg leading-relaxed max-w-2xl opacity-80">{block.body}</p>
+    {block.description && (
+      <p class="text-lg leading-relaxed max-w-2xl opacity-80">{block.description}</p>
     )}
 
-    <SectionActions class="justify-center">
-      <Button href={block.ctaUrl} class={primaryBtnClasses[variant]}>
-        {block.ctaText}
-      </Button>
-      {block.secondaryCtaText && block.secondaryCtaUrl && (
-        <Button href={block.secondaryCtaUrl} variant="outline" class={secondaryBtnClasses[variant]}>
-          {block.secondaryCtaText}
-        </Button>
-      )}
-    </SectionActions>
+    {block.ctaButtons && block.ctaButtons.length > 0 && (
+      <SectionActions class="justify-center">
+        {block.ctaButtons.map((btn, i) => (
+          <Button
+            href={btn.url}
+            variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+            class={i === 0 ? primaryBtnMap[variant] : secondaryBtnMap[variant]}
+          >
+            {btn.text}
+          </Button>
+        ))}
+      </SectionActions>
+    )}
   </SectionContent>
 </Section>

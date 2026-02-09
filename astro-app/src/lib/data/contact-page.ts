@@ -9,9 +9,9 @@ export const contactPage: Page = {
     {
       _type: 'heroBanner',
       _key: 'hero-1',
-      headline: 'Get in Touch',
-      subheadline: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.',
-      layout: 'centered',
+      heading: 'Get in Touch',
+      subheading: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.',
+      alignment: 'center',
     },
     {
       _type: 'contactForm',
@@ -37,9 +37,9 @@ export const contactPage: Page = {
     {
       _type: 'featureGrid',
       _key: 'contact-info',
-      label: 'Other Ways to Reach Us',
+      heading: 'Other Ways to Reach Us',
       columns: 3,
-      features: [
+      items: [
         {
           _key: 'c1',
           title: 'Office',

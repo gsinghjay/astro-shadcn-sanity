@@ -7,7 +7,7 @@ interface Props {
 }
 
 const { block } = Astro.props;
-const isDark = block.variant === 'dark';
+const isDark = block.backgroundVariant === 'dark';
 ---
 
 <Section
@@ -15,6 +15,9 @@ const isDark = block.variant === 'dark';
   class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
   data-animate
 >
+  {block.heading && (
+    <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{block.heading}</h2>
+  )}
   <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
     {block.stats.map((stat) => (
       <div class="text-center">

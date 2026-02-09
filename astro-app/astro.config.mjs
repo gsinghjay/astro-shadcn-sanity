@@ -3,6 +3,8 @@ import { loadEnv } from "vite";
 import sanity from "@sanity/astro";
 import tailwindcss from "@tailwindcss/vite";
 import icon from "astro-icon";
+import node from "@astrojs/node";
+import react from "@astrojs/react";
 
 const {
   PUBLIC_SANITY_STUDIO_PROJECT_ID,
@@ -16,7 +18,7 @@ const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID || PUBLIC_SANITY_PROJECT_ID ||
 const dataset = PUBLIC_SANITY_STUDIO_DATASET || PUBLIC_SANITY_DATASET || "production";
 
 export default defineConfig({
-  output: "static",
+  adapter: node({ mode: "standalone" }),
   vite: {
     plugins: [tailwindcss()],
   },
@@ -26,7 +28,11 @@ export default defineConfig({
       dataset,
       useCdn: false,
       apiVersion: "2024-12-08",
+      stega: {
+        studioUrl: "http://localhost:3333",
+      },
     }),
     icon(),
+    react(),
   ],
 });

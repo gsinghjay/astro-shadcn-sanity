@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { VisualEditing } from "@sanity/astro/visual-editing";
 
 interface Props {
   title?: string;
@@ -14,6 +15,9 @@ const {
   description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
   hideNav = false,
 } = Astro.props;
+
+const visualEditingEnabled =
+  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
 const fullTitle =
   title === "YWCC Industry Capstone Program"
@@ -38,5 +42,6 @@ const fullTitle =
     </main>
     {!hideNav && <Footer />}
     <script src="../scripts/main.ts"></script>
+    <VisualEditing enabled={visualEditingEnabled} />
   </body>
 </html>

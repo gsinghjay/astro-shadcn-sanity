@@ -1,9 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
-import { homePage } from '../lib/data';
+import { getPage } from '../lib/sanity';
+
+const page = await getPage('home');
+if (!page) {
+  return Astro.redirect('/404');
+}
 ---
 
-<Layout title={homePage.title} description={homePage.description}>
-  <BlockRenderer blocks={homePage.blocks} />
+<Layout title={page.title} description={page.description}>
+  <BlockRenderer blocks={page.blocks} />
 </Layout>
