@@ -101,7 +101,7 @@ documentsIncluded:
 | NFR6 | Performance | Page JavaScript payload under 5KB minified (excluding third-party analytics) |
 | NFR7 | Performance | CSS payload under 15KB after Tailwind purge |
 | NFR8 | Performance | Static build under 60 seconds; full CI/CD pipeline under 3 minutes |
-| NFR9 | Security | Sanity write token never exposed to client — form submissions route through Cloudflare Worker |
+| NFR9 | Security | Sanity write token never exposed to client — form submissions route through server-side API route on Cloudflare Pages |
 | NFR10 | Security | Contact form includes honeypot field and rate limiting |
 | NFR11 | Security | HTTPS with security headers (CSP, X-Frame-Options, X-Content-Type-Options) |
 | NFR12 | Security | No user credentials or PII stored client-side |
@@ -114,7 +114,7 @@ documentsIncluded:
 | NFR19 | Accessibility | Skip-to-content link on every page |
 | NFR20 | Integration | Sanity content fetched exclusively at build time — zero runtime API calls |
 | NFR21 | Integration | Build-time Sanity API usage under 10% of free tier (100K requests/month) |
-| NFR22 | Integration | Cloudflare Worker handles up to 100 form submissions/day within free tier |
+| NFR22 | Integration | Cloudflare Pages API route handles up to 100 form submissions/day within free tier |
 | NFR23 | Integration | GA4 loads asynchronously, does not block page rendering |
 | NFR24 | Integration | Monsido operates without impacting performance metrics |
 | NFR25 | Maintainability | Adding a new block requires exactly 3 files: Sanity schema, Astro component, BlockRenderer registration |
@@ -256,12 +256,13 @@ None found.
 #### 🟠 Major Issues
 
 **1. Story 5.2 is oversized**
-Story 5.2 "Analytics, Monitoring & Production Deploy" combines five distinct concerns: GA4 integration, Monsido integration, security headers, GitHub Actions CI/CD pipeline creation, and production deployment to GitHub Pages. These are distinct deliverables that could fail independently.
-- **Recommendation:** Consider splitting into Story 5.2a (Analytics & Monitoring — GA4, Monsido, security headers) and Story 5.2b (CI/CD & Production Deploy — GitHub Actions workflow, deployment verification, Lighthouse validation).
+Story 5.2 "Analytics, Monitoring & Production Deploy" combines five distinct concerns: GA4 integration, Monsido integration, security headers, `@astrojs/cloudflare` adapter setup, and Cloudflare Pages deployment via `wrangler deploy`. These are distinct deliverables that could fail independently.
+- **Recommendation:** Consider splitting into Story 5.2a (Analytics & Monitoring — GA4, Monsido, security headers) and Story 5.2b (CI/CD & Production Deploy — Cloudflare adapter, wrangler config, GitHub Actions workflow, deployment verification, Lighthouse validation).
+- **Update (2026-02-09):** Story 5.2 rewritten for Cloudflare Pages (no longer GitHub Pages). `@astrojs/cloudflare` adapter and `wrangler.jsonc` added here.
 
-**2. Story 6.1 is oversized**
-Story 6.1 "Submission Schema & Cloudflare Infrastructure" combines hosting migration (GitHub Pages → Cloudflare Pages), adapter change (`@astrojs/cloudflare`), Cloudflare Worker creation, Sanity submission schema, rate limiting, and CI/CD pipeline updates. This is a high-risk story with many moving parts.
-- **Recommendation:** Consider splitting into Story 6.1a (Hosting Migration — Cloudflare Pages, adapter, CI/CD) and Story 6.1b (Form Proxy & Submission Schema — Worker, schema, rate limiting).
+**2. Story 6.1 simplified** *(Updated 2026-02-09)*
+Story 6.1 was originally oversized (hosting migration + adapter change + Worker + schema + rate limiting). With the decision to deploy to Cloudflare Pages from day one (Epic 5), Story 6.1 has been simplified to just: submission schema + API route + rate limiting. The hosting migration concern has been eliminated entirely.
+- **Status:** RESOLVED — Story 6.1 rewritten to focus on submission schema and `/api/submit` API route only.
 
 **3. NFR1 Lighthouse threshold discrepancy**
 PRD NFR1 specifies "Lighthouse Performance score 95+" but Story 5.2 AC says "Lighthouse scores are 90+ across Performance, Accessibility, Best Practices, and SEO." The story uses a lower Performance threshold than the PRD requirement.
@@ -354,7 +355,7 @@ None. No critical violations were found.
 
 4. **Consider splitting Story 5.2** — When reaching Epic 5, evaluate whether analytics/monitoring setup and CI/CD/deployment should be separate stories to reduce risk.
 
-5. **Consider splitting Story 6.1** — When reaching Epic 6, evaluate whether hosting migration and form proxy/schema should be separate stories.
+5. ~~**Consider splitting Story 6.1**~~ — RESOLVED (2026-02-09): Hosting migration eliminated. Story 6.1 now focuses on submission schema + API route only.
 
 6. **Add siteSettings fallback to Story 1.3** — Specify what happens when the siteSettings document doesn't exist in Sanity (graceful error message vs build failure).
 

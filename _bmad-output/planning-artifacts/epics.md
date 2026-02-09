@@ -88,7 +88,7 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 - NFR8: Static build under 60 seconds; full CI/CD pipeline under 3 minutes
 
 **Security**
-- NFR9: Sanity write token never exposed to client — form submissions route through Cloudflare Worker
+- NFR9: Sanity write token never exposed to client — form submissions route through server-side API route on Cloudflare Pages
 - NFR10: Contact form includes honeypot field and rate limiting
 - NFR11: HTTPS with security headers (CSP, X-Frame-Options, X-Content-Type-Options)
 - NFR12: No user credentials or PII stored client-side
@@ -105,7 +105,7 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 **Integration**
 - NFR20: Sanity content fetched exclusively at build time — zero runtime API calls
 - NFR21: Build-time Sanity API usage under 10% of free tier (100K requests/month)
-- NFR22: Cloudflare Worker handles up to 100 form submissions/day within free tier
+- NFR22: Cloudflare Pages API route handles up to 100 form submissions/day within free tier
 - NFR23: GA4 loads asynchronously, does not block page rendering
 - NFR24: Monsido operates without impacting performance metrics
 
@@ -118,7 +118,7 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 ### Additional Requirements
 
 **From Architecture — Starter Template & Project Setup:**
-- Project initialized from `sanity-template-astro-clean` starter — requires reconfiguration: remove React/Vercel adapter, add Tailwind v4 via `@tailwindcss/vite`, initialize shadcn CLI with fulldev/ui `@fulldev` registry, set `output: 'static'`
+- Project initialized from `sanity-template-astro-clean` starter — requires reconfiguration: remove React/Vercel adapter, add Tailwind v4 via `@tailwindcss/vite`, initialize shadcn CLI with fulldev/ui `@fulldev` registry, set `output: 'static'` (Cloudflare adapter added later in Epic 5)
 - Monorepo structure: `astro-app/` (frontend) + `studio/` (Sanity Studio) as npm workspaces
 - Node.js 24+ required for CI/CD and local dev
 - Environment config via `.env` files (already wired by starter)
@@ -144,10 +144,10 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 - All images require width, height, alt, and `loading="lazy"`
 
 **From Architecture — Infrastructure & Deployment:**
-- GitHub Pages for initial hosting (pure `output: 'static'`)
-- GitHub Actions CI/CD (deferred until blocks built)
-- Sanity webhook → `repository_dispatch` for content-triggered rebuilds (deferred)
-- Migration path to Cloudflare Pages when forms are implemented (adds `@astrojs/cloudflare` adapter + Worker)
+- Cloudflare Pages hosting from day one with `@astrojs/cloudflare` adapter (adapter added in Epic 5, `output: 'static'` retained — Astro 5.x allows per-route SSR opt-out via `export const prerender = false`)
+- GitHub Actions CI/CD deploys to Cloudflare Pages via `wrangler deploy` (deferred until blocks built)
+- Sanity webhook → Cloudflare Pages deploy hook for content-triggered rebuilds (deferred)
+- `platformProxy` enabled in adapter config for local Workers runtime emulation during development
 
 **From Architecture — Block Development Process:**
 - Adding a new block requires exactly 7 steps: (1) schema file, (2) register in index.ts, (3) install needed fulldev/ui primitives via `npx shadcn@latest add @fulldev/{name}`, (4) Astro component (composing from `ui/` primitives), (5) add to BlockRenderer, (6) add GROQ projection, (7) add type to page schema's `blocks[]` array
@@ -179,11 +179,11 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 - FR14: Epic 4 - Program events (create/manage)
 - FR15: Epic 4 - Timeline with status indicators
 - FR16: Epic 4 - Semester date updates
-- FR17: Epic 6 - Sponsor inquiry form submission
-- FR18: Epic 6 - Form input validation
-- FR19: Epic 6 - Form submissions stored in Sanity via proxy
-- FR20: Epic 6 - Form submissions management in Studio
-- FR21: Epic 6 - Visual confirmation after submission
+- FR17: Epic 6 - Sponsor inquiry form submission (Story 6.1 — Formsite integration)
+- FR18: Epic 6 - Form input validation (Story 6.1 — client-side + Formsite)
+- FR19: Epic 6 - Form submissions stored via Formsite (Story 6.1 — replaces Sanity proxy)
+- FR20: Epic 6 - Form submissions management in Formsite dashboard (Story 6.1)
+- FR21: Epic 6 - Visual confirmation after submission (Story 6.1)
 - FR22: Epic 2 - Hero Banner block
 - FR23: Epic 2 - Feature Grid block
 - FR24: Epic 3 - Sponsor Cards block
@@ -201,7 +201,7 @@ This document provides the complete epic and story breakdown for astro-shadcn-sa
 - FR36: Epic 5 - Sitemap generation
 - FR37: Epic 5 - Semantic HTML (heading hierarchy, landmarks)
 - FR38: Epic 5 - GA4 analytics
-- FR39: Epic 5 - Monsido accessibility monitoring
+- FR39: Epic 5 - Matomo self-hosted analytics (Story 5.3, replaces Monsido)
 - FR40: Epic 1 - Global site settings
 
 ## Epic List
@@ -213,10 +213,11 @@ Content editors can manage site-wide settings, and visitors see a branded, navig
 **Change Log (2026-02-07):** Stories restructured per Sprint Change Proposal. Story 1.2 replaced with reference project migration. Original 1.3/1.4 (layout, mobile nav) absorbed into migration. New 1.3 (schema infrastructure, renumbered). New 1.4 (Storybook setup).
 
 ### Epic 2: Sanity Integration
-Sanity block schemas, document schemas, and GROQ queries wired to the migrated frontend components. Content editors can compose pages from blocks in Sanity Studio. All placeholder data replaced with CMS-driven content.
+Sanity block schemas, document schemas, and GROQ queries wired to the migrated frontend components. Content editors can compose pages from blocks in Sanity Studio. All placeholder data replaced with CMS-driven content. Includes schemas for all 102 fulldev/ui block variants assigned across 5 parallel developer stories.
 **FRs covered:** FR1, FR2, FR3, FR4, FR5, FR22, FR23, FR25, FR26, FR27, FR30
-**Notes:** Frontend block components already exist from Epic 1 migration. This epic focuses exclusively on the Sanity schema layer, GROQ queries, and page composition system. Covers all 12 P0 block schemas.
+**Notes:** Frontend block components already exist from Epic 1 migration. This epic focuses exclusively on the Sanity schema layer, GROQ queries, and page composition system. Covers all 12 P0 custom block schemas (Stories 2.1–2.3) plus all 102 fulldev/ui block schemas (Stories 2.4–2.8, parallel across 5 developers).
 **Change Log (2026-02-07):** Epic refocused per Sprint Change Proposal. Original 4 stories (page composition, hero+CTA, richtext+grid, FAQ+logo) replaced with 3 stories (block schemas, GROQ queries, page composition). Frontend build work eliminated — already migrated in Epic 1.
+**Change Log (2026-02-08):** Added Stories 2.4–2.8 for fulldev/ui block schema conversion. 102 blocks divided into 5 thematic groups for parallel development: Hero & Banner (22), Content & Articles (19), CTA & Features (21), Products & Services (21), Media & Misc (19).
 
 ### Epic 3: Sponsor Showcase & Discovery
 Content editors can create and manage sponsor profiles with tiers and featured flags. Visitors can browse sponsors in card layouts and view individual sponsor detail pages with logos, descriptions, and websites.
@@ -229,14 +230,18 @@ Content editors can manage projects, teams, and program events. Students find te
 **Notes:** Timeline block for milestones with current/completed/upcoming status indicators. Project listing at `/projects/`. Cross-references between sponsors, projects, and teams fully resolved via GROQ queries. Builds on sponsor data from Epic 3.
 
 ### Epic 5: SEO, Analytics & Production Launch
-The site is discoverable via search engines with proper metadata and sitemap. Visitor behavior is tracked with GA4. Accessibility is monitored via Monsido. Site deployed to production on GitHub Pages with CI/CD pipeline.
+The site is discoverable via search engines with proper metadata and sitemap. Visitor behavior is tracked with GA4. Web analytics tracked with self-hosted Matomo on a VPS. Site deployed to production on **Cloudflare Pages** with CI/CD pipeline.
 **FRs covered:** FR35, FR36, FR37, FR38, FR39
-**Notes:** Per-page SEO fields in Sanity (metaTitle, metaDescription, ogImage), `@astrojs/sitemap`, Open Graph tags, semantic HTML validation. GA4 async script, Monsido integration. GitHub Actions deploy workflow. Security headers via meta tags (CSP, X-Frame-Options, X-Content-Type-Options).
+**Notes:** Per-page SEO fields in Sanity (metaTitle, metaDescription, ogImage), `@astrojs/sitemap`, Open Graph tags, semantic HTML validation. GA4 async script in Story 5.2. Matomo self-hosted on VPS in Story 5.3. `@astrojs/cloudflare` adapter added in Story 5.2. GitHub Actions workflow deploys to Cloudflare Pages via `wrangler deploy`. Security headers via meta tags (CSP, X-Frame-Options, X-Content-Type-Options).
+**Change Log (2026-02-09):** Deployment target changed from GitHub Pages to Cloudflare Pages. Story 5.2 rewritten. `@astrojs/cloudflare` adapter added here instead of as a deferred migration in Epic 6.
+**Change Log (2026-02-09b):** Story 5.2 split — Matomo separated into new Story 5.3 (self-hosted on VPS). Monsido replaced with Matomo throughout.
 
-### Epic 6: Sponsor Inquiry System (Deferred)
-Prospective sponsors can submit inquiry forms with validation and receive visual confirmation. Submissions are securely stored in Sanity via server-side proxy. Admins manage submissions in Sanity Studio.
+### Epic 6: Sponsor Inquiry System
+Prospective sponsors can submit inquiry forms with validation and receive visual confirmation. Submissions stored in NJIT's Formsite account. Single story — contact form block wired to Formsite endpoint.
 **FRs covered:** FR17, FR18, FR19, FR20, FR21, FR28
-**Notes:** Requires hosting migration from GitHub Pages to Cloudflare Pages, `@astrojs/cloudflare` adapter, and Cloudflare Worker form proxy. Contact Form block with honeypot field and rate limiting. Deferred by design until all other epics are complete.
+**Notes:** Uses NJIT's existing Formsite license. No Sanity submission schema, no SSR API route, no write token needed. Formsite handles spam protection, rate limiting, and storage. Single Story 6.1 covers everything (original 6.1 + 6.2 collapsed).
+**Change Log (2026-02-09):** Epic is no longer deferred.
+**Change Log (2026-02-09b):** Rewritten for Formsite integration. Stories 6.1 + 6.2 collapsed into single Story 6.1.
 
 ## Epic 1: Site Foundation & Navigation
 
@@ -418,6 +423,169 @@ So that I can build new pages without developer assistance.
 **And** `astro-app/src/pages/[...slug].astro` dynamic catch-all route fetches pages by slug from Sanity and renders through Layout + BlockRenderer
 **And** unrecognized block types render a visible placeholder in development and nothing in production
 
+### Stories 2.4–2.8: fulldev/ui Block Sanity Schemas (Parallel)
+
+> **Change Log (2026-02-08):** NEW — 5 parallel stories splitting the 102 fulldev/ui block components across 5 developers. Each story creates Sanity schemas, registers them, adds GROQ projections, and adds TypeScript types. Components themselves already exist and use a spread-props pattern — no Astro file changes needed.
+
+**Shared Prerequisites:** Story 1.3 (schema infrastructure — `defineBlock` helper) and Story 2.3 (page composition — `blocks[]` array on page schema, `BlockRenderer.astro` dispatch via `fulldotdevBlocks` map).
+
+**Shared Process Per Block (all 5 stories follow the same steps):**
+
+1. Inspect the existing Astro component's props to determine the schema fields
+2. Create a Sanity schema file in `studio/src/schemaTypes/blocks/` using `defineBlock`
+3. Register the schema in `studio/src/schemaTypes/index.ts`
+4. Add the block type to the page schema's `blocks[]` array
+5. Add a GROQ projection in `astro-app/src/lib/sanity.ts`
+6. Add a TypeScript type in `astro-app/src/lib/types.ts` and include it in the `PageBlock` union
+7. Verify the block renders in Sanity Studio and on the frontend
+
+**Coordination Notes:**
+
+- All 5 stories touch the same 4 shared files: `schemaTypes/index.ts`, `page.ts` blocks array, `sanity.ts` projections, `types.ts` union. Each developer adds only their blocks to these files. Merge conflicts are additive (append-only) and trivial to resolve.
+- `BlockRenderer.astro` already dispatches all 102 blocks via the `fulldotdevBlocks` map — no changes needed there.
+- Each developer should work on a dedicated branch (`feat/2.4-ui-blocks-hero-banner`, etc.) and merge sequentially.
+
+### Story 2.4: fulldev/ui Schemas — Hero & Banner Variants (22 blocks)
+
+As a developer,
+I want Sanity schemas for all hero, banner, header, and footer fulldev/ui block variants,
+So that content editors can add these layout components to pages via Sanity Studio.
+
+**Assigned blocks (22):**
+
+| Category | Blocks | Count |
+|----------|--------|:-----:|
+| hero | hero-1 through hero-14 | 14 |
+| banner | banner-1, banner-2 | 2 |
+| header | header-1, header-2, header-3 | 3 |
+| footer | footer-1, footer-2, footer-3 | 3 |
+
+**Acceptance Criteria:**
+
+**Given** the schema infrastructure from Story 1.3 is in place
+**When** all 22 block schemas are created
+**Then** each block has a schema file in `studio/src/schemaTypes/blocks/` using `defineBlock` with fields matching the component's props
+**And** all 22 schemas are registered in `studio/src/schemaTypes/index.ts`
+**And** all 22 block types are added to the page schema's `blocks[]` array
+**And** GROQ projections are added for all 22 blocks in `astro-app/src/lib/sanity.ts`
+**And** TypeScript types are added to `astro-app/src/lib/types.ts` and included in the `PageBlock` union
+**And** Sanity Studio starts without schema errors
+**And** content editors can add, configure, and preview all 22 block types in Studio
+
+### Story 2.5: fulldev/ui Schemas — Content & Articles (19 blocks)
+
+As a developer,
+I want Sanity schemas for all content, article, articles, blocks, links, and table fulldev/ui block variants,
+So that content editors can add these content-focused components to pages via Sanity Studio.
+
+**Assigned blocks (19):**
+
+| Category | Blocks | Count |
+|----------|--------|:-----:|
+| content | content-1 through content-6 | 6 |
+| article | article-1, article-2 | 2 |
+| articles | articles-1 through articles-4 | 4 |
+| blocks | blocks-1 through blocks-4 | 4 |
+| links | links-1, links-2 | 2 |
+| table | table-1 | 1 |
+
+**Acceptance Criteria:**
+
+**Given** the schema infrastructure from Story 1.3 is in place
+**When** all 19 block schemas are created
+**Then** each block has a schema file in `studio/src/schemaTypes/blocks/` using `defineBlock` with fields matching the component's props
+**And** all 19 schemas are registered in `studio/src/schemaTypes/index.ts`
+**And** all 19 block types are added to the page schema's `blocks[]` array
+**And** GROQ projections are added for all 19 blocks in `astro-app/src/lib/sanity.ts`
+**And** TypeScript types are added to `astro-app/src/lib/types.ts` and included in the `PageBlock` union
+**And** Sanity Studio starts without schema errors
+**And** content editors can add, configure, and preview all 19 block types in Studio
+
+### Story 2.6: fulldev/ui Schemas — CTA & Features (21 blocks)
+
+As a developer,
+I want Sanity schemas for all CTA, features, steps, and FAQ fulldev/ui block variants,
+So that content editors can add these conversion-focused components to pages via Sanity Studio.
+
+**Assigned blocks (21):**
+
+| Category | Blocks | Count |
+|----------|--------|:-----:|
+| cta | cta-1 through cta-8 | 8 |
+| features | features-1 through features-6 | 6 |
+| steps | steps-1, steps-2, steps-3 | 3 |
+| faqs | faqs-1 through faqs-4 | 4 |
+
+**Acceptance Criteria:**
+
+**Given** the schema infrastructure from Story 1.3 is in place
+**When** all 21 block schemas are created
+**Then** each block has a schema file in `studio/src/schemaTypes/blocks/` using `defineBlock` with fields matching the component's props
+**And** all 21 schemas are registered in `studio/src/schemaTypes/index.ts`
+**And** all 21 block types are added to the page schema's `blocks[]` array
+**And** GROQ projections are added for all 21 blocks in `astro-app/src/lib/sanity.ts`
+**And** TypeScript types are added to `astro-app/src/lib/types.ts` and included in the `PageBlock` union
+**And** Sanity Studio starts without schema errors
+**And** content editors can add, configure, and preview all 21 block types in Studio
+
+### Story 2.7: fulldev/ui Schemas — Products & Services (21 blocks)
+
+As a developer,
+I want Sanity schemas for all product, products, services, pricings, and reviews fulldev/ui block variants,
+So that content editors can add these commercial/showcase components to pages via Sanity Studio.
+
+**Assigned blocks (21):**
+
+| Category | Blocks | Count |
+|----------|--------|:-----:|
+| product | product-1 | 1 |
+| products | products-1 through products-5 | 5 |
+| services | services-1 through services-7 | 7 |
+| pricings | pricings-1, pricings-2, pricings-3 | 3 |
+| reviews | reviews-1 through reviews-5 | 5 |
+
+**Acceptance Criteria:**
+
+**Given** the schema infrastructure from Story 1.3 is in place
+**When** all 21 block schemas are created
+**Then** each block has a schema file in `studio/src/schemaTypes/blocks/` using `defineBlock` with fields matching the component's props
+**And** all 21 schemas are registered in `studio/src/schemaTypes/index.ts`
+**And** all 21 block types are added to the page schema's `blocks[]` array
+**And** GROQ projections are added for all 21 blocks in `astro-app/src/lib/sanity.ts`
+**And** TypeScript types are added to `astro-app/src/lib/types.ts` and included in the `PageBlock` union
+**And** Sanity Studio starts without schema errors
+**And** content editors can add, configure, and preview all 21 block types in Studio
+
+### Story 2.8: fulldev/ui Schemas — Media & Miscellaneous (19 blocks)
+
+As a developer,
+I want Sanity schemas for all media, logo, contact, stats, and utility fulldev/ui block variants,
+So that content editors can add these media and supplementary components to pages via Sanity Studio.
+
+**Assigned blocks (19):**
+
+| Category | Blocks | Count |
+|----------|--------|:-----:|
+| logos | logos-1, logos-2, logos-3 | 3 |
+| images | images-1, images-2 | 2 |
+| video | video-1, video-2, video-3 | 3 |
+| videos | videos-1 through videos-4 | 4 |
+| contact | contact-1, contact-2, contact-3 | 3 |
+| stats | stats-1, stats-2, stats-3 | 3 |
+| skeletons | skeletons-1 | 1 |
+
+**Acceptance Criteria:**
+
+**Given** the schema infrastructure from Story 1.3 is in place
+**When** all 19 block schemas are created
+**Then** each block has a schema file in `studio/src/schemaTypes/blocks/` using `defineBlock` with fields matching the component's props
+**And** all 19 schemas are registered in `studio/src/schemaTypes/index.ts`
+**And** all 19 block types are added to the page schema's `blocks[]` array
+**And** GROQ projections are added for all 19 blocks in `astro-app/src/lib/sanity.ts`
+**And** TypeScript types are added to `astro-app/src/lib/types.ts` and included in the `PageBlock` union
+**And** Sanity Studio starts without schema errors
+**And** content editors can add, configure, and preview all 19 block types in Studio
+
 ## Epic 3: Sponsor Showcase & Discovery
 
 Content editors can create and manage sponsor profiles with tiers and featured flags. Visitors can browse sponsors in card layouts and view individual sponsor detail pages with logos, descriptions, and websites.
@@ -540,7 +708,9 @@ So that I can find my team assignment, explore project details, and discover con
 
 ## Epic 5: SEO, Analytics & Production Launch
 
-The site is discoverable via search engines with proper metadata and sitemap. Visitor behavior is tracked with GA4. Accessibility is monitored via Monsido. Site deployed to production on GitHub Pages with CI/CD pipeline.
+> **Change Log (2026-02-09):** Deployment target changed from GitHub Pages to Cloudflare Pages. Story 5.2 rewritten. `@astrojs/cloudflare` adapter added here instead of as a deferred migration in Epic 6.
+
+The site is discoverable via search engines with proper metadata and sitemap. Visitor behavior is tracked with GA4. Accessibility is monitored via Monsido. Site deployed to production on **Cloudflare Pages** with CI/CD pipeline.
 
 ### Story 5.1: SEO Metadata & Sitemap
 
@@ -563,52 +733,63 @@ So that the site is discoverable by search engines and pages display correctly w
 **And** the sponsor detail and project listing pages include appropriate meta tags derived from their content
 **And** the build produces a valid `sitemap-index.xml` that includes all static and dynamic pages
 
-### Story 5.2: Analytics, Monitoring & Production Deploy
+### Story 5.2: GA4 Analytics, Security Headers & Cloudflare Pages Deploy (REVISED)
+
+> **Change Log (2026-02-09):** Rewritten. Deployment target changed from GitHub Pages to Cloudflare Pages. `@astrojs/cloudflare` adapter and `wrangler.jsonc` configuration added. CI/CD pipeline deploys via `wrangler deploy`.
+> **Change Log (2026-02-09b):** Monsido/Matomo removed from this story — split into new Story 5.3. This story now focuses on GA4, security headers, and Cloudflare deployment only.
 
 As a program administrator,
-I want visitor analytics, accessibility monitoring, and a production deployment pipeline,
-So that the site is live on a public URL with performance tracking and accessibility compliance from day one.
+I want GA4 visitor analytics, security headers, and a production deployment pipeline on Cloudflare Pages,
+So that the site is live on a public URL with performance tracking from day one.
 
 **Acceptance Criteria:**
 
 **Given** the complete site with all blocks and pages from Epics 1-4 is in place
-**When** analytics, monitoring, and deployment are configured
+**When** analytics and deployment are configured
 **Then** `Layout.astro` includes the GA4 tracking snippet loaded asynchronously with `async` attribute so it does not block page rendering (FR38, NFR23)
 **And** the GA4 measurement ID is configurable via environment variable or siteSettings
-**And** `Layout.astro` includes the Monsido script loaded asynchronously so it does not impact performance metrics (FR39, NFR24)
 **And** `Layout.astro` includes security headers via `<meta>` tags: Content-Security-Policy, X-Content-Type-Options (NFR11)
-**And** `.github/workflows/deploy.yml` defines a GitHub Actions workflow that: checks out code, installs dependencies, runs `npm run build` in `astro-app/`, and deploys the `dist/` output to GitHub Pages
+**And** `@astrojs/cloudflare` adapter is installed and configured in `astro.config.mjs` with `platformProxy` enabled for local development emulation of Workers runtime
+**And** `output` remains `'static'` (Astro 5.x default — pages needing SSR opt out individually with `export const prerender = false`)
+**And** `wrangler.jsonc` is created in `astro-app/` with project name, compatibility date, and `[site]` configuration for static asset serving
+**And** `astro-app/package.json` includes `"deploy": "astro build && wrangler deploy"` script
+**And** `.github/workflows/deploy.yml` defines a GitHub Actions workflow that: checks out code, installs dependencies, runs `astro build` in `astro-app/`, and deploys to Cloudflare Pages via `wrangler deploy` using `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets
 **And** the workflow triggers on push to the main branch
 **And** the full CI/CD pipeline completes in under 3 minutes (NFR8)
 **And** the static build completes in under 60 seconds (NFR8)
-**And** the deployed site is accessible at the GitHub Pages URL with HTTPS
+**And** the deployed site is accessible at the Cloudflare Pages URL (`.pages.dev` subdomain) with HTTPS
 **And** Lighthouse scores are 90+ across Performance, Accessibility, Best Practices, and SEO on the deployed site (NFR1, NFR14)
 
-## Epic 6: Sponsor Inquiry System (Deferred)
+### Story 5.3: Matomo Self-Hosted Analytics on VPS
 
-Prospective sponsors can submit inquiry forms with validation and receive visual confirmation. Submissions are securely stored in Sanity via server-side proxy. Admins manage submissions in Sanity Studio.
+> **Change Log (2026-02-09b):** NEW story. Split from Story 5.2. Replaces Monsido (FR39) with self-hosted Matomo for web analytics and accessibility/compliance monitoring.
 
-### Story 6.1: Submission Schema & Cloudflare Infrastructure
-
-As a developer,
-I want the hosting migrated to Cloudflare Pages with a Worker-based form proxy and submission schema in Sanity,
-So that form submissions can be securely written to Sanity without exposing the write token to the client.
+As a program administrator,
+I want a self-hosted Matomo instance on a VPS with tracking integrated into the site,
+So that we have full ownership of analytics data with no recurring SaaS costs beyond VPS hosting.
 
 **Acceptance Criteria:**
 
-**Given** the site is deployed on GitHub Pages from Epic 5
-**When** the Cloudflare infrastructure and submission schema are set up
-**Then** `studio/src/schemaTypes/documents/submission.ts` defines a document schema with fields: name (string, required), organization (string), email (string, required), message (text, required), submittedAt (datetime), status (string: new/reviewed/contacted, default new) (FR20)
-**And** the schema is registered in `studio/src/schemaTypes/index.ts`
-**And** content editors can view and manage all form submissions in Sanity Studio, filtering by status (FR20)
-**And** `astro.config.mjs` is updated to use `@astrojs/cloudflare` adapter with `output: 'hybrid'` (static pages remain static, form endpoint uses SSR)
-**And** a Cloudflare Worker (or Astro API route via the adapter) is created that: accepts POST requests with form data, validates required fields, creates a submission document in Sanity using the write token, and returns a success/error response (FR19)
-**And** the Sanity write token is stored as a Cloudflare environment variable — never exposed to the client (NFR9)
-**And** the Worker includes rate limiting (max 100 submissions/day) (NFR10, NFR22)
-**And** the site deploys successfully on Cloudflare Pages with the same functionality as GitHub Pages
-**And** the CI/CD pipeline is updated for Cloudflare Pages deployment
+**Given** the site is deployed to Cloudflare Pages from Story 5.2
+**When** Matomo is provisioned and integrated
+**Then** a VPS is provisioned with Matomo On-Premise installed (PHP + MariaDB/MySQL, HTTPS via Let's Encrypt)
+**And** Matomo is configured with the site URL and generates a tracking snippet
+**And** `Layout.astro` includes the Matomo tracking snippet loaded asynchronously so it does not impact performance metrics (FR39, NFR24)
+**And** the Matomo instance URL and site ID are configurable via environment variables
+**And** Matomo dashboard is accessible at the VPS URL and records page views from the deployed site
+**And** Matomo's JavaScript tracker does not block page rendering or impact Lighthouse Performance score
+**And** VPS setup is documented (OS, packages, Matomo version, backup strategy) for reproducibility
 
-### Story 6.2: Contact Form Block
+## Epic 6: Sponsor Inquiry System
+
+> **Change Log (2026-02-09):** Epic is no longer deferred. Hosting migration step removed — Cloudflare Pages infrastructure is in place from Epic 5.
+> **Change Log (2026-02-09b):** Epic rewritten. Stories 6.1 and 6.2 collapsed into single Story 6.1. Formsite replaces custom Sanity API route for form submissions — NJIT already has an institutional Formsite license. Eliminates need for: submission document schema, SSR API route, Sanity write token, server-side rate limiting. Sanity's 10K document quota preserved for content only.
+
+Prospective sponsors can submit inquiry forms with validation and receive visual confirmation. Submissions are stored in NJIT's existing Formsite account. Contact form block wired to Formsite endpoint.
+
+### Story 6.1: Contact Form with Formsite Integration
+
+> **Change Log (2026-02-09b):** NEW — replaces original Stories 6.1 + 6.2. Uses NJIT's institutional Formsite account instead of custom Sanity API route. No submission schema, no SSR API route, no write token needed.
 
 As a prospective sponsor,
 I want to fill out and submit an inquiry form on the site with validation and confirmation feedback,
@@ -616,16 +797,128 @@ So that I can express interest in sponsoring a capstone team and know my submiss
 
 **Acceptance Criteria:**
 
-**Given** the submission schema and Cloudflare infrastructure from Story 6.1 are in place
-**When** the Contact Form block is created
-**Then** `studio/src/schemaTypes/blocks/contact-form.ts` defines a block schema using `defineBlock` with fields: heading (string), description (text), successMessage (string) (FR28)
-**And** `astro-app/src/components/blocks/ContactForm.astro` renders a form with fields: name (text input, required), organization (text input), email (email input, required), message (textarea, required) (FR17)
-**And** the form includes a honeypot field (hidden input) that rejects submissions when filled (NFR10)
+**Given** the site is deployed and NJIT has an active Formsite account with a sponsor inquiry form configured
+**When** the Contact Form block is wired to Formsite
+**Then** `studio/src/schemaTypes/blocks/contact-form.ts` block schema is updated with a `formsiteUrl` field (url) so editors can configure the Formsite endpoint per-block (FR28)
+**And** `astro-app/src/components/blocks/custom/ContactForm.astro` renders a form with fields: name (text input, required), organization (text input), email (email input, required), message (textarea, required) (FR17)
 **And** client-side validation prevents submission of empty required fields and validates email format, displaying inline error messages (FR18)
-**And** on valid submission, the form sends a POST request to the Cloudflare Worker/API endpoint (FR19)
+**And** on valid submission, the form sends a POST request to the Formsite Server Post URL configured in the block schema (FR19)
 **And** on successful submission, a toast/banner confirmation message displays using the `successMessage` from the block schema (FR21)
 **And** on submission error, a user-friendly error message is displayed without exposing technical details
 **And** the form uses vanilla JS (under 50 lines) with inline `<script>`, data-attribute patterns, and proper ARIA attributes for error states (`aria-invalid`, `aria-describedby`)
 **And** the form is fully keyboard navigable with visible focus indicators (NFR15)
-**And** the block is registered in `schemaTypes/index.ts`, `BlockRenderer.astro`, and the page schema's `blocks[]` array
-**And** the form submits successfully and creates a submission document visible in Sanity Studio
+**And** Formsite handles spam protection, rate limiting, and submission storage (NFR10, NFR22)
+**And** no Sanity write token is needed — submissions go directly to Formsite (NFR9)
+**And** form submissions are viewable in the Formsite dashboard (FR20)
+**And** the form submits successfully and the submission appears in the Formsite results
+
+## Epic 7: Sanity Code Quality & Type Safety
+
+> **Source:** Sanity Code Review (2026-02-09) — `docs/code-review/sanity-code-review_20260209_130832.md`
+> **Priority:** Should be completed before continuing Epic 2 block schema stories (2.4–2.9) to avoid compounding technical debt.
+
+Refactor the Sanity integration layer to follow best practices identified in the code review. Fixes critical visual editing breakage, adds TypeGen for automated type safety, improves schema patterns, and cleans up dead code.
+
+**Review Issues Addressed:** 18 findings (1 Critical, 3 High, 4 Medium, 7 Low)
+
+### Story 7.1: Fix Visual Editing (Critical)
+
+> **Review Issues:** #10 (Critical), #11 (Medium)
+
+As a content editor,
+I want visual editing (click-to-edit, live preview) to work correctly on all pages,
+So that I can use Sanity Studio's Presentation tool to navigate and edit content in context.
+
+**Acceptance Criteria:**
+
+**Given** visual editing is enabled via the Presentation tool or preview mode
+**When** a page with template-conditional logic is rendered
+**Then** `stegaClean` from `@sanity/client/stega` is used on all string values used in logic operations: `page.template` in `[...slug].astro` for template lookup and `=== 'landing'` comparison (#10)
+**And** `stegaClean` is applied to block-level string values used in conditionals: `alignment`, `backgroundVariant`, `spacing`, `maxWidth`, `imagePosition` in block components that use these values for CSS class selection or conditional rendering (#10)
+**And** `[...slug].astro` uses the `loadQuery` helper (or equivalent from `@sanity/astro`) instead of direct `sanityClient.fetch`, so that stega encoding, perspective switching, and token injection work correctly on all dynamic pages — not just the homepage (#11)
+**And** visual editing click-to-edit overlays appear on all pages, not just the homepage
+**And** template selection works correctly during visual editing (no fallback to DefaultTemplate)
+
+### Story 7.2: Query Completeness & defineQuery
+
+> **Review Issues:** #5 (High), #6 (Low), #7 (High), #8 (Medium), #9 (Low)
+
+As a developer,
+I want all GROQ queries wrapped in `defineQuery` with complete projections for every block type,
+So that TypeGen can generate result types and no block content is silently dropped.
+
+**Acceptance Criteria:**
+
+**Given** the queries in `astro-app/src/lib/sanity.ts`
+**When** the queries are refactored
+**Then** all GROQ query strings are wrapped in `defineQuery()` from the `groq` package (#5)
+**And** query variable names follow `SCREAMING_SNAKE_CASE` convention: `SITE_SETTINGS_QUERY`, `PAGE_BY_SLUG_QUERY`, `ALL_PAGE_SLUGS_QUERY`, etc. (#6)
+**And** `pageBySlugQuery` (renamed) includes type-conditional projections for all block types registered in the page schema — currently missing `richText`, `faqSection`, `contactForm`, `sponsorCards` (#7)
+**And** the SEO projection includes `seo.metaTitle`, `seo.metaDescription`, and `seo.ogImage` with proper asset resolution (#8)
+**And** all image projections include `metadata { lqip, dimensions }` for blur placeholder support (#9)
+**And** no block type in the page schema's `blocks[]` array is missing a corresponding GROQ projection
+**And** all queries compile without errors
+
+### Story 7.3: Schema Best Practices
+
+> **Review Issues:** #1 (Medium), #2 (Low), #3 (High), #4 (Low), #14 (Medium)
+
+As a developer,
+I want all Sanity schemas to follow documented best practices for type safety, editor UX, and content integrity,
+So that the schema layer is robust and provides a good editing experience.
+
+**Acceptance Criteria:**
+
+**Given** the existing schemas in `studio/src/schemaTypes/`
+**When** schemas are updated to follow best practices
+**Then** all array `of` items use `defineArrayMember()` for type safety — applies to `page.ts` blocks array, `hero-banner.ts` backgroundImages and ctaButtons arrays, and all other array definitions across block schemas (#1)
+**And** block types include descriptive icons in their `defineBlock` or `defineType` calls for better Studio preview in arrays (#2)
+**And** `button.ts` URL validation allows relative paths (internal links like `/about`, `/sponsors`) via `allowRelative: true` or a toggle pattern for internal reference vs. external URL (#3)
+**And** alignment fields (`left`/`center`/`right`) use `layout: 'radio'` for better editor UX — applies to `hero-banner.ts` and `block-base.ts` (#4)
+**And** `sanity.config.ts` restricts document actions on singleton types (siteSettings) to only `publish`, `discardChanges`, and `restore` — preventing accidental deletion or duplication (#14)
+**And** Sanity Studio starts without schema errors
+**And** all existing content remains valid after schema changes
+
+### Story 7.4: TypeGen & Type Replacement
+
+> **Review Issues:** #12 (High), #13 (Low), #16 (Medium)
+> **Blocked by:** Story 7.2 (queries must use `defineQuery` before TypeGen can generate result types)
+
+As a developer,
+I want TypeGen configured to auto-generate TypeScript types from the Sanity schema and GROQ queries,
+So that frontend types are always in sync with the schema and manual type maintenance is eliminated.
+
+**Acceptance Criteria:**
+
+**Given** Story 7.2 is complete (all queries use `defineQuery`)
+**When** TypeGen is configured and run
+**Then** `sanity-typegen.json` is created with correct schema and query paths (#16)
+**And** `studio/package.json` or `astro-app/package.json` includes a `"typegen"` script that generates types (#16)
+**And** running the typegen script produces a types file with interfaces for all document types, block types, and query results (#12)
+**And** `astro-app/src/lib/types.ts` is replaced with imports from the generated types file — the 310 lines of hand-written interfaces are removed (#12)
+**And** all block types in the generated output include base fields (backgroundVariant, spacing, maxWidth) from `defineBlock`, fixing the missing `BlockBase` extends issue (#13)
+**And** phantom fields that exist in manual types but not in the schema (e.g., `Sponsor.projectThemes`, `Sponsor.yearJoined`, `TeamMember.imageUrl`) are not present in generated types (#12)
+**And** the project builds without type errors using the generated types
+**And** a note is added to the project README or developer docs explaining how to regenerate types after schema changes
+
+### Story 7.5: Config & Dead Code Cleanup
+
+> **Review Issues:** #15 (Low), #17 (Low), #18 (Low — partial)
+
+As a developer,
+I want dead code removed and hardcoded config values extracted to environment variables,
+So that the codebase is clean and deployment-ready.
+
+**Acceptance Criteria:**
+
+**Given** the codebase contains dead files and hardcoded config values
+**When** cleanup is performed
+**Then** `studioUrl` in `astro-app/astro.config.mjs` is read from an environment variable (e.g., `PUBLIC_SANITY_STUDIO_URL`) with `http://localhost:3333` as the development fallback (#15)
+**And** dead schema files in `studio/src/schemaTypes/blocks/` that are commented out of the index (`team-grid.ts`, `timeline.ts` if applicable) are either re-enabled and properly registered, or removed entirely (#17)
+**And** if dead schemas are removed, any corresponding imports in `BlockRenderer.astro` are also removed (#17)
+**And** `astro-app/src/lib/data/home-page.ts` is deleted (homepage now wired to Sanity, file is unused) (#18 — partial)
+**And** `astro-app/src/lib/data/site-settings.ts` is deleted (site settings now wired to Sanity, file is unused) (#18 — partial)
+**And** `astro-app/src/lib/data/index.ts` is updated to remove the deleted exports
+**And** remaining data files (`about-page.ts`, `contact-page.ts`, `projects-page.ts`, `sponsors-page.ts`) are retained — they are still actively imported by their pages pending Story 2.2b
+**And** `npm run build` succeeds with no errors
+**And** `npm run dev` starts both workspaces without errors

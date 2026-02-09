@@ -27,7 +27,7 @@ The YWCC Capstone Sponsors platform is a modular, CMS-driven static website for 
 
 **Differentiator:** A toolkit-not-website approach — content editors compose pages by stacking reusable UI blocks in Sanity Studio with zero code required. The block library maps editor-friendly names to shadcn/ui component internals, making the design system invisible to non-technical users.
 
-**Tech Stack:** Astro (SSG) + Sanity.io (headless CMS) + Tailwind CSS/shadcn/ui (styling) + vanilla JS (interactivity) + Storybook via storybook-astro (component development) + Cloudflare Pages (hosting) + Cloudflare Worker (form proxy).
+**Tech Stack:** Astro (SSG) + Sanity.io (headless CMS) + Tailwind CSS/shadcn/ui (styling) + vanilla JS (interactivity) + Storybook via storybook-astro (component development) + Cloudflare Pages (hosting) + Astro API route on Cloudflare Pages (form proxy).
 
 **Target Users:**
 - Industry sponsors and prospective sponsors (site visitors)
@@ -67,7 +67,7 @@ The YWCC Capstone Sponsors platform is a modular, CMS-driven static website for 
 - 100% of reference site pages reproducible with block library (validated at launch)
 - Lighthouse 90+ on all page types (automated audit in CI)
 - Build-time Sanity API usage under 10% of free tier limits
-- Contact form submissions successfully written to Sanity via Cloudflare Worker
+- Contact form submissions successfully written to Sanity via server-side API route on Cloudflare Pages
 
 ## User Journeys
 
@@ -149,7 +149,7 @@ The YWCC Capstone Sponsors platform is a modular, CMS-driven static website for 
 
 Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build time as flat arrays of CMS blocks rendered to static HTML. Interactive elements use scoped vanilla JS with data-attribute driven event delegation.
 
-**Rendering:** SSG via Astro. No runtime API calls. Hybrid SSR available via `@astrojs/cloudflare` adapter if needed later. BlockRenderer maps Sanity `_type` to Astro components at build time.
+**Rendering:** SSG via Astro. No runtime API calls for content. `@astrojs/cloudflare` adapter enables SSR for specific routes (e.g., form API at `/api/submit`) via `export const prerender = false`. BlockRenderer maps Sanity `_type` to Astro components at build time.
 
 **Browser Support:** Modern evergreen browsers (Chrome, Firefox, Safari, Edge — last 2 versions). Progressive enhancement — core content accessible without JS.
 
@@ -189,7 +189,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 | BlockRenderer + flat block array architecture | Core page builder pattern |
 | 7 Sanity document types (page, sponsor, project, team, event, submission, siteSettings) | Content model for all core data |
 | Cloudflare Pages + CI/CD | Production hosting |
-| Cloudflare Worker form proxy | Secure form submissions |
+| Cloudflare Pages API route (`/api/submit`) | Secure form submissions via SSR |
 | Site layout (nav, footer, breadcrumb, mobile nav) | shadcn NavigationMenu, Sheet, Breadcrumb |
 | SEO (meta tags, sitemap, Open Graph) | Search discoverability |
 | GA4 + Monsido | Analytics from day one |
@@ -208,7 +208,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 ### Phase 3 — Expansion
 
 - 3 P2 blocks: Image Gallery, Video Embed, Alert/Notice
-- SSR hybrid pages via `@astrojs/cloudflare` if dynamic features needed
+- Additional SSR routes via `@astrojs/cloudflare` adapter if dynamic features needed (adapter already in place from Epic 5)
 - Admin training video / onboarding walkthrough
 - Additional shadcn blocks as editor needs emerge
 - Multi-language support (if international sponsors require it)
@@ -317,7 +317,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 
 ### Security
 
-- **NFR9:** Sanity write token never exposed to client — form submissions route through Cloudflare Worker
+- **NFR9:** Sanity write token never exposed to client — form submissions route through server-side API route on Cloudflare Pages
 - **NFR10:** Contact form includes honeypot field and rate limiting
 - **NFR11:** HTTPS with security headers (CSP, X-Frame-Options, X-Content-Type-Options)
 - **NFR12:** No user credentials or PII stored client-side
@@ -336,7 +336,7 @@ Multi-page application (MPA) built with Astro SSG. Pages pre-rendered at build t
 
 - **NFR20:** Sanity content fetched exclusively at build time — zero runtime API calls
 - **NFR21:** Build-time Sanity API usage under 10% of free tier (100K requests/month)
-- **NFR22:** Cloudflare Worker handles up to 100 form submissions/day within free tier
+- **NFR22:** Cloudflare Pages API route handles up to 100 form submissions/day within free tier
 - **NFR23:** GA4 loads asynchronously, does not block page rendering
 - **NFR24:** Monsido operates without impacting performance metrics
 

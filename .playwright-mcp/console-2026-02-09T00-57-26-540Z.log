@@ -1,0 +1,7 @@
+[     513ms] [ERROR] SB_PREVIEW_API_0009 (NoStoryMatchError): Couldn't find story matching 'blocks-herobanner-herobanner--default'.
+
+- Are you sure a story with that id exists?
+- Please check your stories field of your main.js config.
+- Also check the browser console and terminal for error messages.
+    at Y5.selectSpecifiedStory (http://localhost:9009/assets/iframe-BaC3Ff1v.js:916:4859)
+    at Y5.initializeWithStoryIndex (http://localhost:9009/assets/iframe-BaC3Ff1v.js:916:4368) @ http://localhost:9009/assets/iframe-BaC3Ff1v.js:37

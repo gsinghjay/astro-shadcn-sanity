@@ -1,5 +1,4 @@
-# generated: 2026-02-08
-# updated: 2026-02-08 (Stories 2.1/2.2 split for homepage-first delivery)
+# generated: 2026-02-09
 # project: astro-shadcn-sanity
 # project_key: NOKEY
 # tracking_system: file-system
@@ -64,8 +63,28 @@
 #   - Story 1.6 added: storybook-github-pages-deploy (deploy working build to GH Pages)
 #   - Epic 1 reopened: in-progress (was done, new stories added)
 #   - Story 1.6 blocked by 1.5
+#
+# 2026-02-09: Sprint status refresh
+#   - Stories 2.4–2.8 added: fulldev/ui block Sanity schemas (5 parallel stories, 102 blocks total)
+#   - Story 2.9 added: custom-block-fulldev-ui-conversion (unify block dispatch pattern)
+#   - Story 5.2 renamed: GA4, Security Headers & Cloudflare Pages Deploy (was GitHub Pages)
+#   - Story 5.3 added: Matomo self-hosted analytics on VPS (split from 5.2)
+#   - Story 6.1 renamed: Contact Form with Formsite Integration (was custom Sanity API route)
+#   - Epic 6 no longer deferred
+#   - Story 2.2b upgraded: backlog → ready-for-dev (file exists)
+#   - Story 6.1 upgraded: backlog → ready-for-dev (file exists)
+#
+# 2026-02-09: Epic 7 added (Sanity Code Quality & Type Safety)
+#   - Source: Sanity Code Review (docs/code-review/sanity-code-review_20260209_130832.md)
+#   - 5 stories addressing 18 review findings (1 Critical, 3 High, 4 Medium, 7 Low)
+#   - Story 7.1: Fix visual editing (stegaClean + loadQuery) — Critical
+#   - Story 7.2: Query completeness & defineQuery — High
+#   - Story 7.3: Schema best practices — High+Medium
+#   - Story 7.4: TypeGen & type replacement — High (blocked by 7.2)
+#   - Story 7.5: Config & dead code cleanup — Low
+#   - Priority: before continuing Epic 2 stories 2.4–2.9
 
-generated: 2026-02-08
+generated: 2026-02-09
 project: astro-shadcn-sanity
 project_key: NOKEY
 tracking_system: file-system
@@ -86,9 +105,15 @@ development_status:
   2-1-homepage-block-schemas: done
   2-1b-remaining-block-schemas: done
   2-2-homepage-data-fetching: done
-  2-2b-remaining-pages-data-fetching: backlog
+  2-2b-remaining-pages-data-fetching: ready-for-dev
   2-3a-site-settings-wiring: done
   2-3-page-composition-system: backlog
+  2-4-ui-blocks-hero-banner: ready-for-dev
+  2-5-ui-blocks-content-articles: ready-for-dev
+  2-6-ui-blocks-cta-features: ready-for-dev
+  2-7-ui-blocks-products-services: ready-for-dev
+  2-8-ui-blocks-media-misc: ready-for-dev
+  2-9-custom-block-fulldev-ui-conversion: ready-for-dev
   epic-2-retrospective: optional
 
   epic-3: in-progress
@@ -105,10 +130,18 @@ development_status:
 
   epic-5: backlog
   5-1-seo-metadata-and-sitemap: backlog
-  5-2-analytics-monitoring-and-production-deploy: backlog
+  5-2-ga4-security-headers-cloudflare-deploy: backlog
+  5-3-matomo-self-hosted-vps: backlog
   epic-5-retrospective: optional
 
   epic-6: backlog
-  6-1-submission-schema-and-cloudflare-infrastructure: backlog
-  6-2-contact-form-block: backlog
+  6-1-contact-form-formsite-integration: ready-for-dev
   epic-6-retrospective: optional
+
+  epic-7: in-progress
+  7-1-fix-visual-editing: ready-for-dev
+  7-2-query-completeness-and-define-query: backlog
+  7-3-schema-best-practices: backlog
+  7-4-typegen-and-type-replacement: backlog  # blocked by 7.2
+  7-5-config-and-dead-code-cleanup: backlog
+  epic-7-retrospective: optional

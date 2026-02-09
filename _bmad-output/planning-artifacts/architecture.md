@@ -2,15 +2,16 @@
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 lastStep: 8
 status: 'complete'
-completedAt: '2026-02-07'
+completedAt: '2026-02-09'
 inputDocuments:
   - '/home/jay/github/astro-shadcn-sanity/_bmad-output/planning-artifacts/prd.md'
+  - '/home/jay/github/astro-shadcn-sanity/_bmad-output/project-context.md'
   - '/home/jay/github/astro-shadcn-sanity/initial-brainstorm.md'
   - '/home/jay/github/astro-shadcn-sanity/_bmad-output/brainstorming/brainstorming-session-2026-02-07.md'
 workflowType: 'architecture'
 project_name: 'astro-shadcn-sanity'
 user_name: 'Jay'
-date: '2026-02-07'
+date: '2026-02-09'
 ---
 
 # Architecture Decision Document
@@ -22,15 +23,15 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 ### Requirements Overview
 
 **Functional Requirements:**
-40 FRs across 8 categories. The architectural center of gravity is the page composition system (FR1-FR5) — a modular block library where content editors arrange pre-built UI blocks in Sanity Studio. This drives the core architectural pattern: Sanity schema → Astro component → BlockRenderer dispatch. Secondary concerns include document management (sponsors, projects, teams, events) with cross-referencing. Form submission (FR17-FR21) is explicitly deferred to last — hosting migrates from GitHub Pages to Cloudflare Pages at that point.
+43 FRs across 10 categories. The architectural center of gravity is the page composition system (FR1-FR5) — a modular block library where content editors arrange pre-built UI blocks in Sanity Studio. This drives the core architectural pattern: Sanity schema → Astro component → BlockRenderer dispatch. Secondary concerns include document management (sponsors, projects, teams, events) with cross-referencing. Form submission (FR17-FR21) uses an Astro API route on Cloudflare Pages with `prerender = false`.
 
 **Non-Functional Requirements:**
 28 NFRs with the most architecturally significant being:
 - **Performance:** Lighthouse 95+ mobile/desktop, FCP <1s, LCP <2s, TBT <100ms, CLS <0.05. JS under 5KB, CSS under 15KB after purge. Build under 60s.
-- **Security:** Write tokens never client-exposed; form proxy via Cloudflare Worker (deferred). CSP/security headers on GitHub Pages via meta tags.
+- **Security:** Write tokens never client-exposed; form proxy via Astro API route on Cloudflare Pages. CSP/security headers via meta tags.
 - **Accessibility:** WCAG 2.1 AA, Lighthouse A11y 90+, keyboard navigation, screen reader compatibility, enforced alt text in Sanity schema.
 - **Maintainability:** New block = exactly 3 files (schema + component + BlockRenderer registration). TypeScript schemas. Consistent data-attribute JS patterns.
-- **Integration:** Zero runtime API calls. Build-time Sanity usage under 10% of free tier. GA4/Monsido non-blocking.
+- **Integration:** Zero runtime API calls. Build-time Sanity usage under 10% of free tier. GA4/Matomo non-blocking.
 
 **Scale & Complexity:**
 
@@ -40,12 +41,11 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 
 ### Technical Constraints & Dependencies
 
-- **$0/month operating cost** — all services must stay within free tiers (Sanity 100K API/month, GitHub Pages unlimited bandwidth)
+- **$0/month operating cost** — all services must stay within free tiers (Sanity 100K API/month, Cloudflare Pages free tier)
 - **Zero framework runtime** — no React, Vue, or Alpine.js in production bundle. Vanilla JS only.
-- **Static output** — Astro 5.x SSG mode with `output: 'static'` (v5 merged the old `hybrid` mode into `static` — any page can opt out of prerendering with `export const prerender = false`). No serverless adapter until forms phase.
+- **Static output** — Astro 5.x SSG mode with `output: 'static'` (v5 merged the old `hybrid` mode into `static` — any page can opt out of prerendering with `export const prerender = false`). The `@astrojs/cloudflare` adapter is added in Epic 5 for deployment; pages needing SSR (e.g., form API route) opt out individually.
 - **Monorepo structure** — `astro-app/` (frontend) + `studio/` (Sanity Studio) already initialized as separate workspaces
-- **GitHub Pages (initial)** — static hosting via GitHub Actions. Migrates to Cloudflare Pages when forms are implemented (last priority).
-- **Forms are last** — Contact Form block, Cloudflare Worker, and `@astrojs/cloudflare` adapter all deferred until final implementation phase. This keeps the architecture pure SSG until then.
+- **Cloudflare Pages** — hosting from day one via `@astrojs/cloudflare` adapter. GitHub Actions CI/CD deploys via `wrangler deploy`. `platformProxy` enabled for local Workers runtime emulation during development.
 - **Sanity free tier** — unlimited admin users but 100K API requests/month, 10K documents, 5GB assets
 - **Reference site parity** — all page types on ywcccapstone1.com must be reproducible with the block library
 
@@ -56,7 +56,7 @@ _This document builds collaboratively through step-by-step discovery. Sections a
 - **Accessibility:** ARIA attributes, keyboard handlers, focus management, and alt text enforcement touch every interactive block and navigation component.
 - **Image Pipeline:** Sanity CDN → `@sanity/image-url` → responsive `srcset` with WebP/AVIF. Used by Hero, Sponsor Cards, Team Grid, Logo Cloud, Image Gallery, and any block with images.
 - **Build-Time Data Contract:** GROQ queries are the API contract between Sanity and Astro. Query patterns, projections, and reference resolution must be consistent and typed.
-- **Hosting Migration Path:** GitHub Pages → Cloudflare Pages is a planned migration. Architecture should avoid GitHub Pages-specific lock-in (e.g., no `_redirects` file assumptions). The switch adds `@astrojs/cloudflare` adapter + Cloudflare Worker for form proxy.
+- **Cloudflare Pages Hosting:** Single deployment target from day one. `@astrojs/cloudflare` adapter added in Epic 5. Form API route leverages the adapter's SSR capability via `prerender = false`.
 - **TypeScript Throughout:** Sanity schemas typed with `defineType`/`defineField`, Astro components with typed props, GROQ query results typed.
 
 ## Starter Template Evaluation
@@ -98,7 +98,7 @@ The project has already been initialized from this starter. It provides the mono
 ### Required Modifications to Starter
 
 **Remove (misaligned with architecture):**
-- `@astrojs/vercel` adapter — replacing with `output: 'static'` for GitHub Pages
+- `@astrojs/vercel` adapter — replacing with `@astrojs/cloudflare` adapter (added in Epic 5)
 - `@astrojs/react` + `react` + `react-dom` from `astro-app` — zero framework runtime requirement. React stays in `studio/` only.
 - `output: 'hybrid'` — no longer exists in Astro 5.x (its behavior is now the default under `output: 'static'`)
 - Sample schemas (`post`, `blockContent`) — replaced by project document types and block schemas
@@ -111,9 +111,9 @@ The project has already been initialized from this starter. It provides the mono
 - Block component directory structure (`src/components/blocks/`)
 - `BlockRenderer.astro` dispatch component
 - All 7 document schemas + 17 block schemas + shared base schema
-- GitHub Actions workflow for deploy to GitHub Pages
+- GitHub Actions workflow for deploy to Cloudflare Pages via `wrangler deploy`
 - Sanity webhook configuration for rebuild triggers
-- `storybook-astro` + Storybook 10 for native Astro component development and documentation (devDependencies: `storybook-astro`, `storybook`, `@storybook/addon-docs`, `@storybook/builder-vite`)
+- `storybook-astro` + Storybook 10 for native Astro component development and documentation
 
 **Note:** Project initialization is already complete. First implementation work is reconfiguring the starter to match the target architecture.
 
@@ -130,11 +130,11 @@ The project has already been initialized from this starter. It provides the mono
 **Important Decisions (Shape Architecture):**
 - Node.js 24+ for CI/CD
 - Environment config via `.env` files (existing starter pattern)
+- Visual Editing via Sanity Presentation tool + `@sanity/astro` integration
 
 **Deferred Decisions (Post-Building-Blocks):**
-- GitHub Actions deploy workflow (deferred until blocks built)
+- GitHub Actions deploy workflow to Cloudflare Pages (deferred until blocks built — Epic 5)
 - Sanity webhook for content-triggered rebuilds (deferred until blocks built)
-- Cloudflare Pages migration (deferred until forms phase)
 
 ### Data Architecture
 
@@ -148,9 +148,9 @@ The project has already been initialized from this starter. It provides the mono
 ### Authentication & Security
 
 No user authentication required. Security concerns limited to:
-- Sanity write token isolation (server-side only, deferred to forms phase)
-- CSP/security headers via `<meta>` tags on GitHub Pages
-- Honeypot + rate limiting on contact form (deferred to forms phase)
+- Sanity write token isolation (server-side only, stored as Cloudflare environment secret)
+- CSP/security headers via `<meta>` tags
+- Honeypot + rate limiting on contact form API route
 
 ### API & Communication Patterns
 
@@ -158,6 +158,7 @@ No user authentication required. Security concerns limited to:
 |---|---|---|
 | Data fetching | Build-time GROQ queries | All content fetched at build time via `sanity.fetch()`. Zero runtime API calls. |
 | Query organization | Colocated in `src/lib/sanity.ts` | Central query file with exported typed query functions. Single source of truth for all GROQ. |
+| Visual Editing | Sanity Presentation tool | `@sanity/astro` integration provides live preview in Sanity Studio. Already wired for homepage and site settings. Enables content editors to see changes in real-time before publishing. |
 | Error handling | Build-time failures | If Sanity is unreachable, build fails. No runtime error handling needed for content. |
 
 ### Frontend Architecture
@@ -176,34 +177,46 @@ No user authentication required. Security concerns limited to:
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Hosting (initial) | GitHub Pages | Free static hosting. Pure `output: 'static'` with no adapter. |
-| Hosting (future) | Cloudflare Pages | Migrate when forms are implemented. Adds `@astrojs/cloudflare` adapter. |
-| CI/CD | GitHub Actions (deferred) | Standard Astro build → GitHub Pages deploy. Configured after blocks are built. |
+| Hosting | Cloudflare Pages | Free hosting from day one. `@astrojs/cloudflare` adapter added in Epic 5. `platformProxy` for local dev emulation. |
+| CI/CD | GitHub Actions (deferred) | Astro build → `wrangler deploy` to Cloudflare Pages. Configured after blocks are built (Epic 5). |
 | Node.js version | 24+ | Latest LTS for CI/CD and local dev. |
-| Rebuild trigger | Sanity webhook (deferred) | `repository_dispatch` via Sanity webhook on content publish. Configured after blocks are built. |
+| Rebuild trigger | Sanity webhook (deferred) | Cloudflare Pages deploy hook via Sanity webhook on content publish. Configured after blocks are built. |
 | Environment config | `.env` files | Existing starter pattern. `PUBLIC_SANITY_STUDIO_PROJECT_ID` and `PUBLIC_SANITY_STUDIO_DATASET` already wired. |
+| Analytics | GA4 + Matomo | GA4 for page views/behavior (FR38). Matomo for accessibility compliance monitoring (FR39). Both load asynchronously, non-blocking. |
 
 ### Decision Impact Analysis
 
-**Implementation Sequence:**
-1. Reconfigure starter (remove React/Vercel, add Tailwind v4 via `@tailwindcss/vite`, set `output: 'static'`)
-2. Initialize shadcn CLI + fulldev/ui registry (`components.json`), install base UI primitives, set up Tailwind v4 CSS-first theme with shadcn CSS variables + NJIT brand tokens in `global.css`
-3. Create `defineBlock` helper + shared base schema
-4. Build document schemas (page, sponsor, project, team, event, siteSettings)
-5. Build block schemas (P0 first, then P1, then P2)
-6. Build matching Astro block components with BlockRenderer
-7. Build layout (nav, footer, mobile nav, breadcrumb)
-8. Build page templates (`[...slug].astro`, sponsor/project detail pages)
-9. Configure GitHub Actions deploy
-10. Configure Sanity webhook
-11. Add forms + migrate to Cloudflare Pages
+**Implementation Sequence (updated per sprint status 2026-02-09):**
+
+Steps 1-10 are DONE. The architecture is well into execution:
+
+1. ~~Reconfigure starter~~ — DONE (Story 1.1)
+2. ~~Initialize fulldev/ui, Tailwind v4 theme, shadcn CSS variables~~ — DONE (Story 1.1)
+3. ~~Create `defineBlock` helper + shared base schema~~ — DONE (Story 1.3)
+4. ~~Build document schemas (page, siteSettings)~~ — DONE (Story 1.3)
+5. ~~Build all block schemas (12 P0 + P1 + P2)~~ — DONE (Stories 2.1 + 2.1b)
+6. ~~Wire homepage to Sanity with GROQ queries, visual editing, and Presentation tool~~ — DONE (Story 2.2)
+7. ~~Wire site settings to Sanity with memoized queries and full schema validation~~ — DONE (Story 2.3a)
+8. ~~Template layout system~~ — DONE (Story 2.0)
+9. ~~Storybook setup + production build~~ — DONE (Stories 1.4 + 1.5)
+10. ~~Storybook GitHub Pages deploy~~ — DONE (Story 1.6)
+11. **Next:** Sponsor document schema + studio management (Story 3.1 — ready-for-dev)
+12. Remaining pages data fetching (Story 2.2b)
+13. Page composition system / `[...slug].astro` (Story 2.3)
+14. Sponsor cards block + listing page (Story 3.2)
+15. Sponsor detail pages (Story 3.3)
+16. Project/team/event document schemas (Epic 4)
+17. SEO metadata, sitemap, analytics (Monsido + GA4), Cloudflare Pages deploy with `@astrojs/cloudflare` adapter (Epic 5)
+18. Contact form submission schema + API route + form block (Epic 6)
 
 **Cross-Component Dependencies:**
-- `defineBlock` helper must exist before any block schema
-- fulldev/ui primitives + shadcn CSS variables and Tailwind v4 theme in `global.css` must exist before any block component
-- BlockRenderer must be updated each time a new block is added
-- Page schema must reference all block types in its `blocks[]` array
-- GROQ queries must project all fields consumed by block components
+- `defineBlock` helper must exist before any block schema — DONE
+- fulldev/ui primitives + shadcn CSS variables and Tailwind v4 theme in `global.css` must exist before any block component — DONE
+- BlockRenderer must be updated each time a new block is added — DONE for all current blocks
+- Page schema must reference all block types in its `blocks[]` array — DONE
+- GROQ queries must project all fields consumed by block components — DONE for homepage, remaining pages next
+- Sponsor document schema needed before sponsor-dependent blocks can fetch real data (Story 3.1 → 3.2)
+- Visual Editing / Presentation tool already wired for homepage — extend to all page types as they're built
 
 ## Implementation Patterns & Consistency Rules
 
@@ -475,11 +488,12 @@ astro-shadcn-sanity/
 ├── README.md
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml              # GitHub Pages deploy (deferred)
+│       └── deploy.yml              # Cloudflare Pages deploy via wrangler (deferred to Epic 5)
 │
 ├── astro-app/                      # Frontend workspace
 │   ├── package.json
-│   ├── astro.config.mjs            # output: 'static', @tailwindcss/vite plugin, @sanity/astro
+│   ├── astro.config.mjs            # output: 'static', @astrojs/cloudflare adapter, @tailwindcss/vite plugin, @sanity/astro
+│   ├── wrangler.jsonc              # Cloudflare Pages/Workers config (added in Epic 5)
 │   ├── components.json             # shadcn CLI config with @fulldev registry
 │   ├── tsconfig.json
 │   ├── .env                        # PUBLIC_SANITY_STUDIO_PROJECT_ID, PUBLIC_SANITY_STUDIO_DATASET
@@ -618,10 +632,10 @@ astro-shadcn-sanity/
 - Schema: `studio/src/schemaTypes/documents/event.ts`
 - Block: `Timeline.astro` + `timeline.ts`
 
-**Forms (FR17-FR21) — Deferred:**
+**Forms (FR17-FR21):**
 - Schema: `studio/src/schemaTypes/documents/submission.ts`
 - Block: `ContactForm.astro` + `contact-form.ts`
-- Requires: Cloudflare Worker (not yet created), hosting migration
+- API route: `astro-app/src/pages/api/submit.ts` (SSR via `prerender = false` on Cloudflare Pages)
 
 **SEO (FR35-FR37):**
 - Object: `studio/src/schemaTypes/objects/seo.ts`
@@ -639,12 +653,14 @@ astro-shadcn-sanity/
 Sanity Studio (content editing)
       ↓ publish
 Sanity Content Lake (hosted)
-      ↓ webhook (deferred) → GitHub Actions rebuild
-Astro Build (npm run build)
+      ↓ webhook (deferred) → GitHub Actions → wrangler deploy
+Astro Build (astro build)
       ↓ sanity.fetch() via GROQ
       ↓ BlockRenderer dispatches to block components
-      ↓ Static HTML generated
-GitHub Pages (served to visitors)
+      ↓ Static HTML generated (+ SSR API routes)
+Cloudflare Pages (served to visitors)
+      ↓ /api/submit (SSR, prerender=false)
+Cloudflare Workers runtime (SSR API route → Sanity write)
 ```
 
 ### Integration Points
@@ -654,17 +670,17 @@ GitHub Pages (served to visitors)
 - Sanity Image CDN — responsive images via `@sanity/image-url` (`lib/image.ts`)
 - fulldev/ui — component registry at `https://ui.full.dev/r/{name}.json`, installed via shadcn CLI at dev time (not a runtime dependency)
 - Storybook — native Astro component development via `storybook-astro` (devDependency, `.storybook/` config)
-- GitHub Actions — CI/CD pipeline (`.github/workflows/deploy.yml`, deferred)
+- GitHub Actions — CI/CD pipeline deploying to Cloudflare Pages via `wrangler deploy` (`.github/workflows/deploy.yml`, deferred to Epic 5)
 - GA4 — async script in `Layout.astro` (FR38)
 - Monsido — async script in `Layout.astro` (FR39)
-- Cloudflare Worker — form proxy (deferred to forms phase)
+- Cloudflare Pages — hosting with `@astrojs/cloudflare` adapter. Form API route at `/api/submit` runs as SSR via `prerender = false`.
 
 ## Architecture Validation Results
 
 ### Coherence Validation
 
 **Decision Compatibility:**
-All technology choices are compatible. Astro 5.x SSG + Sanity + Tailwind v4 + fulldev/ui + vanilla JS is a well-trodden combination. No version conflicts — Astro 5.x works with `@sanity/astro`, Tailwind CSS v4 (via `@tailwindcss/vite`), fulldev/ui (pure `.astro` components via shadcn CLI), and TypeScript 5.x. The `output: 'static'` mode (which now includes the old hybrid rendering capability) eliminates any adapter complexity. fulldev/ui adds zero runtime cost — components are vanilla Astro, no framework dependencies.
+All technology choices are compatible. Astro 5.x SSG + Sanity + Tailwind v4 + fulldev/ui + vanilla JS is a well-trodden combination. No version conflicts — Astro 5.x works with `@sanity/astro`, Tailwind CSS v4 (via `@tailwindcss/vite`), fulldev/ui (pure `.astro` components via shadcn CLI), and TypeScript 5.x. The `output: 'static'` mode (which now includes the old hybrid rendering capability) keeps the architecture simple; the `@astrojs/cloudflare` adapter handles deployment to Cloudflare Pages with SSR opt-out for specific routes. fulldev/ui adds zero runtime cost — components are vanilla Astro, no framework dependencies.
 
 **Pattern Consistency:**
 Naming conventions are coherent — camelCase for Sanity (schema types, field names), PascalCase for Astro components, kebab-case for schema files. All patterns align with their respective ecosystem conventions. The `defineBlock` helper enforces the shared base schema pattern consistently.
@@ -682,14 +698,14 @@ The monorepo structure cleanly separates concerns. The 1:1 mapping between schem
 | FR6-FR9 (Sponsor Management) | sponsor.ts + SponsorCards + sponsor pages | Covered |
 | FR10-FR13 (Project/Team) | project.ts + team.ts + project pages + GROQ cross-refs | Covered |
 | FR14-FR16 (Program Info) | event.ts + Timeline block | Covered |
-| FR17-FR21 (Forms) | submission.ts + ContactForm + CF Worker | Deferred (by design) |
+| FR17-FR21 (Forms) | submission.ts + ContactForm + API route at `/api/submit` on Cloudflare Pages | Covered (Epic 6) |
 | FR22-FR30 (P0 Blocks) | 12 P0 block schemas + 12 Astro components (9 original + statsRow, teamGrid, textWithImage promoted) | Covered |
 | FR31-FR34 (Navigation/Layout) | Header, Footer, MobileNav, Breadcrumb + Layout.astro | Covered |
 | FR35-FR37 (SEO) | seo.ts object + Layout.astro `<head>` + @astrojs/sitemap | Covered |
-| FR38-FR39 (Analytics) | GA4 + Monsido async scripts in Layout.astro | Covered |
+| FR38-FR39 (Analytics) | GA4 + Matomo async scripts in Layout.astro | Covered |
 | FR40 (Site Config) | site-settings.ts singleton | Covered |
 
-40/40 FRs covered (5 deferred by design to forms phase).
+43/43 FRs covered.
 
 **Non-Functional Requirements Coverage:**
 
@@ -698,7 +714,7 @@ The monorepo structure cleanly separates concerns. The 1:1 mapping between schem
 | Performance (NFR1-8) | SSG (zero JS runtime), Tailwind purge, <5KB JS budget, Sanity CDN images | Covered |
 | Security (NFR9-12) | Token isolation via CF Worker (deferred), no client-side PII, CSP meta tags | Covered |
 | Accessibility (NFR13-19) | ARIA patterns in all interactive blocks, enforced alt text in schemas, skip-link in Layout | Covered |
-| Integration (NFR20-24) | Build-time only fetching, GA4/Monsido async loading | Covered |
+| Integration (NFR20-24) | Build-time only fetching, GA4/Matomo async loading | Covered |
 | Maintainability (NFR25-28) | 2-file block pattern (schema + component composing fulldev/ui primitives), TypeScript schemas, consistent conventions | Covered |
 
 ### Implementation Readiness Validation
@@ -763,6 +779,7 @@ No critical gaps found.
 - Zero-runtime constraint eliminates entire categories of architectural complexity
 - Clear boundaries between CMS and frontend workspaces (ui/ primitives → blocks/ composition → BlockRenderer dispatch)
 - Every requirement explicitly mapped to files and directories
+- 10 of 18 implementation steps already completed — architecture is proven, not theoretical
 
 **Areas for Future Enhancement:**
 - Testing framework (Playwright/Vitest) when CI/CD is configured
@@ -779,4 +796,4 @@ No critical gaps found.
 - Refer to this document for all architectural questions
 
 **First Implementation Priority:**
-Reconfigure the starter — remove React/Vercel adapter, add Tailwind v4 via `@tailwindcss/vite`, set `output: 'static'`, initialize shadcn CLI with fulldev/ui `@fulldev` registry (`components.json`), install base UI primitives, create directory structure, set up shadcn CSS variables and NJIT brand tokens in `global.css` (CSS-first configuration, no `tailwind.config.mjs`).
+Next up is Story 3.1 — Sponsor document schema + studio management. This unblocks sponsor-dependent blocks (SponsorCards, LogoCloud) from fetching real data.
