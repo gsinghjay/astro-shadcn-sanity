@@ -1,7 +1,7 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq from "groq";
-import type { Page } from "./types";
+import type { Page, SiteSettings } from "./types";
 
 export { sanityClient, groq };
 
@@ -36,6 +36,50 @@ export async function loadQuery<T>({
     ...(visualEditingEnabled ? { token } : {}),
   });
 
+  return result;
+}
+
+/**
+ * GROQ query: fetch the singleton site settings document.
+ */
+export const siteSettingsQuery = groq`*[_type == "siteSettings"][0]{
+  siteName,
+  siteDescription,
+  logo{ asset->{ _id, url }, alt },
+  logoLight{ asset->{ _id, url }, alt },
+  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },
+  ctaButton{ text, url },
+  footerContent{ text, copyrightText },
+  socialLinks[]{ _key, platform, url },
+  contactInfo{ address, email, phone },
+  footerLinks[]{ _key, label, href },
+  resourceLinks[]{ _key, label, href, external },
+  programLinks[]{ _key, label, href },
+  currentSemester
+}`;
+
+/**
+ * Fetch site settings from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from Layout, Header, and Footer.
+ */
+let _siteSettingsCache: SiteSettings | null = null;
+
+export async function getSiteSettings(): Promise<SiteSettings> {
+  if (_siteSettingsCache) return _siteSettingsCache;
+
+  const result = await loadQuery<SiteSettings | null>({
+    query: siteSettingsQuery,
+  });
+
+  if (!result) {
+    throw new Error(
+      'getSiteSettings(): No siteSettings document found in Sanity. ' +
+        'Create one in Sanity Studio at the "Site Settings" singleton.',
+    );
+  }
+
+  _siteSettingsCache = result;
   return result;
 }
 

@@ -85,8 +85,9 @@ development_status:
   2-0-template-layout-system: done
   2-1-homepage-block-schemas: done
   2-1b-remaining-block-schemas: done
-  2-2-homepage-data-fetching: ready-for-dev
+  2-2-homepage-data-fetching: done
   2-2b-remaining-pages-data-fetching: backlog
+  2-3a-site-settings-wiring: done
   2-3-page-composition-system: backlog
   epic-2-retrospective: optional
 

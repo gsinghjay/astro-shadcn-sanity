@@ -1,5 +1,5 @@
 ---
-import { siteSettings } from '../lib/data';
+import { getSiteSettings } from '../lib/sanity';
 import { Header as HeaderUI, HeaderActions } from '@/components/ui/header';
 import { Logo, LogoText } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
@@ -7,23 +7,34 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/co
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 
-const { navigation } = siteSettings;
+const settings = await getSiteSettings();
+const { navigationItems, ctaButton, siteName, logo } = settings;
 const currentPath = Astro.url.pathname;
+
+const logoUrl = logo?.asset?.url || '/logos/njit-logo-plain.svg';
+const logoAlt = logo?.alt || 'NJIT';
+const ctaText = ctaButton?.text || 'Become a Sponsor';
+const ctaHref = ctaButton?.url || '/contact';
+
+// Split siteName for header display (e.g., "YWCC Industry Capstone" → "YWCC" + "Industry Capstone")
+const nameParts = (siteName || 'YWCC Industry Capstone').split(' ');
+const brandPrimary = nameParts[0];
+const brandSecondary = nameParts.slice(1).join(' ');
 ---
 
 <HeaderUI class="border-b-2 border-foreground">
   <Logo href="/">
-    <img src="/logos/njit-logo-plain.svg" alt="NJIT" class="h-8 w-auto" />
+    <img src={logoUrl} alt={logoAlt} class="h-8 w-auto" />
     <LogoText>
       <span class="flex flex-col">
-        <span class="text-xs font-bold uppercase tracking-widest leading-tight">YWCC</span>
-        <span class="text-2xs uppercase tracking-wider leading-tight text-muted-foreground">Industry Capstone</span>
+        <span class="text-xs font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>
+        <span class="text-2xs uppercase tracking-wider leading-tight text-muted-foreground">{brandSecondary}</span>
       </span>
     </LogoText>
   </Logo>
 
   <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
-    {navigation.map((item) => (
+    {(navigationItems || []).map((item) => (
       <a
         href={item.href}
         class:list={[
@@ -39,7 +50,7 @@ const currentPath = Astro.url.pathname;
   </nav>
 
   <HeaderActions>
-    <Button href="/contact" class="hidden md:inline-flex">Become a Sponsor</Button>
+    <Button href={ctaHref} class="hidden md:inline-flex">{ctaText}</Button>
     <div class="md:hidden">
       <Sheet>
         <SheetTrigger variant="ghost" size="icon">
@@ -50,7 +61,7 @@ const currentPath = Astro.url.pathname;
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
           <nav class="flex flex-col gap-2 p-4">
-            {navigation.map((item) => (
+            {(navigationItems || []).map((item) => (
               <a
                 href={item.href}
                 class:list={[
@@ -62,7 +73,7 @@ const currentPath = Astro.url.pathname;
               </a>
             ))}
             <Separator class="my-2" />
-            <Button href="/contact" class="w-full justify-center">Become a Sponsor</Button>
+            <Button href={ctaHref} class="w-full justify-center">{ctaText}</Button>
           </nav>
         </SheetContent>
       </Sheet>

@@ -112,8 +112,8 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
 
       const indexContent = fs.readFileSync(indexPath, 'utf-8')
       // home-page is no longer barrel-exported (homepage now fetches from Sanity)
+      // site-settings is no longer barrel-exported (Story 2.3: site settings now fetched from Sanity)
       const expectedExports = [
-        'site-settings',
         'about-page',
         'projects-page',
         'sponsors-page',

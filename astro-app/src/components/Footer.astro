@@ -1,5 +1,5 @@
 ---
-import { siteSettings } from '../lib/data';
+import { getSiteSettings } from '../lib/sanity';
 import {
   Footer as FooterUI,
   FooterDescription,
@@ -12,8 +12,33 @@ import {
   FooterSpread,
 } from '@/components/ui/footer';
 import { Logo, LogoText } from '@/components/ui/logo';
+import { Icon } from '@/components/ui/icon';
 
-const { navigation, footerText } = siteSettings;
+const settings = await getSiteSettings();
+const {
+  siteName,
+  siteDescription,
+  logoLight,
+  footerContent,
+  programLinks,
+  resourceLinks,
+  contactInfo,
+  footerLinks,
+  socialLinks,
+} = settings;
+
+const footerLogoUrl = logoLight?.asset?.url || '/logos/njit-logo-plain-light.svg';
+const footerLogoAlt = logoLight?.alt || 'NJIT';
+
+// Split siteName for footer display
+const nameParts = (siteName || 'YWCC Industry Capstone').split(' ');
+const brandPrimary = nameParts[0];
+const brandSecondary = nameParts.slice(1).join(' ');
+
+// Split address into lines for display
+const addressLines = contactInfo?.address ? contactInfo.address.split(', ') : [];
+const addressLine1 = addressLines.slice(0, 2).join(', ');
+const addressLine2 = addressLines.slice(2).join(', ');
 ---
 
 <FooterUI class="bg-foreground text-background">
@@ -22,34 +47,32 @@ const { navigation, footerText } = siteSettings;
     <!-- About Section - Takes more space on desktop -->
     <div class="lg:col-span-4">
       <Logo href="/" class="mb-6">
-        <img src="/logos/njit-logo-plain-light.svg" alt="NJIT" class="h-10 w-auto" />
+        <img src={footerLogoUrl} alt={footerLogoAlt} class="h-10 w-auto" />
         <LogoText class="text-background">
           <span class="flex flex-col">
-            <span class="text-sm font-bold uppercase tracking-widest leading-tight">YWCC</span>
-            <span class="text-xs uppercase tracking-wider leading-tight opacity-60">Industry Capstone</span>
+            <span class="text-sm font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>
+            <span class="text-xs uppercase tracking-wider leading-tight opacity-60">{brandSecondary}</span>
           </span>
         </LogoText>
       </Logo>
       <FooterDescription class="text-background/60 leading-relaxed">
-        {footerText}. Connecting top computing talent with industry partners to solve real-world challenges through applied research and development.
+        {siteDescription || footerContent?.text || ''}
       </FooterDescription>
-    </div>
-
-    <!-- Navigation Links -->
-    <div class="lg:col-span-2">
-      <FooterGroup>
-        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Navigation</FooterGroupLabel>
-        <FooterMenu>
-          <FooterMenuItem>
-            <FooterMenuLink href="/" class="text-background/80 hover:text-background transition-colors">Home</FooterMenuLink>
-          </FooterMenuItem>
-          {navigation.map((item) => (
-            <FooterMenuItem>
-              <FooterMenuLink href={item.href} class="text-background/80 hover:text-background transition-colors">{item.label}</FooterMenuLink>
-            </FooterMenuItem>
+      {(socialLinks && socialLinks.length > 0) && (
+        <div class="flex gap-4 mt-6">
+          {socialLinks.map((link) => (
+            <a
+              href={link.url}
+              target="_blank"
+              rel="noopener"
+              aria-label={link.platform}
+              class="text-background/60 hover:text-background transition-colors text-xl"
+            >
+              <Icon href={link.url} />
+            </a>
           ))}
-        </FooterMenu>
-      </FooterGroup>
+        </div>
+      )}
     </div>
 
     <!-- Programs Section -->
@@ -57,18 +80,11 @@ const { navigation, footerText } = siteSettings;
       <FooterGroup>
         <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Programs</FooterGroupLabel>
         <FooterMenu>
-          <FooterMenuItem>
-            <FooterMenuLink href="/projects" class="text-background/80 hover:text-background transition-colors">Current Projects</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="/sponsors" class="text-background/80 hover:text-background transition-colors">Our Sponsors</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="/about" class="text-background/80 hover:text-background transition-colors">Team</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="/contact" class="text-background/80 hover:text-background transition-colors">Get Involved</FooterMenuLink>
-          </FooterMenuItem>
+          {(programLinks || []).map((item) => (
+            <FooterMenuItem>
+              <FooterMenuLink href={item.href} class="text-background/80 hover:text-background transition-colors">{item.label}</FooterMenuLink>
+            </FooterMenuItem>
+          ))}
         </FooterMenu>
       </FooterGroup>
     </div>
@@ -78,18 +94,15 @@ const { navigation, footerText } = siteSettings;
       <FooterGroup>
         <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Resources</FooterGroupLabel>
         <FooterMenu>
-          <FooterMenuItem>
-            <FooterMenuLink href="https://njit.edu" target="_blank" rel="noopener" class="text-background/80 hover:text-background transition-colors">NJIT Website</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Student Portal</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Partner Login</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="#" class="text-background/80 hover:text-background transition-colors">Documentation</FooterMenuLink>
-          </FooterMenuItem>
+          {(resourceLinks || []).map((item) => (
+            <FooterMenuItem>
+              <FooterMenuLink
+                href={item.href}
+                {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
+                class="text-background/80 hover:text-background transition-colors"
+              >{item.label}</FooterMenuLink>
+            </FooterMenuItem>
+          ))}
         </FooterMenu>
       </FooterGroup>
     </div>
@@ -99,18 +112,26 @@ const { navigation, footerText } = siteSettings;
       <FooterGroup>
         <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Contact</FooterGroupLabel>
         <FooterMenu>
-          <FooterMenuItem>
-            <span class="text-background/60 text-sm leading-relaxed">GITC Building, Room 4400</span>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <span class="text-background/60 text-sm leading-relaxed">Newark, NJ 07102</span>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="mailto:capstone@njit.edu" class="text-background/80 hover:text-background transition-colors">capstone@njit.edu</FooterMenuLink>
-          </FooterMenuItem>
-          <FooterMenuItem>
-            <FooterMenuLink href="tel:+19735963366" class="text-background/60 hover:text-background/80 text-sm transition-colors">(973) 596-3366</FooterMenuLink>
-          </FooterMenuItem>
+          {addressLine1 && (
+            <FooterMenuItem>
+              <span class="text-background/60 text-sm leading-relaxed">{addressLine1}</span>
+            </FooterMenuItem>
+          )}
+          {addressLine2 && (
+            <FooterMenuItem>
+              <span class="text-background/60 text-sm leading-relaxed">{addressLine2}</span>
+            </FooterMenuItem>
+          )}
+          {contactInfo?.email && (
+            <FooterMenuItem>
+              <FooterMenuLink href={`mailto:${contactInfo.email}`} class="text-background/80 hover:text-background transition-colors">{contactInfo.email}</FooterMenuLink>
+            </FooterMenuItem>
+          )}
+          {contactInfo?.phone && (
+            <FooterMenuItem>
+              <FooterMenuLink href={`tel:+1${contactInfo.phone.replace(/\D/g, '')}`} class="text-background/60 hover:text-background/80 text-sm transition-colors">{contactInfo.phone}</FooterMenuLink>
+            </FooterMenuItem>
+          )}
         </FooterMenu>
       </FooterGroup>
     </div>
@@ -118,20 +139,17 @@ const { navigation, footerText } = siteSettings;
 
   <!-- Bottom Bar -->
   <FooterSpread class="border-t border-background/10 pt-8 mt-12">
-    <FooterCopyright class="text-background/40 text-sm">&copy; 2026 New Jersey Institute of Technology. All rights reserved.</FooterCopyright>
+    <FooterCopyright class="text-background/40 text-sm">&copy; {footerContent?.copyrightText || `${new Date().getFullYear()} All rights reserved.`}</FooterCopyright>
     <FooterMenu orientation="horizontal" class="flex-wrap justify-center md:justify-end">
-      <FooterMenuItem>
-        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Privacy Policy</FooterMenuLink>
-      </FooterMenuItem>
-      <FooterMenuItem>
-        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Terms of Service</FooterMenuLink>
-      </FooterMenuItem>
-      <FooterMenuItem>
-        <FooterMenuLink href="#" class="text-background/40 hover:text-background text-xs transition-colors">Accessibility</FooterMenuLink>
-      </FooterMenuItem>
-      <FooterMenuItem>
-        <FooterMenuLink href="https://njit.edu" target="_blank" rel="noopener" class="text-background/40 hover:text-background text-xs transition-colors">NJIT.edu</FooterMenuLink>
-      </FooterMenuItem>
+      {(footerLinks || []).map((item) => (
+        <FooterMenuItem>
+          <FooterMenuLink
+            href={item.href}
+            {...(item.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
+            class="text-background/40 hover:text-background text-xs transition-colors"
+          >{item.label}</FooterMenuLink>
+        </FooterMenuItem>
+      ))}
     </FooterMenu>
   </FooterSpread>
 </FooterUI>

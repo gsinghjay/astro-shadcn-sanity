@@ -251,9 +251,59 @@ export interface NavItem {
   children?: NavItem[];
 }
 
+export interface CtaButton {
+  text: string;
+  url: string;
+}
+
+export interface ContactInfo {
+  address: string;
+  email: string;
+  phone: string;
+}
+
+export interface FooterContent {
+  text: string;
+  copyrightText: string;
+}
+
+export interface SocialLink {
+  _key: string;
+  platform: string;
+  url: string;
+}
+
+export interface FooterLink {
+  _key: string;
+  label: string;
+  href: string;
+}
+
+export interface ResourceLink {
+  _key: string;
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export interface ProgramLink {
+  _key: string;
+  label: string;
+  href: string;
+}
+
 export interface SiteSettings {
-  title: string;
-  description: string;
-  navigation: NavItem[];
-  footerText?: string;
+  siteName: string;
+  siteDescription?: string;
+  logo?: SanityImageWithAlt;
+  logoLight?: SanityImageWithAlt;
+  navigationItems?: NavItem[];
+  ctaButton?: CtaButton;
+  footerContent?: FooterContent;
+  contactInfo?: ContactInfo;
+  socialLinks?: SocialLink[];
+  footerLinks?: FooterLink[];
+  resourceLinks?: ResourceLink[];
+  programLinks?: ProgramLink[];
+  currentSemester?: string;
 }
