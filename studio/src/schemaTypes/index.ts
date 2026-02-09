@@ -8,6 +8,7 @@ import {portableText} from './objects/portable-text'
 // Document schemas
 import {page} from './documents/page'
 import {siteSettings} from './documents/site-settings'
+import {sponsor} from './documents/sponsor'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -32,6 +33,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Documents
   page,
   siteSettings,
+  sponsor,
   // Blocks — homepage
   heroBanner,
   featureGrid,
