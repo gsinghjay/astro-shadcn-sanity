@@ -432,6 +432,8 @@ Claude Opus 4.6 (claude-opus-4-6)
 - GA4 conditional rendering verified: empty ID omits script, set ID renders gtag.js with async attribute
 - Local deploy to Cloudflare Pages succeeded: `wrangler pages deploy dist/` → https://ywcc-capstone.pages.dev
 - Cloudflare Pages project `ywcc-capstone` created via `wrangler pages project create`
+- GitHub secrets/variables configured via `gh` CLI: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, SANITY_API_READ_TOKEN + PUBLIC_* vars
+- Diagnosed and fixed pre-existing Storybook CI failure: `@astrojs/react` injects `/@react-refresh` via `astro:scripts/before-hydration.js` which only exists in Vite dev mode — Rollup fails during Storybook production builds. Fixed by adding `/@react-refresh` to `build.rollupOptions.external` in `.storybook/main.ts`
 
 ### Completion Notes List
 
@@ -444,7 +446,10 @@ Claude Opus 4.6 (claude-opus-4-6)
 - Cloudflare Pages `_headers` file created with X-Content-Type-Options, X-Frame-Options, Referrer-Policy, and Permissions-Policy
 - GitHub Actions `deploy.yml` created with push-to-main trigger, workflow_dispatch, Node 22, all PUBLIC_ vars and secrets
 - `.env.example` and `.env` updated with `PUBLIC_GA_MEASUREMENT_ID` and `PUBLIC_SITE_URL`
-- Tasks 7.2/7.3 (wrangler local preview) and Task 8 (production deploy/validate) require infrastructure access — deferred to manual verification
+- Local deploy verified — site live at https://ywcc-capstone.pages.dev with HTTPS
+- GitHub Actions secrets and variables configured for automated CI/CD deploys
+- Cloudflare Pages project does NOT require git connection — wrangler uploads built files directly via API
+- Fixed pre-existing Storybook CI failure (/@react-refresh externalization) — Storybook build now succeeds in CI
 - 43 integration tests written covering all acceptance criteria for adapter, wrangler, GA4, CSP, _headers, workflow, dependencies, and build output
 
 ### File List
@@ -462,4 +467,5 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `astro-app/src/layouts/Layout.astro` — Added GA4 async script + CSP meta tag
 - `astro-app/.env.example` — Added PUBLIC_GA_MEASUREMENT_ID and PUBLIC_SITE_URL
 - `astro-app/.env` — Added PUBLIC_GA_MEASUREMENT_ID and PUBLIC_SITE_URL
+- `astro-app/.storybook/main.ts` — Added `/@react-refresh` to rollupOptions.external (fixes Storybook CI build failure)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status updated

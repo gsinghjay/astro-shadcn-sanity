@@ -17,7 +17,37 @@ export const aboutPage: Page = {
       _type: 'textWithImage',
       _key: 'twi-1',
       heading: 'Lorem Ipsum Dolor Sit Amet',
-      image: { asset: { _id: '', url: 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=800' }, alt: 'Overview' },
+      content: [
+        {
+          _type: 'block',
+          _key: 'twi-body-1',
+          style: 'normal',
+          children: [
+            {
+              _type: 'span',
+              _key: 'twi-span-1',
+              text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+              marks: [],
+            },
+          ],
+          markDefs: [],
+        },
+        {
+          _type: 'block',
+          _key: 'twi-body-2',
+          style: 'normal',
+          children: [
+            {
+              _type: 'span',
+              _key: 'twi-span-2',
+              text: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
+              marks: [],
+            },
+          ],
+          markDefs: [],
+        },
+      ],
+      image: { asset: { _id: '', url: 'https://placehold.co/800x600' }, alt: 'Overview' },
       imagePosition: 'right',
     },
     {
