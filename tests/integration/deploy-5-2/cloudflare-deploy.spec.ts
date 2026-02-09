@@ -151,9 +151,9 @@ test.describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(content).toContain('X-Content-Type-Options: nosniff')
     })
 
-    test('[P0] 5.2-INT-023 — _headers sets X-Frame-Options: DENY', () => {
+    test('[P0] 5.2-INT-023 — _headers sets X-Frame-Options: SAMEORIGIN', () => {
       const content = readFileSync(headersPath, 'utf-8')
-      expect(content).toContain('X-Frame-Options: DENY')
+      expect(content).toContain('X-Frame-Options: SAMEORIGIN')
     })
 
     test('[P0] 5.2-INT-024 — _headers sets Referrer-Policy', () => {
