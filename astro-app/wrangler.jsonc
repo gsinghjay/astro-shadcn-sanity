@@ -1,0 +1,8 @@
+// astro-app/wrangler.jsonc
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
+  "name": "ywcc-capstone",
+  "compatibility_date": "2025-12-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": "./dist"
+}

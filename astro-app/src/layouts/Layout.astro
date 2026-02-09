@@ -24,6 +24,8 @@ const {
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+
 const fullTitle =
   title === defaultTitle
     ? title
@@ -38,7 +40,22 @@ const fullTitle =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' https://cdn.sanity.io data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://*.sanity.io; font-src 'self'; frame-src 'self'"
+    />
     <title>{fullTitle}</title>
+    {gaId && (
+      <Fragment>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+        <script define:vars={{ gaId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', gaId);
+        </script>
+      </Fragment>
+    )}
   </head>
   <body class="antialiased">
     {!hideNav && <Header />}
