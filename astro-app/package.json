@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro check && astro build",
-    "preview": "astro preview",
+    "preview": "wrangler pages dev dist/ --port 4321 --show-interactive-dev-session false",
     "astro": "astro",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
