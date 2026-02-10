@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.0.1...v1.1.0) (2026-02-10)
+
+### Features
+
+* add Discord notifications for preview branch sync status ([c207c5c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c207c5c851fa2618d5d1d10e47abed42e072a0f4))
+
+### Miscellaneous
+
+* clean up docs and gitignore ([1f30dfa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1f30dfa8f14295a86f7d4643a7c4db2c605b2c78))
+
 ## [1.0.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.0.0...v1.0.1) (2026-02-10)
 
 ### Bug Fixes
