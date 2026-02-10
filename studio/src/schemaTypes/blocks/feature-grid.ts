@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {ThLargeIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const featureGrid = defineBlock({
   name: 'featureGrid',
   title: 'Feature Grid',
+  icon: ThLargeIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

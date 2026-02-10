@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {BarChartIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const statsRow = defineBlock({
   name: 'statsRow',
   title: 'Stats Row',
+  icon: BarChartIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {ImagesIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const logoCloud = defineBlock({
   name: 'logoCloud',
   title: 'Logo Cloud',
+  icon: ImagesIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

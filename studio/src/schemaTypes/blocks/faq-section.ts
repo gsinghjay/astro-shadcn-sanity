@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {HelpCircleIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const faqSection = defineBlock({
   name: 'faqSection',
   title: 'FAQ Section',
+  icon: HelpCircleIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

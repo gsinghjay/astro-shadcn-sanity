@@ -1,6 +1,6 @@
 import type { Page } from '../types';
 
-export const contactPage: Page = {
+export const contactPage = {
   _id: 'contact',
   title: 'Contact',
   slug: '/contact',
@@ -61,4 +61,4 @@ export const contactPage: Page = {
       ],
     },
   ],
-};
+} as unknown as Page;

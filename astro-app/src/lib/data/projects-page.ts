@@ -1,6 +1,6 @@
 import type { Page } from '../types';
 
-export const projectsPage: Page = {
+export const projectsPage = {
   _id: 'projects',
   title: 'Projects & Teams',
   slug: '/projects',
@@ -81,4 +81,4 @@ export const projectsPage: Page = {
       backgroundVariant: 'dark',
     },
   ],
-};
+} as unknown as Page;

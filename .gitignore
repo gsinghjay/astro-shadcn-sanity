@@ -37,8 +37,15 @@ _bmad-output/
 .claude/
 CLAUDE.md
 
+# Test results / reports
+test-results/
+playwright-report/
+
 # Playwright MCP
 .playwright-mcp/
+
+# Sanity TypeGen (generated)
+studio/schema.json
 
 # Repomix
 .repomixignore

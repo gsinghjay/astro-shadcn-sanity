@@ -145,11 +145,11 @@ test.describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
     })
 
     test('[P0] 2.3-INT-004 — GROQ query projects all site settings fields', () => {
-      // sanity.ts must contain a siteSettingsQuery GROQ query
+      // sanity.ts must contain a SITE_SETTINGS_QUERY GROQ query
       expect(
         sanityTsContent,
-        'sanity.ts must define a siteSettingsQuery',
-      ).toMatch(/siteSettingsQuery/)
+        'sanity.ts must define a SITE_SETTINGS_QUERY',
+      ).toMatch(/SITE_SETTINGS_QUERY/)
 
       // The query must target siteSettings document type
       expect(

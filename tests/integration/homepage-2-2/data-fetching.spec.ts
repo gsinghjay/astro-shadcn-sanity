@@ -43,9 +43,9 @@ test.describe('Story 2-2: Homepage GROQ Queries & Data Fetching (ATDD)', () => {
   // ---------------------------------------------------------------------------
   test.describe('AC2: Block type projections in GROQ query', () => {
     test('[P0] 2.2-INT-002 — GROQ query includes type-conditional projections for all 6 homepage block types', () => {
-      // The pageBySlugQuery must contain type-conditional projections
+      // The PAGE_BY_SLUG_QUERY must contain type-conditional projections
       // for each of the 6 homepage block types
-      expect(sanityTsContent).toContain('pageBySlugQuery')
+      expect(sanityTsContent).toContain('PAGE_BY_SLUG_QUERY')
 
       const blockTypes = [
         'heroBanner',

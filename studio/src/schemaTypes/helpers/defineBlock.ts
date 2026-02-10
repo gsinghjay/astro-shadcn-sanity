@@ -1,14 +1,13 @@
 import {defineType, defineField} from 'sanity'
+import type {ComponentType} from 'react'
 import {blockBaseFields} from '../objects/block-base'
-
-type SchemaDefinition = Parameters<typeof defineType>[0]
 
 interface DefineBlockConfig {
   name: string
   title: string
   fields: ReturnType<typeof defineField>[]
-  preview?: SchemaDefinition['preview']
-  icon?: SchemaDefinition['icon']
+  preview?: {select: Record<string, string>}
+  icon?: ComponentType
 }
 
 export function defineBlock(config: DefineBlockConfig) {
