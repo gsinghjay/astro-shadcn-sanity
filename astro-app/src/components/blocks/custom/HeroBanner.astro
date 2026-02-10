@@ -16,7 +16,7 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
 <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
   {hasCarousel && (
     <div class="hero-carousel absolute inset-0" data-carousel>
-      {block.backgroundImages!.map((image, index) => (
+      {block.backgroundImages?.map((image, index) => (
         <div
           class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
           data-slide={index}
@@ -31,7 +31,7 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
         </div>
       ))}
       <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {block.backgroundImages!.map((_, index) => (
+        {block.backgroundImages?.map((_, index) => (
           <button
             class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
             data-dot={index}

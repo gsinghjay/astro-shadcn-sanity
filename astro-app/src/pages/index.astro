@@ -11,6 +11,6 @@ if (!page) {
 }
 ---
 
-<Layout title={page.title} description={page.description}>
-  <BlockRenderer blocks={page.blocks} />
+<Layout title={page.title ?? undefined} description={page.description ?? undefined}>
+  <BlockRenderer blocks={page.blocks ?? []} />
 </Layout>
