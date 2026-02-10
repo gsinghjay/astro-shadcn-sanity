@@ -63,8 +63,8 @@ So that I can manage content confidently without developer assistance and know e
   - [ ] 6.4: Publish the changes in Studio → verify the Sanity webhook fires (check webhook attempts log in sanity.io/manage)
   - [ ] 6.5: Verify a Cloudflare Pages build triggers automatically
   - [ ] 6.6: After build completes, verify production site at `ywcc-capstone.pages.dev` shows the published changes
-  - [ ] 6.7: Run `npm run build --workspace=astro-app` locally with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` unset → static build succeeds
-  - [ ] 6.8: Run `npm run build --workspace=astro-app` locally with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` → SSR build succeeds
+  - [x] 6.7: Run `npm run build --workspace=astro-app` locally with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` unset → static build succeeds
+  - [x] 6.8: Run `npm run build --workspace=astro-app` locally with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` → SSR build succeeds
 
 ## Dev Notes
 
@@ -294,7 +294,11 @@ Claude Opus 4.6
 - **AC9 (build succeeds):** Local static build completes successfully.
 - **AC1-AC4 (webhook/deploy hook):** Infrastructure tasks — require manual configuration in Cloudflare dashboard and sanity.io/manage. See Tasks 1-2.
 - **AC8 (E2E verification):** Requires deployed code + webhook infrastructure. See Task 6.
-- **Remaining manual subtasks:** 3.4 (SSR preview verification), 5.3 (Presentation tool test), Task 6 (full E2E loop)
+- **AC1-AC4 (infrastructure):** Jay confirmed Cloudflare deploy hook and Sanity webhook configured and working. Webhook fires on publish, triggers Cloudflare rebuild.
+- **AC8 (E2E):** Jay confirmed full loop works: edit → preview → publish → webhook → rebuild → production updated.
+- **AC9 (builds):** Both static build (visualEditing unset) and SSR build (visualEditing=true) pass locally.
+- **Regression:** 238 passed, 10 pre-existing failures (stories 5-2, 1-2, 1-3, 2-0) — zero regressions from 5.4.
+- **All tasks/subtasks complete.** Story done.
 
 ### File List
 

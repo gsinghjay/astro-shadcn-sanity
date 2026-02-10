@@ -69,7 +69,22 @@
       "mcp__Sanity__query_documents",
       "Bash(git status:*)",
       "mcp__Sanity__patch_document_from_json",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(gh run view:*)",
+      "Bash(git push:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh run rerun:*)",
+      "Bash(curl:*)",
+      "mcp__Sanity__search_docs",
+      "mcp__astro-docs__search_astro_docs",
+      "mcp__Sanity__read_docs",
+      "Bash(gh pr edit:*)",
+      "Bash(find:*)",
+      "Bash(npx wrangler:*)",
+      "Bash(gh pr comment:*)",
+      "Bash(1 <<'EOF'\n{\n  \"required_pull_request_reviews\": {\n    \"dismiss_stale_reviews\": true,\n    \"require_code_owner_reviews\": false,\n    \"require_last_push_approval\": false,\n    \"required_approving_review_count\": 1\n  },\n  \"enforce_admins\": false,\n  \"required_status_checks\": null,\n  \"restrictions\": null\n}\nEOF)",
+      "mcp__plugin_sanity-plugin_Sanity__get_sanity_rules",
+      "WebFetch(domain:developers.cloudflare.com)"
     ]
   },
   "outputStyle": "default"
