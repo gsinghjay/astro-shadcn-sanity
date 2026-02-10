@@ -2,7 +2,6 @@ import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
 import sanity from "@sanity/astro";
 import tailwindcss from "@tailwindcss/vite";
-import icon from "astro-icon";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 
@@ -37,7 +36,6 @@ export default defineConfig({
         studioUrl: "https://ywcccapstone.sanity.studio",
       },
     }),
-    icon(),
     react(),
   ],
 });

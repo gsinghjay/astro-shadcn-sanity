@@ -562,7 +562,48 @@ Production (`main`) remains `output: "static"` with no Visual Editing JS overhea
 
 9. **`previewDrafts` perspective renamed:** Sanity's API shows a deprecation warning: `The previewDrafts perspective has been renamed to drafts`. The current code in `src/lib/sanity.ts` uses `"previewDrafts"` — this should be updated to `"drafts"` in a future cleanup.
 
-### How to Use the Preview Deployment
+### SSR Fix: Replaced astro-icon with @iconify/utils (RESOLVED)
+
+**Status:** SSR `fs` dependency eliminated. Build succeeds with 0 errors, 0 `fs` references in Worker bundle. Needs deploy + verification.
+
+**Root Cause (was):** Two sources of Node.js `fs` dependency in the SSR render path:
+1. `astro-icon` integration — used `fs` at SSR render time to read SVG files from `@iconify-json/*` packages
+2. `blocks-2/3/4.astro` (fulldotdev generic UI blocks) — used `fs.readFileSync()` to read source files for code block demos
+
+**Fix Applied:**
+1. **Replaced `astro-icon` with `@iconify/utils`** — rewrote `icon/icon.astro` wrapper to use `getIconData()` + `iconToSVG()` + `iconToHTML()` from `@iconify/utils`, reading icon data directly from `@iconify-json/lucide` and `@iconify-json/simple-icons` JSON imports (no `fs`)
+2. **Updated 5 UI components** that bypassed the wrapper and imported directly from `astro-icon/components`: `sheet-close`, `sheet-content`, `accordion-trigger`, `native-select`, `spinner` → now all use `@/components/ui/icon`
+3. **Removed `astro-icon` integration** from `astro.config.mjs` and uninstalled the package
+4. **Stubbed `fs.readFileSync`** in `blocks-2/3/4.astro` — these generic library blocks are never rendered from Sanity content, so `fileContent` is set to `""` instead of reading from filesystem
+
+**Verification:**
+- `npm run build` → 0 errors, 0 `fs` warnings
+- `grep` for `fs` in `dist/` → 0 matches
+- Prerendered pages (about, contact, projects, sponsors) build successfully
+- SSR server bundle has no `fs` dependency
+
+### PR #3 Current State
+
+PR: https://github.com/gsinghjay/astro-shadcn-sanity/pull/3
+
+**Branch:** `preview` (4 commits ahead of `main` + uncommitted astro-icon→iconify fix)
+
+**Commits (prior):**
+1. `b226413` — feat: enable Visual Editing on preview branch deployment (stegaClean, getPage, workflow, studioUrl)
+2. `e5a2767` — feat: switch preview build to SSR for live draft content
+3. `0f25fde` — fix: add prerender export to index page + update implementation doc
+4. `7b2ab7c` — fix: prerender hardcoded pages to avoid fs crash on Cloudflare Workers
+
+**Pending commit:** Replace astro-icon with @iconify/utils for Cloudflare Workers edge compatibility
+
+**What needs to happen next:**
+1. Commit and push the astro-icon→iconify changes
+2. Verify SSR pages load on Cloudflare Workers at `preview.ywcc-capstone.pages.dev`
+3. Test Sanity Studio Presentation tool → verify iframe + overlays
+4. Update PR description
+5. Ensure production (`main`) still builds as static with no regressions
+
+### How to Use the Preview Deployment (once SSR fix is applied)
 
 **For content editors:**
 1. Open Sanity Studio at `https://ywcccapstone.sanity.studio`

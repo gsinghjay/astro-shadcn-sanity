@@ -1,5 +1,5 @@
 ---
-import fs from "fs"
+// fs removed for Cloudflare Workers edge compatibility
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -43,10 +43,7 @@ const { class: className, id, items } = Astro.props
           >
             {items?.map(({ block, href, ...props }) => {
               if (!block) return null
-              const fileContent = fs.readFileSync(
-                `src/components/blocks/${block}.astro`,
-                "utf8"
-              )
+              const fileContent = ""
               return (
                 <div class="group relative aspect-video w-[320px] overflow-hidden rounded-lg border @5xl:w-[640px]">
                   <div class="bg-background @container h-full w-[400%] origin-top-left scale-25 @5xl:w-[200%] @5xl:scale-50">
