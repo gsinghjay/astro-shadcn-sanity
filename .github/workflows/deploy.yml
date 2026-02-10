@@ -21,15 +21,19 @@ jobs:
 
       - run: npm ci
 
+      - name: Write .env for Vite inlining
+        run: |
+          cat <<EOF > astro-app/.env
+          PUBLIC_SANITY_STUDIO_PROJECT_ID=${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
+          PUBLIC_SANITY_STUDIO_DATASET=${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+          PUBLIC_GA_MEASUREMENT_ID=${{ vars.PUBLIC_GA_MEASUREMENT_ID }}
+          PUBLIC_SITE_URL=${{ vars.PUBLIC_SITE_URL }}
+          PUBLIC_SANITY_VISUAL_EDITING_ENABLED=${{ github.ref_name == 'preview' && 'true' || '' }}
+          SANITY_API_READ_TOKEN=${{ secrets.SANITY_API_READ_TOKEN }}
+          EOF
+
       - name: Build Astro site
         run: npm run build --workspace=astro-app
-        env:
-          PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
-          PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
-          PUBLIC_GA_MEASUREMENT_ID: ${{ vars.PUBLIC_GA_MEASUREMENT_ID }}
-          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
-          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
-          PUBLIC_SANITY_VISUAL_EDITING_ENABLED: ${{ github.ref_name == 'preview' && 'true' || '' }}
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy dist/ --project-name=ywcc-capstone ${{ github.ref_name == 'preview' && '--branch=preview' || '' }}
