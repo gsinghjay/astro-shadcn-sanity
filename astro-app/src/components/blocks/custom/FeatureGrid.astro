@@ -20,7 +20,7 @@ const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
   )}
 
   <SectionGrid size={gridSize}>
-    {block.items.map((feature, i) => (
+    {(block.items ?? []).map((feature, i) => (
       <Tile variant="floating">
         <TileContent>
           <div class="flex items-center gap-3">

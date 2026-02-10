@@ -1,6 +1,6 @@
 import type { Page } from '../types';
 
-export const homePage: Page = {
+export const homePage = {
   _id: 'home',
   title: 'Home',
   slug: '/',
@@ -183,4 +183,4 @@ export const homePage: Page = {
       backgroundVariant: 'primary',
     },
   ],
-};
+} as unknown as Page;

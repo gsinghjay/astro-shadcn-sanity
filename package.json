@@ -14,7 +14,8 @@
     "test:unit": "npm run test:unit --workspace=astro-app",
     "test:unit:watch": "npm run test:unit:watch --workspace=astro-app",
     "test:unit:coverage": "npm run test:unit:coverage --workspace=astro-app",
-    "storybook": "npm run storybook --workspace=astro-app"
+    "storybook": "npm run storybook --workspace=astro-app",
+    "typegen": "npm run typegen -w studio"
   },
   "keywords": [
     "Sanity",

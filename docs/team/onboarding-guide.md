@@ -244,9 +244,9 @@ Run these from the project root:
 | `npm run test:integration` | Run integration tests (fast, no browser) |
 | `npm run test:ui` | Run Playwright tests in UI mode |
 | `npm run build --workspace=astro-app` | Type-check + build the Astro site (runs `astro check` first) |
+| `npm run typegen` | Regenerate TypeScript types from schema + GROQ queries |
 | `cd studio && npx tsc --noEmit` | Type-check Sanity Studio schemas (no output files) |
 | `cd studio && npx sanity schema deploy` | Deploy schema to Sanity Content Lake |
-| `cd studio && npx sanity typegen generate` | Generate TypeScript types from your schema |
 
 To run a command in a specific workspace:
 
@@ -388,27 +388,27 @@ cd studio && npx sanity schema deploy
 
 **How to remember:** Changed a schema file? Deploy the schema.
 
-#### Generate TypeScript types from the schema
+#### Regenerate TypeScript types
 
 ```bash
-cd studio && npx sanity typegen generate
+npm run typegen
 ```
 
-**What it does:** Reads your GROQ queries (the ones wrapped in `defineQuery()` in `astro-app/src/lib/sanity.ts`) and generates TypeScript types that match the data those queries return. This means your editor can autocomplete field names and catch typos before you even run the code.
+**What it does:** Two-step pipeline that runs from the project root:
 
-**When to run it:** After any schema change (adding/removing fields) or after modifying a GROQ query. The generated types live alongside your code and keep your frontend in sync with your content model.
+1. **Extracts** the Sanity schema to `studio/schema.json` (intermediate file, gitignored)
+2. **Generates** TypeScript types into `astro-app/src/sanity.types.ts` by scanning all `defineQuery()` calls in `astro-app/src/`
 
-**How to remember:** Changed a schema or query? Regenerate types.
+The generated file contains interfaces for every document type, block type, and GROQ query result. Your editor uses these for autocomplete, and `astro check` uses them to catch field name typos at build time.
 
-#### Extract the schema (advanced)
+**When to run it:**
+- After adding, removing, or renaming a schema field in `studio/src/schemaTypes/`
+- After modifying a GROQ query in `astro-app/src/lib/sanity.ts`
+- After adding a new block or document schema
 
-```bash
-cd studio && npx sanity schema extract
-```
+**Why it matters:** Without regenerating, the frontend types drift from the schema. The build may still pass if field names happen to overlap, but you lose type safety — typos and missing fields won't be caught until runtime.
 
-**What it does:** Exports the full schema to a JSON file. This is an intermediate step that `typegen generate` runs automatically — you rarely need to run it yourself. It's useful for debugging if you want to inspect the raw schema output.
-
-**When to run it:** Almost never. Only if you're debugging schema issues or building custom tooling.
+**How to remember:** Changed a schema or query? Run `npm run typegen`.
 
 ## Working with Storybook
 
@@ -505,7 +505,7 @@ cd astro-app && npx astro check
 **When to run it:**
 - Before committing frontend changes — catches typos in component props, wrong data shapes, missing imports
 - After modifying GROQ queries — ensures the data you fetch matches what your components expect
-- After regenerating TypeScript types (`npx sanity typegen generate`) — verifies the new types are compatible with your components
+- After regenerating TypeScript types (`npm run typegen`) — verifies the new types are compatible with your components
 
 ### Checking the Sanity Studio
 
@@ -536,8 +536,8 @@ Your code might still work! TypeScript errors don't prevent the dev server from 
 |-------------|---------------|
 | Any `.astro` or `.ts` file in `astro-app/` | `cd astro-app && npx astro check` |
 | Any `.ts` file in `studio/` | `cd studio && npx tsc --noEmit` |
-| A GROQ query in `sanity.ts` | `cd studio && npx sanity typegen generate` then `cd astro-app && npx astro check` |
-| A schema file in `studio/src/schemaTypes/` | `cd studio && npx tsc --noEmit` then `cd studio && npx sanity schema deploy` |
+| A GROQ query in `sanity.ts` | `npm run typegen` then `cd astro-app && npx astro check` |
+| A schema file in `studio/src/schemaTypes/` | `cd studio && npx tsc --noEmit` then `npm run typegen` then `cd studio && npx sanity schema deploy` |
 | Everything (pre-commit safety net) | Run both checks + unit tests |
 
 ## Deployment

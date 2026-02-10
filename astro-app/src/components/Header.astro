@@ -39,7 +39,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
         href={item.href}
         class:list={[
           'text-xs font-bold uppercase tracking-widest transition-colors duration-150',
-          currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href))
+          currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href || ''))
             ? 'text-primary'
             : 'text-foreground hover:text-primary',
         ]}
