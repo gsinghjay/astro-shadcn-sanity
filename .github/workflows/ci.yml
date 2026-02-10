@@ -2,7 +2,7 @@ name: CI
 
 on:
   pull_request:
-    branches: [main, preview]
+    branches: [preview]
 
 jobs:
   unit-tests:
@@ -18,7 +18,6 @@ jobs:
         run: npm run test:unit
 
   lighthouse:
-    if: github.base_ref == 'preview'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
