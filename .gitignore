@@ -37,6 +37,10 @@ _bmad-output/
 .claude/
 CLAUDE.md
 
+# Test results / reports
+test-results/
+playwright-report/
+
 # Playwright MCP
 .playwright-mcp/
 
