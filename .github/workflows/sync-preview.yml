@@ -1,0 +1,22 @@
+name: Sync preview with main
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Merge main into preview
+        run: |
+          git checkout preview
+          git merge origin/main --no-edit
+          git push origin preview
