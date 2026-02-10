@@ -1,6 +1,7 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq from "groq";
+import { defineQuery } from "groq";
 import type { Page, SiteSettings } from "./types";
 
 export { sanityClient, groq };
@@ -42,11 +43,11 @@ export async function loadQuery<T>({
 /**
  * GROQ query: fetch the singleton site settings document.
  */
-export const siteSettingsQuery = groq`*[_type == "siteSettings"][0]{
+export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings"][0]{
   siteName,
   siteDescription,
-  logo{ asset->{ _id, url }, alt },
-  logoLight{ asset->{ _id, url }, alt },
+  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
   navigationItems[]{ _key, label, href, children[]{ _key, label, href } },
   ctaButton{ text, url },
   footerContent{ text, copyrightText },
@@ -56,7 +57,7 @@ export const siteSettingsQuery = groq`*[_type == "siteSettings"][0]{
   resourceLinks[]{ _key, label, href, external },
   programLinks[]{ _key, label, href },
   currentSemester
-}`;
+}`);
 
 /**
  * Fetch site settings from Sanity.
@@ -69,7 +70,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
 
   const result = await loadQuery<SiteSettings | null>({
-    query: siteSettingsQuery,
+    query: SITE_SETTINGS_QUERY,
   });
 
   if (!result) {
@@ -86,13 +87,13 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 /**
  * GROQ query: fetch all page slugs for static path generation.
  */
-export const allPageSlugsQuery = groq`*[_type == "page" && defined(slug.current)]{ "slug": slug.current }`;
+export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && defined(slug.current)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single page by slug with template and blocks.
  * Includes type-conditional projections for all homepage block types.
  */
-export const pageBySlugQuery = groq`*[_type == "page" && slug.current == $slug][0]{
+export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.current == $slug][0]{
   _id,
   title,
   "slug": slug.current,
@@ -107,13 +108,13 @@ export const pageBySlugQuery = groq`*[_type == "page" && slug.current == $slug][
     _type == "heroBanner" => {
       heading,
       subheading,
-      backgroundImages[]{ _key, asset->{ _id, url }, alt },
+      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },
       ctaButtons[]{ _key, text, url, variant },
       alignment
     },
     _type == "featureGrid" => {
       heading,
-      items[]{ _key, icon, title, description, image{ asset->{ _id, url }, alt } },
+      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },
       columns
     },
     _type == "ctaBanner" => {
@@ -128,19 +129,19 @@ export const pageBySlugQuery = groq`*[_type == "page" && slug.current == $slug][
     _type == "textWithImage" => {
       heading,
       content[]{...},
-      image{ asset->{ _id, url }, alt },
+      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
       imagePosition
     },
     _type == "logoCloud" => {
       heading,
       autoPopulate,
       "sponsors": select(
-        autoPopulate => *[_type == "sponsor"]{
+        autoPopulate == true => *[_type == "sponsor"]{
           _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url }, alt }, website
+          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website
         },
         sponsors[]->{ _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url }, alt }, website
+          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website
         }
       )
     },
@@ -149,16 +150,49 @@ export const pageBySlugQuery = groq`*[_type == "page" && slug.current == $slug][
       subheading,
       items[]{ _key, title, description, list },
       ctaButtons[]{ _key, text, url, variant }
+    },
+    _type == "richText" => {
+      content[]{...}
+    },
+    _type == "faqSection" => {
+      heading,
+      items[]{ _key, question, answer }
+    },
+    _type == "contactForm" => {
+      heading,
+      description,
+      successMessage
+    },
+    _type == "sponsorCards" => {
+      heading,
+      displayMode,
+      "sponsors": select(
+        displayMode == "all" => *[_type == "sponsor"]{
+          _id, name, "slug": slug.current,
+          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+          tier, description, website
+        },
+        displayMode == "featured" => *[_type == "sponsor" && featured == true]{
+          _id, name, "slug": slug.current,
+          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+          tier, description, website
+        },
+        sponsors[]->{
+          _id, name, "slug": slug.current,
+          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+          tier, description, website
+        }
+      )
     }
   }
-}`;
+}`);
 
 /**
  * Fetch a page by slug from Sanity.
  */
 export async function getPage(slug: string): Promise<Page | null> {
   return loadQuery<Page | null>({
-    query: pageBySlugQuery,
+    query: PAGE_BY_SLUG_QUERY,
     params: { slug },
   });
 }

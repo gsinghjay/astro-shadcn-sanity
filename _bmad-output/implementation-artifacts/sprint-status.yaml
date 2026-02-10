@@ -1,4 +1,4 @@
-# generated: 2026-02-09
+# generated: 2026-02-10
 # project: astro-shadcn-sanity
 # project_key: NOKEY
 # tracking_system: file-system
@@ -89,8 +89,18 @@
 #   - Scope: Sanity webhook config, Cloudflare deploy hook, sanity.ts fixes
 #   - Epic 5 remains in-progress
 #   - Priority: before continuing Epic 2 stories 2.4–2.9
+#
+# 2026-02-10: Epic 7 updated from new Sanity code review
+#   - Source: Sanity Code Review (2026-02-10) — _bmad-output/sanity-code-review.md
+#   - Old Story 7.1 (Fix Visual Editing) removed — stegaClean/loadQuery issues now passing
+#   - Old Story 7.5 (Config & Dead Code) removed — items not flagged in current review
+#   - Stories reorganized from 5 to 4:
+#   - NEW 7.1: Query completeness, defineQuery & SEO stega fix (combines old 7.2 + new findings)
+#   - NEW 7.2: Schema best practices (reduced scope from old 7.3)
+#   - NEW 7.3: TypeGen & type replacement (renumbered from old 7.4, blocked by 7.1)
+#   - NEW 7.4: Server islands preview optimization (from existing artifact)
 
-generated: 2026-02-09
+generated: 2026-02-10
 project: astro-shadcn-sanity
 project_key: NOKEY
 tracking_system: file-system
@@ -113,7 +123,7 @@ development_status:
   2-2-homepage-data-fetching: done
   2-2b-remaining-pages-data-fetching: ready-for-dev
   2-3a-site-settings-wiring: done
-  2-3-page-composition-system: backlog
+  2-3-page-composition-system: ready-for-dev
   2-4-ui-blocks-hero-banner: ready-for-dev
   2-5-ui-blocks-content-articles: ready-for-dev
   2-6-ui-blocks-cta-features: ready-for-dev
@@ -138,7 +148,7 @@ development_status:
   5-1-seo-metadata-and-sitemap: backlog
   5-2-ga4-security-headers-cloudflare-deploy: review
   5-3-matomo-self-hosted-vps: backlog
-  5-4-preview-publish-architecture: review
+  5-4-preview-publish-architecture: in-progress
   epic-5-retrospective: optional
 
   epic-6: backlog
@@ -146,9 +156,8 @@ development_status:
   epic-6-retrospective: optional
 
   epic-7: in-progress
-  7-1-fix-visual-editing: ready-for-dev
-  7-2-query-completeness-and-define-query: backlog
-  7-3-schema-best-practices: backlog
-  7-4-typegen-and-type-replacement: backlog  # blocked by 7.2
-  7-5-config-and-dead-code-cleanup: backlog
+  7-1-query-completeness-definequery-and-seo-stega-fix: review
+  7-2-schema-best-practices: backlog
+  7-3-typegen-and-type-replacement: backlog  # blocked by 7.1
+  7-4-server-islands-preview-optimization: ready-for-dev
   epic-7-retrospective: optional
