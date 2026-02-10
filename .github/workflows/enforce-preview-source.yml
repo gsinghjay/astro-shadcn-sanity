@@ -1,0 +1,15 @@
+name: Enforce Preview Source
+
+on:
+  pull_request:
+    branches: [preview]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block PRs from main to preview
+        if: github.head_ref == 'main'
+        run: |
+          echo "::error::PRs from 'main' to 'preview' are not allowed. The sync-preview workflow handles this automatically."
+          exit 1
