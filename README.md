@@ -464,7 +464,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | Name | GitHub | Role |
 |---|---|---|
 | Jay Singh | [@gsinghjay](https://github.com/gsinghjay) | Project Lead |
-| | | |
+| Roberson Sanchez | [@ras242](https://github.com/ras242)| - |
 | | | |
 | | | |
 | | | |
