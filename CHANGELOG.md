@@ -1,3 +1,27 @@
+## [1.2.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.1.0...v1.2.0) (2026-02-10)
+
+### Features
+
+* add schema icons, defineArrayMember wrapping, and update apiVersion ([4e4c559](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4e4c559f396bc17da80933e031e3b46bb5677dcd))
+* configure TypeGen and replace hand-written types with generated types ([042a414](https://github.com/gsinghjay/astro-shadcn-sanity/commit/042a4140de2a6f0690019a7193a8e374c5f631cf)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1) [#5](https://github.com/gsinghjay/astro-shadcn-sanity/issues/5)
+
+### Bug Fixes
+
+* add --kill-others to concurrently dev scripts to prevent orphaned processes ([0a29c8a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0a29c8a0a76ab0ea3298d2cdb5b258956393ed8a))
+* address code review findings for story 7.1 (PR [#5](https://github.com/gsinghjay/astro-shadcn-sanity/issues/5)) ([0f1189a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0f1189a50347513fc9f6c5c504ee4f27b418729d))
+* resolve TypeScript errors in defineBlock helper and add CogIcon to structure ([9c92074](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9c920749fd01d61fbd61de97b9253e53b5a0fab4))
+
+### Documentation
+
+* add before/after screenshots for story 7.2 schema icons ([74f65c0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/74f65c0acd5963cb2ac996416030637bfc3655ca))
+* add type checking and schema management sections to onboarding guide ([fe4a895](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fe4a895aa1bc1aded0c7d5f1882cff4487b063b0))
+* update README with tech badges and team section, add git workflow guide, update onboarding guide ([f11edfb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f11edfb2317612583e69c69f0ba53d0f167f1bf3))
+
+### Miscellaneous
+
+* gitignore test-results and playwright-report directories ([ece88e3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ece88e30d0e41b70ce57efd2cea9e52253747284))
+* update sanity/cli from 5.8.1 -> 5.9.0 ([b0bd0ec](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b0bd0ec8775fb7da628cb26994e0d9ef7169a637))
+
 ## [1.1.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.0.1...v1.1.0) (2026-02-10)
 
 ### Features
