@@ -4,6 +4,7 @@ import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   block: SponsorCardsBlock;
@@ -32,7 +33,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
   <SectionGrid size="lg">
     {block.sponsors.map((sponsor) => {
-      const tier = tierStyles[sponsor.tier || 'silver'];
+      const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
       return (
         <Tile variant="floating" class={`${tier.border} border-2 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-150`}>
           <TileContent>

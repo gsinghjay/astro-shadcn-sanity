@@ -2,13 +2,14 @@
 import type { TextWithImageBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   block: TextWithImageBlock;
 }
 
 const { block } = Astro.props;
-const isRight = block.imagePosition !== 'left';
+const isRight = stegaClean(block.imagePosition) !== 'left';
 const imgSrc = block.image?.asset?.url;
 ---
 

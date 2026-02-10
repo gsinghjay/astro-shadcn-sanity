@@ -2,7 +2,7 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, preview]
   workflow_dispatch:
 
 jobs:
@@ -29,9 +29,10 @@ jobs:
           PUBLIC_GA_MEASUREMENT_ID: ${{ vars.PUBLIC_GA_MEASUREMENT_ID }}
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
           SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+          PUBLIC_SANITY_VISUAL_EDITING_ENABLED: ${{ github.ref_name == 'preview' && 'true' || '' }}
 
       - name: Deploy to Cloudflare Pages
-        run: npx wrangler pages deploy dist/ --project-name=ywcc-capstone
+        run: npx wrangler pages deploy dist/ --project-name=ywcc-capstone ${{ github.ref_name == 'preview' && '--branch=preview' || '' }}
         working-directory: astro-app
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

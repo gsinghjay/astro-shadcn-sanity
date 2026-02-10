@@ -1,13 +1,14 @@
 ---
 import type { StatsRowBlock } from '@/lib/types';
 import { Section } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   block: StatsRowBlock;
 }
 
 const { block } = Astro.props;
-const isDark = block.backgroundVariant === 'dark';
+const isDark = stegaClean(block.backgroundVariant) === 'dark';
 ---
 
 <Section

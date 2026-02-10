@@ -2,7 +2,8 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
-import { sanityClient, allPageSlugsQuery, pageBySlugQuery } from '@/lib/sanity';
+import { sanityClient, allPageSlugsQuery, getPage } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
@@ -26,16 +27,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 const { slug } = Astro.params;
-const page = await sanityClient.fetch(pageBySlugQuery, { slug });
+const page = await getPage(slug as string);
 
 if (!page) {
   return Astro.redirect('/404');
 }
 
-const TemplateComponent = templates[page.template as keyof typeof templates] ?? DefaultTemplate;
+const template = stegaClean(page.template) as keyof typeof templates;
+const TemplateComponent = templates[template] ?? DefaultTemplate;
 ---
 
-<Layout title={page.title} description={page.description} hideNav={page.template === 'landing'}>
+<Layout title={page.title} description={page.description} hideNav={template === 'landing'}>
   <TemplateComponent>
     <BlockRenderer blocks={page.blocks ?? []} />
   </TemplateComponent>

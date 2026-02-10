@@ -32,7 +32,7 @@ export default defineConfig({
       useCdn: false,
       apiVersion: "2024-12-08",
       stega: {
-        studioUrl: "http://localhost:3333",
+        studioUrl: "https://ywcccapstone.sanity.studio",
       },
     }),
     icon(),

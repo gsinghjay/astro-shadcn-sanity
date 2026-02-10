@@ -241,6 +241,7 @@ export interface Page {
   _id: string;
   title: string;
   slug: string;
+  template?: string;
   description?: string;
   blocks: PageBlock[];
 }
