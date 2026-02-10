@@ -20,6 +20,7 @@ Welcome to the **YWCC Capstone Sponsors** project — a CMS-driven static websit
 - [Working with Sanity Studio](#working-with-sanity-studio)
 - [Working with Storybook](#working-with-storybook)
 - [Running Tests](#running-tests)
+- [Type Checking](#type-checking)
 - [Deployment](#deployment)
 - [Key Documentation](#key-documentation)
 - [Common Tasks](#common-tasks)
@@ -242,6 +243,10 @@ Run these from the project root:
 | `npm run test:unit:coverage` | Run unit tests with coverage report |
 | `npm run test:integration` | Run integration tests (fast, no browser) |
 | `npm run test:ui` | Run Playwright tests in UI mode |
+| `npm run build --workspace=astro-app` | Type-check + build the Astro site (runs `astro check` first) |
+| `cd studio && npx tsc --noEmit` | Type-check Sanity Studio schemas (no output files) |
+| `cd studio && npx sanity schema deploy` | Deploy schema to Sanity Content Lake |
+| `cd studio && npx sanity typegen generate` | Generate TypeScript types from your schema |
 
 To run a command in a specific workspace:
 
@@ -367,6 +372,44 @@ export const myBlock = defineBlock({
 
 Register every new schema in `studio/src/schemaTypes/index.ts`.
 
+### Schema management commands
+
+After you create or modify a schema, there are a few extra steps to make everything work together. Here's what each command does and when you need it.
+
+#### Deploy the schema to the Content Lake
+
+```bash
+cd studio && npx sanity schema deploy
+```
+
+**What it does:** Uploads your local schema definitions to the Sanity Content Lake (the cloud database). This makes your schema available to the Sanity MCP server and other cloud tools.
+
+**When to run it:** Every time you add a new document type, block, or field — basically any change inside `studio/src/schemaTypes/`. Until you deploy, the cloud version of the schema is out of date. If you skip this step and try to create content through the API or MCP tools, the new fields won't be recognized.
+
+**How to remember:** Changed a schema file? Deploy the schema.
+
+#### Generate TypeScript types from the schema
+
+```bash
+cd studio && npx sanity typegen generate
+```
+
+**What it does:** Reads your GROQ queries (the ones wrapped in `defineQuery()` in `astro-app/src/lib/sanity.ts`) and generates TypeScript types that match the data those queries return. This means your editor can autocomplete field names and catch typos before you even run the code.
+
+**When to run it:** After any schema change (adding/removing fields) or after modifying a GROQ query. The generated types live alongside your code and keep your frontend in sync with your content model.
+
+**How to remember:** Changed a schema or query? Regenerate types.
+
+#### Extract the schema (advanced)
+
+```bash
+cd studio && npx sanity schema extract
+```
+
+**What it does:** Exports the full schema to a JSON file. This is an intermediate step that `typegen generate` runs automatically — you rarely need to run it yourself. It's useful for debugging if you want to inspect the raw schema output.
+
+**When to run it:** Almost never. Only if you're debugging schema issues or building custom tooling.
+
 ## Working with Storybook
 
 Storybook lets you develop and preview UI components in isolation.
@@ -434,6 +477,68 @@ These build the Astro app, start a local server, and run browser-based tests acr
 - Use `npm run test:headed` to see the browser during test runs
 - Integration tests use **static imports** for schema files (not dynamic `await import()`) — Playwright transforms static imports but not dynamic ones
 - Unit tests run in CI on every PR to `preview` (see [Git Workflow Guide](git-workflow-guide.md))
+
+## Type Checking
+
+Type checking catches bugs before your code ever runs. It verifies that the data shapes you expect actually match what your code produces. This project has **two separate type checkers** because the Astro frontend and the Sanity Studio use different tools.
+
+### Why two type checkers?
+
+Astro components use `.astro` files, which are a special format that standard TypeScript (`tsc`) cannot understand. Astro provides its own type checker called `astro check` that knows how to read `.astro` files. The Sanity Studio is pure TypeScript with no `.astro` files, so it uses the standard `tsc` compiler.
+
+**Think of it this way:** each workspace speaks a slightly different dialect of TypeScript, so each needs its own translator.
+
+### Checking the Astro frontend
+
+```bash
+npm run build --workspace=astro-app
+```
+
+This runs `astro check` automatically before building. It validates all `.astro` and `.ts` files in the frontend. If there's a type error, the build stops and tells you exactly which file and line to fix.
+
+You can also run the type checker without building:
+
+```bash
+cd astro-app && npx astro check
+```
+
+**When to run it:**
+- Before committing frontend changes — catches typos in component props, wrong data shapes, missing imports
+- After modifying GROQ queries — ensures the data you fetch matches what your components expect
+- After regenerating TypeScript types (`npx sanity typegen generate`) — verifies the new types are compatible with your components
+
+### Checking the Sanity Studio
+
+```bash
+cd studio && npx tsc --noEmit
+```
+
+The `--noEmit` flag means "check everything but don't produce any output files." It validates all `.ts` files in the Studio — schema definitions, config, helpers.
+
+**When to run it:**
+- After modifying any schema file in `studio/src/schemaTypes/`
+- After changing `studio/sanity.config.ts`
+- After updating Sanity packages — new versions occasionally change type signatures
+
+### What happens if I skip type checking?
+
+Your code might still work! TypeScript errors don't prevent the dev server from running. But skipping type checks means:
+
+- Typos in field names won't be caught until a user hits a broken page
+- Refactoring is risky — you won't know if renaming a field broke something elsewhere
+- Code reviews take longer because reviewers have to manually spot issues the computer could have flagged
+
+**Rule of thumb:** Run type checks before every commit. It takes seconds and saves hours of debugging.
+
+### Quick reference
+
+| What changed | Command to run |
+|-------------|---------------|
+| Any `.astro` or `.ts` file in `astro-app/` | `cd astro-app && npx astro check` |
+| Any `.ts` file in `studio/` | `cd studio && npx tsc --noEmit` |
+| A GROQ query in `sanity.ts` | `cd studio && npx sanity typegen generate` then `cd astro-app && npx astro check` |
+| A schema file in `studio/src/schemaTypes/` | `cd studio && npx tsc --noEmit` then `cd studio && npx sanity schema deploy` |
+| Everything (pre-commit safety net) | Run both checks + unit tests |
 
 ## Deployment
 
