@@ -26,7 +26,7 @@ export async function loadQuery<T>({
     );
   }
 
-  const perspective = visualEditingEnabled ? "previewDrafts" : "published";
+  const perspective = visualEditingEnabled ? "drafts" : "published";
 
   const { result } = await sanityClient.fetch<T>(query, params ?? {}, {
     filterResponse: false,
@@ -66,7 +66,7 @@ export const siteSettingsQuery = groq`*[_type == "siteSettings"][0]{
 let _siteSettingsCache: SiteSettings | null = null;
 
 export async function getSiteSettings(): Promise<SiteSettings> {
-  if (_siteSettingsCache) return _siteSettingsCache;
+  if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
 
   const result = await loadQuery<SiteSettings | null>({
     query: siteSettingsQuery,

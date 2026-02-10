@@ -82,6 +82,12 @@
 #   - Story 7.3: Schema best practices — High+Medium
 #   - Story 7.4: TypeGen & type replacement — High (blocked by 7.2)
 #   - Story 7.5: Config & dead code cleanup — Low
+#
+# 2026-02-09: Story 5.4 added (Preview & Publish Architecture)
+#   - New comprehensive story: webhook auto-rebuild, SSR cache fix, perspective deprecation
+#   - Completes the content publishing loop (edit → preview → publish → auto-rebuild)
+#   - Scope: Sanity webhook config, Cloudflare deploy hook, sanity.ts fixes
+#   - Epic 5 remains in-progress
 #   - Priority: before continuing Epic 2 stories 2.4–2.9
 
 generated: 2026-02-09
@@ -132,6 +138,7 @@ development_status:
   5-1-seo-metadata-and-sitemap: backlog
   5-2-ga4-security-headers-cloudflare-deploy: review
   5-3-matomo-self-hosted-vps: backlog
+  5-4-preview-publish-architecture: review
   epic-5-retrospective: optional
 
   epic-6: backlog
