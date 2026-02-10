@@ -1,8 +1,8 @@
-name: Sync preview branch
+name: Sync main branch
 
 on:
   push:
-    branches: [main]
+    branches: [preview]
   workflow_dispatch:
 
 jobs:
@@ -15,10 +15,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Merge main into preview
+      - name: Merge preview into main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout preview
-          git merge origin/main --no-edit
-          git push origin preview
+          git checkout main
+          git merge origin/preview --no-edit
+          git push origin main
