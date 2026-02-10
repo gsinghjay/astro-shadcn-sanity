@@ -19,6 +19,9 @@ const templates = {
   twoColumn: TwoColumnTemplate,
 };
 
+// Only used in static builds — ignored in server mode
+export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true";
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const pages = await sanityClient.fetch<Array<{ slug: string }>>(allPageSlugsQuery);
   return pages.map((page) => ({
