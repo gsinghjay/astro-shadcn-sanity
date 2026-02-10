@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import { sponsorsPage } from '../lib/data';
+
+export const prerender = true;
 ---
 
 <Layout title={sponsorsPage.title} description={sponsorsPage.description}>

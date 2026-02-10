@@ -469,3 +469,175 @@ Claude Opus 4.6 (claude-opus-4-6)
 - `astro-app/.env` — Added PUBLIC_GA_MEASUREMENT_ID and PUBLIC_SITE_URL
 - `astro-app/.storybook/main.ts` — Added `/@react-refresh` to rollupOptions.external (fixes Storybook CI build failure)
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Status updated
+
+---
+
+## Visual Editing Preview Branch (Story 7.1 Prerequisite)
+
+### Context
+
+After Story 5.2 deployed the static production site to Cloudflare Pages, the Sanity Presentation tool (Visual Editing) still couldn't connect because:
+1. Production builds as pure static HTML with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` not set in CI
+2. No preview deployment existed for Studio to connect to
+3. Even with Visual Editing enabled on a static build, content edits in the CMS wouldn't show until the next deploy (content is baked into HTML at build time)
+
+### Solution: SSR Preview Branch Deployment
+
+A `preview` branch deployment at `preview.ywcc-capstone.pages.dev` that runs in **SSR mode** (`output: "server"`) with Visual Editing enabled. This gives:
+- Click-to-edit overlays via the `<VisualEditing>` component
+- **Live draft content** — every page request fetches fresh data from Sanity with `perspective: "previewDrafts"`
+- No rebuild needed to see content changes in the Presentation tool
+
+Production (`main`) remains `output: "static"` with no Visual Editing JS overhead.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    GitHub Actions                        │
+│                                                          │
+│  push to main ────→ build (static) ──→ wrangler deploy   │
+│                                        ywcc-capstone     │
+│                                        .pages.dev        │
+│                                                          │
+│  push to preview ──→ build (SSR)   ──→ wrangler deploy   │
+│                      + visual editing   --branch=preview  │
+│                                        preview.ywcc-     │
+│                                        capstone.pages.dev │
+└─────────────────────────────────────────────────────────┘
+
+┌──────────────┐    iframe     ┌──────────────────────────┐
+│ Sanity Studio │─────────────→│ preview.ywcc-capstone     │
+│ Presentation  │              │ .pages.dev                │
+│ tool          │←─────────────│                           │
+│               │  postMessage │ <VisualEditing/>          │
+│               │  (overlays)  │ SSR + previewDrafts       │
+└──────────────┘               └──────────────────────────┘
+```
+
+### Key Concepts Explained
+
+**Stega Encoding:** When Visual Editing is enabled, the Sanity client embeds invisible Unicode characters into string values. These encode the document ID, field path, and Studio URL so the overlay knows what to link to when you click on content.
+
+**`stegaClean()`:** Because stega encoding adds invisible characters to strings, direct string comparisons break (e.g., `block.alignment === 'center'` returns `false` even when the value is "center"). `stegaClean()` strips these characters before comparison. It's a no-op when stega is disabled, so it's safe to use everywhere.
+
+**`getPage()` vs raw `sanityClient.fetch()`:** The `getPage()` helper wraps `sanityClient.fetch()` with Visual Editing awareness — when enabled, it fetches with `perspective: "previewDrafts"`, enables stega encoding, and uses the API read token. When disabled, it fetches published content with no stega.
+
+**`output: "server"` vs `output: "static"`:** Static mode pre-renders all pages to HTML at build time — fast, cacheable, but content is frozen until the next deploy. Server mode renders pages on-demand per request, fetching fresh data each time — slightly slower per page load but always shows current content.
+
+**Branch Deployments:** Cloudflare Pages supports deploying different branches to different URLs from the same project. Using `wrangler pages deploy --branch=preview` creates a deployment at `preview.ywcc-capstone.pages.dev`. No second Cloudflare project or dashboard config needed.
+
+### Changes Made (PR #3)
+
+| File | Change | Why |
+|------|--------|-----|
+| `astro-app/astro.config.mjs` | Conditional `output: "server"` / `"static"` based on env var; `studioUrl` → deployed Studio URL | SSR for preview, static for production; overlays link to real Studio |
+| `.github/workflows/deploy.yml` | Added `preview` branch to triggers; conditional `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` and `--branch=preview` flag | Enables the branch deployment pipeline |
+| `studio/.env` (local only, gitignored) | `SANITY_STUDIO_PREVIEW_ORIGIN` → `https://preview.ywcc-capstone.pages.dev` | Studio Presentation tool knows where to iframe |
+| `astro-app/src/pages/[...slug].astro` | `sanityClient.fetch` → `getPage()`, added `stegaClean` for `page.template`, added `prerender` export | Draft-aware fetching, safe template comparison, SSR/static compatibility |
+| `astro-app/src/lib/types.ts` | Added `template?: string` to `Page` interface | Type was missing for template field returned by GROQ |
+| `astro-app/src/components/blocks/custom/HeroBanner.astro` | `stegaClean(block.alignment)` | Safe `'center'` comparison with stega |
+| `astro-app/src/components/blocks/custom/CtaBanner.astro` | `stegaClean(block.backgroundVariant)` | Safe variant map lookup |
+| `astro-app/src/components/blocks/custom/StatsRow.astro` | `stegaClean(block.backgroundVariant)` | Safe `'dark'` comparison |
+| `astro-app/src/components/blocks/custom/TextWithImage.astro` | `stegaClean(block.imagePosition)` | Safe `'left'` comparison |
+| `astro-app/src/components/blocks/custom/SponsorCards.astro` | `stegaClean(sponsor.tier)` | Safe tier style lookup |
+
+### Gotchas and Lessons Learned
+
+1. **Cloudflare transient deploy failures:** The first `wrangler pages deploy --branch=preview` failed with `Unknown internal error occurred` — a Cloudflare-side transient error. The re-run succeeded. This is not a code issue; just retry.
+
+2. **No Cloudflare dashboard config needed:** The `--branch=preview` flag on `wrangler pages deploy` handles everything. Cloudflare Pages automatically creates the branch deployment URL. The Cloudflare dashboard shows "Environment variables: None" for preview deployments — this is expected because the build happens in GitHub Actions, not Cloudflare.
+
+3. **Static output + Visual Editing = no live preview:** The initial approach used `output: "static"` for the preview branch too. This gave click-to-edit overlays but content edits in the CMS didn't appear until a rebuild, because all content was baked into HTML at build time. Switching to `output: "server"` for the preview branch fixed this — every page load fetches fresh draft data from Sanity.
+
+4. **SSR on Cloudflare free tier is fine:** Cloudflare Workers free tier gives 100K requests/day. Since only content editors use the preview URL through the Presentation tool, usage is minimal. No paid plan needed.
+
+5. **`loadEnv` reads `.env` at config time:** The `astro.config.mjs` uses Vite's `loadEnv()` to read environment variables at config evaluation time. If `PUBLIC_SANITY_VISUAL_EDITING_ENABLED="true"` is in the local `.env`, the local dev server also runs in SSR mode. This is correct behavior — local dev gets the same Visual Editing experience.
+
+6. **`getStaticPaths` is ignored in server mode:** When `output: "server"`, Astro ignores `getStaticPaths` for pages that don't export `prerender = true`. We added `export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true"` to `[...slug].astro` so it prerenders in static builds but renders on-demand in SSR.
+
+7. **`studio/.env` is gitignored:** The `SANITY_STUDIO_PREVIEW_ORIGIN` change to point to the preview URL is a local-only change. Each developer needs to set this in their own `studio/.env`.
+
+8. **CSP meta tag already updated in prior commits:** The Content Security Policy in `Layout.astro` already included `wss://*.sanity.io` in `connect-src` (for real-time Visual Editing communication) and `https://placehold.co` in `img-src` from earlier security header work.
+
+9. **`previewDrafts` perspective renamed:** Sanity's API shows a deprecation warning: `The previewDrafts perspective has been renamed to drafts`. The current code in `src/lib/sanity.ts` uses `"previewDrafts"` — this should be updated to `"drafts"` in a future cleanup.
+
+### SSR Fix: Replaced astro-icon with @iconify/utils (RESOLVED)
+
+**Status:** SSR `fs` dependency eliminated. Build succeeds with 0 errors, 0 `fs` references in Worker bundle. Needs deploy + verification.
+
+**Root Cause (was):** Two sources of Node.js `fs` dependency in the SSR render path:
+1. `astro-icon` integration — used `fs` at SSR render time to read SVG files from `@iconify-json/*` packages
+2. `blocks-2/3/4.astro` (fulldotdev generic UI blocks) — used `fs.readFileSync()` to read source files for code block demos
+
+**Fix Applied:**
+1. **Replaced `astro-icon` with `@iconify/utils`** — rewrote `icon/icon.astro` wrapper to use `getIconData()` + `iconToSVG()` + `iconToHTML()` from `@iconify/utils`, reading icon data directly from `@iconify-json/lucide` and `@iconify-json/simple-icons` JSON imports (no `fs`)
+2. **Updated 5 UI components** that bypassed the wrapper and imported directly from `astro-icon/components`: `sheet-close`, `sheet-content`, `accordion-trigger`, `native-select`, `spinner` → now all use `@/components/ui/icon`
+3. **Removed `astro-icon` integration** from `astro.config.mjs` and uninstalled the package
+4. **Stubbed `fs.readFileSync`** in `blocks-2/3/4.astro` — these generic library blocks are never rendered from Sanity content, so `fileContent` is set to `""` instead of reading from filesystem
+
+**Verification:**
+- `npm run build` → 0 errors, 0 `fs` warnings
+- `grep` for `fs` in `dist/` → 0 matches
+- Prerendered pages (about, contact, projects, sponsors) build successfully
+- SSR server bundle has no `fs` dependency
+
+### SSR Runtime Fixes (Post-Deploy)
+
+Two runtime issues were discovered and fixed after the initial SSR preview deployment:
+
+**1. SANITY_API_READ_TOKEN not inlined in CI build**
+
+- **Symptom:** All SSR pages returned HTTP 500 with error `The SANITY_API_READ_TOKEN environment variable is required during Visual Editing`
+- **Root cause:** Vite only inlines `import.meta.env.*` values from `.env` files, not from `process.env`. The CI workflow set the token as a process env var (in the `env:` block), but no `.env` file existed in CI — so Vite left the token as `undefined` in the SSR bundle.
+- **Fix:** Added a "Write .env for Vite inlining" step to the GitHub Actions workflow that creates an `.env` file in `astro-app/` before `astro build`. This ensures Vite reads the values from the `.env` file and inlines them into the Worker bundle at build time.
+- **Commit:** `1f8e2f3` — fix: write .env file in CI so Vite inlines SANITY_API_READ_TOKEN into SSR bundle
+
+**2. `[object Object]` response from Cloudflare Workers**
+
+- **Symptom:** All SSR pages returned HTTP 200 with body `[object Object]` instead of HTML. Prerendered pages worked fine. Local wrangler dev (miniflare) worked correctly.
+- **Root cause:** The `nodejs_compat` compatibility flag causes `@cloudflare/unenv-preset` to polyfill `process`, which makes Astro's runtime detection think it's running in Node.js. Astro then returns an `AsyncIterable` for the response body instead of a `ReadableStream`. Cloudflare Workers can't handle `AsyncIterable` and coerces it to `[object Object]`. See [withastro/astro#14511](https://github.com/withastro/astro/issues/14511).
+- **Fix:** Added `disable_nodejs_process_v2` to `compatibility_flags` in `wrangler.jsonc`. This prevents the process polyfill from triggering Astro's Node.js detection while keeping `nodejs_compat` for other Node.js APIs.
+- **Commit:** `3f6202f` — fix: add disable_nodejs_process_v2 flag to fix SSR [object Object] response
+- **Future:** When `compatibility_date` >= `2026-02-19`, the `fetch_iterable_type_support` flag auto-enables, allowing Workers to handle AsyncIterable natively. At that point, `disable_nodejs_process_v2` can be removed.
+
+### PR #3 Current State
+
+PR: https://github.com/gsinghjay/astro-shadcn-sanity/pull/3
+
+**Branch:** `preview` (8 commits ahead of `main`)
+
+**Commits:**
+1. `b226413` — feat: enable Visual Editing on preview branch deployment (stegaClean, getPage, workflow, studioUrl)
+2. `e5a2767` — feat: switch preview build to SSR for live draft content
+3. `0f25fde` — fix: add prerender export to index page + update implementation doc
+4. `7b2ab7c` — fix: prerender hardcoded pages to avoid fs crash on Cloudflare Workers
+5. `95e38e6` — fix: replace astro-icon with @iconify/utils for Cloudflare Workers edge compatibility
+6. `1f8e2f3` — fix: write .env file in CI so Vite inlines SANITY_API_READ_TOKEN into SSR bundle
+7. `8c0ea1c` — debug: add minimal SSR test page to isolate rendering issue (removed in next commit)
+8. `3f6202f` — fix: add disable_nodejs_process_v2 flag to fix SSR [object Object] response
+
+**Status:** All SSR pages rendering correctly on `preview.ywcc-capstone.pages.dev`. All prerendered pages also working.
+
+**Remaining:**
+1. Test Sanity Studio Presentation tool → verify iframe + overlays
+2. Ensure production (`main`) still builds as static with no regressions
+
+### How to Use the Preview Deployment (once SSR fix is applied)
+
+**For content editors:**
+1. Open Sanity Studio at `https://ywcccapstone.sanity.studio`
+2. Click the **Presentation** tool in the sidebar
+3. The preview site loads in an iframe with click-to-edit overlays
+4. Click any content → Studio navigates to that field
+5. Edit content → refresh the preview iframe → changes appear immediately
+
+**For developers — keeping preview in sync:**
+```bash
+git checkout preview
+git merge main
+git push
+```
+
+**For developers — local Visual Editing:**
+The local `.env` already has `PUBLIC_SANITY_VISUAL_EDITING_ENABLED="true"`, so `astro dev` runs in SSR mode with Visual Editing. Run the Studio locally (`cd studio && npx sanity dev`) and use the Presentation tool to preview.

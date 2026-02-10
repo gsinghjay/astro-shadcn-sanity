@@ -2,6 +2,7 @@
 import type { CtaBannerBlock } from '@/lib/types';
 import { Section, SectionContent, SectionActions } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   block: CtaBannerBlock;
@@ -30,7 +31,7 @@ const secondaryBtnMap: Record<string, string> = {
   white: '',
 };
 
-const variant = block.backgroundVariant || 'dark';
+const variant = stegaClean(block.backgroundVariant) || 'dark';
 ---
 
 <Section class={bgMap[variant]} data-animate>

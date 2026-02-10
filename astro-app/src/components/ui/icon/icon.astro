@@ -1,13 +1,15 @@
 ---
-import { Icon as AstroIcon } from "astro-icon/components"
 import type { HTMLAttributes } from "astro/types"
+import { getIconData, iconToSVG, iconToHTML } from "@iconify/utils"
+import lucideIcons from "@iconify-json/lucide/icons.json"
+import simpleIcons from "@iconify-json/simple-icons/icons.json"
 
 interface Props extends Omit<HTMLAttributes<"svg">, "name" | "href"> {
   href?: HTMLAttributes<"a">["href"]
   name?: string
 }
 
-const { name, href, class: className } = Astro.props
+const { name, href, class: className, ...rest } = Astro.props
 
 const hrefMap: Record<string, string> = {
   "x.com": "simple-icons:x",
@@ -38,6 +40,11 @@ const hrefMap: Record<string, string> = {
   linkedin: "simple-icons:linkedin",
 }
 
+const iconSets: Record<string, any> = {
+  lucide: lucideIcons,
+  "simple-icons": simpleIcons,
+}
+
 function resolveIconName(): string | undefined {
   if (name) {
     if (name.includes(":")) return name
@@ -50,7 +57,32 @@ function resolveIconName(): string | undefined {
   return undefined
 }
 
-const iconName = resolveIconName()
+function renderIcon(iconName: string): string | undefined {
+  const [prefix, iconId] = iconName.split(":")
+  const iconSet = iconSets[prefix]
+  if (!iconSet) return undefined
+
+  const data = getIconData(iconSet, iconId)
+  if (!data) return undefined
+
+  const svg = iconToSVG(data)
+
+  // Build extra attributes string from rest props
+  const classValue = ["size-[1em] text-base", className].filter(Boolean).join(" ")
+  const extraAttrs: Record<string, string> = { class: classValue }
+  for (const [key, value] of Object.entries(rest)) {
+    if (value !== undefined && value !== null) {
+      extraAttrs[key] = String(value)
+    }
+  }
+
+  // Merge SVG attributes with extra props
+  const allAttrs = { ...svg.attributes, ...extraAttrs }
+  return iconToHTML(svg.body, allAttrs)
+}
+
+const resolvedName = resolveIconName()
+const svgHtml = resolvedName ? renderIcon(resolvedName) : undefined
 ---
 
-{iconName && <AstroIcon name={iconName} class:list={["size-[1em] text-base", className]} />}
+{svgHtml && <Fragment set:html={svgHtml} />}
