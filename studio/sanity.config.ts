@@ -2,6 +2,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
+import {CogIcon} from '@sanity/icons'
 import {schemaTypes} from './src/schemaTypes'
 import {resolve} from './src/presentation/resolve'
 
@@ -26,6 +27,7 @@ export default defineConfig({
             // Singleton: Site Settings (fixed document ID)
             S.listItem()
               .title('Site Settings')
+              .icon(CogIcon)
               .id('siteSettings')
               .child(
                 S.document().schemaType('siteSettings').documentId('siteSettings'),

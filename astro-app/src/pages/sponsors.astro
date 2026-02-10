@@ -6,6 +6,6 @@ import { sponsorsPage } from '../lib/data';
 export const prerender = true;
 ---
 
-<Layout title={sponsorsPage.title} description={sponsorsPage.description}>
-  <BlockRenderer blocks={sponsorsPage.blocks} />
+<Layout title={sponsorsPage.title ?? undefined} description={sponsorsPage.description ?? undefined}>
+  <BlockRenderer blocks={sponsorsPage.blocks ?? []} />
 </Layout>

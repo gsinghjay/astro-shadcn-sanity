@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {ImageIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const textWithImage = defineBlock({
   name: 'textWithImage',
   title: 'Text with Image',
+  icon: ImageIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

@@ -1,9 +1,11 @@
 import {defineType, defineField} from 'sanity'
+import {CreditCardIcon} from '@sanity/icons'
 
 export const sponsor = defineType({
   name: 'sponsor',
   title: 'Sponsor',
   type: 'document',
+  icon: CreditCardIcon,
   fields: [
     defineField({
       name: 'name',

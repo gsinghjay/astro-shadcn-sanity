@@ -40,7 +40,7 @@ const template = stegaClean(page.template) as keyof typeof templates;
 const TemplateComponent = templates[template] ?? DefaultTemplate;
 ---
 
-<Layout title={page.title} description={page.description} hideNav={template === 'landing'}>
+<Layout title={page.title ?? undefined} description={page.description ?? undefined} hideNav={template === 'landing'}>
   <TemplateComponent>
     <BlockRenderer blocks={page.blocks ?? []} />
   </TemplateComponent>

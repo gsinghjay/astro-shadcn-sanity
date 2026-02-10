@@ -145,7 +145,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
         <FooterMenuItem>
           <FooterMenuLink
             href={item.href}
-            {...(item.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
+            {...((item.href || '').startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
             class="text-background/40 hover:text-background text-xs transition-colors"
           >{item.label}</FooterMenuLink>
         </FooterMenuItem>

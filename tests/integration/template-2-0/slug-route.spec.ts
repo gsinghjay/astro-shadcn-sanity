@@ -50,18 +50,18 @@ test.describe('Story 2-0: Catch-all Route & GROQ Integration (AC6, AC8)', () => 
   test('[P0] 2.0-INT-030 — [...slug].astro imports from sanity.ts', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
     expect(content).toContain('sanityClient')
-    expect(content).toContain('pageBySlugQuery')
+    expect(content).toContain('ALL_PAGE_SLUGS_QUERY')
   })
 
-  test('[P0] 2.0-INT-031 — sanity.ts exports pageBySlugQuery with template field', () => {
+  test('[P0] 2.0-INT-031 — sanity.ts exports PAGE_BY_SLUG_QUERY with template field', () => {
     const content = fs.readFileSync(SANITY_LIB, 'utf-8')
-    expect(content).toContain('pageBySlugQuery')
+    expect(content).toContain('PAGE_BY_SLUG_QUERY')
     expect(content).toContain('template')
   })
 
-  test('[P0] 2.0-INT-032 — sanity.ts exports allPageSlugsQuery', () => {
+  test('[P0] 2.0-INT-032 — sanity.ts exports ALL_PAGE_SLUGS_QUERY', () => {
     const content = fs.readFileSync(SANITY_LIB, 'utf-8')
-    expect(content).toContain('allPageSlugsQuery')
+    expect(content).toContain('ALL_PAGE_SLUGS_QUERY')
   })
 
   test('[P0] 2.0-INT-033 — [...slug].astro has getStaticPaths export', () => {

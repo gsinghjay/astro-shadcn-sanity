@@ -23,13 +23,13 @@ describe("Mock data — structural validation", () => {
     expect(data).toHaveProperty("title");
     expect(data).toHaveProperty("blocks");
     expect(typeof data.title).toBe("string");
-    expect(Array.isArray(data.blocks)).toBe(true);
+    expect(Array.isArray(data.blocks!)).toBe(true);
   });
 
   it.each(pages)(
     "$name page blocks all have _type and _key",
     ({ data }) => {
-      for (const block of data.blocks) {
+      for (const block of data.blocks!) {
         expect(block).toHaveProperty("_type");
         expect(block).toHaveProperty("_key");
         expect(typeof block._type).toBe("string");
@@ -42,7 +42,7 @@ describe("Mock data — structural validation", () => {
   it.each(pages)(
     "$name page block _keys are unique",
     ({ data }) => {
-      const keys = data.blocks.map(
+      const keys = data.blocks!.map(
         (b: { _key: string }) => b._key,
       );
       expect(new Set(keys).size).toBe(keys.length);
@@ -50,7 +50,7 @@ describe("Mock data — structural validation", () => {
   );
 
   it("sponsors page contains sponsorCards or sponsorSteps block", () => {
-    const types = sponsorsPage.blocks.map(
+    const types = sponsorsPage.blocks!.map(
       (b: { _type: string }) => b._type,
     );
     expect(
@@ -59,7 +59,7 @@ describe("Mock data — structural validation", () => {
   });
 
   it("contact page contains contactForm block", () => {
-    const types = contactPage.blocks.map(
+    const types = contactPage.blocks!.map(
       (b: { _type: string }) => b._type,
     );
     expect(types).toContain("contactForm");

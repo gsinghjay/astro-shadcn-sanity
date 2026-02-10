@@ -13,16 +13,13 @@ const { block } = Astro.props;
 <Section data-animate>
   <SectionSplit>
     <SectionContent>
-      {block.label && (
-        <span class="label-caps text-primary">{block.label}</span>
-      )}
-      {block.headline && (
-        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{block.headline}</h2>
+      {block.heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{block.heading}</h2>
       )}
     </SectionContent>
 
     <Accordion>
-      {block.items.map((item, i) => (
+      {(block.items ?? []).map((item, i) => (
         <AccordionItem>
           <AccordionTrigger>
             <span class="flex items-start gap-4">

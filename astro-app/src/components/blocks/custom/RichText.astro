@@ -11,9 +11,9 @@ const { block } = Astro.props;
 
 <Section data-animate>
   <SectionProse>
-    {block.content.map((b) => {
+    {(block.content ?? []).map((b) => {
       if (b._type !== 'block') return null;
-      const text = b.children.map((c) => c.text).join('');
+      const text = (b.children ?? []).map((c) => c.text).join('');
       switch (b.style) {
         case 'h2': return <h2>{text}</h2>;
         case 'h3': return <h3>{text}</h3>;

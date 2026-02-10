@@ -25,7 +25,7 @@ export default defineConfig({
       projectId,
       dataset,
       useCdn: false,
-      apiVersion: "2024-12-08",
+      apiVersion: "2025-03-01",
       stega: {
         studioUrl: "https://ywcccapstone.sanity.studio",
       },
