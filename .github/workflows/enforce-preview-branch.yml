@@ -1,0 +1,15 @@
+name: Enforce Preview Branch
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify source branch is preview
+        if: github.head_ref != 'preview'
+        run: |
+          echo "::error::Only the 'preview' branch can merge into main. This PR is from '${{ github.head_ref }}'."
+          exit 1
