@@ -9,7 +9,7 @@ export const sanityClient = {
   config: vi.fn().mockReturnValue({
     projectId: "test-project",
     dataset: "test-dataset",
-    apiVersion: "2024-12-08",
+    apiVersion: "2025-03-01",
     useCdn: false,
   }),
 };

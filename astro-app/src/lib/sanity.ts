@@ -1,7 +1,10 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
-import type { Page, SiteSettings } from "./types";
+import type {
+  SITE_SETTINGS_QUERY_RESULT,
+  PAGE_BY_SLUG_QUERY_RESULT,
+} from "@/sanity.types";
 
 export { sanityClient, groq };
 
@@ -63,12 +66,12 @@ export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings"][0
  * Result is cached for the duration of the build (module-level memoization)
  * to avoid redundant API calls from Layout, Header, and Footer.
  */
-let _siteSettingsCache: SiteSettings | null = null;
+let _siteSettingsCache: NonNullable<SITE_SETTINGS_QUERY_RESULT> | null = null;
 
-export async function getSiteSettings(): Promise<SiteSettings> {
+export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY_RESULT>> {
   if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
 
-  const result = await loadQuery<SiteSettings | null>({
+  const result = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
     query: SITE_SETTINGS_QUERY,
   });
 
@@ -189,8 +192,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
 /**
  * Fetch a page by slug from Sanity.
  */
-export async function getPage(slug: string): Promise<Page | null> {
-  return loadQuery<Page | null>({
+export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> {
+  return loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
     params: { slug },
   });

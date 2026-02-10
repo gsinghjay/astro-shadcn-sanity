@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {OlistIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const sponsorSteps = defineBlock({
   name: 'sponsorSteps',
   title: 'Sponsor Steps',
+  icon: OlistIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

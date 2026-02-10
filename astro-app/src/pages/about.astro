@@ -6,6 +6,6 @@ import { aboutPage } from '../lib/data';
 export const prerender = true;
 ---
 
-<Layout title={aboutPage.title} description={aboutPage.description}>
-  <BlockRenderer blocks={aboutPage.blocks} />
+<Layout title={aboutPage.title ?? undefined} description={aboutPage.description ?? undefined}>
+  <BlockRenderer blocks={aboutPage.blocks ?? []} />
 </Layout>

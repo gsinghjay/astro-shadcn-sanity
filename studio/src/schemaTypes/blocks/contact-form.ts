@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {EnvelopeIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const contactForm = defineBlock({
   name: 'contactForm',
   title: 'Contact Form',
+  icon: EnvelopeIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({

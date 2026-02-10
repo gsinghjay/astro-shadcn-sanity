@@ -1,10 +1,12 @@
-import {defineType, defineField} from 'sanity'
+import {defineType, defineField, defineArrayMember} from 'sanity'
+import {CogIcon} from '@sanity/icons'
 
 // Singleton document — use desk structure to limit to a single instance
 export const siteSettings = defineType({
   name: 'siteSettings',
   title: 'Site Settings',
   type: 'document',
+  icon: CogIcon,
   fields: [
     defineField({
       name: 'siteName',
@@ -79,7 +81,7 @@ export const siteSettings = defineType({
       title: 'Navigation Items',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           fields: [
             defineField({
@@ -106,7 +108,7 @@ export const siteSettings = defineType({
               type: 'array',
               description: 'Dropdown sub-navigation items (not yet rendered in header — planned for future story)',
               of: [
-                {
+                defineArrayMember({
                   type: 'object',
                   fields: [
                     defineField({
@@ -129,11 +131,11 @@ export const siteSettings = defineType({
                         }),
                     }),
                   ],
-                },
+                }),
               ],
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
@@ -158,7 +160,7 @@ export const siteSettings = defineType({
       title: 'Social Links',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           fields: [
             defineField({
@@ -176,7 +178,7 @@ export const siteSettings = defineType({
               validation: (Rule) => Rule.required(),
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
@@ -207,7 +209,7 @@ export const siteSettings = defineType({
       type: 'array',
       description: 'Links shown in the footer bottom bar (e.g., Privacy Policy, Terms)',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           fields: [
             defineField({
@@ -223,7 +225,7 @@ export const siteSettings = defineType({
               validation: (Rule) => Rule.required(),
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
@@ -232,7 +234,7 @@ export const siteSettings = defineType({
       type: 'array',
       description: 'Links shown in the footer Resources section',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           fields: [
             defineField({
@@ -254,7 +256,7 @@ export const siteSettings = defineType({
               initialValue: false,
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
@@ -263,7 +265,7 @@ export const siteSettings = defineType({
       type: 'array',
       description: 'Links shown in the footer Programs section',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           fields: [
             defineField({
@@ -279,7 +281,7 @@ export const siteSettings = defineType({
               validation: (Rule) => Rule.required(),
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({

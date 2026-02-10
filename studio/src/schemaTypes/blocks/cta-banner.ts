@@ -1,9 +1,11 @@
 import {defineField} from 'sanity'
+import {BoltIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const ctaBanner = defineBlock({
   name: 'ctaBanner',
   title: 'CTA Banner',
+  icon: BoltIcon,
   preview: {select: {title: 'heading'}},
   fields: [
     defineField({
