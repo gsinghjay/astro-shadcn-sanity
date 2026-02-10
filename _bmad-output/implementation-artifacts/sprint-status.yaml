@@ -99,6 +99,14 @@
 #   - NEW 7.2: Schema best practices (reduced scope from old 7.3)
 #   - NEW 7.3: TypeGen & type replacement (renumbered from old 7.4, blocked by 7.1)
 #   - NEW 7.4: Server islands preview optimization (from existing artifact)
+#
+# 2026-02-10: Story 5.5 added (Cloudflare Native Preview Deployments)
+#   - Migrate from GitHub Actions direct upload to Cloudflare Pages git integration
+#   - Eliminates: preview branch, sync-main.yml, double builds, .env writing hack
+#   - CF Pages dashboard handles Production vs Preview env vars
+#   - GitHub Actions retained for CI only (tests/lint), not deployment
+#   - Requires new CF Pages project (cannot migrate direct upload → git integration)
+#   - Epic 5 remains in-progress
 
 generated: 2026-02-10
 project: astro-shadcn-sanity
@@ -149,6 +157,7 @@ development_status:
   5-2-ga4-security-headers-cloudflare-deploy: review
   5-3-matomo-self-hosted-vps: backlog
   5-4-preview-publish-architecture: in-progress
+  5-5-cloudflare-native-preview-deployments: in-progress
   epic-5-retrospective: optional
 
   epic-6: backlog

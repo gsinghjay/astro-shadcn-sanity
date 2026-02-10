@@ -814,75 +814,65 @@ So that I can express interest in sponsoring a capstone team and know my submiss
 
 ## Epic 7: Sanity Code Quality & Type Safety
 
-> **Source:** Sanity Code Review (2026-02-09) — `docs/code-review/sanity-code-review_20260209_130832.md`
-> **Priority:** Should be completed before continuing Epic 2 block schema stories (2.4–2.9) to avoid compounding technical debt.
+> **Source:** Sanity Code Review (2026-02-10) — `_bmad-output/sanity-code-review.md`
+> **Priority:** Should be completed before continuing Epic 2 block schema stories (2.4–2.8) to avoid compounding technical debt.
+> **Change Log (2026-02-10):** Updated from new code review. Old Story 7.1 (Visual Editing) removed — stegaClean and loadQuery issues now passing. Old Story 7.5 (Config & Dead Code) removed — items not flagged in current review. Remaining SEO stega warning merged into Story 7.1. Stories reorganized from 5 to 3 around 10 current findings.
 
-Refactor the Sanity integration layer to follow best practices identified in the code review. Fixes critical visual editing breakage, adds TypeGen for automated type safety, improves schema patterns, and cleans up dead code.
+Refactor the Sanity integration layer to follow best practices identified in the code review. Adds TypeGen for automated type safety, fixes query completeness, improves schema patterns, and resolves type/schema drift.
 
-**Review Issues Addressed:** 18 findings (1 Critical, 3 High, 4 Medium, 7 Low)
+**Review Issues Addressed:** 10 findings (3 Critical, 3 Important, 4 Minor)
 
-### Story 7.1: Fix Visual Editing (Critical)
+**Previously Fixed (removed from scope):**
+- ~~stegaClean for logic values~~ — Now passing. Applied to `alignment`, `backgroundVariant`, `spacing`, `maxWidth`, `imagePosition` in block components and `template` in `[...slug].astro`.
+- ~~VisualEditing component~~ — Now passing. Correctly rendered in Layout.astro when editing is enabled.
+- ~~loadQuery on dynamic pages~~ — Now passing. Visual editing overlays work on all pages, not just the homepage.
 
-> **Review Issues:** #10 (Critical), #11 (Medium)
+### Story 7.1: Query Completeness, defineQuery & SEO Stega Fix
 
-As a content editor,
-I want visual editing (click-to-edit, live preview) to work correctly on all pages,
-So that I can use Sanity Studio's Presentation tool to navigate and edit content in context.
-
-**Acceptance Criteria:**
-
-**Given** visual editing is enabled via the Presentation tool or preview mode
-**When** a page with template-conditional logic is rendered
-**Then** `stegaClean` from `@sanity/client/stega` is used on all string values used in logic operations: `page.template` in `[...slug].astro` for template lookup and `=== 'landing'` comparison (#10)
-**And** `stegaClean` is applied to block-level string values used in conditionals: `alignment`, `backgroundVariant`, `spacing`, `maxWidth`, `imagePosition` in block components that use these values for CSS class selection or conditional rendering (#10)
-**And** `[...slug].astro` uses the `loadQuery` helper (or equivalent from `@sanity/astro`) instead of direct `sanityClient.fetch`, so that stega encoding, perspective switching, and token injection work correctly on all dynamic pages — not just the homepage (#11)
-**And** visual editing click-to-edit overlays appear on all pages, not just the homepage
-**And** template selection works correctly during visual editing (no fallback to DefaultTemplate)
-
-### Story 7.2: Query Completeness & defineQuery
-
-> **Review Issues:** #5 (High), #6 (Low), #7 (High), #8 (Medium), #9 (Low)
+> **Review Findings:** Critical #2, Critical #3, Important #4, Minor #8, Minor #9
+> **Change Log (2026-02-10):** Combines old Story 7.2 (Query Completeness) with the remaining SEO stega finding from the new review. Old visual editing items removed (now passing). New findings added: logoCloud select pattern, SEO stega warning.
 
 As a developer,
-I want all GROQ queries wrapped in `defineQuery` with complete projections for every block type,
-So that TypeGen can generate result types and no block content is silently dropped.
+I want all GROQ queries wrapped in `defineQuery` with complete projections for every block type and clean SEO metadata,
+So that TypeGen can generate result types, no block content is silently dropped, and SEO metadata is free of stega strings.
 
 **Acceptance Criteria:**
 
 **Given** the queries in `astro-app/src/lib/sanity.ts`
 **When** the queries are refactored
-**Then** all GROQ query strings are wrapped in `defineQuery()` from the `groq` package (#5)
-**And** query variable names follow `SCREAMING_SNAKE_CASE` convention: `SITE_SETTINGS_QUERY`, `PAGE_BY_SLUG_QUERY`, `ALL_PAGE_SLUGS_QUERY`, etc. (#6)
-**And** `pageBySlugQuery` (renamed) includes type-conditional projections for all block types registered in the page schema — currently missing `richText`, `faqSection`, `contactForm`, `sponsorCards` (#7)
-**And** the SEO projection includes `seo.metaTitle`, `seo.metaDescription`, and `seo.ogImage` with proper asset resolution (#8)
-**And** all image projections include `metadata { lqip, dimensions }` for blur placeholder support (#9)
+**Then** all GROQ query strings are wrapped in `defineQuery()` from the `groq` package (Critical #2)
+**And** query variable names follow `SCREAMING_SNAKE_CASE` convention: `SITE_SETTINGS_QUERY`, `PAGE_BY_SLUG_QUERY`, `ALL_PAGE_SLUGS_QUERY`, etc. (Minor #9)
+**And** `pageBySlugQuery` (renamed to `PAGE_BY_SLUG_QUERY`) includes type-conditional projections for all block types registered in the page schema — currently missing `richText`, `faqSection`, `contactForm`, `sponsorCards` (Important #4)
+**And** the `logoCloud` projection uses explicit `autoPopulate == true =>` instead of truthy `select(autoPopulate => ...)` to handle `undefined` pre-migration values correctly
+**And** all image projections include `asset->{ _id, url, metadata { lqip, dimensions } }` for blur placeholder support (Minor #8)
+**And** `seo.metaDescription` value is cleaned with `stegaClean()` before rendering in `<meta>` tags in Layout.astro, or the SEO fields are fetched with `stega: false` to prevent stega strings in `<head>` (Critical #3)
 **And** no block type in the page schema's `blocks[]` array is missing a corresponding GROQ projection
 **And** all queries compile without errors
 
-### Story 7.3: Schema Best Practices
+### Story 7.2: Schema Best Practices
 
-> **Review Issues:** #1 (Medium), #2 (Low), #3 (High), #4 (Low), #14 (Medium)
+> **Review Findings:** Important #6, Minor #7, Minor #10
+> **Change Log (2026-02-10):** Reduced scope from old Story 7.3. Items not flagged in current review removed (button.ts URL validation, radio layout for alignment fields, singleton document actions). New finding added: apiVersion outdated.
 
 As a developer,
-I want all Sanity schemas to follow documented best practices for type safety, editor UX, and content integrity,
-So that the schema layer is robust and provides a good editing experience.
+I want all Sanity schemas to follow documented best practices for editor UX and type safety,
+So that the schema layer provides a good editing experience with proper icons and consistent patterns.
 
 **Acceptance Criteria:**
 
 **Given** the existing schemas in `studio/src/schemaTypes/`
 **When** schemas are updated to follow best practices
-**Then** all array `of` items use `defineArrayMember()` for type safety — applies to `page.ts` blocks array, `hero-banner.ts` backgroundImages and ctaButtons arrays, and all other array definitions across block schemas (#1)
-**And** block types include descriptive icons in their `defineBlock` or `defineType` calls for better Studio preview in arrays (#2)
-**And** `button.ts` URL validation allows relative paths (internal links like `/about`, `/sponsors`) via `allowRelative: true` or a toggle pattern for internal reference vs. external URL (#3)
-**And** alignment fields (`left`/`center`/`right`) use `layout: 'radio'` for better editor UX — applies to `hero-banner.ts` and `block-base.ts` (#4)
-**And** `sanity.config.ts` restricts document actions on singleton types (siteSettings) to only `publish`, `discardChanges`, and `restore` — preventing accidental deletion or duplication (#14)
+**Then** all 11 block schemas and `siteSettings` and `sponsor` document schemas include descriptive icons from `@sanity/icons` — currently only `page.ts` has an icon (`DocumentIcon`) (Important #6)
+**And** `site-settings.ts` inline array objects (`navigationItems`, `socialLinks`, `footerLinks`, `resourceLinks`, `programLinks`) are wrapped in `defineArrayMember()` for type safety (Minor #7)
+**And** `apiVersion` in `astro-app/astro.config.mjs` is updated from `"2024-12-08"` to a current date (Minor #10)
 **And** Sanity Studio starts without schema errors
 **And** all existing content remains valid after schema changes
 
-### Story 7.4: TypeGen & Type Replacement
+### Story 7.3: TypeGen & Type Replacement
 
-> **Review Issues:** #12 (High), #13 (Low), #16 (Medium)
-> **Blocked by:** Story 7.2 (queries must use `defineQuery` before TypeGen can generate result types)
+> **Review Findings:** Critical #1, Important #5
+> **Blocked by:** Story 7.1 (queries must use `defineQuery` before TypeGen can generate result types)
+> **Change Log (2026-02-10):** Updated from old Story 7.4. Type/schema mismatch findings now enumerated with specific drift identified in new review.
 
 As a developer,
 I want TypeGen configured to auto-generate TypeScript types from the Sanity schema and GROQ queries,
@@ -890,35 +880,34 @@ So that frontend types are always in sync with the schema and manual type mainte
 
 **Acceptance Criteria:**
 
-**Given** Story 7.2 is complete (all queries use `defineQuery`)
+**Given** Story 7.1 is complete (all queries use `defineQuery`)
 **When** TypeGen is configured and run
-**Then** `sanity-typegen.json` is created with correct schema and query paths (#16)
-**And** `studio/package.json` or `astro-app/package.json` includes a `"typegen"` script that generates types (#16)
-**And** running the typegen script produces a types file with interfaces for all document types, block types, and query results (#12)
-**And** `astro-app/src/lib/types.ts` is replaced with imports from the generated types file — the 310 lines of hand-written interfaces are removed (#12)
-**And** all block types in the generated output include base fields (backgroundVariant, spacing, maxWidth) from `defineBlock`, fixing the missing `BlockBase` extends issue (#13)
-**And** phantom fields that exist in manual types but not in the schema (e.g., `Sponsor.projectThemes`, `Sponsor.yearJoined`, `TeamMember.imageUrl`) are not present in generated types (#12)
+**Then** `sanity-typegen.json` is created with correct schema and query paths (Critical #1)
+**And** a `"typegen"` script is added to `astro-app/package.json` or root `package.json` to generate types (Critical #1)
+**And** running the typegen script produces a types file with interfaces for all document types, block types, and query results (Critical #1)
+**And** `astro-app/src/lib/types.ts` (311 lines of hand-written interfaces) is replaced with imports from the generated types file (Critical #1)
+**And** all type/schema mismatches are resolved by the generated types: `Sponsor.tier` includes `'bronze'` (currently missing from frontend type at `types.ts:90`), `FaqSectionBlock` matches schema fields (`heading` and `items`, not `label` and `headline`), orphaned fields in `TimelineBlock`, `TeamGridBlock`, and `ContactFormBlock` (`label`, `headline`, `formEndpoint`, `fields`) are corrected to match actual schema definitions (Important #5)
+**And** all block types in the generated output include base fields (backgroundVariant, spacing, maxWidth) from `defineBlock`
 **And** the project builds without type errors using the generated types
 **And** a note is added to the project README or developer docs explaining how to regenerate types after schema changes
 
-### Story 7.5: Config & Dead Code Cleanup
+### Story 7.4: Server Islands for Preview Branch Optimization
 
-> **Review Issues:** #15 (Low), #17 (Low), #18 (Low — partial)
+> **Change Log (2026-02-10):** NEW story. Migrates preview branch from `output: "server"` to `output: "static"` with Astro Server Islands for on-demand Sanity content rendering.
 
 As a developer,
-I want dead code removed and hardcoded config values extracted to environment variables,
-So that the codebase is clean and deployment-ready.
+I want the preview branch to use Astro Server Islands (`server:defer`) with `output: "static"` instead of full `output: "server"`,
+So that the page shell (Header, Footer, Layout) is prerendered at build time for fast initial load while Sanity content blocks render on-demand with fresh draft data.
 
 **Acceptance Criteria:**
 
-**Given** the codebase contains dead files and hardcoded config values
-**When** cleanup is performed
-**Then** `studioUrl` in `astro-app/astro.config.mjs` is read from an environment variable (e.g., `PUBLIC_SANITY_STUDIO_URL`) with `http://localhost:3333` as the development fallback (#15)
-**And** dead schema files in `studio/src/schemaTypes/blocks/` that are commented out of the index (`team-grid.ts`, `timeline.ts` if applicable) are either re-enabled and properly registered, or removed entirely (#17)
-**And** if dead schemas are removed, any corresponding imports in `BlockRenderer.astro` are also removed (#17)
-**And** `astro-app/src/lib/data/home-page.ts` is deleted (homepage now wired to Sanity, file is unused) (#18 — partial)
-**And** `astro-app/src/lib/data/site-settings.ts` is deleted (site settings now wired to Sanity, file is unused) (#18 — partial)
-**And** `astro-app/src/lib/data/index.ts` is updated to remove the deleted exports
-**And** remaining data files (`about-page.ts`, `contact-page.ts`, `projects-page.ts`, `sponsors-page.ts`) are retained — they are still actively imported by their pages pending Story 2.2b
-**And** `npm run build` succeeds with no errors
-**And** `npm run dev` starts both workspaces without errors
+**Given** the preview branch currently uses `output: "server"` rendering every page on-demand via Cloudflare Workers
+**When** the preview branch is migrated to Server Islands
+**Then** `astro.config.mjs` uses `output: "static"` (same as production `main` branch) with `@astrojs/cloudflare` adapter retained for server island support
+**And** a `SanityPageContent.astro` wrapper component is created that accepts a page slug, fetches fresh Sanity data using `getPage()` with `previewDrafts` perspective, and wraps `BlockRenderer`
+**And** `[...slug].astro` and `index.astro` render `<SanityPageContent server:defer>` when Visual Editing is enabled, with a fallback skeleton via `slot="fallback"`
+**And** `server:defer` is conditionally applied only when `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true`
+**And** `<VisualEditing />` component works correctly with server islands — stega overlays and click-to-edit function after island content injection
+**And** prerendered pages (about, contact, projects, sponsors) continue to work with no regressions
+**And** production `main` branch builds are unchanged — no server islands, fully static
+**And** preview deployment at `preview.ywcc-capstone.pages.dev` loads all pages with dynamic Sanity content
