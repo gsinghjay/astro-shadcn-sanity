@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { VisualEditing } from "@sanity/astro/visual-editing";
 import { getSiteSettings } from "../lib/sanity";
+import { stegaClean } from "@sanity/client/stega";
 
 interface Props {
   title?: string;
@@ -21,15 +22,18 @@ const {
   hideNav = false,
 } = Astro.props;
 
+const cleanTitle = stegaClean(title);
+const cleanDescription = stegaClean(description);
+
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 
 const fullTitle =
-  title === defaultTitle
-    ? title
-    : `${title} | ${defaultTitle}`;
+  cleanTitle === stegaClean(defaultTitle)
+    ? cleanTitle
+    : `${cleanTitle} | ${stegaClean(defaultTitle)}`;
 ---
 
 <!doctype html>
@@ -39,7 +43,7 @@ const fullTitle =
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
+    <meta name="description" content={cleanDescription} />
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' https://cdn.sanity.io https://placehold.co data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://*.sanity.io wss://*.sanity.io; font-src 'self'; frame-src 'self'"

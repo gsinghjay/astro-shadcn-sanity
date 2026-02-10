@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
-import { sanityClient, allPageSlugsQuery, getPage } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
@@ -23,7 +23,7 @@ const templates = {
 export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true";
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const pages = await sanityClient.fetch<Array<{ slug: string }>>(allPageSlugsQuery);
+  const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY);
   return pages.map((page) => ({
     params: { slug: page.slug },
   }));
