@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import { getPage } from '../lib/sanity';
 
+export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true";
+
 const page = await getPage('home');
 if (!page) {
   return Astro.redirect('/404');
