@@ -582,26 +582,46 @@ Production (`main`) remains `output: "static"` with no Visual Editing JS overhea
 - Prerendered pages (about, contact, projects, sponsors) build successfully
 - SSR server bundle has no `fs` dependency
 
+### SSR Runtime Fixes (Post-Deploy)
+
+Two runtime issues were discovered and fixed after the initial SSR preview deployment:
+
+**1. SANITY_API_READ_TOKEN not inlined in CI build**
+
+- **Symptom:** All SSR pages returned HTTP 500 with error `The SANITY_API_READ_TOKEN environment variable is required during Visual Editing`
+- **Root cause:** Vite only inlines `import.meta.env.*` values from `.env` files, not from `process.env`. The CI workflow set the token as a process env var (in the `env:` block), but no `.env` file existed in CI — so Vite left the token as `undefined` in the SSR bundle.
+- **Fix:** Added a "Write .env for Vite inlining" step to the GitHub Actions workflow that creates an `.env` file in `astro-app/` before `astro build`. This ensures Vite reads the values from the `.env` file and inlines them into the Worker bundle at build time.
+- **Commit:** `1f8e2f3` — fix: write .env file in CI so Vite inlines SANITY_API_READ_TOKEN into SSR bundle
+
+**2. `[object Object]` response from Cloudflare Workers**
+
+- **Symptom:** All SSR pages returned HTTP 200 with body `[object Object]` instead of HTML. Prerendered pages worked fine. Local wrangler dev (miniflare) worked correctly.
+- **Root cause:** The `nodejs_compat` compatibility flag causes `@cloudflare/unenv-preset` to polyfill `process`, which makes Astro's runtime detection think it's running in Node.js. Astro then returns an `AsyncIterable` for the response body instead of a `ReadableStream`. Cloudflare Workers can't handle `AsyncIterable` and coerces it to `[object Object]`. See [withastro/astro#14511](https://github.com/withastro/astro/issues/14511).
+- **Fix:** Added `disable_nodejs_process_v2` to `compatibility_flags` in `wrangler.jsonc`. This prevents the process polyfill from triggering Astro's Node.js detection while keeping `nodejs_compat` for other Node.js APIs.
+- **Commit:** `3f6202f` — fix: add disable_nodejs_process_v2 flag to fix SSR [object Object] response
+- **Future:** When `compatibility_date` >= `2026-02-19`, the `fetch_iterable_type_support` flag auto-enables, allowing Workers to handle AsyncIterable natively. At that point, `disable_nodejs_process_v2` can be removed.
+
 ### PR #3 Current State
 
 PR: https://github.com/gsinghjay/astro-shadcn-sanity/pull/3
 
-**Branch:** `preview` (4 commits ahead of `main` + uncommitted astro-icon→iconify fix)
+**Branch:** `preview` (8 commits ahead of `main`)
 
-**Commits (prior):**
+**Commits:**
 1. `b226413` — feat: enable Visual Editing on preview branch deployment (stegaClean, getPage, workflow, studioUrl)
 2. `e5a2767` — feat: switch preview build to SSR for live draft content
 3. `0f25fde` — fix: add prerender export to index page + update implementation doc
 4. `7b2ab7c` — fix: prerender hardcoded pages to avoid fs crash on Cloudflare Workers
+5. `95e38e6` — fix: replace astro-icon with @iconify/utils for Cloudflare Workers edge compatibility
+6. `1f8e2f3` — fix: write .env file in CI so Vite inlines SANITY_API_READ_TOKEN into SSR bundle
+7. `8c0ea1c` — debug: add minimal SSR test page to isolate rendering issue (removed in next commit)
+8. `3f6202f` — fix: add disable_nodejs_process_v2 flag to fix SSR [object Object] response
 
-**Pending commit:** Replace astro-icon with @iconify/utils for Cloudflare Workers edge compatibility
+**Status:** All SSR pages rendering correctly on `preview.ywcc-capstone.pages.dev`. All prerendered pages also working.
 
-**What needs to happen next:**
-1. Commit and push the astro-icon→iconify changes
-2. Verify SSR pages load on Cloudflare Workers at `preview.ywcc-capstone.pages.dev`
-3. Test Sanity Studio Presentation tool → verify iframe + overlays
-4. Update PR description
-5. Ensure production (`main`) still builds as static with no regressions
+**Remaining:**
+1. Test Sanity Studio Presentation tool → verify iframe + overlays
+2. Ensure production (`main`) still builds as static with no regressions
 
 ### How to Use the Preview Deployment (once SSR fix is applied)
 
