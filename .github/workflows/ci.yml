@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, preview]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Run unit tests
+        run: npm run test:unit
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build Astro site
+        run: npm run build --workspace=astro-app
+        env:
+          PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
+          PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+      - name: Run Lighthouse CI
+        run: npx lhci autorun
+        continue-on-error: true
+        env:
+          # Optional: install GitHub App for PR status checks (see tech-spec Task 4)
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

@@ -5,7 +5,6 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
-
 # misc
 .DS_Store
 *.pem
@@ -29,3 +28,11 @@ next-env.d.ts
 
 # storybook build output
 astro-app/storybook-static
+
+# BMAD framework and outputs
+_bmad/
+_bmad-output/
+
+# Claude Code
+.claude/
+CLAUDE.md

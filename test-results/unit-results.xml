@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="71" failures="0" errors="0" time="0.536107486">
+    <testsuite name="src/cloudflare/__tests__/build-output.test.ts" timestamp="2026-02-10T09:45:53.124Z" hostname="jsingh" tests="10" failures="0" errors="0" skipped="0" time="0.011536047">
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; dist/ directory exists" time="0.001589939">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _worker.js/ directory exists (Cloudflare Workers entrypoint)" time="0.000348592">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _worker.js/index.js exists (main worker script)" time="0.000328458">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _routes.json exists (Cloudflare Pages routing)" time="0.000201705">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _routes.json has valid structure" time="0.00131347">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _routes.json excludes static assets from worker" time="0.000886658">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _astro/ directory exists (client-side bundles)" time="0.000558782">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _astro/ contains hashed JS bundles" time="0.000555841">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; prerendered static pages exist as HTML" time="0.003279127">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/build-output.test.ts" name="Build output — Cloudflare Pages structure &gt; _headers file exists (Cloudflare custom headers)" time="0.000314212">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" timestamp="2026-02-10T09:45:53.128Z" hostname="jsingh" tests="10" failures="0" errors="0" skipped="0" time="0.438391414">
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; worker responds to GET / without crashing" time="0.274671764">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET / returns status 200" time="0.023854565">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET / returns text/html content-type" time="0.016553307">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET / returns valid HTML, not [object Object]" time="0.024195734">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET / HTML body is non-trivially sized (&gt; 500 bytes)" time="0.013746776">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET / HTML contains &lt;head&gt; and &lt;body&gt; structure" time="0.012110869">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; GET /nonexistent-route does not crash the worker" time="0.012957203">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; dynamic route with mocked Sanity data returns HTML" time="0.012037558">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; concurrent requests all complete without server errors" time="0.008593002">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/ssr-worker-smoke.test.ts" name="SSR Worker Smoke Tests (Miniflare) &gt; no response body contains raw [object Object]" time="0.023103579">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/cloudflare/__tests__/wrangler-config.test.ts" timestamp="2026-02-10T09:45:53.132Z" hostname="jsingh" tests="11" failures="0" errors="0" skipped="0" time="0.010893591">
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — root wrangler.toml &gt; exists at project root" time="0.001417056">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — root wrangler.toml &gt; has required name field" time="0.002983609">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — root wrangler.toml &gt; points pages_build_output_dir to astro-app/dist" time="0.000538782">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — root wrangler.toml &gt; has a compatibility_date" time="0.000867638">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — root wrangler.toml &gt; has nodejs_compat flag enabled" time="0.000887626">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — astro-app/wrangler.jsonc &gt; exists in astro-app" time="0.000200332">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — astro-app/wrangler.jsonc &gt; has matching name with root config" time="0.000480644">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — astro-app/wrangler.jsonc &gt; has matching compatibility_date with root config" time="0.000268548">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — astro-app/wrangler.jsonc &gt; has matching compatibility_flags with root config" time="0.00088753">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — astro-app/wrangler.jsonc &gt; pages_build_output_dir points to ./dist" time="0.000297722">
+        </testcase>
+        <testcase classname="src/cloudflare/__tests__/wrangler-config.test.ts" name="Wrangler config — consistency &gt; root output dir resolves to same location as app output dir" time="0.000583774">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/__tests__/data.test.ts" timestamp="2026-02-10T09:45:53.136Z" hostname="jsingh" tests="14" failures="0" errors="0" skipped="0" time="0.008075138">
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;sponsors&apos; page has required top-level fields" time="0.001965831">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;about&apos; page has required top-level fields" time="0.000252253">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;projects&apos; page has required top-level fields" time="0.000142878">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;contact&apos; page has required top-level fields" time="0.000153372">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;sponsors&apos; page blocks all have _type and _key" time="0.000927159">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;about&apos; page blocks all have _type and _key" time="0.000660212">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;projects&apos; page blocks all have _type and _key" time="0.000382424">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;contact&apos; page blocks all have _type and _key" time="0.000265686">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;sponsors&apos; page block _keys are unique" time="0.000283346">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;about&apos; page block _keys are unique" time="0.000172791">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;projects&apos; page block _keys are unique" time="0.000153214">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; &apos;contact&apos; page block _keys are unique" time="0.000091932">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; sponsors page contains sponsorCards or sponsorSteps block" time="0.000152787">
+        </testcase>
+        <testcase classname="src/lib/__tests__/data.test.ts" name="Mock data — structural validation &gt; contact page contains contactForm block" time="0.000780895">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/__tests__/sanity.test.ts" timestamp="2026-02-10T09:45:53.141Z" hostname="jsingh" tests="9" failures="0" errors="0" skipped="0" time="0.013013953">
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="GROQ query definitions &gt; SITE_SETTINGS_QUERY is a non-empty string" time="0.001450943">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="GROQ query definitions &gt; ALL_PAGE_SLUGS_QUERY targets page type with slug projection" time="0.000421546">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="GROQ query definitions &gt; PAGE_BY_SLUG_QUERY includes all block type projections" time="0.000800156">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="GROQ query definitions &gt; PAGE_BY_SLUG_QUERY uses $slug parameter" time="0.000212463">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="loadQuery() &gt; calls sanityClient.fetch with query and params" time="0.002705176">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="loadQuery() &gt; defaults params to empty object when not provided" time="0.001454485">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="loadQuery() &gt; uses published perspective when visual editing is disabled" time="0.001359894">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="getSiteSettings() &gt; throws when no siteSettings document exists" time="0.002431226">
+        </testcase>
+        <testcase classname="src/lib/__tests__/sanity.test.ts" name="getSiteSettings() &gt; returns site settings when document exists" time="0.000742125">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/lib/__tests__/utils.test.ts" timestamp="2026-02-10T09:45:53.144Z" hostname="jsingh" tests="9" failures="0" errors="0" skipped="0" time="0.010268268">
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; merges simple class strings" time="0.0059777">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; resolves Tailwind conflicts (last wins)" time="0.000492471">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; handles conditional classes via clsx" time="0.000345399">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; handles undefined and null inputs" time="0.000212088">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; handles empty string inputs" time="0.0002635">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; handles array inputs" time="0.000171825">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; handles object inputs (truthy keys)" time="0.00018341">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; returns empty string for no valid inputs" time="0.000347338">
+        </testcase>
+        <testcase classname="src/lib/__tests__/utils.test.ts" name="cn() — class name utility &gt; merges complex Tailwind utility conflicts" time="0.000726022">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/scripts/__tests__/main.test.ts" timestamp="2026-02-10T09:45:53.147Z" hostname="jsingh" tests="8" failures="0" errors="0" skipped="0" time="0.043929075">
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Carousel logic &gt; carousel DOM has correct initial state" time="0.017665069">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Carousel logic &gt; goToSlide logic transitions state correctly" time="0.005215011">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Carousel logic &gt; nextSlide wraps around correctly" time="0.003221237">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Contact form logic &gt; form DOM structure is correct" time="0.006759493">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Contact form logic &gt; submit button can be programmatically disabled" time="0.004192333">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Contact form logic &gt; form state can be set to success" time="0.003285587">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Scroll animation logic &gt; IntersectionObserver is NOT natively available in jsdom (requires polyfill in real app)" time="0.000237419">
+        </testcase>
+        <testcase classname="src/scripts/__tests__/main.test.ts" name="Scroll animation logic &gt; data-animate elements can receive animate-visible class" time="0.001881419">
+        </testcase>
+    </testsuite>
+</testsuites>
