@@ -18,7 +18,37 @@ jobs:
           token: ${{ secrets.RELEASE_TOKEN }}
 
       - name: Merge main into preview
+        id: sync
         run: |
           git checkout preview
           git merge origin/main --no-edit
           git push origin preview
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Notify Discord (success)
+        if: success()
+        run: |
+          curl -s -H "Content-Type: application/json" -d '{
+            "embeds": [{
+              "title": "Preview branch synced",
+              "description": "**preview** is now in sync with **main** at `${{ steps.sync.outputs.sha }}`.\n\nSafe to pull and branch from preview.",
+              "color": 3066993,
+              "footer": {"text": "${{ github.repository }}"}
+            }]
+          }' "$DISCORD_WEBHOOK_URL"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+      - name: Notify Discord (failure)
+        if: failure()
+        run: |
+          curl -s -H "Content-Type: application/json" -d '{
+            "embeds": [{
+              "title": "Preview sync failed",
+              "description": "Failed to merge **main** into **preview**. Manual intervention needed.\n\n[View run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "color": 15158332,
+              "footer": {"text": "${{ github.repository }}"}
+            }]
+          }' "$DISCORD_WEBHOOK_URL"
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

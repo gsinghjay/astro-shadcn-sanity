@@ -1,3 +1,0 @@
-[    2473ms] [WARNING] Unrecognized feature: 'web-share'. @ https://www.youtube.com/s/player/4e51e895/www-widgetapi.vflset/www-widgetapi.js:193
-[    2572ms] [ERROR] Failed to load resource: net::ERR_FAILED @ chrome-extension://invalid/:0
-[    4840ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://su.addthis.com/red/usync?pid=11124&puid=85823ee2-91fe-4e74-b8b6-e6439dd289e2&url=https%3a%2f%2fmatch.adsrvr.org%2ftrack%2fcmf%2fgeneric%3fttd_pid%3daddthis:0
