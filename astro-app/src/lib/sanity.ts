@@ -1,7 +1,6 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
-import groq from "groq";
-import { defineQuery } from "groq";
+import groq, { defineQuery } from "groq";
 import type { Page, SiteSettings } from "./types";
 
 export { sanityClient, groq };
@@ -167,7 +166,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       displayMode,
       "sponsors": select(
-        displayMode == "all" => *[_type == "sponsor"]{
+        !defined(displayMode) || displayMode == "all" => *[_type == "sponsor"]{
           _id, name, "slug": slug.current,
           logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
           tier, description, website
