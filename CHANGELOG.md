@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.0.0...v1.0.1) (2026-02-10)
+
+### Bug Fixes
+
+* sync preview after release completes and block main-to-preview PRs ([4be9582](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4be9582dade23f9a0fe9e7a647253ab2336e6b03))
+
 ## 1.0.0 (2026-02-10)
 
 ### Features
