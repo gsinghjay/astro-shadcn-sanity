@@ -3,8 +3,8 @@
   "version": "1.1.0",
   "description": "Minimal Astro site with Sanity Studio",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
-    "dev:storybook": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\" \"npm run storybook --workspace=astro-app\"",
+    "dev": "concurrently --kill-others \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
+    "dev:storybook": "concurrently --kill-others \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\" \"npm run storybook --workspace=astro-app\"",
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
     "test:chromium": "npx playwright test --project=chromium",
