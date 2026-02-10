@@ -1,0 +1,11 @@
+---
+export const prerender = false;
+const now = new Date().toISOString();
+---
+<html>
+<head><title>SSR Test</title></head>
+<body>
+<h1>SSR works</h1>
+<p>Rendered at: {now}</p>
+</body>
+</html>
