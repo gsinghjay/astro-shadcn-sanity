@@ -47,7 +47,7 @@ flowchart LR
     Studio --> Lake[Sanity Content Lake]
     Lake -->|GROQ queries at build| Astro[Astro SSG]
     Astro --> Static[Static HTML/CSS]
-    Static --> Host[GitHub Pages]
+    Static --> Host[Cloudflare Pages]
     Dev[Developer] --> Blocks[Block Components]
     Dev --> Schemas[Sanity Schemas]
     Blocks --> Astro
@@ -88,21 +88,22 @@ flowchart TD
 | Layer | Technology | Notes |
 |-------|-----------|-------|
 | Frontend | **Astro 5** | Static output (`output: 'static'`) |
-| CMS | **Sanity 4** | Headless CMS with real-time editing |
+| CMS | **Sanity 5** | Headless CMS with real-time editing + Visual Editing |
 | UI Components | **fulldev/ui** | Vanilla `.astro` components via shadcn CLI |
 | Styling | **Tailwind CSS v4** | CSS-first config (no `tailwind.config.mjs`) |
-| Icons | **astro-icon** + Lucide | `@iconify-json/lucide` and `@iconify-json/simple-icons` |
-| Testing | **Playwright** | Integration tests and E2E tests |
+| Icons | **@iconify/utils** + Lucide | `@iconify-json/lucide` and `@iconify-json/simple-icons` (edge-compatible, no fs dependency) |
+| Unit Testing | **Vitest** | Unit tests with jsdom environment |
+| E2E Testing | **Playwright** | Integration tests, E2E tests, accessibility audits |
 | Component Dev | **Storybook 10** | Via `storybook-astro` renderer |
 | Build Tool | **Vite 7** | Bundled with Astro |
 | Runtime | **Node.js 24+** | See `.nvmrc` |
 
 **Important distinctions:**
 
-- **No React/JSX** in the frontend. React exists only inside `studio/` (Sanity Studio requires it).
+- **No React/JSX for page UI**. React exists in `studio/` (Sanity Studio) and in `astro-app/` **only** for Sanity Visual Editing (Presentation tool). Never use React for page components.
 - **fulldev/ui is NOT React shadcn/ui**. These are pure Astro components.
 - **Tailwind v4** uses CSS-first configuration. There is no `tailwind.config.mjs` file. Theme tokens live in `astro-app/src/styles/global.css`.
-- **Zero runtime API calls**. All data is fetched from Sanity and baked into HTML at build time.
+- **Zero runtime API calls in production**. All data is fetched from Sanity and baked into HTML at build time. The `preview` branch uses SSR for live draft content during Visual Editing.
 
 ## Prerequisites
 
@@ -236,6 +237,9 @@ Run these from the project root:
 | `npm run dev:storybook` | Start Astro + Studio + Storybook (all three) |
 | `npm run storybook` | Start Storybook alone (port 6006) |
 | `npm run test` | Run E2E tests (builds astro-app first) |
+| `npm run test:unit` | Run Vitest unit tests |
+| `npm run test:unit:watch` | Run unit tests in watch mode |
+| `npm run test:unit:coverage` | Run unit tests with coverage report |
 | `npm run test:integration` | Run integration tests (fast, no browser) |
 | `npm run test:ui` | Run Playwright tests in UI mode |
 
@@ -381,7 +385,7 @@ Read `docs/storybook-constitution.md` before writing stories. Key rules:
 
 - **Block components** work directly in stories — no wrapper needed
 - **Slot-based UI components** (like Button, Card) need a `*Story.astro` wrapper because Storybook cannot pass slot content via story args
-- `astro-icon` and `astro:assets` are stubbed in Storybook — use inline SVG or plain `<img>` tags in wrapper components
+- `astro:assets` is stubbed in Storybook — use plain `<img>` tags in wrapper components
 
 ### Known issues
 
@@ -390,7 +394,19 @@ Read `docs/storybook-constitution.md` before writing stories. Key rules:
 
 ## Running Tests
 
-The project uses **Playwright** for both integration and E2E testing.
+The project uses a **three-layer test pyramid**: Vitest for unit tests, Playwright for integration and E2E tests.
+
+### Unit tests (fastest)
+
+```bash
+npm run test:unit                 # Run once
+npm run test:unit:watch           # Watch mode for development
+npm run test:unit:coverage        # With coverage report
+```
+
+These test utility functions, GROQ queries, mock data, and DOM scripts. They run in a jsdom environment — no browser or server needed.
+
+**Config:** `astro-app/vitest.config.ts`
 
 ### Integration tests (fast)
 
@@ -417,16 +433,18 @@ These build the Astro app, start a local server, and run browser-based tests acr
 - Use `npm run test:ui` for an interactive UI to debug tests
 - Use `npm run test:headed` to see the browser during test runs
 - Integration tests use **static imports** for schema files (not dynamic `await import()`) — Playwright transforms static imports but not dynamic ones
+- Unit tests run in CI on every PR to `preview` (see [Git Workflow Guide](git-workflow-guide.md))
 
 ## Deployment
 
-### Astro site (GitHub Pages)
+### Astro site (Cloudflare Pages)
 
-```bash
-npm run build --workspace=astro-app
-```
+The main site is deployed to **Cloudflare Pages** via git integration — not GitHub Actions. Cloudflare builds and deploys automatically:
 
-Output goes to `astro-app/dist/`. Deploy this folder to your static hosting provider.
+- **Push to `main`** → Production deployment (static output, Visual Editing OFF)
+- **Push to any branch / PR** → Preview deployment with unique URL (SSR, Visual Editing ON)
+
+Environment variables are configured in the **Cloudflare Pages dashboard**, not in GitHub secrets. See [Cloudflare Setup Guide](cloudflare-setup-guide.md) for full details.
 
 ### Sanity Studio
 
@@ -438,7 +456,7 @@ This deploys the Studio to `<your-studio-name>.sanity.studio`.
 
 ### Storybook (GitHub Pages)
 
-A GitHub Actions workflow at `.github/workflows/deploy-storybook.yml` handles Storybook deployment. Trigger it manually from the Actions tab.
+Storybook is the **only thing deployed to GitHub Pages**. The workflow at `.github/workflows/deploy-storybook.yml` triggers automatically on pushes to `main` that touch `astro-app/src/`, `astro-app/.storybook/`, or `astro-app/package.json`. It can also be triggered manually from the Actions tab.
 
 ## Key Documentation
 
@@ -446,9 +464,10 @@ Read these documents as you ramp up:
 
 | Document | When to read it |
 |----------|----------------|
-| [storybook-constitution.md](storybook-constitution.md) | Before any Storybook work |
-| [project-context.md](project-context.md) | Before writing any code (78 critical rules) |
-| [template-layout-system.md](template-layout-system.md) | When working with page layouts |
+| [git-workflow-guide.md](git-workflow-guide.md) | Before your first commit (branch strategy, conventional commits, releases) |
+| [storybook-constitution.md](../storybook-constitution.md) | Before any Storybook work |
+| [project-context.md](../project-context.md) | Before writing any code (95 critical rules) |
+| [cloudflare-setup-guide.md](cloudflare-setup-guide.md) | When working with deployment or environment variables |
 
 Planning artifacts live in `_bmad-output/`:
 

@@ -1,5 +1,18 @@
 # YWCC Capstone Sponsors
 
+![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?logo=astro&logoColor=white)
+![Sanity](https://img.shields.io/badge/Sanity-5-F03E2F?logo=sanity&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Cloudflare Pages](https://img.shields.io/badge/Cloudflare_Pages-F38020?logo=cloudflarepages&logoColor=white)
+![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6CB33E?logo=vitest&logoColor=white)
+![Playwright](https://img.shields.io/badge/Playwright-2EAD33?logo=playwright&logoColor=white)
+![semantic-release](https://img.shields.io/badge/semantic--release-494949?logo=semanticrelease&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24+-5FA04E?logo=nodedotjs&logoColor=white)
+![npm workspaces](https://img.shields.io/badge/npm_workspaces-monorepo-CB3837?logo=npm&logoColor=white)
+
 A CMS-driven static website for NJIT's Ying Wu College of Computing Industry Capstone program. Content editors compose pages by stacking reusable UI blocks in Sanity Studio — zero code required.
 
 ```mermaid
@@ -20,12 +33,15 @@ flowchart LR
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
 - [Development](#development)
+- [Git Workflow](#git-workflow)
 - [Block Library](#block-library)
 - [Content Model](#content-model)
 - [Adding a New Block](#adding-a-new-block)
+- [Testing](#testing)
 - [Deployment](#deployment)
 - [Performance Targets](#performance-targets)
 - [Contributing](#contributing)
+- [Team](#team)
 - [Resources](#resources)
 - [License](#license)
 
@@ -48,16 +64,22 @@ The platform connects industry sponsors with capstone teams by showcasing sponso
 | Layer | Technology |
 |---|---|
 | Frontend | [Astro 5.x](https://astro.build/) (SSG, `output: 'static'`) |
-| CMS | [Sanity.io](https://www.sanity.io/) (headless) |
+| CMS | [Sanity 5](https://www.sanity.io/) (headless, Visual Editing) |
 | UI Components | [fulldev/ui](https://ui.full.dev) — vanilla `.astro` components via shadcn CLI |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com/) (`@tailwindcss/vite`, CSS-first config) |
+| Icons | [@iconify/utils](https://iconify.design/) + Lucide (`@iconify-json/lucide`, `@iconify-json/simple-icons`) |
 | Interactivity | Vanilla JS (< 5KB total) |
-| Hosting (initial) | [GitHub Pages](https://pages.github.com/) |
-| Hosting (future) | [Cloudflare Pages](https://pages.cloudflare.com/) (when forms are added) |
+| Hosting | [Cloudflare Pages](https://pages.cloudflare.com/) (production: static, preview: SSR) |
+| Storybook | [GitHub Pages](https://pages.github.com/) (component library only) |
 | Form Proxy | [Cloudflare Worker](https://workers.cloudflare.com/) (deferred) |
 | Analytics | GA4 + Monsido |
+| Unit Tests | [Vitest](https://vitest.dev/) (jsdom) |
+| E2E Tests | [Playwright](https://playwright.dev/) (5 browser projects + axe-core a11y) |
+| CI/CD | [GitHub Actions](https://github.com/features/actions) (CI, release, Storybook deploy) |
+| Releases | [semantic-release](https://semantic-release.gitbook.io/) (automated versioning + changelog) |
+| Component Dev | [Storybook 10](https://storybook.js.org/) (via `storybook-astro` renderer) |
 
-The build bakes all content into static HTML — zero runtime API calls.
+Production builds bake all content into static HTML — zero runtime API calls. The `preview` branch uses SSR for live Visual Editing with draft content.
 
 ## Project Structure
 
@@ -84,8 +106,12 @@ astro-shadcn-sanity/
 │           ├── documents/    # Document schemas (page, sponsor, etc.)
 │           ├── objects/      # Shared objects (SEO, button, portable text)
 │           └── helpers/      # defineBlock helper
+├── .github/workflows/        # CI, release, Storybook deploy, branch enforcement
+├── docs/team/                # Developer guides and onboarding
+├── tests/                    # Playwright tests
 ├── package.json              # Root workspace config
-└── README.md
+├── .releaserc.json           # semantic-release configuration
+└── CHANGELOG.md              # Auto-generated (do not edit manually)
 ```
 
 This is an **npm workspaces** monorepo with two packages: `astro-app` and `studio`.
@@ -95,15 +121,15 @@ This is an **npm workspaces** monorepo with two packages: `astro-app` and `studi
 - [Node.js](https://nodejs.org/) v24 or later
 - npm v10 or later
 - A [Sanity.io](https://www.sanity.io/) account (free tier)
-- A [GitHub](https://github.com/) account (for GitHub Pages deployment)
-- A [Cloudflare](https://www.cloudflare.com/) account (free tier, for future forms deployment)
+- A [GitHub](https://github.com/) account
+- A [Cloudflare](https://www.cloudflare.com/) account (free tier, for deployment)
 
 ## Getting Started
 
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone git@github.com:gsinghjay/astro-shadcn-sanity.git
 cd astro-shadcn-sanity
 ```
 
@@ -141,31 +167,54 @@ Open <http://localhost:3333> and sign in with the same service (Google, GitHub, 
 
 ## Development
 
-### Run Astro app only
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start Astro + Studio dev servers |
+| `npm run dev:storybook` | Start Astro + Studio + Storybook (all three) |
+| `npm run storybook` | Start Storybook alone (port 6006) |
+| `npm run build --workspace=astro-app` | Build Astro for production |
+| `npm run test:unit` | Run Vitest unit tests |
+| `npm run test:unit:watch` | Unit tests in watch mode |
+| `npm run test` | Run Playwright E2E tests (builds first) |
+| `npm run test:integration` | Run integration tests (fast, no browser) |
+| `npm run test:ui` | Run Playwright in UI mode |
 
-```bash
-npm run dev --workspace=astro-app
+## Git Workflow
+
+We use [Conventional Commits](https://www.conventionalcommits.org/) + [semantic-release](https://semantic-release.gitbook.io/) for automated versioning and changelog generation.
+
+```mermaid
+flowchart TD
+    A[feature/* branch] -->|PR, CI must pass| B[preview branch]
+    B -->|PR, code owner approval| C[main branch]
+    C -->|automatic| D[semantic-release]
+    D --> E[Version bump + CHANGELOG + GitHub Release]
+    E --> F[Sync preview with main]
+    F --> G[Discord notification]
 ```
 
-### Run Sanity Studio only
+### Branch rules
 
-```bash
-npm run dev --workspace=studio
+| Branch | Purpose | Protection |
+|---|---|---|
+| `main` | Production releases | PRs only from `preview`, code owner approval required |
+| `preview` | Staging/integration | PRs only, CI must pass (unit tests + Lighthouse) |
+| `feature/*` | Your working branches | No restrictions |
+
+### Commit format
+
+```
+<type>: <description>
 ```
 
-### Build for production
+| Prefix | Release? | Version bump |
+|---|---|---|
+| `feat:` | Yes | Minor (0.1.0 → 0.2.0) |
+| `fix:` | Yes | Patch (0.1.0 → 0.1.1) |
+| `feat!:` | Yes | Major (0.1.0 → 1.0.0) |
+| `chore:`, `docs:`, `ci:`, `test:`, `refactor:` | No | — |
 
-```bash
-npm run build --workspace=astro-app
-```
-
-This command performs TypeScript checking and generates static HTML.
-
-### Preview production build
-
-```bash
-npm run preview --workspace=astro-app
-```
+See [docs/team/git-workflow-guide.md](docs/team/git-workflow-guide.md) for the full guide with examples and troubleshooting.
 
 ## Block Library
 
@@ -297,19 +346,18 @@ Compose from fulldev/ui primitives in `src/components/ui/`:
 
 ```astro
 ---
-// astro-app/src/components/blocks/YourBlock.astro
-import type { YourBlockBlock } from '../../lib/sanity'
-import { Button } from '../ui/button'
+// astro-app/src/components/blocks/custom/YourBlock.astro
+import type { YourBlockBlock } from '@/lib/types'
+import { Button } from '@/components/ui/button'
 
 interface Props {
   block: YourBlockBlock
 }
 
 const { block } = Astro.props
-const { backgroundVariant = 'white', spacing = 'default', maxWidth = 'default' } = block
 ---
 
-<section class:list={['block-wrapper', `bg-${backgroundVariant}`, `spacing-${spacing}`, `max-w-${maxWidth}`]}>
+<section>
   <h2>{block.heading}</h2>
   <!-- Compose from ui/ primitives + Tailwind utilities -->
 </section>
@@ -317,7 +365,7 @@ const { backgroundVariant = 'white', spacing = 'default', maxWidth = 'default' }
 
 ### 5. Register in BlockRenderer
 
-Add the import and conditional in `BlockRenderer.astro`.
+Add the import and case in `BlockRenderer.astro`.
 
 ### 6. Add GROQ projection
 
@@ -325,31 +373,48 @@ Add the type-specific projection in `src/lib/sanity.ts`.
 
 Build and verify Lighthouse scores hold at 90+.
 
+## Testing
+
+| Layer | Tool | Command | What it tests |
+|---|---|---|---|
+| Unit | Vitest | `npm run test:unit` | Utilities, GROQ queries, mock data, DOM scripts |
+| Integration | Playwright | `npm run test:integration` | Schema validation, module imports |
+| E2E | Playwright | `npm run test` | Full browser tests across 5 device configs |
+| Accessibility | axe-core | Included in E2E | WCAG 2.1 AA compliance |
+| Performance | Lighthouse CI | CI only (preview PRs) | Core Web Vitals, performance budgets |
+
 ## Deployment
 
-### Deploy Sanity Studio
+### Astro site → Cloudflare Pages
+
+Deployed automatically via Cloudflare Pages git integration:
+
+- **Push to `main`** → Production (static, Visual Editing OFF)
+- **Push to any branch** → Preview URL (SSR, Visual Editing ON)
+
+Environment variables are configured in the [Cloudflare Pages dashboard](https://dash.cloudflare.com/). See [docs/team/cloudflare-setup-guide.md](docs/team/cloudflare-setup-guide.md).
+
+### Sanity Studio
 
 ```bash
-cd studio/
-npx sanity deploy
+npx sanity deploy --workspace=studio
 ```
 
-### Deploy Astro app to Cloudflare Pages
+### Storybook → GitHub Pages
 
-1. Connect your GitHub repository to [Cloudflare Pages](https://pages.cloudflare.com/)
-2. Set the build configuration:
-   - **Root directory:** `astro-app`
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-3. Add environment variables (`PUBLIC_SANITY_PROJECT_ID`, `PUBLIC_SANITY_DATASET`)
+Deployed automatically via `.github/workflows/deploy-storybook.yml` on pushes to `main` that touch component files. Can also be triggered manually from the Actions tab.
 
-### Deploy Cloudflare Worker (form proxy)
+### Releases
 
-Deploy a Cloudflare Worker to proxy contact form submissions to Sanity. The worker keeps the write token server-side.
+Fully automated via [semantic-release](https://semantic-release.gitbook.io/). When `preview` merges into `main`:
 
-### Invite collaborators
+1. Commits are analyzed for version bump (based on conventional commit prefixes)
+2. `CHANGELOG.md` and `package.json` are updated
+3. A git tag and GitHub Release are created
+4. `preview` is auto-synced with `main`
+5. Discord notification confirms the sync
 
-Open [Sanity Manage](https://www.sanity.io/manage), select your project, and click "Invite project members."
+See the [CHANGELOG](CHANGELOG.md) and [GitHub Releases](https://github.com/gsinghjay/astro-shadcn-sanity/releases) for version history.
 
 ## Performance Targets
 
@@ -365,23 +430,48 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
+> **Read the [Git Workflow Guide](docs/team/git-workflow-guide.md) before your first contribution.** It covers branch strategy, commit conventions, and the full release pipeline.
+
+1. Pull the latest `preview` branch: `git checkout preview && git pull`
+2. Create a feature branch: `git checkout -b feat/your-feature`
 3. Follow the [block checklist](#adding-a-new-block) for new blocks
-4. Verify Lighthouse scores hold at 90+ across all categories
-5. Commit your changes (`git commit -m 'Add your feature'`)
-6. Push to the branch (`git push origin feature/your-feature`)
-7. Open a Pull Request
+4. Write [conventional commits](#commit-format): `git commit -m "feat: add your feature"`
+5. Push and open a PR to `preview`: `gh pr create --base preview`
+6. After CI passes and merge, open a PR from `preview` → `main`
+7. Code owner reviews and merges → release happens automatically
 
 ### Code conventions
 
 - **Sanity schemas:** TypeScript with `defineBlock` helper (blocks) or `defineType`/`defineField` (documents)
 - **UI primitives:** fulldev/ui components in `src/components/ui/` — install via `npx shadcn@latest add @fulldev/{name}`
-- **Block components:** `.astro` files in `src/components/blocks/` composing from `ui/` primitives
+- **Block components:** `.astro` files in `src/components/blocks/custom/` composing from `ui/` primitives
 - **Styling:** Tailwind v4 utility classes, CSS-first config in `global.css`, no `tailwind.config.mjs`
 - **Interactivity:** Vanilla JS with data-attribute driven event delegation, each handler under 50 lines
 - **Block architecture:** Flat array only — no nested blocks
-- **No React/JSX** in `astro-app/` — fulldev/ui components are pure `.astro`
+- **No React/JSX for page UI** — React is only for Sanity Visual Editing (Presentation tool)
+
+### Team documentation
+
+| Document | When to read it |
+|---|---|
+| [Git Workflow Guide](docs/team/git-workflow-guide.md) | Before your first commit |
+| [Onboarding Guide](docs/team/onboarding-guide.md) | First day setup |
+| [Cloudflare Setup Guide](docs/team/cloudflare-setup-guide.md) | Deployment and environment variables |
+| [How Preview & Publish Works](docs/team/how-preview-and-publish-works.md) | Visual Editing and draft content |
+
+## Team
+
+| Name | GitHub | Role |
+|---|---|---|
+| Jay Singh | [@gsinghjay](https://github.com/gsinghjay) | Project Lead |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+
+> **Team members:** Add your name, GitHub link, and role by editing this table on a feature branch and opening a PR to `preview`.
 
 ## Resources
 
@@ -390,7 +480,9 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 - [fulldev/ui documentation](https://ui.full.dev/docs)
 - [Tailwind CSS v4 documentation](https://tailwindcss.com/docs)
 - [Cloudflare Pages documentation](https://developers.cloudflare.com/pages/)
-- [Sanity Community Slack](https://slack.sanity.io)
+- [Conventional Commits](https://www.conventionalcommits.org/)
+- [semantic-release documentation](https://semantic-release.gitbook.io/)
+- [Keep a Changelog](https://keepachangelog.com/)
 
 ## License
 
