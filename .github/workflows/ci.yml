@@ -21,3 +21,9 @@ jobs:
         env:
           PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
           PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+      - name: Run Lighthouse CI
+        run: npx lhci autorun
+        continue-on-error: true
+        env:
+          # Optional: install GitHub App for PR status checks (see tech-spec Task 4)
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
