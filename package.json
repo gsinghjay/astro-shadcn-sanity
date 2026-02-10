@@ -10,6 +10,9 @@
     "test:e2e": "npx playwright test",
     "test:headed": "npx playwright test --headed --project=chromium",
     "test:integration": "npx playwright test --config=playwright.integration.config.ts",
+    "test:unit": "npm run test:unit --workspace=astro-app",
+    "test:unit:watch": "npm run test:unit:watch --workspace=astro-app",
+    "test:unit:coverage": "npm run test:unit:coverage --workspace=astro-app",
     "storybook": "npm run storybook --workspace=astro-app"
   },
   "keywords": [

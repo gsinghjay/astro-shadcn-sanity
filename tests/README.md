@@ -1,6 +1,10 @@
 # Test Framework
 
-Playwright-based E2E test suite for the astro-shadcn-sanity monorepo.
+Multi-layer test suite for the astro-shadcn-sanity monorepo:
+- **Unit tests** — Vitest (in `astro-app/src/**/__tests__/`)
+- **Integration tests** — Playwright without browser (schema/content validation)
+- **E2E tests** — Playwright with 5 browser projects
+- **Visual tests** — Storybook (153 story files)
 
 ## Setup
 
@@ -15,6 +19,21 @@ npx playwright install --with-deps
 Requires Node 24+ (see `.nvmrc`).
 
 ## Running Tests
+
+### Unit Tests (Vitest)
+
+```bash
+# Run all unit tests once
+npm run test:unit
+
+# Watch mode — reruns on file changes
+npm run test:unit:watch
+
+# With coverage report
+npm run test:unit:coverage
+```
+
+### E2E Tests (Playwright)
 
 ```bash
 # All browsers (chromium, firefox, webkit, mobile)
@@ -39,16 +58,43 @@ npx playwright test --project=mobile-safari
 ## Architecture
 
 ```
-tests/
-├── e2e/                          # End-to-end test specs
-│   └── smoke.spec.ts             # Homepage smoke + a11y + perf baseline
+                ┌──────────┐
+                │  E2E     │  Playwright — 5 browser projects
+                ├──────────┤
+                │Integration│ Playwright — schema/content validation
+            ┌───┴──────────┴───┐
+            │  Unit (Vitest)    │  Fast, isolated, no browser
+            └───────────────────┘
+            ┌───────────────────┐
+            │ Visual (Storybook)│  153 component stories
+            └───────────────────┘
+```
+
+### Directory Layout
+
+```
+astro-app/
+├── vitest.config.ts                    # Vitest configuration
+└── src/
+    ├── lib/__tests__/                  # Unit tests for lib/
+    │   ├── __mocks__/sanity-client.ts  # Mock for sanity:client virtual module
+    │   ├── utils.test.ts              # cn() utility tests
+    │   ├── sanity.test.ts             # Sanity query + fetch wrapper tests
+    │   └── data.test.ts               # Mock data structure validation
+    └── scripts/__tests__/
+        └── main.test.ts               # Client-side DOM script tests (jsdom)
+
+tests/                                  # E2E + Integration (Playwright)
+├── e2e/                               # End-to-end test specs
+│   └── smoke.spec.ts                  # Homepage smoke + a11y + perf baseline
+├── integration/                       # Schema/content validation
 ├── support/
 │   ├── fixtures/
-│   │   └── index.ts              # Merged fixtures (network-error-monitor + log)
+│   │   └── index.ts                   # Merged fixtures (network-error-monitor + log)
 │   └── helpers/
-│       └── a11y.ts               # Axe-core WCAG 2.1 AA helper
-├── .env                          # Test environment variables
-└── .env.example                  # Template
+│       └── a11y.ts                    # Axe-core WCAG 2.1 AA helper
+├── .env                               # Test environment variables
+└── .env.example                       # Template
 ```
 
 ### Fixtures
@@ -65,6 +111,26 @@ Current fixtures (via `@seontechnologies/playwright-utils`):
 - **log** — Structured logging attached to Playwright HTML reports.
 
 No auth or API fixtures — this is a static SSG site with zero runtime API calls.
+
+### Unit Tests (Vitest)
+
+Unit tests live co-located with source code in `astro-app/src/**/__tests__/`:
+
+```typescript
+// astro-app/src/lib/__tests__/utils.test.ts
+import { cn } from "@/lib/utils";
+
+it("resolves Tailwind conflicts", () => {
+  expect(cn("px-4", "px-8")).toBe("px-8");
+});
+```
+
+Key patterns:
+- **`sanity:client` mock** — `__mocks__/sanity-client.ts` provides a fake Sanity client. Vitest config aliases `sanity:client` to this mock so imports resolve.
+- **jsdom environment** — DOM-dependent tests use `@vitest-environment jsdom` pragma.
+- **Path aliases** — `@/` resolves to `astro-app/src/` (matches Astro's tsconfig).
+
+Coverage reports are generated at `test-results/unit-coverage/` and JUnit XML at `test-results/unit-results.xml`.
 
 ### Helpers
 
@@ -149,8 +215,28 @@ The `playwright.config.ts` is CI-ready:
 | mobile-chrome | Pixel 7 | Android responsive |
 | mobile-safari | iPhone 14 | iOS responsive |
 
+## CI Integration — Unit Tests
+
+Unit tests run before E2E in CI for fast feedback:
+
+```yaml
+- name: Run unit tests
+  run: npm run test:unit
+
+- name: Run E2E tests
+  run: npm test
+  env:
+    CI: true
+```
+
 ## Dependencies
 
+### E2E (root workspace)
 - `@playwright/test` — Test runner and browser automation
 - `@axe-core/playwright` — WCAG accessibility auditing
 - `@seontechnologies/playwright-utils` — Production-tested fixtures (network monitor, logging)
+
+### Unit (astro-app workspace)
+- `vitest` — Vite-native test runner
+- `jsdom` — DOM environment for client-side script tests
+- `@vitest/coverage-v8` — V8-based code coverage
