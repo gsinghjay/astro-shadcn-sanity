@@ -1,19 +1,23 @@
 /// <reference types="vitest" />
-import { defineConfig } from "vitest/config";
+import { getViteConfig } from "astro/config";
 import { resolve } from "path";
 
-export default defineConfig({
+export default getViteConfig({
   resolve: {
     alias: {
-      "@": resolve(__dirname, "./src"),
       // Mock Astro virtual modules that can't resolve outside Astro build
-      "sanity:client": resolve(__dirname, "./src/lib/__tests__/__mocks__/sanity-client.ts"),
+      "sanity:client": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/sanity-client.ts",
+      ),
     },
   },
   test: {
     globals: true,
-    environment: "node",
-    include: ["src/**/__tests__/**/*.test.ts"],
+    include: [
+      "src/**/__tests__/**/*.test.ts",
+      "../tests/integration/**/*.test.ts",
+    ],
     exclude: ["node_modules", "dist", ".astro"],
     coverage: {
       provider: "v8",

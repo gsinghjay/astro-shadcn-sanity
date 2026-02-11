@@ -1,4 +1,4 @@
-import {defineType, defineField} from 'sanity'
+import {defineType, defineField, defineArrayMember} from 'sanity'
 import type {SanityDocument} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 
@@ -90,17 +90,17 @@ export const page = defineType({
       type: 'array',
       group: 'content',
       of: [
-        {type: 'heroBanner'},
-        {type: 'featureGrid'},
-        {type: 'sponsorCards'},
-        {type: 'richText'},
-        {type: 'ctaBanner'},
-        {type: 'faqSection'},
-        {type: 'contactForm'},
-        {type: 'logoCloud'},
-        {type: 'statsRow'},
-        {type: 'sponsorSteps'},
-        {type: 'textWithImage'},
+        defineArrayMember({type: 'heroBanner'}),
+        defineArrayMember({type: 'featureGrid'}),
+        defineArrayMember({type: 'sponsorCards'}),
+        defineArrayMember({type: 'richText'}),
+        defineArrayMember({type: 'ctaBanner'}),
+        defineArrayMember({type: 'faqSection'}),
+        defineArrayMember({type: 'contactForm'}),
+        defineArrayMember({type: 'logoCloud'}),
+        defineArrayMember({type: 'statsRow'}),
+        defineArrayMember({type: 'sponsorSteps'}),
+        defineArrayMember({type: 'textWithImage'}),
       ],
       validation: (Rule) =>
         Rule.custom((blocks, context) => {

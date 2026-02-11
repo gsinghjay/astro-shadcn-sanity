@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {ThLargeIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -18,7 +18,7 @@ export const featureGrid = defineBlock({
       title: 'Items',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           preview: {select: {title: 'title'}},
           fields: [
@@ -55,7 +55,7 @@ export const featureGrid = defineBlock({
               type: 'text',
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({

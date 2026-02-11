@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {HelpCircleIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -18,7 +18,7 @@ export const faqSection = defineBlock({
       title: 'Items',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           preview: {select: {title: 'question'}},
           fields: [
@@ -35,7 +35,7 @@ export const faqSection = defineBlock({
               validation: (Rule) => Rule.required(),
             }),
           ],
-        },
+        }),
       ],
     }),
   ],

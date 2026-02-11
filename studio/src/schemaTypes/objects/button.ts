@@ -1,9 +1,11 @@
 import {defineType, defineField} from 'sanity'
+import {LinkIcon} from '@sanity/icons'
 
 export const button = defineType({
   name: 'button',
   title: 'Button',
   type: 'object',
+  icon: LinkIcon,
   fields: [
     defineField({
       name: 'text',
@@ -14,9 +16,14 @@ export const button = defineType({
     defineField({
       name: 'url',
       title: 'URL',
-      type: 'url',
+      type: 'string',
       validation: (Rule) =>
-        Rule.required().uri({scheme: ['http', 'https', 'mailto', 'tel']}),
+        Rule.required().custom((value) => {
+          if (!value) return true
+          if (value.startsWith('/') || /^https?:\/\//.test(value) || /^(mailto|tel):/.test(value))
+            return true
+          return 'Must be a relative path starting with "/" or a full URL (http/https/mailto/tel)'
+        }),
     }),
     defineField({
       name: 'variant',

@@ -12,6 +12,7 @@
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "schema:extract": "sanity schema extract --path=schema.json",
+    "schema:deploy": "sanity schema deploy",
     "typegen": "sanity schema extract --path=schema.json && sanity typegen generate"
   },
   "keywords": [
