@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {ImagesIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -26,10 +26,10 @@ export const logoCloud = defineBlock({
       type: 'array',
       hidden: ({parent}) => parent?.autoPopulate !== false,
       of: [
-        {
+        defineArrayMember({
           type: 'reference',
           to: [{type: 'sponsor'}],
-        },
+        }),
       ],
     }),
   ],

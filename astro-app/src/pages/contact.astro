@@ -6,6 +6,6 @@ import { contactPage } from '../lib/data';
 export const prerender = true;
 ---
 
-<Layout title={contactPage.title ?? undefined} description={contactPage.description ?? undefined}>
+<Layout title={contactPage.title ?? undefined} seo={contactPage.seo}>
   <BlockRenderer blocks={contactPage.blocks ?? []} />
 </Layout>

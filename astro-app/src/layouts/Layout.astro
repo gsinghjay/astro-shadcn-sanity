@@ -4,11 +4,21 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { VisualEditing } from "@sanity/astro/visual-editing";
 import { getSiteSettings } from "../lib/sanity";
+import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
+
+interface SeoProps {
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImage?: {
+    asset?: { _id: string; url?: string | null; metadata?: { lqip?: string | null; dimensions?: unknown } | null } | null;
+    alt?: string | null;
+  } | null;
+}
 
 interface Props {
   title?: string;
-  description?: string;
+  seo?: SeoProps | null;
   hideNav?: boolean;
 }
 
@@ -18,22 +28,31 @@ const defaultDescription = siteSettings?.siteDescription || "";
 
 const {
   title = defaultTitle,
-  description = defaultDescription,
+  seo,
   hideNav = false,
 } = Astro.props;
 
 const cleanTitle = stegaClean(title);
-const cleanDescription = stegaClean(description);
+const cleanSeoTitle = seo?.metaTitle ? stegaClean(seo.metaTitle) : null;
+const cleanDescription = stegaClean(
+  seo?.metaDescription ?? defaultDescription
+);
 
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 
-const fullTitle =
-  cleanTitle === stegaClean(defaultTitle)
+const fullTitle = cleanSeoTitle
+  ? cleanSeoTitle
+  : cleanTitle === stegaClean(defaultTitle)
     ? cleanTitle
     : `${cleanTitle} | ${stegaClean(defaultTitle)}`;
+
+const ogTitle = cleanSeoTitle ?? cleanTitle;
+const ogImageUrl = seo?.ogImage?.asset
+  ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
+  : null;
 ---
 
 <!doctype html>
@@ -44,6 +63,11 @@ const fullTitle =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={cleanDescription} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={cleanDescription} />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:type" content="website" />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' https://cdn.sanity.io https://placehold.co data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://*.sanity.io wss://*.sanity.io; font-src 'self'; frame-src 'self'"

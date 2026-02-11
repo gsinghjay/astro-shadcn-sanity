@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {RocketIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -24,7 +24,7 @@ export const heroBanner = defineBlock({
       title: 'Background Images',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'image',
           options: {hotspot: true},
           fields: [
@@ -35,14 +35,14 @@ export const heroBanner = defineBlock({
               validation: (Rule) => Rule.required(),
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
       name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
-      of: [{type: 'button'}],
+      of: [defineArrayMember({type: 'button'})],
     }),
     defineField({
       name: 'alignment',
@@ -50,6 +50,7 @@ export const heroBanner = defineBlock({
       type: 'string',
       options: {
         list: ['left', 'center', 'right'],
+        layout: 'radio',
       },
       initialValue: 'center',
     }),

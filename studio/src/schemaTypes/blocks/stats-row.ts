@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {BarChartIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -18,7 +18,7 @@ export const statsRow = defineBlock({
       title: 'Stats',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label', subtitle: 'value'}},
           fields: [
@@ -41,7 +41,7 @@ export const statsRow = defineBlock({
               type: 'string',
             }),
           ],
-        },
+        }),
       ],
     }),
   ],

@@ -53,6 +53,14 @@ export default defineConfig({
     types: schemaTypes,
   },
   document: {
+    // Restrict actions on singleton types to prevent delete/duplicate
+    actions: (input, context) =>
+      singletonTypes.has(context.schemaType)
+        ? input.filter(
+            ({action}) =>
+              action && ['publish', 'discardChanges', 'restore'].includes(action),
+          )
+        : input,
     // Prevent creating new documents for singleton types
     newDocumentOptions: (prev) =>
       prev.filter((templateItem) => !singletonTypes.has(templateItem.templateId)),
