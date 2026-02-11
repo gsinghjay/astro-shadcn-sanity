@@ -5,7 +5,7 @@
  *
  * @story 1-2
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
@@ -14,12 +14,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
 
-test.describe('Story 1-2: Migrate Reference Project', () => {
+describe('Story 1-2: Migrate Reference Project', () => {
   // ---------------------------------------------------------------------------
   // Architecture Anti-patterns
   // ---------------------------------------------------------------------------
-  test.describe('Architecture Anti-patterns', () => {
-    test('[P0] 1.2-INT-010 — No lucide-react imports in production code', async () => {
+  describe('Architecture Anti-patterns', () => {
+    test('[P0] 1.2-INT-010 — No lucide-react imports in production code', () => {
       const dirsToScan = [
         path.join(ASTRO_APP, 'src/components/blocks'),
         path.join(ASTRO_APP, 'src/pages'),
@@ -66,7 +66,7 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
       ).toHaveLength(0)
     })
 
-    test('[P1] 1.2-INT-011 — components.json has tsx: false', async () => {
+    test('[P1] 1.2-INT-011 — components.json has tsx: false', () => {
       const configPath = path.join(ASTRO_APP, 'components.json')
       expect(fs.existsSync(configPath), 'components.json missing').toBe(true)
 
@@ -78,8 +78,8 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
   // ---------------------------------------------------------------------------
   // AC4,5: Layout Components
   // ---------------------------------------------------------------------------
-  test.describe('AC4,5: Layout Components', () => {
-    test('[P1] 1.2-INT-012 — Header.astro, Footer.astro, and Layout.astro exist', async () => {
+  describe('AC4,5: Layout Components', () => {
+    test('[P1] 1.2-INT-012 — Header.astro, Footer.astro, and Layout.astro exist', () => {
       const componentsDir = path.join(ASTRO_APP, 'src/components')
       const layoutsDir = path.join(ASTRO_APP, 'src/layouts')
 
@@ -101,15 +101,13 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
   // ---------------------------------------------------------------------------
   // AC6: Pages
   // ---------------------------------------------------------------------------
-  test.describe('AC6: Pages', () => {
-    test('[P1] 1.2-INT-007 — All 5 page files exist', async () => {
+  describe('AC6: Pages', () => {
+    test('[P1] 1.2-INT-007 — Homepage and catch-all route exist', () => {
       const pagesDir = path.join(ASTRO_APP, 'src/pages')
+      // Remaining pages migrated to CMS-driven catch-all route (Story 2.2b)
       const expectedPages = [
         'index.astro',
-        'about.astro',
-        'projects.astro',
-        'sponsors.astro',
-        'contact.astro',
+        '[...slug].astro',
       ]
 
       for (const page of expectedPages) {
@@ -125,21 +123,23 @@ test.describe('Story 1-2: Migrate Reference Project', () => {
   // ---------------------------------------------------------------------------
   // AC11: Icon Integration
   // ---------------------------------------------------------------------------
-  test.describe('AC11: Icon Integration', () => {
-    test('[P1] 1.2-INT-013 — astro.config.mjs imports and uses astro-icon integration', async () => {
+  describe('AC11: Integrations', () => {
+    test('[P1] 1.2-INT-013 — astro.config.mjs imports and uses required integrations', () => {
       const configPath = path.join(ASTRO_APP, 'astro.config.mjs')
       expect(fs.existsSync(configPath), 'astro.config.mjs missing').toBe(true)
 
       const content = fs.readFileSync(configPath, 'utf-8')
 
+      // Must have Sanity integration
       expect(
-        /import\s+icon\s+from\s+['"]astro-icon['"]/.test(content),
-        'astro.config.mjs missing astro-icon import',
+        content.includes('@sanity/astro'),
+        'astro.config.mjs missing @sanity/astro import',
       ).toBe(true)
 
+      // Must have Cloudflare adapter
       expect(
-        content.includes('icon()'),
-        'astro.config.mjs missing icon() in integrations',
+        content.includes('@astrojs/cloudflare'),
+        'astro.config.mjs missing @astrojs/cloudflare import',
       ).toBe(true)
     })
   })

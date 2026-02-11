@@ -6,11 +6,15 @@
  * @story 2-0
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 
-const TEMPLATES_DIR = path.resolve('astro-app/src/layouts/templates')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
+const TEMPLATES_DIR = path.join(ASTRO_APP, 'src/layouts/templates')
 
 const TEMPLATE_FILES = [
   'DefaultTemplate.astro',
@@ -20,7 +24,7 @@ const TEMPLATE_FILES = [
   'TwoColumnTemplate.astro',
 ]
 
-test.describe('Story 2-0: Template Shell Components (AC7)', () => {
+describe('Story 2-0: Template Shell Components (AC7)', () => {
   test('[P0] 2.0-INT-018 — all 5 template files exist', () => {
     for (const file of TEMPLATE_FILES) {
       const filePath = path.join(TEMPLATES_DIR, file)

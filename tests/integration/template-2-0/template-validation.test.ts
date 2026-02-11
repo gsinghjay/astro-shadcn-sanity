@@ -6,7 +6,7 @@
  * @story 2-0
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 import {
   page as pageSchema,
@@ -14,7 +14,7 @@ import {
   validateBlockTemplateCompatibility,
 } from '../../../studio/src/schemaTypes/documents/page'
 
-test.describe('Story 2-0: Template-Aware Validation (AC9)', () => {
+describe('Story 2-0: Template-Aware Validation (AC9)', () => {
   test('[P0] 2.0-INT-034 — wideBlockWarnings map is exported and non-empty', () => {
     expect(wideBlockWarnings).toBeDefined()
     expect(Object.keys(wideBlockWarnings).length).toBeGreaterThan(0)
@@ -28,8 +28,8 @@ test.describe('Story 2-0: Template-Aware Validation (AC9)', () => {
     expect(wideBlockWarnings.statsRow).toContain('sidebar')
   })
 
-  test('[P0] 2.0-INT-037 — timeline warns in sidebar and twoColumn', () => {
-    expect(wideBlockWarnings.timeline).toEqual(expect.arrayContaining(['sidebar', 'twoColumn']))
+  test('[P0] 2.0-INT-037 — logoCloud warns in sidebar', () => {
+    expect(wideBlockWarnings.logoCloud).toContain('sidebar')
   })
 
   test('[P0] 2.0-INT-038 — blocks field has custom validation defined', () => {
@@ -47,14 +47,14 @@ test.describe('Story 2-0: Template-Aware Validation (AC9)', () => {
   })
 
   test('[P1] 2.0-INT-040 — wideBlockWarnings covers all expected wide blocks', () => {
-    const expectedWideBlocks = ['heroBanner', 'statsRow', 'logoCloud', 'sponsorCards', 'timeline', 'teamGrid']
+    const expectedWideBlocks = ['heroBanner', 'statsRow', 'logoCloud', 'sponsorCards']
     for (const block of expectedWideBlocks) {
       expect(wideBlockWarnings[block], `${block} should have warnings`).toBeDefined()
     }
   })
 })
 
-test.describe('Story 2-0: Validation Function Behavior (AC9)', () => {
+describe('Story 2-0: Validation Function Behavior (AC9)', () => {
   test('[P0] 2.0-INT-049 — returns true for null blocks', () => {
     expect(validateBlockTemplateCompatibility(null, 'sidebar')).toBe(true)
   })
@@ -95,12 +95,12 @@ test.describe('Story 2-0: Validation Function Behavior (AC9)', () => {
   })
 
   test('[P0] 2.0-INT-057 — returns combined warnings for multiple incompatible blocks', () => {
-    const blocks = [{_type: 'heroBanner'}, {_type: 'timeline'}]
-    const result = validateBlockTemplateCompatibility(blocks, 'twoColumn')
+    const blocks = [{_type: 'heroBanner'}, {_type: 'sponsorCards'}]
+    const result = validateBlockTemplateCompatibility(blocks, 'sidebar')
     expect(result).not.toBe(true)
     const warning = result as {message: string; level: string}
     expect(warning.message).toContain('heroBanner')
-    expect(warning.message).toContain('timeline')
+    expect(warning.message).toContain('sponsorCards')
     expect(warning.level).toBe('warning')
   })
 

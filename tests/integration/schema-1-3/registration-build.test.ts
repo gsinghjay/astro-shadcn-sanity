@@ -7,7 +7,7 @@
  * @story 1-3
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import { execSync } from 'child_process'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
@@ -21,12 +21,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const STUDIO_ROOT = path.resolve(__dirname, '../../../studio')
 
-test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
+describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC8: Schema Registration
   // ---------------------------------------------------------------------------
-  test.describe('AC8: Schema Registration', () => {
-    test('[P0] 1.3-INT-030 — schemaTypes array contains all registered schemas', async () => {
+  describe('AC8: Schema Registration', () => {
+    test('[P0] 1.3-INT-030 — schemaTypes array contains all registered schemas', () => {
       const typeNames = schemaTypes.map((s: any) => s.name)
 
       // Object schemas
@@ -42,7 +42,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(schemaTypes.length).toBeGreaterThanOrEqual(5)
     })
 
-    test('[P0] 1.3-INT-031 — blockBaseFields is NOT registered as a standalone schema', async () => {
+    test('[P0] 1.3-INT-031 — blockBaseFields is NOT registered as a standalone schema', () => {
       const typeNames = schemaTypes.map((s: any) => s.name)
       expect(typeNames).not.toContain('blockBase')
       expect(typeNames).not.toContain('block-base')
@@ -52,8 +52,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC9: Schema Quality (defineType/defineField usage)
   // ---------------------------------------------------------------------------
-  test.describe('AC9: Schema Quality', () => {
-    test('[P1] 1.3-INT-032 — all schemas have a name property', async () => {
+  describe('AC9: Schema Quality', () => {
+    test('[P1] 1.3-INT-032 — all schemas have a name property', () => {
       for (const schema of schemaTypes) {
         expect(schema, `Schema missing name`).toHaveProperty('name')
         expect(typeof (schema as any).name).toBe('string')
@@ -61,7 +61,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       }
     })
 
-    test('[P1] 1.3-INT-033 — all schemas have typed fields', async () => {
+    test('[P1] 1.3-INT-033 — all schemas have typed fields', () => {
       for (const schema of schemaTypes) {
         const s = schema as any
         if (s.fields) {
@@ -77,8 +77,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC10: Studio Build Verification
   // ---------------------------------------------------------------------------
-  test.describe('AC10: Studio Build Verification', () => {
-    test('[P0] 1.3-INT-034 — studio builds without schema errors', async () => {
+  describe('AC10: Studio Build Verification', () => {
+    test('[P0] 1.3-INT-034 — studio builds without schema errors', () => {
       const result = execSync('npm run build', {
         cwd: STUDIO_ROOT,
         encoding: 'utf-8',
@@ -93,6 +93,6 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       })
 
       expect(result).toBeDefined()
-    })
+    }, BUILD_TIMEOUT_MS)
   })
 })

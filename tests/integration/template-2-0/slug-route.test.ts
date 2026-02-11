@@ -6,14 +6,18 @@
  * @story 2-0
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 
-const SLUG_ROUTE = path.resolve('astro-app/src/pages/[...slug].astro')
-const SANITY_LIB = path.resolve('astro-app/src/lib/sanity.ts')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
+const SLUG_ROUTE = path.join(ASTRO_APP, 'src/pages/[...slug].astro')
+const SANITY_LIB = path.join(ASTRO_APP, 'src/lib/sanity.ts')
 
-test.describe('Story 2-0: Catch-all Route & GROQ Integration (AC6, AC8)', () => {
+describe('Story 2-0: Catch-all Route & GROQ Integration (AC6, AC8)', () => {
   test('[P0] 2.0-INT-025 — [...slug].astro exists', () => {
     expect(fs.existsSync(SLUG_ROUTE)).toBe(true)
   })

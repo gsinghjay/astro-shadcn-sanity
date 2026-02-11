@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import { readFileSync, existsSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -7,12 +7,12 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
 
-test.describe('Story 5-4: Preview & Publish Architecture', () => {
-  test.describe('AC7: Perspective deprecation fix', () => {
+describe('Story 5-4: Preview & Publish Architecture', () => {
+  describe('AC7: Perspective deprecation fix', () => {
     const sanityPath = path.resolve(ASTRO_APP, 'src/lib/sanity.ts')
     let sanityContent: string
 
-    test.beforeAll(() => {
+    beforeAll(() => {
       sanityContent = readFileSync(sanityPath, 'utf-8')
     })
 
@@ -32,11 +32,11 @@ test.describe('Story 5-4: Preview & Publish Architecture', () => {
     })
   })
 
-  test.describe('AC5: SSR cache invalidation', () => {
+  describe('AC5: SSR cache invalidation', () => {
     const sanityPath = path.resolve(ASTRO_APP, 'src/lib/sanity.ts')
     let sanityContent: string
 
-    test.beforeAll(() => {
+    beforeAll(() => {
       sanityContent = readFileSync(sanityPath, 'utf-8')
     })
 
@@ -60,11 +60,11 @@ test.describe('Story 5-4: Preview & Publish Architecture', () => {
     })
   })
 
-  test.describe('AC6: Preview CSP for Visual Editing', () => {
+  describe('AC6: Preview CSP for Visual Editing', () => {
     const layoutPath = path.resolve(ASTRO_APP, 'src/layouts/Layout.astro')
     let layoutContent: string
 
-    test.beforeAll(() => {
+    beforeAll(() => {
       layoutContent = readFileSync(layoutPath, 'utf-8')
     })
 
@@ -90,7 +90,7 @@ test.describe('Story 5-4: Preview & Publish Architecture', () => {
     })
   })
 
-  test.describe('AC6: Cloudflare _headers for iframe embedding', () => {
+  describe('AC6: Cloudflare _headers for iframe embedding', () => {
     const headersPath = path.resolve(ASTRO_APP, 'public/_headers')
 
     test('[P0] 5.4-INT-011 — _headers file exists', () => {
@@ -105,11 +105,11 @@ test.describe('Story 5-4: Preview & Publish Architecture', () => {
     })
   })
 
-  test.describe('Sanity client configuration guards', () => {
+  describe('Sanity client configuration guards', () => {
     const sanityPath = path.resolve(ASTRO_APP, 'src/lib/sanity.ts')
     let sanityContent: string
 
-    test.beforeAll(() => {
+    beforeAll(() => {
       sanityContent = readFileSync(sanityPath, 'utf-8')
     })
 

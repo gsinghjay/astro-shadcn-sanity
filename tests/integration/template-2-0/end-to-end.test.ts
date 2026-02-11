@@ -6,17 +6,21 @@
  * @story 2-0
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 
 import { page as pageSchema, wideBlockWarnings } from '../../../studio/src/schemaTypes/documents/page'
 
-const TEMPLATES_DIR = path.resolve('astro-app/src/layouts/templates')
-const SLUG_ROUTE = path.resolve('astro-app/src/pages/[...slug].astro')
-const SANITY_LIB = path.resolve('astro-app/src/lib/sanity.ts')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
+const TEMPLATES_DIR = path.join(ASTRO_APP, 'src/layouts/templates')
+const SLUG_ROUTE = path.join(ASTRO_APP, 'src/pages/[...slug].astro')
+const SANITY_LIB = path.join(ASTRO_APP, 'src/lib/sanity.ts')
 
-test.describe('Story 2-0: End-to-End Verification', () => {
+describe('Story 2-0: End-to-End Verification', () => {
   // AC1+AC2+AC3: Template field with all options and radio layout
   test('[P0] 2.0-INT-041 — AC1+2+3 full template field spec', () => {
     const templateField = (pageSchema as any).fields.find((f: any) => f.name === 'template')
@@ -29,7 +33,7 @@ test.describe('Story 2-0: End-to-End Verification', () => {
   })
 
   // AC4: Insert menu groups categorize blocks
-  test('[P0] 2.0-INT-042 — AC4 insert menu groups cover all 12 block types', () => {
+  test('[P0] 2.0-INT-042 — AC4 insert menu groups cover all 11 block types', () => {
     const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
     const groups = blocksField.options.insertMenu.groups
     const allGroupedTypes = groups.flatMap((g: any) => g.of)
@@ -116,13 +120,13 @@ test.describe('Story 2-0: End-to-End Verification', () => {
   })
 
   test('[P0] 2.0-INT-060 — Layout.astro accepts hideNav prop', () => {
-    const layoutPath = path.resolve('astro-app/src/layouts/Layout.astro')
+    const layoutPath = path.join(ASTRO_APP, 'src/layouts/Layout.astro')
     const content = fs.readFileSync(layoutPath, 'utf-8')
     expect(content).toContain('hideNav')
   })
 
   test('[P0] 2.0-INT-061 — Layout.astro conditionally renders Header/Footer', () => {
-    const layoutPath = path.resolve('astro-app/src/layouts/Layout.astro')
+    const layoutPath = path.join(ASTRO_APP, 'src/layouts/Layout.astro')
     const content = fs.readFileSync(layoutPath, 'utf-8')
     expect(content).toMatch(/!hideNav.*Header/)
     expect(content).toMatch(/!hideNav.*Footer/)

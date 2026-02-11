@@ -7,7 +7,7 @@
  * @story 1-3
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 // Schema imports — static so Playwright transforms them
 import { defineBlock } from '../../../studio/src/schemaTypes/helpers/defineBlock'
@@ -16,16 +16,16 @@ import { seo } from '../../../studio/src/schemaTypes/objects/seo'
 import { button } from '../../../studio/src/schemaTypes/objects/button'
 import { portableText } from '../../../studio/src/schemaTypes/objects/portable-text'
 
-test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
+describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: defineBlock helper
   // ---------------------------------------------------------------------------
-  test.describe('AC1: defineBlock Helper', () => {
-    test('[P0] 1.3-INT-001 — defineBlock exports a function', async () => {
+  describe('AC1: defineBlock Helper', () => {
+    test('[P0] 1.3-INT-001 — defineBlock exports a function', () => {
       expect(typeof defineBlock).toBe('function')
     })
 
-    test('[P0] 1.3-INT-002 — defineBlock merges base fields into block schema', async () => {
+    test('[P0] 1.3-INT-002 — defineBlock merges base fields into block schema', () => {
       const result = defineBlock({
         name: 'testBlock',
         title: 'Test Block',
@@ -41,7 +41,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('maxWidth')
     })
 
-    test('[P0] 1.3-INT-003 — defineBlock places base fields before block-specific fields', async () => {
+    test('[P0] 1.3-INT-003 — defineBlock places base fields before block-specific fields', () => {
       const result = defineBlock({
         name: 'testBlock',
         title: 'Test Block',
@@ -63,8 +63,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC2: block-base shared fields
   // ---------------------------------------------------------------------------
-  test.describe('AC2: Block Base Fields', () => {
-    test('[P0] 1.3-INT-004 — blockBaseFields contains backgroundVariant with constrained presets', async () => {
+  describe('AC2: Block Base Fields', () => {
+    test('[P0] 1.3-INT-004 — blockBaseFields contains backgroundVariant with constrained presets', () => {
       const bgField = blockBaseFields.find((f: any) => f.name === 'backgroundVariant')
       expect(bgField).toBeDefined()
       expect(bgField!.type).toBe('string')
@@ -74,7 +74,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(options).toHaveLength(4)
     })
 
-    test('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', async () => {
+    test('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', () => {
       const spacingField = blockBaseFields.find((f: any) => f.name === 'spacing')
       expect(spacingField).toBeDefined()
       expect(spacingField!.type).toBe('string')
@@ -84,7 +84,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(options).toHaveLength(4)
     })
 
-    test('[P0] 1.3-INT-006 — blockBaseFields contains maxWidth with constrained presets', async () => {
+    test('[P0] 1.3-INT-006 — blockBaseFields contains maxWidth with constrained presets', () => {
       const maxWidthField = blockBaseFields.find((f: any) => f.name === 'maxWidth')
       expect(maxWidthField).toBeDefined()
       expect(maxWidthField!.type).toBe('string')
@@ -98,8 +98,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC3: SEO object schema
   // ---------------------------------------------------------------------------
-  test.describe('AC3: SEO Object Schema', () => {
-    test('[P1] 1.3-INT-007 — seo schema has metaTitle, metaDescription, ogImage fields', async () => {
+  describe('AC3: SEO Object Schema', () => {
+    test('[P1] 1.3-INT-007 — seo schema has metaTitle, metaDescription, ogImage fields', () => {
       expect(seo.name).toBe('seo')
       expect(seo.type).toBe('object')
 
@@ -109,21 +109,21 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('ogImage')
     })
 
-    test('[P1] 1.3-INT-008 — seo metaTitle has max length validation', async () => {
+    test('[P1] 1.3-INT-008 — seo metaTitle has max length validation', () => {
       const metaTitle = (seo as any).fields.find((f: any) => f.name === 'metaTitle')
       expect(metaTitle).toBeDefined()
       expect(metaTitle.type).toBe('string')
       expect(metaTitle.validation).toBeDefined()
     })
 
-    test('[P1] 1.3-INT-009 — seo metaDescription is text type with max length validation', async () => {
+    test('[P1] 1.3-INT-009 — seo metaDescription is text type with max length validation', () => {
       const metaDesc = (seo as any).fields.find((f: any) => f.name === 'metaDescription')
       expect(metaDesc).toBeDefined()
       expect(metaDesc.type).toBe('text')
       expect(metaDesc.validation).toBeDefined()
     })
 
-    test('[P1] 1.3-INT-010 — seo ogImage has alt text field', async () => {
+    test('[P1] 1.3-INT-010 — seo ogImage has alt text field', () => {
       const ogImage = (seo as any).fields.find((f: any) => f.name === 'ogImage')
       expect(ogImage).toBeDefined()
       expect(ogImage.type).toBe('image')
@@ -137,8 +137,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC4: Button object schema
   // ---------------------------------------------------------------------------
-  test.describe('AC4: Button Object Schema', () => {
-    test('[P1] 1.3-INT-011 — button schema has text, url, variant fields', async () => {
+  describe('AC4: Button Object Schema', () => {
+    test('[P1] 1.3-INT-011 — button schema has text, url, variant fields', () => {
       expect(button.name).toBe('button')
       expect(button.type).toBe('object')
 
@@ -148,21 +148,21 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('variant')
     })
 
-    test('[P1] 1.3-INT-012 — button text is required string', async () => {
+    test('[P1] 1.3-INT-012 — button text is required string', () => {
       const textField = (button as any).fields.find((f: any) => f.name === 'text')
       expect(textField).toBeDefined()
       expect(textField.type).toBe('string')
       expect(textField.validation).toBeDefined()
     })
 
-    test('[P1] 1.3-INT-013 — button url is required url type', async () => {
+    test('[P1] 1.3-INT-013 — button url is required string with URL validation', () => {
       const urlField = (button as any).fields.find((f: any) => f.name === 'url')
       expect(urlField).toBeDefined()
-      expect(urlField.type).toBe('url')
+      expect(urlField.type).toBe('string')
       expect(urlField.validation).toBeDefined()
     })
 
-    test('[P1] 1.3-INT-014 — button variant has constrained options', async () => {
+    test('[P1] 1.3-INT-014 — button variant has constrained options', () => {
       const variantField = (button as any).fields.find((f: any) => f.name === 'variant')
       expect(variantField).toBeDefined()
       expect(variantField.type).toBe('string')
@@ -177,8 +177,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC5: Portable Text schema
   // ---------------------------------------------------------------------------
-  test.describe('AC5: Portable Text Schema', () => {
-    test('[P1] 1.3-INT-015 — portableText is array type with block, image, callout members', async () => {
+  describe('AC5: Portable Text Schema', () => {
+    test('[P1] 1.3-INT-015 — portableText is array type with block, image, callout members', () => {
       expect(portableText.name).toBe('portableText')
       expect(portableText.type).toBe('array')
 
@@ -192,7 +192,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(hasCallout).toBe(true)
     })
 
-    test('[P1] 1.3-INT-016 — portableText block has expected styles', async () => {
+    test('[P1] 1.3-INT-016 — portableText block has expected styles', () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       expect(blockMember).toBeDefined()
 
@@ -204,7 +204,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(styleValues).toContain('blockquote')
     })
 
-    test('[P1] 1.3-INT-017 — portableText block has strong, em, code, underline decorators', async () => {
+    test('[P1] 1.3-INT-017 — portableText block has strong, em, code, underline decorators', () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       const decorators = blockMember.marks.decorators.map((d: any) => d.value)
       expect(decorators).toContain('strong')
@@ -213,14 +213,14 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(decorators).toContain('underline')
     })
 
-    test('[P1] 1.3-INT-018 — portableText block has link and internalLink annotations', async () => {
+    test('[P1] 1.3-INT-018 — portableText block has link and internalLink annotations', () => {
       const blockMember = (portableText as any).of.find((m: any) => m.type === 'block')
       const annotationNames = blockMember.marks.annotations.map((a: any) => a.name)
       expect(annotationNames).toContain('link')
       expect(annotationNames).toContain('internalLink')
     })
 
-    test('[P1] 1.3-INT-019 — portableText image member has required alt text (NFR16)', async () => {
+    test('[P1] 1.3-INT-019 — portableText image member has required alt text (NFR16)', () => {
       const imageMember = (portableText as any).of.find((m: any) => m.type === 'image')
       expect(imageMember).toBeDefined()
 

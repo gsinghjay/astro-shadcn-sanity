@@ -12,7 +12,7 @@
  * @story 2-1
  * @phase GREEN (retroactive — schemas already implemented)
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 // Schema imports — static so Playwright transforms them
 import { heroBanner } from '../../../studio/src/schemaTypes/blocks/hero-banner'
@@ -48,11 +48,11 @@ const HOMEPAGE_BLOCKS = [
   { schema: logoCloud, name: 'logoCloud' },
 ]
 
-test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
+describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: heroBanner block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: heroBanner', () => {
+  describe('AC1: heroBanner', () => {
     test('[P0] 2.1-INT-001 — heroBanner has correct name and type object', () => {
       expect(heroBanner.name).toBe('heroBanner')
       expect(heroBanner.type).toBe('object')
@@ -112,7 +112,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: featureGrid block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: featureGrid', () => {
+  describe('AC1: featureGrid', () => {
     test('[P0] 2.1-INT-007 — featureGrid has correct name and type object', () => {
       expect(featureGrid.name).toBe('featureGrid')
       expect(featureGrid.type).toBe('object')
@@ -178,7 +178,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: ctaBanner block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: ctaBanner', () => {
+  describe('AC1: ctaBanner', () => {
     test('[P0] 2.1-INT-013 — ctaBanner has correct name and type object', () => {
       expect(ctaBanner.name).toBe('ctaBanner')
       expect(ctaBanner.type).toBe('object')
@@ -218,7 +218,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: statsRow block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: statsRow', () => {
+  describe('AC1: statsRow', () => {
     test('[P0] 2.1-INT-018 — statsRow has correct name and type object', () => {
       expect(statsRow.name).toBe('statsRow')
       expect(statsRow.type).toBe('object')
@@ -258,7 +258,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: textWithImage block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: textWithImage', () => {
+  describe('AC1: textWithImage', () => {
     test('[P0] 2.1-INT-021 — textWithImage has correct name and type object', () => {
       expect(textWithImage.name).toBe('textWithImage')
       expect(textWithImage.type).toBe('object')
@@ -303,7 +303,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: logoCloud block schema
   // ---------------------------------------------------------------------------
-  test.describe('AC1: logoCloud', () => {
+  describe('AC1: logoCloud', () => {
     test('[P0] 2.1-INT-026 — logoCloud has correct name and type object', () => {
       expect(logoCloud.name).toBe('logoCloud')
       expect(logoCloud.type).toBe('object')
@@ -351,7 +351,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC2: Schema Registration
   // ---------------------------------------------------------------------------
-  test.describe('AC2: Schema Registration', () => {
+  describe('AC2: Schema Registration', () => {
     test('[P0] 2.1-INT-031 — all 6 homepage block schemas are registered in schemaTypes', () => {
       const typeNames = schemaTypes.map((s: any) => s.name)
 
@@ -367,7 +367,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1 (cross-cutting): Base fields inherited via defineBlock
   // ---------------------------------------------------------------------------
-  test.describe('AC1: Base Field Inheritance', () => {
+  describe('AC1: Base Field Inheritance', () => {
     for (const { schema, name } of HOMEPAGE_BLOCKS) {
       test(`[P0] 2.1-INT-032-${name} — ${name} has base fields (backgroundVariant, spacing, maxWidth)`, () => {
         const fieldNames = getFields(schema).map((f: any) => f.name)
@@ -381,7 +381,7 @@ test.describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1 (cross-cutting): Preview configuration
   // ---------------------------------------------------------------------------
-  test.describe('AC1: Preview Configuration', () => {
+  describe('AC1: Preview Configuration', () => {
     for (const { schema, name } of HOMEPAGE_BLOCKS) {
       test(`[P2] 2.1-INT-033-${name} — ${name} has preview config selecting heading`, () => {
         expect((schema as any).preview).toBeDefined()

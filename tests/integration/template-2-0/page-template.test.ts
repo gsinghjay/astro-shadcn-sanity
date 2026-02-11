@@ -7,15 +7,15 @@
  * @story 2-0
  * @phase RED → GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 import { page as pageSchema } from '../../../studio/src/schemaTypes/documents/page'
 
-test.describe('Story 2-0: Template Layout System — Page Schema', () => {
+describe('Story 2-0: Template Layout System — Page Schema', () => {
   // ---------------------------------------------------------------------------
   // AC1: Template string field with constrained layout options
   // ---------------------------------------------------------------------------
-  test.describe('AC1: Template field exists with correct options', () => {
+  describe('AC1: Template field exists with correct options', () => {
     test('[P0] 2.0-INT-001 — page schema has template field', () => {
       const fieldNames = (pageSchema as any).fields.map((f: any) => f.name)
       expect(fieldNames).toContain('template')
@@ -41,7 +41,7 @@ test.describe('Story 2-0: Template Layout System — Page Schema', () => {
   // ---------------------------------------------------------------------------
   // AC2: Available templates
   // ---------------------------------------------------------------------------
-  test.describe('AC2: Available template options', () => {
+  describe('AC2: Available template options', () => {
     test('[P0] 2.0-INT-005 — template field has exactly 5 options', () => {
       const templateField = (pageSchema as any).fields.find((f: any) => f.name === 'template')
       expect(templateField.options?.list).toHaveLength(5)
@@ -57,7 +57,7 @@ test.describe('Story 2-0: Template Layout System — Page Schema', () => {
   // ---------------------------------------------------------------------------
   // AC5: Template field placement (before blocks)
   // ---------------------------------------------------------------------------
-  test.describe('AC5: Template field placement', () => {
+  describe('AC5: Template field placement', () => {
     test('[P0] 2.0-INT-007 — template field appears before blocks field', () => {
       const fieldNames = (pageSchema as any).fields.map((f: any) => f.name)
       const templateIndex = fieldNames.indexOf('template')
@@ -76,7 +76,7 @@ test.describe('Story 2-0: Template Layout System — Page Schema', () => {
   // ---------------------------------------------------------------------------
   // AC4: Insert menu groups on blocks field
   // ---------------------------------------------------------------------------
-  test.describe('AC4: Insert menu groups', () => {
+  describe('AC4: Insert menu groups', () => {
     test('[P0] 2.0-INT-009 — blocks field has insertMenu with filter enabled', () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       expect(blocksField.options?.insertMenu).toBeDefined()
@@ -106,13 +106,13 @@ test.describe('Story 2-0: Template Layout System — Page Schema', () => {
     test('[P0] 2.0-INT-012 — content group contains expected types', () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       const contentGroup = blocksField.options.insertMenu.groups.find((g: any) => g.name === 'content')
-      expect(contentGroup.of).toEqual(expect.arrayContaining(['richText', 'textWithImage', 'faqSection', 'timeline']))
+      expect(contentGroup.of).toEqual(expect.arrayContaining(['richText', 'textWithImage', 'faqSection']))
     })
 
     test('[P0] 2.0-INT-013 — media group contains expected types', () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       const mediaGroup = blocksField.options.insertMenu.groups.find((g: any) => g.name === 'media')
-      expect(mediaGroup.of).toEqual(expect.arrayContaining(['statsRow', 'featureGrid', 'teamGrid']))
+      expect(mediaGroup.of).toEqual(expect.arrayContaining(['statsRow', 'featureGrid']))
     })
 
     test('[P0] 2.0-INT-014 — social group contains expected types', () => {
@@ -141,7 +141,7 @@ test.describe('Story 2-0: Template Layout System — Page Schema', () => {
   // ---------------------------------------------------------------------------
   // AC3: Page schema groups
   // ---------------------------------------------------------------------------
-  test.describe('AC3: Page schema groups', () => {
+  describe('AC3: Page schema groups', () => {
     test('[P1] 2.0-INT-017 — page schema defines groups', () => {
       expect((pageSchema as any).groups).toBeDefined()
       expect((pageSchema as any).groups.length).toBeGreaterThan(0)

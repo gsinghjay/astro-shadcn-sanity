@@ -7,18 +7,18 @@
  * @story 3-1
  * @phase RED — all tests use test.skip() until sponsor schema is implemented
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 // Schema imports — static so Playwright transforms them
 // These will FAIL until sponsor.ts is created (RED phase)
 import { sponsor } from '../../../studio/src/schemaTypes/documents/sponsor'
 import { schemaTypes } from '../../../studio/src/schemaTypes/index'
 
-test.describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
+describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1 + AC2: Schema structure and validation
   // ---------------------------------------------------------------------------
-  test.describe('AC1: Sponsor Schema Structure', () => {
+  describe('AC1: Sponsor Schema Structure', () => {
     test('[P0] 3.1-INT-001 — sponsor schema has correct name and type document', () => {
       expect(sponsor.name).toBe('sponsor')
       expect(sponsor.type).toBe('document')
@@ -108,7 +108,7 @@ test.describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC3: Schema registration
   // ---------------------------------------------------------------------------
-  test.describe('AC3: Schema Registration', () => {
+  describe('AC3: Schema Registration', () => {
     test('[P0] 3.1-INT-011 — sponsor schema is registered in schemaTypes array', () => {
       const sponsorType = schemaTypes.find((s: any) => s.name === 'sponsor')
       expect(sponsorType).toBeDefined()

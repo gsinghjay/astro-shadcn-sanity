@@ -16,7 +16,7 @@
  * @story 2-3
  * @phase RED (TDD — tests written before implementation)
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,11 +42,11 @@ const layoutContent = fs.readFileSync(layoutPath, 'utf-8')
 const headerContent = fs.readFileSync(headerPath, 'utf-8')
 const footerContent = fs.readFileSync(footerPath, 'utf-8')
 
-test.describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
+describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC1: siteSettings schema exports all required fields
   // ---------------------------------------------------------------------------
-  test.describe('AC1: siteSettings schema completeness', () => {
+  describe('AC1: siteSettings schema completeness', () => {
     test('[P0] 2.3-INT-001 — Schema exports siteSettings with all required fields', () => {
       // The siteSettings schema must be a document type named 'siteSettings'
       expect(siteSettingsSchema.name).toBe('siteSettings')
@@ -125,7 +125,7 @@ test.describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC2: sanity.ts exports getSiteSettings function
   // ---------------------------------------------------------------------------
-  test.describe('AC2: getSiteSettings GROQ query function', () => {
+  describe('AC2: getSiteSettings GROQ query function', () => {
     test('[P0] 2.3-INT-003 — sanity.ts exports getSiteSettings function', () => {
       // sanity.ts must export a function named getSiteSettings
       const hasGetSiteSettings = /export\s+(async\s+)?function\s+getSiteSettings\b/.test(
@@ -185,78 +185,46 @@ test.describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC3: SiteSettings type matches expanded schema
   // ---------------------------------------------------------------------------
-  test.describe('AC3: SiteSettings TypeScript type', () => {
-    test('[P0] 2.3-INT-005 — SiteSettings type matches expanded schema', () => {
-      // Extract the SiteSettings interface/type from types.ts
-      const siteSettingsMatch = typesTsContent.match(
-        /export\s+(?:interface|type)\s+SiteSettings[\s\S]*?\{([\s\S]*?\n\})/,
-      )
-      expect(siteSettingsMatch, 'SiteSettings interface must exist in types.ts').toBeTruthy()
-      const siteSettingsBody = siteSettingsMatch![1]
+  describe('AC3: SiteSettings TypeScript type', () => {
+    test('[P0] 2.3-INT-005 — SiteSettings type is exported and derived from GROQ query', () => {
+      // SiteSettings is now a TypeGen-generated type alias:
+      //   export type SiteSettings = NonNullable<SITE_SETTINGS_QUERY_RESULT>
+      // Fields are validated via the GROQ query projections (AC2: INT-004).
+      expect(
+        typesTsContent,
+        'types.ts must export SiteSettings type',
+      ).toMatch(/export\s+type\s+SiteSettings\b/)
 
-      // Must have all expanded fields matching the Sanity schema
-      expect(siteSettingsBody, 'SiteSettings must have siteName field').toContain('siteName')
-      expect(siteSettingsBody, 'SiteSettings must have siteDescription field').toContain(
-        'siteDescription',
-      )
-      expect(siteSettingsBody, 'SiteSettings must have logo field').toContain('logo')
-      expect(siteSettingsBody, 'SiteSettings must have navigationItems field').toContain(
-        'navigationItems',
-      )
-      expect(siteSettingsBody, 'SiteSettings must have ctaButton field').toContain('ctaButton')
-      expect(siteSettingsBody, 'SiteSettings must have footerContent field').toContain(
-        'footerContent',
-      )
-      expect(siteSettingsBody, 'SiteSettings must have socialLinks field').toContain('socialLinks')
-      expect(siteSettingsBody, 'SiteSettings must have contactInfo field').toContain('contactInfo')
-      expect(siteSettingsBody, 'SiteSettings must have footerLinks field').toContain('footerLinks')
-      expect(siteSettingsBody, 'SiteSettings must have resourceLinks field').toContain(
-        'resourceLinks',
-      )
-      expect(siteSettingsBody, 'SiteSettings must have programLinks field').toContain(
-        'programLinks',
-      )
-      expect(siteSettingsBody, 'SiteSettings must have currentSemester field').toContain(
-        'currentSemester',
-      )
+      // SiteSettings derives from the GROQ query result
+      expect(
+        typesTsContent,
+        'SiteSettings must be derived from SITE_SETTINGS_QUERY_RESULT',
+      ).toContain('SITE_SETTINGS_QUERY_RESULT')
     })
 
-    test('[P0] 2.3-INT-006 — SiteSettings type does NOT use old field names', () => {
-      // Extract the SiteSettings interface/type from types.ts
-      const siteSettingsMatch = typesTsContent.match(
-        /export\s+(?:interface|type)\s+SiteSettings[\s\S]*?\{([\s\S]*?\n\})/,
-      )
-      expect(siteSettingsMatch, 'SiteSettings interface must exist in types.ts').toBeTruthy()
-      const siteSettingsBody = siteSettingsMatch![1]
+    test('[P0] 2.3-INT-006 — GROQ query projects all required SiteSettings fields', () => {
+      // Since SiteSettings is now a TypeGen alias, field names are validated
+      // via the GROQ query in sanity.ts (already tested by AC2: INT-004).
+      // This test verifies the GROQ query projects all expanded schema fields.
+      const requiredFields = [
+        'siteName', 'siteDescription', 'logo', 'navigationItems',
+        'ctaButton', 'footerContent', 'socialLinks', 'contactInfo',
+        'footerLinks', 'resourceLinks', 'programLinks', 'currentSemester',
+      ]
 
-      // The old minimal SiteSettings had: title, description, navigation, footerText
-      // The new expanded version should use Sanity field names instead:
-      //   title -> siteName
-      //   description -> siteDescription
-      //   navigation -> navigationItems
-      //   footerText -> footerContent (object)
-      expect(siteSettingsBody, 'Must NOT use old "title" field (should be siteName)').not.toMatch(
-        /\btitle\s*[?:]:\s*string/,
-      )
-      expect(
-        siteSettingsBody,
-        'Must NOT use old "description" field (should be siteDescription)',
-      ).not.toMatch(/\bdescription\s*[?:]\s*string/)
-      expect(
-        siteSettingsBody,
-        'Must NOT use old "navigation" field (should be navigationItems)',
-      ).not.toMatch(/\bnavigation\s*[?:]\s*/)
-      expect(
-        siteSettingsBody,
-        'Must NOT use old "footerText" field (should be footerContent)',
-      ).not.toMatch(/\bfooterText\s*[?:]\s*string/)
+      for (const field of requiredFields) {
+        expect(
+          sanityTsContent,
+          `GROQ query must project field: ${field}`,
+        ).toContain(field)
+      }
     })
   })
 
   // ---------------------------------------------------------------------------
   // AC6: Layout.astro imports from lib/sanity, not hardcoded
   // ---------------------------------------------------------------------------
-  test.describe('AC6: Layout uses Sanity data', () => {
+  describe('AC6: Layout uses Sanity data', () => {
     test('[P1] 2.3-INT-007 — Layout.astro imports from lib/sanity, not hardcoded', () => {
       // Extract the frontmatter section (between --- delimiters)
       const frontmatterMatch = layoutContent.match(/^---\n([\s\S]*?)\n---/)
@@ -292,7 +260,7 @@ test.describe('Story 2-3: Wire Site Settings to Sanity (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC8: Header/Footer/Layout do NOT import from lib/data
   // ---------------------------------------------------------------------------
-  test.describe('AC8: No imports from lib/data', () => {
+  describe('AC8: No imports from lib/data', () => {
     test('[P1] 2.3-INT-008 — Header/Footer/Layout do NOT import from lib/data', () => {
       // Extract frontmatter from Header.astro
       const headerFrontmatterMatch = headerContent.match(/^---\n([\s\S]*?)\n---/)

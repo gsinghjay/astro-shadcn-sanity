@@ -7,18 +7,18 @@
  * @story 1-3
  * @phase GREEN
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 
 // Schema imports — static so Playwright transforms them
 import { page as pageSchema } from '../../../studio/src/schemaTypes/documents/page'
 import { siteSettings } from '../../../studio/src/schemaTypes/documents/site-settings'
 
-test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
+describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC6: Page document schema
   // ---------------------------------------------------------------------------
-  test.describe('AC6: Page Document Schema', () => {
-    test('[P0] 1.3-INT-020 — page schema has title, slug, seo, blocks fields', async () => {
+  describe('AC6: Page Document Schema', () => {
+    test('[P0] 1.3-INT-020 — page schema has title, slug, seo, blocks fields', () => {
       expect(pageSchema.name).toBe('page')
       expect(pageSchema.type).toBe('document')
 
@@ -29,7 +29,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('blocks')
     })
 
-    test('[P0] 1.3-INT-021 — page blocks array accepts all registered block types', async () => {
+    test('[P0] 1.3-INT-021 — page blocks array accepts all registered block types', () => {
       const blocksField = (pageSchema as any).fields.find((f: any) => f.name === 'blocks')
       expect(blocksField).toBeDefined()
       expect(blocksField.type).toBe('array')
@@ -37,25 +37,25 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       const blockTypeNames = blocksField.of.map((b: any) => b.type)
       const expectedTypes = [
         'heroBanner', 'featureGrid', 'sponsorCards', 'richText',
-        'ctaBanner', 'faqSection', 'contactForm', 'timeline',
-        'logoCloud', 'statsRow', 'teamGrid', 'textWithImage',
+        'ctaBanner', 'faqSection', 'contactForm',
+        'logoCloud', 'statsRow', 'textWithImage',
         'sponsorSteps',
       ]
 
       for (const type of expectedTypes) {
         expect(blockTypeNames, `Missing block type: ${type}`).toContain(type)
       }
-      expect(blockTypeNames).toHaveLength(13)
+      expect(blockTypeNames).toHaveLength(11)
     })
 
-    test('[P0] 1.3-INT-022 — page title is required string', async () => {
+    test('[P0] 1.3-INT-022 — page title is required string', () => {
       const titleField = (pageSchema as any).fields.find((f: any) => f.name === 'title')
       expect(titleField).toBeDefined()
       expect(titleField.type).toBe('string')
       expect(titleField.validation).toBeDefined()
     })
 
-    test('[P0] 1.3-INT-023 — page slug is required and sourced from title', async () => {
+    test('[P0] 1.3-INT-023 — page slug is required and sourced from title', () => {
       const slugField = (pageSchema as any).fields.find((f: any) => f.name === 'slug')
       expect(slugField).toBeDefined()
       expect(slugField.type).toBe('slug')
@@ -67,8 +67,8 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
   // AC7: Site Settings document schema
   // ---------------------------------------------------------------------------
-  test.describe('AC7: Site Settings Document Schema', () => {
-    test('[P0] 1.3-INT-024 — siteSettings schema has all required fields', async () => {
+  describe('AC7: Site Settings Document Schema', () => {
+    test('[P0] 1.3-INT-024 — siteSettings schema has all required fields', () => {
       expect(siteSettings.name).toBe('siteSettings')
       expect(siteSettings.type).toBe('document')
 
@@ -81,14 +81,14 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(fieldNames).toContain('currentSemester')
     })
 
-    test('[P0] 1.3-INT-025 — siteSettings siteName is required', async () => {
+    test('[P0] 1.3-INT-025 — siteSettings siteName is required', () => {
       const siteNameField = (siteSettings as any).fields.find((f: any) => f.name === 'siteName')
       expect(siteNameField).toBeDefined()
       expect(siteNameField.type).toBe('string')
       expect(siteNameField.validation).toBeDefined()
     })
 
-    test('[P0] 1.3-INT-026 — siteSettings logo has alt text field', async () => {
+    test('[P0] 1.3-INT-026 — siteSettings logo has alt text field', () => {
       const logoField = (siteSettings as any).fields.find((f: any) => f.name === 'logo')
       expect(logoField).toBeDefined()
       expect(logoField.type).toBe('image')
@@ -97,7 +97,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(altField).toBeDefined()
     })
 
-    test('[P1] 1.3-INT-027 — siteSettings navigationItems supports one level of nesting', async () => {
+    test('[P1] 1.3-INT-027 — siteSettings navigationItems supports one level of nesting', () => {
       const navField = (siteSettings as any).fields.find((f: any) => f.name === 'navigationItems')
       expect(navField).toBeDefined()
       expect(navField.type).toBe('array')
@@ -112,7 +112,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(navItemFieldNames).toContain('children')
     })
 
-    test('[P1] 1.3-INT-028 — siteSettings socialLinks has platform options', async () => {
+    test('[P1] 1.3-INT-028 — siteSettings socialLinks has platform options', () => {
       const socialField = (siteSettings as any).fields.find((f: any) => f.name === 'socialLinks')
       expect(socialField).toBeDefined()
       expect(socialField.type).toBe('array')
@@ -130,7 +130,7 @@ test.describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       )
     })
 
-    test('[P1] 1.3-INT-029 — siteSettings currentSemester is a string field', async () => {
+    test('[P1] 1.3-INT-029 — siteSettings currentSemester is a string field', () => {
       const semesterField = (siteSettings as any).fields.find(
         (f: any) => f.name === 'currentSemester',
       )

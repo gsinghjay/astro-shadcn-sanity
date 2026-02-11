@@ -3,7 +3,7 @@
  * Validates Storybook configuration, story files, and scripts.
  * @story 1-4
  */
-import { test, expect } from '@playwright/test'
+import { describe, test, expect, beforeAll } from 'vitest'
 import { execSync } from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -17,12 +17,12 @@ const ASTRO_APP = path.resolve(__dirname, '../../astro-app')
 
 const BLOCK_STORY_FILES = BLOCK_NAMES.map(name => `${name}.stories.ts`)
 
-test.describe('Story 1-4: Storybook Setup', () => {
+describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC2,3: Storybook Config
   // ---------------------------------------------------------------------------
-  test.describe('AC2,3: Storybook Config', () => {
-    test('[P0] 1.4-INT-001 — .storybook/main.ts configures storybook-astro framework', async () => {
+  describe('AC2,3: Storybook Config', () => {
+    test('[P0] 1.4-INT-001 — .storybook/main.ts configures storybook-astro framework', () => {
       const mainPath = path.join(ASTRO_APP, '.storybook/main.ts')
       expect(fs.existsSync(mainPath), '.storybook/main.ts missing').toBe(true)
 
@@ -39,7 +39,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
       ).toBe(true)
     })
 
-    test('[P0] 1.4-INT-002 — .storybook/preview.ts imports global.css', async () => {
+    test('[P0] 1.4-INT-002 — .storybook/preview.ts imports global.css', () => {
       const previewPath = path.join(ASTRO_APP, '.storybook/preview.ts')
       expect(fs.existsSync(previewPath), '.storybook/preview.ts missing').toBe(true)
 
@@ -52,7 +52,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
       ).toBe(true)
     })
 
-    test('[P0] 1.4-INT-003 — .storybook/main.ts includes Tailwind vite plugin and virtual module stubs', async () => {
+    test('[P0] 1.4-INT-003 — .storybook/main.ts includes Tailwind vite plugin and virtual module stubs', () => {
       const mainPath = path.join(ASTRO_APP, '.storybook/main.ts')
       const content = fs.readFileSync(mainPath, 'utf-8')
 
@@ -71,8 +71,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC5: Block Stories
   // ---------------------------------------------------------------------------
-  test.describe('AC5: Block Stories', () => {
-    test('[P0] 1.4-INT-004 — All 13 block story files exist', async () => {
+  describe('AC5: Block Stories', () => {
+    test('[P0] 1.4-INT-004 — All block story files exist', () => {
       const blocksDir = path.join(ASTRO_APP, 'src/components/blocks/custom')
 
       for (const storyFile of BLOCK_STORY_FILES) {
@@ -84,7 +84,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
       }
     })
 
-    test('[P1] 1.4-INT-005 — Each block story exports meta with title/component and at least one named story', async () => {
+    test('[P1] 1.4-INT-005 — Each block story exports meta with title/component and at least one named story', () => {
       const blocksDir = path.join(ASTRO_APP, 'src/components/blocks/custom')
 
       for (const storyFile of BLOCK_STORY_FILES) {
@@ -113,8 +113,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC4: UI Stories
   // ---------------------------------------------------------------------------
-  test.describe('AC4: UI Stories', () => {
-    test('[P1] 1.4-INT-006 — Original 4 UI story files exist', async () => {
+  describe('AC4: UI Stories', () => {
+    test('[P1] 1.4-INT-006 — Original 4 UI story files exist', () => {
       const uiDir = path.join(ASTRO_APP, 'src/components/ui')
       const expectedStories = [
         'button/button.stories.ts',
@@ -132,7 +132,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
       }
     })
 
-    test('[P1] 1.4-INT-007 — Slot-based UI components have *Story.astro wrapper files', async () => {
+    test('[P1] 1.4-INT-007 — Slot-based UI components have *Story.astro wrapper files', () => {
       const uiDir = path.join(ASTRO_APP, 'src/components/ui')
       const expectedWrappers = [
         'button/ButtonStory.astro',
@@ -154,8 +154,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC6,7: npm Scripts
   // ---------------------------------------------------------------------------
-  test.describe('AC6,7: npm Scripts', () => {
-    test('[P0] 1.4-INT-008 — astro-app/package.json has storybook and build-storybook scripts', async () => {
+  describe('AC6,7: npm Scripts', () => {
+    test('[P0] 1.4-INT-008 — astro-app/package.json has storybook and build-storybook scripts', () => {
       const pkgPath = path.join(ASTRO_APP, 'package.json')
       const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 
@@ -170,7 +170,7 @@ test.describe('Story 1-4: Storybook Setup', () => {
       ).toBeDefined()
     })
 
-    test('[P1] 1.4-INT-009 — Root package.json has storybook script', async () => {
+    test('[P1] 1.4-INT-009 — Root package.json has storybook script', () => {
       const rootPkgPath = path.resolve(ASTRO_APP, '../package.json')
       const pkg = JSON.parse(fs.readFileSync(rootPkgPath, 'utf-8'))
 
@@ -185,8 +185,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC1: Dependencies
   // ---------------------------------------------------------------------------
-  test.describe('AC1: Dependencies', () => {
-    test('[P0] 1.4-INT-010 — Storybook devDependencies installed', async () => {
+  describe('AC1: Dependencies', () => {
+    test('[P0] 1.4-INT-010 — Storybook devDependencies installed', () => {
       const pkgPath = path.join(ASTRO_APP, 'package.json')
       const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
 
@@ -209,8 +209,8 @@ test.describe('Story 1-4: Storybook Setup', () => {
   // ---------------------------------------------------------------------------
   // AC8: Build Verification
   // ---------------------------------------------------------------------------
-  test.describe('AC8: Build Verification', () => {
-    test('[P0] 1.4-INT-011 — storybook build succeeds and produces valid iframe.html', async () => {
+  describe('AC8: Build Verification', () => {
+    test('[P0] 1.4-INT-011 — storybook build succeeds and produces valid iframe.html', () => {
       let result: string
 
       try {
@@ -245,6 +245,6 @@ test.describe('Story 1-4: Storybook Setup', () => {
         iframeSize,
         `iframe.html must be > 1KB (got ${iframeSize} bytes — likely empty chunk)`,
       ).toBeGreaterThan(1024)
-    })
+    }, BUILD_TIMEOUT_MS)
   })
 })
