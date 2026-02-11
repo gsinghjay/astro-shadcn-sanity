@@ -1,3 +1,34 @@
+## [1.3.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.2.0...v1.3.0) (2026-02-11)
+
+### Features
+
+* **astro:** migrate remaining pages to CMS-driven catch-all route (Story 2.2b) ([098f9f1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/098f9f1ffb3ee76e88858d0271eff08de78ecfd2))
+* **sanity:** schema polish, SEO projection & cleanup (Story 7-5) ([cf57632](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cf576321a956cd31178115d44a3417808ac08227))
+
+### Bug Fixes
+
+* **storybook:** align story args with Sanity schema field names and fix render errors ([056512e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/056512ede171523701a501aa24ca32a14b07b202))
+* **tsconfig:** exclude vitest.config.ts from astro check ([fb7a000](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fb7a0001fc5b92033d0a3e8042e74b13f44fee00))
+
+### Documentation
+
+* added a guide for converting the shadcn components ([0fd8bd3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0fd8bd31187df5d2ae0fe63418f50c898e466474))
+* added rules for Cursor ([71331f2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/71331f212d35a052329b87a417091be2cf75aa2c))
+
+### Miscellaneous
+
+* add .astro/ to gitignore ([cf73d8c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cf73d8cb7dfd6fd607194b6e9b3c5e5eaeeac43d))
+* remove TeamGrid, Timeline blocks and team/event document schema plans ([e72acf0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e72acf03455b15810c522be1b30aad8428324f98))
+
+### CI/CD
+
+* add Sanity webhook → GitHub Actions deploy workflow ([ee8002b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ee8002b2a500bee14d1b7260b92b8326d47fb921))
+
+### Refactoring
+
+* **astro:** replace 200+ static block imports with import.meta.glob registry ([8117877](https://github.com/gsinghjay/astro-shadcn-sanity/commit/81178779c1e92481f4cb763cc2e2be4720c17081))
+* **test:** consolidate test architecture to Vitest + Playwright E2E ([886917e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/886917e4a5ee641d2e499c67714b93c8a0df27b8))
+
 ## [1.2.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.1.0...v1.2.0) (2026-02-10)
 
 ### Features
