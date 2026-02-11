@@ -47,5 +47,8 @@ playwright-report/
 # Sanity TypeGen (generated)
 studio/schema.json
 
+# Astro generated
+.astro/
+
 # Repomix
 .repomixignore

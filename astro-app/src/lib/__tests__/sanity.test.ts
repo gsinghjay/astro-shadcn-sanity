@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { sanityClient } from "sanity:client";
-import {
-  loadQuery,
-  getSiteSettings,
-  SITE_SETTINGS_QUERY,
-  ALL_PAGE_SLUGS_QUERY,
-  PAGE_BY_SLUG_QUERY,
-} from "@/lib/sanity";
+
+// Ensure Visual Editing is off for unit tests (getViteConfig loads .env)
+vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+
+// Must import AFTER stubbing env so module-level const picks up the stub
+const { loadQuery, getSiteSettings, SITE_SETTINGS_QUERY, ALL_PAGE_SLUGS_QUERY, PAGE_BY_SLUG_QUERY } =
+  await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
 beforeEach(() => {
