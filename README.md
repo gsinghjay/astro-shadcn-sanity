@@ -466,6 +466,8 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | Jay Singh | [@gsinghjay](https://github.com/gsinghjay) | Project Lead |
 | Roberson Sanchez | [@ras242](https://github.com/ras242)| - |
 | Sahil Parmar |[@SahilP20](https://github.com/SahilP20)| Discord Bot Dev |
+| Mohsin Imtiaz | [@mi329-gif](https://github.com/mi329-gif) | Team Member |
+
 | | | |
 | | | |
 | | | |
