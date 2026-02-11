@@ -54,11 +54,13 @@ describeIfBuilt("Build output — Cloudflare Pages structure", () => {
     expect(jsFiles.length).toBeGreaterThan(0);
   });
 
-  it("prerendered static pages exist as HTML", () => {
-    const expectedPages = ["about", "contact", "projects", "sponsors"];
-    for (const page of expectedPages) {
+  it("all pages are SSR-rendered via catch-all route (no prerendered HTML)", () => {
+    // After Story 2.2b, all pages are served by [...slug].astro (SSR)
+    // so no prerendered HTML files should exist for these routes
+    const ssrPages = ["about", "contact", "projects", "sponsors"];
+    for (const page of ssrPages) {
       const indexPath = resolve(DIST, page, "index.html");
-      expect(existsSync(indexPath), `${page}/index.html should exist`).toBe(true);
+      expect(existsSync(indexPath), `${page}/index.html should NOT exist (SSR)`).toBe(false);
     }
   });
 
