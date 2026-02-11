@@ -11,10 +11,9 @@ export const TwoColumn = {
     block: {
       _type: 'featureGrid',
       _key: 'story-features-2col',
-      label: 'Features',
-      headline: 'Lorem Ipsum Dolor Sit',
+      heading: 'Lorem Ipsum Dolor Sit',
       columns: 2,
-      features: [
+      items: [
         { _key: 'f1', title: 'Consectetur Adipiscing', description: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.' },
         { _key: 'f2', title: 'Elit Sed Do', description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi.' },
       ],
@@ -27,14 +26,12 @@ export const ThreeColumn = {
     block: {
       _type: 'featureGrid',
       _key: 'story-features-3col',
-      label: 'Benefits',
-      headline: 'Lorem Ipsum Features',
-      subtitle: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      heading: 'Lorem Ipsum Features',
       columns: 3,
-      features: [
-        { _key: 'f1', title: 'Consectetur Adipiscing', description: 'Duis aute irure dolor in reprehenderit', stat: '100+' },
-        { _key: 'f2', title: 'Elit Sed Do', description: 'Ut enim ad minim veniam quis nostrud', stat: '200+' },
-        { _key: 'f3', title: 'Eiusmod Tempor', description: 'Excepteur sint occaecat cupidatat non', stat: '99%' },
+      items: [
+        { _key: 'f1', title: 'Consectetur Adipiscing', description: 'Duis aute irure dolor in reprehenderit' },
+        { _key: 'f2', title: 'Elit Sed Do', description: 'Ut enim ad minim veniam quis nostrud' },
+        { _key: 'f3', title: 'Eiusmod Tempor', description: 'Excepteur sint occaecat cupidatat non' },
       ],
     },
   },
@@ -45,9 +42,9 @@ export const FourColumn = {
     block: {
       _type: 'featureGrid',
       _key: 'story-features-4col',
-      headline: 'Lorem Highlights',
+      heading: 'Lorem Highlights',
       columns: 4,
-      features: [
+      items: [
         { _key: 'f1', title: 'Lorem Ipsum', description: 'Sed do eiusmod tempor incididunt ut labore.' },
         { _key: 'f2', title: 'Dolor Sit', description: 'Ut enim ad minim veniam quis nostrud exercitation.' },
         { _key: 'f3', title: 'Amet Consectetur', description: 'Duis aute irure dolor in reprehenderit in voluptate.' },

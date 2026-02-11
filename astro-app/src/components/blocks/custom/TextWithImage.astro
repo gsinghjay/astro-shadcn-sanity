@@ -14,7 +14,7 @@ const imgSrc = block.image?.asset?.url;
 ---
 
 <Section data-animate>
-  <SectionSplit class={!isRight ? '@lg:direction-rtl @lg:[&>*]:direction-ltr' : ''}>
+  <SectionSplit>
     <SectionContent class="justify-center">
       {block.heading && (
         <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{block.heading}</h2>
@@ -26,7 +26,7 @@ const imgSrc = block.image?.asset?.url;
       )}
     </SectionContent>
 
-    <SectionMedia class="aspect-[4/3]">
+    <SectionMedia class={`aspect-[4/3] ${!isRight ? '@lg:order-first' : ''}`}>
       {imgSrc && (
         <img
           src={imgSrc}

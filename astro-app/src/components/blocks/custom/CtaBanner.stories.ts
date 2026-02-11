@@ -12,13 +12,13 @@ export const Default = {
     block: {
       _type: 'ctaBanner',
       _key: 'story-cta-1',
-      headline: 'Lorem Ipsum Dolor Sit Amet?',
-      body: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
-      ctaText: 'Get Started',
-      ctaUrl: '/sponsors',
-      secondaryCtaText: 'Learn More',
-      secondaryCtaUrl: '/about',
-      variant: 'dark',
+      heading: 'Lorem Ipsum Dolor Sit Amet?',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam.',
+      backgroundVariant: 'dark',
+      ctaButtons: [
+        { _key: 'btn-1', text: 'Get Started', url: '/sponsors' },
+        { _key: 'btn-2', text: 'Learn More', url: '/about', variant: 'outline' },
+      ],
     },
   },
 }
@@ -28,10 +28,11 @@ export const Minimal = {
     block: {
       _type: 'ctaBanner',
       _key: 'story-cta-2',
-      headline: 'Consectetur Adipiscing',
-      ctaText: 'Contact Us',
-      ctaUrl: '/contact',
-      variant: 'light',
+      heading: 'Consectetur Adipiscing',
+      backgroundVariant: 'light',
+      ctaButtons: [
+        { _key: 'btn-1', text: 'Contact Us', url: '/contact' },
+      ],
     },
   },
 }
