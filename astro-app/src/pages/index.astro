@@ -11,6 +11,6 @@ if (!page) {
 }
 ---
 
-<Layout title={page.title ?? undefined} description={page.description ?? undefined}>
+<Layout title={page.title ?? undefined} seo={page.seo}>
   <BlockRenderer blocks={page.blocks ?? []} />
 </Layout>

@@ -1,7 +1,7 @@
 ---
 project_name: 'astro-shadcn-sanity'
 user_name: 'Jay'
-date: '2026-02-09'
+date: '2026-02-11'
 sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns']
 status: 'complete'
 rule_count: 95
@@ -75,11 +75,11 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 
 #### Type Organization
 
-- **Centralized types**: `src/lib/types.ts` contains the full block type hierarchy.
-- **`BlockBase` interface**: Shared fields `backgroundVariant`, `spacing`, `maxWidth` — every block type extends it.
-- **Discriminated unions**: Each block type includes `_type` literal + `_key`. `PageBlock` is the union of all block types.
-- **`Page` interface**: `{ _id, title, slug, description, blocks: PageBlock[] }`.
-- **`SiteSettings` interface**: All navigation, footer, contact, social link types.
+- **TypeGen-derived types**: `src/lib/types.ts` re-exports generated types from `sanity.types.ts`. Run `npm run typegen` after schema/query changes.
+- **`Page`**: `NonNullable<PAGE_BY_SLUG_QUERY_RESULT>` — derived from GROQ query result.
+- **`SiteSettings`**: `NonNullable<SITE_SETTINGS_QUERY_RESULT>` — derived from GROQ query result.
+- **Block types**: `Extract<PageBlock, { _type: 'heroBanner' }>` pattern. Each block type is automatically extracted from the `PageBlock` union.
+- **`PageBlock`**: Union of all block types, derived from `Page['blocks']`.
 
 #### Data Fetching Patterns
 
@@ -116,33 +116,24 @@ Every block has exactly **2 files** + registration lines:
 1. Schema: `studio/src/schemaTypes/blocks/{block-name}.ts` using `defineBlock`
 2. Component: `astro-app/src/components/blocks/custom/{BlockName}.astro` composing from `ui/` primitives
 3. Register in `studio/src/schemaTypes/index.ts` (schema array)
-4. Register in `astro-app/src/components/BlockRenderer.astro` (switch statement)
+4. **Auto-discovered** by `block-registry.ts` via `import.meta.glob` (no manual BlockRenderer changes needed)
 5. Add GROQ projection in `src/lib/sanity.ts`
 6. Add type to page schema's `blocks[]` array
 
-#### BlockRenderer Dual Dispatch Pattern
+#### BlockRenderer Auto-Discovery Pattern
 
-The renderer has two dispatch modes in a single `blocks.map()`:
+BlockRenderer uses `block-registry.ts` which auto-discovers block components via `import.meta.glob`. **No switch statement or manual imports needed.**
 
-1. **Custom blocks** (block prop pattern): `case 'heroBanner': return <HeroBanner block={block} />`
-   - Live in `src/components/blocks/custom/`
+1. **Custom blocks** (block prop pattern): Auto-discovered from `blocks/custom/*.astro`
+   - PascalCase filename → camelCase `_type` (e.g., `HeroBanner.astro` → `heroBanner`)
    - Receive typed `block` prop matching their interface
-2. **fulldev/ui blocks** (spread props via map): `default` case falls through to `fulldotdevBlocks` record
-   - Live in `src/components/blocks/` (root)
-   - Receive spread props: `<FdComponent {...block} />`
-   - Registered in a `Record<string, any>` map at top of file
+2. **fulldev/ui blocks** (spread props pattern): Auto-discovered from `blocks/*.astro`
+   - Receive spread props: `<UiComponent {...block} />`
 
-```astro
-{blocks.map((block) => {
-  switch (block._type) {
-    case 'heroBanner': return <HeroBanner block={block} />;
-    // ... other custom blocks
-    default: {
-      const FdComponent = fulldotdevBlocks[(block as any)._type]
-      return FdComponent ? <FdComponent {...(block as any)} /> : null
-    }
-  }
-})}
+```ts
+// block-registry.ts — auto-discovers blocks via import.meta.glob
+const customModules = import.meta.glob('./blocks/custom/*.astro', { eager: true });
+// Converts PascalCase filename to camelCase _type automatically
 ```
 
 #### GROQ Query Rules
@@ -170,43 +161,58 @@ Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page
 - **Objects (3)**: `seo`, `button`, `portableText`
 - **Documents (3)**: `page`, `siteSettings`, `sponsor`
 - **Blocks (11)**: `heroBanner`, `featureGrid`, `ctaBanner`, `statsRow`, `textWithImage`, `logoCloud`, `sponsorSteps`, `richText`, `faqSection`, `contactForm`, `sponsorCards`
-- **Pending** (need document type dependencies): `timeline` (needs `event`), `teamGrid` (needs `team`)
 
 ### Testing Rules
 
-#### Playwright Test Framework
+#### Two-Runner Architecture
 
-- **Config**: `playwright.config.ts` at project root. Integration tests: `playwright.integration.config.ts`.
-- **Test directory**: `./tests`. Output: `./test-results` + `playwright-report/`.
-- **Reporters**: HTML (open: never), JUnit (results.xml), list.
+| Runner | Config | Scope |
+|---|---|---|
+| **Vitest** | `astro-app/vitest.config.ts` | Unit + Component (Container API) + Schema/Integration |
+| **Playwright** | `playwright.config.ts` | E2E only (real browser) |
+
+#### Vitest (Unit + Component + Integration)
+
+- **Config**: `astro-app/vitest.config.ts` using `getViteConfig()` from `astro/config`.
+- **Include patterns**: `src/**/__tests__/**/*.test.ts` + `../tests/integration/**/*.test.ts`.
+- **`sanity:client` mock**: Aliased via `__mocks__/sanity-client.ts` in vitest config.
+- **Component tests**: Use Astro Container API (`experimental_AstroContainer`) — renders components in Node.js, no browser.
+- **Fixtures**: Typed from `sanity.types.ts` in `__fixtures__/` directories.
+- **Integration tests**: Pure Node.js assertions (file existence, schema shape, module imports) — previously Playwright, now Vitest.
+
+#### Playwright (E2E Only)
+
+- **Config**: `playwright.config.ts` at project root.
+- **Test directory**: `tests/e2e/`. Output: `./test-results` + `playwright-report/`.
 - **Web server**: Builds astro-app then runs preview (`build && preview`) before tests. 120s startup timeout.
+- **Browser projects (5)**: Desktop: `chromium`, `firefox`, `webkit`. Mobile: `mobile-chrome` (Pixel 7), `mobile-safari` (iPhone 14).
 
-#### Browser Projects (5)
+#### Accessibility & SEO Testing
 
-Desktop: `chromium`, `firefox`, `webkit`. Mobile: `mobile-chrome` (Pixel 7), `mobile-safari` (iPhone 14).
-
-#### Accessibility Testing
-
-- `@axe-core/playwright` — automated WCAG compliance checks.
-- Target: WCAG 2.1 AA, Lighthouse A11y 90+.
-
-#### SEO Testing
-
+- `@axe-core/playwright` — automated WCAG compliance checks. Target: WCAG 2.1 AA, Lighthouse A11y 90+.
 - `@seontechnologies/playwright-utils` — SEO validation utilities.
 
 #### Test Commands
 
 | Command | What It Does |
 |---|---|
-| `npm test` | All browser projects |
-| `npm run test:chromium` | Chromium only (fastest) |
-| `npm run test:headed` | Headed chromium for debugging |
-| `npm run test:ui` | Playwright UI mode |
-| `npm run test:integration` | Integration tests (separate config) |
+| `npm run test:unit` | Vitest: unit + component + integration |
+| `npm run test:e2e` | Playwright: all browser projects |
+| `npm test` | Both: `test:unit && test:e2e` |
+| `npm run test:chromium` | Playwright: Chromium only (fastest) |
+| `npm run test:headed` | Playwright: headed chromium for debugging |
+| `npm run test:ui` | Playwright: UI mode |
+
+#### When to Write Tests
+
+- New block component → Container API test with full + minimal fixture data
+- New GROQ query → Verify query string contains expected type/field references
+- Schema change → Run `npm run typegen` (type errors surface fixture/component drift)
+- Interactive behavior → Playwright E2E spec
 
 #### CI Configuration
 
-- `retries: 2`, `workers: 1`, `forbidOnly: true` when `CI` env var is set.
+- Playwright: `retries: 2`, `workers: 1`, `forbidOnly: true` when `CI` env var is set.
 - Traces on first retry, screenshots on failure, video retained on failure.
 
 #### Build-Time Validation
@@ -280,16 +286,22 @@ astro-app/src/
     blocks/
       custom/        # Custom block components (1:1 with Sanity schemas)
       *.astro        # fulldev/ui block variants (hero-1, features-3, etc.)
-    BlockRenderer.astro
+    block-registry.ts  # Auto-discovers blocks via import.meta.glob
+    BlockRenderer.astro  # Renders blocks using block-registry
     Header.astro, Footer.astro, MobileNav.astro, Breadcrumb.astro
-  layouts/Layout.astro
+    __tests__/       # Container API component tests + __fixtures__/
+  layouts/
+    Layout.astro
+    templates/       # Page template shells (Default, FullWidth, Landing, Sidebar, TwoColumn)
   lib/
     sanity.ts        # Client + ALL GROQ queries + loadQuery wrapper
     image.ts         # urlFor() helper
     utils.ts         # cn() utility
-    types.ts         # TypeScript interfaces for blocks/pages
-    data/            # Placeholder data (TEMPORARY — removed when GROQ queries are wired)
-  pages/             # File-based routing + [...slug].astro catch-all
+    types.ts         # TypeGen-derived type aliases (Extract<PageBlock, ...>)
+    __tests__/       # Unit tests for sanity.ts, utils.ts
+  pages/
+    index.astro      # Homepage
+    [...slug].astro  # CMS-driven catch-all route with template dispatch
   scripts/main.ts    # Global client-side JS
   styles/global.css  # Tailwind imports + @theme + shadcn vars
 
@@ -299,6 +311,11 @@ studio/src/schemaTypes/
   documents/         # page.ts, site-settings.ts, sponsor.ts
   blocks/            # One file per block schema
   index.ts           # Schema registry (exports schemaTypes[])
+
+tests/
+  e2e/               # Playwright E2E tests (real browser)
+  integration/       # Vitest integration tests (schema, file structure, config)
+  support/           # Shared test constants
 ```
 
 ### Development Workflow Rules
@@ -311,12 +328,11 @@ studio/src/schemaTypes/
 | `npm run dev:storybook` (root) | Both workspaces + Storybook |
 | `npm run storybook` (root) | Storybook only (port 6006) |
 | `cd astro-app && npm run build` | Build with `astro check && astro build` |
-| `npm test` (root) | Playwright tests (all browsers) |
+| `npm test` (root) | Unit + E2E tests |
 
 #### Hosting
 
-- **Current**: GitHub Pages. Pure static output.
-- **Future**: Cloudflare Pages when forms are implemented. Adds `@astrojs/cloudflare` adapter.
+- **Target**: Cloudflare Pages. `@astrojs/cloudflare` adapter configured. Output conditionally `static` or `server` (Visual Editing).
 
 #### CI/CD
 
@@ -341,12 +357,12 @@ Schema change in `studio/` must be reflected in:
 
 1. Create schema: `studio/src/schemaTypes/blocks/{block-name}.ts` using `defineBlock`
 2. Register in `studio/src/schemaTypes/index.ts`
-3. Install any needed fulldev/ui primitives: `npx shadcn@latest add @fulldev/{name}`
-4. Create component: `astro-app/src/components/blocks/custom/{BlockName}.astro`
-5. Add import + case in `BlockRenderer.astro`
+3. Add type to page schema's `blocks[]` array `of` list in `studio/src/schemaTypes/documents/page.ts`
+4. Install any needed fulldev/ui primitives: `npx shadcn@latest add @fulldev/{name}`
+5. Create component: `astro-app/src/components/blocks/custom/{BlockName}.astro` (PascalCase filename auto-registers via `block-registry.ts`)
 6. Add GROQ projection in `src/lib/sanity.ts` page query
-7. Add type interface in `src/lib/types.ts` and to `PageBlock` union
-8. Add type to page schema's `blocks[]` array `of` list
+7. Run `npm run typegen` to regenerate types (block type auto-extracted via `Extract<PageBlock, ...>`)
+8. Add Container API test in `src/components/__tests__/{BlockName}.test.ts` with typed fixtures
 
 ### Critical Don't-Miss Rules
 
@@ -411,11 +427,11 @@ Schema change in `studio/` must be reflected in:
 | 2.1b Block Schemas (Remaining) | DONE | richText, faqSection, contactForm, sponsorCards |
 | 2.2 Homepage Wiring | DONE | GROQ queries, Visual Editing, Presentation tool for homepage |
 | 2.3a Site Settings Wiring | DONE | Memoized queries, full schema validation for siteSettings |
+| 2.2b Remaining Pages Data | DONE | CMS-driven catch-all route, template dispatch, all pages from Sanity |
+| Testing Refactor | DONE | Vitest Container API tests, integration test migration, consolidated test scripts |
 | 3.1 Sponsor Document Schema | NEXT | Sponsor document schema + studio management |
-| 2.2b Remaining Pages Data | BACKLOG | Wire remaining pages to Sanity |
-| 2.3 Page Composition | BACKLOG | `[...slug].astro` catch-all for CMS-built pages |
 
-**Current state**: Sanity schemas are built and wired for homepage + site settings. Sponsor document exists. Next up is Story 3.1 (sponsor studio management) then remaining page wiring.
+**Current state**: All pages are CMS-driven via `[...slug].astro` catch-all route with 5 template layouts. Test architecture consolidated to Vitest (unit/component/integration) + Playwright (E2E only). Next up is Story 3.1 (sponsor studio management).
 
 ---
 
@@ -435,4 +451,4 @@ Schema change in `studio/` must be reflected in:
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-02-09
+Last Updated: 2026-02-11
