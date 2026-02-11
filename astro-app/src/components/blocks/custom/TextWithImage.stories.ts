@@ -11,13 +11,12 @@ export const ImageRight = {
     block: {
       _type: 'textWithImage',
       _key: 'story-twi-1',
-      label: 'About Us',
-      headline: 'Lorem Ipsum Dolor Sit Amet Elit',
-      body: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.',
-      imageUrl: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder',
+      heading: 'Lorem Ipsum Dolor Sit Amet Elit',
+      content: [
+        { _type: 'block', _key: 'b1', style: 'normal', children: [{ _type: 'span', _key: 's1', text: 'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.' }] },
+      ],
+      image: { asset: { url: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder' }, alt: 'Placeholder image' },
       imagePosition: 'right',
-      ctaText: 'Learn More',
-      ctaUrl: '/about',
     },
   },
 }
@@ -27,13 +26,12 @@ export const ImageLeft = {
     block: {
       _type: 'textWithImage',
       _key: 'story-twi-2',
-      label: 'Our Impact',
-      headline: 'Consectetur Adipiscing Elit Sed Do',
-      body: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
-      imageUrl: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder',
+      heading: 'Consectetur Adipiscing Elit Sed Do',
+      content: [
+        { _type: 'block', _key: 'b1', style: 'normal', children: [{ _type: 'span', _key: 's1', text: 'Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.' }] },
+      ],
+      image: { asset: { url: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder' }, alt: 'Placeholder image' },
       imagePosition: 'left',
-      ctaText: 'View Projects',
-      ctaUrl: '/projects',
     },
   },
 }
@@ -43,9 +41,11 @@ export const Minimal = {
     block: {
       _type: 'textWithImage',
       _key: 'story-twi-3',
-      headline: 'Eiusmod Tempor Incididunt',
-      body: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      imageUrl: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder',
+      heading: 'Eiusmod Tempor Incididunt',
+      content: [
+        { _type: 'block', _key: 'b1', style: 'normal', children: [{ _type: 'span', _key: 's1', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' }] },
+      ],
+      image: { asset: { url: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder' }, alt: 'Placeholder image' },
     },
   },
 }

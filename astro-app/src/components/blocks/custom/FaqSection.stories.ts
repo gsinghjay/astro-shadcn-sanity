@@ -11,8 +11,7 @@ export const Default = {
     block: {
       _type: 'faqSection',
       _key: 'story-faq-1',
-      label: 'FAQ',
-      headline: 'Frequently Asked Questions',
+      heading: 'Frequently Asked Questions',
       items: [
         {
           _key: 'q1',
@@ -49,7 +48,7 @@ export const Minimal = {
     block: {
       _type: 'faqSection',
       _key: 'story-faq-2',
-      headline: 'Questions',
+      heading: 'Questions',
       items: [
         {
           _key: 'q1',

@@ -11,26 +11,20 @@ export const Default = {
     block: {
       _type: 'contactForm',
       _key: 'story-contact-1',
-      headline: 'Contact Us',
-      subtitle: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore.',
+      heading: 'Contact Us',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore.',
     },
   },
 }
 
-export const WithCustomFields = {
+export const WithSuccessMessage = {
   args: {
     block: {
       _type: 'contactForm',
       _key: 'story-contact-2',
-      headline: 'Lorem Ipsum Inquiry',
-      subtitle: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-      fields: [
-        { _key: 'f1', name: 'name', label: 'Full Name', type: 'text', required: true },
-        { _key: 'f2', name: 'email', label: 'Work Email', type: 'email', required: true, placeholder: 'you@example.com' },
-        { _key: 'f3', name: 'company', label: 'Organization', type: 'text', required: true },
-        { _key: 'f4', name: 'tier', label: 'Category', type: 'select', required: true, options: ['Option A', 'Option B', 'Option C'] },
-        { _key: 'f5', name: 'message', label: 'Message', type: 'textarea', required: false, placeholder: 'Your message here...' },
-      ],
+      heading: 'Lorem Ipsum Inquiry',
+      description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      successMessage: 'Your inquiry has been submitted successfully. We will respond within 48 hours.',
     },
   },
 }
