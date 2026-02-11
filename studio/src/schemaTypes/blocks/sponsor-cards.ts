@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {StarIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -28,10 +28,10 @@ export const sponsorCards = defineBlock({
       type: 'array',
       hidden: ({parent}) => parent?.displayMode !== 'manual',
       of: [
-        {
+        defineArrayMember({
           type: 'reference',
           to: [{type: 'sponsor'}],
-        },
+        }),
       ],
     }),
   ],

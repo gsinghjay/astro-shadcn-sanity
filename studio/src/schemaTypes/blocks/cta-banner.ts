@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {BoltIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -23,7 +23,7 @@ export const ctaBanner = defineBlock({
       name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
-      of: [{type: 'button'}],
+      of: [defineArrayMember({type: 'button'})],
     }),
   ],
 })

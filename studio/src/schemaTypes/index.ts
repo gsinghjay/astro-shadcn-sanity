@@ -23,7 +23,7 @@ import {richText} from './blocks/rich-text'
 import {faqSection} from './blocks/faq-section'
 import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
-// timeline and teamGrid removed — depend on event/team document types (Story 2.1b)
+
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Objects

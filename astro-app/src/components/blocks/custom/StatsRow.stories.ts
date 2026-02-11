@@ -12,7 +12,8 @@ export const Light = {
     block: {
       _type: 'statsRow',
       _key: 'story-stats-1',
-      variant: 'light',
+      heading: 'By the Numbers',
+      backgroundVariant: 'light',
       stats: [
         { _key: 's1', value: '100+', label: 'Lorem Ipsum' },
         { _key: 's2', value: '200+', label: 'Dolor Sit' },
@@ -28,7 +29,7 @@ export const Dark = {
     block: {
       _type: 'statsRow',
       _key: 'story-stats-2',
-      variant: 'dark',
+      backgroundVariant: 'dark',
       stats: [
         { _key: 's1', value: '100+', label: 'Lorem Ipsum' },
         { _key: 's2', value: '200+', label: 'Dolor Sit' },
@@ -44,7 +45,7 @@ export const TwoStats = {
     block: {
       _type: 'statsRow',
       _key: 'story-stats-3',
-      variant: 'light',
+      backgroundVariant: 'light',
       stats: [
         { _key: 's1', value: '10', label: 'Lorem Ipsum' },
         { _key: 's2', value: '15', label: 'Dolor Sit' },

@@ -100,7 +100,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   title,
   "slug": slug.current,
   template,
-  "description": seo.metaDescription,
+  seo {
+    metaTitle,
+    metaDescription,
+    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }
+  },
   blocks[]{
     _type,
     _key,

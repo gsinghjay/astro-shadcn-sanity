@@ -1,4 +1,4 @@
-import {defineField} from 'sanity'
+import {defineField, defineArrayMember} from 'sanity'
 import {OlistIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
@@ -23,7 +23,7 @@ export const sponsorSteps = defineBlock({
       title: 'Steps',
       type: 'array',
       of: [
-        {
+        defineArrayMember({
           type: 'object',
           preview: {select: {title: 'title'}},
           fields: [
@@ -42,17 +42,17 @@ export const sponsorSteps = defineBlock({
               name: 'list',
               title: 'Bullet Points',
               type: 'array',
-              of: [{type: 'string'}],
+              of: [defineArrayMember({type: 'string'})],
             }),
           ],
-        },
+        }),
       ],
     }),
     defineField({
       name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
-      of: [{type: 'button'}],
+      of: [defineArrayMember({type: 'button'})],
     }),
   ],
 })
