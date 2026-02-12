@@ -54,14 +54,24 @@ describeIfBuilt("Build output — Cloudflare Pages structure", () => {
     expect(jsFiles.length).toBeGreaterThan(0);
   });
 
-  it("all pages are SSR-rendered via catch-all route (no prerendered HTML)", () => {
-    // After Story 2.2b, all pages are served by [...slug].astro (SSR)
-    // so no prerendered HTML files should exist for these routes
-    const ssrPages = ["about", "contact", "projects", "sponsors"];
-    for (const page of ssrPages) {
-      const indexPath = resolve(DIST, page, "index.html");
-      expect(existsSync(indexPath), `${page}/index.html should NOT exist (SSR)`).toBe(false);
-    }
+  it("published pages are prerendered as static HTML", () => {
+    // With output: "static" + server islands (Story 7.4),
+    // all pages are prerendered at build time. The server island
+    // handles only the dynamic content area via /_server-islands/*.
+    const indexHtml = resolve(DIST, "index.html");
+    expect(existsSync(indexHtml), "index.html should exist (prerendered)").toBe(true);
+  });
+
+  it("_routes.json excludes prerendered pages from worker", () => {
+    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
+    // Root route should be excluded — served as static HTML, not by the worker
+    expect(routes.exclude).toContain("/");
+  });
+
+  it("worker entry includes server island map", () => {
+    const workerEntry = readFileSync(resolve(DIST, "_worker.js/index.js"), "utf-8");
+    expect(workerEntry).toContain("serverIslandMap");
+    expect(workerEntry).toContain("SanityPageContent");
   });
 
   it("_headers file exists (Cloudflare custom headers)", () => {

@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
+import SanityPageContent from '@/components/SanityPageContent.astro';
 import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
@@ -19,9 +20,9 @@ const templates = {
   twoColumn: TwoColumnTemplate,
 };
 
-// Only used in static builds — ignored in server mode
-export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true";
+const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
+// getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
   const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY);
   return pages.map((page) => ({
@@ -30,18 +31,44 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 const { slug } = Astro.params;
-const page = await getPage(slug as string);
 
-if (!page) {
-  return Astro.redirect('/404');
+// In static mode: fetch page data and render inline
+// In VE mode: skip fetch — server island handles its own data fetching
+let page = null;
+let template: keyof typeof templates = 'default';
+let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
+
+if (!visualEditingEnabled) {
+  page = await getPage(slug as string);
+  if (!page) {
+    return Astro.redirect('/404');
+  }
+  template = stegaClean(page.template) as keyof typeof templates;
+  TemplateComponent = templates[template] ?? DefaultTemplate;
 }
-
-const template = stegaClean(page.template) as keyof typeof templates;
-const TemplateComponent = templates[template] ?? DefaultTemplate;
 ---
 
-<Layout title={page.title ?? undefined} seo={page.seo} hideNav={template === 'landing'}>
-  <TemplateComponent>
-    <BlockRenderer blocks={page.blocks ?? []} />
-  </TemplateComponent>
+<Layout
+  title={page?.title ?? undefined}
+  seo={page?.seo}
+  hideNav={!visualEditingEnabled && template === 'landing'}
+>
+  {visualEditingEnabled ? (
+    <SanityPageContent server:defer slug={slug as string}>
+      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div class="animate-pulse space-y-8">
+          <div class="h-10 bg-muted rounded w-2/5"></div>
+          <div class="h-64 bg-muted rounded"></div>
+          <div class="space-y-3">
+            <div class="h-4 bg-muted rounded w-3/4"></div>
+            <div class="h-4 bg-muted rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    </SanityPageContent>
+  ) : (
+    <TemplateComponent>
+      <BlockRenderer blocks={page!.blocks ?? []} />
+    </TemplateComponent>
+  )}
 </Layout>
