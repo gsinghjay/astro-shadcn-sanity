@@ -22,6 +22,8 @@ import { statsRow } from '../../../studio/src/schemaTypes/blocks/stats-row'
 import { textWithImage } from '../../../studio/src/schemaTypes/blocks/text-with-image'
 import { logoCloud } from '../../../studio/src/schemaTypes/blocks/logo-cloud'
 import { schemaTypes } from '../../../studio/src/schemaTypes/index'
+import { featureItem } from '../../../studio/src/schemaTypes/objects/feature-item'
+import { statItem } from '../../../studio/src/schemaTypes/objects/stat-item'
 
 // Helper to extract block-specific fields (skip the 3 base fields)
 const BASE_FIELD_NAMES = ['backgroundVariant', 'spacing', 'maxWidth']
@@ -126,25 +128,23 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(fieldNames).toHaveLength(3)
     })
 
-    test('[P1] 2.1-INT-009 — featureGrid items is array of objects with icon, image, title, description', () => {
+    test('[P1] 2.1-INT-009 — featureGrid items is array of featureItem with icon, image, title, description', () => {
       const items = findField(featureGrid, 'items')
       expect(items).toBeDefined()
       expect(items.type).toBe('array')
 
-      const objectMember = items.of.find((m: any) => m.type === 'object')
-      expect(objectMember).toBeDefined()
+      const namedMember = items.of.find((m: any) => m.type === 'featureItem')
+      expect(namedMember).toBeDefined()
 
-      const itemFieldNames = objectMember.fields.map((f: any) => f.name)
+      const itemFieldNames = featureItem.fields.map((f: any) => f.name)
       expect(itemFieldNames).toContain('icon')
       expect(itemFieldNames).toContain('image')
       expect(itemFieldNames).toContain('title')
       expect(itemFieldNames).toContain('description')
     })
 
-    test('[P0] 2.1-INT-010 — featureGrid items image has hotspot and required alt text (NFR16)', () => {
-      const items = findField(featureGrid, 'items')
-      const objectMember = items.of.find((m: any) => m.type === 'object')
-      const imageField = objectMember.fields.find((f: any) => f.name === 'image')
+    test('[P0] 2.1-INT-010 — featureItem image has hotspot and required alt text (NFR16)', () => {
+      const imageField = featureItem.fields.find((f: any) => f.name === 'image')
 
       expect(imageField).toBeDefined()
       expect(imageField.type).toBe('image')
@@ -156,10 +156,8 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(altField.validation).toBeDefined()
     })
 
-    test('[P1] 2.1-INT-011 — featureGrid items title is required', () => {
-      const items = findField(featureGrid, 'items')
-      const objectMember = items.of.find((m: any) => m.type === 'object')
-      const titleField = objectMember.fields.find((f: any) => f.name === 'title')
+    test('[P1] 2.1-INT-011 — featureItem title is required', () => {
+      const titleField = featureItem.fields.find((f: any) => f.name === 'title')
 
       expect(titleField).toBeDefined()
       expect(titleField.type).toBe('string')
@@ -231,25 +229,25 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(fieldNames).toHaveLength(2)
     })
 
-    test('[P1] 2.1-INT-020 — statsRow stats is array of objects with value (required), label (required), description', () => {
+    test('[P1] 2.1-INT-020 — statsRow stats is array of statItem with value (required), label (required), description', () => {
       const stats = findField(statsRow, 'stats')
       expect(stats).toBeDefined()
       expect(stats.type).toBe('array')
 
-      const objectMember = stats.of.find((m: any) => m.type === 'object')
-      expect(objectMember).toBeDefined()
+      const namedMember = stats.of.find((m: any) => m.type === 'statItem')
+      expect(namedMember).toBeDefined()
 
-      const statFieldNames = objectMember.fields.map((f: any) => f.name)
+      const statFieldNames = statItem.fields.map((f: any) => f.name)
       expect(statFieldNames).toContain('value')
       expect(statFieldNames).toContain('label')
       expect(statFieldNames).toContain('description')
 
       // value and label are required
-      const valueField = objectMember.fields.find((f: any) => f.name === 'value')
+      const valueField = statItem.fields.find((f: any) => f.name === 'value')
       expect(valueField.type).toBe('string')
       expect(valueField.validation).toBeDefined()
 
-      const labelField = objectMember.fields.find((f: any) => f.name === 'label')
+      const labelField = statItem.fields.find((f: any) => f.name === 'label')
       expect(labelField.type).toBe('string')
       expect(labelField.validation).toBeDefined()
     })
@@ -389,19 +387,15 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       })
     }
 
-    test('[P2] 2.1-INT-034 — featureGrid items have preview selecting title', () => {
-      const items = findField(featureGrid, 'items')
-      const objectMember = items.of.find((m: any) => m.type === 'object')
-      expect(objectMember.preview).toBeDefined()
-      expect(objectMember.preview.select.title).toBe('title')
+    test('[P2] 2.1-INT-034 — featureItem has preview selecting title', () => {
+      expect(featureItem.preview).toBeDefined()
+      expect(featureItem.preview!.select!.title).toBe('title')
     })
 
-    test('[P2] 2.1-INT-035 — statsRow stats have preview selecting label and value', () => {
-      const stats = findField(statsRow, 'stats')
-      const objectMember = stats.of.find((m: any) => m.type === 'object')
-      expect(objectMember.preview).toBeDefined()
-      expect(objectMember.preview.select.title).toBe('label')
-      expect(objectMember.preview.select.subtitle).toBe('value')
+    test('[P2] 2.1-INT-035 — statItem has preview selecting value and label', () => {
+      expect(statItem.preview).toBeDefined()
+      expect(statItem.preview!.select!.title).toBe('value')
+      expect(statItem.preview!.select!.subtitle).toBe('label')
     })
   })
 })

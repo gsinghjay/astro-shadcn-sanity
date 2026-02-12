@@ -17,46 +17,7 @@ export const featureGrid = defineBlock({
       name: 'items',
       title: 'Items',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          preview: {select: {title: 'title'}},
-          fields: [
-            defineField({
-              name: 'icon',
-              title: 'Icon',
-              type: 'string',
-              description: 'Icon name from icon set',
-            }),
-            defineField({
-              name: 'image',
-              title: 'Image',
-              type: 'image',
-              options: {hotspot: true},
-              fields: [
-                defineField({
-                  name: 'alt',
-                  title: 'Alternative Text',
-                  type: 'string',
-                  description: 'Required for accessibility',
-                  validation: (Rule) => Rule.required(),
-                }),
-              ],
-            }),
-            defineField({
-              name: 'title',
-              title: 'Title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'description',
-              title: 'Description',
-              type: 'text',
-            }),
-          ],
-        }),
-      ],
+      of: [defineArrayMember({type: 'featureItem'})],
     }),
     defineField({
       name: 'columns',
