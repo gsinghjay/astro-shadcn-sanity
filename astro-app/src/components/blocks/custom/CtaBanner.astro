@@ -25,7 +25,7 @@ const secondaryBtnMap: Record<string, string> = {
   white: '',
 };
 
-const variant = stegaClean(backgroundVariant) || 'dark';
+const variant = stegaClean(backgroundVariant) ?? 'white';
 ---
 
 <Section data-animate>

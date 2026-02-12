@@ -1,7 +1,7 @@
 ---
 import type { PageBlock } from '@/lib/types';
 import { allBlocks } from './block-registry';
-import BlockWrapper from './blocks/BlockWrapper.astro';
+import BlockWrapper from './BlockWrapper.astro';
 
 interface Props {
   blocks: PageBlock[];
@@ -11,7 +11,7 @@ const { blocks } = Astro.props;
 ---
 
 {blocks.map((block) => {
-  const Component = allBlocks[(block as any)._type];
+  const Component = allBlocks[block._type];
   if (!Component) return null;
-  return <BlockWrapper backgroundVariant={(block as any).backgroundVariant} spacing={(block as any).spacing} maxWidth={(block as any).maxWidth}><Component {...(block as any)} /></BlockWrapper>;
+  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth}><Component {...block} /></BlockWrapper>;
 })}
