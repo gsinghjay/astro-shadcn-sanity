@@ -1,5 +1,7 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CogIcon} from '@sanity/icons'
+import {linkFields} from '../objects/link'
+import {buttonFields} from '../objects/button'
 
 // Singleton document — use desk structure to limit to a single instance
 export const siteSettings = defineType({
@@ -56,25 +58,7 @@ export const siteSettings = defineType({
       title: 'CTA Button',
       type: 'object',
       description: 'Call-to-action button shown in the header',
-      fields: [
-        defineField({
-          name: 'text',
-          title: 'Button Text',
-          type: 'string',
-          validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-          name: 'url',
-          title: 'Button URL',
-          type: 'string',
-          validation: (Rule) =>
-            Rule.required().custom((value) => {
-              if (!value) return true
-              if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-              return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-            }),
-        }),
-      ],
+      fields: [...buttonFields],
     }),
     defineField({
       name: 'navigationItems',
@@ -85,24 +69,7 @@ export const siteSettings = defineType({
           type: 'object',
           preview: {select: {title: 'label'}},
           fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              description: 'Relative path (e.g. /about) or full URL (e.g. https://example.com)',
-              validation: (Rule) =>
-                Rule.required().custom((value) => {
-                  if (!value) return true
-                  if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-                  return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-                }),
-            }),
+            ...linkFields,
             defineField({
               name: 'children',
               title: 'Sub-items',
@@ -112,27 +79,7 @@ export const siteSettings = defineType({
                 defineArrayMember({
                   type: 'object',
                   preview: {select: {title: 'label'}},
-                  fields: [
-                    defineField({
-                      name: 'label',
-                      title: 'Label',
-                      type: 'string',
-                      validation: (Rule) => Rule.required(),
-                    }),
-                    defineField({
-                      name: 'href',
-                      title: 'URL',
-                      type: 'string',
-                      description:
-                        'Relative path (e.g. /about) or full URL (e.g. https://example.com)',
-                      validation: (Rule) =>
-                        Rule.required().custom((value) => {
-                          if (!value) return true
-                          if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-                          return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-                        }),
-                    }),
-                  ],
+                  fields: [...linkFields],
                 }),
               ],
             }),
@@ -215,20 +162,7 @@ export const siteSettings = defineType({
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),
@@ -241,26 +175,7 @@ export const siteSettings = defineType({
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'external',
-              title: 'External Link',
-              type: 'boolean',
-              initialValue: false,
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),
@@ -273,20 +188,7 @@ export const siteSettings = defineType({
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),

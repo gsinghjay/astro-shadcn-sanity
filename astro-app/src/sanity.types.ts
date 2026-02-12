@@ -273,13 +273,16 @@ export type SiteSettings = {
   ctaButton?: {
     text?: string;
     url?: string;
+    variant?: "default" | "secondary" | "outline" | "ghost";
   };
   navigationItems?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     children?: Array<{
       label?: string;
       href?: string;
+      external?: boolean;
       _key: string;
     }>;
     _key: string;
@@ -301,6 +304,7 @@ export type SiteSettings = {
   footerLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   resourceLinks?: Array<{
@@ -312,6 +316,7 @@ export type SiteSettings = {
   programLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   currentSemester?: string;
@@ -427,6 +432,13 @@ export type Seo = {
     alt?: string;
     _type: "image";
   };
+};
+
+export type Link = {
+  _type: "link";
+  label?: string;
+  href?: string;
+  external?: boolean;
 };
 
 export type Button = {
@@ -557,6 +569,7 @@ export type AllSanitySchemaTypes =
   | PortableText
   | Page
   | Seo
+  | Link
   | Button
   | SanityImagePaletteSwatch
   | SanityImagePalette

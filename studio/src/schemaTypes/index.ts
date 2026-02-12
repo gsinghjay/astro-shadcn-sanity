@@ -3,6 +3,7 @@ import type {SchemaTypeDefinition} from 'sanity'
 // Object schemas
 import {seo} from './objects/seo'
 import {button} from './objects/button'
+import {link} from './objects/link'
 import {portableText} from './objects/portable-text'
 
 // Document schemas
@@ -29,6 +30,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Objects
   seo,
   button,
+  link,
   portableText,
   // Documents
   page,
