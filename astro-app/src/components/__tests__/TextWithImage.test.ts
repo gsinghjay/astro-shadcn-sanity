@@ -7,7 +7,7 @@ describe('TextWithImage', () => {
   test('renders heading and content', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TextWithImage, {
-      props: { block: textWithImageFull },
+      props: textWithImageFull,
     });
 
     expect(html).toContain('Our Story');
@@ -16,7 +16,7 @@ describe('TextWithImage', () => {
   test('renders image with alt text', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TextWithImage, {
-      props: { block: textWithImageFull },
+      props: textWithImageFull,
     });
 
     expect(html).toContain('Team photo');
@@ -26,7 +26,7 @@ describe('TextWithImage', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TextWithImage, {
-      props: { block: textWithImageMinimal },
+      props: textWithImageMinimal,
     });
     expect(html).toBeDefined();
   });

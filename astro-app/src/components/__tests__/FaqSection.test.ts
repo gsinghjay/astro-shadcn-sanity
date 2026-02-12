@@ -7,7 +7,7 @@ describe('FaqSection', () => {
   test('renders heading and FAQ items', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FaqSection, {
-      props: { block: faqFull },
+      props: faqFull,
     });
 
     expect(html).toContain('Frequently Asked Questions');
@@ -19,7 +19,7 @@ describe('FaqSection', () => {
   test('renders numbered items', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FaqSection, {
-      props: { block: faqFull },
+      props: faqFull,
     });
 
     expect(html).toContain('01');
@@ -29,7 +29,7 @@ describe('FaqSection', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FaqSection, {
-      props: { block: faqMinimal },
+      props: faqMinimal,
     });
     expect(html).toBeDefined();
   });

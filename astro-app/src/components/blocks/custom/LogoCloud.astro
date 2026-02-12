@@ -2,22 +2,23 @@
 import type { LogoCloudBlock } from '@/lib/types';
 import { Section } from '@/components/ui/section';
 
-interface Props {
-  block: LogoCloudBlock;
+interface Props extends LogoCloudBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
+const { heading, sponsors } = Astro.props;
 ---
 
 <Section size="sm" class="bg-muted border-y border-border" data-animate>
-  {block.heading && (
+  {heading && (
     <div class="text-center">
-      <span class="label-caps text-muted-foreground">{block.heading}</span>
+      <span class="label-caps text-muted-foreground">{heading}</span>
     </div>
   )}
 
   <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
-    {block.sponsors?.map((sponsor) => {
+    {sponsors?.map((sponsor) => {
       const logoUrl = sponsor.logo?.asset?.url;
       const content = (
         <div class="bg-muted p-6 flex items-center justify-center h-24 hover:bg-background transition-colors duration-200">

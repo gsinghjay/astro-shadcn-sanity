@@ -7,7 +7,7 @@ describe('CtaBanner', () => {
   test('renders heading, description, and CTA buttons', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(CtaBanner, {
-      props: { block: ctaFull },
+      props: ctaFull,
     });
 
     expect(html).toContain('Ready to Get Started?');
@@ -19,7 +19,7 @@ describe('CtaBanner', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(CtaBanner, {
-      props: { block: ctaMinimal },
+      props: ctaMinimal,
     });
 
     expect(html).toContain('Simple CTA');
@@ -28,7 +28,7 @@ describe('CtaBanner', () => {
   test('omits description when null', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(CtaBanner, {
-      props: { block: ctaMinimal },
+      props: ctaMinimal,
     });
 
     expect(html).not.toContain('opacity-80');

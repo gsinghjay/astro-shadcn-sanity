@@ -4,24 +4,25 @@ import { Section, SectionSplit, SectionContent, SectionMedia } from '@/component
 import { PortableText } from 'astro-portabletext';
 import { stegaClean } from '@sanity/client/stega';
 
-interface Props {
-  block: TextWithImageBlock;
+interface Props extends TextWithImageBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
-const isRight = stegaClean(block.imagePosition) !== 'left';
-const imgSrc = block.image?.asset?.url;
+const { heading, content, image, imagePosition } = Astro.props;
+const isRight = stegaClean(imagePosition) !== 'left';
+const imgSrc = image?.asset?.url;
 ---
 
 <Section data-animate>
   <SectionSplit>
     <SectionContent class="justify-center">
-      {block.heading && (
-        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{block.heading}</h2>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
       )}
-      {block.content && (
+      {content && (
         <div class="text-muted-foreground leading-relaxed prose">
-          <PortableText value={block.content} />
+          <PortableText value={content} />
         </div>
       )}
     </SectionContent>
@@ -30,7 +31,7 @@ const imgSrc = block.image?.asset?.url;
       {imgSrc && (
         <img
           src={imgSrc}
-          alt={block.image?.alt || block.heading || ''}
+          alt={image?.alt || heading || ''}
           class="w-full h-full object-cover"
           loading="lazy"
         />

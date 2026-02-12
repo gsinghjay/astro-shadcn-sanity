@@ -3,23 +3,24 @@ import type { FaqSectionBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 
-interface Props {
-  block: FaqSectionBlock;
+interface Props extends FaqSectionBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
+const { heading, items } = Astro.props;
 ---
 
 <Section data-animate>
   <SectionSplit>
     <SectionContent>
-      {block.heading && (
-        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{block.heading}</h2>
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{heading}</h2>
       )}
     </SectionContent>
 
     <Accordion>
-      {(block.items ?? []).map((item, i) => (
+      {(items ?? []).map((item, i) => (
         <AccordionItem>
           <AccordionTrigger>
             <span class="flex items-start gap-4">

@@ -7,7 +7,7 @@ describe('FeatureGrid', () => {
   test('renders heading and feature items', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FeatureGrid, {
-      props: { block: featureGridFull },
+      props: featureGridFull,
     });
 
     expect(html).toContain('What We Offer');
@@ -19,7 +19,7 @@ describe('FeatureGrid', () => {
   test('renders numbered items', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FeatureGrid, {
-      props: { block: featureGridFull },
+      props: featureGridFull,
     });
 
     expect(html).toContain('01');
@@ -29,7 +29,7 @@ describe('FeatureGrid', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FeatureGrid, {
-      props: { block: featureGridMinimal },
+      props: featureGridMinimal,
     });
     expect(html).toBeDefined();
   });

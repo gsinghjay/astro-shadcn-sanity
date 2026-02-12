@@ -7,7 +7,7 @@ describe('LogoCloud', () => {
   test('renders heading and sponsor logos', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { block: logoCloudFull },
+      props: logoCloudFull,
     });
 
     expect(html).toContain('Trusted By');
@@ -17,7 +17,7 @@ describe('LogoCloud', () => {
   test('renders logo image with sponsor name as alt', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { block: logoCloudFull },
+      props: logoCloudFull,
     });
 
     // LogoCloud uses sponsor.name as alt text
@@ -27,7 +27,7 @@ describe('LogoCloud', () => {
   test('renders sponsor name as fallback when no logo', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { block: logoCloudFull },
+      props: logoCloudFull,
     });
 
     expect(html).toContain('DataLabs');
@@ -36,7 +36,7 @@ describe('LogoCloud', () => {
   test('wraps sponsor in link when website is present', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { block: logoCloudFull },
+      props: logoCloudFull,
     });
 
     expect(html).toContain('https://techcorp.example.com');
@@ -45,7 +45,7 @@ describe('LogoCloud', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { block: logoCloudMinimal },
+      props: logoCloudMinimal,
     });
     expect(html).toBeDefined();
   });

@@ -18,24 +18,25 @@ import {
   TileTitle,
 } from '@/components/ui/tile';
 
-interface Props {
-  block: SponsorStepsBlock;
+interface Props extends SponsorStepsBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
+const { heading, subheading, items, ctaButtons } = Astro.props;
 ---
 
 <Section>
   <SectionContent>
-    {(block.heading || block.subheading) && (
+    {(heading || subheading) && (
       <SectionProse>
-        {block.heading && <h2>{block.heading}</h2>}
-        {block.subheading && <p>{block.subheading}</p>}
+        {heading && <h2>{heading}</h2>}
+        {subheading && <p>{subheading}</p>}
       </SectionProse>
     )}
     <SectionActions>
       {
-        block.ctaButtons?.map((btn, i) => (
+        ctaButtons?.map((btn, i) => (
           <Button variant={i === 0 ? 'default' : 'outline'} href={btn.url}>
             {btn.text}
           </Button>
@@ -46,7 +47,7 @@ const { block } = Astro.props;
       class="before:bg-border relative gap-8 before:absolute before:left-5.5 before:h-full before:w-px before:@5xl:top-5.5 before:@5xl:h-px before:@5xl:w-full"
     >
       {
-        (block.items ?? []).map(({ title, description, list }, i) => (
+        (items ?? []).map(({ title, description, list }, i) => (
           <Tile class="items-start gap-8 gap-x-4 @max-5xl:flex-row">
             <TileMedia variant="icon">{i + 1}</TileMedia>
             <TileContent class="p-0">

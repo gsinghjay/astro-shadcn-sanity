@@ -7,7 +7,7 @@ describe('ContactForm', () => {
   test('renders heading and description', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
-      props: { block: contactFormFull },
+      props: contactFormFull,
     });
 
     expect(html).toContain('Get In Touch');
@@ -17,7 +17,7 @@ describe('ContactForm', () => {
   test('renders form fields', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
-      props: { block: contactFormFull },
+      props: contactFormFull,
     });
 
     expect(html).toContain('Full Name');
@@ -29,7 +29,7 @@ describe('ContactForm', () => {
   test('renders custom success message', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
-      props: { block: contactFormFull },
+      props: contactFormFull,
     });
 
     expect(html).toContain('Thanks! We will be in touch soon.');
@@ -38,7 +38,7 @@ describe('ContactForm', () => {
   test('renders default success message when none provided', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
-      props: { block: contactFormMinimal },
+      props: contactFormMinimal,
     });
 
     expect(html).toContain('Thank you for your inquiry');
@@ -47,7 +47,7 @@ describe('ContactForm', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
-      props: { block: contactFormMinimal },
+      props: contactFormMinimal,
     });
 
     expect(html).toContain('data-contact-form');
