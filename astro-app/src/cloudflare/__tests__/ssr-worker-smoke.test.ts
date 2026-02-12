@@ -93,19 +93,20 @@ const PAGE_MOCK = {
 };
 
 /**
- * SSR Worker Smoke Tests
+ * Worker Smoke Tests (Miniflare)
  *
  * These tests start the built Cloudflare Pages worker inside Miniflare
- * and make real HTTP requests to verify SSR behaviour. They defend
- * against the class of bugs where the worker returns [object Object]
- * instead of HTML (e.g. missing nodejs_compat / disable_nodejs_process_v2).
+ * and make real HTTP requests to verify behaviour. With output: "static"
+ * + server islands (Story 7.4), prerendered pages are served as static
+ * assets via the `assets` binding and the worker handles only
+ * /_server-islands/* requests.
  *
  * Requires: `npm run build --workspace=astro-app` to have run first.
  * In CI the build step runs before test:unit, so these execute naturally.
  */
 const describeIfBuilt = existsSync(DIST) ? describe : describe.skip;
 
-describeIfBuilt("SSR Worker Smoke Tests (Miniflare)", () => {
+describeIfBuilt("Worker Smoke Tests (Miniflare)", () => {
   let mf: Miniflare;
   let mockAgent: ReturnType<typeof createFetchMock>;
 
@@ -149,6 +150,9 @@ describeIfBuilt("SSR Worker Smoke Tests (Miniflare)", () => {
       compatibilityDate: "2025-12-01",
       compatibilityFlags: ["nodejs_compat", "disable_nodejs_process_v2"],
       fetchMock: mockAgent,
+      // Serve prerendered static HTML from dist/ — matches Cloudflare Pages behavior
+      // where the CDN serves static files and the worker handles only dynamic routes
+      assets: { directory: DIST },
     });
   }, 30_000);
 

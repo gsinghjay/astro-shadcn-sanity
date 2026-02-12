@@ -2,6 +2,7 @@
 import type { FaqSectionBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { PortableText } from 'astro-portabletext';
 
 interface Props extends FaqSectionBlock {
   class?: string;
@@ -31,7 +32,9 @@ const { heading, items } = Astro.props;
             </span>
           </AccordionTrigger>
           <AccordionContent>
-            <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>
+            {Array.isArray(item.answer)
+              ? <div class="text-muted-foreground leading-relaxed pl-10 prose"><PortableText value={item.answer} /></div>
+              : <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>}
           </AccordionContent>
         </AccordionItem>
       ))}
