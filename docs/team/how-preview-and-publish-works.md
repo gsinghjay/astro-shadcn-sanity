@@ -1,7 +1,7 @@
 ---
 title: "How Preview & Publish Works"
 description: "A beginner-friendly guide to the dual-deployment architecture, Visual Editing, and the content publishing loop."
-lastUpdated: 2026-02-09
+lastUpdated: 2026-02-11
 ---
 
 # How Preview & Publish Works
@@ -307,17 +307,20 @@ flowchart TD
 
     subgraph Target["Publish Loop (after Story 5.4)"]
         Publish2["Editor publishes content"] --> Webhook["Sanity webhook fires"]
-        Webhook --> Hook["POST to Cloudflare deploy hook"]
-        Hook --> Rebuild["Cloudflare rebuilds production"]
-        Rebuild --> Live["New content is live"]
+        Webhook --> GH["POST to GitHub API\n(repository_dispatch)"]
+        GH --> Actions["GitHub Actions builds site"]
+        Actions --> Deploy["Wrangler deploys to\nCloudflare Pages"]
+        Deploy --> Live["New content is live"]
     end
 ```
 
 ### What Story 5.4 adds
 
-**1. Cloudflare deploy hook** — A secret URL in Cloudflare Pages that triggers a production build when called via HTTP POST. Created in the Cloudflare dashboard under Settings > Builds & deployments > Deploy hooks.
+**1. Sanity webhook** — A GROQ-powered webhook configured at `sanity.io/manage` that fires when a document is published (created, updated, or deleted). It sends an HTTP POST to the GitHub API to trigger a `repository_dispatch` event.
 
-**2. Sanity webhook** — A GROQ-powered webhook configured at `sanity.io/manage` that fires when a document is published (created, updated, or deleted). It sends an HTTP POST to the Cloudflare deploy hook URL.
+**2. GitHub Actions deploy workflow** (`.github/workflows/sanity-deploy.yml`) — A workflow triggered by `repository_dispatch` that builds the Astro site and deploys to Cloudflare Pages via Wrangler.
+
+> **Why not Cloudflare deploy hooks?** Deploy hooks are a Cloudflare Pro feature. The GitHub `repository_dispatch` approach achieves the same result on the free tier by routing through GitHub Actions instead of calling Cloudflare directly.
 
 The webhook has a **filter** that only fires for content types that affect the public site:
 
@@ -339,6 +342,7 @@ sequenceDiagram
     participant Studio as Sanity Studio
     participant CL as Content Lake
     participant Webhook as Sanity Webhook
+    participant GH as GitHub Actions
     participant CF as Cloudflare Pages
     participant Prod as Production Site
 
@@ -349,10 +353,11 @@ sequenceDiagram
     Editor->>Studio: Click "Publish"
     Studio->>CL: Publish document
     CL->>Webhook: Document published event
-    Webhook->>CF: POST deploy hook URL
-    CF->>CF: Rebuild static site from main branch
+    Webhook->>GH: POST repository_dispatch
+    GH->>GH: Build static site (npm run build)
+    GH->>CF: wrangler pages deploy
     CF->>Prod: Deploy new HTML files
-    Note over Prod: New content is live
+    Note over Prod: New content is live (~2-3 min)
 ```
 
 ## Two Bugs Story 5.4 Fixes in Code
@@ -411,7 +416,7 @@ A simple rename. The behavior is identical — `"drafts"` is the new name for th
 | **Cloudflare Worker** | A serverless function that runs on Cloudflare's edge network. Executes the SSR rendering code for the preview site. |
 | **Content Lake** | Sanity's hosted database where all content (documents, images, settings) is stored. |
 | **CSP (Content Security Policy)** | A browser security feature that restricts which external resources a page can load (scripts, images, etc.). |
-| **Deploy hook** | A secret URL that triggers a build when called via HTTP POST. No authentication beyond knowing the URL. |
+| **Deploy hook** | A secret URL that triggers a build when called via HTTP POST. Cloudflare deploy hooks require a Pro plan; this project uses GitHub `repository_dispatch` instead. |
 | **Draft** | An unpublished version of a document in Sanity. Only visible through authenticated API calls with the `drafts` perspective. |
 | **GROQ** | Sanity's query language (Graph-Relational Object Queries). Similar to SQL but designed for JSON documents. |
 | **Perspective** | The "lens" through which you query Sanity content. `"published"` returns only published documents. `"drafts"` returns drafts, falling back to published versions. |

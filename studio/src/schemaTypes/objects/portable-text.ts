@@ -22,7 +22,7 @@ export const portableText = defineType({
           {title: 'Underline', value: 'underline'},
         ],
         annotations: [
-          {
+          defineArrayMember({
             name: 'link',
             type: 'object',
             title: 'External Link',
@@ -35,8 +35,8 @@ export const portableText = defineType({
                   Rule.uri({scheme: ['http', 'https', 'mailto', 'tel']}),
               }),
             ],
-          },
-          {
+          }),
+          defineArrayMember({
             name: 'internalLink',
             type: 'object',
             title: 'Internal Link',
@@ -48,7 +48,7 @@ export const portableText = defineType({
                 to: [{type: 'page'}],
               }),
             ],
-          },
+          }),
         ],
       },
       lists: [

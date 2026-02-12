@@ -2,16 +2,17 @@
 import type { RichTextBlock } from '@/lib/types';
 import { Section, SectionProse } from '@/components/ui/section';
 
-interface Props {
-  block: RichTextBlock;
+interface Props extends RichTextBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
+const { content } = Astro.props;
 ---
 
 <Section data-animate>
   <SectionProse>
-    {(block.content ?? []).map((b) => {
+    {(content ?? []).map((b) => {
       if (b._type !== 'block') return null;
       const text = (b.children ?? []).map((c) => c.text).join('');
       switch (b.style) {

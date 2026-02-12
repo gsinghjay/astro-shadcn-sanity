@@ -7,7 +7,7 @@ describe('StatsRow', () => {
   test('renders stats values and labels', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {
-      props: { block: statsFull },
+      props: statsFull,
     });
 
     expect(html).toContain('500+');
@@ -21,7 +21,7 @@ describe('StatsRow', () => {
   test('renders heading when present', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {
-      props: { block: statsFull },
+      props: statsFull,
     });
 
     expect(html).toContain('Our Impact');
@@ -30,7 +30,7 @@ describe('StatsRow', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {
-      props: { block: statsMinimal },
+      props: statsMinimal,
     });
     expect(html).toBeDefined();
   });

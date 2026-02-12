@@ -7,7 +7,7 @@ describe('SponsorCards', () => {
   test('renders heading and sponsor names', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsFull },
+      props: sponsorCardsFull,
     });
 
     expect(html).toContain('Our Sponsors');
@@ -18,7 +18,7 @@ describe('SponsorCards', () => {
   test('renders tier badges', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsFull },
+      props: sponsorCardsFull,
     });
 
     expect(html).toContain('gold');
@@ -28,7 +28,7 @@ describe('SponsorCards', () => {
   test('renders sponsor description and website link', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsFull },
+      props: sponsorCardsFull,
     });
 
     expect(html).toContain('Leading technology partner');
@@ -39,7 +39,7 @@ describe('SponsorCards', () => {
   test('renders logo image when available', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsFull },
+      props: sponsorCardsFull,
     });
 
     expect(html).toContain('Acme logo');
@@ -48,7 +48,7 @@ describe('SponsorCards', () => {
   test('renders initials fallback when no logo', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsFull },
+      props: sponsorCardsFull,
     });
 
     // Beta Inc has no logo — should show initials "BI"
@@ -58,7 +58,7 @@ describe('SponsorCards', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorCards, {
-      props: { block: sponsorCardsMinimal },
+      props: sponsorCardsMinimal,
     });
     expect(html).toBeDefined();
   });

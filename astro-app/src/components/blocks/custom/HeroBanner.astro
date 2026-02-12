@@ -4,19 +4,20 @@ import { Section, SectionContent, SectionActions } from '@/components/ui/section
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 
-interface Props {
-  block: HeroBannerBlock;
+interface Props extends HeroBannerBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
-const isCentered = stegaClean(block.alignment) === 'center';
-const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
+const { heading, subheading, ctaButtons, backgroundImages, alignment } = Astro.props;
+const isCentered = stegaClean(alignment) === 'center';
+const hasCarousel = backgroundImages && backgroundImages.length > 0;
 ---
 
 <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
   {hasCarousel && (
     <div class="hero-carousel absolute inset-0" data-carousel>
-      {block.backgroundImages?.map((image, index) => (
+      {backgroundImages?.map((image, index) => (
         <div
           class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
           data-slide={index}
@@ -31,7 +32,7 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
         </div>
       ))}
       <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {block.backgroundImages?.map((_, index) => (
+        {backgroundImages?.map((_, index) => (
           <button
             class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
             data-dot={index}
@@ -45,18 +46,18 @@ const hasCarousel = block.backgroundImages && block.backgroundImages.length > 0;
 
   <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
     <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
-      {block.heading}
+      {heading}
     </h1>
 
-    {block.subheading && (
+    {subheading && (
       <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
-        {block.subheading}
+        {subheading}
       </p>
     )}
 
-    {block.ctaButtons && block.ctaButtons.length > 0 && (
+    {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions class={isCentered ? 'justify-center' : ''}>
-        {block.ctaButtons.map((btn, i) => (
+        {ctaButtons.map((btn, i) => (
           <Button
             href={btn.url}
             variant={i === 0 ? 'default' : (btn.variant || 'outline')}

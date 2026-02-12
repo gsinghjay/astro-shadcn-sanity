@@ -7,7 +7,7 @@ describe('RichText', () => {
   test('renders h2 blocks', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(RichText, {
-      props: { block: richTextFull },
+      props: richTextFull,
     });
 
     // Astro adds data-astro-source-* attributes, so match content not exact tags
@@ -17,7 +17,7 @@ describe('RichText', () => {
   test('renders h3 blocks', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(RichText, {
-      props: { block: richTextFull },
+      props: richTextFull,
     });
 
     expect(html).toMatch(/<h3[^>]*>Our Values<\/h3>/);
@@ -26,7 +26,7 @@ describe('RichText', () => {
   test('renders normal paragraphs', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(RichText, {
-      props: { block: richTextFull },
+      props: richTextFull,
     });
 
     expect(html).toContain('We empower women in technology.');
@@ -35,7 +35,7 @@ describe('RichText', () => {
   test('handles null content without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(RichText, {
-      props: { block: richTextMinimal },
+      props: richTextMinimal,
     });
     expect(html).toBeDefined();
   });

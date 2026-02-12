@@ -7,7 +7,7 @@ import {schemaTypes} from './src/schemaTypes'
 import {resolve} from './src/presentation/resolve'
 
 // Environment variables for project configuration
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || 'your-projectID'
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '<your project ID>'
 const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 
 // Singleton document types — only one instance allowed

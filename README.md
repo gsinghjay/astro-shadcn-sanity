@@ -91,7 +91,11 @@ astro-shadcn-sanity/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── ui/           # fulldev/ui primitives (installed via shadcn CLI)
-│   │   │   ├── blocks/       # Block components (compose from ui/ primitives)
+│   │   │   ├── blocks/       # Block components
+│   │   │   │   ├── custom/   # Custom blocks with business logic (11)
+│   │   │   │   └── *.astro   # fulldev/ui template blocks (100+ variants)
+│   │   │   ├── block-registry.ts  # Unified block map (auto-discovers all blocks)
+│   │   │   ├── BlockRenderer.astro # Single dispatch: allBlocks[_type] → spread props
 │   │   │   └── *.astro       # Layout components (Header, Footer, etc.)
 │   │   ├── layouts/          # Base HTML layout
 │   │   ├── lib/              # Sanity client, GROQ queries, image helpers
@@ -203,7 +207,7 @@ flowchart TD
 
 ### Commit format
 
-```
+```text
 <type>: <description>
 ```
 
@@ -218,29 +222,61 @@ See [docs/team/git-workflow-guide.md](docs/team/git-workflow-guide.md) for the f
 
 ## Block Library
 
-Pages are composed from a flat array of reusable CMS blocks. Each block inherits a shared base schema providing background variant, spacing, and max-width options.
+Pages are composed from a flat array of reusable CMS blocks. All blocks — custom and template — dispatch through a single unified registry with spread props.
 
-### P0 Blocks (MVP)
+```mermaid
+flowchart LR
+    Page["Page (blocks[])"] --> BR["BlockRenderer"]
+    BR --> Reg["block-registry.ts"]
+    Reg -->|"allBlocks[_type]"| BW["BlockWrapper"]
+    BW -->|"<Component {...block} />"| C["Block Component"]
+```
+
+### Block Architecture
+
+| Category | Location | Count | Description |
+|---|---|---|---|
+| Custom blocks | `blocks/custom/` | 11 | Business logic, CMS-connected, Sanity schemas + GROQ projections |
+| Template blocks | `blocks/` | 100+ | [fulldev/ui](https://ui.full.dev) variants, CMS connection in progress |
+
+Both categories use the same flat-props interface (`interface Props extends BlockType`) and are auto-discovered by `block-registry.ts` — no manual registration required.
+
+### Custom Blocks (CMS-Connected)
 
 | Block | Description |
 |---|---|
-| Hero Banner | Heading, subheading, optional background image, CTA buttons, configurable alignment |
+| Hero Banner | Heading, subheading, optional background image carousel, CTA buttons, configurable alignment |
 | Feature Grid | Icon/image + title + description cards in configurable column layouts |
-| Sponsor Cards | Sponsor documents with tier badges |
+| Sponsor Cards | Sponsor documents with tier badges and display modes |
 | Rich Text | Portable Text with inline images and callout boxes |
-| CTA Banner | Heading, description, and action buttons |
-| FAQ Accordion | Expandable question/answer pairs with keyboard accessibility |
+| CTA Banner | Heading, description, and action buttons with variant-aware styling |
+| FAQ Section | Expandable question/answer pairs with keyboard accessibility |
 | Contact Form | Configurable fields with server-side submission via Cloudflare Worker |
-| Timeline | Date-ordered milestones with current-phase highlighting |
+| Stats Row | Heading + stat cards with dark/light variant support |
+| Text with Image | Portable text content alongside a positioned image |
 | Logo Cloud | Sponsor logos from sponsor documents |
+| Sponsor Steps | Numbered step-by-step process cards |
 
-### P1 Blocks (Growth)
+### Template Blocks (fulldev/ui)
 
-Tabbed Content, Testimonials, Stats Row, Data Table, Team Grid, CarouselWrapper
+102 pre-built design variants across 12 categories, installed via `npx shadcn@latest add @fulldev/{name}`:
 
-### P2 Blocks (Expansion)
+| Category | Variants | Examples |
+|---|---|---|
+| Heroes | 14 | `hero-1` through `hero-14` — headline + CTA + image layouts |
+| Features | 6 | `features-1` through `features-6` — icon/card grid layouts |
+| Content | 6 | `content-1` through `content-6` — text + image sections |
+| CTA | 8 | `cta-1` through `cta-8` — call-to-action banners |
+| Pricing | 3 | `pricings-1` through `pricings-3` — tier comparison cards |
+| Reviews | 5 | `reviews-1` through `reviews-5` — testimonial layouts |
+| Services | 7 | `services-1` through `services-7` — service card grids |
+| Articles | 6 | `article-1`, `article-2`, `articles-1` through `articles-4` |
+| Media | 9 | `logos-*`, `images-*`, `video-*`, `videos-*` |
+| Navigation | 6 | `header-1` through `header-3`, `footer-1` through `footer-3` |
+| FAQ/Steps | 7 | `faqs-1` through `faqs-4`, `steps-1` through `steps-3` |
+| Misc | 25 | `banner-*`, `stats-*`, `contact-*`, `links-*`, `table-1`, etc. |
 
-Image Gallery, Video Embed, Alert/Notice
+These blocks have Storybook stories with demo data. Sanity schema + GROQ projection wiring is tracked in Stories 2.4–2.8. See [fulldev/ui to Sanity Conversion Guide](docs/team/fulldev-ui-to-sanity-conversion-guide.md).
 
 ## Content Model
 
@@ -311,9 +347,13 @@ erDiagram
 
 ## Adding a New Block
 
-Every block follows this checklist:
+There are two paths depending on the block type.
 
-### 1. Create the Sanity schema
+### Path A: New Custom Block (with business logic)
+
+Use this when you need custom rendering logic, Sanity document references, or Portable Text.
+
+#### 1. Create the Sanity schema
 
 Use the `defineBlock` helper (merges shared base fields automatically):
 
@@ -330,19 +370,19 @@ export const yourBlock = defineBlock({
 })
 ```
 
-### 2. Register the schema
+#### 2. Register the schema
 
 Add to `studio/src/schemaTypes/index.ts` and the page schema's `blocks[]` array.
 
-### 3. Install needed fulldev/ui primitives
+#### 3. Install needed fulldev/ui primitives
 
 ```bash
 npx shadcn@latest add @fulldev/button @fulldev/badge  # whatever the block needs
 ```
 
-### 4. Create the Astro component
+#### 4. Create the Astro component
 
-Compose from fulldev/ui primitives in `src/components/ui/`:
+All blocks use the flat-props pattern — `interface Props extends YourBlockType`:
 
 ```astro
 ---
@@ -350,28 +390,45 @@ Compose from fulldev/ui primitives in `src/components/ui/`:
 import type { YourBlockBlock } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 
-interface Props {
-  block: YourBlockBlock
+interface Props extends YourBlockBlock {
+  class?: string
+  id?: string
 }
 
-const { block } = Astro.props
+const { heading, description, ctaButtons, backgroundVariant } = Astro.props
 ---
 
 <section>
-  <h2>{block.heading}</h2>
+  <h2>{heading}</h2>
   <!-- Compose from ui/ primitives + Tailwind utilities -->
 </section>
 ```
 
-### 5. Register in BlockRenderer
+The component is auto-discovered by `block-registry.ts` — no manual registration needed. The filename determines the `_type` mapping: `YourBlock.astro` maps to `yourBlock`.
 
-Add the import and case in `BlockRenderer.astro`.
+#### 5. Add GROQ projection
 
-### 6. Add GROQ projection
-
-Add the type-specific projection in `src/lib/sanity.ts`.
+Add the type-specific projection in `src/lib/sanity.ts`. Run `npm run typegen` to generate types.
 
 Build and verify Lighthouse scores hold at 90+.
+
+### Path B: Wire a fulldev/ui Template Block to Sanity
+
+Use this when connecting an existing `blocks/*.astro` template to the CMS. The `.astro` component stays unchanged — you only add the data pipeline.
+
+#### 1. Create the Sanity schema
+
+Map the component's `Props` interface to Sanity field types. The GROQ projection reshapes Sanity's structured data back to match the component's expected props:
+
+```text
+Sanity Schema (structured) → GROQ Projection (adapter) → Component Props (flat)
+```
+
+#### 2. Register schema + add GROQ projection + run TypeGen
+
+See [fulldev/ui to Sanity Conversion Guide](docs/team/fulldev-ui-to-sanity-conversion-guide.md) for the full 7-step process and patterns for images, links, nested arrays, and more.
+
+**Files touched per block:** 4 (schema file, schema index, page schema, GROQ query). No `.astro` changes.
 
 ## Testing
 
@@ -444,7 +501,14 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 
 - **Sanity schemas:** TypeScript with `defineBlock` helper (blocks) or `defineType`/`defineField` (documents)
 - **UI primitives:** fulldev/ui components in `src/components/ui/` — install via `npx shadcn@latest add @fulldev/{name}`
-- **Block components:** `.astro` files in `src/components/blocks/custom/` composing from `ui/` primitives
+- **Custom block components:** `.astro` files in `src/components/blocks/custom/` composing from `ui/` primitives
+- **Template block components:** `.astro` files in `src/components/blocks/` — fulldev/ui variants installed via shadcn CLI
+- **Block dispatch:** Single unified registry (`block-registry.ts`) auto-discovers all blocks — no switch statements or manual registration
+- **Block props pattern:** All blocks receive flat spread props (`<Component {...block} />`). Extend the block type directly:
+  ```typescript
+  interface Props extends YourBlockType { class?: string; id?: string }
+  const { heading, description, backgroundVariant } = Astro.props  // direct access, not block.heading
+  ```
 - **Styling:** Tailwind v4 utility classes, CSS-first config in `global.css`, no `tailwind.config.mjs`
 - **Interactivity:** Vanilla JS with data-attribute driven event delegation, each handler under 50 lines
 - **Block architecture:** Flat array only — no nested blocks
@@ -458,6 +522,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | [Onboarding Guide](docs/team/onboarding-guide.md) | First day setup |
 | [Cloudflare Setup Guide](docs/team/cloudflare-setup-guide.md) | Deployment and environment variables |
 | [How Preview & Publish Works](docs/team/how-preview-and-publish-works.md) | Visual Editing and draft content |
+| [fulldev/ui to Sanity Conversion Guide](docs/team/fulldev-ui-to-sanity-conversion-guide.md) | Wiring template blocks to the CMS (Stories 2.4–2.8) |
 
 ## Team
 
@@ -466,6 +531,8 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | Jay Singh | [@gsinghjay](https://github.com/gsinghjay) | Project Lead |
 | Roberson Sanchez | [@ras242](https://github.com/ras242)| - |
 | Sahil Parmar |[@SahilP20](https://github.com/SahilP20)| Discord Bot Dev |
+| Aryaan Panda |[@panzemary](https://github.com/panzemary)| - |
+| Mohsin Imtiaz | [@mi329-gif](https://github.com/mi329-gif) | Team Member |
 | | | |
 | | | |
 | | | |
@@ -483,6 +550,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 - [Cloudflare Pages documentation](https://developers.cloudflare.com/pages/)
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [semantic-release documentation](https://semantic-release.gitbook.io/)
+- [Storybook documentation](https://storybook.js.org/docs)
 - [Keep a Changelog](https://keepachangelog.com/)
 
 ## License

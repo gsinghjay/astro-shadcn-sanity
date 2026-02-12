@@ -192,6 +192,84 @@ Run a Lighthouse audit on the deployed site:
 
 ---
 
+## 10. Set Up Sanity Webhook (Auto-Rebuild on Publish)
+
+When an editor publishes content in Sanity Studio, the production site should automatically rebuild. Cloudflare Pages only auto-builds on **code pushes** — it has no way to know when content changes in Sanity. Cloudflare deploy hooks (which would solve this) require a **Pro plan**, so this project uses a free-tier alternative: **Sanity webhook → GitHub `repository_dispatch` → GitHub Actions builds the site with fresh Sanity content → Wrangler deploys to Cloudflare Pages**.
+
+### 10a. Create a GitHub Fine-Grained PAT
+
+The Sanity webhook needs a token to call the GitHub API.
+
+1. Go to [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta) → **Generate new token**
+2. Configure:
+   - **Token name:** `Sanity Webhook`
+   - **Expiration:** 90 days (or longer — set a calendar reminder to rotate)
+   - **Repository access:** **Only select repositories** → pick `gsinghjay/astro-shadcn-sanity`
+   - **Permissions → Repository permissions:** **Contents** → **Read and write** (required for `repository_dispatch`)
+3. Click **Generate token** and copy it immediately
+
+![GitHub fine-grained PAT setup for Sanity webhook](../screenshots/create-pat-for-sanity-webhook.jpeg)
+
+### 10b. Configure the Sanity Webhook
+
+1. Go to [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks** → **Add webhook**
+2. Fill in:
+
+| Field | Value |
+|---|---|
+| **Name** | `Trigger production rebuild` |
+| **URL** | `https://api.github.com/repos/gsinghjay/astro-shadcn-sanity/dispatches` |
+| **Trigger on** | Create, Update, Delete |
+| **Filter** | `_type in ["page", "siteSettings", "sponsor", "project", "team", "event"]` |
+| **Drafts** | OFF (only fire on publish, not every keystroke) |
+| **HTTP method** | POST |
+| **HTTP Headers** | `Authorization` : `token YOUR_GITHUB_PAT` (see warning below) |
+| **HTTP Headers** | `Accept` : `application/vnd.github+json` |
+| **Projection** | `{"event_type": "sanity-content-published"}` |
+| **Secret** | Add a secret string for audit trail |
+
+3. Enable the webhook and save
+
+> **Critical: The Authorization header value must be the word `token`, a space, then your PAT.**
+> For example: `token github_pat_XXXXXXXXXXXX`. Do **not** paste the PAT alone — GitHub returns `401 Requires authentication` if the `token ` prefix is missing. Do **not** use `Bearer` — that is a different auth scheme and will also fail.
+
+**Before** (empty Authorization value — returns 401):
+
+![Sanity webhook before PAT is set](../screenshots/sanity-studio-webhook-before.jpeg)
+
+**After** (PAT set correctly — returns 204):
+
+![Sanity webhook with PAT configured](../screenshots/sanity-studio-webhook-after.jpeg)
+
+### 10c. How It Works
+
+The GitHub Actions workflow (`.github/workflows/sanity-deploy.yml`) listens for the `sanity-content-published` `repository_dispatch` event:
+
+```
+Editor publishes in Studio
+  → Sanity Content Lake fires GROQ webhook
+    → POST to GitHub API (repository_dispatch)
+      → GitHub Actions: checkout → npm ci → build → wrangler pages deploy
+        → Production site updated (~2-3 min)
+```
+
+### 10d. Verify
+
+1. Publish a content change in Sanity Studio
+2. Check **sanity.io/manage** → Webhooks → your webhook → **Attempts** tab → should show `204 No Content`
+3. Check **GitHub** → **Actions** tab → **Sanity Content Deploy** workflow should be running
+4. After the workflow completes, verify the production site shows the updated content
+
+### 10e. Troubleshooting
+
+- **Webhook shows 401/403:** Most commonly, the Authorization header value is missing the `token ` prefix (it must be `token github_pat_...`, not just `github_pat_...`). If the prefix is correct, the PAT may be expired or missing **Contents: Read and write** permission on the correct repo.
+- **Webhook shows 404:** The URL is wrong. Verify the repo owner/name: `gsinghjay/astro-shadcn-sanity`.
+- **Webhook shows 422:** The projection body is malformed. It must be valid JSON: `{"event_type": "sanity-content-published"}`.
+- **GitHub Actions workflow doesn't appear:** The workflow file must exist on the `main` branch. Merge the branch containing `sanity-deploy.yml` first.
+- **Build fails in the workflow:** Check that `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and the `PUBLIC_SANITY_*` variables are all configured in GitHub (same as section 6).
+
+---
+
 ## Quick Reference: One-Shot Local Test
 
 ```bash

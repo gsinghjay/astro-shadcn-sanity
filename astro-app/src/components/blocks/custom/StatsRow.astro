@@ -3,12 +3,13 @@ import type { StatsRowBlock } from '@/lib/types';
 import { Section } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 
-interface Props {
-  block: StatsRowBlock;
+interface Props extends StatsRowBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
-const isDark = stegaClean(block.backgroundVariant) === 'dark';
+const { heading, stats, backgroundVariant } = Astro.props;
+const isDark = stegaClean(backgroundVariant) === 'dark';
 ---
 
 <Section
@@ -16,11 +17,11 @@ const isDark = stegaClean(block.backgroundVariant) === 'dark';
   class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
   data-animate
 >
-  {block.heading && (
-    <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{block.heading}</h2>
+  {heading && (
+    <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
   )}
   <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-    {(block.stats ?? []).map((stat) => (
+    {(stats ?? []).map((stat) => (
       <div class="text-center">
         <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
           {stat.value}
