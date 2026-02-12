@@ -25,6 +25,7 @@
     "@portabletext/to-html": "^5.0.1",
     "@sanity/astro": "^3.2.11",
     "@sanity/image-url": "^1.2.0",
+    "@sanity/visual-editing": "^5.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "astro": "^5.17.1",
