@@ -83,6 +83,7 @@ export const siteSettings = defineType({
       of: [
         defineArrayMember({
           type: 'object',
+          preview: {select: {title: 'label'}},
           fields: [
             defineField({
               name: 'label',
@@ -110,6 +111,7 @@ export const siteSettings = defineType({
               of: [
                 defineArrayMember({
                   type: 'object',
+                  preview: {select: {title: 'label'}},
                   fields: [
                     defineField({
                       name: 'label',
@@ -162,6 +164,7 @@ export const siteSettings = defineType({
       of: [
         defineArrayMember({
           type: 'object',
+          preview: {select: {title: 'platform'}},
           fields: [
             defineField({
               name: 'platform',
@@ -211,6 +214,7 @@ export const siteSettings = defineType({
       of: [
         defineArrayMember({
           type: 'object',
+          preview: {select: {title: 'label'}},
           fields: [
             defineField({
               name: 'label',
@@ -236,6 +240,7 @@ export const siteSettings = defineType({
       of: [
         defineArrayMember({
           type: 'object',
+          preview: {select: {title: 'label'}},
           fields: [
             defineField({
               name: 'label',
@@ -267,6 +272,7 @@ export const siteSettings = defineType({
       of: [
         defineArrayMember({
           type: 'object',
+          preview: {select: {title: 'label'}},
           fields: [
             defineField({
               name: 'label',
