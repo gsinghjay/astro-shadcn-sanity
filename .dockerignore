@@ -1,0 +1,38 @@
+# Dependencies (reinstalled inside container)
+node_modules/
+
+# Build artifacts
+**/dist/
+**/.astro/
+astro-app/storybook-static/
+
+# Git
+.git/
+
+# Test artifacts
+test-results/
+playwright-report/
+
+# Env files (secrets — NOT for image builds)
+.env
+.env.*
+!*.env.example
+
+# Documentation
+**/*.md
+docs/
+
+# BMAD framework
+_bmad/
+_bmad-output/
+
+# Claude Code
+.claude/
+
+# Misc
+.DS_Store
+.vercel
+*.pem
+*.tsbuildinfo
+.playwright-mcp/
+.repomixignore
