@@ -12,6 +12,7 @@ const projectId = env.PUBLIC_SANITY_STUDIO_PROJECT_ID || process.env.PUBLIC_SANI
 const dataset = env.PUBLIC_SANITY_STUDIO_DATASET || process.env.PUBLIC_SANITY_STUDIO_DATASET || env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || "production";
 const isVisualEditing = (env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED) === "true";
 const siteUrl = env.PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || "http://localhost:4321";
+const studioUrl = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 
 export default defineConfig({
   output: isVisualEditing ? "server" : "static",
@@ -27,7 +28,7 @@ export default defineConfig({
       useCdn: false,
       apiVersion: "2025-03-01",
       stega: {
-        studioUrl: "https://ywcccapstone.sanity.studio",
+        studioUrl,
       },
     }),
     react(),
