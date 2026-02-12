@@ -7,7 +7,7 @@ describe('HeroBanner', () => {
   test('renders heading and subheading', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroFull },
+      props: heroFull,
     });
 
     expect(html).toContain('Welcome to YWCC');
@@ -17,7 +17,7 @@ describe('HeroBanner', () => {
   test('renders CTA buttons with links', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroFull },
+      props: heroFull,
     });
 
     expect(html).toContain('Get Started');
@@ -29,7 +29,7 @@ describe('HeroBanner', () => {
   test('renders background images in carousel', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroFull },
+      props: heroFull,
     });
 
     expect(html).toContain('data-carousel');
@@ -39,7 +39,7 @@ describe('HeroBanner', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroMinimal },
+      props: heroMinimal,
     });
 
     expect(html).toContain('Minimal Hero');
@@ -49,7 +49,7 @@ describe('HeroBanner', () => {
   test('omits subheading when null', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroMinimal },
+      props: heroMinimal,
     });
 
     // Subheading paragraph should not render
@@ -59,7 +59,7 @@ describe('HeroBanner', () => {
   test('omits CTA section when no buttons', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {
-      props: { block: heroMinimal },
+      props: heroMinimal,
     });
 
     expect(html).not.toContain('Get Started');

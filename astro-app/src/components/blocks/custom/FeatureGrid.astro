@@ -3,24 +3,25 @@ import type { FeatureGridBlock } from '@/lib/types';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
 
-interface Props {
-  block: FeatureGridBlock;
+interface Props extends FeatureGridBlock {
+  class?: string;
+  id?: string;
 }
 
-const { block } = Astro.props;
-const cols = block.columns || 3;
+const { heading, columns, items } = Astro.props;
+const cols = columns || 3;
 const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
 ---
 
 <Section data-animate>
-  {block.heading && (
+  {heading && (
     <SectionContent class="max-w-3xl">
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{block.heading}</h2>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
     </SectionContent>
   )}
 
   <SectionGrid size={gridSize}>
-    {(block.items ?? []).map((feature, i) => (
+    {(items ?? []).map((feature, i) => (
       <Tile variant="floating">
         <TileContent>
           <div class="flex items-center gap-3">

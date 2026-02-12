@@ -1,0 +1,39 @@
+---
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  backgroundVariant?: string | null;
+  spacing?: string | null;
+  maxWidth?: string | null;
+}
+
+const { backgroundVariant, spacing, maxWidth } = Astro.props;
+
+const bg = stegaClean(backgroundVariant) ?? 'white';
+const sp = stegaClean(spacing) ?? 'default';
+const mw = stegaClean(maxWidth) ?? 'default';
+
+const bgClasses: Record<string, string> = {
+  white: '',
+  light: 'bg-muted',
+  dark: 'bg-foreground text-background',
+  primary: 'bg-primary text-primary-foreground',
+};
+
+const spacingClasses: Record<string, string> = {
+  none: 'py-0',
+  small: 'py-4',
+  default: '',
+  large: 'py-8',
+};
+
+const maxWidthClasses: Record<string, string> = {
+  narrow: 'max-w-4xl mx-auto',
+  default: '',
+  full: 'max-w-full',
+};
+---
+
+<div class:list={[bgClasses[bg], spacingClasses[sp], maxWidthClasses[mw]]}>
+  <slot />
+</div>

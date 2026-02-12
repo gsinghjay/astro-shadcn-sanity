@@ -7,7 +7,7 @@ describe('SponsorSteps', () => {
   test('renders heading and subheading', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
-      props: { block: sponsorStepsFull },
+      props: sponsorStepsFull,
     });
 
     expect(html).toContain('How to Become a Sponsor');
@@ -17,7 +17,7 @@ describe('SponsorSteps', () => {
   test('renders step items with titles and descriptions', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
-      props: { block: sponsorStepsFull },
+      props: sponsorStepsFull,
     });
 
     expect(html).toContain('Choose a Tier');
@@ -28,7 +28,7 @@ describe('SponsorSteps', () => {
   test('renders list items within steps', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
-      props: { block: sponsorStepsFull },
+      props: sponsorStepsFull,
     });
 
     expect(html).toContain('Platinum');
@@ -40,7 +40,7 @@ describe('SponsorSteps', () => {
   test('renders CTA buttons', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
-      props: { block: sponsorStepsFull },
+      props: sponsorStepsFull,
     });
 
     expect(html).toContain('Get Started');
@@ -50,7 +50,7 @@ describe('SponsorSteps', () => {
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
-      props: { block: sponsorStepsMinimal },
+      props: sponsorStepsMinimal,
     });
     expect(html).toBeDefined();
   });

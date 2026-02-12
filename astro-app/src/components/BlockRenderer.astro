@@ -1,6 +1,7 @@
 ---
 import type { PageBlock } from '@/lib/types';
-import { customBlocks, uiBlocks } from './block-registry';
+import { allBlocks } from './block-registry';
+import BlockWrapper from './blocks/BlockWrapper.astro';
 
 interface Props {
   blocks: PageBlock[];
@@ -10,19 +11,7 @@ const { blocks } = Astro.props;
 ---
 
 {blocks.map((block) => {
-  const type = (block as any)._type;
-
-  // Custom blocks (block prop pattern)
-  const CustomComponent = customBlocks[type];
-  if (CustomComponent) {
-    return <CustomComponent block={block} />;
-  }
-
-  // fulldotdev/ui blocks (spread props pattern)
-  const UiComponent = uiBlocks[type];
-  if (UiComponent) {
-    return <UiComponent {...(block as any)} />;
-  }
-
-  return null;
+  const Component = allBlocks[(block as any)._type];
+  if (!Component) return null;
+  return <BlockWrapper backgroundVariant={(block as any).backgroundVariant} spacing={(block as any).spacing} maxWidth={(block as any).maxWidth}><Component {...(block as any)} /></BlockWrapper>;
 })}

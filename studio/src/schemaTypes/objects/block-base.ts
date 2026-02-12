@@ -5,6 +5,7 @@ export const blockBaseFields = [
     name: 'backgroundVariant',
     title: 'Background Variant',
     type: 'string',
+    fieldset: 'layout',
     options: {
       list: ['white', 'light', 'dark', 'primary'],
       layout: 'radio',
@@ -15,6 +16,7 @@ export const blockBaseFields = [
     name: 'spacing',
     title: 'Spacing',
     type: 'string',
+    fieldset: 'layout',
     options: {
       list: ['none', 'small', 'default', 'large'],
       layout: 'radio',
@@ -25,6 +27,7 @@ export const blockBaseFields = [
     name: 'maxWidth',
     title: 'Max Width',
     type: 'string',
+    fieldset: 'layout',
     options: {
       list: ['narrow', 'default', 'full'],
       layout: 'radio',
