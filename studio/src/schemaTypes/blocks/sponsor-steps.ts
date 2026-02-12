@@ -22,31 +22,7 @@ export const sponsorSteps = defineBlock({
       name: 'items',
       title: 'Steps',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          preview: {select: {title: 'title'}},
-          fields: [
-            defineField({
-              name: 'title',
-              title: 'Title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'description',
-              title: 'Description',
-              type: 'text',
-            }),
-            defineField({
-              name: 'list',
-              title: 'Bullet Points',
-              type: 'array',
-              of: [defineArrayMember({type: 'string'})],
-            }),
-          ],
-        }),
-      ],
+      of: [defineArrayMember({type: 'stepItem'})],
     }),
     defineField({
       name: 'ctaButtons',

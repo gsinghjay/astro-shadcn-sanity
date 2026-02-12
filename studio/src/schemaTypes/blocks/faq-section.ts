@@ -17,26 +17,7 @@ export const faqSection = defineBlock({
       name: 'items',
       title: 'Items',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          preview: {select: {title: 'question'}},
-          fields: [
-            defineField({
-              name: 'question',
-              title: 'Question',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'answer',
-              title: 'Answer',
-              type: 'portableText',
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
-        }),
-      ],
+      of: [defineArrayMember({type: 'faqItem'})],
     }),
   ],
 })
