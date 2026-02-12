@@ -17,32 +17,7 @@ export const statsRow = defineBlock({
       name: 'stats',
       title: 'Stats',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          preview: {select: {title: 'label', subtitle: 'value'}},
-          fields: [
-            defineField({
-              name: 'value',
-              title: 'Value',
-              type: 'string',
-              description: 'e.g., "50+", "$2M", "98%"',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'description',
-              title: 'Description',
-              type: 'string',
-            }),
-          ],
-        }),
-      ],
+      of: [defineArrayMember({type: 'statItem'})],
     }),
   ],
 })

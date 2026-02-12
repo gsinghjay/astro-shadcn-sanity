@@ -59,22 +59,24 @@ describe('BlockWrapper', () => {
     expect(html).not.toContain('bg-');
   });
 
-  test('maps spacing "large" to py-8', async () => {
+  test('maps spacing "large" to py-20 md:py-24', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'large' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('py-8');
+    expect(html).toContain('py-20');
+    expect(html).toContain('md:py-24');
   });
 
-  test('maps spacing "small" to py-4', async () => {
+  test('maps spacing "small" to py-6 md:py-8', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'small' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('py-4');
+    expect(html).toContain('py-6');
+    expect(html).toContain('md:py-8');
   });
 
   test('maps spacing "none" to py-0', async () => {
@@ -96,13 +98,13 @@ describe('BlockWrapper', () => {
     expect(html).toContain('mx-auto');
   });
 
-  test('maps maxWidth "full" to max-w-full', async () => {
+  test('maps maxWidth "full" to max-w-none', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { maxWidth: 'full' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('max-w-full');
+    expect(html).toContain('max-w-none');
   });
 
   test('all props null defaults gracefully', async () => {

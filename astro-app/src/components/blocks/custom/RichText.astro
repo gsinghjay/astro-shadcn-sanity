@@ -1,6 +1,7 @@
 ---
 import type { RichTextBlock } from '@/lib/types';
 import { Section, SectionProse } from '@/components/ui/section';
+import { PortableText } from 'astro-portabletext';
 
 interface Props extends RichTextBlock {
   class?: string;
@@ -12,15 +13,6 @@ const { content } = Astro.props;
 
 <Section data-animate>
   <SectionProse>
-    {(content ?? []).map((b) => {
-      if (b._type !== 'block') return null;
-      const text = (b.children ?? []).map((c) => c.text).join('');
-      switch (b.style) {
-        case 'h2': return <h2>{text}</h2>;
-        case 'h3': return <h3>{text}</h3>;
-        case 'h4': return <h4>{text}</h4>;
-        default: return <p>{text}</p>;
-      }
-    })}
+    {content && <PortableText value={content} />}
   </SectionProse>
 </Section>

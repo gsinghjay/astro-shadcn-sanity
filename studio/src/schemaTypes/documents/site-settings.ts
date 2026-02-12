@@ -1,5 +1,7 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, ImageIcon, MenuIcon, BlockContentIcon, UsersIcon} from '@sanity/icons'
+import {linkFields} from '../objects/link'
+import {buttonFields} from '../objects/button'
 
 // Singleton document — use desk structure to limit to a single instance
 export const siteSettings = defineType({
@@ -7,23 +9,32 @@ export const siteSettings = defineType({
   title: 'Site Settings',
   type: 'document',
   icon: CogIcon,
+  groups: [
+    {name: 'branding', title: 'Branding', icon: ImageIcon},
+    {name: 'navigation', title: 'Navigation', icon: MenuIcon, default: true},
+    {name: 'footer', title: 'Footer', icon: BlockContentIcon},
+    {name: 'social', title: 'Social & Contact', icon: UsersIcon},
+  ],
   fields: [
     defineField({
       name: 'siteName',
       title: 'Site Name',
       type: 'string',
+      group: 'branding',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'siteDescription',
       title: 'Site Description',
       type: 'text',
+      group: 'branding',
       description: 'Used as the default meta description for the site',
     }),
     defineField({
       name: 'logo',
       title: 'Logo',
       type: 'image',
+      group: 'branding',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -39,6 +50,7 @@ export const siteSettings = defineType({
       name: 'logoLight',
       title: 'Logo (Light Variant)',
       type: 'image',
+      group: 'branding',
       description: 'Light-on-dark variant used in the footer',
       options: {hotspot: true},
       fields: [
@@ -55,54 +67,21 @@ export const siteSettings = defineType({
       name: 'ctaButton',
       title: 'CTA Button',
       type: 'object',
+      group: 'navigation',
       description: 'Call-to-action button shown in the header',
-      fields: [
-        defineField({
-          name: 'text',
-          title: 'Button Text',
-          type: 'string',
-          validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-          name: 'url',
-          title: 'Button URL',
-          type: 'string',
-          validation: (Rule) =>
-            Rule.required().custom((value) => {
-              if (!value) return true
-              if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-              return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-            }),
-        }),
-      ],
+      fields: [...buttonFields],
     }),
     defineField({
       name: 'navigationItems',
       title: 'Navigation Items',
       type: 'array',
+      group: 'navigation',
       of: [
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
           fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              description: 'Relative path (e.g. /about) or full URL (e.g. https://example.com)',
-              validation: (Rule) =>
-                Rule.required().custom((value) => {
-                  if (!value) return true
-                  if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-                  return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-                }),
-            }),
+            ...linkFields,
             defineField({
               name: 'children',
               title: 'Sub-items',
@@ -112,27 +91,7 @@ export const siteSettings = defineType({
                 defineArrayMember({
                   type: 'object',
                   preview: {select: {title: 'label'}},
-                  fields: [
-                    defineField({
-                      name: 'label',
-                      title: 'Label',
-                      type: 'string',
-                      validation: (Rule) => Rule.required(),
-                    }),
-                    defineField({
-                      name: 'href',
-                      title: 'URL',
-                      type: 'string',
-                      description:
-                        'Relative path (e.g. /about) or full URL (e.g. https://example.com)',
-                      validation: (Rule) =>
-                        Rule.required().custom((value) => {
-                          if (!value) return true
-                          if (value.startsWith('/') || /^https?:\/\//.test(value)) return true
-                          return 'Must be a relative path starting with "/" or a full URL starting with "http(s)://"'
-                        }),
-                    }),
-                  ],
+                  fields: [...linkFields],
                 }),
               ],
             }),
@@ -144,6 +103,7 @@ export const siteSettings = defineType({
       name: 'footerContent',
       title: 'Footer Content',
       type: 'object',
+      group: 'footer',
       fields: [
         defineField({
           name: 'text',
@@ -161,6 +121,7 @@ export const siteSettings = defineType({
       name: 'socialLinks',
       title: 'Social Links',
       type: 'array',
+      group: 'social',
       of: [
         defineArrayMember({
           type: 'object',
@@ -188,6 +149,7 @@ export const siteSettings = defineType({
       name: 'contactInfo',
       title: 'Contact Information',
       type: 'object',
+      group: 'social',
       fields: [
         defineField({
           name: 'address',
@@ -210,25 +172,13 @@ export const siteSettings = defineType({
       name: 'footerLinks',
       title: 'Footer Bottom Bar Links',
       type: 'array',
+      group: 'footer',
       description: 'Links shown in the footer bottom bar (e.g., Privacy Policy, Terms)',
       of: [
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),
@@ -236,31 +186,13 @@ export const siteSettings = defineType({
       name: 'resourceLinks',
       title: 'Resource Links',
       type: 'array',
+      group: 'footer',
       description: 'Links shown in the footer Resources section',
       of: [
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'external',
-              title: 'External Link',
-              type: 'boolean',
-              initialValue: false,
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),
@@ -268,25 +200,13 @@ export const siteSettings = defineType({
       name: 'programLinks',
       title: 'Program Links',
       type: 'array',
+      group: 'footer',
       description: 'Links shown in the footer Programs section',
       of: [
         defineArrayMember({
           type: 'object',
           preview: {select: {title: 'label'}},
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'URL',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-          ],
+          fields: [...linkFields],
         }),
       ],
     }),
@@ -294,6 +214,7 @@ export const siteSettings = defineType({
       name: 'currentSemester',
       title: 'Current Semester',
       type: 'string',
+      group: 'social',
       description: 'e.g., "Fall 2026"',
     }),
   ],

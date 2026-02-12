@@ -13,22 +13,6 @@
  */
 
 // Source: schema.json
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type ObjectImage = {
-  asset?: SanityImageAssetReference;
-  media?: unknown; // Unable to locate the referenced type "object.image.media" in schema
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-  _type: "image";
-};
-
 export type SponsorReference = {
   _ref: string;
   _type: "reference";
@@ -66,11 +50,11 @@ export type FaqSection = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  items?: Array<{
-    question?: string;
-    answer?: string;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & FaqItem
+  >;
 };
 
 export type RichText = {
@@ -88,12 +72,11 @@ export type SponsorSteps = {
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
   subheading?: string;
-  items?: Array<{
-    title?: string;
-    description?: string;
-    list?: Array<string>;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & StepItem
+  >;
   ctaButtons?: Array<
     {
       _key: string;
@@ -113,6 +96,13 @@ export type LogoCloud = {
       _key: string;
     } & SponsorReference
   >;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type TextWithImage = {
@@ -139,12 +129,11 @@ export type StatsRow = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  stats?: Array<{
-    value?: string;
-    label?: string;
-    description?: string;
-    _key: string;
-  }>;
+  stats?: Array<
+    {
+      _key: string;
+    } & StatItem
+  >;
 };
 
 export type CtaBanner = {
@@ -167,13 +156,11 @@ export type FeatureGrid = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  items?: Array<{
-    icon?: string;
-    image?: ObjectImage;
-    title?: string;
-    description?: string;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & FeatureItem
+  >;
   columns?: 2 | 3 | 4;
 };
 
@@ -273,13 +260,16 @@ export type SiteSettings = {
   ctaButton?: {
     text?: string;
     url?: string;
+    variant?: "default" | "secondary" | "outline" | "ghost";
   };
   navigationItems?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     children?: Array<{
       label?: string;
       href?: string;
+      external?: boolean;
       _key: string;
     }>;
     _key: string;
@@ -301,6 +291,7 @@ export type SiteSettings = {
   footerLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   resourceLinks?: Array<{
@@ -312,9 +303,45 @@ export type SiteSettings = {
   programLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   currentSemester?: string;
+};
+
+export type StepItem = {
+  _type: "stepItem";
+  title?: string;
+  description?: string;
+  list?: Array<string>;
+};
+
+export type StatItem = {
+  _type: "statItem";
+  value?: string;
+  label?: string;
+  description?: string;
+};
+
+export type FeatureItem = {
+  _type: "featureItem";
+  icon?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  title?: string;
+  description?: string;
+};
+
+export type FaqItem = {
+  _type: "faqItem";
+  question?: string;
+  answer?: PortableText;
 };
 
 export type PageReference = {
@@ -429,6 +456,13 @@ export type Seo = {
   };
 };
 
+export type Link = {
+  _type: "link";
+  label?: string;
+  href?: string;
+  external?: boolean;
+};
+
 export type Button = {
   _type: "button";
   text?: string;
@@ -534,8 +568,6 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | SanityImageAssetReference
-  | ObjectImage
   | SponsorReference
   | SponsorCards
   | ContactForm
@@ -543,6 +575,7 @@ export type AllSanitySchemaTypes =
   | RichText
   | SponsorSteps
   | LogoCloud
+  | SanityImageAssetReference
   | TextWithImage
   | StatsRow
   | CtaBanner
@@ -553,10 +586,15 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Slug
   | SiteSettings
+  | StepItem
+  | StatItem
+  | FeatureItem
+  | FaqItem
   | PageReference
   | PortableText
   | Page
   | Seo
+  | Link
   | Button
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -722,7 +760,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         items: Array<{
           _key: string;
           question: string | null;
-          answer: string | null;
+          answer: PortableText | null;
         }> | null;
       }
     | {
