@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { sanityClient } from "sanity:client";
 
 // Ensure Visual Editing is off for unit tests (getViteConfig loads .env)
@@ -10,7 +10,12 @@ const { loadQuery, getSiteSettings, SITE_SETTINGS_QUERY, ALL_PAGE_SLUGS_QUERY, P
 
 // Reset module state between tests (clears _siteSettingsCache)
 beforeEach(() => {
+  vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
   vi.restoreAllMocks();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 describe("GROQ query definitions", () => {
