@@ -1,6 +1,6 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
-import BlockWrapper from '../blocks/BlockWrapper.astro';
+import BlockWrapper from '../BlockWrapper.astro';
 
 describe('BlockWrapper', () => {
   test('renders slot content', async () => {
