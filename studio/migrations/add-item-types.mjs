@@ -2,9 +2,18 @@
  * Migration: Add _type fields to array items after extracting named object types.
  * Story 7.10: featureGrid items → featureItem, statsRow stats → statItem, sponsorSteps items → stepItem
  */
-import {getCliClient} from 'sanity/cli'
+import {createClient} from '@sanity/client'
+import {config} from 'dotenv'
 
-const client = getCliClient({apiVersion: '2024-01-01'})
+config()
+
+const client = createClient({
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID,
+  dataset: process.env.SANITY_STUDIO_DATASET || 'production',
+  apiVersion: '2024-01-01',
+  token: process.env.SANITY_AUTH_TOKEN,
+  useCdn: false,
+})
 
 const TYPE_MAP = {
   featureGrid: {field: 'items', itemType: 'featureItem'},
