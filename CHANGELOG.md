@@ -1,3 +1,26 @@
+## [1.4.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.3.0...v1.4.0) (2026-02-12)
+
+### Features
+
+* **docker:** add containerized dev environment with Docker Compose ([a5c68a4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a5c68a4c5fd04f359dba07d0fbe04b0d56f2a595))
+* **sanity:** add stegaClean BlockWrapper and Studio UX polish (Story 7-6) ([64111e8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/64111e8e7f2ffb80b00f65cbd1d21067bd1c3e7a))
+
+### Bug Fixes
+
+* **config:** make studioUrl env-driven for local Visual Editing ([28f3dad](https://github.com/gsinghjay/astro-shadcn-sanity/commit/28f3dad3f3ab6134d6b547c4350c41aed0580474))
+
+### Documentation
+
+* add aryaan to team section ([2e5ba64](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2e5ba643ce1084bd23e65e03d121cb5bda3e4fa1))
+* add Mohsin Imtiaz to team section ([de22337](https://github.com/gsinghjay/astro-shadcn-sanity/commit/de2233768e8de2f93565e74e46142255b92d7ed4))
+* add Sanity webhook setup guide with screenshots and update publishing docs ([21dc3e8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/21dc3e84a341a787441672e346f5d1cbc4111af4))
+* update README with unified block dispatch and fulldev/ui library ([f31cf30](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f31cf30517b5254d3ee4f8ce77af3342d8af1c86))
+* updated team docs ([54ecb43](https://github.com/gsinghjay/astro-shadcn-sanity/commit/54ecb432a6ede2e76f9a4091029bd56f3640a880))
+
+### Refactoring
+
+* **blocks:** unify dispatch pattern — all blocks use spread props (Story 2-9) ([cb94d14](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cb94d140d579e5101826877f1d403919f6380620))
+
 ## [1.3.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.2.0...v1.3.0) (2026-02-11)
 
 ### Features
