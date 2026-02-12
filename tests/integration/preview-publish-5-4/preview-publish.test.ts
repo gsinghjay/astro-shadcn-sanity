@@ -80,13 +80,13 @@ describe('Story 5-4: Preview & Publish Architecture', () => {
 
     test('[P0] 5.4-INT-009 — Layout renders VisualEditing component', () => {
       // AC6: The VisualEditing component must be present for overlays and click-to-edit
-      expect(layoutContent).toContain('<VisualEditing')
-      expect(layoutContent).toContain('enabled={visualEditingEnabled}')
+      expect(layoutContent).toContain('<VisualEditingMPA')
+      expect(layoutContent).toContain('client:only="react"')
     })
 
-    test('[P0] 5.4-INT-010 — Layout imports VisualEditing from @sanity/astro', () => {
-      // AC6: Correct import path for the Astro Visual Editing integration
-      expect(layoutContent).toContain('from "@sanity/astro/visual-editing"')
+    test('[P0] 5.4-INT-010 — Layout imports VisualEditing from custom MPA wrapper', () => {
+      // AC6: Custom MPA wrapper adds history adapter for Presentation Tool navigation
+      expect(layoutContent).toContain('from "../components/VisualEditingMPA"')
     })
   })
 
