@@ -68,7 +68,7 @@ export type FaqSection = {
   heading?: string;
   items?: Array<{
     question?: string;
-    answer?: string;
+    answer?: PortableText;
     _key: string;
   }>;
 };
@@ -735,7 +735,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         items: Array<{
           _key: string;
           question: string | null;
-          answer: string | null;
+          answer: PortableText | null;
         }> | null;
       }
     | {

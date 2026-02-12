@@ -31,7 +31,7 @@ export const faqSection = defineBlock({
             defineField({
               name: 'answer',
               title: 'Answer',
-              type: 'text',
+              type: 'portableText',
               validation: (Rule) => Rule.required(),
             }),
           ],

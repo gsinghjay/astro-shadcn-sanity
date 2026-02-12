@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import RichText from '../blocks/custom/RichText.astro';
-import { richTextFull, richTextMinimal } from './__fixtures__/rich-text';
+import { richTextFull, richTextWithMarks, richTextMinimal } from './__fixtures__/rich-text';
 
 describe('RichText', () => {
   test('renders h2 blocks', async () => {
@@ -30,6 +30,24 @@ describe('RichText', () => {
     });
 
     expect(html).toContain('We empower women in technology.');
+  });
+
+  test('renders bold marks as <strong>', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(RichText, {
+      props: richTextWithMarks,
+    });
+
+    expect(html).toMatch(/<strong[^>]*>here<\/strong>/);
+  });
+
+  test('renders link annotations as <a>', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(RichText, {
+      props: richTextWithMarks,
+    });
+
+    expect(html).toMatch(/<a[^>]*href="https:\/\/example\.com"[^>]*>our site<\/a>/);
   });
 
   test('handles null content without crashing', async () => {
