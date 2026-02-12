@@ -11,13 +11,6 @@ interface Props extends CtaBannerBlock {
 
 const { heading, description, ctaButtons, backgroundVariant } = Astro.props;
 
-const bgMap: Record<string, string> = {
-  primary: 'bg-primary text-primary-foreground',
-  dark: 'bg-foreground text-background',
-  light: 'bg-muted',
-  white: '',
-};
-
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
   dark: '',
@@ -35,7 +28,7 @@ const secondaryBtnMap: Record<string, string> = {
 const variant = stegaClean(backgroundVariant) || 'dark';
 ---
 
-<Section class={bgMap[variant]} data-animate>
+<Section data-animate>
   <SectionContent class="items-center text-center max-w-3xl mx-auto">
     <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
       {heading}

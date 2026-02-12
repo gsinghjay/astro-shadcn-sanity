@@ -33,4 +33,26 @@ describe('CtaBanner', () => {
 
     expect(html).not.toContain('opacity-80');
   });
+
+  test('does not apply background classes on Section (wrapper handles background)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(CtaBanner, {
+      props: ctaFull,
+    });
+
+    // Section element should not have bg-primary (BlockWrapper handles backgrounds now)
+    const sectionMatch = html.match(/<section[^>]*class="([^"]*)"/);
+    expect(sectionMatch).toBeTruthy();
+    expect(sectionMatch![1]).not.toContain('bg-primary');
+  });
+
+  test('retains button color mapping per backgroundVariant', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(CtaBanner, {
+      props: ctaFull,
+    });
+
+    // Primary button should get variant-specific classes (primaryBtnMap['primary'])
+    expect(html).toContain('bg-background');
+  });
 });
