@@ -42,26 +42,6 @@ const locateDocument: DocumentLocationResolver = (params, context) => {
       )
   }
 
-  if (params.type === 'sponsor') {
-    return context.documentStore
-      .listenQuery(`*[_id == $id][0]{ name, "slug": slug.current }`, {id: params.id})
-      .pipe(
-        map((doc: Record<string, string> | null) => ({
-          locations: [
-            ...(doc
-              ? [
-                  {
-                    title: doc.name || 'Untitled Sponsor',
-                    href: `/sponsors/${doc.slug}`,
-                  },
-                ]
-              : []),
-            {title: 'All Sponsors', href: '/sponsors'},
-          ],
-        })),
-      )
-  }
-
   return null
 }
 
