@@ -9,10 +9,13 @@ const {
   loadQuery,
   getSiteSettings,
   getAllSponsors,
+  getSponsorBySlug,
   resolveBlockSponsors,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
   ALL_SPONSORS_QUERY,
+  ALL_SPONSOR_SLUGS_QUERY,
+  SPONSOR_BY_SLUG_QUERY,
   PAGE_BY_SLUG_QUERY,
 } = await import("@/lib/sanity");
 
@@ -45,6 +48,29 @@ describe("GROQ query definitions", () => {
     expect(ALL_SPONSORS_QUERY).toContain("tier");
     expect(ALL_SPONSORS_QUERY).toContain("featured");
     expect(ALL_SPONSORS_QUERY).toContain("order(name asc)");
+  });
+
+  it("ALL_SPONSOR_SLUGS_QUERY targets sponsor type with slug projection", () => {
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("defined(slug.current)");
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("slug.current");
+  });
+
+  it("SPONSOR_BY_SLUG_QUERY fetches single sponsor by slug with all fields", () => {
+    expect(SPONSOR_BY_SLUG_QUERY).toContain('_type == "sponsor"');
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("$slug");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("name");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("slug.current");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("tier");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("description");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("website");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("industry");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("featured");
+  });
+
+  it("SPONSOR_BY_SLUG_QUERY includes projects sub-query", () => {
+    expect(SPONSOR_BY_SLUG_QUERY).toContain('_type == "project"');
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("references(^._id)");
   });
 
   it("PAGE_BY_SLUG_QUERY includes all block type projections", () => {
@@ -207,6 +233,41 @@ describe("getAllSponsors()", () => {
     const cached = await freshModule.getAllSponsors();
     expect(cached).toEqual(mockSponsors);
     expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getSponsorBySlug()", () => {
+  it("fetches a sponsor by slug with the correct query and params", async () => {
+    const mockSponsor = {
+      _id: "sp-1",
+      name: "Acme Corp",
+      slug: "acme-corp",
+      tier: "gold",
+      projects: [],
+    };
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockSponsor,
+    } as never);
+
+    const result = await getSponsorBySlug("acme-corp");
+    expect(result).toEqual(mockSponsor);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      SPONSOR_BY_SLUG_QUERY,
+      { slug: "acme-corp" },
+      expect.objectContaining({
+        filterResponse: false,
+        perspective: "published",
+      }),
+    );
+  });
+
+  it("returns null when sponsor is not found", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+    } as never);
+
+    const result = await getSponsorBySlug("nonexistent");
+    expect(result).toBeNull();
   });
 });
 

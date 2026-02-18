@@ -1,0 +1,15 @@
+---
+import BreadcrumbItem from './BreadcrumbItem.astro';
+
+interface Props {
+  items: Array<{ label: string; href?: string }>;
+}
+const { items } = Astro.props;
+---
+<nav aria-label="Breadcrumb" class="mb-6">
+  <ol class="flex items-center gap-2 text-sm text-muted-foreground">
+    {items.map((item, i) => (
+      <BreadcrumbItem label={item.label} href={item.href} showSeparator={i !== 0} />
+    ))}
+  </ol>
+</nav>

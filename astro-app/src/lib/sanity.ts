@@ -5,6 +5,8 @@ import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
   ALL_SPONSORS_QUERY_RESULT,
+  ALL_SPONSOR_SLUGS_QUERY_RESULT,
+  SPONSOR_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -120,6 +122,32 @@ export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
   const result = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
+}
+
+/**
+ * GROQ query: fetch all sponsor slugs for static path generation.
+ */
+export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && defined(slug.current)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single sponsor by slug with all fields and associated projects.
+ * The projects sub-query returns an empty array until Epic 4 creates the project schema.
+ */
+export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug][0]{
+  _id, name, "slug": slug.current,
+  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  tier, description, website, featured, industry,
+  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * Fetch a single sponsor by slug from Sanity.
+ */
+export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QUERY_RESULT> {
+  return loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
+    query: SPONSOR_BY_SLUG_QUERY,
+    params: { slug },
+  });
 }
 
 /**

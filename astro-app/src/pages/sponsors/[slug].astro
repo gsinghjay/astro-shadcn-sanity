@@ -1,0 +1,122 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { sanityClient, ALL_SPONSOR_SLUGS_QUERY, getSponsorBySlug } from '@/lib/sanity';
+import { urlFor } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
+import { Badge } from '@/components/ui/badge';
+import { Icon } from '@/components/ui/icon';
+import { Section, SectionContent } from '@/components/ui/section';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const sponsors = await sanityClient.fetch<Array<{ slug: string }>>(ALL_SPONSOR_SLUGS_QUERY);
+  return sponsors.map((s) => ({ params: { slug: s.slug } }));
+};
+
+const { slug } = Astro.params;
+const sponsor = await getSponsorBySlug(slug as string);
+if (!sponsor) return Astro.redirect('/404');
+
+const tierStyles: Record<string, { border: string; badge: string }> = {
+  platinum: { border: 'border-foreground', badge: 'bg-foreground text-background border-foreground' },
+  gold: { border: 'border-njit-gold', badge: 'bg-njit-gold text-foreground border-njit-gold' },
+  silver: { border: 'border-muted-foreground', badge: 'bg-muted-foreground text-background border-muted-foreground' },
+  bronze: { border: 'border-amber-700', badge: 'bg-amber-700 text-background border-amber-700' },
+};
+
+const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
+
+function sponsorLogoUrl(logo: typeof sponsor.logo) {
+  return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(200).height(200).url() : null;
+}
+
+const logoUrl = sponsorLogoUrl(sponsor.logo);
+const projects = sponsor.projects ?? [];
+---
+
+<Layout title={sponsor.name ?? 'Sponsor'}>
+  <Section>
+    <SectionContent>
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Sponsors', href: '/sponsors' },
+        { label: sponsor.name ?? 'Sponsor' },
+      ]} />
+
+      <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+        {logoUrl && (
+          <div class="w-[200px] h-[200px] bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
+            <img
+              src={logoUrl}
+              alt={sponsor.logo?.alt || `${sponsor.name} logo`}
+              class="w-full h-full object-cover"
+              width="200"
+              height="200"
+              loading="eager"
+            />
+          </div>
+        )}
+
+        <div class="flex-1">
+          <div class="flex items-center gap-4 mb-4">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+              {sponsor.name}
+            </h1>
+            {sponsor.tier && (
+              <Badge class={tier.badge}>{sponsor.tier}</Badge>
+            )}
+          </div>
+
+          {sponsor.industry && (
+            <p class="text-muted-foreground mb-4">{sponsor.industry}</p>
+          )}
+
+          {sponsor.description && (
+            <p class="text-lg leading-relaxed mb-6">{sponsor.description}</p>
+          )}
+
+          {sponsor.website && (
+            <a
+              href={stegaClean(sponsor.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-sm hover:text-primary/80"
+            >
+              Visit Website
+              <Icon name="lucide:arrow-up-right" class="w-4 h-4" />
+            </a>
+          )}
+        </div>
+      </div>
+    </SectionContent>
+  </Section>
+
+  {projects.length > 0 && (
+    <Section>
+      <SectionContent>
+        <h2 class="text-2xl font-bold mb-6">Associated Projects</h2>
+        <ul class="space-y-3">
+          {projects.map((p) => (
+            <li>
+              <a
+                href={`/projects/${stegaClean(p.slug)}`}
+                class="text-primary hover:text-primary/80 underline"
+              >
+                {p.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </SectionContent>
+    </Section>
+  )}
+
+  <Section>
+    <SectionContent>
+      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+        &larr; Back to Sponsors
+      </a>
+    </SectionContent>
+  </Section>
+</Layout>

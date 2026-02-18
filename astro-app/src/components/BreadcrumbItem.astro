@@ -1,0 +1,23 @@
+---
+interface Props {
+  label: string;
+  href?: string;
+  showSeparator: boolean;
+}
+const { label, href, showSeparator } = Astro.props;
+---
+<li class="flex items-center gap-2">
+  {showSeparator && (
+    <span aria-hidden="true" class="text-border">/</span>
+  )}
+  {href && (
+    <a href={href} class="hover:text-foreground underline">
+      {label}
+    </a>
+  )}
+  {!href && (
+    <span aria-current="page" class="text-foreground font-medium">
+      {label}
+    </span>
+  )}
+</li>
