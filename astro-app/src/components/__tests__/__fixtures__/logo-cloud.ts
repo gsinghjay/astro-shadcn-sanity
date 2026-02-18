@@ -6,8 +6,10 @@ export const logoCloudSponsors: Sponsor[] = [
     name: 'TechCorp',
     slug: 'techcorp',
     logo: {
-      asset: { _id: 'img-tc', url: 'https://cdn.sanity.io/test/techcorp.png', metadata: null },
+      asset: { _id: 'image-Xk7mDaTH2sjqfOBf9pgYrQ-300x300-png', url: 'https://cdn.sanity.io/images/test-project/test-dataset/Xk7mDaTH2sjqfOBf9pgYrQ-300x300.png', metadata: null },
       alt: 'TechCorp logo',
+      hotspot: null,
+      crop: null,
     },
     tier: 'gold',
     description: 'Technology company',
