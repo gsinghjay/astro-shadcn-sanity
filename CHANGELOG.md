@@ -1,3 +1,13 @@
+## [1.5.2](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.1...v1.5.2) (2026-02-18)
+
+### Bug Fixes
+
+* pass GA4 and visual editing env vars through Vite define ([89e6fbf](https://github.com/gsinghjay/astro-shadcn-sanity/commit/89e6fbf9ef20a202c7fc5b9c623357716c031150))
+
+### Documentation
+
+* update README title to match site name ([c807787](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c80778796802862912dc2210e098b90380090f5c))
+
 ## [1.5.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.0...v1.5.1) (2026-02-18)
 
 ### Bug Fixes
