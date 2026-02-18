@@ -5,8 +5,9 @@ import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
   ALL_SPONSORS_QUERY_RESULT,
-  ALL_SPONSOR_SLUGS_QUERY_RESULT,
   SPONSOR_BY_SLUG_QUERY_RESULT,
+  ALL_PROJECTS_QUERY_RESULT,
+  PROJECT_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -20,6 +21,12 @@ const token = import.meta.env.SANITY_API_READ_TOKEN;
  * Array element type extracted for use in component props and helper functions.
  */
 export type Sponsor = ALL_SPONSORS_QUERY_RESULT[number];
+
+/**
+ * Project type — derived from the generated ALL_PROJECTS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Project = ALL_PROJECTS_QUERY_RESULT[number];
 
 /**
  * Fetch wrapper that enables stega encoding + draft perspective
@@ -171,6 +178,64 @@ export function resolveBlockSponsors(
   // manual
   const manualIds = new Set(block.sponsors?.map(s => s._id) ?? []);
   return allSponsors.filter(s => manualIds.has(s._id));
+}
+
+/**
+ * GROQ query: fetch all projects with resolved sponsor references.
+ */
+export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project"] | order(title asc){
+  _id, title, "slug": slug.current,
+  content,
+  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },
+  technologyTags,
+  semester,
+  status,
+  outcome
+}`);
+
+/**
+ * Fetch all projects from Sanity.
+ * Result is cached for the duration of the build (module-level memoization).
+ */
+let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
+
+export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _projectsCache) return _projectsCache;
+  const result = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
+  _projectsCache = result ?? [];
+  return _projectsCache;
+}
+
+/**
+ * GROQ query: fetch all project slugs for static path generation.
+ */
+export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && defined(slug.current)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single project by slug with full data and linked testimonials.
+ * The testimonials sub-query returns [] until Story 2.11 creates the testimonial schema.
+ */
+export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug][0]{
+  _id, title, "slug": slug.current,
+  content,
+  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },
+  technologyTags,
+  semester,
+  status,
+  team[]{ _key, name, role },
+  mentor,
+  outcome,
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }
+}`);
+
+/**
+ * Fetch a single project by slug from Sanity.
+ */
+export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QUERY_RESULT> {
+  return loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
+    query: PROJECT_BY_SLUG_QUERY,
+    params: { slug },
+  });
 }
 
 /**

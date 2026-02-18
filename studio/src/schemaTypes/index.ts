@@ -14,6 +14,7 @@ import {stepItem} from './objects/step-item'
 import {page} from './documents/page'
 import {siteSettings} from './documents/site-settings'
 import {sponsor} from './documents/sponsor'
+import {project} from './documents/project'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -44,6 +45,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   page,
   siteSettings,
   sponsor,
+  project,
   // Blocks — homepage
   heroBanner,
   featureGrid,

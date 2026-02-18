@@ -27,7 +27,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
 
-function sponsorLogoUrl(logo: typeof sponsor.logo) {
+function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
   return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(200).height(200).url() : null;
 }
 

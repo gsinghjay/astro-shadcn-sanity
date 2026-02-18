@@ -13,6 +13,8 @@ export const sponsorDetailFull: SponsorDetail = {
       metadata: null,
     },
     alt: 'Acme logo',
+    hotspot: null,
+    crop: null,
   },
   tier: 'gold',
   description: 'Leading technology partner delivering innovative solutions.',

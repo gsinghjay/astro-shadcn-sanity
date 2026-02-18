@@ -188,6 +188,85 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
+export type Project = {
+  _id: string;
+  _type: "project";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  sponsor?: SponsorReference;
+  status?: "active" | "completed" | "archived";
+  semester?: string;
+  content?: PortableText;
+  outcome?: string;
+  team?: Array<{
+    name?: string;
+    role?: string;
+    _key: string;
+  }>;
+  mentor?: string;
+  technologyTags?: Array<string>;
+};
+
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type PortableText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<
+        | {
+            href?: string;
+            _type: "link";
+            _key: string;
+          }
+        | {
+            reference?: PageReference;
+            _type: "internalLink";
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }
+  | {
+      tone?: "info" | "warning" | "success";
+      text?: string;
+      _type: "callout";
+      _key: string;
+    }
+>;
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type Sponsor = {
   _id: string;
   _type: "sponsor";
@@ -225,12 +304,6 @@ export type SanityImageHotspot = {
   y?: number;
   height?: number;
   width?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type SiteSettings = {
@@ -343,57 +416,6 @@ export type FaqItem = {
   question?: string;
   answer?: PortableText;
 };
-
-export type PageReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "page";
-};
-
-export type PortableText = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
-      listItem?: "bullet" | "number";
-      markDefs?: Array<
-        | {
-            href?: string;
-            _type: "link";
-            _key: string;
-          }
-        | {
-            reference?: PageReference;
-            _type: "internalLink";
-            _key: string;
-          }
-      >;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }
-  | {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      caption?: string;
-      _type: "image";
-      _key: string;
-    }
-  | {
-      tone?: "info" | "warning" | "success";
-      text?: string;
-      _type: "callout";
-      _key: string;
-    }
->;
 
 export type Page = {
   _id: string;
@@ -581,17 +603,18 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
+  | Project
+  | PageReference
+  | PortableText
+  | Slug
   | Sponsor
   | SanityImageCrop
   | SanityImageHotspot
-  | Slug
   | SiteSettings
   | StepItem
   | StatItem
   | FeatureItem
   | FaqItem
-  | PageReference
-  | PortableText
   | Page
   | Seo
   | Link
@@ -753,7 +776,94 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   website: string | null;
   featured: boolean | null;
   industry: string | null;
-  projects: Array<never>;
+  projects: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  }>;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_PROJECTS_QUERY
+// Query: *[_type == "project"] | order(title asc){  _id, title, "slug": slug.current,  content,  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },  technologyTags,  semester,  status,  outcome}
+export type ALL_PROJECTS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  content: PortableText | null;
+  sponsor: {
+    _id: string;
+    name: string | null;
+    slug: string | null;
+    logo: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+    industry: string | null;
+  } | null;
+  technologyTags: Array<string> | null;
+  semester: string | null;
+  status: "active" | "archived" | "completed" | null;
+  outcome: string | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_PROJECT_SLUGS_QUERY
+// Query: *[_type == "project" && defined(slug.current)]{ "slug": slug.current }
+export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
+  slug: string | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: PROJECT_BY_SLUG_QUERY
+// Query: *[_type == "project" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  content,  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor,  outcome,  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+export type PROJECT_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  content: PortableText | null;
+  sponsor: {
+    _id: string;
+    name: string | null;
+    slug: string | null;
+    logo: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+    tier: "bronze" | "gold" | "platinum" | "silver" | null;
+    industry: string | null;
+    description: string | null;
+    website: string | null;
+  } | null;
+  technologyTags: Array<string> | null;
+  semester: string | null;
+  status: "active" | "archived" | "completed" | null;
+  team: Array<{
+    _key: string;
+    name: string | null;
+    role: string | null;
+  }> | null;
+  mentor: string | null;
+  outcome: string | null;
+  testimonials: Array<never>;
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -1062,6 +1172,9 @@ declare module "@sanity/client" {
     '*[_type == "sponsor"] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && defined(slug.current)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project"] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },\n  technologyTags,\n  semester,\n  status,\n  outcome\n}': ALL_PROJECTS_QUERY_RESULT;
+    '*[_type == "project" && defined(slug.current)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }
