@@ -1,27 +1,27 @@
 {
   "workflow_version": "1.2.0",
   "timestamps": {
-    "started": "2026-02-09T00:00:00Z",
-    "last_updated": "2026-02-09T00:15:00Z",
-    "completed": "2026-02-09T00:15:00Z"
+    "started": "2026-02-13T00:00:00Z",
+    "last_updated": "2026-02-13T00:15:00Z",
+    "completed": "2026-02-13T00:15:00Z"
   },
-  "mode": "initial_scan",
+  "mode": "full_rescan",
   "scan_level": "exhaustive",
   "project_root": "/home/jay/github/astro-shadcn-sanity",
   "output_folder": "/home/jay/github/astro-shadcn-sanity/docs",
   "completed_steps": [
-    {"step": "step_1", "status": "completed", "timestamp": "2026-02-09T00:01:00Z", "summary": "Classified as monorepo with 2 parts: astro-app (web), studio (web)"},
-    {"step": "step_2", "status": "completed", "timestamp": "2026-02-09T00:02:00Z", "summary": "Found 53 existing docs across root, docs/, tests/, _bmad-output/"},
-    {"step": "step_3", "status": "completed", "timestamp": "2026-02-09T00:03:00Z", "summary": "Tech stack: Astro 5.x + Sanity v5 + Tailwind v4 + fulldev/ui + Storybook 10"},
-    {"step": "step_4", "status": "completed", "timestamp": "2026-02-09T00:06:00Z", "summary": "Exhaustive analysis: 251 UI components, 102 blocks, 13 custom blocks, 11 schemas, 3 documents, 50+ tests"},
-    {"step": "step_5", "status": "completed", "timestamp": "2026-02-09T00:07:00Z", "summary": "Source tree documented with all critical folders"},
-    {"step": "step_6", "status": "completed", "timestamp": "2026-02-09T00:08:00Z", "summary": "Dev/deployment guides written"},
-    {"step": "step_7", "status": "completed", "timestamp": "2026-02-09T00:09:00Z", "summary": "Integration architecture: 5 integration points (content delivery, visual editing, schema sharing, shared deps, CI/CD)"},
-    {"step": "step_8", "status": "completed", "timestamp": "2026-02-09T00:10:00Z", "summary": "Architecture doc written covering system design, block lifecycle, data models, templates, design system"},
-    {"step": "step_9", "status": "completed", "timestamp": "2026-02-09T00:12:00Z", "summary": "All supporting docs written: project-overview, component-inventory, data-models, development-guide"},
-    {"step": "step_10", "status": "completed", "timestamp": "2026-02-09T00:13:00Z", "summary": "Master index generated with links to all 7 generated docs + 15 existing docs"},
-    {"step": "step_11", "status": "completed", "timestamp": "2026-02-09T00:14:00Z", "summary": "Validation complete, no incomplete markers found"},
-    {"step": "step_12", "status": "completed", "timestamp": "2026-02-09T00:15:00Z", "summary": "Workflow complete"}
+    {"step": "step_1", "status": "completed", "timestamp": "2026-02-13T00:01:00Z", "summary": "Classified as monorepo with 2 parts: astro-app (web frontend, Astro 5.17 SSG), studio (web CMS admin, Sanity v5.9)"},
+    {"step": "step_2", "status": "completed", "timestamp": "2026-02-13T00:02:00Z", "summary": "Found 134+ existing docs across root, docs/ (26), tests/ (1), _bmad-output/ (104+), studio/ (1), .github/workflows/ (7)"},
+    {"step": "step_3", "status": "completed", "timestamp": "2026-02-13T00:03:00Z", "summary": "Tech stack: Astro 5.17 + Sanity v5.9 + Tailwind 4.1 + React 19.2 + fulldev/ui + Storybook 10 + Vitest 3.2 + Playwright 1.58"},
+    {"step": "step_4", "status": "completed", "timestamp": "2026-02-13T00:06:00Z", "summary": "Exhaustive analysis: 507 component files, 12 custom blocks, ~100 UI variants, ~39 UI primitives, 22 schema types, 3 GROQ queries"},
+    {"step": "step_5", "status": "completed", "timestamp": "2026-02-13T00:07:00Z", "summary": "Source tree documented with all critical folders and 8 entry points annotated"},
+    {"step": "step_6", "status": "completed", "timestamp": "2026-02-13T00:08:00Z", "summary": "Dev/deployment guides: Docker + native setup, 7 CI/CD workflows, Conventional Commits, Cloudflare Pages deployment"},
+    {"step": "step_7", "status": "completed", "timestamp": "2026-02-13T00:09:00Z", "summary": "Integration architecture: 5 integration points (content delivery, visual editing, schema sharing/TypeGen, shared deps, CI/CD)"},
+    {"step": "step_8", "status": "completed", "timestamp": "2026-02-13T00:10:00Z", "summary": "Architecture doc written covering system design, block lifecycle, template system, data architecture, design system, testing, deployment"},
+    {"step": "step_9", "status": "completed", "timestamp": "2026-02-13T00:12:00Z", "summary": "All supporting docs written: project-overview, component-inventory, data-models, development-guide, source-tree-analysis"},
+    {"step": "step_10", "status": "completed", "timestamp": "2026-02-13T00:13:00Z", "summary": "Master index generated with links to 7 generated docs + 30+ existing docs organized by category"},
+    {"step": "step_11", "status": "completed", "timestamp": "2026-02-13T00:14:00Z", "summary": "Validation complete: no incomplete markers found, all files verified on disk"},
+    {"step": "step_12", "status": "completed", "timestamp": "2026-02-13T00:15:00Z", "summary": "Workflow complete"}
   ],
   "current_step": "completed",
   "project_types": [
@@ -29,13 +29,14 @@
     {"part_id": "studio", "project_type_id": "web", "display_name": "Sanity CMS Studio"}
   ],
   "findings": {
-    "project_classification": "Monorepo (npm workspaces), 2 parts, TypeScript/Astro+Sanity",
-    "existing_docs_count": 53,
-    "technology_stack": "Astro 5.x + Sanity v5 + Tailwind v4 + fulldev/ui + Storybook 10 + Playwright",
-    "components": "251 UI primitives, 102 pre-built blocks, 13 custom blocks",
-    "schemas": "3 documents, 4 objects, 11 blocks",
-    "tests": "50+ tests (E2E + integration), 5 browser projects",
-    "integration_points": "Content delivery, visual editing, schema sharing, shared deps, CI/CD"
+    "project_classification": "Monorepo (npm workspaces), 2 parts, TypeScript/Astro+Sanity, v1.4.0",
+    "existing_docs_count": 134,
+    "technology_stack": "Astro 5.17 + Sanity v5.9 + Tailwind 4.1 + React 19.2 + fulldev/ui + Storybook 10 + Vitest 3.2 + Playwright 1.58",
+    "components": "507 total: 12 custom blocks, ~100 UI variants, ~39 UI primitives, 7 layout, 5 templates",
+    "schemas": "22 types: 3 documents (page, siteSettings, sponsor), 11 blocks, 8 objects",
+    "tests": "19 unit/component tests, 19 integration tests (241 cases), 4 E2E specs (34 cases, 5 browser projects)",
+    "integration_points": "Content delivery (GROQ API), Visual editing (Presentation Tool), Schema sharing (TypeGen), Shared deps (npm workspaces), CI/CD (7 GitHub Actions workflows)",
+    "ci_cd": "7 workflows: CI, release, storybook deploy, sanity deploy, sync preview, 2 branch enforcement"
   },
   "outputs_generated": [
     "project-scan-report.json",

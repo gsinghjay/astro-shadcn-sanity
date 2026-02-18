@@ -13,22 +13,6 @@
  */
 
 // Source: schema.json
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type ObjectImage = {
-  asset?: SanityImageAssetReference;
-  media?: unknown; // Unable to locate the referenced type "object.image.media" in schema
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-  _type: "image";
-};
-
 export type SponsorReference = {
   _ref: string;
   _type: "reference";
@@ -66,11 +50,11 @@ export type FaqSection = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  items?: Array<{
-    question?: string;
-    answer?: string;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & FaqItem
+  >;
 };
 
 export type RichText = {
@@ -88,12 +72,11 @@ export type SponsorSteps = {
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
   subheading?: string;
-  items?: Array<{
-    title?: string;
-    description?: string;
-    list?: Array<string>;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & StepItem
+  >;
   ctaButtons?: Array<
     {
       _key: string;
@@ -113,6 +96,13 @@ export type LogoCloud = {
       _key: string;
     } & SponsorReference
   >;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type TextWithImage = {
@@ -139,12 +129,11 @@ export type StatsRow = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  stats?: Array<{
-    value?: string;
-    label?: string;
-    description?: string;
-    _key: string;
-  }>;
+  stats?: Array<
+    {
+      _key: string;
+    } & StatItem
+  >;
 };
 
 export type CtaBanner = {
@@ -167,13 +156,11 @@ export type FeatureGrid = {
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  items?: Array<{
-    icon?: string;
-    image?: ObjectImage;
-    title?: string;
-    description?: string;
-    _key: string;
-  }>;
+  items?: Array<
+    {
+      _key: string;
+    } & FeatureItem
+  >;
   columns?: 2 | 3 | 4;
 };
 
@@ -273,13 +260,16 @@ export type SiteSettings = {
   ctaButton?: {
     text?: string;
     url?: string;
+    variant?: "default" | "secondary" | "outline" | "ghost";
   };
   navigationItems?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     children?: Array<{
       label?: string;
       href?: string;
+      external?: boolean;
       _key: string;
     }>;
     _key: string;
@@ -301,6 +291,7 @@ export type SiteSettings = {
   footerLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   resourceLinks?: Array<{
@@ -312,9 +303,45 @@ export type SiteSettings = {
   programLinks?: Array<{
     label?: string;
     href?: string;
+    external?: boolean;
     _key: string;
   }>;
   currentSemester?: string;
+};
+
+export type StepItem = {
+  _type: "stepItem";
+  title?: string;
+  description?: string;
+  list?: Array<string>;
+};
+
+export type StatItem = {
+  _type: "statItem";
+  value?: string;
+  label?: string;
+  description?: string;
+};
+
+export type FeatureItem = {
+  _type: "featureItem";
+  icon?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  title?: string;
+  description?: string;
+};
+
+export type FaqItem = {
+  _type: "faqItem";
+  question?: string;
+  answer?: PortableText;
 };
 
 export type PageReference = {
@@ -429,6 +456,13 @@ export type Seo = {
   };
 };
 
+export type Link = {
+  _type: "link";
+  label?: string;
+  href?: string;
+  external?: boolean;
+};
+
 export type Button = {
   _type: "button";
   text?: string;
@@ -534,8 +568,6 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | SanityImageAssetReference
-  | ObjectImage
   | SponsorReference
   | SponsorCards
   | ContactForm
@@ -543,6 +575,7 @@ export type AllSanitySchemaTypes =
   | RichText
   | SponsorSteps
   | LogoCloud
+  | SanityImageAssetReference
   | TextWithImage
   | StatsRow
   | CtaBanner
@@ -553,10 +586,15 @@ export type AllSanitySchemaTypes =
   | SanityImageHotspot
   | Slug
   | SiteSettings
+  | StepItem
+  | StatItem
+  | FeatureItem
+  | FaqItem
   | PageReference
   | PortableText
   | Page
   | Seo
+  | Link
   | Button
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -658,8 +696,32 @@ export type ALL_PAGE_SLUGS_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_SPONSORS_QUERY
+// Query: *[_type == "sponsor"] | order(name asc){  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  tier, description, website, featured}
+export type ALL_SPONSORS_QUERY_RESULT = Array<{
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  logo: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+  tier: "bronze" | "gold" | "platinum" | "silver" | null;
+  description: string | null;
+  website: string | null;
+  featured: boolean | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{...},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      "sponsors": select(        autoPopulate == true => *[_type == "sponsor"]{          _id, name, "slug": slug.current,          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website        },        sponsors[]->{ _id, name, "slug": slug.current,          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website        }      )    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{...}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer }    },    _type == "contactForm" => {      heading,      description,      successMessage    },    _type == "sponsorCards" => {      heading,      displayMode,      "sponsors": select(        !defined(displayMode) || displayMode == "all" => *[_type == "sponsor"]{          _id, name, "slug": slug.current,          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },          tier, description, website        },        displayMode == "featured" => *[_type == "sponsor" && featured == true]{          _id, name, "slug": slug.current,          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },          tier, description, website        },        sponsors[]->{          _id, name, "slug": slug.current,          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },          tier, description, website        }      )    }  }}
+// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{...},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{...}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer }    },    _type == "contactForm" => {      heading,      description,      successMessage    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -722,7 +784,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         items: Array<{
           _key: string;
           question: string | null;
-          answer: string | null;
+          answer: PortableText | null;
         }> | null;
       }
     | {
@@ -789,20 +851,6 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         autoPopulate: boolean | null;
         sponsors: Array<{
           _id: string;
-          name: string | null;
-          slug: string | null;
-          logo: {
-            asset: {
-              _id: string;
-              url: string | null;
-              metadata: {
-                lqip: string | null;
-                dimensions: SanityImageDimensions | null;
-              } | null;
-            } | null;
-            alt: string | null;
-          } | null;
-          website: string | null;
         }> | null;
       }
     | {
@@ -865,22 +913,6 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         displayMode: "all" | "featured" | "manual" | null;
         sponsors: Array<{
           _id: string;
-          name: string | null;
-          slug: string | null;
-          logo: {
-            asset: {
-              _id: string;
-              url: string | null;
-              metadata: {
-                lqip: string | null;
-                dimensions: SanityImageDimensions | null;
-              } | null;
-            } | null;
-            alt: string | null;
-          } | null;
-          tier: "bronze" | "gold" | "platinum" | "silver" | null;
-          description: string | null;
-          website: string | null;
         }> | null;
       }
     | {
@@ -990,6 +1022,7 @@ declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type == "siteSettings"][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      "sponsors": select(\n        autoPopulate == true => *[_type == "sponsor"]{\n          _id, name, "slug": slug.current,\n          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website\n        },\n        sponsors[]->{ _id, name, "slug": slug.current,\n          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website\n        }\n      )\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      "sponsors": select(\n        !defined(displayMode) || displayMode == "all" => *[_type == "sponsor"]{\n          _id, name, "slug": slug.current,\n          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n          tier, description, website\n        },\n        displayMode == "featured" => *[_type == "sponsor" && featured == true]{\n          _id, name, "slug": slug.current,\n          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n          tier, description, website\n        },\n        sponsors[]->{\n          _id, name, "slug": slug.current,\n          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n          tier, description, website\n        }\n      )\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor"] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

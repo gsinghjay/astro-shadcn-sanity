@@ -10,12 +10,11 @@ const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
 // Fallback to process.env for Cloudflare Pages git integration builds (no .env file)
 const projectId = env.PUBLIC_SANITY_STUDIO_PROJECT_ID || process.env.PUBLIC_SANITY_STUDIO_PROJECT_ID || env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID || "placeholder";
 const dataset = env.PUBLIC_SANITY_STUDIO_DATASET || process.env.PUBLIC_SANITY_STUDIO_DATASET || env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || "production";
-const isVisualEditing = (env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED) === "true";
 const siteUrl = env.PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || "http://localhost:4321";
 const studioUrl = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 
 export default defineConfig({
-  output: isVisualEditing ? "server" : "static",
+  output: "static",
   site: siteUrl,
   adapter: cloudflare({ platformProxy: { enabled: true } }),
   vite: {
@@ -25,7 +24,7 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: false,
+      useCdn: !(env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED),
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,

@@ -1,17 +1,23 @@
 ---
 import type { PageBlock } from '@/lib/types';
+import type { Sponsor } from '@/lib/sanity';
+import { resolveBlockSponsors } from '@/lib/sanity';
 import { allBlocks } from './block-registry';
-import BlockWrapper from './blocks/BlockWrapper.astro';
+import BlockWrapper from './BlockWrapper.astro';
 
 interface Props {
   blocks: PageBlock[];
+  sponsors?: Sponsor[];
 }
 
-const { blocks } = Astro.props;
+const { blocks, sponsors = [] } = Astro.props;
 ---
 
 {blocks.map((block) => {
-  const Component = allBlocks[(block as any)._type];
+  const Component = allBlocks[block._type];
   if (!Component) return null;
-  return <BlockWrapper backgroundVariant={(block as any).backgroundVariant} spacing={(block as any).spacing} maxWidth={(block as any).maxWidth}><Component {...(block as any)} /></BlockWrapper>;
+  const extraProps = (block._type === 'logoCloud' || block._type === 'sponsorCards')
+    ? { sponsors: resolveBlockSponsors(block, sponsors) }
+    : {};
+  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth}><Component {...block} {...extraProps} /></BlockWrapper>;
 })}

@@ -1,0 +1,52 @@
+---
+/**
+ * Server Island component for Sanity page content.
+ * Used with `server:defer` in preview mode to render fresh draft data
+ * on-demand while the page shell (Header, Footer, Layout) is prerendered.
+ *
+ * Props must be serializable — only the slug string is passed.
+ * The component fetches its own data, selects the template, and renders blocks.
+ */
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { getPage, getAllSponsors } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
+
+import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
+import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
+import LandingTemplate from '@/layouts/templates/LandingTemplate.astro';
+import SidebarTemplate from '@/layouts/templates/SidebarTemplate.astro';
+import TwoColumnTemplate from '@/layouts/templates/TwoColumnTemplate.astro';
+
+interface Props {
+  slug: string;
+}
+
+const templates = {
+  default: DefaultTemplate,
+  fullWidth: FullWidthTemplate,
+  landing: LandingTemplate,
+  sidebar: SidebarTemplate,
+  twoColumn: TwoColumnTemplate,
+};
+
+const { slug } = Astro.props;
+
+// Ensure fresh draft data on every request — no caching for preview content
+Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+
+const page = await getPage(slug);
+const sponsors = await getAllSponsors();
+
+const template = page ? (stegaClean(page.template) as keyof typeof templates) : 'default';
+const TemplateComponent = templates[template] ?? DefaultTemplate;
+---
+
+{page ? (
+  <TemplateComponent>
+    <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} />
+  </TemplateComponent>
+) : (
+  <div class="mx-auto max-w-7xl px-4 py-12 text-center">
+    <p class="text-muted-foreground">Page not found for slug: {slug}</p>
+  </div>
+)}

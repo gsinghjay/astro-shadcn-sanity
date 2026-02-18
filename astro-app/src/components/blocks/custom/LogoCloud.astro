@@ -1,10 +1,14 @@
 ---
-import type { LogoCloudBlock } from '@/lib/types';
+import type { Sponsor } from '@/lib/sanity';
 import { Section } from '@/components/ui/section';
 
-interface Props extends LogoCloudBlock {
+interface Props {
+  heading?: string | null;
+  autoPopulate?: boolean | null;
+  sponsors?: Sponsor[];
   class?: string;
   id?: string;
+  [key: string]: unknown;
 }
 
 const { heading, sponsors } = Astro.props;

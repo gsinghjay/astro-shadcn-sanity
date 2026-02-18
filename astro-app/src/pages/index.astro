@@ -1,16 +1,39 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
-import { getPage } from '../lib/sanity';
+import SanityPageContent from '../components/SanityPageContent.astro';
+import { getPage, getAllSponsors } from '../lib/sanity';
 
-export const prerender = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED !== "true";
+const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
-const page = await getPage('home');
-if (!page) {
-  return Astro.redirect('/404');
+// In static mode: fetch page data and render inline
+// In VE mode: skip fetch — server island handles its own data fetching
+let page = null;
+let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
+if (!visualEditingEnabled) {
+  page = await getPage('home');
+  if (!page) {
+    return Astro.redirect('/404');
+  }
+  sponsors = await getAllSponsors();
 }
 ---
 
-<Layout title={page.title ?? undefined} seo={page.seo}>
-  <BlockRenderer blocks={page.blocks ?? []} />
+<Layout title={page?.title ?? undefined} seo={page?.seo}>
+  {visualEditingEnabled ? (
+    <SanityPageContent server:defer slug="home">
+      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+        <div class="animate-pulse space-y-8">
+          <div class="h-10 bg-muted rounded w-2/5"></div>
+          <div class="h-64 bg-muted rounded"></div>
+          <div class="space-y-3">
+            <div class="h-4 bg-muted rounded w-3/4"></div>
+            <div class="h-4 bg-muted rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+    </SanityPageContent>
+  ) : (
+    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} />
+  )}
 </Layout>
