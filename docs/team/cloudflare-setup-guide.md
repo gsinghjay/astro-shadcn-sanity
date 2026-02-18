@@ -1,6 +1,6 @@
 # Cloudflare Pages Setup & Testing Guide
 
-Guide for deploying the Astro site to Cloudflare Pages with GA4 analytics, security headers, and GitHub Actions CI/CD.
+Guide for deploying the Astro site to Cloudflare Pages with GA4 analytics, security headers, GitHub Actions CI/CD, and build caching.
 
 ---
 
@@ -194,79 +194,176 @@ Run a Lighthouse audit on the deployed site:
 
 ## 10. Set Up Sanity Webhook (Auto-Rebuild on Publish)
 
-When an editor publishes content in Sanity Studio, the production site should automatically rebuild. Cloudflare Pages only auto-builds on **code pushes** — it has no way to know when content changes in Sanity. Cloudflare deploy hooks (which would solve this) require a **Pro plan**, so this project uses a free-tier alternative: **Sanity webhook → GitHub `repository_dispatch` → GitHub Actions builds the site with fresh Sanity content → Wrangler deploys to Cloudflare Pages**.
+When an editor publishes content in Sanity Studio, the production site should automatically rebuild. Cloudflare Pages only auto-builds on **code pushes** — it has no way to know when content changes in Sanity. A **Cloudflare deploy hook** bridges this gap: Sanity fires a webhook on publish, which hits the deploy hook URL, triggering a Cloudflare Pages build directly.
 
-### 10a. Create a GitHub Fine-Grained PAT
+### Architecture
 
-The Sanity webhook needs a token to call the GitHub API.
+```mermaid
+flowchart LR
+    A[Editor publishes\nin Sanity Studio] --> B[Sanity Content Lake\nfires GROQ webhook]
+    B --> C[POST to Cloudflare\nDeploy Hook URL]
+    C --> D[Cloudflare Pages\nbuilds from git]
+    D --> E[Production site\nupdated ~45-75s]
 
-1. Go to [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta) → **Generate new token**
-2. Configure:
-   - **Token name:** `Sanity Webhook`
-   - **Expiration:** 90 days (or longer — set a calendar reminder to rotate)
-   - **Repository access:** **Only select repositories** → pick `gsinghjay/astro-shadcn-sanity`
-   - **Permissions → Repository permissions:** **Contents** → **Read and write** (required for `repository_dispatch`)
-3. Click **Generate token** and copy it immediately
+    style A fill:#f9f,stroke:#333
+    style D fill:#ff9,stroke:#333
+    style E fill:#9f9,stroke:#333
+```
 
-![GitHub fine-grained PAT setup for Sanity webhook](../screenshots/create-pat-for-sanity-webhook.jpeg)
+This is the simplest possible pipeline — no GitHub Actions in the loop, no PAT tokens to rotate, no intermediate `repository_dispatch`. Cloudflare builds internally using its own build system and build cache (Section 11).
+
+> **Previously** this project used a longer path: Sanity webhook → GitHub `repository_dispatch` → GitHub Actions `npm ci` → build → `wrangler pages deploy`. That approach required a GitHub Fine-Grained PAT, a dedicated `sanity-deploy.yml` workflow, and took ~2-3 minutes. The deploy hook approach eliminates all of that.
+
+```mermaid
+flowchart TB
+    subgraph old ["Legacy: GitHub Actions Pipeline (~2-3 min)"]
+        direction LR
+        O1[Sanity webhook] --> O2[GitHub API\nrepository_dispatch]
+        O2 --> O3[GitHub Actions\nnpm ci + build]
+        O3 --> O4[wrangler pages deploy]
+        O4 --> O5[Cloudflare Pages]
+    end
+
+    subgraph new ["Current: Cloudflare Deploy Hook (~45-75s)"]
+        direction LR
+        N1[Sanity webhook] --> N2[Cloudflare\nDeploy Hook]
+        N2 --> N3[Cloudflare Pages\nbuilds from git]
+    end
+
+    style old fill:#fee,stroke:#c33
+    style new fill:#efe,stroke:#3c3
+```
+
+### 10a. Create the Cloudflare Deploy Hook
+
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → your `ywcc-capstone` Pages project
+2. Navigate to **Settings** → **Builds & deployments** → **Deploy hooks**
+3. Click **Add deploy hook**
+4. Configure:
+   - **Name:** `Sanity Content Publish`
+   - **Branch:** `main`
+5. Click **Save**
+6. **Copy the generated URL** — it looks like `https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/...`
+
+> **Important:** The deploy hook URL acts as the secret. Anyone with this URL can trigger a build. Do not commit it to the repository or share it publicly.
 
 ### 10b. Configure the Sanity Webhook
 
-1. Go to [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks** → **Add webhook**
-2. Fill in:
+1. Go to [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks**
+2. Edit the existing `Trigger production rebuild` webhook (or create a new one)
+3. Fill in:
 
 | Field | Value |
 |---|---|
 | **Name** | `Trigger production rebuild` |
-| **URL** | `https://api.github.com/repos/gsinghjay/astro-shadcn-sanity/dispatches` |
+| **URL** | The Cloudflare deploy hook URL from step 10a |
 | **Trigger on** | Create, Update, Delete |
 | **Filter** | `_type in ["page", "siteSettings", "sponsor", "project", "team", "event"]` |
 | **Drafts** | OFF (only fire on publish, not every keystroke) |
 | **HTTP method** | POST |
-| **HTTP Headers** | `Authorization` : `token YOUR_GITHUB_PAT` (see warning below) |
-| **HTTP Headers** | `Accept` : `application/vnd.github+json` |
-| **Projection** | `{"event_type": "sanity-content-published"}` |
-| **Secret** | Add a secret string for audit trail |
+| **HTTP Headers** | _(none required — remove any existing Authorization/Accept headers)_ |
+| **Projection** | _(leave empty — deploy hooks don't need a request body)_ |
+| **Secret** | Optional — add a secret string for the audit trail |
 
-3. Enable the webhook and save
+4. Enable the webhook and save
 
-> **Critical: The Authorization header value must be the word `token`, a space, then your PAT.**
-> For example: `token github_pat_XXXXXXXXXXXX`. Do **not** paste the PAT alone — GitHub returns `401 Requires authentication` if the `token ` prefix is missing. Do **not** use `Bearer` — that is a different auth scheme and will also fail.
+> **If migrating from the old GitHub-based webhook:** Remove the `Authorization: token ...` and `Accept: application/vnd.github+json` headers, clear the projection field, and replace the URL. Everything else stays the same.
 
-**Before** (empty Authorization value — returns 401):
-
-![Sanity webhook before PAT is set](../screenshots/sanity-studio-webhook-before.jpeg)
-
-**After** (PAT set correctly — returns 204):
-
-![Sanity webhook with PAT configured](../screenshots/sanity-studio-webhook-after.jpeg)
-
-### 10c. How It Works
-
-The GitHub Actions workflow (`.github/workflows/sanity-deploy.yml`) listens for the `sanity-content-published` `repository_dispatch` event:
-
-```
-Editor publishes in Studio
-  → Sanity Content Lake fires GROQ webhook
-    → POST to GitHub API (repository_dispatch)
-      → GitHub Actions: checkout → npm ci → build → wrangler pages deploy
-        → Production site updated (~2-3 min)
-```
-
-### 10d. Verify
+### 10c. Verify
 
 1. Publish a content change in Sanity Studio
-2. Check **sanity.io/manage** → Webhooks → your webhook → **Attempts** tab → should show `204 No Content`
-3. Check **GitHub** → **Actions** tab → **Sanity Content Deploy** workflow should be running
-4. After the workflow completes, verify the production site shows the updated content
+2. Check **sanity.io/manage** → Webhooks → your webhook → **Attempts** tab → should show `200 OK`
+3. Check **Cloudflare Pages dashboard** → **Deployments** → a new production build should appear
+4. Build should complete in ~45-75 seconds (with build cache enabled — see Section 11)
+5. Verify the production site at `https://ywcc-capstone.pages.dev` shows the updated content
+
+### 10d. Clean Up Legacy Workflow
+
+Once the deploy hook is verified working:
+
+1. **Delete** `.github/workflows/sanity-deploy.yml` — Cloudflare handles content rebuilds now
+2. **Revoke** the GitHub Fine-Grained PAT (`Sanity Webhook`) at [github.com/settings/tokens](https://github.com/settings/tokens) — it's no longer needed
+3. **Optionally remove** the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` GitHub Actions secrets if no other workflow uses them
 
 ### 10e. Troubleshooting
 
-- **Webhook shows 401/403:** Most commonly, the Authorization header value is missing the `token ` prefix (it must be `token github_pat_...`, not just `github_pat_...`). If the prefix is correct, the PAT may be expired or missing **Contents: Read and write** permission on the correct repo.
-- **Webhook shows 404:** The URL is wrong. Verify the repo owner/name: `gsinghjay/astro-shadcn-sanity`.
-- **Webhook shows 422:** The projection body is malformed. It must be valid JSON: `{"event_type": "sanity-content-published"}`.
-- **GitHub Actions workflow doesn't appear:** The workflow file must exist on the `main` branch. Merge the branch containing `sanity-deploy.yml` first.
-- **Build fails in the workflow:** Check that `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and the `PUBLIC_SANITY_*` variables are all configured in GitHub (same as section 6).
+- **Webhook shows 403:** The deploy hook URL is wrong or the hook was deleted. Recreate it in the CF Pages dashboard and update the Sanity webhook URL.
+- **Webhook shows 200 but no build appears:** Check that the deploy hook is configured for the `main` branch and that the CF Pages project has git integration active (not direct upload).
+- **Build triggers but fails:** Check the Cloudflare Pages build log in the dashboard. Common issues: missing environment variables (Section 6), monorepo build command misconfigured.
+- **Build succeeds but content is stale:** The build fetches content from the Sanity Content Lake at build time. If you just published, there may be a brief CDN propagation delay. Wait 30 seconds and hard-refresh.
+- **Multiple builds triggered per publish:** The Sanity webhook filter should exclude drafts (`Drafts: OFF`). If multiple document types are published simultaneously, Sanity may fire multiple webhook events — Cloudflare deduplicates builds on the same branch within a short window.
+
+### Build Pipeline Summary
+
+```mermaid
+flowchart TB
+    subgraph triggers ["What triggers a build?"]
+        T1[Push to main\nor merge PR] --> CF
+        T2[Push to any\nother branch] --> CF
+        T3[Sanity content\npublished] --> DH[Deploy Hook] --> CF
+    end
+
+    CF[Cloudflare Pages\nBuild System]
+    CF --> |main branch| PROD[Production\nywcc-capstone.pages.dev]
+    CF --> |other branch| PREV[Preview\nbranch.ywcc-capstone.pages.dev]
+
+    subgraph cache ["Build Cache (Section 11)"]
+        C1[npm cache .npm]
+        C2[Astro cache node_modules/.astro]
+    end
+
+    CF -.-> cache
+
+    style PROD fill:#9f9,stroke:#333
+    style PREV fill:#ff9,stroke:#333
+    style DH fill:#9df,stroke:#333
+```
+
+---
+
+## 11. Enable Build Caching (Beta)
+
+Cloudflare Pages has a native build cache that preserves dependencies and build outputs across deployments. This significantly reduces build times after the first cached build.
+
+### How to Enable
+
+1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → your Pages project → **Settings** → **Build** → **Build cache**
+2. Click **Enable**
+3. The next build establishes the baseline cache. All subsequent builds restore from it automatically.
+
+### What Gets Cached
+
+| Cache | Directory | Effect |
+|---|---|---|
+| npm global cache | `.npm` | `npm ci` pulls packages from local cache instead of the network |
+| Astro build cache | `node_modules/.astro` | Incremental builds — only reprocesses changed pages |
+
+### Expected Impact
+
+| Scenario | Build Time |
+|---|---|
+| No cache (cold start) | ~2 minutes |
+| With build cache (warm) | ~45–75 seconds |
+| Self-hosted runner on VPS (Story 5-9) | ~20–30 seconds |
+
+The CF build cache helps all Cloudflare-triggered builds (production deploys on push to `main`, preview deploys on PR branches). For GitHub Actions-triggered builds (CI checks, Sanity webhook deploys), a self-hosted runner on the VPS provides additional speed gains — see Story 5-9.
+
+### Constraints
+
+- **10 GB** storage per project (more than sufficient for this project)
+- Cache **expires after 7 days** without a build — if no deploy happens for a week, the next build is cold
+- Requires Build System V2 or later (the default for new projects)
+- Feature is in beta — behavior may change
+
+### Clearing the Cache
+
+If a build behaves unexpectedly after a dependency change, clear the cache:
+
+1. Go to Pages project → **Settings** → **Build** → **Build cache**
+2. Click **Clear Cache**
+3. The next build will be a full cold start, re-establishing the cache
+
+> **Reference:** [Cloudflare Pages Build Caching documentation](https://developers.cloudflare.com/pages/configuration/build-caching/)
 
 ---
 

@@ -32,4 +32,5 @@ export type RichTextBlock = Extract<PageBlock, { _type: 'richText' }>;
 export type FaqSectionBlock = Extract<PageBlock, { _type: 'faqSection' }>;
 export type ContactFormBlock = Extract<PageBlock, { _type: 'contactForm' }>;
 export type SponsorCardsBlock = Extract<PageBlock, { _type: 'sponsorCards' }>;
+export type TestimonialsBlock = Extract<PageBlock, { _type: 'testimonials' }>;
 

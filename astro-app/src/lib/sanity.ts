@@ -8,6 +8,7 @@ import type {
   SPONSOR_BY_SLUG_QUERY_RESULT,
   ALL_PROJECTS_QUERY_RESULT,
   PROJECT_BY_SLUG_QUERY_RESULT,
+  ALL_TESTIMONIALS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -27,6 +28,12 @@ export type Sponsor = ALL_SPONSORS_QUERY_RESULT[number];
  * Array element type extracted for use in component props and helper functions.
  */
 export type Project = ALL_PROJECTS_QUERY_RESULT[number];
+
+/**
+ * Testimonial type — derived from the generated ALL_TESTIMONIALS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
 
 /**
  * Fetch wrapper that enables stega encoding + draft perspective
@@ -239,6 +246,48 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
 }
 
 /**
+ * GROQ query: fetch all testimonials for build-time caching.
+ * Fetched once per build and shared across all blocks that need testimonial data.
+ */
+export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial"] | order(name asc){
+  _id, name, quote, role, organization, type,
+  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  project->{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * Fetch all testimonials from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from testimonials blocks.
+ */
+let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
+
+export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
+  const result = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
+  _testimonialsCache = result ?? [];
+  return _testimonialsCache;
+}
+
+/**
+ * Resolve testimonials for a testimonials block from the pre-fetched cache.
+ * Filters based on displayMode config (all/industry/student/byProject/manual).
+ */
+export function resolveBlockTestimonials(
+  block: { _type: string; displayMode?: string | null; testimonials?: Array<{ _id: string }> | null },
+  allTestimonials: Testimonial[],
+): Testimonial[] {
+  const mode = block.displayMode ?? 'all';
+  if (mode === 'all') return allTestimonials;
+  if (mode === 'industry') return allTestimonials.filter(t => t.type === 'industry');
+  if (mode === 'student') return allTestimonials.filter(t => t.type === 'student');
+  if (mode === 'byProject') return allTestimonials.filter(t => t.project != null);
+  // manual
+  const manualIds = new Set(block.testimonials?.map(t => t._id) ?? []);
+  return allTestimonials.filter(t => manualIds.has(t._id));
+}
+
+/**
  * GROQ query: fetch a single page by slug with template and blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
@@ -314,6 +363,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       displayMode,
       sponsors[]->{ _id }
+    },
+    _type == "testimonials" => {
+      heading,
+      displayMode,
+      testimonials[]->{ _id }
     }
   }
 }`);
