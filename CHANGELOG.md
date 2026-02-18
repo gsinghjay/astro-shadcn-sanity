@@ -1,3 +1,14 @@
+## [1.5.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.0...v1.5.1) (2026-02-18)
+
+### Bug Fixes
+
+* add build-time env vars to wrangler.toml for CF Pages v3 ([9301e60](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9301e60b862548536fd0b798ba6f2bc46517c724))
+* remove wrangler.toml so CF Pages dashboard controls env vars ([f80f93a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f80f93aff1dea27f02cfd79aa985c1b6b2580954))
+
+### Tests
+
+* update wrangler config tests for removed root wrangler.toml ([0b28ea8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0b28ea880ca713e4d308da642f2382c63eef2355))
+
 ## [1.5.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.4.0...v1.5.0) (2026-02-18)
 
 ### Features
