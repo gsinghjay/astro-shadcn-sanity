@@ -1,0 +1,70 @@
+---
+import type { Testimonial } from '@/lib/sanity';
+import { Section, SectionContent } from '@/components/ui/section';
+import TestimonialCard from '@/components/TestimonialCard.astro';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  heading?: string | null;
+  displayMode?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
+  testimonials?: Testimonial[];
+  class?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
+const { heading, displayMode, testimonials = [] } = Astro.props;
+
+// For byProject mode, group testimonials by project reference
+const isByProject = stegaClean(displayMode) === 'byProject';
+const grouped = new Map<string, { title: string; slug: string; testimonials: Testimonial[] }>();
+if (isByProject) {
+  for (const t of testimonials) {
+    if (!t.project) continue;
+    const key = t.project._id;
+    if (!grouped.has(key)) {
+      grouped.set(key, { title: t.project.title ?? '', slug: t.project.slug ?? '', testimonials: [] });
+    }
+    grouped.get(key)!.testimonials.push(t);
+  }
+}
+---
+
+<Section data-animate>
+  {heading && (
+    <SectionContent>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+    </SectionContent>
+  )}
+
+  {isByProject ? (
+    <SectionContent>
+      {[...grouped.entries()].map(([, group]) => (
+        <div class="mb-10 last:mb-0">
+          <h3 class="text-2xl font-bold mb-4">
+            <a href={`/projects/${group.slug}`} class="hover:text-primary transition-colors">
+              {group.title}
+            </a>
+          </h3>
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {group.testimonials.map((t) => (
+              <TestimonialCard testimonial={t} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </SectionContent>
+  ) : (
+    <SectionContent>
+      {testimonials.length > 0 ? (
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {testimonials.map((t) => (
+            <TestimonialCard testimonial={t} />
+          ))}
+        </div>
+      ) : (
+        <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+      )}
+    </SectionContent>
+  )}
+</Section>

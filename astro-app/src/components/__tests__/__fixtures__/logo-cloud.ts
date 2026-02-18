@@ -8,6 +8,8 @@ export const logoCloudSponsors: Sponsor[] = [
     logo: {
       asset: { _id: 'image-Xk7mDaTH2sjqfOBf9pgYrQ-300x300-png', url: 'https://cdn.sanity.io/images/test-project/test-dataset/Xk7mDaTH2sjqfOBf9pgYrQ-300x300.png', metadata: null },
       alt: 'TechCorp logo',
+      hotspot: null,
+      crop: null,
     },
     tier: 'gold',
     description: 'Technology company',
