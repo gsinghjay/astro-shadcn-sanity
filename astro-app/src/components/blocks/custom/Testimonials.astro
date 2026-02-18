@@ -2,6 +2,7 @@
 import type { Testimonial } from '@/lib/sanity';
 import { Section, SectionContent } from '@/components/ui/section';
 import TestimonialCard from '@/components/TestimonialCard.astro';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   heading?: string | null;
@@ -15,7 +16,7 @@ interface Props {
 const { heading, displayMode, testimonials = [] } = Astro.props;
 
 // For byProject mode, group testimonials by project reference
-const isByProject = displayMode === 'byProject';
+const isByProject = stegaClean(displayMode) === 'byProject';
 const grouped = new Map<string, { title: string; slug: string; testimonials: Testimonial[] }>();
 if (isByProject) {
   for (const t of testimonials) {

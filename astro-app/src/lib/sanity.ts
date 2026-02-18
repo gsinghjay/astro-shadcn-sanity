@@ -1,6 +1,7 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
+import { stegaClean } from "@sanity/client/stega";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -179,7 +180,7 @@ export function resolveBlockSponsors(
     return allSponsors.filter(s => manualIds.has(s._id));
   }
   // sponsorCards: displayMode drives filtering
-  const mode = block.displayMode ?? 'all';
+  const mode = stegaClean(block.displayMode) ?? 'all';
   if (mode === 'all') return allSponsors;
   if (mode === 'featured') return allSponsors.filter(s => s.featured);
   // manual
@@ -277,7 +278,7 @@ export function resolveBlockTestimonials(
   block: { _type: string; displayMode?: string | null; testimonials?: Array<{ _id: string }> | null },
   allTestimonials: Testimonial[],
 ): Testimonial[] {
-  const mode = block.displayMode ?? 'all';
+  const mode = stegaClean(block.displayMode) ?? 'all';
   if (mode === 'all') return allTestimonials;
   if (mode === 'industry') return allTestimonials.filter(t => t.type === 'industry');
   if (mode === 'student') return allTestimonials.filter(t => t.type === 'student');

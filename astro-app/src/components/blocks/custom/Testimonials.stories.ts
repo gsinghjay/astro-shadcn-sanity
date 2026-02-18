@@ -14,6 +14,12 @@ const industryTestimonials = [
     role: 'CTO',
     organization: 'Acme Corp',
     type: 'industry',
+    photo: {
+      asset: { _id: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200-png', url: 'https://cdn.sanity.io/images/test/test/Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200.png', metadata: null },
+      alt: 'Jane Smith photo',
+      hotspot: null,
+      crop: null,
+    },
     project: { _id: 'p1', title: 'AI Dashboard', slug: 'ai-dashboard' },
   },
   {
