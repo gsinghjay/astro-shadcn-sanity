@@ -12,10 +12,10 @@ const allIndustries = [...new Set(projects.map(p => p.sponsor?.industry ? stegaC
 const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
 ---
 
-<SidebarLayout title="Projects">
+<SidebarLayout title="Projects" seo={{ metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' }}>
   <Section slot="header">
     <SectionContent>
-      <Breadcrumb items={[
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
         { label: 'Projects' },
       ]} />

@@ -33,13 +33,24 @@ function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
 
 const logoUrl = sponsorLogoUrl(sponsor.logo);
 const projects = sponsor.projects ?? [];
+
+const sponsorJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": stegaClean(sponsor.name),
+  ...(sponsor.website && { "url": stegaClean(sponsor.website) }),
+  ...(sponsor.description && { "description": stegaClean(sponsor.description) }),
+  ...(logoUrl && { "logo": logoUrl }),
+  ...(sponsor.industry && { "industry": stegaClean(sponsor.industry) }),
+};
 ---
 
-<Layout title={sponsor.name ?? 'Sponsor'}>
+<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined}>
+  <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
   <!-- Header with breadcrumb + sponsor info -->
   <Section>
     <SectionContent>
-      <Breadcrumb items={[
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
         { label: 'Sponsors', href: '/sponsors' },
         { label: sponsor.name ?? 'Sponsor' },

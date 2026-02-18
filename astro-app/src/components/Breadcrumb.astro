@@ -1,12 +1,28 @@
 ---
 import BreadcrumbItem from './BreadcrumbItem.astro';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   items: Array<{ label: string; href?: string }>;
+  baseUrl?: string;
 }
-const { items } = Astro.props;
+const { items, baseUrl = '' } = Astro.props;
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": items
+    .filter((item, index) => item.href || index === items.length - 1)
+    .map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": stegaClean(item.label),
+      ...(item.href && { "item": `${baseUrl}${item.href}` }),
+    })),
+};
 ---
 <nav aria-label="Breadcrumb" class="mb-6">
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
   <ol class="flex items-center gap-2 text-sm text-muted-foreground">
     {items.map((item, i) => (
       <BreadcrumbItem label={item.label} href={item.href} showSeparator={i !== 0} />

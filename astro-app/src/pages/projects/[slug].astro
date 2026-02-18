@@ -48,11 +48,11 @@ const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
-<Layout title={project.title ?? 'Project'}>
+<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article">
   <!-- Header with breadcrumb, title, status, semester -->
   <Section>
     <SectionContent>
-      <Breadcrumb items={[
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
         { label: 'Projects', href: '/projects' },
         { label: project.title ?? 'Project' },
