@@ -60,6 +60,7 @@ const ogImageUrl = seo?.ogImage?.asset
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
+  "@id": `${Astro.url.origin}/#organization`,
   "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
   "url": Astro.url.origin,
   ...(cleanDescription && { "description": cleanDescription }),

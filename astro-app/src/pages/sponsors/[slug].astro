@@ -37,11 +37,11 @@ const projects = sponsor.projects ?? [];
 const sponsorJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": Astro.url.href,
   "name": stegaClean(sponsor.name),
   ...(sponsor.website && { "url": stegaClean(sponsor.website) }),
   ...(sponsor.description && { "description": stegaClean(sponsor.description) }),
   ...(logoUrl && { "logo": logoUrl }),
-  ...(sponsor.industry && { "industry": stegaClean(sponsor.industry) }),
 };
 ---
 
