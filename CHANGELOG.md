@@ -1,3 +1,35 @@
+## [1.5.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.4.0...v1.5.0) (2026-02-18)
+
+### Features
+
+* optimize build-time Sanity API calls and update typegen ([45fbf24](https://github.com/gsinghjay/astro-shadcn-sanity/commit/45fbf24f1da68d5e8423f46add70f764e7ec5c64))
+* **studio:** dynamic Presentation Tool locations and MPA navigation (Story 7-11) ([9b7fa33](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9b7fa339441012969c01a6421541e2a68950ea35))
+* use Server Islands for preview instead of full SSR (Story 7-4) ([34d07b3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/34d07b3bd95ed42e6be4906e556dc3344173dfc5))
+
+### Bug Fixes
+
+* address 3 P1 findings from TEA test review ([e4e43a7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e4e43a7608b892917bb794298cb2ff48a269bef1))
+* address code review findings for build-time optimization ([913c398](https://github.com/gsinghjay/astro-shadcn-sanity/commit/913c3982440aaea0d72ea27a5519674cfcc1e227))
+* **blocks:** update BlockWrapper CSS values and delegate CtaBanner background (Story 7-9) ([098a064](https://github.com/gsinghjay/astro-shadcn-sanity/commit/098a0643e9569f6ef3dc307a13b23441798dbc75))
+* **blocks:** use PortableText component for RichText and FAQ rendering (Story 7-8) ([36f00ba](https://github.com/gsinghjay/astro-shadcn-sanity/commit/36f00ba12dcb949d21ea1dd37461668181026619))
+* move BlockWrapper out of blocks/, remove as-any casts, align CtaBanner default ([482b54f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/482b54ff9f00af6d792f1d2a1374734adc96d833))
+* remove sponsor location resolver pointing to non-existent routes ([4e6e1f9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4e6e1f90636d43a8da606617b6ff7ca98ea9780d))
+* **test:** update block schema tests for named object types and run data migration (Story 7-10) ([77afcde](https://github.com/gsinghjay/astro-shadcn-sanity/commit/77afcde5b0496553f3288b60c634c0bc628251d5))
+
+### Documentation
+
+* add joshua lastimosa to team section ([fd8b50f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fd8b50f67d0701afe07534b6d1aa916623969839))
+* add relevent business information ([aff751a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/aff751a282e2694ab90db291180697fea1f9818a))
+
+### Miscellaneous
+
+* **typegen:** regenerate types after named object type extraction (Story 7-10) ([a7167fb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a7167fbb886f67f3414c45567663b117b3a8791c))
+
+### Refactoring
+
+* **schema:** extract reusable inline object types (Story 7-10) ([f03c695](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f03c695975af5ded91b3991f34da93fbd7b513e9))
+* **schema:** extract reusable link and button field patterns (Story 7-7) ([6385461](https://github.com/gsinghjay/astro-shadcn-sanity/commit/638546161778f7aca5ca5f48275f876f5f0bc8b6))
+
 ## [1.4.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.3.0...v1.4.0) (2026-02-12)
 
 ### Features
