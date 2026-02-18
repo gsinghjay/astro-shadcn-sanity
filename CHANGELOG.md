@@ -1,3 +1,26 @@
+## [1.6.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.2...v1.6.0) (2026-02-18)
+
+### Features
+
+* add event document schema and EventList block (Story 2.12) ([1deb82c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1deb82cb5880e4b5559eaa56cbc8c3999fd22bfb))
+* add project listing page with filtering and cross-reference navigation (Story 4.3) ([e330396](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e330396a3967182650df19253b4a4e0223dff8e2))
+* add SidebarLayout and move project filters to sticky sidebar ([ff53129](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ff53129e1de2ac4acaf2a6344407eb7075fd35a1))
+* add sponsor detail links, urlFor logos, listing page, and fix Storybook build ([a038979](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a038979dd41dae9585eeb35f35c2d4b046385688))
+* add sponsor detail pages with breadcrumb navigation ([c4a8877](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c4a88777b5bfbe3874acbaa1b0afe7a80d3614f4))
+* add testimonial document schema and testimonials block (Story 2.11) ([1ec72eb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1ec72ebe49658697301895c698e237cf71cbac8a))
+
+### Bug Fixes
+
+* add hotspot/crop to sponsor logo GROQ projections and noreferrer to SponsorCard ([a174e43](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a174e436913669ffdcb19e714be1f54766326619))
+* add stegaClean to displayMode comparisons for Visual Editing compatibility ([d89078d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d89078de264c6896cedded9b6ff9ccd5a19bd481))
+* code review fixes for Stories 2.11, 2.12, 4.3, 4.4 ([7ec81eb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7ec81eb0568c0d8b354118252208e581d567e147))
+* remove debug logging and keep Vite define for CF env vars ([b8fda54](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b8fda541e7af9f0b89e4b2eb316c7ba0a5992dbd))
+* stegaClean on href values and extract shared SponsorCard component ([c353777](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c3537779243084f14ac3010873d2175ebdb7c93e))
+
+### Miscellaneous
+
+* update sanity CLI ([4040a6e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4040a6e0e40905ddc653e8a5e11c9ded0d81a735))
+
 ## [1.5.2](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.1...v1.5.2) (2026-02-18)
 
 ### Bug Fixes
