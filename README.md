@@ -1,4 +1,4 @@
-# YWCC Capstone Sponsors
+# YWCC Industry Capstone
 
 ![Astro](https://img.shields.io/badge/Astro-5.x-FF5D01?logo=astro&logoColor=white)
 ![Sanity](https://img.shields.io/badge/Sanity-5-F03E2F?logo=sanity&logoColor=white)
