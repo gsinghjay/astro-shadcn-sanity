@@ -37,7 +37,10 @@ export const testimonial = defineType({
       title: 'Type',
       type: 'string',
       options: {
-        list: ['industry', 'student'],
+        list: [
+          {title: 'Industry', value: 'industry'},
+          {title: 'Student', value: 'student'},
+        ],
       },
     }),
     defineField({
