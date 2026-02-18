@@ -9,10 +9,18 @@ const {
   loadQuery,
   getSiteSettings,
   getAllSponsors,
+  getSponsorBySlug,
+  getAllProjects,
+  getProjectBySlug,
   resolveBlockSponsors,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
   ALL_SPONSORS_QUERY,
+  ALL_SPONSOR_SLUGS_QUERY,
+  SPONSOR_BY_SLUG_QUERY,
+  ALL_PROJECTS_QUERY,
+  ALL_PROJECT_SLUGS_QUERY,
+  PROJECT_BY_SLUG_QUERY,
   PAGE_BY_SLUG_QUERY,
 } = await import("@/lib/sanity");
 
@@ -45,6 +53,58 @@ describe("GROQ query definitions", () => {
     expect(ALL_SPONSORS_QUERY).toContain("tier");
     expect(ALL_SPONSORS_QUERY).toContain("featured");
     expect(ALL_SPONSORS_QUERY).toContain("order(name asc)");
+  });
+
+  it("ALL_SPONSOR_SLUGS_QUERY targets sponsor type with slug projection", () => {
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("defined(slug.current)");
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("slug.current");
+  });
+
+  it("SPONSOR_BY_SLUG_QUERY fetches single sponsor by slug with all fields", () => {
+    expect(SPONSOR_BY_SLUG_QUERY).toContain('_type == "sponsor"');
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("$slug");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("name");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("slug.current");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("tier");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("description");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("website");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("industry");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("featured");
+  });
+
+  it("SPONSOR_BY_SLUG_QUERY includes projects sub-query", () => {
+    expect(SPONSOR_BY_SLUG_QUERY).toContain('_type == "project"');
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("references(^._id)");
+  });
+
+  it("ALL_PROJECTS_QUERY targets project type with sponsor reference", () => {
+    expect(ALL_PROJECTS_QUERY).toContain('_type == "project"');
+    expect(ALL_PROJECTS_QUERY).toContain("sponsor->");
+    expect(ALL_PROJECTS_QUERY).toContain("slug.current");
+    expect(ALL_PROJECTS_QUERY).toContain("technologyTags");
+    expect(ALL_PROJECTS_QUERY).toContain("order(title asc)");
+  });
+
+  it("ALL_PROJECT_SLUGS_QUERY targets project type with slug projection", () => {
+    expect(ALL_PROJECT_SLUGS_QUERY).toContain('_type == "project"');
+    expect(ALL_PROJECT_SLUGS_QUERY).toContain("defined(slug.current)");
+    expect(ALL_PROJECT_SLUGS_QUERY).toContain("slug.current");
+  });
+
+  it("PROJECT_BY_SLUG_QUERY fetches single project by slug with all fields", () => {
+    expect(PROJECT_BY_SLUG_QUERY).toContain('_type == "project"');
+    expect(PROJECT_BY_SLUG_QUERY).toContain("$slug");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("sponsor->");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("technologyTags");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("team[]");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("mentor");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("outcome");
+  });
+
+  it("PROJECT_BY_SLUG_QUERY includes testimonials sub-query", () => {
+    expect(PROJECT_BY_SLUG_QUERY).toContain('_type == "testimonial"');
+    expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
   });
 
   it("PAGE_BY_SLUG_QUERY includes all block type projections", () => {
@@ -207,6 +267,115 @@ describe("getAllSponsors()", () => {
     const cached = await freshModule.getAllSponsors();
     expect(cached).toEqual(mockSponsors);
     expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getSponsorBySlug()", () => {
+  it("fetches a sponsor by slug with the correct query and params", async () => {
+    const mockSponsor = {
+      _id: "sp-1",
+      name: "Acme Corp",
+      slug: "acme-corp",
+      tier: "gold",
+      projects: [],
+    };
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockSponsor,
+    } as never);
+
+    const result = await getSponsorBySlug("acme-corp");
+    expect(result).toEqual(mockSponsor);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      SPONSOR_BY_SLUG_QUERY,
+      { slug: "acme-corp" },
+      expect.objectContaining({
+        filterResponse: false,
+        perspective: "published",
+      }),
+    );
+  });
+
+  it("returns null when sponsor is not found", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+    } as never);
+
+    const result = await getSponsorBySlug("nonexistent");
+    expect(result).toBeNull();
+  });
+});
+
+describe("getAllProjects()", () => {
+  it("fetches and returns projects from Sanity", async () => {
+    const mockProjects = [
+      { _id: "proj-1", title: "Project Alpha", slug: "project-alpha" },
+      { _id: "proj-2", title: "Project Beta", slug: "project-beta" },
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockProjects,
+    } as never);
+
+    const result = await getAllProjects();
+    expect(result).toEqual(mockProjects);
+    expect(sanityClient.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("returns cached result on subsequent calls without additional API calls", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockProjects = [
+      { _id: "proj-1", title: "Project Alpha" },
+    ];
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({
+      result: mockProjects,
+    } as never);
+
+    await freshModule.getAllProjects();
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    const cached = await freshModule.getAllProjects();
+    expect(cached).toEqual(mockProjects);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getProjectBySlug()", () => {
+  it("fetches a project by slug with the correct query and params", async () => {
+    const mockProject = {
+      _id: "proj-1",
+      title: "Smart Campus",
+      slug: "smart-campus",
+      sponsor: { _id: "sp-1", name: "Acme Corp" },
+      testimonials: [],
+    };
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockProject,
+    } as never);
+
+    const result = await getProjectBySlug("smart-campus");
+    expect(result).toEqual(mockProject);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      PROJECT_BY_SLUG_QUERY,
+      { slug: "smart-campus" },
+      expect.objectContaining({
+        filterResponse: false,
+        perspective: "published",
+      }),
+    );
+  });
+
+  it("returns null when project is not found", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+    } as never);
+
+    const result = await getProjectBySlug("nonexistent");
+    expect(result).toBeNull();
   });
 });
 
