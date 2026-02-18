@@ -20,6 +20,7 @@ interface Props {
   title?: string;
   seo?: SeoProps | null;
   hideNav?: boolean;
+  ogType?: string;
 }
 
 const siteSettings = await getSiteSettings();
@@ -30,6 +31,7 @@ const {
   title = defaultTitle,
   seo,
   hideNav = false,
+  ogType,
 } = Astro.props;
 
 const cleanTitle = stegaClean(title);
@@ -42,7 +44,7 @@ const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
 // Fallback to process.env for Cloudflare Pages git integration builds (no .env file)
-const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || process.env.PUBLIC_GA_MEASUREMENT_ID;
+const gtmId = import.meta.env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID;
 
 const fullTitle = cleanSeoTitle
   ? cleanSeoTitle
@@ -54,6 +56,15 @@ const ogTitle = cleanSeoTitle ?? cleanTitle;
 const ogImageUrl = seo?.ogImage?.asset
   ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
   : null;
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "@id": `${Astro.url.origin}/#organization`,
+  "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
+  "url": Astro.url.origin,
+  ...(cleanDescription && { "description": cleanDescription }),
+};
 ---
 
 <!doctype html>
@@ -67,26 +78,35 @@ const ogImageUrl = seo?.ogImage?.asset
     <meta property="og:title" content={ogTitle} />
     <meta property="og:description" content={cleanDescription} />
     <meta property="og:url" content={Astro.url.href} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType ?? 'website'} />
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+    <meta name="twitter:card" content={ogImageUrl ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={cleanDescription} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' https://cdn.sanity.io https://placehold.co data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://*.sanity.io wss://*.sanity.io; font-src 'self'; frame-src 'self'"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.sanity.io wss://*.sanity.io; font-src 'self'; frame-src 'self' https://www.googletagmanager.com"
     />
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     <title>{fullTitle}</title>
-    {gaId && (
-      <Fragment>
-        <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-        <script define:vars={{ gaId }}>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', gaId);
-        </script>
-      </Fragment>
+    {gtmId && (
+      <script define:vars={{ gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',gtmId);
+      </script>
     )}
   </head>
   <body class="antialiased">
+    {gtmId && (
+      <noscript>
+        <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0" width="0" style="display:none;visibility:hidden"></iframe>
+      </noscript>
+    )}
     {!hideNav && <Header />}
     <main>
       <slot />

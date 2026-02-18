@@ -85,10 +85,15 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
     })
   })
 
-  describe('AC2: GA4 environment variable', () => {
-    test('[P0] 5.2-INT-011 — .env.example has PUBLIC_GA_MEASUREMENT_ID placeholder', () => {
+  describe('AC2: GTM environment variable (migrated from GA4 in Story 5.8)', () => {
+    test('[P0] 5.2-INT-011 — .env.example has PUBLIC_GTM_ID placeholder', () => {
       const envExample = readFileSync(path.resolve(ASTRO_APP, '.env.example'), 'utf-8')
-      expect(envExample).toContain('PUBLIC_GA_MEASUREMENT_ID')
+      expect(envExample).toContain('PUBLIC_GTM_ID')
+    })
+
+    test('[P0] 5.2-INT-011b — .env.example does NOT have old PUBLIC_GA_MEASUREMENT_ID', () => {
+      const envExample = readFileSync(path.resolve(ASTRO_APP, '.env.example'), 'utf-8')
+      expect(envExample).not.toContain('PUBLIC_GA_MEASUREMENT_ID')
     })
 
     test('[P0] 5.2-INT-012 — .env.example has PUBLIC_SITE_URL placeholder', () => {
@@ -97,7 +102,7 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
     })
   })
 
-  describe('AC1,AC3: Layout.astro GA4 + CSP', () => {
+  describe('AC1,AC3: Layout.astro GTM + CSP (migrated from GA4 in Story 5.8)', () => {
     const layoutPath = path.resolve(ASTRO_APP, 'src/layouts/Layout.astro')
     let layoutContent: string
 
@@ -105,30 +110,72 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       layoutContent = readFileSync(layoutPath, 'utf-8')
     })
 
-    test('[P0] 5.2-INT-013 — Layout.astro reads PUBLIC_GA_MEASUREMENT_ID from env', () => {
-      expect(layoutContent).toContain('import.meta.env.PUBLIC_GA_MEASUREMENT_ID')
+    test('[P0] 5.8-INT-001 — Layout.astro reads PUBLIC_GTM_ID from env', () => {
+      expect(layoutContent).toContain('import.meta.env.PUBLIC_GTM_ID')
     })
 
-    test('[P0] 5.2-INT-014 — Layout.astro includes GA4 async script with googletagmanager', () => {
-      expect(layoutContent).toContain('https://www.googletagmanager.com/gtag/js')
-      expect(layoutContent).toContain('async')
+    test('[P0] 5.8-INT-002 — Layout.astro includes GTM container script with gtm.js', () => {
+      expect(layoutContent).toContain('https://www.googletagmanager.com/gtm.js')
     })
 
-    test('[P0] 5.2-INT-015 — GA4 script is conditionally rendered (only when gaId is set)', () => {
-      expect(layoutContent).toMatch(/gaId\s*&&/)
+    test('[P0] 5.8-INT-003 — GTM script is conditionally rendered (only when gtmId is set)', () => {
+      expect(layoutContent).toMatch(/gtmId\s*&&/)
     })
 
-    test('[P0] 5.2-INT-016 — GA4 uses define:vars to pass measurement ID', () => {
-      expect(layoutContent).toContain('define:vars={{ gaId }}')
+    test('[P0] 5.8-INT-004 — GTM uses define:vars to pass container ID', () => {
+      expect(layoutContent).toContain('define:vars={{ gtmId }}')
+    })
+
+    test('[P0] 5.8-INT-005 — GTM noscript iframe present in body', () => {
+      expect(layoutContent).toContain('https://www.googletagmanager.com/ns.html')
+      expect(layoutContent).toContain('<noscript>')
+      expect(layoutContent).toContain('<iframe')
+    })
+
+    test('[P0] 5.8-INT-006 — Old GA4 gtag.js snippet is removed', () => {
+      expect(layoutContent).not.toContain('gtag/js')
+      expect(layoutContent).not.toContain("gtag('config'")
+      expect(layoutContent).not.toContain('PUBLIC_GA_MEASUREMENT_ID')
+    })
+
+    test('[P0] 5.8-INT-007 — No gaId variable remains', () => {
+      expect(layoutContent).not.toMatch(/\bgaId\b/)
     })
 
     test('[P0] 5.2-INT-017 — Layout.astro has CSP meta tag', () => {
       expect(layoutContent).toContain('http-equiv="Content-Security-Policy"')
     })
 
-    test('[P0] 5.2-INT-018 — CSP allows googletagmanager and google-analytics in script-src', () => {
+    test('[P0] 5.2-INT-018 — CSP allows googletagmanager in script-src', () => {
       expect(layoutContent).toContain('https://www.googletagmanager.com')
-      expect(layoutContent).toContain('https://www.google-analytics.com')
+    })
+
+    test('[P0] 5.8-INT-008 — CSP allows googletagmanager in img-src (noscript pixel)', () => {
+      const cspMatch = layoutContent.match(/content="([^"]*Content-Security-Policy[^"]*)"/)
+        || layoutContent.match(/content="(default-src[^"]*)"/)
+      expect(cspMatch).not.toBeNull()
+      const csp = cspMatch![1]
+      const imgSrc = csp.match(/img-src\s+([^;]+)/)
+      expect(imgSrc).not.toBeNull()
+      expect(imgSrc![1]).toContain('https://www.googletagmanager.com')
+    })
+
+    test('[P0] 5.8-INT-009a — CSP allows googletagmanager in connect-src (GTM container fetch)', () => {
+      const cspMatch = layoutContent.match(/content="(default-src[^"]*)"/)
+      expect(cspMatch).not.toBeNull()
+      const csp = cspMatch![1]
+      const connectSrc = csp.match(/connect-src\s+([^;]+)/)
+      expect(connectSrc).not.toBeNull()
+      expect(connectSrc![1]).toContain('https://www.googletagmanager.com')
+    })
+
+    test('[P0] 5.8-INT-009 — CSP allows googletagmanager in frame-src (noscript iframe)', () => {
+      const cspMatch = layoutContent.match(/content="(default-src[^"]*)"/)
+      expect(cspMatch).not.toBeNull()
+      const csp = cspMatch![1]
+      const frameSrc = csp.match(/frame-src\s+([^;]+)/)
+      expect(frameSrc).not.toBeNull()
+      expect(frameSrc![1]).toContain('https://www.googletagmanager.com')
     })
 
     test('[P0] 5.2-INT-019 — CSP allows cdn.sanity.io in img-src', () => {
@@ -236,5 +283,26 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       const indexHtml = readFileSync(path.resolve(ASTRO_APP, 'dist/index.html'), 'utf-8')
       expect(indexHtml).toContain('Content-Security-Policy')
     })
+  })
+})
+
+describe('Story 5-8: Migrate GA4 to GTM — astro.config.mjs', () => {
+  const configPath = path.resolve(ASTRO_APP, 'astro.config.mjs')
+  let configContent: string
+
+  beforeAll(() => {
+    configContent = readFileSync(configPath, 'utf-8')
+  })
+
+  test('[P0] 5.8-INT-010 — astro.config.mjs reads PUBLIC_GTM_ID env var', () => {
+    expect(configContent).toContain('PUBLIC_GTM_ID')
+  })
+
+  test('[P0] 5.8-INT-011 — astro.config.mjs passes PUBLIC_GTM_ID through Vite define', () => {
+    expect(configContent).toContain('"import.meta.env.PUBLIC_GTM_ID"')
+  })
+
+  test('[P0] 5.8-INT-012 — astro.config.mjs does NOT reference old PUBLIC_GA_MEASUREMENT_ID', () => {
+    expect(configContent).not.toContain('PUBLIC_GA_MEASUREMENT_ID')
   })
 })

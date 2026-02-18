@@ -11,6 +11,7 @@ import type {
   PROJECT_BY_SLUG_QUERY_RESULT,
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
+  EVENT_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -346,6 +347,29 @@ export function resolveBlockEvents(
   }
 
   return filtered.slice(0, limit);
+}
+
+/**
+ * GROQ query: fetch all event slugs for static path generation.
+ */
+export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defined(slug.current)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single event by slug with all fields.
+ */
+export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug][0]{
+  _id, title, "slug": slug.current,
+  date, endDate, location, description, eventType, status
+}`);
+
+/**
+ * Fetch a single event by slug from Sanity.
+ */
+export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
+  return loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
+    query: EVENT_BY_SLUG_QUERY,
+    params: { slug },
+  });
 }
 
 /**

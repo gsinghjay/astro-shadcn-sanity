@@ -99,4 +99,58 @@ describe('Breadcrumb', () => {
     const separatorCount = (html.match(/aria-hidden="true"/g) || []).length;
     expect(separatorCount).toBe(1);
   });
+
+  it('renders JSON-LD BreadcrumbList structured data', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Breadcrumb, {
+      props: {
+        items: [
+          { label: 'Home', href: '/' },
+          { label: 'Sponsors', href: '/sponsors' },
+          { label: 'Acme Corp' },
+        ],
+        baseUrl: 'https://example.com',
+      },
+    });
+
+    expect(html).toContain('application/ld+json');
+    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    expect(jsonLdMatch).not.toBeNull();
+
+    const jsonLd = JSON.parse(jsonLdMatch![1]);
+    expect(jsonLd['@context']).toBe('https://schema.org');
+    expect(jsonLd['@type']).toBe('BreadcrumbList');
+    expect(jsonLd.itemListElement).toHaveLength(3);
+
+    expect(jsonLd.itemListElement[0].position).toBe(1);
+    expect(jsonLd.itemListElement[0].name).toBe('Home');
+    expect(jsonLd.itemListElement[0].item).toBe('https://example.com/');
+
+    expect(jsonLd.itemListElement[1].position).toBe(2);
+    expect(jsonLd.itemListElement[1].name).toBe('Sponsors');
+    expect(jsonLd.itemListElement[1].item).toBe('https://example.com/sponsors');
+
+    // Last item (current page) has no item URL per Schema.org spec
+    expect(jsonLd.itemListElement[2].position).toBe(3);
+    expect(jsonLd.itemListElement[2].name).toBe('Acme Corp');
+    expect(jsonLd.itemListElement[2].item).toBeUndefined();
+  });
+
+  it('renders JSON-LD with relative URLs when baseUrl is omitted', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Breadcrumb, {
+      props: {
+        items: [
+          { label: 'Home', href: '/' },
+          { label: 'Current' },
+        ],
+      },
+    });
+
+    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+    expect(jsonLdMatch).not.toBeNull();
+
+    const jsonLd = JSON.parse(jsonLdMatch![1]);
+    expect(jsonLd.itemListElement[0].item).toBe('/');
+  });
 });
