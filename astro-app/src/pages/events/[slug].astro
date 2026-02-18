@@ -61,9 +61,7 @@ const eventJsonLd = {
     },
   }),
   ...(event.description && { "description": stegaClean(event.description) }),
-  "eventStatus": cleanStatus === 'upcoming'
-    ? "https://schema.org/EventScheduled"
-    : "https://schema.org/EventPostponed",
+  "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
   "organizer": {
     "@type": "Organization",
