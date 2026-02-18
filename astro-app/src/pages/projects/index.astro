@@ -1,90 +1,91 @@
 ---
-import Layout from '@/layouts/Layout.astro';
+import SidebarLayout from '@/layouts/SidebarLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import { getAllProjects } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
-import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Section, SectionContent } from '@/components/ui/section';
 import ProjectCard from '@/components/ProjectCard.astro';
 
 const projects = await getAllProjects();
 const allTechs = [...new Set(projects.flatMap(p => (p.technologyTags ?? []).map(t => stegaClean(t))))].sort();
 const allIndustries = [...new Set(projects.map(p => p.sponsor?.industry ? stegaClean(p.sponsor.industry) : '').filter(Boolean))].sort();
+const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
 ---
 
-<Layout title="Projects">
-  <Section>
+<SidebarLayout title="Projects">
+  <Section slot="header">
     <SectionContent>
       <Breadcrumb items={[
         { label: 'Home', href: '/' },
         { label: 'Projects' },
       ]} />
 
-      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] mb-8">Capstone Projects</h1>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Capstone Projects</h1>
+    </SectionContent>
+  </Section>
 
-      {(allTechs.length > 0 || allIndustries.length > 0) && (
-        <div data-project-filters class="mb-8 space-y-4">
-          {allTechs.length > 0 && (
-            <div>
-              <span class="text-sm font-medium text-muted-foreground mr-3">Technology:</span>
-              <div class="inline-flex flex-wrap gap-2">
-                <button
-                  data-filter-tech="all"
-                  data-state="active"
-                  aria-pressed="true"
-                  class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-                >
-                  All
-                </button>
-                {allTechs.map((tech) => (
-                  <button
-                    data-filter-tech={tech}
-                    aria-pressed="false"
-                    class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-                  >
-                    {tech}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {projects.map((project) => (
+      <ProjectCard project={project} />
+    ))}
+  </div>
 
-          {allIndustries.length > 0 && (
-            <div>
-              <span class="text-sm font-medium text-muted-foreground mr-3">Industry:</span>
-              <div class="inline-flex flex-wrap gap-2">
-                <button
-                  data-filter-industry="all"
-                  data-state="active"
-                  aria-pressed="true"
-                  class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-                >
-                  All Industries
-                </button>
-                {allIndustries.map((industry) => (
-                  <button
-                    data-filter-industry={industry}
-                    aria-pressed="false"
-                    class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-                  >
-                    {industry}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+  {hasFilters && (
+    <div slot="sidebar" data-project-filters class="space-y-6">
+      {allTechs.length > 0 && (
+        <div>
+          <h3 class="text-sm font-semibold text-foreground mb-3">Technology</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              data-filter-tech="all"
+              data-state="active"
+              aria-pressed="true"
+              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+            >
+              All
+            </button>
+            {allTechs.map((tech) => (
+              <button
+                data-filter-tech={tech}
+                aria-pressed="false"
+                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              >
+                {tech}
+              </button>
+            ))}
+          </div>
         </div>
       )}
-    </SectionContent>
 
-    <SectionGrid size="lg">
-      {projects.map((project) => (
-        <ProjectCard project={project} />
-      ))}
-    </SectionGrid>
-  </Section>
-</Layout>
+      {allIndustries.length > 0 && (
+        <div>
+          <h3 class="text-sm font-semibold text-foreground mb-3">Industry</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              data-filter-industry="all"
+              data-state="active"
+              aria-pressed="true"
+              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+            >
+              All Industries
+            </button>
+            {allIndustries.map((industry) => (
+              <button
+                data-filter-industry={industry}
+                aria-pressed="false"
+                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              >
+                {industry}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+</SidebarLayout>
 
-<style>
+<style is:global>
   [data-project-card][data-state="hidden"] { display: none; }
 </style>
 
