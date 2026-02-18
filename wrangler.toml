@@ -1,4 +1,0 @@
-name = "ywcc-capstone"
-pages_build_output_dir = "astro-app/dist"
-compatibility_date = "2025-12-01"
-compatibility_flags = ["nodejs_compat", "disable_nodejs_process_v2"]
