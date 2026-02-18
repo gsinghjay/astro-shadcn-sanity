@@ -1,6 +1,7 @@
 import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
+import { stegaClean } from "@sanity/client/stega";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -8,6 +9,8 @@ import type {
   SPONSOR_BY_SLUG_QUERY_RESULT,
   ALL_PROJECTS_QUERY_RESULT,
   PROJECT_BY_SLUG_QUERY_RESULT,
+  ALL_TESTIMONIALS_QUERY_RESULT,
+  ALL_EVENTS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -27,6 +30,18 @@ export type Sponsor = ALL_SPONSORS_QUERY_RESULT[number];
  * Array element type extracted for use in component props and helper functions.
  */
 export type Project = ALL_PROJECTS_QUERY_RESULT[number];
+
+/**
+ * Testimonial type — derived from the generated ALL_TESTIMONIALS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
+
+/**
+ * SanityEvent type — derived from the generated ALL_EVENTS_QUERY_RESULT.
+ * Named "SanityEvent" to avoid collision with the global DOM Event type.
+ */
+export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
 
 /**
  * Fetch wrapper that enables stega encoding + draft perspective
@@ -172,7 +187,7 @@ export function resolveBlockSponsors(
     return allSponsors.filter(s => manualIds.has(s._id));
   }
   // sponsorCards: displayMode drives filtering
-  const mode = block.displayMode ?? 'all';
+  const mode = stegaClean(block.displayMode) ?? 'all';
   if (mode === 'all') return allSponsors;
   if (mode === 'featured') return allSponsors.filter(s => s.featured);
   // manual
@@ -236,6 +251,101 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
     query: PROJECT_BY_SLUG_QUERY,
     params: { slug },
   });
+}
+
+/**
+ * GROQ query: fetch all testimonials for build-time caching.
+ * Fetched once per build and shared across all blocks that need testimonial data.
+ */
+export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial"] | order(name asc){
+  _id, name, quote, role, organization, type,
+  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  project->{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * Fetch all testimonials from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from testimonials blocks.
+ */
+let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
+
+export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
+  const result = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
+  _testimonialsCache = result ?? [];
+  return _testimonialsCache;
+}
+
+/**
+ * Resolve testimonials for a testimonials block from the pre-fetched cache.
+ * Filters based on displayMode config (all/industry/student/byProject/manual).
+ */
+export function resolveBlockTestimonials(
+  block: { _type: string; displayMode?: string | null; testimonials?: Array<{ _id: string }> | null },
+  allTestimonials: Testimonial[],
+): Testimonial[] {
+  const mode = stegaClean(block.displayMode) ?? 'all';
+  if (mode === 'all') return allTestimonials;
+  if (mode === 'industry') return allTestimonials.filter(t => stegaClean(t.type) === 'industry');
+  if (mode === 'student') return allTestimonials.filter(t => stegaClean(t.type) === 'student');
+  if (mode === 'byProject') return allTestimonials.filter(t => t.project != null);
+  // manual
+  const manualIds = new Set(block.testimonials?.map(t => t._id) ?? []);
+  return allTestimonials.filter(t => manualIds.has(t._id));
+}
+
+/**
+ * GROQ query: fetch all events for build-time caching.
+ * Fetched once per build and shared across all blocks that need event data.
+ */
+export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event"] | order(date asc){
+  _id, title, "slug": slug.current, date, endDate, location,
+  description, eventType, status
+}`);
+
+/**
+ * Fetch all events from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from eventList blocks.
+ */
+let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
+
+export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _eventsCache) return _eventsCache;
+  const result = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
+  _eventsCache = result ?? [];
+  return _eventsCache;
+}
+
+/**
+ * Resolve events for an eventList block from the pre-fetched cache.
+ * Filters based on filterBy config (all/upcoming/past) and applies limit.
+ * Status field takes priority; date comparison is fallback when status is unset.
+ */
+export function resolveBlockEvents(
+  block: { _type: string; filterBy?: string | null; limit?: number | null },
+  allEvents: SanityEvent[],
+): SanityEvent[] {
+  const filter = stegaClean(block.filterBy) ?? 'upcoming';
+  const limit = block.limit ?? 10;
+  const now = new Date().toISOString();
+
+  let filtered: SanityEvent[];
+  if (filter === 'upcoming') {
+    filtered = allEvents
+      .filter(e => stegaClean(e.status) === 'upcoming' || (!e.status && e.date && e.date >= now))
+      .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  } else if (filter === 'past') {
+    filtered = allEvents
+      .filter(e => stegaClean(e.status) === 'past' || (!e.status && e.date && e.date < now))
+      .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+  } else {
+    // all
+    filtered = [...allEvents].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  }
+
+  return filtered.slice(0, limit);
 }
 
 /**
@@ -314,6 +424,16 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       displayMode,
       sponsors[]->{ _id }
+    },
+    _type == "testimonials" => {
+      heading,
+      displayMode,
+      testimonials[]->{ _id }
+    },
+    _type == "eventList" => {
+      heading,
+      filterBy,
+      limit
     }
   }
 }`);

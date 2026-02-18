@@ -15,6 +15,8 @@ import {page} from './documents/page'
 import {siteSettings} from './documents/site-settings'
 import {sponsor} from './documents/sponsor'
 import {project} from './documents/project'
+import {testimonial} from './documents/testimonial'
+import {event} from './documents/event'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -29,6 +31,8 @@ import {richText} from './blocks/rich-text'
 import {faqSection} from './blocks/faq-section'
 import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
+import {testimonials} from './blocks/testimonials'
+import {eventList} from './blocks/event-list'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -46,6 +50,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   siteSettings,
   sponsor,
   project,
+  testimonial,
+  event,
   // Blocks — homepage
   heroBanner,
   featureGrid,
@@ -59,4 +65,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   faqSection,
   contactForm,
   sponsorCards,
+  testimonials,
+  eventList,
 ]
