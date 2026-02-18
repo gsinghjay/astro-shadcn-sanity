@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, prefetchPages } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, getAllEvents, prefetchPages } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
@@ -41,6 +41,7 @@ let template: keyof typeof templates = 'default';
 let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
+let events: Awaited<ReturnType<typeof getAllEvents>> = [];
 
 if (!visualEditingEnabled) {
   page = await getPage(slug as string);
@@ -51,6 +52,7 @@ if (!visualEditingEnabled) {
   TemplateComponent = templates[template] ?? DefaultTemplate;
   sponsors = await getAllSponsors();
   testimonials = await getAllTestimonials();
+  events = await getAllEvents();
 }
 ---
 
@@ -74,7 +76,7 @@ if (!visualEditingEnabled) {
     </SanityPageContent>
   ) : (
     <TemplateComponent>
-      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} />
+      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
     </TemplateComponent>
   )}
 </Layout>

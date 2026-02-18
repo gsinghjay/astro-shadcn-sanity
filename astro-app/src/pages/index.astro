@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
-import { getPage, getAllSponsors, getAllTestimonials } from '../lib/sanity';
+import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '../lib/sanity';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
@@ -11,6 +11,7 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 let page = null;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
+let events: Awaited<ReturnType<typeof getAllEvents>> = [];
 if (!visualEditingEnabled) {
   page = await getPage('home');
   if (!page) {
@@ -18,6 +19,7 @@ if (!visualEditingEnabled) {
   }
   sponsors = await getAllSponsors();
   testimonials = await getAllTestimonials();
+  events = await getAllEvents();
 }
 ---
 
@@ -36,6 +38,6 @@ if (!visualEditingEnabled) {
       </div>
     </SanityPageContent>
   ) : (
-    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} />
+    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
   )}
 </Layout>

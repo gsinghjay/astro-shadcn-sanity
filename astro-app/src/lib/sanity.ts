@@ -10,6 +10,7 @@ import type {
   ALL_PROJECTS_QUERY_RESULT,
   PROJECT_BY_SLUG_QUERY_RESULT,
   ALL_TESTIMONIALS_QUERY_RESULT,
+  ALL_EVENTS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -35,6 +36,12 @@ export type Project = ALL_PROJECTS_QUERY_RESULT[number];
  * Array element type extracted for use in component props and helper functions.
  */
 export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
+
+/**
+ * SanityEvent type — derived from the generated ALL_EVENTS_QUERY_RESULT.
+ * Named "SanityEvent" to avoid collision with the global DOM Event type.
+ */
+export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
 
 /**
  * Fetch wrapper that enables stega encoding + draft perspective
@@ -289,6 +296,59 @@ export function resolveBlockTestimonials(
 }
 
 /**
+ * GROQ query: fetch all events for build-time caching.
+ * Fetched once per build and shared across all blocks that need event data.
+ */
+export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event"] | order(date asc){
+  _id, title, "slug": slug.current, date, endDate, location,
+  description, eventType, status
+}`);
+
+/**
+ * Fetch all events from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from eventList blocks.
+ */
+let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
+
+export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _eventsCache) return _eventsCache;
+  const result = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
+  _eventsCache = result ?? [];
+  return _eventsCache;
+}
+
+/**
+ * Resolve events for an eventList block from the pre-fetched cache.
+ * Filters based on filterBy config (all/upcoming/past) and applies limit.
+ * Status field takes priority; date comparison is fallback when status is unset.
+ */
+export function resolveBlockEvents(
+  block: { _type: string; filterBy?: string | null; limit?: number | null },
+  allEvents: SanityEvent[],
+): SanityEvent[] {
+  const filter = stegaClean(block.filterBy) ?? 'upcoming';
+  const limit = block.limit ?? 10;
+  const now = new Date().toISOString();
+
+  let filtered: SanityEvent[];
+  if (filter === 'upcoming') {
+    filtered = allEvents
+      .filter(e => stegaClean(e.status) === 'upcoming' || (!e.status && e.date && e.date >= now))
+      .sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  } else if (filter === 'past') {
+    filtered = allEvents
+      .filter(e => stegaClean(e.status) === 'past' || (!e.status && e.date && e.date < now))
+      .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+  } else {
+    // all
+    filtered = [...allEvents].sort((a, b) => (a.date ?? '').localeCompare(b.date ?? ''));
+  }
+
+  return filtered.slice(0, limit);
+}
+
+/**
  * GROQ query: fetch a single page by slug with template and blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
@@ -369,6 +429,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       displayMode,
       testimonials[]->{ _id }
+    },
+    _type == "eventList" => {
+      heading,
+      filterBy,
+      limit
     }
   }
 }`);
