@@ -1,193 +1,212 @@
-# Architecture — YWCC Capstone Sponsors
+# Architecture
 
-**Generated:** 2026-02-09 | **Scan Level:** Exhaustive
+**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
 
-## 1. System Architecture
+## System Design
 
+```mermaid
+flowchart LR
+    Editor[Content Editor] -->|Compose pages| Studio[Sanity Studio v5]
+    Studio -->|Webhook trigger| GHA[GitHub Actions]
+    GHA -->|Build| Astro[Astro SSG]
+    Astro -->|Deploy static HTML| CF[Cloudflare Pages]
+    Visitor[Site Visitor] -->|Browse| CF
+    Visitor -->|Submit form| Worker[CF Worker]
+    Worker -->|Store submission| Sanity[(Sanity CMS)]
+    Studio -->|Visual Editing| Preview[Preview SSR Mode]
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Content Editor  │────▶│  Sanity Studio   │────▶│   Sanity API    │
-│  (Browser)       │     │  (studio/)       │     │   (Cloud)       │
-└─────────────────┘     └─────────────────┘     └────────┬────────┘
-                                                          │
-                                                          ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  Site Visitor    │◀────│  Static HTML     │◀────│  Astro SSG      │
-│  (Browser)       │     │  (CDN/CF Pages)  │     │  (astro-app/)   │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-```
 
-## 2. Technology Stack
+### Production Flow (Static)
 
-### astro-app
+1. Editor creates/updates content in Sanity Studio
+2. Sanity webhook triggers GitHub Actions `sanity-deploy.yml`
+3. Astro builds static HTML from all GROQ queries at build time
+4. Cloudflare Pages serves pre-rendered HTML (zero runtime API calls)
 
-| Category | Technology | Version | Purpose |
-|---|---|---|---|
-| Framework | Astro | 5.x | Static site generation |
-| Adapter | @astrojs/node | 9.x | Node.js standalone adapter |
-| CMS Integration | @sanity/astro | 3.x | Sanity client + visual editing (stega) |
-| Styling | Tailwind CSS | v4 | CSS-first utility classes |
-| Typography | @tailwindcss/typography | 0.5.x | Prose styling for rich text |
-| Icons | astro-icon + @iconify-json/lucide | 1.x | SVG icon system |
-| UI Library | fulldev/ui via shadcn CLI | 3.x | Astro component primitives |
-| React | react + react-dom | 19.x | Minimal interactive islands |
-| Image | @sanity/image-url | 1.x | Sanity CDN image URL builder |
-| Portable Text | @portabletext/to-html + astro-portabletext | 5.x / 0.10.x | Rich text rendering |
-| Class Utils | clsx + tailwind-merge + class-variance-authority | 2.x / 3.x / 0.7.x | Conditional class composition |
-| Component Docs | Storybook | 10.x | Component development and showcase |
+### Preview Flow (SSR)
 
-### studio
+1. Editor uses Presentation Tool in Sanity Studio
+2. Astro runs in SSR mode on `preview` branch
+3. Visual Editing (stega encoding) enables click-to-edit overlays
+4. Draft content rendered in real-time via `drafts` perspective
 
-| Category | Technology | Version | Purpose |
-|---|---|---|---|
-| CMS | sanity | v5 | Content management platform |
-| Query Tool | @sanity/vision | 5.x | GROQ query playground |
-| UI Framework | React + styled-components | 19.x / 6.x | Studio UI |
-| TypeScript | typescript | 5.x | Type safety |
-
-### Root (Testing & DevOps)
-
-| Category | Technology | Version | Purpose |
-|---|---|---|---|
-| Test Runner | @playwright/test | 1.58+ | E2E and integration testing |
-| Accessibility | @axe-core/playwright | 4.x | WCAG 2.1 AA auditing |
-| Process Mgr | concurrently | 9.x | Parallel dev servers |
-
-## 3. Architecture Pattern: Block-Based Page Composition
-
-### Design Philosophy
-The system uses a **toolkit-not-website** approach. A block library maps editor-friendly names to fulldev/ui component internals (vanilla Astro components via the shadcn CLI), making the design system invisible to non-technical users.
+## Block-Based Page Composition
 
 ### Block Lifecycle
 
-```
-1. Schema Definition (studio/src/schemaTypes/blocks/*.ts)
-   └─ defineBlock() helper merges base fields (backgroundVariant, spacing, maxWidth)
-
-2. Schema Registration (studio/src/schemaTypes/index.ts)
-   └─ Exported in schemaTypes array, added to page.blocks[] array
-
-3. GROQ Projection (astro-app/src/lib/sanity.ts)
-   └─ Type-conditional projection: _type == "heroBanner" => { heading, ... }
-
-4. Type Definition (astro-app/src/lib/types.ts)
-   └─ TypeScript interface: HeroBannerBlock extends BlockBase
-
-5. Component Rendering (astro-app/src/components/blocks/custom/*.astro)
-   └─ Astro component receives typed block props
-
-6. Block Routing (astro-app/src/components/BlockRenderer.astro)
-   └─ Switch statement routes _type to component
+```mermaid
+flowchart TD
+    Schema[Sanity Block Schema] -->|defineBlock helper| Registry[Block Registry]
+    Registry -->|import.meta.glob| Components[Astro Components]
+    Editor2[Editor picks blocks] -->|Page builder| Content[Sanity Content]
+    Content -->|GROQ query| Data[Block Data]
+    Data -->|BlockRenderer| Render[Dynamic Rendering]
+    Render -->|allBlocks _type lookup| Components
+    Components -->|BlockWrapper| HTML[Styled HTML Output]
 ```
 
-### Block Base Fields (inherited by all blocks)
+1. **Schema definition** (`studio/src/schemaTypes/blocks/`) — Each block uses `defineBlock()` helper which auto-injects base layout fields (backgroundVariant, spacing, maxWidth)
+2. **Block registry** (`astro-app/src/components/block-registry.ts`) — Auto-discovers blocks via `import.meta.glob()`, maps PascalCase filenames to camelCase `_type`
+3. **Content creation** — Editor stacks blocks in Sanity page builder with grid preview and insert menu groups
+4. **Data fetching** (`astro-app/src/lib/sanity.ts`) — `PAGE_BY_SLUG_QUERY` fetches all block types with type-conditional GROQ projections
+5. **Rendering** (`BlockRenderer.astro`) — Iterates blocks array, resolves component from registry by `_type`, wraps in `BlockWrapper`
+6. **Styling** (`BlockWrapper.astro`) — Applies background variant, spacing, and maxWidth CSS classes with stega-cleaned values
 
-| Field | Type | Options | Default |
-|---|---|---|---|
-| `backgroundVariant` | string | white, light, dark, primary | white |
-| `spacing` | string | none, small, default, large | default |
-| `maxWidth` | string | narrow, default, full | default |
+### Block Types (11 Custom)
 
-## 4. Data Architecture
+| Block | _type | Purpose |
+|-------|-------|---------|
+| HeroBanner | heroBanner | Hero section with background images, heading, CTAs |
+| FeatureGrid | featureGrid | Grid of feature items with icons |
+| CtaBanner | ctaBanner | Call-to-action section with buttons |
+| StatsRow | statsRow | Statistics display row |
+| TextWithImage | textWithImage | Rich text content alongside an image |
+| LogoCloud | logoCloud | Sponsor logo showcase (auto-populate or manual) |
+| SponsorSteps | sponsorSteps | Step-by-step process with CTA |
+| RichText | richText | Portable Text content block |
+| FaqSection | faqSection | FAQ accordion section |
+| ContactForm | contactForm | Contact form with success message |
+| SponsorCards | sponsorCards | Sponsor card display (all/featured/manual) |
 
-### Document Types
+## Template System
 
-| Document | Type | Purpose |
-|---|---|---|
-| `page` | document | CMS-managed pages with block array |
-| `siteSettings` | document (singleton) | Global site configuration |
-| `sponsor` | document | Sponsor organization profiles |
+5 page templates control layout structure:
 
-### Object Types
+| Template | Use Case | Layout |
+|----------|----------|--------|
+| `default` | Standard content pages | Constrained width, standard header/footer |
+| `fullWidth` | Wide content pages | Full-width blocks, standard chrome |
+| `landing` | Marketing/landing pages | Full-width, minimal navigation |
+| `sidebar` | Pages with side navigation | Two-column with sidebar |
+| `twoColumn` | Dual-content layouts | Two equal columns |
 
-| Object | Purpose |
-|---|---|
-| `seo` | SEO metadata (title, description, OG image) |
-| `button` | Reusable CTA button (text, url, variant) |
-| `portableText` | Rich text with images, links, callouts |
-| `blockBase` | Shared block fields (background, spacing, maxWidth) |
+Schema validation warns if wide blocks (heroBanner, statsRow, logoCloud, sponsorCards) are placed in constrained templates (sidebar, twoColumn).
 
-### Block Types (11 total)
+## Data Architecture
 
-| Block | Key Fields | Category |
-|---|---|---|
-| `heroBanner` | heading, subheading, backgroundImages, ctaButtons, alignment | Hero |
-| `featureGrid` | heading, items (icon/image/title/desc), columns | Content |
-| `ctaBanner` | heading, description, ctaButtons | CTA |
-| `statsRow` | heading, stats (value/label/description) | Social Proof |
-| `textWithImage` | heading, content (portableText), image, imagePosition | Content |
-| `logoCloud` | heading, autoPopulate, sponsors | Social Proof |
-| `sponsorSteps` | heading, subheading, items (title/desc/list), ctaButtons | Content |
-| `richText` | content (portableText) | Content |
-| `faqSection` | heading, items (question/answer) | Content |
-| `contactForm` | heading, description, successMessage | CTA |
-| `sponsorCards` | heading, displayMode (all/featured/manual), sponsors | Content |
+### Sanity Content Model
 
-### Content Model Relationships
+```mermaid
+erDiagram
+    PAGE ||--o{ BLOCK : "contains blocks[]"
+    PAGE ||--o| SEO : "has seo"
+    PAGE {
+        string title
+        slug slug
+        string template
+    }
+    SITE_SETTINGS ||--o{ LINK : "navigationItems[]"
+    SITE_SETTINGS ||--o| BUTTON : "ctaButton"
+    SITE_SETTINGS {
+        string siteName
+        string siteDescription
+        image logo
+        image logoLight
+    }
+    SPONSOR {
+        string name
+        slug slug
+        image logo
+        string tier
+        boolean featured
+    }
+    LOGO_CLOUD }o--o{ SPONSOR : "references"
+    SPONSOR_CARDS }o--o{ SPONSOR : "references"
+    BLOCK {
+        string _type
+        string backgroundVariant
+        string spacing
+        string maxWidth
+    }
+```
+
+### GROQ Query Strategy
+
+- **`SITE_SETTINGS_QUERY`** — Fetches singleton with all navigation, footer, and branding data
+- **`ALL_PAGE_SLUGS_QUERY`** — Generates static paths for `getStaticPaths()`
+- **`PAGE_BY_SLUG_QUERY`** — Fetches single page with type-conditional block projections
+- **Module-level caching** — `getSiteSettings()` caches at module scope for build performance
+- All queries use `defineQuery()` for TypeGen integration
+
+## Design System
+
+### Color Palette
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| Swiss Red | `#E30613` | Primary brand color |
+| Swiss Black | `#0A0A0A` | Text, dark backgrounds |
+| NJIT Red | `#D32032` | Accent, hover states |
+| NJIT Blue | `#003A6B` | Secondary accent |
+
+### Component Hierarchy
 
 ```
-PAGE ──contains──▶ BLOCK[] (flat array, no nesting)
-PAGE ──has──▶ SEO (embedded object)
-SITE_SETTINGS ──configures──▶ PAGE (global nav, footer, branding)
-SPONSOR ──referenced-by──▶ sponsorCards, logoCloud blocks
+fulldev/ui primitives (39 components in ui/)
+  └── Custom blocks (12 in blocks/custom/)
+       └── Block variants (~100 in blocks/)
+            └── Page templates (5 in layouts/templates/)
+                 └── Main Layout (Header + Footer + Content)
 ```
 
-## 5. Page Templates
+### Styling Approach
 
-| Template | Layout | Use Case |
-|---|---|---|
-| `default` | Centered max-w-7xl container | Standard pages |
-| `fullWidth` | Full-width, no constraints | Image-heavy showcases |
-| `landing` | Full-width, no nav/footer | Conversion-focused pages |
-| `sidebar` | 2/3 + 1/3 grid | Blog-style, filtered listings |
-| `twoColumn` | Equal 2-column grid | Comparison, dual-content |
+- **Tailwind CSS v4** with CSS-first configuration via `@tailwindcss/vite`
+- **class-variance-authority** for component variants
+- **tailwind-merge** via `cn()` utility for conflict-free class composition
+- **CSS custom properties** for dark mode and brand tokens
+- **Stega cleaning** — Visual editing encoded strings cleaned before CSS class application
 
-## 6. Routing
+## Testing Architecture
 
-| Route | Source | Data |
-|---|---|---|
-| `/` | `pages/index.astro` | Sanity CMS (getPage('home')) |
-| `/about` | `pages/about.astro` | Static data (lib/data/) |
-| `/contact` | `pages/contact.astro` | Static data |
-| `/projects` | `pages/projects.astro` | Static data |
-| `/sponsors` | `pages/sponsors.astro` | Static data |
-| `/[...slug]` | `pages/[...slug].astro` | Sanity CMS (dynamic) |
+| Layer | Runner | Location | Purpose |
+|-------|--------|----------|---------|
+| Unit | Vitest | `astro-app/src/lib/__tests__/` | Pure functions (cn, loadQuery, image) |
+| Component | Vitest + Container API | `astro-app/src/components/__tests__/` | Astro component rendering with mocked Sanity data |
+| SSR Smoke | Vitest | `astro-app/src/cloudflare/__tests__/` | Cloudflare Worker build validation |
+| Integration | Vitest | `tests/integration/` | Schema validation, data wiring, type checks (241 cases) |
+| E2E | Playwright | `tests/e2e/` | Real browser: a11y (axe-core), interactions, 5 browsers (34 cases) |
 
-## 7. Client-Side Interactivity
+## Deployment Architecture
 
-All interactivity is vanilla TypeScript (< 5KB), event-delegated via data attributes:
+### Environments
 
-| Feature | Trigger | Mechanism |
-|---|---|---|
-| Scroll animations | `[data-animate]` | IntersectionObserver, one-shot |
-| Contact form | `[data-contact-form]` | Form submit handler, data-state |
-| Hero carousel | `[data-carousel]` | 5s auto-rotate, dot navigation |
+| Environment | Branch | Mode | Host |
+|-------------|--------|------|------|
+| Production | `main` | Static (SSG) | Cloudflare Pages |
+| Preview | `preview` | SSR | Cloudflare Pages |
+| Storybook | `main` | Static | GitHub Pages |
+| Studio | — | Hosted | Sanity Cloud |
 
-## 8. Visual Editing Integration
+### CI/CD Pipeline
 
-- **Stega encoding** via `@sanity/astro` (invisible content IDs embedded in text)
-- **Draft perspective** for preview mode
-- **Presentation tool** in Studio maps documents to frontend URLs
-- **Resolve config** maps page slugs to routes (home → `/`, others → `/{slug}`)
+```mermaid
+flowchart TD
+    PR[PR to preview] -->|Trigger| CI[CI: Unit tests + Lighthouse]
+    CI -->|Pass| Merge1[Merge to preview]
+    Merge1 -->|Only preview→main| PR2[PR to main]
+    PR2 -->|Enforce branch rules| Merge2[Merge to main]
+    Merge2 -->|Trigger| Release[semantic-release]
+    Release -->|Auto| SyncPrev[Sync preview with main]
+    Release -->|Auto| DeployStory[Deploy Storybook to GH Pages]
+    SanityPub[Sanity content publish] -->|Webhook| Deploy[Build + Deploy to CF Pages]
+```
 
-## 9. Design System
+### Branch Protection
 
-### Theme Colors
+- `main` ← only accepts PRs from `preview` (enforced by `enforce-preview-branch.yml`)
+- `preview` ← rejects PRs from `main` (enforced by `enforce-preview-source.yml`)
+- After release, `sync-preview.yml` auto-merges `main` back into `preview`
+- Discord notifications on sync success/failure
 
-| Token | Hex | Usage |
-|---|---|---|
-| Swiss Red | #E30613 | Primary, CTAs, accents |
-| Swiss Black | #0A0A0A | Foreground text |
-| Swiss White | #FFFFFF | Backgrounds |
-| NJIT Red | #D22630 | Brand accent |
-| NJIT Navy | #003366 | Brand accent |
-| NJIT Gold | #E89B32 | Brand accent |
+### CI Workflows (7)
 
-### Typography
-- **Font:** Helvetica Neue, Helvetica, Arial, sans-serif
-- **Headings:** 700 weight, -0.03em tracking, 1.05 line-height
-- **Body:** 16px, 1.5 line-height, -0.01em tracking
-- **Label caps utility:** 0.6875rem, uppercase, 0.12em tracking
-
-### Border Radius
-- All radii set to 0 (sharp corners, Swiss design aesthetic)
+| Workflow | Trigger | Actions |
+|----------|---------|---------|
+| `ci.yml` | PR to preview | Unit tests + Lighthouse CI |
+| `release.yml` | Push to main | semantic-release (versioning + changelog) |
+| `deploy-storybook.yml` | Push to main (src changes) | Build + deploy Storybook to GH Pages |
+| `sanity-deploy.yml` | Sanity webhook | Build Astro + deploy to Cloudflare Pages |
+| `sync-preview.yml` | After release | Merge main into preview + Discord notify |
+| `enforce-preview-branch.yml` | PR to main | Block non-preview source branches |
+| `enforce-preview-source.yml` | PR to preview | Block PRs from main |

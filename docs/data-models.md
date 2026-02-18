@@ -1,245 +1,274 @@
-# Data Models — YWCC Capstone Sponsors
+# Data Models
 
-**Generated:** 2026-02-09 | **Scan Level:** Exhaustive
+**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
 
 ## Overview
 
-This project uses Sanity.io as its headless CMS. Data is modeled as document types, object types, and block types. Content is queried via GROQ and consumed at build time by Astro SSG.
+| Category | Count | Location |
+|----------|-------|----------|
+| Document types | 3 | `studio/src/schemaTypes/documents/` |
+| Block types | 11 | `studio/src/schemaTypes/blocks/` |
+| Object types | 8 | `studio/src/schemaTypes/objects/` |
+| **Total schema types** | **22** | `studio/src/schemaTypes/index.ts` |
 
-## Document Types (3)
+All schemas use `defineType` / `defineField` from the Sanity SDK. Block schemas use a custom `defineBlock()` helper that auto-injects base layout fields.
 
-### page
+## Document Types
 
-The core content document. Pages are composed from a flat array of block objects.
+### page (`studio/src/schemaTypes/documents/page.ts`)
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `title` | string | Yes | Page display title |
-| `slug` | slug | Yes | URL slug (auto-generated from title) |
-| `template` | string | No | Layout template (default, fullWidth, landing, sidebar, twoColumn) |
-| `seo` | seo (object) | No | SEO metadata |
-| `blocks` | array | No | Flat array of 13 block types |
+Content pages with composable block arrays.
 
-**Field Groups:** layout, content, seo
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| title | string | Yes | Page name |
+| slug | slug | Yes | Auto-generated from title, max 96 chars |
+| template | string | Yes | default, fullWidth, landing, sidebar, twoColumn |
+| seo | seo (object) | No | SEO metadata |
+| blocks | array | No | Array of 11 block types |
 
-**Block types accepted:** heroBanner, featureGrid, sponsorCards, richText, ctaBanner, faqSection, contactForm, timeline, logoCloud, statsRow, teamGrid, textWithImage, sponsorSteps
+**Validation:** Custom validator warns if wide blocks (heroBanner, statsRow, logoCloud, sponsorCards) are used in constrained templates (sidebar, twoColumn).
 
-**Insert Menu Groups:**
-- Heroes & Banners: heroBanner, ctaBanner
-- Content & Text: richText, textWithImage, featureGrid, faqSection
-- Media & Data: logoCloud, statsRow
-- Social Proof: sponsorCards, sponsorSteps
-- Calls to Action: contactForm
+**Insert Menu Groups:** Heroes, Content, Media & Stats, Social Proof, Calls to Action
 
-### siteSettings (singleton)
+**Preview:** Grid layout with block preview images from `/static/block-previews/{type}.png`
 
-Global site configuration. Only one instance allowed (fixed document ID: `siteSettings`).
+### siteSettings (`studio/src/schemaTypes/documents/site-settings.ts`)
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `siteName` | string | Yes | Site display name |
-| `siteDescription` | string | No | Site tagline/description |
-| `logo` | image | No | Primary logo (with alt text) |
-| `logoLight` | image | No | Light-on-dark logo variant for footer |
-| `ctaButton` | object | No | Header CTA button (text + URL) |
-| `navigationItems` | array | No | Nav items (label, href, sub-items) |
-| `footerContent` | text | No | Footer description text |
-| `copyrightText` | string | No | Copyright line |
-| `socialLinks` | array | No | Social platform links (github, linkedin, twitter, instagram, youtube) |
-| `address` | text | No | Physical address |
-| `email` | string | No | Contact email |
-| `phone` | string | No | Contact phone |
-| `footerLinks` | array | No | Footer link column items |
-| `resourceLinks` | array | No | Resource link column items (with external flag) |
-| `programLinks` | array | No | Program link column items |
-| `currentSemester` | string | No | Active semester label |
+Singleton document for global site configuration. Fixed ID: `siteSettings`.
 
-**Field Groups:** Navigation & Branding, Footer & Contact, Links & Settings
+| Group | Field | Type | Notes |
+|-------|-------|------|-------|
+| Branding | siteName | string (required) | Site name |
+| Branding | siteDescription | text | Description |
+| Branding | logo | image (required) | Main logo, alt text required |
+| Branding | logoLight | image | Light variant for footer, alt text required |
+| Navigation | ctaButton | button (object) | Header CTA |
+| Navigation | navigationItems | link[] | Top nav items (children supported but not rendered) |
+| Footer | footerContent | object | text + copyrightText |
+| Footer | footerLinks | link[] | Bottom bar links |
+| Footer | resourceLinks | link[] | Resources section |
+| Footer | programLinks | link[] | Programs section |
+| Social & Contact | socialLinks | array | github, linkedin, twitter, instagram, youtube |
+| Social & Contact | contactInfo | object | address, email, phone |
+| Social & Contact | currentSemester | string | e.g., "Fall 2026" |
 
-### sponsor
+**Singleton Management:** Restricted document actions (publish, discardChanges, restore only). Excluded from new document menu.
 
-Sponsor organization profiles referenced by sponsorCards and logoCloud blocks.
+### sponsor (`studio/src/schemaTypes/documents/sponsor.ts`)
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `name` | string | Yes | Sponsor organization name |
-| `slug` | slug | Yes | URL slug (auto-generated from name) |
-| `logo` | image | Yes | Sponsor logo (with required alt text) |
-| `description` | text | No | About the sponsor |
-| `website` | url | No | Sponsor website URL |
-| `industry` | string | No | Industry category |
-| `tier` | string | No | Sponsorship tier (platinum, gold, silver, bronze) |
-| `featured` | boolean | No | Highlight sponsor (default: false) |
+Sponsor profiles for the logo cloud and sponsor cards.
 
-## Object Types (4)
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| name | string | Yes | Sponsor name |
+| slug | slug | Yes | Auto-generated from name |
+| logo | image | Yes | Alt text required |
+| description | text | No | Sponsor description |
+| website | url | No | Sponsor website |
+| industry | string | No | Industry sector |
+| tier | string | No | platinum, gold, silver, bronze |
+| featured | boolean | No | Default: false |
 
-### seo
-
-SEO metadata embedded in page documents.
-
-| Field | Type | Validation | Description |
-|---|---|---|---|
-| `metaTitle` | string | Max 60 chars | Page meta title |
-| `metaDescription` | text | Max 160 chars | Page meta description |
-| `ogImage` | image | 1200x630 recommended | Open Graph image (with required alt text) |
-
-### button
-
-Reusable CTA button object used in multiple block types.
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `text` | string | Yes | Button display text |
-| `url` | url | Yes | Valid HTTP(S), mailto, or tel URL |
-| `variant` | string | No | Style variant (default, secondary, outline, ghost) |
-
-### portableText
-
-Rich text editor configuration supporting structured content.
-
-**Text Styles:** normal, h2, h3, h4, blockquote
-**Decorators:** bold, italic, code, underline
-**Links:** External URLs, internal page references
-**Lists:** Bullet, numbered
-**Custom blocks:**
-- Image (with required alt text, optional caption)
-- Callout box (with tone: info, warning, success)
-
-### blockBase
-
-Shared base fields inherited by all block types via `defineBlock()` helper.
-
-| Field | Type | Options | Default |
-|---|---|---|---|
-| `backgroundVariant` | string | white, light, dark, primary | white |
-| `spacing` | string | none, small, default, large | default |
-| `maxWidth` | string | narrow, default, full | default |
+**Referenced by:** logoCloud (auto-populate or manual), sponsorCards (all/featured/manual display modes)
 
 ## Block Types (11)
 
-All blocks inherit `blockBase` fields via the `defineBlock()` helper.
+All blocks inherit base layout fields via `defineBlock()`:
+
+| Base Field | Type | Options | Default |
+|------------|------|---------|---------|
+| backgroundVariant | string (radio) | white, light, dark, primary | white |
+| spacing | string (radio) | none, small, default, large | default |
+| maxWidth | string (radio) | narrow, default, full | default |
 
 ### heroBanner
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `heading` | string | Yes | - | Main heading text |
-| `subheading` | string | No | - | Supporting text |
-| `backgroundImages` | array[image] | No | - | Carousel images (with alt text) |
-| `ctaButtons` | array[button] | No | - | CTA buttons |
-| `alignment` | string | No | center | Text alignment (left, center, right) |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string (required) | Hero heading |
+| subheading | string | Subtitle |
+| backgroundImages | image[] | Alt text required per image |
+| ctaButtons | button[] | Call-to-action buttons |
+| alignment | string (radio) | left, center, right (default: center) |
 
 ### featureGrid
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `heading` | string | No | - | Section heading |
-| `items` | array[object] | No | - | Feature items |
-| `columns` | number | No | 3 | Column count (2, 3, or 4) |
 
-**Item fields:** icon (string), image (image with alt), title (string, required), description (text)
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| items | featureItem[] | Feature items with icon/image |
+| columns | number | 2, 3, or 4 (default: 3) |
 
 ### ctaBanner
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `heading` | string | Yes | CTA heading |
-| `description` | text | No | Supporting text |
-| `ctaButtons` | array[button] | No | Action buttons |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string (required) | CTA heading |
+| description | text | Description text |
+| ctaButtons | button[] | Action buttons |
 
 ### statsRow
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `heading` | string | No | Section heading |
-| `stats` | array[object] | No | Statistics items |
 
-**Stat fields:** value (string, required), label (string, required), description (string)
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| stats | statItem[] | Stat value + label pairs |
 
 ### textWithImage
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `heading` | string | No | - | Section heading |
-| `content` | portableText | No | - | Rich text content |
-| `image` | image | No | - | Featured image (with hotspot, required alt) |
-| `imagePosition` | string | No | right | Image side (left, right) |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| content | portableText | Rich text content |
+| image | image | Side image, hotspot enabled, alt required |
+| imagePosition | string | left or right (default: right) |
 
 ### logoCloud
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `heading` | string | No | - | Section heading |
-| `autoPopulate` | boolean | No | true | Auto-pull all sponsor logos |
-| `sponsors` | array[reference→sponsor] | No | - | Manual sponsor selection (hidden when autoPopulate=true) |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| autoPopulate | boolean | Auto-pull all sponsors (default: true) |
+| sponsors | sponsor[] (refs) | Manual selection, hidden when autoPopulate=true |
 
 ### sponsorSteps
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `heading` | string | No | Section heading |
-| `subheading` | string | No | Supporting text |
-| `items` | array[object] | No | Step items |
-| `ctaButtons` | array[button] | No | Action buttons |
 
-**Item fields:** title (string, required), description (text), list (array[string])
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| subheading | string | Subtitle |
+| items | stepItem[] | Process steps |
+| ctaButtons | button[] | Action buttons |
 
 ### richText
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `content` | portableText | No | Full rich text content |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| content | portableText | Full Portable Text content |
 
 ### faqSection
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `heading` | string | No | Section heading |
-| `items` | array[object] | No | FAQ items |
 
-**Item fields:** question (string, required), answer (text, required)
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| items | faqItem[] | Question + answer pairs |
 
 ### contactForm
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `heading` | string | No | Form heading |
-| `description` | text | No | Form description |
-| `successMessage` | string | No | Success message text |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string (required) | Form heading |
+| description | text | Form description |
+| successMessage | string | Shown after submission |
 
 ### sponsorCards
-| Field | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `heading` | string | No | - | Section heading |
-| `displayMode` | string | No | all | Display mode (all, featured, manual) |
-| `sponsors` | array[reference→sponsor] | No | - | Manual selection (hidden unless displayMode=manual) |
+
+| Field | Type | Notes |
+|-------|------|-------|
+| heading | string | Section heading |
+| displayMode | string | all, featured, or manual (default: all) |
+| sponsors | sponsor[] (refs) | Manual selection, hidden unless displayMode=manual |
+
+## Object Types (8)
+
+### seo
+
+| Field | Type | Notes |
+|-------|------|-------|
+| metaTitle | string | Max 60 chars |
+| metaDescription | text | Max 160 chars |
+| ogImage | image | 1200x630 recommended, alt required |
+
+### button
+
+| Field | Type | Notes |
+|-------|------|-------|
+| text | string (required) | Button label |
+| url | string (required) | Validated: /path, http(s)://, mailto:, tel: |
+| variant | string | default, secondary, outline, ghost |
+
+Exports `buttonFields` array for composition in other schemas.
+
+### link
+
+| Field | Type | Notes |
+|-------|------|-------|
+| label | string (required) | Link text |
+| href | string (required) | Validated: /path, #anchor, http(s)://, mailto:, tel: |
+| external | boolean | Default: false |
+
+Exports `linkFields` array for composition in other schemas.
+
+### portableText
+
+Rich text array type supporting:
+
+- **Styles:** Normal, H2, H3, H4, Blockquote
+- **Decorators:** Bold, Italic, Code, Underline
+- **Lists:** Bullet, Numbered
+- **Annotations:** External link (url), Internal link (page reference)
+- **Custom blocks:** Image (hotspot, required alt, optional caption), Callout (info/warning/success tone)
+
+### faqItem
+
+| Field | Type | Notes |
+|-------|------|-------|
+| question | string (required) | FAQ question |
+| answer | portableText (required) | Rich text answer |
+
+### featureItem
+
+| Field | Type | Notes |
+|-------|------|-------|
+| icon | string | Icon name |
+| image | image | Hotspot enabled, alt required |
+| title | string (required) | Feature title |
+| description | text | Feature description |
+
+### statItem
+
+| Field | Type | Notes |
+|-------|------|-------|
+| value | string (required) | e.g., "50+", "$2M", "98%" |
+| label | string (required) | Stat label |
+| description | string | Additional context |
+
+### stepItem
+
+| Field | Type | Notes |
+|-------|------|-------|
+| title | string (required) | Step title |
+| description | text | Step description |
+| list | string[] | Bullet points |
 
 ## GROQ Queries
 
-### Site Settings Query
-```groq
-*[_type == "siteSettings"][0] {
-  siteName, siteDescription, logo, logoLight, ctaButton,
-  navigationItems[], footerContent, copyrightText,
-  socialLinks[], address, email, phone,
-  footerLinks[], resourceLinks[], programLinks[], currentSemester
-}
-```
+All queries are defined using `defineQuery()` in `astro-app/src/lib/sanity.ts` for TypeGen integration.
 
-### Page by Slug Query
-```groq
-*[_type == "page" && slug.current == $slug][0] {
-  title, slug, template, seo,
-  blocks[] {
-    _type, _key, backgroundVariant, spacing, maxWidth,
-    _type == "heroBanner" => { heading, subheading, backgroundImages, ctaButtons, alignment },
-    _type == "featureGrid" => { heading, items, columns },
-    // ... type-conditional projections for all 11+ block types
-  }
-}
-```
+### SITE_SETTINGS_QUERY
 
-### All Page Slugs Query
-```groq
-*[_type == "page"]{ "slug": slug.current }
-```
+Fetches the singleton siteSettings document with all navigation, footer, branding, social, and contact data.
 
-## Content Model Relationships
+### ALL_PAGE_SLUGS_QUERY
 
-```
-PAGE ──contains──▶ BLOCK[] (flat array, no nesting)
-PAGE ──has──▶ SEO (embedded object)
-SITE_SETTINGS ──configures──▶ All pages (global nav, footer, branding)
-SPONSOR ──referenced-by──▶ sponsorCards block (manual mode)
-SPONSOR ──referenced-by──▶ logoCloud block (manual mode)
-```
+Returns all page slugs as an array for static path generation in `getStaticPaths()`.
+
+### PAGE_BY_SLUG_QUERY
+
+Fetches a single page by slug with type-conditional block projections for all 11 block types. Each block type has its own GROQ projection to select only the relevant fields.
+
+### Data Fetching Functions
+
+| Function | Purpose |
+|----------|---------|
+| `loadQuery<T>(query, params)` | Wrapper handling stega encoding + draft perspective |
+| `getSiteSettings()` | Fetches siteSettings with module-level caching |
+| `getPage(slug)` | Fetches single page with all blocks |
+
+## TypeGen Integration
+
+- **Schema extraction:** `npm run typegen` in studio/ extracts `schema.json`
+- **Type generation:** Generates `astro-app/src/sanity.types.ts` (1033 lines)
+- **Type adapters:** `astro-app/src/lib/types.ts` re-exports generated types
+- **Watch mode:** TypeGen watches `../astro-app/src/**/*.{ts,tsx,js,jsx}` for query changes

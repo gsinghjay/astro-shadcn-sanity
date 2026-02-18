@@ -4,6 +4,7 @@ import groq, { defineQuery } from "groq";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
+  ALL_SPONSORS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -11,6 +12,12 @@ export { sanityClient, groq };
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
+
+/**
+ * Sponsor type — derived from the generated ALL_SPONSORS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Sponsor = ALL_SPONSORS_QUERY_RESULT[number];
 
 /**
  * Fetch wrapper that enables stega encoding + draft perspective
@@ -92,8 +99,57 @@ export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY
 export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && defined(slug.current)]{ "slug": slug.current }`);
 
 /**
+ * GROQ query: fetch all sponsors for build-time caching.
+ * Fetched once per build and shared across all blocks that need sponsor data.
+ */
+export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor"] | order(name asc){
+  _id, name, "slug": slug.current,
+  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  tier, description, website, featured
+}`);
+
+/**
+ * Fetch all sponsors from Sanity.
+ * Result is cached for the duration of the build (module-level memoization)
+ * to avoid redundant API calls from logoCloud and sponsorCards blocks.
+ */
+let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
+
+export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
+  const result = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
+  _sponsorsCache = result ?? [];
+  return _sponsorsCache;
+}
+
+/**
+ * Resolve sponsors for a logoCloud or sponsorCards block from the pre-fetched cache.
+ * Filters based on autoPopulate (logoCloud) or displayMode (sponsorCards) config.
+ */
+export function resolveBlockSponsors(
+  block: { autoPopulate?: boolean | null; displayMode?: string | null; sponsors?: Array<{ _id: string }> | null },
+  allSponsors: Sponsor[],
+): Sponsor[] {
+  // logoCloud: autoPopulate → all sponsors, else manual refs
+  if ('autoPopulate' in block) {
+    if (block.autoPopulate) return allSponsors;
+    const manualIds = new Set(block.sponsors?.map(s => s._id) ?? []);
+    return allSponsors.filter(s => manualIds.has(s._id));
+  }
+  // sponsorCards: displayMode drives filtering
+  const mode = block.displayMode ?? 'all';
+  if (mode === 'all') return allSponsors;
+  if (mode === 'featured') return allSponsors.filter(s => s.featured);
+  // manual
+  const manualIds = new Set(block.sponsors?.map(s => s._id) ?? []);
+  return allSponsors.filter(s => manualIds.has(s._id));
+}
+
+/**
  * GROQ query: fetch a single page by slug with template and blocks.
- * Includes type-conditional projections for all homepage block types.
+ * Includes type-conditional projections for all block types.
+ * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
+ * and resolved per-block via resolveBlockSponsors().
  */
 export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.current == $slug][0]{
   _id,
@@ -141,15 +197,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "logoCloud" => {
       heading,
       autoPopulate,
-      "sponsors": select(
-        autoPopulate == true => *[_type == "sponsor"]{
-          _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website
-        },
-        sponsors[]->{ _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, website
-        }
-      )
+      sponsors[]->{ _id }
     },
     _type == "sponsorSteps" => {
       heading,
@@ -172,31 +220,47 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "sponsorCards" => {
       heading,
       displayMode,
-      "sponsors": select(
-        !defined(displayMode) || displayMode == "all" => *[_type == "sponsor"]{
-          _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
-          tier, description, website
-        },
-        displayMode == "featured" => *[_type == "sponsor" && featured == true]{
-          _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
-          tier, description, website
-        },
-        sponsors[]->{
-          _id, name, "slug": slug.current,
-          logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
-          tier, description, website
-        }
-      )
+      sponsors[]->{ _id }
     }
   }
 }`);
 
 /**
+ * Page cache for build-time deduplication.
+ * Populated by prefetchPages() during getStaticPaths, read by getPage().
+ * Bypassed when Visual Editing is enabled (fresh draft data required).
+ */
+const _pageCache = new Map<string, PAGE_BY_SLUG_QUERY_RESULT>();
+
+/**
+ * Pre-fetch all pages in parallel batches during getStaticPaths.
+ * Populates the page cache so individual getPage() calls are instant.
+ */
+export async function prefetchPages(slugs: string[], concurrency = 6): Promise<void> {
+  if (visualEditingEnabled) return;
+  const chunks: string[][] = [];
+  for (let i = 0; i < slugs.length; i += concurrency) {
+    chunks.push(slugs.slice(i, i + concurrency));
+  }
+  for (const chunk of chunks) {
+    const results = await Promise.all(
+      chunk.map(slug =>
+        loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
+          query: PAGE_BY_SLUG_QUERY,
+          params: { slug },
+        }),
+      ),
+    );
+    chunk.forEach((slug, i) => _pageCache.set(slug, results[i]));
+  }
+}
+
+/**
  * Fetch a page by slug from Sanity.
+ * Returns cached result if available (populated by prefetchPages).
  */
 export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> {
+  if (!visualEditingEnabled && _pageCache.has(slug)) return _pageCache.get(slug)!;
   return loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
     params: { slug },

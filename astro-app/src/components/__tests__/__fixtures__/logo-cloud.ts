@@ -1,41 +1,49 @@
-import type { LogoCloudBlock } from '@/lib/types';
+import type { Sponsor } from '@/lib/sanity';
 
-export const logoCloudFull: LogoCloudBlock = {
-  _type: 'logoCloud',
+export const logoCloudSponsors: Sponsor[] = [
+  {
+    _id: 'sp-1',
+    name: 'TechCorp',
+    slug: 'techcorp',
+    logo: {
+      asset: { _id: 'img-tc', url: 'https://cdn.sanity.io/test/techcorp.png', metadata: null },
+      alt: 'TechCorp logo',
+    },
+    tier: 'gold',
+    description: 'Technology company',
+    website: 'https://techcorp.example.com',
+    featured: true,
+  },
+  {
+    _id: 'sp-2',
+    name: 'DataLabs',
+    slug: 'datalabs',
+    logo: null,
+    tier: 'silver',
+    description: null,
+    website: null,
+    featured: false,
+  },
+];
+
+export const logoCloudFull = {
+  _type: 'logoCloud' as const,
   _key: 'test-lc-1',
   backgroundVariant: null,
-  spacing: 'default',
-  maxWidth: 'default',
+  spacing: 'default' as const,
+  maxWidth: 'default' as const,
   heading: 'Trusted By',
   autoPopulate: false,
-  sponsors: [
-    {
-      _id: 'sp-1',
-      name: 'TechCorp',
-      slug: 'techcorp',
-      logo: {
-        asset: { _id: 'img-tc', url: 'https://cdn.sanity.io/test/techcorp.png', metadata: null },
-        alt: 'TechCorp logo',
-      },
-      website: 'https://techcorp.example.com',
-    },
-    {
-      _id: 'sp-2',
-      name: 'DataLabs',
-      slug: 'datalabs',
-      logo: null,
-      website: null,
-    },
-  ],
+  sponsors: logoCloudSponsors,
 };
 
-export const logoCloudMinimal: LogoCloudBlock = {
-  _type: 'logoCloud',
+export const logoCloudMinimal = {
+  _type: 'logoCloud' as const,
   _key: 'test-lc-2',
   backgroundVariant: null,
   spacing: null,
   maxWidth: null,
   heading: null,
   autoPopulate: null,
-  sponsors: null,
+  sponsors: undefined as Sponsor[] | undefined,
 };

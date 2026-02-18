@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, prefetchPages } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
@@ -25,6 +25,8 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 // getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
   const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY);
+  // Pre-fetch all pages in parallel batches to populate the cache
+  await prefetchPages(pages.map(p => p.slug));
   return pages.map((page) => ({
     params: { slug: page.slug },
   }));
@@ -37,6 +39,7 @@ const { slug } = Astro.params;
 let page = null;
 let template: keyof typeof templates = 'default';
 let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
+let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 
 if (!visualEditingEnabled) {
   page = await getPage(slug as string);
@@ -45,6 +48,7 @@ if (!visualEditingEnabled) {
   }
   template = stegaClean(page.template) as keyof typeof templates;
   TemplateComponent = templates[template] ?? DefaultTemplate;
+  sponsors = await getAllSponsors();
 }
 ---
 
@@ -68,7 +72,7 @@ if (!visualEditingEnabled) {
     </SanityPageContent>
   ) : (
     <TemplateComponent>
-      <BlockRenderer blocks={page!.blocks ?? []} />
+      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} />
     </TemplateComponent>
   )}
 </Layout>

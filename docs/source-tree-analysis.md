@@ -1,233 +1,250 @@
-# Source Tree Analysis — YWCC Capstone Sponsors
+# Source Tree Analysis
 
-**Generated:** 2026-02-09 | **Scan Level:** Exhaustive
+**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
 
 ## Annotated Directory Tree
 
 ```
-astro-shadcn-sanity/                    # Root monorepo (npm workspaces)
-├── package.json                        # Workspace config, test scripts, devDependencies
-├── package-lock.json                   # Lockfile
-├── playwright.config.ts                # E2E test config (5 browsers, webServer)
-├── playwright.integration.config.ts    # Integration test config (no browser)
-├── .nvmrc                              # Node 24 LTS requirement
-├── .gitignore                          # Root gitignore
-├── README.md                           # ★ Primary project documentation
-├── initial-brainstorm.md               # Initial project brainstorming notes
-│
-├── astro-app/                          # ★ PART: Astro Frontend (SSG)
-│   ├── package.json                    # App dependencies (astro, tailwind, react)
-│   ├── astro.config.mjs                # ★ Astro config: sanity, tailwind, icon, react, node adapter
-│   ├── tsconfig.json                   # TypeScript config (strict, @/* path alias)
-│   ├── components.json                 # shadcn CLI config (@fulldev registry)
-│   ├── .eslintrc                       # Prettier-style lint config
-│   ├── .gitignore                      # Ignores dist/, .astro/, storybook-static/
-│   │
+astro-shadcn-sanity/                    # Monorepo root (npm workspaces)
+├── astro-app/                          # Part 1: Astro Frontend (SSG)
+│   ├── astro.config.mjs                # Astro config: static output, Sanity + React + Tailwind
+│   ├── components.json                 # shadcn CLI config with @fulldev registry
+│   ├── vitest.config.ts                # Vitest: getViteConfig(), sanity:client mock alias
+│   ├── wrangler.jsonc                  # Cloudflare Pages: ywcc-capstone, nodejs_compat
+│   ├── tsconfig.json                   # Strict mode, @/* path alias
+│   ├── .env.example                    # Template: Sanity IDs, GA4, Studio URL
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── Header.astro            # ★ Site header with nav, CTA, mobile sheet
-│   │   │   ├── Footer.astro            # ★ Site footer (4-column, social links, contact)
-│   │   │   ├── BlockRenderer.astro     # ★ Central block routing (13 custom + 102 generic)
-│   │   │   ├── block.astro             # Dynamic block renderer (import.meta.glob)
-│   │   │   │
-│   │   │   ├── ui/                     # UI primitives (fulldev/ui via shadcn CLI)
-│   │   │   │   ├── accordion/          # Expandable content panels
-│   │   │   │   ├── alert/              # Alert notifications
-│   │   │   │   ├── auto-form/          # Auto-generated forms
-│   │   │   │   ├── avatar/             # User avatar display
-│   │   │   │   ├── badge/              # Status/category badges
-│   │   │   │   ├── banner/             # Banner notifications
-│   │   │   │   ├── button/             # CTA buttons with variants
-│   │   │   │   ├── checkbox/           # Checkbox inputs
-│   │   │   │   ├── collapsible/        # Collapsible content
-│   │   │   │   ├── empty/              # Empty state placeholders
-│   │   │   │   ├── field/              # Form field wrappers
-│   │   │   │   ├── footer/             # Footer layout primitives
-│   │   │   │   ├── header/             # Header layout primitives
-│   │   │   │   ├── icon/               # Icon display component
-│   │   │   │   ├── image/              # Image display with optimization
-│   │   │   │   ├── input/              # Text input fields
-│   │   │   │   ├── item/               # List item component
-│   │   │   │   ├── label/              # Form label component
-│   │   │   │   ├── list/               # List layout component
-│   │   │   │   ├── logo/               # Logo display component
-│   │   │   │   ├── marquee/            # Scrolling marquee
-│   │   │   │   ├── native-carousel/    # Native HTML carousel
-│   │   │   │   ├── native-select/      # Native select dropdown
-│   │   │   │   ├── navigation-menu/    # Navigation menu component
-│   │   │   │   ├── price/              # Pricing display
-│   │   │   │   ├── radio-group/        # Radio button groups
-│   │   │   │   ├── rating/             # Star rating display
-│   │   │   │   ├── section/            # Section layout wrapper
-│   │   │   │   ├── separator/          # Visual separator line
-│   │   │   │   ├── sheet/              # Slide-out panel (mobile nav)
-│   │   │   │   ├── sidebar/            # Sidebar layout
-│   │   │   │   ├── skeleton/           # Loading skeleton
-│   │   │   │   ├── spinner/            # Loading spinner
-│   │   │   │   ├── table/              # Data table
-│   │   │   │   ├── tabs/               # Tabbed interface
-│   │   │   │   ├── textarea/           # Multi-line text input
-│   │   │   │   ├── theme-toggle/       # Light/dark mode toggle
-│   │   │   │   ├── tile/               # Tile/card layout
-│   │   │   │   └── video/              # Video embed component
-│   │   │   │                           # Total: 251 files across 37 categories
-│   │   │   │
-│   │   │   └── blocks/                 # Block components
-│   │   │       ├── custom/             # ★ 13 domain-specific blocks
-│   │   │       │   ├── HeroBanner.astro        # Hero with carousel background
-│   │   │       │   ├── StatsRow.astro          # Statistics display grid
-│   │   │       │   ├── FeatureGrid.astro       # Feature cards grid
-│   │   │       │   ├── FaqSection.astro        # FAQ accordion
-│   │   │       │   ├── CtaBanner.astro         # Call-to-action section
-│   │   │       │   ├── TextWithImage.astro     # Text + image split
-│   │   │       │   ├── LogoCloud.astro         # Sponsor logos grid
-│   │   │       │   ├── SponsorCards.astro       # Sponsor tier cards
-│   │   │       │   ├── SponsorSteps.astro      # Sponsor onboarding steps
-│   │   │       │   ├── TeamGrid.astro          # Team member grid
-│   │   │       │   ├── ContactForm.astro       # Contact form with fields
-│   │   │       │   ├── Timeline.astro          # Event timeline
-│   │   │       │   └── RichText.astro          # Portable text renderer
-│   │   │       │
-│   │   │       └── *.astro             # 102 pre-built fulldotdev/ui blocks
-│   │   │                               # (Articles, Banners, CTAs, FAQs, Features,
-│   │   │                               #  Heroes, Logos, Pricings, Products, Reviews,
-│   │   │                               #  Services, Stats, Steps, Videos, etc.)
-│   │   │
+│   │   ├── components/                 # ★ 507 component files total
+│   │   │   ├── Header.astro            # Site header with navigation
+│   │   │   ├── Footer.astro            # Site footer with links/social
+│   │   │   ├── BlockRenderer.astro     # ★ Dynamic block dispatch by _type
+│   │   │   ├── BlockWrapper.astro      # Block layout: background, spacing, maxWidth
+│   │   │   ├── SanityPageContent.astro # Page content wrapper
+│   │   │   ├── VisualEditingMPA.tsx    # React: Presentation Tool integration
+│   │   │   ├── block-registry.ts       # ★ Auto-discover blocks via import.meta.glob
+│   │   │   ├── block.astro             # Block helper
+│   │   │   ├── __tests__/              # 13 component test files
+│   │   │   │   ├── __fixtures__/       # Typed test data from sanity.types.ts
+│   │   │   │   │   ├── contact-form.ts
+│   │   │   │   │   ├── cta-banner.ts
+│   │   │   │   │   ├── faq-section.ts
+│   │   │   │   │   ├── feature-grid.ts
+│   │   │   │   │   ├── hero-banner.ts
+│   │   │   │   │   ├── logo-cloud.ts
+│   │   │   │   │   ├── rich-text.ts
+│   │   │   │   │   ├── sponsor-cards.ts
+│   │   │   │   │   ├── sponsor-steps.ts
+│   │   │   │   │   ├── stats-row.ts
+│   │   │   │   │   └── text-with-image.ts
+│   │   │   │   ├── BlockRenderer.test.ts
+│   │   │   │   ├── BlockWrapper.test.ts
+│   │   │   │   ├── ContactForm.test.ts
+│   │   │   │   ├── CtaBanner.test.ts
+│   │   │   │   ├── FaqSection.test.ts
+│   │   │   │   ├── FeatureGrid.test.ts
+│   │   │   │   ├── HeroBanner.test.ts
+│   │   │   │   ├── LogoCloud.test.ts
+│   │   │   │   ├── RichText.test.ts
+│   │   │   │   ├── SponsorCards.test.ts
+│   │   │   │   ├── SponsorSteps.test.ts
+│   │   │   │   ├── StatsRow.test.ts
+│   │   │   │   └── TextWithImage.test.ts
+│   │   │   ├── blocks/
+│   │   │   │   ├── custom/             # ★ 11 custom Sanity-backed blocks
+│   │   │   │   │   ├── ContactForm.astro + .stories.ts
+│   │   │   │   │   ├── CtaBanner.astro + .stories.ts
+│   │   │   │   │   ├── FaqSection.astro + .stories.ts
+│   │   │   │   │   ├── FeatureGrid.astro + .stories.ts
+│   │   │   │   │   ├── HeroBanner.astro + .stories.ts
+│   │   │   │   │   ├── LogoCloud.astro + .stories.ts
+│   │   │   │   │   ├── RichText.astro + .stories.ts
+│   │   │   │   │   ├── SponsorCards.astro + .stories.ts
+│   │   │   │   │   ├── SponsorSteps.astro + .stories.ts
+│   │   │   │   │   ├── StatsRow.astro + .stories.ts
+│   │   │   │   │   └── TextWithImage.astro + .stories.ts
+│   │   │   │   └── *.astro             # ~100 fulldev/ui variant blocks
+│   │   │   │       ├── hero-{1..14}.astro + .stories.ts
+│   │   │   │       ├── features-{1..6}.astro + .stories.ts
+│   │   │   │       ├── cta-{1..8}.astro + .stories.ts
+│   │   │   │       ├── services-{1..7}.astro + .stories.ts
+│   │   │   │       ├── content-{1..6}.astro + .stories.ts
+│   │   │   │       ├── reviews-{1..5}.astro + .stories.ts
+│   │   │   │       ├── products-{1..5}.astro + .stories.ts
+│   │   │   │       ├── faqs-{1..4}.astro + .stories.ts
+│   │   │   │       ├── articles-{1..4}.astro + .stories.ts
+│   │   │   │       ├── videos-{1..4}.astro + .stories.ts
+│   │   │   │       ├── stats-{1..3}.astro + .stories.ts
+│   │   │   │       ├── steps-{1..3}.astro + .stories.ts
+│   │   │   │       ├── pricings-{1..3}.astro + .stories.ts
+│   │   │   │       ├── logos-{1..3}.astro + .stories.ts
+│   │   │   │       ├── contact-{1..3}.astro + .stories.ts
+│   │   │   │       ├── footer-{1..3}.astro + .stories.ts
+│   │   │   │       ├── header-{1..3}.astro + .stories.ts
+│   │   │   │       └── (banner, blocks, images, links, video, table, product)
+│   │   │   └── ui/                     # ~39 shadcn/ui primitive components
+│   │   │       ├── accordion, alert, avatar, badge, banner, button
+│   │   │       ├── checkbox, collapsible, empty, field, footer, header
+│   │   │       ├── icon, image, input, item, label, list, logo
+│   │   │       └── (and more standard UI patterns)
 │   │   ├── layouts/
-│   │   │   ├── Layout.astro            # ★ Master HTML layout (head, meta, scripts)
-│   │   │   └── templates/
-│   │   │       ├── DefaultTemplate.astro    # Centered max-w-7xl
-│   │   │       ├── FullWidthTemplate.astro  # Full-width, no constraints
-│   │   │       ├── LandingTemplate.astro    # No nav/footer, conversion
-│   │   │       ├── SidebarTemplate.astro    # 2/3 + 1/3 grid
-│   │   │       └── TwoColumnTemplate.astro  # Equal 2-column grid
-│   │   │
-│   │   ├── lib/
-│   │   │   ├── sanity.ts               # ★ Sanity client, GROQ queries, data fetching
-│   │   │   ├── types.ts                # ★ TypeScript interfaces for all data structures
-│   │   │   ├── image.ts                # Sanity image URL builder (urlFor)
-│   │   │   ├── utils.ts                # cn() class utility (clsx + tailwind-merge)
-│   │   │   └── data/                   # Static/placeholder page data
-│   │   │       ├── index.ts            # Barrel export
-│   │   │       ├── home-page.ts        # Homepage block structure
-│   │   │       ├── about-page.ts       # About page blocks
-│   │   │       ├── contact-page.ts     # Contact page blocks
-│   │   │       ├── projects-page.ts    # Projects page blocks
-│   │   │       ├── sponsors-page.ts    # Sponsors page blocks
-│   │   │       └── site-settings.ts    # Legacy site settings (deprecated)
-│   │   │
-│   │   ├── pages/
-│   │   │   ├── index.astro             # ★ Homepage (Sanity CMS data)
-│   │   │   ├── about.astro             # About page (static data)
-│   │   │   ├── contact.astro           # Contact page (static data)
-│   │   │   ├── projects.astro          # Projects page (static data)
-│   │   │   ├── sponsors.astro          # Sponsors page (static data)
-│   │   │   └── [...slug].astro         # ★ Dynamic catch-all (Sanity, 5 templates)
-│   │   │
+│   │   │   ├── Layout.astro            # ★ Main layout: head, meta, CSP, GA4, VE
+│   │   │   └── templates/              # 5 page templates
+│   │   │       ├── DefaultTemplate.astro
+│   │   │       ├── FullWidthTemplate.astro
+│   │   │       ├── LandingTemplate.astro
+│   │   │       ├── SidebarTemplate.astro
+│   │   │       └── TwoColumnTemplate.astro
+│   │   ├── lib/                        # ★ Core utilities
+│   │   │   ├── sanity.ts               # GROQ queries, loadQuery, getSiteSettings
+│   │   │   ├── image.ts                # urlFor() — Sanity image URL builder
+│   │   │   ├── types.ts                # Type adapters from sanity.types.ts
+│   │   │   ├── utils.ts                # cn() utility (clsx + tailwind-merge)
+│   │   │   └── __tests__/
+│   │   │       ├── __mocks__/
+│   │   │       │   └── sanity-client.ts # Mock for "sanity:client" virtual module
+│   │   │       ├── sanity.test.ts
+│   │   │       ├── image.test.ts
+│   │   │       └── utils.test.ts
+│   │   ├── pages/                      # ★ 2 route files
+│   │   │   ├── index.astro             # Home page (slug: 'home')
+│   │   │   └── [...slug].astro         # Catch-all dynamic pages
+│   │   ├── scripts/
+│   │   │   └── main.ts                 # Client JS: scroll animations, forms, carousel
 │   │   ├── styles/
-│   │   │   └── global.css              # ★ Tailwind v4, theme, Swiss design tokens
-│   │   │
-│   │   └── scripts/
-│   │       └── main.ts                 # Client-side JS (animations, form, carousel)
-│   │
-│   ├── public/                         # Static assets (favicon, etc.)
-│   ├── dist/                           # Build output (gitignored)
-│   └── storybook-static/              # Storybook build output (gitignored)
+│   │   │   └── global.css              # Tailwind + Swiss/NJIT brand tokens
+│   │   ├── sanity.types.ts             # ★ Auto-generated TypeScript types (1033 lines)
+│   │   └── env.d.ts                    # Astro environment type declarations
+│   └── .storybook/                     # Storybook 10 configuration
 │
-├── studio/                             # ★ PART: Sanity CMS Studio
-│   ├── package.json                    # Studio dependencies (sanity v5, react 19)
-│   ├── sanity.config.ts                # ★ Studio config (structure, presentation, vision)
-│   ├── sanity.cli.ts                   # CLI config (deploy, appId)
-│   ├── tsconfig.json                   # TypeScript config (ES2017, strict)
-│   ├── .eslintrc                       # Extends @sanity/eslint-config-studio
-│   ├── .gitignore                      # Ignores dist/, .sanity/, node_modules/
-│   │
+├── studio/                             # Part 2: Sanity Studio v5
+│   ├── sanity.config.ts                # ★ Main config: plugins, singletons, desk structure
+│   ├── sanity.cli.ts                   # CLI + TypeGen config (generates to astro-app)
+│   ├── schema.json                     # Extracted schema for TypeGen
+│   ├── tsconfig.json                   # TypeScript strict mode
+│   ├── .env.example                    # Template: project ID, dataset, preview origin
 │   └── src/
-│       ├── schemaTypes/
-│       │   ├── index.ts                # ★ Schema registry (all types exported)
-│       │   │
-│       │   ├── documents/
-│       │   │   ├── page.ts             # ★ Page document (title, slug, template, seo, blocks[])
-│       │   │   ├── site-settings.ts    # ★ Site settings singleton (nav, footer, branding)
-│       │   │   └── sponsor.ts          # Sponsor profile (name, logo, tier, featured)
-│       │   │
-│       │   ├── objects/
-│       │   │   ├── block-base.ts       # Shared block base fields
-│       │   │   ├── button.ts           # Reusable button object
-│       │   │   ├── portable-text.ts    # Rich text editor config
-│       │   │   └── seo.ts              # SEO metadata object
-│       │   │
-│       │   ├── blocks/
-│       │   │   ├── hero-banner.ts      # Hero section schema
-│       │   │   ├── feature-grid.ts     # Feature cards schema
-│       │   │   ├── cta-banner.ts       # CTA section schema
-│       │   │   ├── stats-row.ts        # Statistics display schema
-│       │   │   ├── text-with-image.ts  # Text + image schema
-│       │   │   ├── logo-cloud.ts       # Logo showcase schema
-│       │   │   ├── sponsor-steps.ts    # Sponsor process schema
-│       │   │   ├── rich-text.ts        # Rich text content schema
-│       │   │   ├── faq-section.ts      # FAQ accordion schema
-│       │   │   ├── contact-form.ts     # Contact form schema
-│       │   │   └── sponsor-cards.ts    # Sponsor cards schema
-│       │   │
-│       │   └── helpers/
-│       │       └── defineBlock.ts      # ★ Block factory (merges base fields)
-│       │
-│       └── presentation/
-│           └── resolve.ts              # Presentation tool URL resolver
+│       ├── presentation/
+│       │   └── resolve.ts              # Preview URL resolver for Presentation Tool
+│       └── schemaTypes/
+│           ├── index.ts                # ★ Schema exports (21 types)
+│           ├── helpers/
+│           │   └── defineBlock.ts      # Block factory: auto-adds layout fields
+│           ├── objects/                # 8 reusable object types
+│           │   ├── seo.ts             # SEO metadata (title, description, ogImage)
+│           │   ├── button.ts          # Button (text, url, variant)
+│           │   ├── link.ts            # Navigation link (label, href, external)
+│           │   ├── portable-text.ts   # Rich text with links, images, callouts
+│           │   ├── block-base.ts      # Base fields: backgroundVariant, spacing, maxWidth
+│           │   ├── faq-item.ts        # FAQ question + answer
+│           │   ├── feature-item.ts    # Feature with icon/image + title
+│           │   ├── stat-item.ts       # Statistic value + label
+│           │   └── step-item.ts       # Process step with bullet list
+│           ├── documents/              # 3 document types
+│           │   ├── page.ts            # ★ Page with blocks[], template, SEO
+│           │   ├── site-settings.ts   # ★ Singleton: nav, footer, branding, social
+│           │   └── sponsor.ts         # Sponsor: logo, tier, featured
+│           └── blocks/                 # 11 block types
+│               ├── hero-banner.ts
+│               ├── feature-grid.ts
+│               ├── cta-banner.ts
+│               ├── stats-row.ts
+│               ├── text-with-image.ts
+│               ├── logo-cloud.ts
+│               ├── sponsor-steps.ts
+│               ├── rich-text.ts
+│               ├── faq-section.ts
+│               ├── contact-form.ts
+│               └── sponsor-cards.ts
 │
-├── tests/                              # Test suite
+├── tests/                              # ★ Test suite (root level)
 │   ├── README.md                       # Test framework documentation
-│   ├── CLAUDE.md                       # Testing rules for AI development
-│   ├── .env.example                    # Test env template
-│   │
-│   ├── e2e/                            # E2E browser tests
-│   │   ├── smoke.spec.ts              # Homepage smoke + a11y + perf
-│   │   ├── pages-1-2.spec.ts          # All pages render + content
-│   │   ├── homepage-2-2.spec.ts       # Sanity data fetching (TDD)
-│   │   └── site-settings-2-3.spec.ts  # Site settings wiring (TDD)
-│   │
-│   ├── integration/                    # Integration tests (no browser)
-│   │   ├── blocks-2-1/
-│   │   │   └── block-schemas.spec.ts  # Block schema validation (32+ tests)
-│   │   ├── homepage-2-2/
-│   │   │   └── data-fetching.spec.ts  # GROQ query validation
-│   │   ├── site-settings-2-3/
-│   │   │   └── data-wiring.spec.ts    # Site settings validation
-│   │   └── schema-1-3/
-│   │       └── documents.spec.ts      # Document schema validation
-│   │
-│   └── support/
-│       ├── fixtures/index.ts           # Playwright fixtures (network, log)
-│       ├── helpers/a11y.ts            # Accessibility helper (axe-core)
+│   ├── e2e/                            # Playwright E2E specs (34 test cases)
+│   │   ├── smoke.spec.ts              # Baseline: load, a11y, meta, nav, perf
+│   │   ├── pages-1-2.spec.ts          # All pages: 200 status, blocks, errors, a11y
+│   │   ├── homepage-2-2.spec.ts       # Homepage Sanity content validation
+│   │   └── site-settings-2-3.spec.ts  # Header/footer Sanity data wiring
+│   ├── integration/                    # Vitest integration tests (241 cases)
+│   │   ├── blocks-2-1/                # Block schema validation
+│   │   ├── migration-1-2/             # Architecture, block components, types
+│   │   ├── schema-1-3/                # Documents, helpers, registration
+│   │   ├── template-2-0/              # Template system (5 files)
+│   │   ├── homepage-2-2/              # Data fetching validation
+│   │   ├── site-settings-2-3/         # Settings data wiring
+│   │   ├── sponsor-3-1/               # Sponsor schema
+│   │   ├── deploy-5-2/                # Cloudflare deploy checks
+│   │   ├── preview-publish-5-4/       # Preview/publish architecture
+│   │   ├── link-7-7/                  # Link extraction
+│   │   └── storybook-1-4/             # Storybook config
+│   └── support/                        # Test infrastructure
+│       ├── fixtures/index.ts           # Playwright fixtures (network monitor, logging)
+│       ├── helpers/a11y.ts             # expectAccessible() — axe-core WCAG 2.1 AA
 │       └── constants.ts               # Block names, types, timeouts
 │
-├── docs/                               # Project documentation (this folder)
-├── _bmad/                              # BMAD workflow system
-├── _bmad-output/                       # BMAD planning/implementation artifacts
-└── .github/
-    └── workflows/
-        └── deploy-storybook.yml        # Storybook → GitHub Pages deployment
+├── .github/workflows/                  # 7 CI/CD workflows
+│   ├── ci.yml                          # PR checks: unit tests + Lighthouse
+│   ├── release.yml                     # semantic-release on main
+│   ├── deploy-storybook.yml            # Storybook → GitHub Pages
+│   ├── sanity-deploy.yml               # Webhook → build + CF deploy
+│   ├── sync-preview.yml                # Auto-sync main → preview + Discord
+│   ├── enforce-preview-branch.yml      # Only preview → main
+│   └── enforce-preview-source.yml      # Block main → preview
+│
+├── docs/                               # ★ Project documentation
+│   ├── index.md                        # Master documentation index
+│   ├── project-overview.md             # Executive summary
+│   ├── architecture.md                 # System design and patterns
+│   ├── source-tree-analysis.md         # This file
+│   ├── component-inventory.md          # Component catalog
+│   ├── data-models.md                  # Sanity schemas and GROQ
+│   ├── development-guide.md            # Setup and commands
+│   ├── integration-architecture.md     # Part communication
+│   ├── project-context.md              # Tech stack reference
+│   ├── template-layout-system.md       # Template system design
+│   ├── storybook-constitution.md       # Storybook best practices
+│   ├── server-islands-cost-analysis.md # Server islands analysis
+│   ├── team/                           # Team guides (13 files)
+│   └── code-review/                    # Code review reports (4 files)
+│
+├── _bmad-output/                       # BMAD workflow outputs
+│   ├── planning-artifacts/             # PRD, architecture, epics
+│   ├── implementation-artifacts/       # 40+ implementation stories
+│   ├── test-artifacts/                 # Test framework docs + reviews
+│   ├── brainstorming/                  # Brainstorming sessions
+│   └── capstone/                       # Capstone deliverables
+│
+├── rules/                              # AI development rules (Cursor/Claude)
+├── Dockerfile                          # Multi-stage: astro, studio, storybook
+├── docker-compose.yml                  # 3 services + optional storybook profile
+├── playwright.config.ts                # 5 browser projects, webServer build+preview
+├── wrangler.toml                       # Cloudflare Pages deployment config
+├── package.json                        # ★ Root: workspaces, dev/test scripts
+├── CLAUDE.md                           # AI assistant instructions
+├── CHANGELOG.md                        # Auto-generated changelog (semantic-release)
+└── README.md                           # Primary project documentation
 ```
-
-## Critical Folders
-
-| Folder | Purpose | Key Files |
-|---|---|---|
-| `astro-app/src/lib/` | Data layer | `sanity.ts` (queries), `types.ts` (interfaces) |
-| `astro-app/src/components/blocks/custom/` | Domain blocks | 13 custom Astro components |
-| `astro-app/src/components/ui/` | UI primitives | 251 shadcn/fulldev components |
-| `astro-app/src/pages/` | Routes | 6 page routes including dynamic catch-all |
-| `studio/src/schemaTypes/` | CMS schemas | 11 blocks, 3 documents, 4 objects |
-| `tests/` | Test suite | 50+ tests (E2E + integration) |
 
 ## Entry Points
 
-| Entry Point | Path | Description |
-|---|---|---|
-| Astro app | `astro-app/src/pages/index.astro` | Homepage route |
-| Dynamic pages | `astro-app/src/pages/[...slug].astro` | CMS-driven pages |
-| Studio | `studio/sanity.config.ts` | Sanity Studio config |
-| Tests (E2E) | `playwright.config.ts` | Browser test runner |
-| Tests (Integration) | `playwright.integration.config.ts` | Schema test runner |
-| Client JS | `astro-app/src/scripts/main.ts` | All client-side interactivity |
+| Entry Point | Path | Purpose |
+|-------------|------|---------|
+| Home page | `astro-app/src/pages/index.astro` | Fetches page with slug 'home' |
+| Dynamic pages | `astro-app/src/pages/[...slug].astro` | Catch-all route with `getStaticPaths()` |
+| Main layout | `astro-app/src/layouts/Layout.astro` | Global head, meta, CSP, GA4 |
+| Client script | `astro-app/src/scripts/main.ts` | Scroll animations, forms, carousel |
+| Block registry | `astro-app/src/components/block-registry.ts` | Auto-discovers all blocks |
+| GROQ queries | `astro-app/src/lib/sanity.ts` | Data fetching layer |
+| Studio config | `studio/sanity.config.ts` | Sanity plugins, desk structure |
+| Schema index | `studio/src/schemaTypes/index.ts` | All 21 schema type exports |
+
+## Critical Folders
+
+| Folder | Files | Role |
+|--------|-------|------|
+| `astro-app/src/components/blocks/custom/` | 24 | Custom Sanity-backed block components + stories |
+| `astro-app/src/components/blocks/` | ~200 | UI variant blocks + stories |
+| `astro-app/src/components/ui/` | ~39 | shadcn/ui primitives |
+| `astro-app/src/lib/` | 8 | Core utilities + GROQ queries |
+| `studio/src/schemaTypes/` | 21 | All Sanity schema definitions |
+| `tests/e2e/` | 4 | Playwright E2E specs |
+| `tests/integration/` | 19 | Vitest integration tests |
+| `.github/workflows/` | 7 | CI/CD pipeline definitions |
