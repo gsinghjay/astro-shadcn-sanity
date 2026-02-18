@@ -27,7 +27,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
 
-function sponsorLogoUrl(logo: typeof sponsor.logo) {
+function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
   return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(200).height(200).url() : null;
 }
 
@@ -36,6 +36,7 @@ const projects = sponsor.projects ?? [];
 ---
 
 <Layout title={sponsor.name ?? 'Sponsor'}>
+  <!-- Header with breadcrumb + sponsor info -->
   <Section>
     <SectionContent>
       <Breadcrumb items={[
@@ -92,28 +93,27 @@ const projects = sponsor.projects ?? [];
     </SectionContent>
   </Section>
 
-  {projects.length > 0 && (
-    <Section>
-      <SectionContent>
-        <h2 class="text-2xl font-bold mb-6">Associated Projects</h2>
-        <ul class="space-y-3">
-          {projects.map((p) => (
-            <li>
-              <a
-                href={`/projects/${stegaClean(p.slug)}`}
-                class="text-primary hover:text-primary/80 underline"
-              >
-                {p.title}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </SectionContent>
-    </Section>
-  )}
+  <!-- Detail content — single section -->
+  <Section size="sm">
+    <SectionContent class="gap-y-10">
+      {projects.length > 0 && (
+        <div>
+          <h2 class="text-2xl font-bold mb-4">Associated Projects</h2>
+          <ul class="space-y-3">
+            {projects.map((p) => (
+              <li>
+                <a
+                  href={`/projects/${stegaClean(p.slug)}`}
+                  class="text-primary hover:text-primary/80 underline"
+                >
+                  {p.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-  <Section>
-    <SectionContent>
       <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
         &larr; Back to Sponsors
       </a>

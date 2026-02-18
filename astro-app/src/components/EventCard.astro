@@ -1,0 +1,55 @@
+---
+import type { SanityEvent } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  event: SanityEvent;
+}
+
+const { event: e } = Astro.props;
+
+// Format date for display
+const eventDate = e.date ? new Date(e.date) : null;
+const formattedDate = eventDate
+  ? eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  : null;
+const formattedTime = eventDate
+  ? eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  : null;
+
+// Truncate description for excerpt
+const excerpt = e.description
+  ? (e.description.length > 150 ? e.description.slice(0, 150) + '...' : e.description)
+  : null;
+
+// Event type badge colors — stegaClean required for Visual Editing compatibility
+const cleanType = e.eventType ? stegaClean(e.eventType) : null;
+const badgeClasses: Record<string, string> = {
+  showcase: 'bg-primary/10 text-primary',
+  networking: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  workshop: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+};
+const badgeClass = cleanType ? badgeClasses[cleanType] ?? 'bg-muted text-muted-foreground' : null;
+---
+
+<div class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+  <div class="flex items-center justify-between gap-2">
+    {formattedDate && (
+      <time datetime={e.date ?? undefined} class="text-sm font-medium text-primary">
+        {formattedDate}{formattedTime && ` at ${formattedTime}`}
+      </time>
+    )}
+    {e.eventType && badgeClass && (
+      <span class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClass}`}>
+        {e.eventType}
+      </span>
+    )}
+  </div>
+  <h3 class="text-lg font-semibold">{e.title}</h3>
+  {e.location && (
+    <p class="text-sm text-muted-foreground">{e.location}</p>
+  )}
+  {excerpt && (
+    <p class="text-sm text-card-foreground leading-relaxed">{excerpt}</p>
+  )}
+</div>

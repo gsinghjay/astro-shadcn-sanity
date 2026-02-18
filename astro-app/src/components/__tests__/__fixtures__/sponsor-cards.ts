@@ -8,6 +8,8 @@ export const sponsorCardsSponsors: Sponsor[] = [
     logo: {
       asset: { _id: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200-png', url: 'https://cdn.sanity.io/images/test-project/test-dataset/Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200.png', metadata: null },
       alt: 'Acme logo',
+      hotspot: null,
+      crop: null,
     },
     tier: 'gold',
     description: 'Leading technology partner',

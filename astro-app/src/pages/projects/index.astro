@@ -1,0 +1,137 @@
+---
+import SidebarLayout from '@/layouts/SidebarLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { getAllProjects } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
+import { Section, SectionContent } from '@/components/ui/section';
+import ProjectCard from '@/components/ProjectCard.astro';
+
+const projects = await getAllProjects();
+const allTechs = [...new Set(projects.flatMap(p => (p.technologyTags ?? []).map(t => stegaClean(t))))].sort();
+const allIndustries = [...new Set(projects.map(p => p.sponsor?.industry ? stegaClean(p.sponsor.industry) : '').filter(Boolean))].sort();
+const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
+---
+
+<SidebarLayout title="Projects">
+  <Section slot="header">
+    <SectionContent>
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Projects' },
+      ]} />
+
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Capstone Projects</h1>
+    </SectionContent>
+  </Section>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {projects.map((project) => (
+      <ProjectCard project={project} />
+    ))}
+  </div>
+
+  {hasFilters && (
+    <div slot="sidebar" data-project-filters class="space-y-6">
+      {allTechs.length > 0 && (
+        <div>
+          <h3 class="text-sm font-semibold text-foreground mb-3">Technology</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              data-filter-tech="all"
+              data-state="active"
+              aria-pressed="true"
+              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+            >
+              All
+            </button>
+            {allTechs.map((tech) => (
+              <button
+                data-filter-tech={tech}
+                aria-pressed="false"
+                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              >
+                {tech}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {allIndustries.length > 0 && (
+        <div>
+          <h3 class="text-sm font-semibold text-foreground mb-3">Industry</h3>
+          <div class="flex flex-wrap gap-2">
+            <button
+              data-filter-industry="all"
+              data-state="active"
+              aria-pressed="true"
+              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+            >
+              All Industries
+            </button>
+            {allIndustries.map((industry) => (
+              <button
+                data-filter-industry={industry}
+                aria-pressed="false"
+                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              >
+                {industry}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+</SidebarLayout>
+
+<style is:global>
+  [data-project-card][data-state="hidden"] { display: none; }
+</style>
+
+<script>
+  function initProjectFilter(): void {
+    const container = document.querySelector('[data-project-filters]');
+    if (!container) return;
+
+    const cards = document.querySelectorAll<HTMLElement>('[data-project-card]');
+    let activeTech = 'all';
+    let activeIndustry = 'all';
+
+    function applyFilters() {
+      cards.forEach((el) => {
+        const techs = el.dataset.techTags?.split(',').filter(Boolean) ?? [];
+        const industry = el.dataset.industry ?? '';
+
+        const matchesTech = activeTech === 'all' || techs.includes(activeTech);
+        const matchesIndustry = activeIndustry === 'all' || industry === activeIndustry;
+
+        el.dataset.state = (matchesTech && matchesIndustry) ? 'visible' : 'hidden';
+      });
+    }
+
+    container.querySelectorAll<HTMLElement>('[data-filter-tech]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeTech = btn.dataset.filterTech ?? 'all';
+        container.querySelectorAll<HTMLElement>('[data-filter-tech]').forEach(b => {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+          b.dataset.state = b === btn ? 'active' : '';
+        });
+        applyFilters();
+      });
+    });
+
+    container.querySelectorAll<HTMLElement>('[data-filter-industry]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeIndustry = btn.dataset.filterIndustry ?? 'all';
+        container.querySelectorAll<HTMLElement>('[data-filter-industry]').forEach(b => {
+          b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+          b.dataset.state = b === btn ? 'active' : '';
+        });
+        applyFilters();
+      });
+    });
+  }
+
+  initProjectFilter();
+</script>
