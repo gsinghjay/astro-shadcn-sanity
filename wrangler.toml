@@ -2,3 +2,14 @@ name = "ywcc-capstone"
 pages_build_output_dir = "astro-app/dist"
 compatibility_date = "2025-12-01"
 compatibility_flags = ["nodejs_compat", "disable_nodejs_process_v2"]
+
+# Build-time environment variables for Astro prerendering.
+# CF Pages v3 with wrangler.toml requires [vars] for build-time access;
+# dashboard Secrets are runtime-only (context.env) and NOT available during builds.
+[vars]
+PUBLIC_SANITY_STUDIO_PROJECT_ID = "49nk9b0w"
+PUBLIC_SANITY_STUDIO_DATASET = "production"
+PUBLIC_SANITY_VISUAL_EDITING_ENABLED = "false"
+PUBLIC_GA_MEASUREMENT_ID = "G-1XJP4FMQJJ"
+PUBLIC_SITE_URL = "https://ywcc-capstone.pages.dev"
+PUBLIC_SANITY_STUDIO_URL = "https://ywcccapstone.sanity.studio"
