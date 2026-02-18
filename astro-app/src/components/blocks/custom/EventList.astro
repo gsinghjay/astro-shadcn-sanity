@@ -1,0 +1,37 @@
+---
+import type { SanityEvent } from '@/lib/sanity';
+import { Section, SectionContent } from '@/components/ui/section';
+import EventCard from '@/components/EventCard.astro';
+
+interface Props {
+  heading?: string | null;
+  filterBy?: 'all' | 'upcoming' | 'past' | null;
+  limit?: number | null;
+  events?: SanityEvent[];
+  class?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
+const { heading, events = [] } = Astro.props;
+---
+
+<Section data-animate>
+  {heading && (
+    <SectionContent>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+    </SectionContent>
+  )}
+
+  <SectionContent>
+    {events.length > 0 ? (
+      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {events.map((e) => (
+          <EventCard event={e} />
+        ))}
+      </div>
+    ) : (
+      <p class="text-muted-foreground text-center py-8">No events to display.</p>
+    )}
+  </SectionContent>
+</Section>
