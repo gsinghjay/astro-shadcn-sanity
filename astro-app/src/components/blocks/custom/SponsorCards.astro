@@ -5,6 +5,13 @@ import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/t
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+
+function sponsorLogoUrl(logo: Sponsor['logo']) {
+  // GROQ dereferences asset->{ _id, url } which is structurally incompatible with Image._ref
+  // but @sanity/image-url parses the CDN url to extract the asset ref at runtime
+  return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(112).height(112).url() : null;
+}
 
 interface Props {
   heading?: string | null;
@@ -35,12 +42,12 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
   <SectionGrid size="lg">
     {(sponsors ?? []).map((sponsor) => {
       const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
-      const logoUrl = sponsor.logo?.asset?.url;
+      const logoUrl = sponsorLogoUrl(sponsor.logo);
       return (
         <Tile variant="floating" class={`${tier.border} border-2 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-150`}>
           <TileContent>
             <div class="flex items-start justify-between gap-4">
-              <div class="flex items-center gap-4">
+              <a href={`/sponsors/${sponsor.slug}`} class="flex items-center gap-4 no-underline text-inherit">
                 <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
                   {logoUrl ? (
                     <img src={logoUrl} alt={sponsor.logo?.alt || `${sponsor.name} logo`} class="w-full h-full object-cover" loading="lazy" />
@@ -53,7 +60,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
                 <div>
                   <TileTitle class="text-xl">{sponsor.name}</TileTitle>
                 </div>
-              </div>
+              </a>
               {sponsor.tier && (
                 <Badge class={tier.badge}>{sponsor.tier}</Badge>
               )}

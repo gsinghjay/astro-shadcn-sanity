@@ -105,6 +105,7 @@ function astroVirtualModuleStubs(): Plugin {
     'virtual:astro-icon': `export default { ${iconEntries.join(', ')} }; export const config = { include: { ${iconSets.map((s) => `"${s}": ["*"]`).join(', ')} } };`,
     'virtual:astro:assets/fonts/runtime': 'export {};',
     'virtual:astro:assets/fonts/internal': 'export {};',
+    'sanity:client': `export const sanityClient = { config() { return { projectId: 'storybook', dataset: 'production', apiVersion: '2025-03-01' }; }, fetch() { return Promise.resolve({ result: null }); } };`,
   }
 
   return {
