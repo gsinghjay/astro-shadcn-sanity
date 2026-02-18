@@ -9,7 +9,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import javax.security.auth.login.LoginException;
 
 public class Main {
-    static void main(String[] args) throws LoginException, InterruptedException{
+    public static void main(String[] args) throws LoginException, InterruptedException {
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
         String token = dotenv.get("BOT_TOKEN", System.getenv("BOT_TOKEN"));
         if (token == null || token.isBlank()) {
