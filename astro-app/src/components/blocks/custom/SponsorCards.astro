@@ -1,14 +1,18 @@
 ---
-import type { SponsorCardsBlock } from '@/lib/types';
+import type { Sponsor } from '@/lib/sanity';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { stegaClean } from '@sanity/client/stega';
 
-interface Props extends SponsorCardsBlock {
+interface Props {
+  heading?: string | null;
+  displayMode?: 'all' | 'featured' | 'manual' | null;
+  sponsors?: Sponsor[];
   class?: string;
   id?: string;
+  [key: string]: unknown;
 }
 
 const { heading, sponsors } = Astro.props;

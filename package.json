@@ -1,7 +1,7 @@
 {
   "name": "ywcc-capstone-template",
   "version": "1.4.0",
-  "description": "Minimal Astro site with Sanity Studio",
+  "description": "YWCC Capstone Websites — Astro + Sanity monorepo",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
     "dev:storybook": "concurrently --kill-others \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\" \"npm run storybook --workspace=astro-app\"",
@@ -25,9 +25,9 @@
     "Real-time"
   ],
   "bugs": {
-    "url": "https://github.com/sanity-io/sanity-template-astro-clean/issues"
+    "url": "https://github.com/gsinghjay/astro-shadcn-sanity/issues"
   },
-  "homepage": "https://github.com/sanity-io/sanity-template-astro-clean#readme",
+  "homepage": "https://github.com/gsinghjay/astro-shadcn-sanity#readme",
   "workspaces": [
     "studio",
     "astro-app"

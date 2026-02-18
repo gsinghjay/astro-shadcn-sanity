@@ -2,18 +2,20 @@
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
-import { getPage } from '../lib/sanity';
+import { getPage, getAllSponsors } from '../lib/sanity';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
 // In static mode: fetch page data and render inline
 // In VE mode: skip fetch — server island handles its own data fetching
 let page = null;
+let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 if (!visualEditingEnabled) {
   page = await getPage('home');
   if (!page) {
     return Astro.redirect('/404');
   }
+  sponsors = await getAllSponsors();
 }
 ---
 
@@ -32,6 +34,6 @@ if (!visualEditingEnabled) {
       </div>
     </SanityPageContent>
   ) : (
-    <BlockRenderer blocks={page!.blocks ?? []} />
+    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} />
   )}
 </Layout>

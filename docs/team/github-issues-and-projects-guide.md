@@ -52,6 +52,7 @@ Each sub-issue is one block conversion. Sub-issues are linked as GitHub sub-issu
 |-------|---------|
 | `block-conversion` | All block schema conversion issues |
 | `enhancement` | Parent issues |
+| `gap-analysis` | Native feature gaps from Sanity & Astro gap analysis |
 
 ---
 
@@ -79,32 +80,49 @@ These are needed for programmatic updates via `gh api graphql`.
 | Reviewers | REVIEWERS | `PVTF_lAHOAz5-bs4BO-Rdzg9hLf4` |
 | Parent issue | PARENT_ISSUE | `PVTF_lAHOAz5-bs4BO-Rdzg9hLf8` |
 | Sub-issues progress | SUB_ISSUES_PROGRESS | `PVTF_lAHOAz5-bs4BO-Rdzg9hLgA` |
-| Date (due) | DATE | `PVTF_lAHOAz5-bs4BO-Rdzg9hLqc` |
+| Due Date | DATE | `PVTF_lAHOAz5-bs4BO-Rdzg9hLqc` |
 | Start Date | DATE | `PVTF_lAHOAz5-bs4BO-Rdzg9hUnE` |
 
 ### Status Options
 
-| Status | Option ID |
-|--------|-----------|
-| Todo | `f75ad846` |
-| In Progress | `47fc9ee4` |
-| Done | `98236657` |
+| Status | Color | Option ID |
+|--------|-------|-----------|
+| Backlog | Gray | `aeb05804` |
+| Ready | Green | `d0f8afa9` |
+| In Progress | Yellow | `81800a17` |
+| Blocked | Red | `24bd65d4` |
+| In Review | Blue | `fe9342ae` |
+| Done | Purple | `f43b1261` |
+
+---
+
+## Milestones
+
+| # | Milestone | Due | Issues |
+|---|-----------|-----|--------|
+| 1 | Sprint 1 - Platform Foundation | Feb 19 | #158-#184 (27 issues: foundation, schemas, queries, infra) |
+| 2 | Sprint 2 - Core Content System | Mar 5 | #122 (fdLink), #186 B.1 GA4 Dashboard (+6 sub-issues), #213-#217 #219 #232 gap quick wins (7 issues) |
+| 3 | Sprint 3 - Blocks & Content Types | Mar 19 | #37-#40, #121, #41-#144 (109 blocks), #187 B.2 Monsido (+5 sub-issues) |
+| 4 | Sprint 4 - Feature Completion | Apr 2 | SEO, contact form, #220-#221 #224 #226-#227 #231 #233-#234 gap P2 (8 issues) |
+| 5 | Sprint 5 - Multi-Site Launch | Apr 16 | Multi-site infra, RWC US + International, #225 #228-#230 gap P3 (4 issues), #188 B.3 Cross-Site Analytics (+5 sub-issues) |
+| 6 | Post-Sprint - Delivery | May 7 | Bug fixes, docs, presentations, #189 B.4 Final Report (+6 sub-issues) |
 
 ---
 
 ## Current Timeline
 
-Dates are set on the project board via the `Start Date` and `Date` (due) fields.
+Dates are set on the project board via the `Start Date` and `Due Date` fields.
 
-| Parent | Start | Due | Sprint |
-|--------|-------|-----|--------|
-| #121 Hero & Banner | 2026-03-01 | 2026-03-12 | Sprint 2-3 |
-| #37 Content & Articles | 2026-03-02 | 2026-03-12 | Sprint 2-3 |
+### Block Conversion Schedule
+
+| Parent | Start | Due | Milestone |
+|--------|-------|-----|-----------|
+| #122 fdLink (prerequisite) | 2026-02-28 | 2026-03-01 | Sprint 2 |
+| #121 Hero & Banner | 2026-03-01 | 2026-03-12 | Sprint 3 |
+| #37 Content & Articles | 2026-03-02 | 2026-03-12 | Sprint 3 |
 | #38 CTA & Features | 2026-03-02 | 2026-03-13 | Sprint 3 |
 | #39 Products & Services | 2026-03-05 | 2026-03-16 | Sprint 3 |
 | #40 Media & Misc | 2026-03-13 | 2026-03-19 | Sprint 3 |
-
-Special: **#122 (fdLink shared type)** has dates Feb 28 - Mar 1 (prerequisite for all blocks).
 
 ---
 
@@ -198,7 +216,7 @@ for (parent, start_range, end_range), (start_str, due_str) in current_dates.item
 ```bash
 # Mark all sub-issues of parent #37 as "In Progress"
 STATUS_FIELD="PVTSSF_lAHOAz5-bs4BO-Rdzg9hLfk"
-IN_PROGRESS_ID="47fc9ee4"
+IN_PROGRESS_ID="81800a17"
 
 for num in $(seq 41 59); do
   ITEM_ID=$(grep "^${num} " /tmp/items.txt | cut -d' ' -f2)
@@ -218,15 +236,79 @@ done
 
 ---
 
+## Epic 8: Analytics & Monitoring (Dev B)
+
+| Parent | Title | Sub-issues | Milestone | Dates |
+|--------|-------|-----------|-----------|-------|
+| #185 | Epic 8 (parent) | #186-#189 | — | Feb 24 – Apr 23 |
+| #186 | B.1: GA4 Dashboard & Event Tracking | #190-#195 (6) | Sprint 2 | Feb 24 – Mar 5 |
+| #187 | B.2: Monsido Accessibility Baseline | #196-#200 (5) | Sprint 3 | Mar 10 – Mar 19 |
+| #188 | B.3: Cross-Site Analytics Extension | #201-#205 (5) | Sprint 5 | Mar 24 – Apr 16 |
+| #189 | B.4: Final Report & Recommendations | #206-#211 (6) | Post-Sprint | Apr 7 – Apr 23 |
+
+---
+
+## Gap Analysis Issues (20 total, 3 closed)
+
+Issues created from the [Native Features Gap Analysis](../../_bmad-output/planning-artifacts/sanity-astro-native-features-gap-analysis.md) verified via Sanity MCP on 2026-02-13.
+
+### Sprint 2 — P0/P1 Quick Wins (7 open, 1 closed)
+
+| # | Title | SP | Start | Due |
+|---|-------|----|-------|-----|
+| ~~#212~~ | ~~Deploy 10 missing schema types~~ | ~~1~~ | — | — | Closed: already deployed |
+| #213 | View Transitions (ClientRouter) | 1 | Feb 26 | Feb 27 |
+| #214 | Prefetch for instant navigation | 1 | Feb 26 | Feb 27 |
+| #215 | Custom 404 error page | 1 | Feb 26 | Feb 27 |
+| #216 | Custom 500 error page | 1 | Feb 26 | Feb 27 |
+| #217 | `astro:env` schema validation | 2 | Feb 28 | Mar 2 |
+| #219 | Scheduled Publishing plugin | 1 | Feb 28 | Mar 1 |
+| #232 | Astro redirects configuration | 1 | Feb 26 | Feb 27 |
+
+### Sprint 4 — P2 Medium Effort (8 issues)
+
+| # | Title | SP |
+|---|-------|----|
+| #220 | Astro Middleware (security headers + shared data) | 2 |
+| #221 | Astro Actions (type-safe form handling) | 2 |
+| #224 | Custom Document Actions (Preview on Live Site) | 2 |
+| #226 | Orderable document list for sponsors | 1 |
+| #227 | Server Endpoints (API routes) | 2 |
+| #231 | Partytown GA4 script offloading | 1 |
+| #233 | Client directives expansion (visible/idle) | 2 |
+| #234 | CI step for schema deployment validation | 2 |
+
+### Sprint 5 — P3 Later (4 issues)
+
+| # | Title | SP |
+|---|-------|----|
+| #225 | Document Badges (sponsor tiers, SEO status) | 2 |
+| #228 | RSS feed generation | 1 |
+| #229 | GROQ `pt::text()` for site search | 2 |
+| #230 | SEO Document Inspector panel | 2 |
+
+### Closed — Paid Subscription Required
+
+| # | Title | Reason |
+|---|-------|--------|
+| ~~#218~~ | ~~AI Assist plugin~~ | Paid Sanity plan |
+| ~~#222~~ | ~~Content Releases~~ | Paid Sanity plan |
+| ~~#223~~ | ~~Embeddings Index~~ | Paid Sanity plan |
+
+---
+
 ## Quick Reference: Issue Ranges
 
 ```
+Sprint 1 Foundation:    #158 - #184  (27 issues)
 fdLink shared type:     #122
 Hero & Banner blocks:   #123 - #144  (parent #121)
 Content & Articles:     #41  - #59   (parent #37)
 CTA & Features:         #60  - #80   (parent #38)
 Products & Services:    #81  - #101  (parent #39)
 Media & Misc:           #102 - #120  (parent #40)
+Epic 8 Analytics:       #185 - #211  (parent #185, subs under #186-#189)
+Gap Analysis:           #212 - #234  (20 created, 4 closed)
 ```
 
 ## Quick Reference: gh Commands
