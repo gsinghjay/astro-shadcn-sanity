@@ -184,10 +184,29 @@ describe("getAllSponsors()", () => {
   });
 
   it("returns cached result on subsequent calls without additional API calls", async () => {
-    // Previous test populated the cache — this call should NOT trigger fetch
-    const result = await getAllSponsors();
-    expect(result).toHaveLength(2);
-    expect(sanityClient.fetch).not.toHaveBeenCalled();
+    // Use a fresh module so cache is empty and no test-ordering dependency
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockSponsors = [
+      { _id: "sp-1", name: "Alpha Corp", featured: true },
+    ];
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({
+      result: mockSponsors,
+    } as never);
+
+    // First call — populates cache
+    await freshModule.getAllSponsors();
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    // Second call — should hit cache, no fetch
+    const cached = await freshModule.getAllSponsors();
+    expect(cached).toEqual(mockSponsors);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
   });
 });
 
@@ -200,51 +219,130 @@ describe("resolveBlockSponsors()", () => {
 
   describe("logoCloud blocks (autoPopulate)", () => {
     it("returns all sponsors when autoPopulate is true", () => {
-      const block = { autoPopulate: true, sponsors: null };
+      const block = { _type: "logoCloud", autoPopulate: true, sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual(allSponsors);
     });
 
     it("returns manual sponsors when autoPopulate is false", () => {
-      const block = { autoPopulate: false, sponsors: [{ _id: "sp-2" }] };
+      const block = { _type: "logoCloud", autoPopulate: false, sponsors: [{ _id: "sp-2" }] };
       const result = resolveBlockSponsors(block, allSponsors);
       expect(result).toHaveLength(1);
       expect(result[0]._id).toBe("sp-2");
     });
 
     it("returns empty array when autoPopulate is false and no sponsors selected", () => {
-      const block = { autoPopulate: false, sponsors: null };
+      const block = { _type: "logoCloud", autoPopulate: false, sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual([]);
     });
   });
 
   describe("sponsorCards blocks (displayMode)", () => {
     it("returns all sponsors when displayMode is 'all'", () => {
-      const block = { displayMode: "all", sponsors: null };
+      const block = { _type: "sponsorCards", displayMode: "all", sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual(allSponsors);
     });
 
     it("returns all sponsors when displayMode is null (defaults to all)", () => {
-      const block = { displayMode: null, sponsors: null };
+      const block = { _type: "sponsorCards", displayMode: null, sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual(allSponsors);
     });
 
     it("returns featured sponsors when displayMode is 'featured'", () => {
-      const block = { displayMode: "featured", sponsors: null };
+      const block = { _type: "sponsorCards", displayMode: "featured", sponsors: null };
       const result = resolveBlockSponsors(block, allSponsors);
       expect(result).toHaveLength(2);
       expect(result.every((s: any) => s.featured)).toBe(true);
     });
 
     it("returns manual sponsors when displayMode is 'manual'", () => {
-      const block = { displayMode: "manual", sponsors: [{ _id: "sp-1" }, { _id: "sp-3" }] };
+      const block = { _type: "sponsorCards", displayMode: "manual", sponsors: [{ _id: "sp-1" }, { _id: "sp-3" }] };
       const result = resolveBlockSponsors(block, allSponsors);
       expect(result).toHaveLength(2);
       expect(result.map((s: any) => s._id)).toEqual(["sp-1", "sp-3"]);
     });
 
     it("returns empty array when displayMode is 'manual' and no sponsors selected", () => {
-      const block = { displayMode: "manual", sponsors: null };
+      const block = { _type: "sponsorCards", displayMode: "manual", sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual([]);
     });
+  });
+});
+
+describe("prefetchPages() and getPage() cache", () => {
+  it("prefetchPages populates cache and getPage returns cached results", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockPageA = { _id: "page-a", title: "Page A", slug: "about" };
+    const mockPageB = { _id: "page-b", title: "Page B", slug: "contact" };
+
+    vi.mocked(freshClient.fetch)
+      .mockResolvedValueOnce({ result: mockPageA } as never)
+      .mockResolvedValueOnce({ result: mockPageB } as never);
+
+    await freshModule.prefetchPages(["about", "contact"]);
+    expect(freshClient.fetch).toHaveBeenCalledTimes(2);
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    // getPage should return cached results without additional API calls
+    const pageA = await freshModule.getPage("about");
+    const pageB = await freshModule.getPage("contact");
+    expect(pageA).toEqual(mockPageA);
+    expect(pageB).toEqual(mockPageB);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+
+  it("getPage fetches from API on cache miss", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockPage = { _id: "page-x", title: "Uncached", slug: "uncached" };
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({ result: mockPage } as never);
+
+    const result = await freshModule.getPage("uncached");
+    expect(result).toEqual(mockPage);
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("prefetchPages is a no-op when Visual Editing is enabled", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "true");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    await freshModule.prefetchPages(["about", "contact"]);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+
+  it("prefetchPages respects concurrency chunking", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const slugs = ["a", "b", "c", "d", "e"];
+    for (const slug of slugs) {
+      vi.mocked(freshClient.fetch).mockResolvedValueOnce({
+        result: { _id: slug, title: slug },
+      } as never);
+    }
+
+    // concurrency=2 → 3 sequential chunks: [a,b], [c,d], [e]
+    await freshModule.prefetchPages(slugs, 2);
+    expect(freshClient.fetch).toHaveBeenCalledTimes(5);
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    // All 5 should be cached
+    for (const slug of slugs) {
+      const page = await freshModule.getPage(slug);
+      expect(page).toEqual({ _id: slug, title: slug });
+    }
+    expect(freshClient.fetch).not.toHaveBeenCalled();
   });
 });

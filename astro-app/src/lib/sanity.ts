@@ -127,11 +127,11 @@ export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
  * Filters based on autoPopulate (logoCloud) or displayMode (sponsorCards) config.
  */
 export function resolveBlockSponsors(
-  block: { autoPopulate?: boolean | null; displayMode?: string | null; sponsors?: Array<{ _id: string }> | null },
+  block: { _type: string; autoPopulate?: boolean | null; displayMode?: string | null; sponsors?: Array<{ _id: string }> | null },
   allSponsors: Sponsor[],
 ): Sponsor[] {
-  // logoCloud: autoPopulate → all sponsors, else manual refs
-  if ('autoPopulate' in block) {
+  if (block._type === 'logoCloud') {
+    // autoPopulate → all sponsors, else manual refs
     if (block.autoPopulate) return allSponsors;
     const manualIds = new Set(block.sponsors?.map(s => s._id) ?? []);
     return allSponsors.filter(s => manualIds.has(s._id));
