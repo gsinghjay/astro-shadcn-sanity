@@ -1,137 +1,155 @@
-# Component Inventory — YWCC Capstone Sponsors
+# Component Inventory
 
-**Generated:** 2026-02-09 | **Scan Level:** Exhaustive
+**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
 
 ## Summary
 
-| Category | Count | Source |
-|---|---|---|
-| Custom Domain Blocks | 13 | `astro-app/src/components/blocks/custom/` |
-| Pre-built UI Blocks | 102 | `astro-app/src/components/blocks/` (fulldev/ui) |
-| UI Primitives | 251 files / 37 categories | `astro-app/src/components/ui/` |
-| Layout Components | 4 | `astro-app/src/components/` |
-| Page Templates | 5 | `astro-app/src/layouts/templates/` |
-| **Total** | **375+** | |
+| Category | Count | Location |
+|----------|-------|----------|
+| Custom Sanity blocks | 11 | `astro-app/src/components/blocks/custom/` |
+| UI variant blocks | ~100 | `astro-app/src/components/blocks/` |
+| UI primitives | ~39 | `astro-app/src/components/ui/` |
+| Layout components | 7 | `astro-app/src/components/` + `layouts/` |
+| Page templates | 5 | `astro-app/src/layouts/templates/` |
+| **Total** | **~507** | |
 
-## 1. Custom Domain Blocks
+## Custom Sanity Block Components (11)
 
-These are purpose-built for the YWCC Capstone Sponsors use case, each with a corresponding Sanity schema.
+These are the primary content blocks backed by Sanity schemas. Each has a `.astro` component, `.stories.ts` Storybook story, unit test, and typed fixture.
 
-| Block | File | Sanity Schema | Description |
-|---|---|---|---|
-| HeroBanner | `custom/HeroBanner.astro` | `heroBanner` | Full-width hero with background image carousel, heading, subheading, CTAs |
-| StatsRow | `custom/StatsRow.astro` | `statsRow` | Statistics display in 2-4 column grid |
-| FeatureGrid | `custom/FeatureGrid.astro` | `featureGrid` | Feature cards in configurable 2/3/4 column grid |
-| FaqSection | `custom/FaqSection.astro` | `faqSection` | Two-column FAQ with numbered accordion items |
-| CtaBanner | `custom/CtaBanner.astro` | `ctaBanner` | Call-to-action with heading, description, buttons |
-| TextWithImage | `custom/TextWithImage.astro` | `textWithImage` | Split layout: rich text + image (left/right) |
-| LogoCloud | `custom/LogoCloud.astro` | `logoCloud` | Sponsor logo grid with auto-populate option |
-| SponsorCards | `custom/SponsorCards.astro` | `sponsorCards` | Sponsor tier cards (all/featured/manual display) |
-| SponsorSteps | `custom/SponsorSteps.astro` | `sponsorSteps` | Step-by-step sponsor onboarding process |
-| TeamGrid | `custom/TeamGrid.astro` | N/A (static) | Team member grid grouped by team |
-| ContactForm | `custom/ContactForm.astro` | `contactForm` | Dynamic form with data-state success handling |
-| Timeline | `custom/Timeline.astro` | N/A (static) | Vertical timeline with alternating layout |
-| RichText | `custom/RichText.astro` | `richText` | Portable text content renderer |
+| Component | File | Schema _type | Test | Fixture |
+|-----------|------|-------------|------|---------|
+| ContactForm | `blocks/custom/ContactForm.astro` | contactForm | ContactForm.test.ts | contact-form.ts |
+| CtaBanner | `blocks/custom/CtaBanner.astro` | ctaBanner | CtaBanner.test.ts | cta-banner.ts |
+| FaqSection | `blocks/custom/FaqSection.astro` | faqSection | FaqSection.test.ts | faq-section.ts |
+| FeatureGrid | `blocks/custom/FeatureGrid.astro` | featureGrid | FeatureGrid.test.ts | feature-grid.ts |
+| HeroBanner | `blocks/custom/HeroBanner.astro` | heroBanner | HeroBanner.test.ts | hero-banner.ts |
+| LogoCloud | `blocks/custom/LogoCloud.astro` | logoCloud | LogoCloud.test.ts | logo-cloud.ts |
+| RichText | `blocks/custom/RichText.astro` | richText | RichText.test.ts | rich-text.ts |
+| SponsorCards | `blocks/custom/SponsorCards.astro` | sponsorCards | SponsorCards.test.ts | sponsor-cards.ts |
+| SponsorSteps | `blocks/custom/SponsorSteps.astro` | sponsorSteps | SponsorSteps.test.ts | sponsor-steps.ts |
+| StatsRow | `blocks/custom/StatsRow.astro` | statsRow | StatsRow.test.ts | stats-row.ts |
+| TextWithImage | `blocks/custom/TextWithImage.astro` | textWithImage | TextWithImage.test.ts | text-with-image.ts |
 
-## 2. Pre-built UI Blocks (fulldev/ui)
+### Block Features
 
-102 pre-built blocks installed via shadcn CLI from the @fulldev registry. These are generic marketing/content blocks.
+| Block | CTA Buttons | Images | References | Portable Text |
+|-------|------------|--------|------------|--------------|
+| HeroBanner | Yes | Background images[] | — | — |
+| FeatureGrid | — | Per-item | — | — |
+| CtaBanner | Yes | — | — | — |
+| StatsRow | — | — | — | — |
+| TextWithImage | — | Side image | — | Yes (content) |
+| LogoCloud | — | — | Sponsor[] (optional) | — |
+| SponsorSteps | Yes | — | — | — |
+| RichText | — | Inline images | — | Yes (content) |
+| FaqSection | — | — | — | Yes (answers) |
+| ContactForm | — | — | — | — |
+| SponsorCards | — | — | Sponsor[] (optional) | — |
 
-| Category | Variants | Description |
-|---|---|---|
-| Articles | 1-4 | Blog article card layouts |
-| Banners | 1-2 | Notification/announcement banners |
-| Blocks | 1-4 | Generic content containers |
-| Contact | 1-3 | Contact form variations |
-| Content | 1-6 | Text content sections |
-| CTAs | 1-8 | Call-to-action sections |
-| FAQs | 1-4 | FAQ section layouts |
-| Features | 1-6 | Feature showcase variations |
-| Footers | 1-3 | Footer layouts |
-| Headers | 1-3 | Header/navigation layouts |
-| Heroes | 1-14 | Hero section variations |
-| Images | 1-2 | Image display blocks |
-| Links | 1-2 | Link list sections |
-| Logos | 1-3 | Logo cloud layouts |
-| Pricings | 1-3 | Pricing table layouts |
-| Products | 1-5 | Product showcase sections |
-| Reviews | 1-5 | Testimonial/review sections |
-| Services | 1-7 | Service listing sections |
-| Skeletons | 1 | Loading skeleton block |
-| Stats | 1-3 | Statistics display sections |
-| Steps | 1-3 | Step process sections |
-| Tables | 1 | Data table block |
-| Videos | 1-4 | Video embed sections |
+## UI Variant Blocks (~100)
 
-## 3. UI Primitives (37 categories)
+fulldev/ui template blocks providing styling variations. Each has a Storybook story.
 
-Low-level component primitives from fulldev/ui. Used by custom blocks and pre-built blocks.
+| Category | Variants | Examples |
+|----------|----------|---------|
+| Hero | 14 | hero-1 through hero-14 |
+| Features | 6 | features-1 through features-6 |
+| CTA | 8 | cta-1 through cta-8 |
+| Services | 7 | services-1 through services-7 |
+| Content | 6 | content-1 through content-6 |
+| Reviews | 5 | reviews-1 through reviews-5 |
+| Products | 5 | products-1 through products-5 |
+| FAQs | 4 | faqs-1 through faqs-4 |
+| Articles | 4 | articles-1 through articles-4 |
+| Videos | 4 | videos-1 through videos-4 |
+| Stats | 3 | stats-1 through stats-3 |
+| Steps | 3 | steps-1 through steps-3 |
+| Pricings | 3 | pricings-1 through pricings-3 |
+| Logos | 3 | logos-1 through logos-3 |
+| Contact | 3 | contact-1 through contact-3 |
+| Footer | 3 | footer-1 through footer-3 |
+| Header | 3 | header-1 through header-3 |
+| Banner | 2 | banner-1, banner-2 |
+| Images | 2 | images-1, images-2 |
+| Links | 2 | links-1, links-2 |
+| Video | 3 | video-1 through video-3 |
+| Blocks | 4 | blocks-1 through blocks-4 |
+| Product | 1 | product-1 |
+| Table | 1 | table-1 |
+| Article | 4 | article-1 through article-4 |
 
-| Category | Files | Description |
-|---|---|---|
-| accordion | ~5 | Expandable content panels |
-| alert | ~3 | Alert/notification components |
-| auto-form | ~5 | Auto-generated form components |
-| avatar | ~3 | User avatar display |
-| badge | ~3 | Status/category badges |
-| banner | ~3 | Banner notifications |
-| button | ~5 | CTA buttons with variants (default, secondary, outline, ghost) |
-| checkbox | ~3 | Checkbox inputs |
-| collapsible | ~3 | Collapsible content sections |
-| empty | ~2 | Empty state placeholders |
-| field | ~3 | Form field wrappers |
-| footer | ~5 | Footer layout primitives |
-| header | ~5 | Header layout primitives |
-| icon | ~3 | SVG icon display |
-| image | ~3 | Image with optimization |
-| input | ~3 | Text input fields |
-| item | ~3 | List item component |
-| label | ~2 | Form label component |
-| list | ~3 | List layout component |
-| logo | ~3 | Logo display component |
-| marquee | ~3 | Scrolling marquee |
-| native-carousel | ~5 | Native HTML carousel |
-| native-select | ~3 | Native select dropdown |
-| navigation-menu | ~5 | Navigation menu component |
-| price | ~3 | Pricing display |
-| radio-group | ~3 | Radio button groups |
-| rating | ~3 | Star rating display |
-| section | ~5 | Section layout wrapper (SectionContent, SectionProse, etc.) |
-| separator | ~2 | Visual separator line |
-| sheet | ~5 | Slide-out panel (mobile nav) |
-| sidebar | ~5 | Sidebar layout |
-| skeleton | ~2 | Loading skeleton |
-| spinner | ~2 | Loading spinner |
-| table | ~5 | Data table components |
-| tabs | ~5 | Tabbed interface |
-| textarea | ~3 | Multi-line text input |
-| theme-toggle | ~3 | Light/dark mode toggle |
-| tile | ~5 | Tile/card layout |
-| video | ~3 | Video embed component |
+## UI Primitive Components (~39)
 
-## 4. Layout Components
+shadcn/ui-style components from fulldev/ui, installed via the shadcn CLI.
 
-| Component | File | Description |
-|---|---|---|
-| Header | `Header.astro` | Site header with navigation, CTA, mobile sheet menu |
-| Footer | `Footer.astro` | 4-column footer with social links, contact info |
-| BlockRenderer | `BlockRenderer.astro` | Central block routing switch (13 custom + 102 generic) |
-| block | `block.astro` | Dynamic block renderer using import.meta.glob() |
+| Component | Path |
+|-----------|------|
+| Accordion | `ui/accordion/` |
+| Alert | `ui/alert/` |
+| Avatar | `ui/avatar/` |
+| Badge | `ui/badge/` |
+| Banner | `ui/banner/` |
+| Button | `ui/button/` |
+| Checkbox | `ui/checkbox/` |
+| Collapsible | `ui/collapsible/` |
+| Empty | `ui/empty/` |
+| Field | `ui/field/` |
+| Footer | `ui/footer/` |
+| Header | `ui/header/` |
+| Icon | `ui/icon/` |
+| Image | `ui/image/` |
+| Input | `ui/input/` |
+| Item | `ui/item/` |
+| Label | `ui/label/` |
+| List | `ui/list/` |
+| Logo | `ui/logo/` |
+| *(and ~20 more)* | |
 
-## 5. Page Templates
+## Layout Components (7)
 
-| Template | File | Layout | Use Case |
-|---|---|---|---|
-| Default | `DefaultTemplate.astro` | `max-w-7xl` centered | Standard pages |
-| FullWidth | `FullWidthTemplate.astro` | `w-full` no constraints | Image-heavy pages |
-| Landing | `LandingTemplate.astro` | Full-width, no nav | Conversion pages |
-| Sidebar | `SidebarTemplate.astro` | 2/3 + 1/3 grid | Blog-style pages |
-| TwoColumn | `TwoColumnTemplate.astro` | Equal 2-column grid | Comparison pages |
+| Component | File | Purpose |
+|-----------|------|---------|
+| Layout | `layouts/Layout.astro` | Main HTML layout: head, meta, CSP, GA4, visual editing |
+| Header | `components/Header.astro` | Site header with navigation from siteSettings |
+| Footer | `components/Footer.astro` | Site footer with links, social, copyright |
+| BlockRenderer | `components/BlockRenderer.astro` | Dynamic block dispatch by _type |
+| BlockWrapper | `components/BlockWrapper.astro` | Block layout: background, spacing, maxWidth |
+| SanityPageContent | `components/SanityPageContent.astro` | Page content wrapper |
+| VisualEditingMPA | `components/VisualEditingMPA.tsx` | React: Presentation Tool visual editing |
 
-## 6. Design System Notes
+## Page Templates (5)
 
-- **No React in astro-app** for UI rendering — all fulldev/ui components are pure `.astro` files
-- React is included only for Sanity's visual editing integration (island architecture)
-- All components use Tailwind CSS v4 utility classes
-- CSS-first configuration in `global.css` (no `tailwind.config.mjs`)
-- Swiss International Typographic Style aesthetic (Helvetica Neue, sharp corners, red accents)
+| Template | File | Layout |
+|----------|------|--------|
+| Default | `templates/DefaultTemplate.astro` | Standard constrained width |
+| Full Width | `templates/FullWidthTemplate.astro` | Full-width blocks |
+| Landing | `templates/LandingTemplate.astro` | Full-width, minimal nav |
+| Sidebar | `templates/SidebarTemplate.astro` | Two-column with sidebar |
+| Two Column | `templates/TwoColumnTemplate.astro` | Two equal columns |
+
+## Block Registration System
+
+The block registry (`block-registry.ts`) auto-discovers components at build time:
+
+```
+Custom blocks:  import.meta.glob('./blocks/custom/*.astro')
+                PascalCase → camelCase _type mapping
+                e.g., HeroBanner.astro → heroBanner
+
+UI blocks:      import.meta.glob('./blocks/*.astro')
+                kebab-case filenames used directly as _type
+                e.g., hero-1.astro → hero-1
+```
+
+`BlockRenderer.astro` resolves the component from the registry by `_type` and spreads all block props.
+
+## Test Coverage
+
+| Layer | Files | Cases | Coverage |
+|-------|-------|-------|----------|
+| Component tests | 13 | — | All 11 custom blocks + BlockRenderer + BlockWrapper |
+| Unit tests | 3 | — | sanity.ts, image.ts, utils.ts |
+| SSR smoke tests | 3 | — | Cloudflare Worker build validation |
+| Integration tests | 19 | 241 | Schema, types, data wiring, templates |
+| E2E tests | 4 | 34 | Pages, a11y, content rendering (5 browsers) |

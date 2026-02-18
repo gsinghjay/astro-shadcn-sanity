@@ -22,7 +22,7 @@ const { heading, items } = Astro.props;
 
     <Accordion>
       {(items ?? []).map((item, i) => (
-        <AccordionItem>
+        <AccordionItem id={item._key}>
           <AccordionTrigger>
             <span class="flex items-start gap-4">
               <span class="text-xs font-bold text-muted-foreground mt-0.5 flex-shrink-0">

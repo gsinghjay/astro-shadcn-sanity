@@ -14,8 +14,8 @@ const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
 const singletonTypes = new Set(['siteSettings'])
 
 export default defineConfig({
-  name: 'sanity-template-astro-clean',
-  title: 'Sanity Astro Starter',
+  name: 'default',
+  title: 'YWCC Capstone Studio',
   projectId,
   dataset,
   plugins: [

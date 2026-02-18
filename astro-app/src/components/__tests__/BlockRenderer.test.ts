@@ -8,9 +8,9 @@ import { ctaFull } from './__fixtures__/cta-banner';
 import { statsFull } from './__fixtures__/stats-row';
 import { faqFull } from './__fixtures__/faq-section';
 import { richTextFull } from './__fixtures__/rich-text';
-import { sponsorCardsFull } from './__fixtures__/sponsor-cards';
+import { sponsorCardsFull, sponsorCardsSponsors } from './__fixtures__/sponsor-cards';
 import { sponsorStepsFull } from './__fixtures__/sponsor-steps';
-import { logoCloudFull } from './__fixtures__/logo-cloud';
+import { logoCloudFull, logoCloudSponsors } from './__fixtures__/logo-cloud';
 import { textWithImageFull } from './__fixtures__/text-with-image';
 import { contactFormFull } from './__fixtures__/contact-form';
 
@@ -71,7 +71,7 @@ describe('BlockRenderer', () => {
   test('dispatches sponsorCards to SponsorCards component', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockRenderer, {
-      props: { blocks: [sponsorCardsFull] },
+      props: { blocks: [sponsorCardsFull], sponsors: sponsorCardsSponsors },
     });
     expect(html).toContain('Our Sponsors');
     expect(html).toContain('Acme Corp');
@@ -89,7 +89,7 @@ describe('BlockRenderer', () => {
   test('dispatches logoCloud to LogoCloud component', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockRenderer, {
-      props: { blocks: [logoCloudFull] },
+      props: { blocks: [logoCloudFull], sponsors: logoCloudSponsors },
     });
     expect(html).toContain('Trusted By');
     expect(html).toContain('TechCorp');
@@ -127,9 +127,12 @@ describe('BlockRenderer', () => {
       contactFormFull,
     ];
 
+    // Merge all sponsor data for blocks that need it
+    const allTestSponsors = [...logoCloudSponsors, ...sponsorCardsSponsors.filter(s => !logoCloudSponsors.some(ls => ls._id === s._id))];
+
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockRenderer, {
-      props: { blocks: allBlocks },
+      props: { blocks: allBlocks, sponsors: allTestSponsors },
     });
 
     // Every block's key content should appear

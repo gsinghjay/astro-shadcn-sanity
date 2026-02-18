@@ -24,7 +24,7 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: false,
+      useCdn: !(env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED),
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,

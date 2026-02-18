@@ -1,10 +1,10 @@
 ---
 project_name: 'astro-shadcn-sanity'
 user_name: 'Jay'
-date: '2026-02-11'
+date: '2026-02-13'
 sections_completed: ['technology_stack', 'language_rules', 'framework_rules', 'testing_rules', 'quality_rules', 'workflow_rules', 'anti_patterns']
 status: 'complete'
-rule_count: 95
+rule_count: 105
 optimized_for_llm: true
 ---
 
@@ -24,13 +24,14 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 
 | Technology | Version | Critical Notes |
 |---|---|---|
-| Astro | ^5.17.1 | Uses `@astrojs/node` adapter for Visual Editing preview. v5 merged `hybrid` into `static` — pages can opt out with `export const prerender = false` |
+| Astro | ^5.17.1 | `output: 'static'` with `@astrojs/cloudflare` adapter. v5 merged `hybrid` into `static` — pages can opt out with `export const prerender = false` |
 | Tailwind CSS | v4.1.18 | Via `@tailwindcss/vite` plugin. **No `tailwind.config.mjs`** — CSS-first config in `global.css` `@theme` block |
-| Sanity | ^5.8.1 | React 19 in `studio/`. Uses `structureTool` + `visionTool` |
+| Sanity | ^5.9.0 | React 19 in `studio/`. Uses `structureTool` + `presentationTool` + `visionTool` |
 | TypeScript | ^5.9.3 | Astro strict mode. `@/*` path alias maps to `./src/*` |
 | Vite | ^7.3.1 | Astro's build tool. Tailwind v4 runs as Vite plugin |
 | Storybook | 10.2.7 | Native Astro support via `storybook-astro`. Deployed to GitHub Pages |
 | Playwright | ^1.58.2 | 5 browser projects. `@axe-core/playwright` for a11y testing |
+| Vitest | ^3.2.1 | Unit + Component (Container API) + Integration tests |
 | Node.js | 24+ | Target runtime for CI/CD and local dev |
 
 ### Key Dependencies (astro-app)
@@ -39,16 +40,18 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 |---|---|---|
 | `@sanity/astro` | ^3.2.11 | Provides `sanity:client` virtual module. Add `"types": ["@sanity/astro/module"]` to tsconfig |
 | `@sanity/image-url` | ^1.2.0 | Image URL builder — always use `urlFor()` helper, never construct CDN URLs |
+| `@sanity/visual-editing` | ^5.2.1 | Visual Editing support for Presentation tool |
 | `astro-portabletext` | ^0.10.0 | Portable Text rendering in `.astro` components |
 | `@portabletext/to-html` | ^5.0.1 | HTML rendering for Portable Text |
-| `groq` | ^3.48.1 | GROQ tagged template for syntax highlighting + `defineQuery` |
+| `groq` | ^5.8.1 | GROQ tagged template for syntax highlighting + `defineQuery` |
 | fulldev/ui | via `shadcn ^3.8.4` | Vanilla `.astro` UI primitives. Install: `npx shadcn@latest add @fulldev/{name}` |
-| `astro-icon` | ^1.1.5 | Iconify wrapper. Icon sets: `@iconify-json/lucide`, `@iconify-json/simple-icons` |
+| `@astrojs/cloudflare` | ^12.6.12 | Cloudflare Pages adapter with `platformProxy` for local dev |
 | `class-variance-authority` | ^0.7.1 | Component variant definitions (used by fulldev/ui) |
 | `tailwind-merge` | ^3.4.0 | `cn()` utility in `src/lib/utils.ts` |
 | `@tailwindcss/typography` | ^0.5.19 | `prose` class for rich text. Loaded as `@plugin` in global.css |
 | `@astrojs/react` | ^4.4.2 | **Visual Editing only** — enables Sanity Presentation tool. Never use for page components |
 | `react` / `react-dom` | ^19.2.4 | Required by `@sanity/astro` Presentation tool. Never use for page UI |
+| `wrangler` | ^4.63.0 | Cloudflare Pages local dev + deploy |
 
 ### Version Constraints Agents MUST Know
 
@@ -57,6 +60,9 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 - **`components.json`**: `"tsx": false`, `"rsc": false`. Shadcn CLI generates Astro, not React.
 - **No `@astrojs/tailwind`**: That's the v3 integration. This project uses `@tailwindcss/vite` directly.
 - **React in astro-app is for Visual Editing only**: `@astrojs/react` + `react`/`react-dom` exist to support the Sanity Presentation tool. **Never use React for page components** — all page UI must be `.astro` files.
+- **`@astrojs/cloudflare` is the production adapter**: Not `@astrojs/node`. `platformProxy: { enabled: true }` for local Workers emulation.
+- **Sanity Studio v5**: `studio/` uses `sanity: ^5.9.0`. This is the Sanity v5 major version.
+- **`groq` ^5.8.1**: Includes `defineQuery` for typed GROQ queries (required per CLAUDE.md).
 
 ---
 
@@ -70,7 +76,7 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 - **No enums**: Use union types or `as const` arrays. Enums don't work well with Astro's build.
 - **ES modules only**: `"type": "module"` in all package.json files. Use `import`/`export`, never `require`.
 - **Sanity schemas**: Always use `defineType`, `defineField`, `defineArrayMember` from `'sanity'` for type safety.
-- **GROQ queries**: Use `groq` tagged template literal for syntax highlighting.
+- **GROQ queries**: Use `defineQuery` (from `groq` package) for all GROQ queries.
 - **Sanity client import**: Import from `sanity:client` virtual module, not from a file path.
 
 #### Type Organization
@@ -80,6 +86,7 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 - **`SiteSettings`**: `NonNullable<SITE_SETTINGS_QUERY_RESULT>` — derived from GROQ query result.
 - **Block types**: `Extract<PageBlock, { _type: 'heroBanner' }>` pattern. Each block type is automatically extracted from the `PageBlock` union.
 - **`PageBlock`**: Union of all block types, derived from `Page['blocks']`.
+- **No manual type interfaces for blocks**: All block types flow from TypeGen. Never hand-write block interfaces.
 
 #### Data Fetching Patterns
 
@@ -108,10 +115,11 @@ npm workspaces: `astro-app/` (frontend) + `studio/` (Sanity CMS). **No shared co
 - **Objects not documents for blocks**: Blocks are `type: 'object'`, consumed via `blocks[]` array on page documents.
 - **Never delete fields with production data**: Use the deprecation pattern (deprecated + readOnly + hidden).
 - **Validation**: Use `rule.required()`, `rule.max()`, `rule.custom()`. Cross-field validation via `context.document`.
+- **Reusable named object types**: Common field patterns (links, buttons) extracted as shared object types in `objects/` directory (Story 7-10).
 
 #### Block Architecture (The Core Pattern)
 
-Every block has exactly **2 files** + registration lines:
+Every block has **2 files** + registration:
 
 1. Schema: `studio/src/schemaTypes/blocks/{block-name}.ts` using `defineBlock`
 2. Component: `astro-app/src/components/blocks/custom/{BlockName}.astro` composing from `ui/` primitives
@@ -120,25 +128,39 @@ Every block has exactly **2 files** + registration lines:
 5. Add GROQ projection in `src/lib/sanity.ts`
 6. Add type to page schema's `blocks[]` array
 
-#### BlockRenderer Auto-Discovery Pattern
+#### BlockRenderer Unified Dispatch Pattern
 
-BlockRenderer uses `block-registry.ts` which auto-discovers block components via `import.meta.glob`. **No switch statement or manual imports needed.**
-
-1. **Custom blocks** (block prop pattern): Auto-discovered from `blocks/custom/*.astro`
-   - PascalCase filename → camelCase `_type` (e.g., `HeroBanner.astro` → `heroBanner`)
-   - Receive typed `block` prop matching their interface
-2. **fulldev/ui blocks** (spread props pattern): Auto-discovered from `blocks/*.astro`
-   - Receive spread props: `<UiComponent {...block} />`
+All blocks use a single, unified dispatch via `block-registry.ts`. **No switch statement, no manual imports.**
 
 ```ts
-// block-registry.ts — auto-discovers blocks via import.meta.glob
+// block-registry.ts — auto-discovers all blocks
 const customModules = import.meta.glob('./blocks/custom/*.astro', { eager: true });
-// Converts PascalCase filename to camelCase _type automatically
+// PascalCase filename → camelCase _type (e.g. HeroBanner.astro → heroBanner)
+const uiModules = import.meta.glob('./blocks/*.astro', { eager: true });
+// kebab-case filename used directly as _type
 ```
+
+```astro
+// BlockRenderer.astro — unified dispatch, all blocks get spread props
+{blocks.map((block) => {
+  const Component = allBlocks[block._type];
+  if (!Component) return null;
+  return <BlockWrapper {...baseFields}><Component {...block} /></BlockWrapper>;
+})}
+```
+
+#### BlockWrapper (Base Field Handling)
+
+`BlockWrapper.astro` wraps every block and handles the three base fields. **Block components do NOT handle base fields themselves.**
+
+- Uses `stegaClean()` from `@sanity/client/stega` to clean Visual Editing stega data from field values
+- Maps `backgroundVariant`, `spacing`, `maxWidth` to CSS classes via lookup records
+- Lives at `src/components/BlockWrapper.astro` (not in `blocks/` directory)
 
 #### GROQ Query Rules
 
 - **All queries in `src/lib/sanity.ts`**: Never inline queries in page/component files.
+- **Use `defineQuery`**: Required for all GROQ queries (per CLAUDE.md).
 - **Use `sanity.fetch()` in page frontmatter only**: Block components receive data as props, never fetch.
 - **Project specific fields**: Don't use `{ ... }` (select all). Always project the fields you need.
 - **Expand references with `->`**: `author->{ name, bio }`. Use `_ref` (not `->`) in filters for performance.
@@ -149,18 +171,25 @@ const customModules = import.meta.glob('./blocks/custom/*.astro', { eager: true 
 #### Data Flow
 
 ```
-Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page frontmatter → BlockRenderer → Block components (props) → Static HTML
+Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page frontmatter → BlockRenderer → BlockWrapper (base fields) → Block components (spread props) → Static HTML
 ```
 
-- Zero runtime API calls to Sanity (except Visual Editing preview mode)
+- Zero runtime API calls to Sanity (except Visual Editing via Server Islands)
 - All data resolved at build time
 - No client-side state management
+- Preview uses Server Islands (`server:defer`), not full SSR mode
 
 #### Currently Registered Schemas
 
-- **Objects (3)**: `seo`, `button`, `portableText`
+- **Objects (3+)**: `seo`, `button`, `portableText` + reusable named object types (links, buttons)
 - **Documents (3)**: `page`, `siteSettings`, `sponsor`
 - **Blocks (11)**: `heroBanner`, `featureGrid`, `ctaBanner`, `statsRow`, `textWithImage`, `logoCloud`, `sponsorSteps`, `richText`, `faqSection`, `contactForm`, `sponsorCards`
+
+#### Studio Configuration
+
+- `sanity.config.ts` uses `structureTool` + `presentationTool` + `visionTool`
+- Singleton pattern for `siteSettings` (fixed document ID, restricted actions — no delete/duplicate)
+- Presentation tool with dynamic locations and MPA navigation support (Story 7-11)
 
 ### Testing Rules
 
@@ -168,29 +197,40 @@ Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page
 
 | Runner | Config | Scope |
 |---|---|---|
-| **Vitest** | `astro-app/vitest.config.ts` | Unit + Component (Container API) + Schema/Integration |
-| **Playwright** | `playwright.config.ts` | E2E only (real browser) |
+| **Vitest** | `astro-app/vitest.config.ts` | Unit + Component (Container API) + Integration |
+| **Playwright** | `playwright.config.ts` (root) | E2E only (real browser) |
 
-#### Vitest (Unit + Component + Integration)
+#### 4-Layer Test Architecture
 
-- **Config**: `astro-app/vitest.config.ts` using `getViteConfig()` from `astro/config`.
-- **Include patterns**: `src/**/__tests__/**/*.test.ts` + `../tests/integration/**/*.test.ts`.
-- **`sanity:client` mock**: Aliased via `__mocks__/sanity-client.ts` in vitest config.
-- **Component tests**: Use Astro Container API (`experimental_AstroContainer`) — renders components in Node.js, no browser.
-- **Fixtures**: Typed from `sanity.types.ts` in `__fixtures__/` directories.
-- **Integration tests**: Pure Node.js assertions (file existence, schema shape, module imports) — previously Playwright, now Vitest.
+| Layer | Runner | Location | Purpose |
+|---|---|---|---|
+| Unit | Vitest | `astro-app/src/lib/__tests__/` | Pure functions (`cn`, `loadQuery`, query strings) |
+| Component | Vitest + Container API | `astro-app/src/components/__tests__/` | Astro component rendering with mocked Sanity data |
+| SSR Smoke | Vitest + Miniflare | `astro-app/src/cloudflare/__tests__/` | Cloudflare Worker doesn't crash |
+| E2E | Playwright | `tests/e2e/` | Real browser: a11y, interactions, cross-browser |
 
-#### Playwright (E2E Only)
+#### Vitest Configuration
 
-- **Config**: `playwright.config.ts` at project root.
-- **Test directory**: `tests/e2e/`. Output: `./test-results` + `playwright-report/`.
-- **Web server**: Builds astro-app then runs preview (`build && preview`) before tests. 120s startup timeout.
-- **Browser projects (5)**: Desktop: `chromium`, `firefox`, `webkit`. Mobile: `mobile-chrome` (Pixel 7), `mobile-safari` (iPhone 14).
+- Uses `getViteConfig()` from `astro/config` (resolves Astro virtual modules).
+- Include: `src/**/__tests__/**/*.test.ts` + `../tests/integration/**/*.test.ts`.
+- `sanity:client` mocked via alias → `__mocks__/sanity-client.ts`.
+- Coverage: v8 provider, covers `src/lib/**/*.ts` + `src/scripts/**/*.ts`.
+- Reporters: default + JUnit (`../test-results/unit-results.xml`).
 
-#### Accessibility & SEO Testing
+#### Component Testing Conventions
 
-- `@axe-core/playwright` — automated WCAG compliance checks. Target: WCAG 2.1 AA, Lighthouse A11y 90+.
-- `@seontechnologies/playwright-utils` — SEO validation utilities.
+- Use Astro Container API (`experimental_AstroContainer`).
+- Fixtures typed from `sanity.types.ts`, live in `__fixtures__/` directories.
+- **Never test client-side JS** (carousel, forms) in jsdom — use Playwright E2E instead.
+
+#### Playwright Configuration
+
+- 5 browser projects: chromium, firefox, webkit, mobile-chrome (Pixel 7), mobile-safari (iPhone 14).
+- Web server: builds astro-app then runs preview. 120s startup timeout.
+- CI: `retries: 2`, `workers: 1`, `forbidOnly: true`.
+- Traces on first retry, screenshots on failure, video retained on failure.
+- `@axe-core/playwright` for WCAG compliance. `@seontechnologies/playwright-utils` for SEO validation.
+- E2E tests import from `tests/support/fixtures/` (not `@playwright/test` directly).
 
 #### Test Commands
 
@@ -199,7 +239,7 @@ Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page
 | `npm run test:unit` | Vitest: unit + component + integration |
 | `npm run test:e2e` | Playwright: all browser projects |
 | `npm test` | Both: `test:unit && test:e2e` |
-| `npm run test:chromium` | Playwright: Chromium only (fastest) |
+| `npm run test:chromium` | Playwright: Chromium only (fastest feedback) |
 | `npm run test:headed` | Playwright: headed chromium for debugging |
 | `npm run test:ui` | Playwright: UI mode |
 
@@ -209,16 +249,6 @@ Sanity Content Lake → sanity.fetch() via loadQuery<T>() at build time → Page
 - New GROQ query → Verify query string contains expected type/field references
 - Schema change → Run `npm run typegen` (type errors surface fixture/component drift)
 - Interactive behavior → Playwright E2E spec
-
-#### CI Configuration
-
-- Playwright: `retries: 2`, `workers: 1`, `forbidOnly: true` when `CI` env var is set.
-- Traces on first retry, screenshots on failure, video retained on failure.
-
-#### Build-Time Validation
-
-- `astro check && astro build` is the primary quality gate in `astro-app/`.
-- TypeScript strict mode catches type errors at build time.
 
 ### Code Quality & Style Rules
 
@@ -287,7 +317,8 @@ astro-app/src/
       custom/        # Custom block components (1:1 with Sanity schemas)
       *.astro        # fulldev/ui block variants (hero-1, features-3, etc.)
     block-registry.ts  # Auto-discovers blocks via import.meta.glob
-    BlockRenderer.astro  # Renders blocks using block-registry
+    BlockRenderer.astro  # Renders blocks using block-registry (unified dispatch)
+    BlockWrapper.astro   # Wraps every block with base field CSS (stegaClean)
     Header.astro, Footer.astro, MobileNav.astro, Breadcrumb.astro
     __tests__/       # Container API component tests + __fixtures__/
   layouts/
@@ -307,7 +338,7 @@ astro-app/src/
 
 studio/src/schemaTypes/
   helpers/defineBlock.ts
-  objects/           # block-base.ts, seo.ts, button.ts, portable-text.ts
+  objects/           # block-base.ts, seo.ts, button.ts, portable-text.ts + reusable named types
   documents/         # page.ts, site-settings.ts, sponsor.ts
   blocks/            # One file per block schema
   index.ts           # Schema registry (exports schemaTypes[])
@@ -315,7 +346,7 @@ studio/src/schemaTypes/
 tests/
   e2e/               # Playwright E2E tests (real browser)
   integration/       # Vitest integration tests (schema, file structure, config)
-  support/           # Shared test constants
+  support/           # Shared test fixtures and constants
 ```
 
 ### Development Workflow Rules
@@ -325,14 +356,18 @@ tests/
 | Command | What It Does |
 |---|---|
 | `npm run dev` (root) | Runs both workspaces concurrently |
+| `npm run dev -w astro-app` | Astro dev server only (port 4321) |
+| `npm run dev -w studio` | Sanity Studio dev server only |
 | `npm run dev:storybook` (root) | Both workspaces + Storybook |
 | `npm run storybook` (root) | Storybook only (port 6006) |
-| `cd astro-app && npm run build` | Build with `astro check && astro build` |
-| `npm test` (root) | Unit + E2E tests |
+| `npm run build -w astro-app` | Build with `astro check && astro build` |
+| `npm run typegen` | Extract schema + generate TypeScript types |
 
 #### Hosting
 
-- **Target**: Cloudflare Pages. `@astrojs/cloudflare` adapter configured. Output conditionally `static` or `server` (Visual Editing).
+- **Target**: Cloudflare Pages. `@astrojs/cloudflare` adapter configured with `platformProxy: { enabled: true }`.
+- **Preview**: `wrangler pages dev dist/` for local Cloudflare Workers emulation.
+- **Deploy**: `astro build && wrangler pages deploy dist/`.
 
 #### CI/CD
 
@@ -344,25 +379,34 @@ tests/
 - `PUBLIC_SANITY_STUDIO_PROJECT_ID` / `PUBLIC_SANITY_STUDIO_DATASET` — primary Sanity config in `.env`.
 - `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` — toggles Visual Editing mode (stega encoding + draft perspective).
 - `SANITY_API_READ_TOKEN` — required when Visual Editing is enabled.
-- Fallbacks in `astro.config.mjs`: `PUBLIC_SANITY_PROJECT_ID` → `"placeholder"`, `PUBLIC_SANITY_DATASET` → `"production"`.
+- `PUBLIC_SITE_URL` / `PUBLIC_SANITY_STUDIO_URL` — site and studio URLs.
+- Fallbacks in `astro.config.mjs`: checks both `loadEnv()` and `process.env` for Cloudflare Pages git integration builds (no `.env` file).
 
 #### Schema Change Propagation
 
-Schema change in `studio/` must be reflected in:
-1. GROQ projections in `astro-app/src/lib/sanity.ts`
-2. TypeScript interfaces in `astro-app/src/lib/types.ts`
-3. Component props in the corresponding block component
+1. Update schema in `studio/src/schemaTypes/`
+2. Deploy schema: `npx sanity schema deploy` (from `studio/`)
+3. Update GROQ projections in `astro-app/src/lib/sanity.ts`
+4. Run `npm run typegen` to regenerate types
+5. Fix any type errors in components/fixtures
 
 #### Adding a New Block (Checklist)
 
 1. Create schema: `studio/src/schemaTypes/blocks/{block-name}.ts` using `defineBlock`
 2. Register in `studio/src/schemaTypes/index.ts`
-3. Add type to page schema's `blocks[]` array `of` list in `studio/src/schemaTypes/documents/page.ts`
-4. Install any needed fulldev/ui primitives: `npx shadcn@latest add @fulldev/{name}`
-5. Create component: `astro-app/src/components/blocks/custom/{BlockName}.astro` (PascalCase filename auto-registers via `block-registry.ts`)
-6. Add GROQ projection in `src/lib/sanity.ts` page query
-7. Run `npm run typegen` to regenerate types (block type auto-extracted via `Extract<PageBlock, ...>`)
-8. Add Container API test in `src/components/__tests__/{BlockName}.test.ts` with typed fixtures
+3. Add type to page schema's `blocks[]` array in `studio/src/schemaTypes/documents/page.ts`
+4. Deploy schema: `npx sanity schema deploy` (from `studio/`)
+5. Install any needed fulldev/ui primitives: `npx shadcn@latest add @fulldev/{name}`
+6. Create component: `astro-app/src/components/blocks/custom/{BlockName}.astro` (PascalCase filename auto-registers via `block-registry.ts`)
+7. Add GROQ projection in `src/lib/sanity.ts` page query
+8. Run `npm run typegen` (block type auto-extracted via `Extract<PageBlock, ...>`)
+9. Add Container API test in `src/components/__tests__/{BlockName}.test.ts` with typed fixtures
+
+#### Boundaries (from CLAUDE.md)
+
+- **Always**: Use `defineQuery` for GROQ queries. Run `npm run typegen` after schema/query changes. Deploy schema after schema changes. Update local schema files first.
+- **Ask First**: Before modifying `sanity.config.ts`. Before deleting any schema definition file.
+- **Never**: Hardcode API tokens (`use process.env`). Use loose types (`any`) for Sanity content.
 
 ### Critical Don't-Miss Rules
 
@@ -384,6 +428,9 @@ Schema change in `studio/` must be reflected in:
 | Deleting Sanity fields | Data loss in production | Use deprecation pattern |
 | `@astrojs/tailwind` | That's Tailwind v3 | Use `@tailwindcss/vite` (v4) |
 | `@portabletext/react` | Requires React runtime | Use `astro-portabletext` |
+| `any` types for Sanity content | Loses type safety | Use TypeGen-derived types |
+| Manual BlockRenderer edits | Old pattern, now auto-discovered | Just add PascalCase file to `blocks/custom/` |
+| Handling base fields in blocks | BlockWrapper handles them | Don't add backgroundVariant/spacing/maxWidth CSS in block components |
 
 #### Edge Cases
 
@@ -392,7 +439,10 @@ Schema change in `studio/` must be reflected in:
 - **`sanity:client` virtual module**: Import from `sanity:client`, not from a file path. Requires `@sanity/astro` integration in `astro.config.mjs`.
 - **Portable Text in Astro**: Use `astro-portabletext` (not `@portabletext/react`). It renders in `.astro` components without React.
 - **shadcn CLI + Astro**: The `shadcn` package works with fulldev/ui's Astro registry. Always specify `@fulldev/` prefix when adding components.
-- **`@astrojs/node` adapter in config**: This is for Visual Editing preview mode, not production deploy. Production is pure static.
+- **Cloudflare adapter**: `@astrojs/cloudflare` with `platformProxy: { enabled: true }` for local dev. Static output by default.
+- **Env var fallbacks**: `astro.config.mjs` checks both `loadEnv()` and `process.env` for Cloudflare Pages builds without `.env` files.
+- **Visual Editing preview**: Uses Server Islands (`server:defer`), not full SSR mode (Story 7-4).
+- **`stegaClean` in BlockWrapper**: Base field values may contain Visual Editing stega data — `BlockWrapper.astro` cleans them via `stegaClean()` from `@sanity/client/stega`.
 
 #### Accessibility Requirements (WCAG 2.1 AA)
 
@@ -419,19 +469,25 @@ Schema change in `studio/` must be reflected in:
 | 1.1 Reconfigure Starter | DONE | Removed Vercel adapter, added Tailwind v4, fulldev/ui, directory structure |
 | 1.2 Migrate Reference | DONE | 12 block components, 22 ui families, 5 pages with placeholder data |
 | 1.3 Schema Infrastructure | DONE | defineBlock helper, base objects, document schemas (page, siteSettings) |
-| 1.4 Storybook Setup | DONE | storybook-astro framework, native Astro component development |
-| 1.5 Storybook Production Build | DONE | Production build fixes and configuration |
-| 1.6 Storybook GitHub Pages Deploy | DONE | CI/CD workflow for Storybook deployment |
-| 2.0 Template Layout System | DONE | Layout.astro, Header, Footer, navigation |
-| 2.1 Block Schemas (Homepage) | DONE | heroBanner, featureGrid, ctaBanner, statsRow, textWithImage, logoCloud, sponsorSteps |
-| 2.1b Block Schemas (Remaining) | DONE | richText, faqSection, contactForm, sponsorCards |
-| 2.2 Homepage Wiring | DONE | GROQ queries, Visual Editing, Presentation tool for homepage |
-| 2.3a Site Settings Wiring | DONE | Memoized queries, full schema validation for siteSettings |
-| 2.2b Remaining Pages Data | DONE | CMS-driven catch-all route, template dispatch, all pages from Sanity |
-| Testing Refactor | DONE | Vitest Container API tests, integration test migration, consolidated test scripts |
-| 3.1 Sponsor Document Schema | NEXT | Sponsor document schema + studio management |
+| 1.4-1.6 Storybook | DONE | Setup, production build, GitHub Pages deploy |
+| 2.0 Template Layout System | DONE | Layout.astro, Header, Footer, navigation, 5 template shells |
+| 2.1/2.1b Block Schemas | DONE | All 11 block schemas created |
+| 2.2 Homepage Wiring | DONE | GROQ queries, Visual Editing, Presentation tool |
+| 2.2b Remaining Pages | DONE | CMS-driven catch-all route, template dispatch |
+| 2.3a Site Settings | DONE | Memoized queries, full schema validation |
+| 2.9 Unified Dispatch | DONE | All blocks use spread props, no switch statement |
+| Testing Refactor | DONE | 4-layer test architecture: Vitest + Playwright |
+| 7-4 Server Islands | DONE | Preview uses Server Islands instead of full SSR |
+| 7-6 BlockWrapper | DONE | stegaClean BlockWrapper, Studio UX polish |
+| 7-7 Reusable Patterns | DONE | Extracted reusable link and button field patterns |
+| 7-8 Portable Text | DONE | PortableText component for RichText and FAQ rendering |
+| 7-9 Block Base Fields | DONE | BlockWrapper CSS values, CtaBanner background delegation |
+| 7-10 Named Object Types | DONE | Extracted reusable inline object types |
+| 7-11 Presentation Tool | DONE | Dynamic locations and MPA navigation |
+| TEA Test Review P1 | DONE | 3 P1 findings addressed |
+| 3.1 Sponsor Schema | NEXT | Sponsor document schema + studio management |
 
-**Current state**: All pages are CMS-driven via `[...slug].astro` catch-all route with 5 template layouts. Test architecture consolidated to Vitest (unit/component/integration) + Playwright (E2E only). Next up is Story 3.1 (sponsor studio management).
+**Current state**: All pages are CMS-driven via `[...slug].astro` catch-all route with 5 template layouts. Unified block dispatch via `block-registry.ts`. BlockWrapper handles base fields with stegaClean. Test architecture: 4-layer (Unit/Component/SSR Smoke/E2E). Server Islands for Visual Editing preview. Next up is Story 3.1 (sponsor studio management).
 
 ---
 
@@ -451,4 +507,4 @@ Schema change in `studio/` must be reflected in:
 - Review quarterly for outdated rules
 - Remove rules that become obvious over time
 
-Last Updated: 2026-02-11
+Last Updated: 2026-02-13

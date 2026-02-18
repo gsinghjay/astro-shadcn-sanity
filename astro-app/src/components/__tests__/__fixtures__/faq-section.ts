@@ -1,5 +1,9 @@
 import type { FaqSectionBlock } from '@/lib/types';
 
+/** Legacy FAQ data: answer stored as plain string before Portable Text migration */
+type LegacyFaqItem = Omit<NonNullable<FaqSectionBlock['items']>[number], 'answer'> & { answer: string };
+type LegacyFaqSectionBlock = Omit<FaqSectionBlock, 'items'> & { items: LegacyFaqItem[] };
+
 export const faqFull: FaqSectionBlock = {
   _type: 'faqSection',
   _key: 'test-faq-1',
@@ -42,7 +46,7 @@ export const faqFull: FaqSectionBlock = {
 };
 
 /** Legacy data: answer stored as plain string (pre-migration) */
-export const faqLegacyString: FaqSectionBlock = {
+export const faqLegacyString: LegacyFaqSectionBlock = {
   _type: 'faqSection',
   _key: 'test-faq-3',
   backgroundVariant: null,
@@ -50,7 +54,7 @@ export const faqLegacyString: FaqSectionBlock = {
   maxWidth: 'default',
   heading: 'Old FAQs',
   items: [
-    { _key: 'q1', question: 'Legacy question?', answer: 'Plain text answer.' as any },
+    { _key: 'q1', question: 'Legacy question?', answer: 'Plain text answer.' },
   ],
 };
 

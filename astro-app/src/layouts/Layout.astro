@@ -41,7 +41,8 @@ const cleanDescription = stegaClean(
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 
-const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+// Fallback to process.env for Cloudflare Pages git integration builds (no .env file)
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID || process.env.PUBLIC_GA_MEASUREMENT_ID;
 
 const fullTitle = cleanSeoTitle
   ? cleanSeoTitle

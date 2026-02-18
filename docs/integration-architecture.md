@@ -1,138 +1,211 @@
-# Integration Architecture — YWCC Capstone Sponsors
+# Integration Architecture
 
-**Generated:** 2026-02-09 | **Scan Level:** Exhaustive
+**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
 
 ## Part Communication Overview
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                       MONOREPO ROOT                          │
-│  package.json (npm workspaces: ["studio", "astro-app"])      │
-│  playwright.config.ts, tests/                                │
-└──────────────────────────────────────────────────────────────┘
-              │                              │
-              ▼                              ▼
-┌──────────────────────┐    ┌──────────────────────────────────┐
-│     studio/          │    │          astro-app/               │
-│                      │    │                                   │
-│  Sanity Studio       │    │  Astro Frontend (SSG)             │
-│  (React SPA)         │    │                                   │
-│                      │    │  ┌─────────────────────────────┐  │
-│  Writes content to   │    │  │ src/lib/sanity.ts            │  │
-│  Sanity Cloud API    │───▶│  │ - GROQ queries               │  │
-│                      │    │  │ - loadQuery() with stega      │  │
-│  Serves on :3333     │    │  │ - getSiteSettings() memoized  │  │
-│                      │    │  └─────────────────────────────┘  │
-│  Presentation Tool   │    │                                   │
-│  previews at :4321   │◀───│  Serves on :4321                  │
-│                      │    │                                   │
-└──────────────────────┘    └──────────────────────────────────┘
-              │                              │
-              ▼                              ▼
-┌──────────────────────────────────────────────────────────────┐
-│                     Sanity Cloud API                         │
-│  Project: 49nk9b0w | Dataset: production                    │
-│  Content Delivery Network + Real-time API                    │
-└──────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Studio[studio/]
+        Schema[Schema Types]
+        Config[sanity.config.ts]
+        Preview[Presentation Tool]
+    end
+
+    subgraph AstroApp[astro-app/]
+        Queries[GROQ Queries]
+        Types[sanity.types.ts]
+        Components[Block Components]
+        Client[Sanity Client]
+    end
+
+    Schema -->|schema.json → TypeGen| Types
+    Schema -->|Content Lake API| Client
+    Config -->|Preview URL resolver| Preview
+    Preview -->|Visual Editing iframe| AstroApp
+    Client -->|loadQuery| Queries
+    Queries -->|Typed data| Components
 ```
 
-## Integration Points
+## Integration Points (5)
 
-### 1. Content Delivery (studio → Sanity Cloud → astro-app)
+### 1. Content Delivery (GROQ API)
 
-| Attribute | Value |
-|---|---|
-| **From** | studio (content editing) |
-| **To** | astro-app (content consumption) |
-| **Protocol** | Sanity Content Lake API (HTTPS) |
-| **Data Format** | JSON (GROQ query results) |
-| **Auth** | Read token (`SANITY_API_READ_TOKEN`) for drafts; public CDN for published |
-| **API Version** | 2024-12-08 |
+**Direction:** Studio → Astro (via Sanity Content Lake)
 
-**Flow:**
-1. Content editor creates/updates content in Studio
-2. Content is stored in Sanity Content Lake (cloud)
-3. At build time, Astro fetches content via GROQ queries
-4. Content is baked into static HTML (zero runtime API calls)
+| Aspect | Detail |
+|--------|--------|
+| Protocol | HTTPS REST API (Content Lake) |
+| Client | `@sanity/astro` integration (provides `sanity:client` virtual module) |
+| Authentication | Public API for published content; API read token for drafts |
+| Caching | Module-level caching for `getSiteSettings()` during build |
+| API Version | 2025-03-01 |
 
-### 2. Visual Editing (studio ↔ astro-app)
+**Queries:**
+- `SITE_SETTINGS_QUERY` — Global config (nav, footer, branding)
+- `ALL_PAGE_SLUGS_QUERY` — Static path generation
+- `PAGE_BY_SLUG_QUERY` — Page with type-conditional block projections
 
-| Attribute | Value |
-|---|---|
-| **From** | studio (Presentation tool) |
-| **To** | astro-app (preview iframe) |
-| **Protocol** | Stega encoding + iframe communication |
-| **Preview URL** | http://localhost:4321 (dev) |
+### 2. Visual Editing (Presentation Tool)
 
-**Flow:**
-1. Studio's Presentation tool loads astro-app in an iframe
-2. Astro renders content with stega-encoded invisible markers
-3. Studio detects markers and enables click-to-edit on content elements
-4. Edits update content in Sanity, astro-app re-renders with draft perspective
+**Direction:** Studio ↔ Astro (bidirectional via iframe + postMessage)
 
-**Configuration:**
-- `studio/sanity.config.ts` → `presentationTool({ previewUrl: { origin: 'http://localhost:4321' } })`
-- `astro-app/astro.config.mjs` → `sanity({ stega: { studioUrl: 'http://localhost:3333' } })`
-- `studio/src/presentation/resolve.ts` → Maps page documents to frontend URLs
+| Aspect | Detail |
+|--------|--------|
+| Protocol | iframe embedding + Sanity Channels (postMessage) |
+| Studio Side | `presentationTool()` plugin with preview URL resolver |
+| Astro Side | `VisualEditingMPA.tsx` React component + `@sanity/visual-editing` |
+| Stega Encoding | Field values encoded with invisible markers for click-to-edit |
+| Perspective | `drafts` for live preview content |
+| Preview Origin | `SANITY_STUDIO_PREVIEW_ORIGIN` (default: `http://localhost:4321`) |
 
-### 3. Schema Sharing (studio → tests)
+**URL Resolution** (`studio/src/presentation/resolve.ts`):
+- Pages: `/{slug}` (home page → `/`)
+- Sponsors: `/sponsors/{slug}` and `/sponsors`
+- Site Settings: Shows all pages (nav/footer appear everywhere)
 
-| Attribute | Value |
-|---|---|
-| **From** | studio (schema definitions) |
-| **To** | tests (integration tests) |
-| **Protocol** | Direct ESM imports |
-| **Method** | Static `import` statements |
+### 3. Schema Sharing (TypeGen)
 
-**Flow:**
-1. Integration tests import schema definitions directly from `studio/src/schemaTypes/`
-2. Tests validate schema structure, field types, and relationships
-3. No browser or network required (pure Node.js execution)
+**Direction:** Studio → Astro (one-way, build-time)
 
-**Important rule:** Tests MUST use static `import` (never dynamic `await import()`) and studio must keep `"type": "module"` in package.json.
+| Aspect | Detail |
+|--------|--------|
+| Schema Source | `studio/schema.json` (extracted via `sanity schema extract`) |
+| Output | `astro-app/src/sanity.types.ts` (1033 lines of generated types) |
+| Watch Patterns | `../astro-app/src/**/*.{ts,tsx,js,jsx}` |
+| Type Adapters | `astro-app/src/lib/types.ts` re-exports named types |
+| Command | `npm run typegen` (runs from root, executes in studio/) |
 
-### 4. Shared Dependencies
-
-| Dependency | studio | astro-app | Purpose |
-|---|---|---|---|
-| react | 19.x | 19.x | Studio UI + Astro islands |
-| react-dom | 19.x | 19.x | DOM rendering |
-| typescript | 5.x | 5.x | Type checking |
-
-### 5. CI/CD (GitHub Actions → GitHub Pages)
-
-| Attribute | Value |
-|---|---|
-| **Trigger** | Push to main (astro-app/src/**, .storybook/**, package.json) |
-| **Build** | `npm run build-storybook --workspace=astro-app` |
-| **Deploy** | GitHub Pages artifact upload |
-| **Base Path** | `/astro-shadcn-sanity/` |
-
-## Environment Variable Mapping
-
-| Variable | Used In | Purpose |
-|---|---|---|
-| `PUBLIC_SANITY_STUDIO_PROJECT_ID` | astro-app | Sanity project ID for content fetching |
-| `PUBLIC_SANITY_STUDIO_DATASET` | astro-app | Sanity dataset name |
-| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | astro-app | Enable stega visual editing |
-| `SANITY_API_READ_TOKEN` | astro-app | API token for draft content |
-| `SANITY_STUDIO_PROJECT_ID` | studio | Sanity project ID for Studio |
-| `SANITY_STUDIO_DATASET` | studio | Sanity dataset name |
-| `SANITY_STUDIO_PREVIEW_ORIGIN` | studio | Astro preview URL for Presentation tool |
-| `SANITY_STUDIO_STUDIO_HOST` | studio | Optional Studio deployment hostname |
-
-## Data Flow Summary
-
+**TypeGen Pipeline:**
 ```
-Content Editor → Studio → Sanity Cloud
-                                ↓
-                     Astro SSG Build (GROQ)
-                                ↓
-                        Static HTML + CSS
-                                ↓
-                    CDN (GitHub Pages / Cloudflare)
-                                ↓
-                          Site Visitor
+Schema files → sanity schema extract → schema.json → sanity typegen generate → sanity.types.ts
 ```
 
-Zero runtime API calls. All content is pre-rendered at build time.
+### 4. Shared Dependencies (npm Workspaces)
+
+**Direction:** Bidirectional (shared node_modules)
+
+| Aspect | Detail |
+|--------|--------|
+| Workspace Manager | npm workspaces |
+| Root `package.json` | `"workspaces": ["studio", "astro-app"]` |
+| Shared Dev Deps | Playwright, axe-core, concurrently (root level) |
+| React | Both parts use React 19.2 (astro-app for islands, studio for UI) |
+
+**Workspace Commands:**
+- `npm run dev` — Starts both via `concurrently`
+- `npm run test` — Runs unit + E2E from root
+- `npm run typegen` — Delegates to studio workspace
+
+### 5. CI/CD Pipeline Integration
+
+**Direction:** GitHub Actions orchestrates both parts
+
+```mermaid
+flowchart TD
+    subgraph Triggers
+        PR[PR to preview]
+        Push[Push to main]
+        Webhook[Sanity webhook]
+    end
+
+    subgraph CI[CI Pipeline]
+        Unit[Unit tests - astro-app]
+        LH[Lighthouse CI - astro-app build]
+    end
+
+    subgraph Deploy[Deploy Pipeline]
+        Build[Build astro-app]
+        CFDeploy[Cloudflare Pages deploy]
+        StudioDeploy[Sanity Studio deploy]
+        SBDeploy[Storybook GH Pages deploy]
+    end
+
+    subgraph Release[Release Pipeline]
+        SemRel[semantic-release]
+        Sync[Sync preview branch]
+        Discord[Discord notification]
+    end
+
+    PR --> CI
+    Push --> SemRel
+    Push --> SBDeploy
+    Webhook --> Build --> CFDeploy
+    SemRel --> Sync --> Discord
+```
+
+**Shared Configuration:**
+- Both parts share `PUBLIC_SANITY_STUDIO_PROJECT_ID` and `PUBLIC_SANITY_STUDIO_DATASET` via GitHub Actions variables
+- Cloudflare credentials stored as GitHub secrets
+- Wrangler config at root (`wrangler.toml`) points to `astro-app/dist`
+
+## Data Flow Diagrams
+
+### Build-Time Data Flow (Production)
+
+```mermaid
+sequenceDiagram
+    participant Build as Astro Build
+    participant CL as Content Lake
+    participant CF as Cloudflare Pages
+
+    Build->>CL: SITE_SETTINGS_QUERY
+    CL-->>Build: siteSettings (cached)
+    Build->>CL: ALL_PAGE_SLUGS_QUERY
+    CL-->>Build: page slugs[]
+    loop Each page
+        Build->>CL: PAGE_BY_SLUG_QUERY(slug)
+        CL-->>Build: page + blocks[]
+        Build->>Build: Render blocks via BlockRenderer
+    end
+    Build->>CF: Deploy static HTML
+```
+
+### Runtime Data Flow (Visual Editing)
+
+```mermaid
+sequenceDiagram
+    participant Editor as Content Editor
+    participant Studio as Sanity Studio
+    participant Astro as Astro SSR (preview)
+    participant CL as Content Lake
+
+    Editor->>Studio: Edit content
+    Studio->>Astro: Load in Presentation iframe
+    Astro->>CL: loadQuery(drafts perspective)
+    CL-->>Astro: Draft content with stega encoding
+    Astro-->>Studio: Rendered page with edit markers
+    Editor->>Studio: Click element
+    Studio->>Studio: Resolve field from stega data
+    Studio->>Studio: Open field editor
+```
+
+### Content Publish Flow
+
+```mermaid
+sequenceDiagram
+    participant Editor as Content Editor
+    participant Studio as Sanity Studio
+    participant CL as Content Lake
+    participant GHA as GitHub Actions
+    participant CF as Cloudflare Pages
+
+    Editor->>Studio: Publish document
+    Studio->>CL: Write published document
+    CL->>GHA: repository_dispatch webhook
+    GHA->>GHA: npm ci && build astro-app
+    GHA->>CF: wrangler pages deploy
+    CF-->>CF: Serve updated static site
+```
+
+## Containerized Development
+
+Docker Compose provides isolated development:
+
+| Service | Port | Volume Mounts |
+|---------|------|---------------|
+| astro-app | 4321 | Source code + separate node_modules |
+| studio | 3333 | Source code + separate node_modules |
+| storybook | 6006 | Source code (optional profile) |
+
+Named volumes prevent node_modules conflicts: `node_modules`, `astro_node_modules`, `studio_node_modules`.
