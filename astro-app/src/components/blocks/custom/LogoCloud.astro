@@ -1,6 +1,7 @@
 ---
 import type { Sponsor } from '@/lib/sanity';
 import { Section } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   heading?: string | null;
@@ -35,7 +36,7 @@ const { heading, sponsors } = Astro.props;
       );
 
       return sponsor.website ? (
-        <a href={sponsor.website} target="_blank" rel="noopener">
+        <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">
           {content}
         </a>
       ) : (

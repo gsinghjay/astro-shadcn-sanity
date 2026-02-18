@@ -6,8 +6,10 @@ export const sponsorCardsSponsors: Sponsor[] = [
     name: 'Acme Corp',
     slug: 'acme-corp',
     logo: {
-      asset: { _id: 'img-1', url: 'https://cdn.sanity.io/test/acme.png', metadata: null },
+      asset: { _id: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200-png', url: 'https://cdn.sanity.io/images/test-project/test-dataset/Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200.png', metadata: null },
       alt: 'Acme logo',
+      hotspot: null,
+      crop: null,
     },
     tier: 'gold',
     description: 'Leading technology partner',

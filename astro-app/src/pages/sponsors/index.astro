@@ -1,0 +1,22 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getAllSponsors } from '@/lib/sanity';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import SponsorCard from '@/components/SponsorCard.astro';
+
+const sponsors = await getAllSponsors();
+---
+
+<Layout title="Sponsors">
+  <Section>
+    <SectionContent>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Our Sponsors</h1>
+    </SectionContent>
+
+    <SectionGrid size="lg">
+      {sponsors.map((sponsor) => (
+        <SponsorCard sponsor={sponsor} />
+      ))}
+    </SectionGrid>
+  </Section>
+</Layout>

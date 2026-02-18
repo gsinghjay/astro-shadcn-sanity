@@ -7,14 +7,6 @@ import react from "@astrojs/react";
 
 const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
-// Debug: log env var sources during CF Pages builds (remove after confirming)
-console.log("[astro.config] mode:", import.meta.env.MODE);
-console.log("[astro.config] cwd:", process.cwd());
-console.log("[astro.config] loadEnv PUBLIC_GA_MEASUREMENT_ID:", env.PUBLIC_GA_MEASUREMENT_ID ?? "(not found)");
-console.log("[astro.config] process.env PUBLIC_GA_MEASUREMENT_ID:", process.env.PUBLIC_GA_MEASUREMENT_ID ?? "(not found)");
-console.log("[astro.config] loadEnv PUBLIC_SANITY_STUDIO_PROJECT_ID:", env.PUBLIC_SANITY_STUDIO_PROJECT_ID ?? "(not found)");
-console.log("[astro.config] process.env PUBLIC_SANITY_STUDIO_PROJECT_ID:", process.env.PUBLIC_SANITY_STUDIO_PROJECT_ID ?? "(not found)");
-
 // Fallback to process.env for Cloudflare Pages builds (no .env file on CF)
 const projectId = env.PUBLIC_SANITY_STUDIO_PROJECT_ID || process.env.PUBLIC_SANITY_STUDIO_PROJECT_ID || env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID || "placeholder";
 const dataset = env.PUBLIC_SANITY_STUDIO_DATASET || process.env.PUBLIC_SANITY_STUDIO_DATASET || env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || "production";
