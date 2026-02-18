@@ -18,7 +18,13 @@ export const testimonials = defineBlock({
       title: 'Display Mode',
       type: 'string',
       options: {
-        list: ['all', 'industry', 'student', 'byProject', 'manual'],
+        list: [
+          {title: 'All', value: 'all'},
+          {title: 'Industry', value: 'industry'},
+          {title: 'Student', value: 'student'},
+          {title: 'By Project', value: 'byProject'},
+          {title: 'Manual', value: 'manual'},
+        ],
       },
       initialValue: 'all',
     }),

@@ -64,7 +64,11 @@ export const event = defineType({
       title: 'Event Type',
       type: 'string',
       options: {
-        list: ['showcase', 'networking', 'workshop'],
+        list: [
+          {title: 'Showcase', value: 'showcase'},
+          {title: 'Networking', value: 'networking'},
+          {title: 'Workshop', value: 'workshop'},
+        ],
         layout: 'radio',
       },
     }),
@@ -73,7 +77,10 @@ export const event = defineType({
       title: 'Status',
       type: 'string',
       options: {
-        list: ['upcoming', 'past'],
+        list: [
+          {title: 'Upcoming', value: 'upcoming'},
+          {title: 'Past', value: 'past'},
+        ],
         layout: 'radio',
       },
       initialValue: 'upcoming',

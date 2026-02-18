@@ -287,8 +287,8 @@ export function resolveBlockTestimonials(
 ): Testimonial[] {
   const mode = stegaClean(block.displayMode) ?? 'all';
   if (mode === 'all') return allTestimonials;
-  if (mode === 'industry') return allTestimonials.filter(t => t.type === 'industry');
-  if (mode === 'student') return allTestimonials.filter(t => t.type === 'student');
+  if (mode === 'industry') return allTestimonials.filter(t => stegaClean(t.type) === 'industry');
+  if (mode === 'student') return allTestimonials.filter(t => stegaClean(t.type) === 'student');
   if (mode === 'byProject') return allTestimonials.filter(t => t.project != null);
   // manual
   const manualIds = new Set(block.testimonials?.map(t => t._id) ?? []);

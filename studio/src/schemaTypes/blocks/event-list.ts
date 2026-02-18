@@ -18,7 +18,11 @@ export const eventList = defineBlock({
       title: 'Filter By',
       type: 'string',
       options: {
-        list: ['all', 'upcoming', 'past'],
+        list: [
+          {title: 'All', value: 'all'},
+          {title: 'Upcoming', value: 'upcoming'},
+          {title: 'Past', value: 'past'},
+        ],
       },
       initialValue: 'upcoming',
     }),
