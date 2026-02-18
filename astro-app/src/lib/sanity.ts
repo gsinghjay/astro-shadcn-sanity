@@ -106,7 +106,7 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
  */
 export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor"] | order(name asc){
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
   tier, description, website, featured
 }`);
 
@@ -135,7 +135,7 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
  */
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug][0]{
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
   tier, description, website, featured, industry,
   "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }
 }`);

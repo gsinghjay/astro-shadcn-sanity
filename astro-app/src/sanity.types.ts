@@ -697,7 +697,7 @@ export type ALL_PAGE_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_SPONSORS_QUERY
-// Query: *[_type == "sponsor"] | order(name asc){  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  tier, description, website, featured}
+// Query: *[_type == "sponsor"] | order(name asc){  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured}
 export type ALL_SPONSORS_QUERY_RESULT = Array<{
   _id: string;
   name: string | null;
@@ -712,6 +712,8 @@ export type ALL_SPONSORS_QUERY_RESULT = Array<{
       } | null;
     } | null;
     alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
   } | null;
   tier: "bronze" | "gold" | "platinum" | "silver" | null;
   description: string | null;
@@ -728,7 +730,7 @@ export type ALL_SPONSOR_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SPONSOR_BY_SLUG_QUERY
-// Query: *[_type == "sponsor" && slug.current == $slug][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  tier, description, website, featured, industry,  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }}
+// Query: *[_type == "sponsor" && slug.current == $slug][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }}
 export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   _id: string;
   name: string | null;
@@ -743,6 +745,8 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
       } | null;
     } | null;
     alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
   } | null;
   tier: "bronze" | "gold" | "platinum" | "silver" | null;
   description: string | null;
@@ -1055,9 +1059,9 @@ declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type == "siteSettings"][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor"] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
+    '*[_type == "sponsor"] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && defined(slug.current)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor" && slug.current == $slug][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  tier, description, website, featured, industry,\n  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor" && slug.current == $slug][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }
