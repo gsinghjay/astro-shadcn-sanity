@@ -7,8 +7,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
+  // Get Cloudflare runtime env (wrangler.jsonc vars + CF dashboard secrets)
+  const runtimeEnv = context.locals.runtime?.env;
+
   // Portal routes — validate CF Access JWT (defense-in-depth)
-  const result = await validateAccessJWT(context.request);
+  const result = await validateAccessJWT(context.request, runtimeEnv);
 
   if (result) {
     context.locals.user = { email: result.email };
