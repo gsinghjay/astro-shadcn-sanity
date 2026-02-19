@@ -534,7 +534,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | Aryaan Panda |[@panzemary](https://github.com/panzemary)| - |
 | Mohsin Imtiaz | [@mi329-gif](https://github.com/mi329-gif) | Team Member |
 | Joshua Lastimosa | [@jo-las](https://github.com/jo-las) | Core Developer |
-| | | |
+| Pranav Chintala | [@pac27-cloud](https://github.com/pac27-cloud) | Team Member |
 | | | |
 | | | |
 | | | |
