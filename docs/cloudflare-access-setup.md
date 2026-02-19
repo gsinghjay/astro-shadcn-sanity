@@ -19,11 +19,12 @@ status: active
 4. [Email Allow Policy](#4-email-allow-policy)
 5. [Add Sponsor Access](#5-add-sponsor-access)
 6. [Remove Sponsor Access](#6-remove-sponsor-access)
-7. [Environment Variables](#7-environment-variables)
-8. [How JWT Validation Works](#8-how-jwt-validation-works)
-9. [Troubleshooting](#9-troubleshooting)
-10. [Free Tier Limits](#10-free-tier-limits)
-11. [VPS + Authentik Migration Path](#11-vps--authentik-migration-path)
+7. [Logging Out / Switching Accounts](#7-logging-out--switching-accounts)
+8. [Environment Variables](#8-environment-variables)
+9. [How JWT Validation Works](#9-how-jwt-validation-works)
+10. [Troubleshooting](#10-troubleshooting)
+11. [Free Tier Limits](#11-free-tier-limits)
+12. [VPS + Authentik Migration Path](#12-vps--authentik-migration-path)
 
 ---
 
@@ -91,8 +92,8 @@ Google login lets sponsors authenticate with their existing Google accounts — 
 3. Set User Type to **External**, fill in app name and support email
 4. Navigate to **APIs & Services → Credentials → Create Credentials → OAuth client ID**
 5. Application type: **Web application**
-6. Add authorized JavaScript origin: `https://ywcc-capstone.cloudflareaccess.com`
-7. Add authorized redirect URI: `https://ywcc-capstone.cloudflareaccess.com/cdn-cgi/access/callback`
+6. Add authorized JavaScript origin: `https://ywcc-capstone-pages.cloudflareaccess.com`
+7. Add authorized redirect URI: `https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/callback`
 8. Copy the **Client ID** and **Client Secret**
 
 **Cloudflare Zero Trust setup:**
@@ -152,13 +153,25 @@ The sponsor's existing session remains valid until it expires (24 hours by defau
 
 ---
 
-## 7. Environment Variables
+## 7. Logging Out / Switching Accounts
+
+To log out of a CF Access session (e.g., to switch to a different email):
+
+```
+https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/logout
+```
+
+This clears the session cookie. The next visit to `/portal/` will show the login page again.
+
+---
+
+## 8. Environment Variables
 
 Two environment variables are required for JWT validation:
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `CF_ACCESS_TEAM_DOMAIN` | Your Cloudflare Access team domain | `https://ywcc-capstone.cloudflareaccess.com` |
+| `CF_ACCESS_TEAM_DOMAIN` | Your Cloudflare Access team domain | `https://ywcc-capstone-pages.cloudflareaccess.com` |
 | `CF_ACCESS_AUD` | Application Audience tag from CF dashboard | (64-char hex string from Task 1 step 5) |
 
 ### Where to set them
@@ -174,7 +187,7 @@ npx wrangler pages secret put CF_ACCESS_AUD
 
 ---
 
-## 8. How JWT Validation Works
+## 9. How JWT Validation Works
 
 `astro-app/src/lib/auth.ts` implements defense-in-depth JWT validation:
 
@@ -190,7 +203,7 @@ Cloudflare rotates signing keys every **6 weeks**. The previous key remains vali
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 ### OTP email not received
 
@@ -224,7 +237,7 @@ Cloudflare rotates signing keys every **6 weeks**. The previous key remains vali
 
 ---
 
-## 10. Free Tier Limits
+## 11. Free Tier Limits
 
 Cloudflare Zero Trust free tier:
 
@@ -241,7 +254,7 @@ For programs with more than 50 sponsors, consider the [VPS + Authentik migration
 
 ---
 
-## 11. VPS + Authentik Migration Path
+## 12. VPS + Authentik Migration Path
 
 A full VPS migration plan exists at [`docs/vps-migration-plan.md`](vps-migration-plan.md). This section summarizes the auth-relevant differences.
 

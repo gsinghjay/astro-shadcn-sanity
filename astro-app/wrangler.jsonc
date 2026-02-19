@@ -6,7 +6,7 @@
   "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
   "pages_build_output_dir": "./dist",
   "vars": {
-    "CF_ACCESS_TEAM_DOMAIN": "https://ywcc-capstone.cloudflareaccess.com",
+    "CF_ACCESS_TEAM_DOMAIN": "https://ywcc-capstone-pages.cloudflareaccess.com",
     "CF_ACCESS_AUD": ""
   }
 }
