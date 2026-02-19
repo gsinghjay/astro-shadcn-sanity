@@ -9,12 +9,13 @@ import { jwtVerify, createRemoteJWKSet } from "jose";
  */
 export async function validateAccessJWT(
   request: Request,
+  env?: Record<string, unknown>,
 ): Promise<{ email: string } | null> {
   const token = request.headers.get("Cf-Access-Jwt-Assertion");
   if (!token) return null;
 
-  const teamDomain = getEnvVar("CF_ACCESS_TEAM_DOMAIN");
-  const aud = getEnvVar("CF_ACCESS_AUD");
+  const teamDomain = getEnvVar("CF_ACCESS_TEAM_DOMAIN", env);
+  const aud = getEnvVar("CF_ACCESS_AUD", env);
   if (!teamDomain || !aud) return null;
 
   try {
@@ -36,11 +37,23 @@ export async function validateAccessJWT(
   }
 }
 
-/** Read env vars from either Astro's import.meta.env or process.env (Workers runtime). */
-function getEnvVar(name: string): string | undefined {
-  // Cloudflare Workers: vars are on process.env at runtime
-  // Astro dev: vars are on process.env via .env file
-  return (
-    (typeof process !== "undefined" && process.env?.[name]) || undefined
-  );
+/**
+ * Read env vars from Cloudflare runtime env (preferred), then fall back to process.env.
+ * On CF Workers: vars from wrangler.jsonc are in locals.runtime.env, not process.env.
+ * On local dev: vars come from .env via process.env.
+ */
+function getEnvVar(
+  name: string,
+  runtimeEnv?: Record<string, unknown>,
+): string | undefined {
+  // Cloudflare Workers runtime: env vars from wrangler.jsonc / CF dashboard
+  const runtimeVal = runtimeEnv?.[name];
+  if (typeof runtimeVal === "string" && runtimeVal) return runtimeVal;
+
+  // Local dev fallback: .env file loaded into process.env
+  if (typeof process !== "undefined" && process.env?.[name]) {
+    return process.env[name];
+  }
+
+  return undefined;
 }
