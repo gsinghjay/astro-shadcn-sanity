@@ -48,7 +48,7 @@ const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
-<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article">
+<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article" template="detail">
   <!-- Header with breadcrumb, title, status, semester -->
   <Section>
     <SectionContent>
@@ -97,6 +97,9 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
                 <a
                   href={`/sponsors/${sponsorSlug}`}
                   class="text-xl font-semibold text-primary hover:text-primary/80"
+                  data-gtm-category="sponsor"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(sponsor.name)}
                 >
                   {sponsor.name}
                 </a>
@@ -180,7 +183,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
       )}
 
       <!-- Back to Projects -->
-      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-projects">
         &larr; Back to Projects
       </a>
     </SectionContent>

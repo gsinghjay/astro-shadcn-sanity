@@ -2,6 +2,7 @@
 import type { SponsorStepsBlock } from '@/lib/types';
 import CircleCheck from 'lucide-static/icons/circle-check.svg';
 import { Button } from '@/components/ui/button';
+import { stegaClean } from '@sanity/client/stega';
 import { List, ListItem } from '@/components/ui/list';
 import {
   Section,
@@ -37,7 +38,13 @@ const { heading, subheading, items, ctaButtons } = Astro.props;
     <SectionActions>
       {
         ctaButtons?.map((btn, i) => (
-          <Button variant={i === 0 ? 'default' : 'outline'} href={btn.url}>
+          <Button
+            variant={i === 0 ? 'default' : 'outline'}
+            href={btn.url}
+            data-gtm-category="cta"
+            data-gtm-action="click"
+            data-gtm-label={stegaClean(btn.text)}
+          >
             {btn.text}
           </Button>
         ))

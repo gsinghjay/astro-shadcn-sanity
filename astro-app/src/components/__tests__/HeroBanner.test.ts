@@ -64,4 +64,16 @@ describe('HeroBanner', () => {
 
     expect(html).not.toContain('Get Started');
   });
+
+  test('renders GTM tracking attributes on CTA buttons', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HeroBanner, {
+      props: heroFull,
+    });
+
+    expect(html).toContain('data-gtm-category="cta"');
+    expect(html).toContain('data-gtm-action="click"');
+    expect(html).toContain('data-gtm-label="Get Started"');
+    expect(html).toContain('data-gtm-label="Learn More"');
+  });
 });

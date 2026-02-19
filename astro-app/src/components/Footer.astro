@@ -1,5 +1,6 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
 import {
   Footer as FooterUI,
   FooterDescription,
@@ -67,6 +68,8 @@ const addressLine2 = addressLines.slice(2).join(', ');
               rel="noopener"
               aria-label={link.platform}
               class="text-background/60 hover:text-background transition-colors text-xl"
+              data-gtm-category="social"
+              data-gtm-label={stegaClean(link.platform)}
             >
               <Icon href={link.url} />
             </a>
@@ -82,7 +85,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
         <FooterMenu>
           {(programLinks || []).map((item) => (
             <FooterMenuItem>
-              <FooterMenuLink href={item.href} class="text-background/80 hover:text-background transition-colors">{item.label}</FooterMenuLink>
+              <FooterMenuLink href={item.href} class="text-background/80 hover:text-background transition-colors" data-gtm-category="footer" data-gtm-label={stegaClean(item.label)}>{item.label}</FooterMenuLink>
             </FooterMenuItem>
           ))}
         </FooterMenu>
@@ -100,6 +103,8 @@ const addressLine2 = addressLines.slice(2).join(', ');
                 href={item.href}
                 {...(item.external ? { target: '_blank', rel: 'noopener' } : {})}
                 class="text-background/80 hover:text-background transition-colors"
+                data-gtm-category="footer"
+                data-gtm-label={stegaClean(item.label)}
               >{item.label}</FooterMenuLink>
             </FooterMenuItem>
           ))}
@@ -124,12 +129,12 @@ const addressLine2 = addressLines.slice(2).join(', ');
           )}
           {contactInfo?.email && (
             <FooterMenuItem>
-              <FooterMenuLink href={`mailto:${contactInfo.email}`} class="text-background/80 hover:text-background transition-colors">{contactInfo.email}</FooterMenuLink>
+              <FooterMenuLink href={`mailto:${contactInfo.email}`} class="text-background/80 hover:text-background transition-colors" data-gtm-category="footer" data-gtm-label="email">{contactInfo.email}</FooterMenuLink>
             </FooterMenuItem>
           )}
           {contactInfo?.phone && (
             <FooterMenuItem>
-              <FooterMenuLink href={`tel:+1${contactInfo.phone.replace(/\D/g, '')}`} class="text-background/60 hover:text-background/80 text-sm transition-colors">{contactInfo.phone}</FooterMenuLink>
+              <FooterMenuLink href={`tel:+1${contactInfo.phone.replace(/\D/g, '')}`} class="text-background/60 hover:text-background/80 text-sm transition-colors" data-gtm-category="footer" data-gtm-label="phone">{contactInfo.phone}</FooterMenuLink>
             </FooterMenuItem>
           )}
         </FooterMenu>
@@ -147,6 +152,8 @@ const addressLine2 = addressLines.slice(2).join(', ');
             href={item.href}
             {...((item.href || '').startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
             class="text-background/40 hover:text-background text-xs transition-colors"
+            data-gtm-category="footer"
+            data-gtm-label={stegaClean(item.label)}
           >{item.label}</FooterMenuLink>
         </FooterMenuItem>
       ))}

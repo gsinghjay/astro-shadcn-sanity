@@ -47,7 +47,7 @@ const industry = sponsor?.industry ? stegaClean(sponsor.industry) : '';
   <Tile variant="floating" class="border-2 border-border hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-150 h-full">
     <TileContent class="flex flex-col h-full">
       <div class="flex items-start justify-between gap-3 mb-3">
-        <a href={`/projects/${slug}`} class="no-underline text-inherit flex-1">
+        <a href={`/projects/${slug}`} class="no-underline text-inherit flex-1" data-gtm-category="project" data-gtm-label={stegaClean(project.title)}>
           <TileTitle class="text-xl">{project.title}</TileTitle>
         </a>
         {status && (

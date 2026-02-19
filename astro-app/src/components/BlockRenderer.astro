@@ -25,5 +25,5 @@ const { blocks, sponsors = [], testimonials = [], events = [] } = Astro.props;
       : block._type === 'eventList'
         ? { events: resolveBlockEvents(block, events) }
         : {};
-  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth}><Component {...block} {...extraProps} /></BlockWrapper>;
+  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth} blockType={block._type}><Component {...block} {...extraProps} /></BlockWrapper>;
 })}

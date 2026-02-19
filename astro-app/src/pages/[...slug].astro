@@ -60,6 +60,7 @@ if (!visualEditingEnabled) {
   title={page?.title ?? undefined}
   seo={page?.seo}
   hideNav={!visualEditingEnabled && template === 'landing'}
+  template={template}
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>

@@ -45,6 +45,9 @@ const variant = stegaClean(backgroundVariant) ?? 'white';
             href={btn.url}
             variant={i === 0 ? 'default' : (btn.variant || 'outline')}
             class={i === 0 ? primaryBtnMap[variant] : secondaryBtnMap[variant]}
+            data-gtm-category="cta"
+            data-gtm-action="click"
+            data-gtm-label={stegaClean(btn.text)}
           >
             {btn.text}
           </Button>
