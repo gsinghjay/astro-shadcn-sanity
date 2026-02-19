@@ -12,6 +12,7 @@ node_modules/
 
 # logs
 npm-debug.log*
+build-storybook.log
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
