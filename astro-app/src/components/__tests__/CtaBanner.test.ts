@@ -55,4 +55,15 @@ describe('CtaBanner', () => {
     // Primary button should get variant-specific classes (primaryBtnMap['primary'])
     expect(html).toContain('bg-background');
   });
+
+  test('renders GTM tracking attributes on CTA buttons', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(CtaBanner, {
+      props: ctaFull,
+    });
+
+    expect(html).toContain('data-gtm-category="cta"');
+    expect(html).toContain('data-gtm-action="click"');
+    expect(html).toContain('data-gtm-label="Sign Up"');
+  });
 });

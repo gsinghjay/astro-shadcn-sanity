@@ -48,8 +48,7 @@ const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
-<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article">
-  <!-- Header with breadcrumb, title, status, semester -->
+<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article" template="detail">
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
@@ -69,12 +68,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
           <p class="text-muted-foreground text-sm">{project.semester}</p>
         )}
       </div>
-    </SectionContent>
-  </Section>
 
-  <!-- Detail content — single section with tighter spacing -->
-  <Section size="sm">
-    <SectionContent class="gap-y-10">
       <!-- Sponsor -->
       {sponsor && (
         <div>
@@ -97,6 +91,9 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
                 <a
                   href={`/sponsors/${sponsorSlug}`}
                   class="text-xl font-semibold text-primary hover:text-primary/80"
+                  data-gtm-category="sponsor"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(sponsor.name)}
                 >
                   {sponsor.name}
                 </a>
@@ -180,7 +177,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
       )}
 
       <!-- Back to Projects -->
-      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-projects">
         &larr; Back to Projects
       </a>
     </SectionContent>

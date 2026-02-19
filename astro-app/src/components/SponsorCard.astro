@@ -31,7 +31,7 @@ const logoUrl = sponsorLogoUrl(sponsor.logo);
 <Tile variant="floating" class={`${tier.border} border-2 hover:-translate-y-1 hover:shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-150`}>
   <TileContent>
     <div class="flex items-start justify-between gap-4">
-      <a href={`/sponsors/${stegaClean(sponsor.slug)}`} class="flex items-center gap-4 no-underline text-inherit">
+      <a href={`/sponsors/${stegaClean(sponsor.slug)}`} class="flex items-center gap-4 no-underline text-inherit" data-gtm-category="sponsor" data-gtm-action="detail" data-gtm-label={stegaClean(sponsor.name)}>
         <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
           {logoUrl ? (
             <img src={logoUrl} alt={sponsor.logo?.alt || `${sponsor.name} logo`} class="w-full h-full object-cover" loading="lazy" />
@@ -60,6 +60,9 @@ const logoUrl = sponsorLogoUrl(sponsor.logo);
         target="_blank"
         rel="noopener noreferrer"
         class="text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 inline-flex items-center gap-2"
+        data-gtm-category="sponsor"
+        data-gtm-action="external"
+        data-gtm-label={stegaClean(sponsor.name)}
       >
         Visit Website
         <Icon name="lucide:arrow-up-right" class="w-3.5 h-3.5" />

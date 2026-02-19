@@ -70,7 +70,7 @@ const eventJsonLd = {
 };
 ---
 
-<Layout title={event.title ?? 'Event'} seo={{ metaDescription: event.description }}>
+<Layout title={event.title ?? 'Event'} seo={{ metaDescription: event.description }} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(eventJsonLd)} />
 
   <Section>
@@ -120,7 +120,7 @@ const eventJsonLd = {
         </div>
       )}
 
-      <a href="/" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+      <a href="/" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">
         &larr; Back to Events
       </a>
     </SectionContent>

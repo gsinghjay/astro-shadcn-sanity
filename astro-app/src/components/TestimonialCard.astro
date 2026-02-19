@@ -40,7 +40,7 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
     </div>
   </div>
   {t.project && projectSlug && (
-    <a href={`/projects/${projectSlug}`} class="text-xs font-medium text-primary hover:text-primary/80 inline-flex items-center gap-1">
+    <a href={`/projects/${projectSlug}`} class="text-xs font-medium text-primary hover:text-primary/80 inline-flex items-center gap-1" data-gtm-category="testimonial" data-gtm-label={stegaClean(t.name)}>
       {t.project.title}
     </a>
   )}

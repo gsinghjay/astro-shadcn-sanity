@@ -5,9 +5,10 @@ interface Props {
   backgroundVariant?: string | null;
   spacing?: string | null;
   maxWidth?: string | null;
+  blockType?: string;
 }
 
-const { backgroundVariant, spacing, maxWidth } = Astro.props;
+const { backgroundVariant, spacing, maxWidth, blockType } = Astro.props;
 
 const bg = stegaClean(backgroundVariant) ?? 'white';
 const sp = stegaClean(spacing) ?? 'default';
@@ -34,6 +35,6 @@ const maxWidthClasses: Record<string, string> = {
 };
 ---
 
-<div class:list={[bgClasses[bg], spacingClasses[sp], maxWidthClasses[mw]]}>
+<div class:list={[bgClasses[bg], spacingClasses[sp], maxWidthClasses[mw]]} data-gtm-section={blockType}>
   <slot />
 </div>

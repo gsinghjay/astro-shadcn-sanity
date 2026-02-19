@@ -119,4 +119,22 @@ describe('BlockWrapper', () => {
     expect(html).not.toContain('py-');
     expect(html).not.toContain('max-w-');
   });
+
+  test('renders data-gtm-section with blockType', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { blockType: 'heroBanner' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).toContain('data-gtm-section="heroBanner"');
+  });
+
+  test('omits data-gtm-section when blockType not provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: {},
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).not.toContain('data-gtm-section');
+  });
 });
