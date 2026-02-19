@@ -45,9 +45,8 @@ const sponsorJsonLd = {
 };
 ---
 
-<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined}>
+<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
-  <!-- Header with breadcrumb + sponsor info -->
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
@@ -94,6 +93,9 @@ const sponsorJsonLd = {
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-sm hover:text-primary/80"
+              data-gtm-category="sponsor"
+              data-gtm-action="external"
+              data-gtm-label={stegaClean(sponsor.name)}
             >
               Visit Website
               <Icon name="lucide:arrow-up-right" class="w-4 h-4" />
@@ -101,12 +103,7 @@ const sponsorJsonLd = {
           )}
         </div>
       </div>
-    </SectionContent>
-  </Section>
 
-  <!-- Detail content — single section -->
-  <Section size="sm">
-    <SectionContent class="gap-y-10">
       {projects.length > 0 && (
         <div>
           <h2 class="text-2xl font-bold mb-4">Associated Projects</h2>
@@ -116,6 +113,9 @@ const sponsorJsonLd = {
                 <a
                   href={`/projects/${stegaClean(p.slug)}`}
                   class="text-primary hover:text-primary/80 underline"
+                  data-gtm-category="project"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(p.title)}
                 >
                   {p.title}
                 </a>
@@ -125,7 +125,7 @@ const sponsorJsonLd = {
         </div>
       )}
 
-      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-sponsors">
         &larr; Back to Sponsors
       </a>
     </SectionContent>

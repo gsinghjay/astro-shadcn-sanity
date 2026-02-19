@@ -46,7 +46,7 @@ const badgeClass = cleanType ? badgeClasses[cleanType] ?? 'bg-muted text-muted-f
     )}
   </div>
   <h3 class="text-lg font-semibold">
-    <a href={`/events/${stegaClean(e.slug)}`} class="hover:text-primary hover:underline">
+    <a href={`/events/${stegaClean(e.slug)}`} class="hover:text-primary hover:underline" data-gtm-category="event" data-gtm-label={stegaClean(e.title)}>
       {e.title}
     </a>
   </h3>

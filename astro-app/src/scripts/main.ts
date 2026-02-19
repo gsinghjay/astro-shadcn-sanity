@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initContactForm();
   initCarousel();
+  initGtmEvents();
 });
 
 function initScrollAnimations(): void {
@@ -42,6 +43,9 @@ function initContactForm(): void {
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Submit';
+      }
+      if (window.dataLayer) {
+        window.dataLayer.push({ event: 'form_submit', form: { name: 'contact' } });
       }
     }, 1500);
   });
@@ -86,4 +90,38 @@ function initCarousel(): void {
   });
 
   startAutoPlay();
+}
+
+function initGtmEvents(): void {
+  if (!window.dataLayer) return;
+
+  // Form tracking
+  const form = document.querySelector('[data-contact-form]');
+  if (form) {
+    let formStarted = false;
+    form.addEventListener('focusin', () => {
+      if (!formStarted) {
+        formStarted = true;
+        window.dataLayer.push({ event: 'form_start', form: { name: 'contact' } });
+      }
+    });
+  }
+
+  // FAQ accordion tracking
+  document.querySelectorAll('[data-slot="accordion-item"]').forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if ((item as HTMLDetailsElement).open) {
+        const question = item.querySelector('[data-slot="accordion-trigger"]')?.textContent?.trim() || '';
+        window.dataLayer.push({ event: 'faq_expand', faq: { question } });
+      }
+    });
+  });
+
+  // Carousel dot tracking
+  document.querySelectorAll('[data-dot]').forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = (dot as HTMLElement).dataset.dot;
+      window.dataLayer.push({ event: 'carousel_navigate', carousel: { index: Number(index) } });
+    });
+  });
 }

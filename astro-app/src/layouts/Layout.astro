@@ -21,6 +21,7 @@ interface Props {
   seo?: SeoProps | null;
   hideNav?: boolean;
   ogType?: string;
+  template?: string;
 }
 
 const siteSettings = await getSiteSettings();
@@ -32,6 +33,7 @@ const {
   seo,
   hideNav = false,
   ogType,
+  template = 'default',
 } = Astro.props;
 
 const cleanTitle = stegaClean(title);
@@ -97,6 +99,19 @@ const orgJsonLd = {
         j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer',gtmId);
+      </script>
+    )}
+    {gtmId && (
+      <script define:vars={{ pagePath: Astro.url.pathname, pageTitle: fullTitle, pageTemplate: template }}>
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: 'page_view',
+          page: {
+            path: pagePath,
+            title: pageTitle,
+            template: pageTemplate
+          }
+        });
       </script>
     )}
   </head>

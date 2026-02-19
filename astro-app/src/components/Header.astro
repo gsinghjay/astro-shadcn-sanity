@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
+import { stegaClean } from '@sanity/client/stega';
 
 const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo } = settings;
@@ -43,6 +44,8 @@ const brandSecondary = nameParts.slice(1).join(' ');
             ? 'text-primary'
             : 'text-foreground hover:text-primary',
         ]}
+        data-gtm-category="navigation"
+        data-gtm-label={stegaClean(item.label)}
       >
         {item.label}
       </a>
@@ -50,7 +53,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
   </nav>
 
   <HeaderActions>
-    <Button href={ctaHref} class="hidden md:inline-flex">{ctaText}</Button>
+    <Button href={ctaHref} class="hidden md:inline-flex" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
     <div class="md:hidden">
       <Sheet>
         <SheetTrigger variant="ghost" size="icon">
@@ -68,12 +71,14 @@ const brandSecondary = nameParts.slice(1).join(' ');
                   'text-lg font-bold uppercase tracking-wider py-2',
                   currentPath === item.href ? 'text-primary' : 'text-foreground',
                 ]}
+                data-gtm-category="navigation"
+                data-gtm-label={stegaClean(item.label)}
               >
                 {item.label}
               </a>
             ))}
             <Separator class="my-2" />
-            <Button href={ctaHref} class="w-full justify-center">{ctaText}</Button>
+            <Button href={ctaHref} class="w-full justify-center" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
           </nav>
         </SheetContent>
       </Sheet>
