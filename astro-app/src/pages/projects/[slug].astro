@@ -49,7 +49,6 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
 <Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article" template="detail">
-  <!-- Header with breadcrumb, title, status, semester -->
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
@@ -69,12 +68,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
           <p class="text-muted-foreground text-sm">{project.semester}</p>
         )}
       </div>
-    </SectionContent>
-  </Section>
 
-  <!-- Detail content — single section with tighter spacing -->
-  <Section size="sm">
-    <SectionContent class="gap-y-10">
       <!-- Sponsor -->
       {sponsor && (
         <div>

@@ -47,7 +47,6 @@ const sponsorJsonLd = {
 
 <Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
-  <!-- Header with breadcrumb + sponsor info -->
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
@@ -104,12 +103,7 @@ const sponsorJsonLd = {
           )}
         </div>
       </div>
-    </SectionContent>
-  </Section>
 
-  <!-- Detail content — single section -->
-  <Section size="sm">
-    <SectionContent class="gap-y-10">
       {projects.length > 0 && (
         <div>
           <h2 class="text-2xl font-bold mb-4">Associated Projects</h2>
