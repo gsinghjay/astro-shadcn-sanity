@@ -71,6 +71,9 @@ const industry = sponsor?.industry ? stegaClean(sponsor.industry) : '';
           <a
             href={`/sponsors/${sponsorSlug}`}
             class="text-sm text-primary hover:text-primary/80 font-medium no-underline"
+            data-gtm-category="sponsor"
+            data-gtm-action="detail"
+            data-gtm-label={stegaClean(sponsor.name)}
           >
             {sponsor.name}
           </a>
