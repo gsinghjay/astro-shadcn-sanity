@@ -50,6 +50,7 @@ const { class: className, fields, submit, ...props } = Astro.props
 
 <form
   method="POST"
+  novalidate
   class={cn("flex w-full max-w-2xl flex-col gap-6", className)}
   {...props}
 >
@@ -71,8 +72,7 @@ const { class: className, fields, submit, ...props } = Astro.props
               <FieldLabel for={id}>{label}</FieldLabel>
               <NativeSelect id={id} name={name} {...select}>
                 <NativeSelectOption
-                  value={placeholder}
-                  id={placeholder}
+                  value=""
                   disabled
                   selected
                 >

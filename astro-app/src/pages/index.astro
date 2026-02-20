@@ -3,6 +3,8 @@ import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
 import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '../lib/sanity';
+import { urlFor } from '../lib/image';
+import type { Image } from '@sanity/types';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
@@ -21,9 +23,18 @@ if (!visualEditingEnabled) {
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
 }
+
+// Extract first hero image for <link rel="preload"> (LCP optimization)
+const firstBlock = page?.blocks?.[0];
+const heroImage = firstBlock?._type === 'heroBanner'
+  ? (firstBlock as { backgroundImages?: Array<{ asset?: { _id: string } | null }> }).backgroundImages?.[0]
+  : null;
+const preloadImageUrl = heroImage?.asset
+  ? urlFor(heroImage as unknown as Image).width(1920).height(1080).fit('crop').url()
+  : undefined;
 ---
 
-<Layout title={page?.title ?? undefined} seo={page?.seo}>
+<Layout title={page?.title ?? undefined} seo={page?.seo} preloadImage={preloadImageUrl}>
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug="home">
       <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
