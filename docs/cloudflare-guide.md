@@ -53,9 +53,12 @@ Visitor → Cloudflare CDN (static HTML from edge cache)
 | **Access / Zero Trust** | Active | Auth gate for `/portal/*` |
 | **Deploy Hook** | Active | Sanity webhook triggers production rebuild |
 | **Build Cache** | Active (beta) | Faster rebuilds (~45-75s warm) |
-| **D1** | Planned (Story 9.8) | Portal database (RSVPs, agreements) |
-| **KV** | Planned (Story 9.5) | Site health summary index |
+| **D1** | Planned (Story 9.8) | Portal database (RSVPs, agreements, notification prefs) |
+| **KV** | Planned (Stories 9.5, 9.13) | Site health index + notification storage |
 | **R2** | Planned (Story 9.5) | Lighthouse/Pa11y report storage |
+| **Queues** | Planned (Story 9.13) | Async notification creation pipeline |
+| **Analytics Engine** | Planned (Stories 9.9, 9.15) | Portal activity tracking + admin analytics |
+| **Cron Triggers** | Planned (Story 9.13) | Daily event reminder notifications |
 | **Turnstile** | Planned | Bot protection for contact form |
 
 ### Key Files
@@ -412,6 +415,39 @@ D1 limits reset daily at 00:00 UTC. Exceeding them blocks all queries until rese
 | Class B ops (reads) | 10,000,000/month |
 | Egress | Free (always) |
 
+### Queues
+
+| Resource | Limit |
+|:---------|:------|
+| Operations (read + write + delete) | 10,000/day |
+| Queues per account | 10,000 |
+| Message size | 128 KB |
+| Message retention | 24 hours (free) / 14 days (paid) |
+| Consumer batch size | 100 messages max |
+| Consumer batch timeout | 60 seconds max |
+
+Queues are available on the free plan (added Feb 2026). Queue consumers must be standalone Workers — Pages Functions can only produce to queues.
+
+### Analytics Engine
+
+| Resource | Limit |
+|:---------|:------|
+| Data points written | 100,000/day |
+| SQL API read queries | 10,000/day |
+| Data retention | 31 days |
+| Index columns | 1 (string) |
+| Blob columns | 20 (string) |
+| Double columns | 20 (numeric) |
+
+**Key advantage:** SQL API reads run on Cloudflare's infrastructure via HTTP (`api.cloudflare.com`), NOT inside your Worker. This means aggregations (GROUP BY, SUM, COUNT) consume zero Worker CPU time and zero D1 rows-read budget. Writes via `writeDataPoint()` are fire-and-forget I/O calls from Workers.
+
+### Cron Triggers
+
+| Resource | Limit |
+|:---------|:------|
+| Cron Triggers per account | 5 (free) / 250 (paid) |
+| CPU time per invocation | 10 ms (same as Workers) |
+
 ### Access (Zero Trust)
 
 | Resource | Limit |
@@ -501,15 +537,19 @@ Some stories exceed free-tier limits and were descoped or deferred:
 | 9.6 — Site Health Dashboard | **IN** | Low-traffic, minimal R2/KV reads |
 | 9.7 — Submission Dashboard | **PARTIAL** | Submissions panel only; GA4 engagement panel deferred |
 | 9.8 — D1 Setup | **REDUCED** | 4 tables instead of 6 (removed `portal_activity`) |
-| 9.9 — Activity Tracking | **DESCOPED** | Replaced with GTM/GA4 (client-side, $0) |
+| 9.9 — Activity Tracking | **UN-DESCOPED** | Analytics Engine replaces D1 — `writeDataPoint()` is I/O, SQL API reads run outside Worker |
 | 9.10 — Event RSVPs | **IN** | Low D1 volume (~100 writes/semester) |
 | 9.11 — Evaluations | **DEFERRED** | Low priority for MVP |
 | 9.12 — Agreement Signatures | **IN** | One-time writes, legally required |
-| 9.13 — Notifications | **DEFERRED** | Cross-cutting D1 reads on every page load |
+| 9.13 — Notifications | **UN-DEFERRED** | Queues + KV replace D1 — single KV read per page load, Queue for async creation |
 | 9.14 — Multi-Provider Auth | **IN** | Dashboard config only |
-| 9.15 — Admin Analytics | **DESCOPED** | Full table scans blow through rows-read limit |
+| 9.15 — Admin Analytics | **UN-DESCOPED** | Analytics Engine SQL API replaces D1 GROUP BY — aggregations run on CF infra, not Worker |
 
-The $5/month Workers Paid plan removes all daily limits and unlocks every descoped story with zero architectural changes.
+Three previously blocked stories were un-descoped/un-deferred (2026-02-20) by replacing D1 with purpose-built free services:
+- **9.9 + 9.15:** Workers Analytics Engine (writes from Worker, reads via HTTP SQL API — zero D1 pressure)
+- **9.13:** Cloudflare Queues + KV (async notification pipeline, single-key reads instead of D1 table queries)
+
+The $5/month Workers Paid plan removes all remaining daily limits and unlocks Story 9.11 (Evaluations) with zero architectural changes.
 
 ---
 
