@@ -1,0 +1,73 @@
+---
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
+
+interface Props {
+  image: {
+    asset?: {
+      _id: string;
+      url?: string | null;
+      metadata?: {
+        lqip?: string | null;
+        dimensions?: { width: number; height: number; aspectRatio: number } | null;
+      } | null;
+    } | null;
+    alt?: string | null;
+    hotspot?: { x: number; y: number; width: number; height: number } | null;
+    crop?: { top: number; bottom: number; left: number; right: number } | null;
+  };
+  width: number;
+  height: number;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  decoding?: 'async' | 'sync' | 'auto';
+  sizes?: string;
+}
+
+const {
+  image,
+  width,
+  height,
+  class: className,
+  loading = 'lazy',
+  fetchpriority,
+  decoding = 'async',
+  sizes,
+} = Astro.props;
+
+const lqip = image.asset?.metadata?.lqip;
+const alt = image.alt || '';
+
+const optimizedUrl = image.asset
+  ? urlFor(image as unknown as Image).width(width).height(height).fit('crop').url()
+  : '';
+---
+
+{lqip ? (
+  <div style={`background-image: url(${lqip}); background-size: cover;`}>
+    <img
+      src={optimizedUrl}
+      alt={alt}
+      width={width}
+      height={height}
+      loading={loading}
+      fetchpriority={fetchpriority}
+      decoding={decoding}
+      sizes={sizes}
+      class={className}
+    />
+  </div>
+) : (
+  <img
+    src={optimizedUrl}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding={decoding}
+    sizes={sizes}
+    class={className}
+  />
+)}

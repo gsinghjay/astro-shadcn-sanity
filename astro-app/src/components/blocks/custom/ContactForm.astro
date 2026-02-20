@@ -1,11 +1,8 @@
 ---
 import type { ContactFormBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
 import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
-import { Field, FieldLabel, FieldContent } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
-import { Button } from '@/components/ui/button';
+import { AutoForm } from '@/components/ui/auto-form';
 import { Icon } from '@/components/ui/icon';
 
 interface Props extends ContactFormBlock {
@@ -13,23 +10,58 @@ interface Props extends ContactFormBlock {
   id?: string;
 }
 
-const { heading, description, successMessage } = Astro.props;
+const { heading, description, successMessage, form } = Astro.props;
 
-interface FormField {
-  _key: string;
-  name: string;
-  label: string;
-  type: 'text' | 'email' | 'textarea' | 'select';
-  required: boolean;
-  placeholder?: string;
-  options?: string[];
-}
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const formId = form?._id ?? '';
 
-const formFields: FormField[] = [
-  { _key: 'f1', name: 'name', label: 'Full Name', type: 'text', required: true },
-  { _key: 'f2', name: 'email', label: 'Email', type: 'email', required: true },
-  { _key: 'f3', name: 'message', label: 'Message', type: 'textarea', required: true },
-];
+// Map Sanity formField[] → AutoForm Field[] with stegaClean on logic-critical values
+const mappedFields = form?.fields?.map((field) => {
+  const fieldType = stegaClean(field.type) ?? 'text';
+  const fieldName = stegaClean(field.name) ?? '';
+  const placeholder = stegaClean(field.options?.placeholder) ?? '';
+
+  const base = {
+    label: field.label ?? '',
+    name: fieldName,
+    required: field.required ?? false,
+    placeholder,
+  };
+
+  // Map select/radio choices to string arrays for AutoForm
+  if (fieldType === 'select') {
+    return {
+      ...base,
+      type: 'select' as const,
+      options: field.choices?.map((c) => stegaClean(c.value) || stegaClean(c.label) || '') ?? [],
+    };
+  }
+
+  if (fieldType === 'radio') {
+    return {
+      ...base,
+      type: 'radio-group' as const,
+      options: field.choices?.map((c) => stegaClean(c.value) || stegaClean(c.label) || '') ?? [],
+    };
+  }
+
+  if (fieldType === 'checkbox') {
+    return { ...base, type: 'checkbox' as const };
+  }
+
+  if (fieldType === 'textarea') {
+    return { ...base, type: 'textarea' as const, rows: 5 };
+  }
+
+  // text, email, tel, number, url, etc. → map to AutoForm input types
+  const inputType = (['text', 'email', 'tel', 'number'] as const).includes(fieldType as 'text' | 'email' | 'tel' | 'number')
+    ? (fieldType as 'text' | 'email' | 'tel' | 'number')
+    : 'text';
+
+  return { ...base, type: inputType };
+}) ?? [];
+
+const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
 ---
 
 <Section data-animate>
@@ -43,55 +75,18 @@ const formFields: FormField[] = [
       )}
     </SectionContent>
 
-    <form data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
-      <div data-form-fields class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {formFields.map((field) => {
-          const isFullWidth = field.type === 'textarea' || field.type === 'select';
-          return (
-            <Field class={isFullWidth ? 'md:col-span-2' : ''}>
-              <FieldLabel for={field.name}>
-                {field.label}
-                {field.required && <span class="text-primary ml-1">*</span>}
-              </FieldLabel>
-              <FieldContent>
-                {field.type === 'textarea' ? (
-                  <Textarea
-                    id={field.name}
-                    name={field.name}
-                    required={field.required}
-                    placeholder={field.placeholder || ''}
-                    rows={5}
-                  />
-                ) : field.type === 'select' ? (
-                  <div class="w-full [&_[data-slot=native-select-wrapper]]:w-full">
-                    <NativeSelect id={field.name} name={field.name} required={field.required} class="w-full">
-                      <NativeSelectOption value="">Select an option</NativeSelectOption>
-                      {field.options?.map((opt) => (
-                        <NativeSelectOption value={opt}>{opt}</NativeSelectOption>
-                      ))}
-                    </NativeSelect>
-                  </div>
-                ) : (
-                  <Input
-                    id={field.name}
-                    type={field.type as 'text' | 'email'}
-                    name={field.name}
-                    required={field.required}
-                    placeholder={field.placeholder || ''}
-                  />
-                )}
-              </FieldContent>
-            </Field>
-          );
-        })}
-
-        <div class="md:col-span-2 pt-2">
-          <Button type="submit" class="w-full md:w-auto">Submit Inquiry</Button>
-        </div>
+    <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
+      <div data-form-fields>
+        <AutoForm fields={mappedFields} submit={submitText}>
+          <input type="hidden" name="form_id" value={formId} />
+          <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
+        </AutoForm>
       </div>
 
       <div
         data-form-success
+        role="status"
+        aria-live="polite"
         class="text-center py-12"
       >
         <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
@@ -100,6 +95,93 @@ const formFields: FormField[] = [
         <h3 class="text-2xl font-bold mb-3">Inquiry Received</h3>
         <p class="text-muted-foreground">{successMessage || 'Thank you for your inquiry. We will get back to you shortly.'}</p>
       </div>
-    </form>
+
+      <div data-form-error role="alert" class="text-destructive text-sm font-medium mt-4">
+        Something went wrong. Please try again.
+      </div>
+    </div>
   </SectionSplit>
 </Section>
+
+<style>
+  [data-contact-form] [data-form-success] { display: none; }
+  [data-contact-form][data-form-state="success"] [data-form-fields] { display: none; }
+  [data-contact-form][data-form-state="success"] [data-form-success] { display: block; }
+  [data-contact-form] [data-form-error] { display: none; }
+  [data-contact-form] [data-form-error][data-visible] { display: block; }
+</style>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" is:inline async defer></script>
+
+<script>
+  import { actions, isInputError } from 'astro:actions';
+
+  document.querySelectorAll<HTMLElement>('[data-contact-form]').forEach((wrapper) => {
+    const form = wrapper.querySelector('form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+      const errorEl = wrapper.querySelector('[data-form-error]');
+
+      // Client-side validation (quick feedback — Zod handles server-side)
+      let valid = true;
+      form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((f) => {
+        const errId = `${f.name}-error`;
+        if (!f.value.trim()) {
+          f.setAttribute('aria-invalid', 'true');
+          f.setAttribute('aria-describedby', errId);
+          valid = false;
+        } else {
+          f.removeAttribute('aria-invalid');
+          f.removeAttribute('aria-describedby');
+        }
+      });
+      const emailField = form.querySelector<HTMLInputElement>('[type="email"]');
+      if (emailField?.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
+        emailField.setAttribute('aria-invalid', 'true');
+        emailField.setAttribute('aria-describedby', `${emailField.name}-error`);
+        valid = false;
+      }
+      if (!valid) {
+        form.querySelector<HTMLElement>('[aria-invalid]')?.focus();
+        return;
+      }
+
+      // Submit via Astro Action
+      const originalText = btn?.textContent ?? '';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+      }
+      errorEl?.removeAttribute('data-visible');
+
+      const { error } = await actions.submitForm(new FormData(form));
+
+      if (error) {
+        if (isInputError(error)) {
+          Object.entries(error.fields).forEach(([field, _messages]) => {
+            const input = form.querySelector<HTMLElement>(`[name="${field}"]`);
+            if (input) {
+              input.setAttribute('aria-invalid', 'true');
+              input.setAttribute('aria-describedby', `${field}-error`);
+            }
+          });
+          form.querySelector<HTMLElement>('[aria-invalid]')?.focus();
+        } else {
+          errorEl?.setAttribute('data-visible', '');
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = originalText;
+        }
+      } else {
+        wrapper.dataset.formState = 'success';
+        if (window.dataLayer) {
+          window.dataLayer.push({ event: 'form_submit', form: { name: 'contact' } });
+        }
+      }
+    });
+  });
+</script>

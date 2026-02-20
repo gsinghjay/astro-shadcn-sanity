@@ -41,17 +41,16 @@ type Field = {
 )
 
 interface Props extends HTMLAttributes<"form"> {
-  inbox?: string
   fields?: Field[]
   submit?: string
 }
 
-const { class: className, inbox, fields, submit, ...props } = Astro.props
+const { class: className, fields, submit, ...props } = Astro.props
 ---
 
 <form
   method="POST"
-  data-netlify="true"
+  novalidate
   class={cn("flex w-full max-w-2xl flex-col gap-6", className)}
   {...props}
 >
@@ -73,8 +72,7 @@ const { class: className, inbox, fields, submit, ...props } = Astro.props
               <FieldLabel for={id}>{label}</FieldLabel>
               <NativeSelect id={id} name={name} {...select}>
                 <NativeSelectOption
-                  value={placeholder}
-                  id={placeholder}
+                  value=""
                   disabled
                   selected
                 >
@@ -128,8 +126,5 @@ const { class: className, inbox, fields, submit, ...props } = Astro.props
     })
   }
   <slot />
-  {inbox && <input type="hidden" name="inbox_key" value={inbox} />}
-  <input type="text" name="_gotcha" class="hidden" />
-  <input type="text" name="Pagina" class="hidden" value={Astro.url.pathname} />
   <Button type="submit">{submit}</Button>
 </form>

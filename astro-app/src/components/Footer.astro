@@ -1,6 +1,8 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
 import {
   Footer as FooterUI,
   FooterDescription,
@@ -28,7 +30,14 @@ const {
   socialLinks,
 } = settings;
 
-const footerLogoUrl = logoLight?.asset?.url || '/logos/njit-logo-plain-light.svg';
+let footerLogoUrl = '/logos/njit-logo-plain-light.svg';
+if (logoLight?.asset) {
+  try {
+    footerLogoUrl = urlFor(logoLight as unknown as Image).width(160).height(40).fit('max').url();
+  } catch {
+    footerLogoUrl = logoLight.asset.url || footerLogoUrl;
+  }
+}
 const footerLogoAlt = logoLight?.alt || 'NJIT';
 
 // Split siteName for footer display

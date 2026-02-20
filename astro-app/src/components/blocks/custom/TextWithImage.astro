@@ -3,6 +3,8 @@ import type { TextWithImageBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
 
 interface Props extends TextWithImageBlock {
   class?: string;
@@ -11,7 +13,10 @@ interface Props extends TextWithImageBlock {
 
 const { heading, content, image, imagePosition } = Astro.props;
 const isRight = stegaClean(imagePosition) !== 'left';
-const imgSrc = image?.asset?.url;
+const imgSrc = image?.asset
+  ? urlFor(image as unknown as Image).width(800).height(600).fit('crop').url()
+  : null;
+const lqip = image?.asset?.metadata?.lqip;
 ---
 
 <Section data-animate>
@@ -28,14 +33,29 @@ const imgSrc = image?.asset?.url;
     </SectionContent>
 
     <SectionMedia class={`aspect-[4/3] ${!isRight ? '@lg:order-first' : ''}`}>
-      {imgSrc && (
+      {imgSrc && lqip ? (
+        <div style={`background-image: url(${lqip}); background-size: cover;`}>
+          <img
+            src={imgSrc}
+            alt={image?.alt || heading || ''}
+            width={800}
+            height={600}
+            class="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : imgSrc ? (
         <img
           src={imgSrc}
           alt={image?.alt || heading || ''}
+          width={800}
+          height={600}
           class="w-full h-full object-cover"
           loading="lazy"
+          decoding="async"
         />
-      )}
+      ) : null}
     </SectionMedia>
   </SectionSplit>
 </Section>
