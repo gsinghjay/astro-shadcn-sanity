@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
-  initContactForm();
   initCarousel();
   initGtmEvents();
 });
@@ -20,34 +19,6 @@ function initScrollAnimations(): void {
 
   document.querySelectorAll('[data-animate]').forEach((el) => {
     observer.observe(el);
-  });
-}
-
-function initContactForm(): void {
-  const form = document.querySelector('[data-contact-form]') as HTMLFormElement | null;
-  if (!form) return;
-
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
-    const successMsg = form.querySelector('[data-form-success]') as HTMLElement | null;
-
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = 'Sending...';
-    }
-
-    setTimeout(() => {
-      form.dataset.formState = 'success';
-      if (btn) {
-        btn.disabled = false;
-        btn.textContent = 'Submit';
-      }
-      if (window.dataLayer) {
-        window.dataLayer.push({ event: 'form_submit', form: { name: 'contact' } });
-      }
-    }, 1500);
   });
 }
 

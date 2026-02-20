@@ -23,10 +23,22 @@ describe("urlFor", () => {
     expect(url).toContain("test-dataset");
   });
 
+  test("auto-applies format optimization (auto=format) by default", () => {
+    const url = urlFor(validSource).url();
+    expect(url).toContain("auto=format");
+  });
+
   test("supports builder chaining (width, height, format)", () => {
     const url = urlFor(validSource).width(400).height(300).format("webp").url();
     expect(url).toContain("w=400");
     expect(url).toContain("h=300");
     expect(url).toContain("fm=webp");
+  });
+
+  test("auto=format works with width/height chaining", () => {
+    const url = urlFor(validSource).width(1920).height(1080).url();
+    expect(url).toContain("auto=format");
+    expect(url).toContain("w=1920");
+    expect(url).toContain("h=1080");
   });
 });
