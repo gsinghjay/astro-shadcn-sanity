@@ -50,7 +50,7 @@
 - [Git Workflow Guide](./team/git-workflow-guide.md) — Branch strategy and PR process
 - [GitHub Issues & Projects Guide](./team/github-issues-and-projects-guide.md) — Issue tracking and project management
 - [Professional Development](./team/professional-development.md) — Resume and LinkedIn presentation guide
-- [Cloudflare Setup Guide](./team/cloudflare-setup-guide.md) — Cloudflare Pages deployment setup
+- [Cloudflare Guide](./cloudflare-guide.md) — Pages deployment, Access auth, free tier limits, monitoring
 - [Docker Dev Setup](./team/docker-dev-setup.md) — Containerized development environment
 - [Storybook-Figma Integration](./team/storybook-figma-integration-guide.md) — Design-to-code integration
 - [fulldev/ui to Sanity Conversion Guide](./team/fulldev-ui-to-sanity-conversion-guide.md) — Step-by-step block conversion

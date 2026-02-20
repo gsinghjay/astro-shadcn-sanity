@@ -549,7 +549,7 @@ The main site is deployed to **Cloudflare Pages** via git integration — not Gi
 - **Push to `main`** → Production deployment (static output, Visual Editing OFF)
 - **Push to any branch / PR** → Preview deployment with unique URL (SSR, Visual Editing ON)
 
-Environment variables are configured in the **Cloudflare Pages dashboard**, not in GitHub secrets. See [Cloudflare Setup Guide](cloudflare-setup-guide.md) for full details.
+Environment variables are configured in the **Cloudflare Pages dashboard**, not in GitHub secrets. See [Cloudflare Guide](../cloudflare-guide.md#6-environment-variables) for full details.
 
 ### Sanity Studio
 
@@ -572,7 +572,7 @@ Read these documents as you ramp up:
 | [git-workflow-guide.md](git-workflow-guide.md) | Before your first commit (branch strategy, conventional commits, releases) |
 | [storybook-constitution.md](../storybook-constitution.md) | Before any Storybook work |
 | [project-context.md](../project-context.md) | Before writing any code (95 critical rules) |
-| [cloudflare-setup-guide.md](cloudflare-setup-guide.md) | When working with deployment or environment variables |
+| [cloudflare-guide.md](../cloudflare-guide.md) | When working with deployment, auth, or environment variables |
 
 Planning artifacts live in `_bmad-output/`:
 
