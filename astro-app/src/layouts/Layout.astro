@@ -14,6 +14,7 @@ interface Props {
   hideNav?: boolean;
   ogType?: string;
   template?: string;
+  preloadImage?: string;
 }
 
 const siteSettings = await getSiteSettings();
@@ -26,6 +27,7 @@ const {
   hideNav = false,
   ogType,
   template = 'default',
+  preloadImage,
 } = Astro.props;
 
 const cleanTitle = stegaClean(title);
@@ -83,6 +85,7 @@ const orgJsonLd = {
       content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.sanity.io wss://*.sanity.io; font-src 'self'; frame-src 'self' https://www.googletagmanager.com"
     />
     <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <title>{fullTitle}</title>
     {gtmId && (
       <script define:vars={{ gtmId }}>

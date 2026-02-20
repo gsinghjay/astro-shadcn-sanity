@@ -7,12 +7,21 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/co
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
 
 const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo } = settings;
 const currentPath = Astro.url.pathname;
 
-const logoUrl = logo?.asset?.url || '/logos/njit-logo-plain.svg';
+let logoUrl = '/logos/njit-logo-plain.svg';
+if (logo?.asset) {
+  try {
+    logoUrl = urlFor(logo as unknown as Image).width(160).height(40).fit('max').url();
+  } catch {
+    logoUrl = logo.asset.url || logoUrl;
+  }
+}
 const logoAlt = logo?.alt || 'NJIT';
 const ctaText = ctaButton?.text || 'Become a Sponsor';
 const ctaHref = ctaButton?.url || '/contact';

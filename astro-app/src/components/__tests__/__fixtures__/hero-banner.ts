@@ -16,11 +16,26 @@ export const heroFull: HeroBannerBlock = {
     {
       _key: 'img-1',
       asset: {
-        _id: 'image-test-1',
-        url: 'https://cdn.sanity.io/images/test/test/test.jpg',
-        metadata: { lqip: null, dimensions: null },
+        _id: 'image-test1-1920x1080-jpg',
+        url: 'https://cdn.sanity.io/images/test/test/test1-1920x1080.jpg',
+        metadata: {
+          lqip: 'data:image/jpeg;base64,/9j/2wBDAAYEBQY',
+          dimensions: { width: 1920, height: 1080, aspectRatio: 1.7778 },
+        },
       },
       alt: 'Test background',
+    },
+    {
+      _key: 'img-2',
+      asset: {
+        _id: 'image-test2-1920x1080-jpg',
+        url: 'https://cdn.sanity.io/images/test/test/test2-1920x1080.jpg',
+        metadata: {
+          lqip: 'data:image/jpeg;base64,/9j/4AAQSkZJRg',
+          dimensions: { width: 1920, height: 1080, aspectRatio: 1.7778 },
+        },
+      },
+      alt: 'Second slide',
     },
   ],
   alignment: 'center',
