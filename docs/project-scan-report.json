@@ -1,43 +1,430 @@
 {
-  "workflow_version": "1.2.0",
+  "workflow_version": "2.0.0",
+  "scan_method": "parallel_agent_team",
+  "agent_count": 6,
   "timestamps": {
-    "started": "2026-02-13T00:00:00Z",
-    "last_updated": "2026-02-13T00:15:00Z",
-    "completed": "2026-02-13T00:15:00Z"
+    "started": "2026-02-20T06:04:00Z",
+    "last_updated": "2026-02-20T06:21:00Z",
+    "completed": "2026-02-20T06:21:00Z"
+  },
+  "previous_scan": {
+    "date": "2026-02-13T00:00:00Z",
+    "version": "1.2.0"
   },
   "mode": "full_rescan",
   "scan_level": "exhaustive",
   "project_root": "/home/jay/github/astro-shadcn-sanity",
   "output_folder": "/home/jay/github/astro-shadcn-sanity/docs",
-  "completed_steps": [
-    {"step": "step_1", "status": "completed", "timestamp": "2026-02-13T00:01:00Z", "summary": "Classified as monorepo with 2 parts: astro-app (web frontend, Astro 5.17 SSG), studio (web CMS admin, Sanity v5.9)"},
-    {"step": "step_2", "status": "completed", "timestamp": "2026-02-13T00:02:00Z", "summary": "Found 134+ existing docs across root, docs/ (26), tests/ (1), _bmad-output/ (104+), studio/ (1), .github/workflows/ (7)"},
-    {"step": "step_3", "status": "completed", "timestamp": "2026-02-13T00:03:00Z", "summary": "Tech stack: Astro 5.17 + Sanity v5.9 + Tailwind 4.1 + React 19.2 + fulldev/ui + Storybook 10 + Vitest 3.2 + Playwright 1.58"},
-    {"step": "step_4", "status": "completed", "timestamp": "2026-02-13T00:06:00Z", "summary": "Exhaustive analysis: 507 component files, 12 custom blocks, ~100 UI variants, ~39 UI primitives, 22 schema types, 3 GROQ queries"},
-    {"step": "step_5", "status": "completed", "timestamp": "2026-02-13T00:07:00Z", "summary": "Source tree documented with all critical folders and 8 entry points annotated"},
-    {"step": "step_6", "status": "completed", "timestamp": "2026-02-13T00:08:00Z", "summary": "Dev/deployment guides: Docker + native setup, 7 CI/CD workflows, Conventional Commits, Cloudflare Pages deployment"},
-    {"step": "step_7", "status": "completed", "timestamp": "2026-02-13T00:09:00Z", "summary": "Integration architecture: 5 integration points (content delivery, visual editing, schema sharing/TypeGen, shared deps, CI/CD)"},
-    {"step": "step_8", "status": "completed", "timestamp": "2026-02-13T00:10:00Z", "summary": "Architecture doc written covering system design, block lifecycle, template system, data architecture, design system, testing, deployment"},
-    {"step": "step_9", "status": "completed", "timestamp": "2026-02-13T00:12:00Z", "summary": "All supporting docs written: project-overview, component-inventory, data-models, development-guide, source-tree-analysis"},
-    {"step": "step_10", "status": "completed", "timestamp": "2026-02-13T00:13:00Z", "summary": "Master index generated with links to 7 generated docs + 30+ existing docs organized by category"},
-    {"step": "step_11", "status": "completed", "timestamp": "2026-02-13T00:14:00Z", "summary": "Validation complete: no incomplete markers found, all files verified on disk"},
-    {"step": "step_12", "status": "completed", "timestamp": "2026-02-13T00:15:00Z", "summary": "Workflow complete"}
-  ],
-  "current_step": "completed",
-  "project_types": [
-    {"part_id": "astro-app", "project_type_id": "web", "display_name": "Astro Frontend (SSG)"},
-    {"part_id": "studio", "project_type_id": "web", "display_name": "Sanity CMS Studio"}
-  ],
-  "findings": {
-    "project_classification": "Monorepo (npm workspaces), 2 parts, TypeScript/Astro+Sanity, v1.4.0",
-    "existing_docs_count": 134,
-    "technology_stack": "Astro 5.17 + Sanity v5.9 + Tailwind 4.1 + React 19.2 + fulldev/ui + Storybook 10 + Vitest 3.2 + Playwright 1.58",
-    "components": "507 total: 12 custom blocks, ~100 UI variants, ~39 UI primitives, 7 layout, 5 templates",
-    "schemas": "22 types: 3 documents (page, siteSettings, sponsor), 11 blocks, 8 objects",
-    "tests": "19 unit/component tests, 19 integration tests (241 cases), 4 E2E specs (34 cases, 5 browser projects)",
-    "integration_points": "Content delivery (GROQ API), Visual editing (Presentation Tool), Schema sharing (TypeGen), Shared deps (npm workspaces), CI/CD (7 GitHub Actions workflows)",
-    "ci_cd": "7 workflows: CI, release, storybook deploy, sanity deploy, sync preview, 2 branch enforcement"
+
+  "project_classification": {
+    "name": "ywcc-capstone-template",
+    "version": "1.7.0",
+    "type": "monorepo",
+    "package_manager": "npm workspaces",
+    "language": "TypeScript",
+    "parts": [
+      {"part_id": "astro-app", "name": "app", "version": "0.0.1", "type": "web_frontend", "framework": "Astro 5.17 SSG", "display_name": "Astro Frontend (SSG + selective SSR)"},
+      {"part_id": "studio", "name": "ywcc-capstone-studio", "version": "1.0.0", "type": "cms_admin", "framework": "Sanity Studio v5.10", "display_name": "Sanity CMS Studio"},
+      {"part_id": "discord-bot", "name": "discord-bot", "version": null, "type": "standalone", "framework": "Java/Maven", "display_name": "Discord Bot (not in npm workspace)"}
+    ]
   },
+
+  "technology_stack": {
+    "frontend": {
+      "astro": "^5.17.1",
+      "react": "^19.2.4",
+      "typescript": "^5.9.3",
+      "vite": "^7.3.1",
+      "tailwindcss": "^4.1.18",
+      "tailwind_typography": "^0.5.19",
+      "tailwind_vite": "^4.1.18",
+      "tw_animate_css": "^1.4.0"
+    },
+    "cms": {
+      "sanity": "^5.10.0",
+      "sanity_astro": "^3.2.11",
+      "sanity_visual_editing": "^5.2.1",
+      "sanity_image_url": "^1.2.0",
+      "sanity_vision": "^5.10.0",
+      "groq": "^5.8.1"
+    },
+    "ui": {
+      "shadcn_style": "new-york",
+      "fulldev_ui_registry": "https://ui.full.dev/r/{name}.json",
+      "class_variance_authority": "^0.7.1",
+      "clsx": "^2.1.1",
+      "tailwind_merge": "^3.4.0",
+      "iconify_lucide": "^1.2.89",
+      "iconify_simple_icons": "^1.2.69",
+      "portable_text_html": "^5.0.1",
+      "astro_portabletext": "^0.10.0"
+    },
+    "deployment": {
+      "cloudflare_adapter": "^12.6.12",
+      "wrangler": "^4.63.0",
+      "worker_name": "ywcc-capstone",
+      "compatibility_date": "2025-12-01",
+      "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
+      "output_mode": "static",
+      "auth": "Cloudflare Access (Zero Trust) via jose ^6.1.3"
+    },
+    "testing": {
+      "vitest": "^3.2.1",
+      "vitest_coverage_v8": "^3.2.1",
+      "playwright": "^1.58.2",
+      "axe_core_playwright": "^4.11.1",
+      "storybook": "^10.2.7",
+      "storybook_astro": "^0.1.0",
+      "chromatic": "^15.1.1",
+      "lighthouse_ci": "^0.15.1"
+    },
+    "tooling": {
+      "eslint": "^9.38.0",
+      "prettier": "^3.6.2",
+      "concurrently": "^9.1.0",
+      "semantic_release": "conventional commits",
+      "node_ci": "22 (most workflows), 24 (release)",
+      "node_docker": "24-slim"
+    }
+  },
+
+  "infrastructure": {
+    "scripts": {
+      "root": ["dev", "dev:storybook", "test", "test:unit", "test:e2e", "test:chromium", "test:headed", "test:ui", "storybook", "typegen"],
+      "astro_app": ["dev", "start", "build", "check", "preview", "astro", "storybook", "build-storybook", "deploy", "test:unit", "test:unit:watch", "test:unit:coverage"],
+      "studio": ["dev", "start", "build", "deploy", "deploy-graphql", "schema:extract", "schema:deploy", "typegen"]
+    },
+    "ci_cd": {
+      "platform": "GitHub Actions",
+      "workflows": [
+        {"file": "ci.yml", "name": "CI", "trigger": "pull_request to preview", "purpose": "Unit tests + Lighthouse CI"},
+        {"file": "release.yml", "name": "Release", "trigger": "push to main", "purpose": "Semantic Release (changelog, git tag, GitHub release)"},
+        {"file": "deploy-storybook.yml", "name": "Deploy Storybook", "trigger": "push to main (path-filtered) + manual", "purpose": "Build & deploy Storybook to GitHub Pages"},
+        {"file": "enforce-preview-branch.yml", "name": "Enforce Preview Branch", "trigger": "pull_request to main", "purpose": "Block PRs to main unless from preview"},
+        {"file": "enforce-preview-source.yml", "name": "Enforce Preview Source", "trigger": "pull_request to preview", "purpose": "Block PRs from main to preview"},
+        {"file": "sanity-deploy.yml", "name": "Sanity Content Deploy", "trigger": "repository_dispatch: sanity-content-published", "purpose": "Build Astro + deploy to Cloudflare Pages"},
+        {"file": "sync-preview.yml", "name": "Sync preview with main", "trigger": "workflow_run after Release", "purpose": "Merge main into preview + Discord webhook"}
+      ],
+      "branch_strategy": "feature -> preview -> main (preview gates main, auto-sync back after release)"
+    },
+    "docker": {
+      "main_dockerfile": "Dockerfile (node:24-slim, 3 targets: dev-astro, dev-studio, dev-storybook)",
+      "compose": "docker-compose.yml (3 services: astro-app:4321, studio:3333, storybook:6006 via profile)",
+      "discord_bot_dockerfile": "discord-bot/Dockerfile (Maven 3.9, Eclipse Temurin 25 Alpine, multi-stage)"
+    },
+    "mcp_servers": ["cloudflare", "cloudflare-bindings", "cloudflare-builds", "cloudflare-observe"],
+    "env_vars": {
+      "astro_app": ["PUBLIC_SANITY_STUDIO_PROJECT_ID", "PUBLIC_SANITY_STUDIO_DATASET", "PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "SANITY_API_READ_TOKEN", "PUBLIC_GTM_ID", "PUBLIC_SANITY_STUDIO_URL", "PUBLIC_SITE_URL", "CF_ACCESS_TEAM_DOMAIN", "CF_ACCESS_AUD"],
+      "studio": ["SANITY_STUDIO_PROJECT_ID", "SANITY_STUDIO_DATASET", "SANITY_STUDIO_STUDIO_HOST", "SANITY_STUDIO_PREVIEW_ORIGIN"]
+    }
+  },
+
+  "frontend": {
+    "pages": {
+      "total": 9,
+      "static_ssg": 7,
+      "ssr": 2,
+      "routes": [
+        {"route": "/", "file": "src/pages/index.astro", "rendering": "SSG"},
+        {"route": "/[...slug]", "file": "src/pages/[...slug].astro", "rendering": "SSG"},
+        {"route": "/sponsors", "file": "src/pages/sponsors/index.astro", "rendering": "SSG"},
+        {"route": "/sponsors/[slug]", "file": "src/pages/sponsors/[slug].astro", "rendering": "SSG"},
+        {"route": "/projects", "file": "src/pages/projects/index.astro", "rendering": "SSG"},
+        {"route": "/projects/[slug]", "file": "src/pages/projects/[slug].astro", "rendering": "SSG"},
+        {"route": "/events/[slug]", "file": "src/pages/events/[slug].astro", "rendering": "SSG"},
+        {"route": "/portal", "file": "src/pages/portal/index.astro", "rendering": "SSR"},
+        {"route": "/portal/api/me", "file": "src/pages/portal/api/me.ts", "rendering": "SSR"}
+      ]
+    },
+    "layouts": {
+      "total": 8,
+      "base": ["Layout.astro"],
+      "extended": ["SidebarLayout.astro", "PortalLayout.astro"],
+      "templates": ["DefaultTemplate.astro", "FullWidthTemplate.astro", "LandingTemplate.astro", "SidebarTemplate.astro", "TwoColumnTemplate.astro"]
+    },
+    "components": {
+      "total_files": 508,
+      "custom_blocks": 13,
+      "ui_blocks_generic": 101,
+      "ui_primitive_families": 39,
+      "top_level_components": 14,
+      "portal_components": 5,
+      "categories": {
+        "custom_blocks": ["HeroBanner", "FeatureGrid", "CtaBanner", "StatsRow", "TextWithImage", "LogoCloud", "SponsorSteps", "RichText", "FaqSection", "ContactForm", "SponsorCards", "Testimonials", "EventList"],
+        "ui_block_categories": {
+          "hero": 14, "cta": 8, "services": 7, "features": 6, "content": 6,
+          "reviews": 5, "products": 5, "videos": 4, "faqs": 4, "blocks": 4,
+          "articles": 4, "video": 3, "steps": 3, "stats": 3, "pricings": 3,
+          "logos": 3, "header": 3, "footer": 3, "contact": 3, "links": 2,
+          "images": 2, "banner": 2, "article": 2, "table": 1, "product": 1
+        },
+        "ui_primitives": ["accordion", "alert", "auto-form", "avatar", "badge", "banner", "button", "checkbox", "collapsible", "empty", "field", "footer", "header", "icon", "image", "input", "item", "label", "list", "logo", "marquee", "native-carousel", "native-select", "navigation-menu", "price", "radio-group", "rating", "section", "separator", "sheet", "sidebar", "skeleton", "spinner", "table", "tabs", "textarea", "theme-toggle", "tile", "video"],
+        "portal": ["PortalCard.tsx", "PortalIcon.tsx", "PortalSkeleton.tsx"]
+      }
+    },
+    "lib_utilities": {
+      "total_files": 5,
+      "files": [
+        {"file": "lib/utils.ts", "exports": ["cn()"]},
+        {"file": "lib/image.ts", "exports": ["urlFor()"]},
+        {"file": "lib/auth.ts", "exports": ["validateAccessJWT()"]},
+        {"file": "lib/types.ts", "exports": ["Page", "SiteSettings", "PageBlock", "all block types", "SeoProps"]},
+        {"file": "lib/sanity.ts", "exports": ["loadQuery()", "getSiteSettings()", "getAllSponsors()", "getSponsorBySlug()", "getAllProjects()", "getProjectBySlug()", "getAllTestimonials()", "getAllEvents()", "getEventBySlug()", "getPage()", "prefetchPages()", "resolveBlockSponsors()", "resolveBlockTestimonials()", "resolveBlockEvents()"]}
+      ]
+    },
+    "client_side_js": {
+      "astro_islands": 1,
+      "island_details": "VisualEditingMPA (client:only='react', conditional on visual editing)",
+      "server_islands": 1,
+      "server_island_details": "SanityPageContent (server:defer with fallback skeleton)",
+      "inline_scripts": 3,
+      "script_details": ["main.ts (scroll animations, contact form, carousel, GTM events)", "project filter (client-side tech/industry filtering)", "portal GTM (portal_landing_view event)"]
+    },
+    "middleware": {
+      "file": "src/middleware.ts",
+      "purpose": "Cloudflare Access JWT auth for /portal/* routes",
+      "bypass": "dev mode sets mock user"
+    },
+    "styling": {
+      "framework": "Tailwind CSS v4 (CSS-first config)",
+      "global_css": "src/styles/global.css (231 lines)",
+      "theme": "Swiss design tokens (swiss-red, swiss-black) + NJIT colors (njit-red, njit-navy, njit-gold)",
+      "dark_mode": "CSS variables (:root + .dark)",
+      "typography_plugin": true
+    },
+    "public_assets": 8,
+    "content_collections": "none (all content from Sanity GROQ API)",
+    "storybook_stories": 153
+  },
+
+  "sanity": {
+    "project_id": "49nk9b0w",
+    "dataset": "production",
+    "organization_id": "oaon9MlgI",
+    "project_name": "YWCC Capstone Spring 2026",
+    "members": 12,
+    "studio_app_id": "zi1cig2o607y1js5cfoyird6",
+    "api_version": "2025-03-01",
+    "schema": {
+      "total_types": 27,
+      "document_types": {
+        "count": 6,
+        "types": [
+          {"name": "page", "fields": 5, "key_fields": "title, slug, template (5 variants), seo, blocks (13 block types)", "notes": "Page builder with template-block compatibility validation"},
+          {"name": "siteSettings", "fields": 13, "key_fields": "siteName, siteDescription, logo, logoLight, ctaButton, navigationItems, footerContent, socialLinks, contactInfo, footerLinks, resourceLinks, programLinks, currentSemester", "notes": "Singleton"},
+          {"name": "sponsor", "fields": 8, "key_fields": "name, slug, logo, description, website, industry, tier, featured"},
+          {"name": "project", "fields": 10, "key_fields": "title, slug, sponsor (ref), status, semester, content (PT), outcome, team, mentor, technologyTags"},
+          {"name": "testimonial", "fields": 7, "key_fields": "name, quote, role, organization, type, photo, project (ref)"},
+          {"name": "event", "fields": 8, "key_fields": "title, slug, date, endDate, location, description, eventType, status"}
+        ]
+      },
+      "object_types": {
+        "count": 8,
+        "types": ["seo", "portableText", "button", "link", "featureItem", "faqItem", "stepItem", "statItem"]
+      },
+      "block_types": {
+        "count": 13,
+        "shared_fields": "blockBaseFields (backgroundVariant, spacing, maxWidth)",
+        "types": ["heroBanner", "featureGrid", "ctaBanner", "statsRow", "textWithImage", "logoCloud", "sponsorSteps", "richText", "faqSection", "contactForm", "sponsorCards", "testimonials", "eventList"]
+      }
+    },
+    "reference_graph": {
+      "project_to_sponsor": "project.sponsor -> sponsor",
+      "testimonial_to_project": "testimonial.project -> project",
+      "logoCloud_to_sponsor": "logoCloud.sponsors[] -> sponsor (conditional)",
+      "sponsorCards_to_sponsor": "sponsorCards.sponsors[] -> sponsor (conditional)",
+      "testimonials_block_to_testimonial": "testimonials.testimonials[] -> testimonial (conditional)",
+      "portableText_to_page": "portableText internalLink annotation -> page"
+    },
+    "groq_queries": {
+      "total": 13,
+      "location": "astro-app/src/lib/sanity.ts",
+      "all_use_defineQuery": true,
+      "queries": [
+        "SITE_SETTINGS_QUERY", "ALL_PAGE_SLUGS_QUERY", "PAGE_BY_SLUG_QUERY",
+        "ALL_SPONSORS_QUERY", "ALL_SPONSOR_SLUGS_QUERY", "SPONSOR_BY_SLUG_QUERY",
+        "ALL_PROJECTS_QUERY", "ALL_PROJECT_SLUGS_QUERY", "PROJECT_BY_SLUG_QUERY",
+        "ALL_TESTIMONIALS_QUERY", "ALL_EVENTS_QUERY", "ALL_EVENT_SLUGS_QUERY",
+        "EVENT_BY_SLUG_QUERY"
+      ]
+    },
+    "typegen": {
+      "output": "astro-app/src/sanity.types.ts",
+      "lines": 1387,
+      "scan_pattern": "../astro-app/src/**/*.{ts,tsx,js,jsx}"
+    },
+    "visual_editing": {
+      "presentation_tool": true,
+      "stega": true,
+      "mpa_history_adapter": true,
+      "server_islands": true,
+      "component": "VisualEditingMPA.tsx (client:only='react')"
+    },
+    "portable_text": {
+      "styles": ["normal", "h2", "h3", "h4", "blockquote"],
+      "decorators": ["strong", "em", "code", "underline"],
+      "annotations": ["link (external)", "internalLink (ref to page)"],
+      "lists": ["bullet", "number"],
+      "custom_blocks": ["image (with alt + caption)", "callout (tone + text)"],
+      "renderer": "astro-portabletext (default renderers, no custom overrides)"
+    },
+    "content_lake": {
+      "total_documents": 68,
+      "user_documents": 40,
+      "by_type": {
+        "sanity.imageAsset": 24,
+        "testimonial": 10,
+        "page": 8,
+        "sponsor": 7,
+        "project": 7,
+        "event": 7,
+        "siteSettings": 1,
+        "post_orphan": 1
+      },
+      "anomalies": [
+        "1 orphan 'post' document — type not in schema, likely leftover from template",
+        "Stale 'sanity-template-astro-clean' workspace schema (22 types vs 27 in default) — should be cleaned up"
+      ]
+    },
+    "schema_drift": {
+      "default_workspace": "NO DRIFT — all 27 types match local code",
+      "stale_workspace": "sanity-template-astro-clean missing 5 types: project, testimonial, event, testimonials block, eventList block"
+    }
+  },
+
+  "testing": {
+    "summary": {
+      "total_test_files": 48,
+      "total_test_cases": 563,
+      "storybook_stories": 153,
+      "browser_projects": 5
+    },
+    "layers": {
+      "unit": {
+        "runner": "Vitest",
+        "files": 3,
+        "test_cases": 52,
+        "location": "astro-app/src/lib/__tests__/",
+        "covers": ["cn() utility", "GROQ query definitions (13 queries)", "loadQuery()", "data fetching functions", "cache behavior", "urlFor() image builder"]
+      },
+      "component": {
+        "runner": "Vitest + Astro Container API",
+        "files": 18,
+        "test_cases": 122,
+        "location": "astro-app/src/components/__tests__/",
+        "covers": ["BlockRenderer", "BlockWrapper", "Breadcrumb", "ContactForm", "CtaBanner", "EventList", "FaqSection", "FeatureGrid", "Header (GTM only)", "HeroBanner", "LogoCloud", "ProjectCard", "RichText", "SponsorCards", "SponsorSteps", "StatsRow", "Testimonials", "TextWithImage"],
+        "fixtures": 15,
+        "fixture_location": "astro-app/src/components/__tests__/__fixtures__/"
+      },
+      "ssr_smoke": {
+        "runner": "Vitest + Miniflare",
+        "files": 3,
+        "test_cases": 27,
+        "location": "astro-app/src/cloudflare/__tests__/",
+        "covers": ["Worker response validation", "Build output structure", "Wrangler config parsing"]
+      },
+      "integration": {
+        "runner": "Vitest",
+        "files": 19,
+        "test_cases": 339,
+        "location": "tests/integration/",
+        "covers": ["Block schemas", "Cloudflare deploy config", "Homepage data", "Link schema", "Migration validation", "Schema documents/helpers/registration", "Site settings wiring", "Sponsor schema", "Storybook config", "Page templates"]
+      },
+      "e2e": {
+        "runner": "Playwright",
+        "files": 5,
+        "test_cases": 23,
+        "effective_with_browsers": 115,
+        "location": "tests/e2e/",
+        "browser_matrix": ["chromium", "firefox", "webkit", "mobile-chrome (Pixel 7)", "mobile-safari (iPhone 14)"],
+        "covers": ["Smoke (load, a11y, SEO, nav, performance)", "All pages (200 status, blocks, console, a11y)", "Homepage Sanity content", "Site settings (header, footer, copyright)", "GTM dataLayer"]
+      }
+    },
+    "storybook": {
+      "total_stories": 153,
+      "breakdown": {
+        "ui_primitives": 38,
+        "ui_blocks_generic": 101,
+        "custom_sanity_blocks": 13,
+        "other": 1
+      },
+      "framework": "storybook-astro",
+      "deployment": "GitHub Pages"
+    },
+    "coverage_config": {
+      "provider": "v8",
+      "includes": ["src/lib/**/*.ts", "src/scripts/**/*.ts"],
+      "reporters": ["text", "html", "lcov"],
+      "output": "test-results/unit-coverage/"
+    },
+    "gaps": {
+      "components_without_tests": ["Footer.astro", "SanityPageContent.astro", "BreadcrumbItem.astro", "block.astro", "TestimonialCard.astro", "SponsorCard.astro", "EventCard.astro"],
+      "pages_without_dedicated_tests": ["sponsors/[slug]", "projects/[slug]", "events/[slug]", "portal/index"],
+      "other_gaps": [
+        "No Vitest coverage for src/scripts/ (client-side JS)",
+        "No tests for layout files (src/layouts/)",
+        "No E2E tests for events pages",
+        "No E2E tests for portal page",
+        "No lint/format CI enforcement (no scripts, no pre-commit hooks)",
+        "Header.test.ts only has 2 GTM-specific tests — no nav rendering tests"
+      ]
+    }
+  },
+
+  "astro_patterns": {
+    "current_patterns": {
+      "output_mode": "static with selective SSR (prerender = false)",
+      "server_islands": "SanityPageContent with server:defer + fallback skeletons",
+      "middleware": "defineMiddleware for Cloudflare Access JWT auth",
+      "client_islands": "1 only (VisualEditingMPA, client:only='react')",
+      "api_endpoints": "1 (portal/api/me.ts)",
+      "container_api": "Used in all 18 component tests",
+      "typed_cloudflare_bindings": true,
+      "minimal_client_js": true
+    },
+    "recommendations": [
+      {"feature": "astro:env", "priority": "HIGH", "status": "not_used", "benefit": "Type-safe env vars, replace manual fallback logic across 6+ files"},
+      {"feature": "MPA View Transitions", "priority": "MODERATE", "status": "not_used", "benefit": "Zero-JS CSS-only page transitions for polish"},
+      {"feature": "Content Collections with Sanity Loader", "priority": "EVALUATE", "status": "not_used", "benefit": "Build-time caching + Zod validation, but typegen already provides types"},
+      {"feature": "Sessions API", "priority": "MODERATE_FUTURE", "status": "not_used", "benefit": "Portal user state when features expand"},
+      {"feature": "Astro Actions", "priority": "LOW", "status": "not_used", "benefit": "Type-safe server functions, but only 1 API endpoint currently"},
+      {"feature": "Live Content Collections", "priority": "SKIP", "status": "not_used", "benefit": "Experimental, redundant with current server islands approach"}
+    ],
+    "deprecated_patterns_found": "none",
+    "architecture_quality": "Follows current Astro 5 best practices well. Main gap is environment variable management."
+  },
+
+  "changes_since_last_scan": {
+    "previous_scan_date": "2026-02-13",
+    "notable_changes": [
+      "Version: 1.4.0 -> 1.7.0 (3 releases)",
+      "Components: 507 -> 508 total files",
+      "Schema types: 22 -> 27 in previous count (was undercounting; actual local schema has been 27 for a while)",
+      "GROQ queries: 3 -> 13 (previous scan dramatically undercounted)",
+      "Tests: ~274 previously counted -> 563 test cases (previous scan undercounted integration tests)",
+      "Storybook stories: not previously counted -> 153",
+      "New docs consolidation: 29 files replaced by GitHub wiki",
+      "New: Figma/Storybook capture scripts added",
+      "New: 3 Cloudflare docs consolidated into single cloudflare-guide.md",
+      "CI Node: workflows still on Node 22 (most), 24 (release)"
+    ]
+  },
+
+  "findings_summary": {
+    "project_classification": "Monorepo (npm workspaces), 3 parts, TypeScript/Astro+Sanity+Java, v1.7.0",
+    "technology_stack": "Astro 5.17 + Sanity 5.10 + Tailwind 4.1 + React 19.2 + fulldev/ui + Storybook 10.2 + Vitest 3.2 + Playwright 1.58",
+    "components": "508 total: 13 custom blocks, 101 UI block variants, 39 UI primitive families, 14 top-level, 5 portal",
+    "schemas": "27 types: 6 documents, 8 objects, 13 blocks (live schema in sync with local code)",
+    "queries": "13 GROQ queries (all defineQuery), module-level caching, Visual Editing support",
+    "tests": "563 test cases across 48 files (52 unit, 122 component, 27 SSR smoke, 339 integration, 23 E2E x5 browsers)",
+    "stories": "153 Storybook stories",
+    "content": "40 user documents + 24 image assets in Content Lake",
+    "ci_cd": "7 GitHub Actions workflows, Cloudflare Pages deployment, Semantic Release",
+    "deployment": "Cloudflare Pages (static), Sanity hosted Studio, GitHub Pages (Storybook)",
+    "anomalies": ["1 orphan 'post' document in Content Lake", "1 stale workspace schema (sanity-template-astro-clean)"],
+    "key_recommendations": ["Adopt astro:env for type-safe env vars", "Consider MPA View Transitions", "Clean up orphan post document", "Remove stale workspace schema", "Add pre-commit hooks / lint CI enforcement", "Add E2E tests for events and portal pages"]
+  },
+
   "outputs_generated": [
     "project-scan-report.json",
     "index.md",
@@ -49,5 +436,13 @@
     "development-guide.md",
     "integration-architecture.md"
   ],
-  "resume_instructions": "Workflow completed successfully"
+  "documentation_workflow": {
+    "method": "parallel_agent_team",
+    "writer_count": 7,
+    "total_output_bytes": 148529,
+    "docs_generated": 8,
+    "scan_agents": 6,
+    "total_agents_used": 13
+  },
+  "resume_instructions": "Workflow completed successfully. All documentation generated and indexed."
 }

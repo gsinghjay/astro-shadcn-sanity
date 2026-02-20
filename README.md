@@ -449,7 +449,7 @@ Deployed automatically via Cloudflare Pages git integration:
 - **Push to `main`** → Production (static, Visual Editing OFF)
 - **Push to any branch** → Preview URL (SSR, Visual Editing ON)
 
-Environment variables are configured in the [Cloudflare Pages dashboard](https://dash.cloudflare.com/). See [docs/team/cloudflare-setup-guide.md](docs/team/cloudflare-setup-guide.md).
+Environment variables are configured in the [Cloudflare Pages dashboard](https://dash.cloudflare.com/). See [docs/cloudflare-guide.md](docs/cloudflare-guide.md#6-environment-variables).
 
 ### Sanity Studio
 
@@ -520,7 +520,7 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 |---|---|
 | [Git Workflow Guide](docs/team/git-workflow-guide.md) | Before your first commit |
 | [Onboarding Guide](docs/team/onboarding-guide.md) | First day setup |
-| [Cloudflare Setup Guide](docs/team/cloudflare-setup-guide.md) | Deployment and environment variables |
+| [Cloudflare Guide](docs/cloudflare-guide.md) | Deployment, authentication, and environment variables |
 | [How Preview & Publish Works](docs/team/how-preview-and-publish-works.md) | Visual Editing and draft content |
 | [fulldev/ui to Sanity Conversion Guide](docs/team/fulldev-ui-to-sanity-conversion-guide.md) | Wiring template blocks to the CMS (Stories 2.4–2.8) |
 

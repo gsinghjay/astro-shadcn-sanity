@@ -3,6 +3,8 @@ import type { HeroBannerBlock } from '@/lib/types';
 import { Section, SectionContent, SectionActions } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
 
 interface Props extends HeroBannerBlock {
   class?: string;
@@ -17,20 +19,33 @@ const hasCarousel = backgroundImages && backgroundImages.length > 0;
 <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
   {hasCarousel && (
     <div class="hero-carousel absolute inset-0" data-carousel>
-      {backgroundImages?.map((image, index) => (
-        <div
-          class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
-          data-slide={index}
-          data-state={index === 0 ? 'active' : 'inactive'}
-        >
-          <img
-            src={image.asset?.url || ''}
-            alt={image.alt || `Slide ${index + 1}`}
-            class="w-full h-full object-cover"
-          />
-          <div class="absolute inset-0 bg-foreground/60"></div>
-        </div>
-      ))}
+      {backgroundImages?.map((image, index) => {
+        const lqip = image.asset?.metadata?.lqip;
+        const optimizedUrl = image.asset
+          ? urlFor(image as unknown as Image).width(1920).height(1080).fit('crop').url()
+          : '';
+        const isFirst = index === 0;
+        return (
+          <div
+            class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
+            data-slide={index}
+            data-state={isFirst ? 'active' : 'inactive'}
+            style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+          >
+            <img
+              src={optimizedUrl}
+              alt={image.alt || `Slide ${index + 1}`}
+              width={1920}
+              height={1080}
+              loading={isFirst ? 'eager' : 'lazy'}
+              fetchpriority={isFirst ? 'high' : undefined}
+              decoding="async"
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute inset-0 bg-foreground/60"></div>
+          </div>
+        );
+      })}
       <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         {backgroundImages?.map((_, index) => (
           <button

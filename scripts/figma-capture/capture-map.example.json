@@ -1,0 +1,12 @@
+[
+  {
+    "title": "UI/Button",
+    "storyId": "ui-button--default",
+    "captureId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  },
+  {
+    "title": "UI/Badge",
+    "storyId": "ui-badge--default",
+    "captureId": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
+  }
+]

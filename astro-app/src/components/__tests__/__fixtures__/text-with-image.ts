@@ -17,7 +17,14 @@ export const textWithImageFull: TextWithImageBlock = {
     },
   ],
   image: {
-    asset: { _id: 'img-twi', url: 'https://cdn.sanity.io/test/story.jpg', metadata: null },
+    asset: {
+      _id: 'image-story123-1200x900-jpg',
+      url: 'https://cdn.sanity.io/images/test/test/story123-1200x900.jpg',
+      metadata: {
+        lqip: 'data:image/jpeg;base64,/9j/2wBDAAkGBw',
+        dimensions: { width: 1200, height: 900, aspectRatio: 1.3333 },
+      },
+    },
     alt: 'Team photo',
   },
   imagePosition: 'right',

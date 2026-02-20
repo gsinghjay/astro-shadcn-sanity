@@ -106,6 +106,7 @@ function astroVirtualModuleStubs(): Plugin {
     'virtual:astro:assets/fonts/runtime': 'export {};',
     'virtual:astro:assets/fonts/internal': 'export {};',
     'sanity:client': `export const sanityClient = { config() { return { projectId: 'storybook', dataset: 'production', apiVersion: '2025-03-01' }; }, fetch() { return Promise.resolve({ result: null }); } };`,
+    'astro:actions': `export const actions = new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }); export function isInputError() { return false; }; export class ActionError extends Error { constructor(opts) { super(opts?.message); this.code = opts?.code; } }; export function defineAction(opts) { return opts?.handler || (() => {}); };`,
   }
 
   return {
