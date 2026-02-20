@@ -43,7 +43,7 @@ const formFields: FormField[] = [
       )}
     </SectionContent>
 
-    <form data-contact-form class="border-2 border-foreground p-8 md:p-12">
+    <form data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
       <div data-form-fields class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {formFields.map((field) => {
           const isFullWidth = field.type === 'textarea' || field.type === 'select';

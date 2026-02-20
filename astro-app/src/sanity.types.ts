@@ -1020,6 +1020,28 @@ export type ALL_EVENTS_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_EVENT_SLUGS_QUERY
+// Query: *[_type == "event" && defined(slug.current)]{ "slug": slug.current }
+export type ALL_EVENT_SLUGS_QUERY_RESULT = Array<{
+  slug: string | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: EVENT_BY_SLUG_QUERY
+// Query: *[_type == "event" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status}
+export type EVENT_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  date: string | null;
+  endDate: string | null;
+  location: string | null;
+  description: string | null;
+  eventType: "networking" | "showcase" | "workshop" | null;
+  status: "past" | "upcoming" | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
 // Query: *[_type == "page" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{...},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{...}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer }    },    _type == "contactForm" => {      heading,      description,      successMessage    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
@@ -1358,6 +1380,8 @@ declare module "@sanity/client" {
     '*[_type == "project" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial"] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "event"] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status\n}': ALL_EVENTS_QUERY_RESULT;
+    '*[_type == "event" && defined(slug.current)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
+    '*[_type == "event" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status\n}': EVENT_BY_SLUG_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

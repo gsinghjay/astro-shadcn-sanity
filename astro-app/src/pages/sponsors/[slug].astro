@@ -33,13 +33,23 @@ function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
 
 const logoUrl = sponsorLogoUrl(sponsor.logo);
 const projects = sponsor.projects ?? [];
+
+const sponsorJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": Astro.url.href,
+  "name": stegaClean(sponsor.name),
+  ...(sponsor.website && { "url": stegaClean(sponsor.website) }),
+  ...(sponsor.description && { "description": stegaClean(sponsor.description) }),
+  ...(logoUrl && { "logo": logoUrl }),
+};
 ---
 
-<Layout title={sponsor.name ?? 'Sponsor'}>
-  <!-- Header with breadcrumb + sponsor info -->
+<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined} template="detail">
+  <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
   <Section>
     <SectionContent>
-      <Breadcrumb items={[
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
         { label: 'Sponsors', href: '/sponsors' },
         { label: sponsor.name ?? 'Sponsor' },
@@ -83,6 +93,9 @@ const projects = sponsor.projects ?? [];
               target="_blank"
               rel="noopener noreferrer"
               class="inline-flex items-center gap-2 text-primary font-bold uppercase tracking-wider text-sm hover:text-primary/80"
+              data-gtm-category="sponsor"
+              data-gtm-action="external"
+              data-gtm-label={stegaClean(sponsor.name)}
             >
               Visit Website
               <Icon name="lucide:arrow-up-right" class="w-4 h-4" />
@@ -90,12 +103,7 @@ const projects = sponsor.projects ?? [];
           )}
         </div>
       </div>
-    </SectionContent>
-  </Section>
 
-  <!-- Detail content — single section -->
-  <Section size="sm">
-    <SectionContent class="gap-y-10">
       {projects.length > 0 && (
         <div>
           <h2 class="text-2xl font-bold mb-4">Associated Projects</h2>
@@ -105,6 +113,9 @@ const projects = sponsor.projects ?? [];
                 <a
                   href={`/projects/${stegaClean(p.slug)}`}
                   class="text-primary hover:text-primary/80 underline"
+                  data-gtm-category="project"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(p.title)}
                 >
                   {p.title}
                 </a>
@@ -114,7 +125,7 @@ const projects = sponsor.projects ?? [];
         </div>
       )}
 
-      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm">
+      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-sponsors">
         &larr; Back to Sponsors
       </a>
     </SectionContent>

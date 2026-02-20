@@ -1,0 +1,82 @@
+---
+export const prerender = false;
+
+import PortalLayout from "@/layouts/PortalLayout.astro";
+import PortalCard from "@/components/portal/PortalCard";
+import PortalSkeleton from "@/components/portal/PortalSkeleton";
+
+const user = Astro.locals.user;
+
+// TODO (Story 9.2): Look up sponsor by email
+// const sponsor = await loadQuery(SPONSOR_BY_EMAIL_QUERY, { email: user?.email });
+// if (sponsor) throw Astro.redirect(`/portal/${sponsor.slug}`);
+
+const cards = [
+  {
+    title: "My Projects",
+    description: "View your sponsored capstone projects, student teams, and technologies used",
+    icon: "lucide:folder",
+    href: "/portal/projects",
+    disabled: true,
+    story: "9.2",
+  },
+  {
+    title: "Project Progress",
+    description: "Track milestones, sprint updates, deliverables, and student presentations",
+    icon: "lucide:git-pull-request",
+    href: "/portal/progress",
+    disabled: true,
+    story: "9.2",
+  },
+  {
+    title: "Events & Schedule",
+    description: "Capstone showcases, networking events, workshops, and RSVP with reminders",
+    icon: "lucide:calendar",
+    href: "/portal/events",
+    disabled: true,
+    story: "9.3",
+  },
+  {
+    title: "My Sponsorship",
+    description: "Sponsorship tier, agreements, expectations, and program contact information",
+    icon: "lucide:handshake",
+    href: "/portal/sponsorship",
+    disabled: true,
+    story: "9.4",
+  },
+];
+---
+
+<PortalLayout title="Sponsor Portal" activeNav="/portal/">
+  <div class="flex flex-col gap-8">
+    {/* Welcome heading */}
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-bold tracking-tight">Welcome to the Sponsor Portal</h1>
+      <p class="text-muted-foreground">
+        Signed in as <strong>{user?.email ?? "unknown"}</strong>
+      </p>
+    </div>
+
+    {/* Skeleton placeholder cards — no client directive, SSR-only */}
+    <div class="grid gap-6 sm:grid-cols-2">
+      {cards.map((card) => (
+        <PortalCard
+          title={card.title}
+          description={card.description}
+          icon={card.icon}
+          href={card.href}
+          disabled={card.disabled}
+          badge="Coming Soon"
+        >
+          <PortalSkeleton lines={2} />
+        </PortalCard>
+      ))}
+    </div>
+  </div>
+</PortalLayout>
+
+{/* GTM: portal landing page view */}
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "portal_landing_view" });
+</script>

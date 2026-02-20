@@ -1,0 +1,15 @@
+# Requires: cp .env.example .env  (fill in BOT_TOKEN)
+
+services:
+  discord-bot:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    env_file:
+      - .env
+
+volumes:
+  maven_cache:

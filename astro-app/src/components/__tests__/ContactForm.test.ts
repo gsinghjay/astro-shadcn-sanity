@@ -52,4 +52,13 @@ describe('ContactForm', () => {
 
     expect(html).toContain('data-contact-form');
   });
+
+  test('renders GTM form tracking attribute', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('data-gtm-form="contact"');
+  });
 });

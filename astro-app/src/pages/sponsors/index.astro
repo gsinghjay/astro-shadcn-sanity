@@ -7,7 +7,7 @@ import SponsorCard from '@/components/SponsorCard.astro';
 const sponsors = await getAllSponsors();
 ---
 
-<Layout title="Sponsors">
+<Layout title="Sponsors" seo={{ metaDescription: 'Meet the industry sponsors partnering with YWCC to provide real-world capstone project experiences for students.' }}>
   <Section>
     <SectionContent>
       <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Our Sponsors</h1>

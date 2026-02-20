@@ -1,0 +1,212 @@
+---
+/**
+ * Portal layout — extends Layout with a left sidebar navigation.
+ * Sidebar LEFT, content RIGHT (opposite of SidebarLayout).
+ * Mobile: sidebar collapses into a Sheet drawer.
+ *
+ * Props:
+ *   title     — page <title>
+ *   seo       — SEO overrides
+ *   activeNav — pathname to highlight in sidebar (defaults to current URL)
+ */
+import Layout from "./Layout.astro";
+import { Icon } from "@/components/ui/icon";
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import type { PortalNavItem } from "@/components/portal/types";
+import type { SeoProps } from "@/lib/types";
+
+interface Props {
+  title?: string;
+  seo?: SeoProps | null;
+  activeNav?: string;
+}
+
+const { title = "Sponsor Portal", seo, activeNav } = Astro.props;
+const user = Astro.locals.user;
+const currentPath = activeNav ?? Astro.url.pathname;
+
+const isActive = (href: string) =>
+  currentPath === href || (href !== "/portal/" && currentPath.startsWith(href));
+
+const navItems: PortalNavItem[] = [
+  { href: "/portal/", label: "Dashboard", icon: "lucide:layout-dashboard" },
+  {
+    href: "/portal/projects",
+    label: "My Projects",
+    icon: "lucide:folder",
+    disabled: true,
+  },
+  {
+    href: "/portal/progress",
+    label: "Project Progress",
+    icon: "lucide:git-pull-request",
+    disabled: true,
+  },
+  {
+    href: "/portal/events",
+    label: "Events & Schedule",
+    icon: "lucide:calendar",
+    disabled: true,
+  },
+  {
+    href: "/portal/sponsorship",
+    label: "My Sponsorship",
+    icon: "lucide:handshake",
+    disabled: true,
+  },
+];
+
+const email = user?.email ?? "unknown";
+const avatarLetter = email.charAt(0).toUpperCase();
+const logoutUrl =
+  "https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/logout";
+---
+
+<Layout title={title} seo={seo} template="portal">
+  <Fragment slot="default">
+    <meta slot="head" name="robots" content="noindex" />
+
+    {/* Mobile header — visible below lg */}
+    <div class="lg:hidden flex items-center gap-3 border-b px-4 py-3">
+      <Sheet>
+        <SheetTrigger variant="ghost" size="icon">
+          <Icon name="lucide:menu" />
+        </SheetTrigger>
+        <SheetContent side="left">
+          <SheetHeader>
+            <SheetTitle>Portal Navigation</SheetTitle>
+          </SheetHeader>
+
+          {/* Mobile user identity */}
+          <div class="flex items-center gap-3 px-4 pb-3">
+            <div class="flex size-8 items-center justify-center bg-primary text-primary-foreground text-sm font-bold">
+              {avatarLetter}
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-muted-foreground">Signed in</span>
+              <span class="text-sm font-medium truncate max-w-[200px]">{email}</span>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Mobile nav links */}
+          <nav class="flex flex-col gap-1 p-4" aria-label="Portal navigation">
+            {navItems.map((item) => (
+              <a
+                href={item.disabled ? undefined : item.href}
+                class:list={[
+                  "flex items-center gap-3 px-3 py-2 text-sm transition-colors",
+                  item.disabled
+                    ? "text-muted-foreground pointer-events-none opacity-50"
+                    : isActive(item.href)
+                      ? "bg-accent text-accent-foreground font-medium"
+                      : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                ]}
+                aria-current={!item.disabled && isActive(item.href) ? "page" : undefined}
+              >
+                <Icon name={item.icon} class="size-4" />
+                <span>{item.label}</span>
+                {item.badge && (
+                  <Badge variant="secondary" class="ml-auto text-2xs">{item.badge}</Badge>
+                )}
+              </a>
+            ))}
+          </nav>
+
+          <Separator />
+
+          <div class="p-4">
+            <a
+              href={logoutUrl}
+              class="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Icon name="lucide:log-out" class="size-4" />
+              <span>Sign out</span>
+            </a>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <span class="text-sm font-semibold">Sponsor Portal</span>
+    </div>
+
+    {/* Desktop grid — sidebar LEFT (viewport edge), content RIGHT */}
+    <div
+      class="w-full flex flex-col lg:grid lg:gap-0"
+      style="--sidebar-width: 260px;"
+      data-portal-layout
+    >
+      {/* Desktop sidebar — flush to left edge, hidden below lg */}
+      <aside class="hidden lg:flex flex-col border-r bg-sidebar text-sidebar-foreground min-h-[calc(100vh-4rem)]">
+        {/* User identity */}
+        <div class="flex items-center gap-3 p-4">
+          <div class="flex size-8 items-center justify-center bg-primary text-primary-foreground text-sm font-bold shrink-0">
+            {avatarLetter}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-xs text-muted-foreground">Signed in</span>
+            <span class="text-sm font-medium truncate">{email}</span>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Nav links */}
+        <nav class="flex-1 p-3" aria-label="Portal navigation">
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  href={item.disabled ? undefined : item.href}
+                  active={!item.disabled && isActive(item.href)}
+                  class:list={[
+                    item.disabled && "pointer-events-none opacity-50",
+                  ]}
+                  aria-current={!item.disabled && isActive(item.href) ? "page" : undefined}
+                >
+                  <Icon name={item.icon} />
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <Badge variant="secondary" class="ml-auto text-2xs">{item.badge}</Badge>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </nav>
+
+        {/* Footer — logout */}
+        <div class="mt-auto p-3 border-t">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton href={logoutUrl}>
+                <Icon name="lucide:log-out" />
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </div>
+      </aside>
+
+      {/* Main content area — constrained width */}
+      <div class="flex-1 p-6 lg:p-8 lg:max-w-[var(--breakpoint-xl)]">
+        <slot />
+      </div>
+    </div>
+  </Fragment>
+</Layout>
+
+<style is:global>
+  [data-portal-layout] {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+</style>

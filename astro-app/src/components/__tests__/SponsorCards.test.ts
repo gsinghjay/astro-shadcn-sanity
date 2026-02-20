@@ -74,4 +74,16 @@ describe('SponsorCards', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('renders GTM tracking attributes on sponsor links', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorCards, {
+      props: sponsorCardsFull,
+    });
+
+    expect(html).toContain('data-gtm-category="sponsor"');
+    expect(html).toContain('data-gtm-label="Acme Corp"');
+    expect(html).toContain('data-gtm-action="external"');
+    expect(html).toContain('data-gtm-action="detail"');
+  });
 });

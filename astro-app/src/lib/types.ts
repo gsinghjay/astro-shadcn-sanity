@@ -35,3 +35,20 @@ export type SponsorCardsBlock = Extract<PageBlock, { _type: 'sponsorCards' }>;
 export type TestimonialsBlock = Extract<PageBlock, { _type: 'testimonials' }>;
 export type EventListBlock = Extract<PageBlock, { _type: 'eventList' }>;
 
+// ---------------------------------------------------------------------------
+// Layout types — shared across Layout, SidebarLayout, PortalLayout
+// ---------------------------------------------------------------------------
+
+export interface SeoProps {
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImage?: {
+    asset?: {
+      _id: string;
+      url?: string | null;
+      metadata?: { lqip?: string | null; dimensions?: unknown } | null;
+    } | null;
+    alt?: string | null;
+  } | null;
+}
+

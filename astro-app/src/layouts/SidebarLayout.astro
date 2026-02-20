@@ -5,28 +5,21 @@
  * On mobile, sidebar stacks above content for filter-first UX.
  */
 import Layout from './Layout.astro';
-
-interface SeoProps {
-  metaTitle?: string | null;
-  metaDescription?: string | null;
-  ogImage?: {
-    asset?: { _id: string; url?: string | null; metadata?: { lqip?: string | null; dimensions?: unknown } | null } | null;
-    alt?: string | null;
-  } | null;
-}
+import type { SeoProps } from "@/lib/types";
 
 interface Props {
   title?: string;
   seo?: SeoProps | null;
   hideNav?: boolean;
+  ogType?: string;
   sidebarWidth?: string;
 }
 
-const { title, seo, hideNav, sidebarWidth = '280px' } = Astro.props;
+const { title, seo, hideNav, ogType, sidebarWidth = '280px' } = Astro.props;
 const hasSidebar = Astro.slots.has('sidebar');
 ---
 
-<Layout title={title} seo={seo} hideNav={hideNav}>
+<Layout title={title} seo={seo} hideNav={hideNav} ogType={ogType}>
   <slot name="header" />
   {hasSidebar ? (
     <div class="mx-auto w-full max-w-[var(--breakpoint-xl)] px-6 pb-12 flex flex-col lg:grid lg:gap-8 lg:pb-16" style={`--sidebar-width: ${sidebarWidth};`} data-sidebar-layout>

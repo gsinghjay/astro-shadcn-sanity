@@ -1,0 +1,128 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import { sanityClient, ALL_EVENT_SLUGS_QUERY, getEventBySlug, getSiteSettings } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
+import { Badge } from '@/components/ui/badge';
+import { Section, SectionContent } from '@/components/ui/section';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const events = await sanityClient.fetch<Array<{ slug: string }>>(ALL_EVENT_SLUGS_QUERY);
+  return events.map((e) => ({ params: { slug: e.slug } }));
+};
+
+const { slug } = Astro.params;
+const event = await getEventBySlug(slug as string);
+if (!event) return Astro.redirect('/404');
+
+const siteSettings = await getSiteSettings();
+
+const cleanStatus = stegaClean(event.status) || 'upcoming';
+const cleanType = event.eventType ? stegaClean(event.eventType) : null;
+
+const statusStyles: Record<string, string> = {
+  upcoming: 'bg-green-100 text-green-800 border-green-300',
+  past: 'bg-muted text-muted-foreground border-border',
+};
+
+const badgeClasses: Record<string, string> = {
+  showcase: 'bg-primary/10 text-primary',
+  networking: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+  workshop: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+};
+
+const eventDate = event.date ? new Date(event.date) : null;
+const formattedDate = eventDate
+  ? eventDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+  : null;
+const formattedTime = eventDate
+  ? eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  : null;
+
+const endDate = event.endDate ? new Date(event.endDate) : null;
+const formattedEndDate = endDate
+  ? endDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+  : null;
+const formattedEndTime = endDate
+  ? endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  : null;
+
+const eventJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Event",
+  "name": stegaClean(event.title),
+  "startDate": event.date,
+  ...(event.endDate && { "endDate": event.endDate }),
+  ...(event.location && {
+    "location": {
+      "@type": "Place",
+      "name": stegaClean(event.location),
+    },
+  }),
+  ...(event.description && { "description": stegaClean(event.description) }),
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  "organizer": {
+    "@type": "Organization",
+    "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
+  },
+};
+---
+
+<Layout title={event.title ?? 'Event'} seo={{ metaDescription: event.description }} template="detail">
+  <script type="application/ld+json" set:html={JSON.stringify(eventJsonLd)} />
+
+  <Section>
+    <SectionContent>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: 'Events', href: '/' },
+        { label: event.title ?? 'Event' },
+      ]} />
+
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3 flex-wrap">
+          <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+            {event.title}
+          </h1>
+          <Badge class={statusStyles[cleanStatus] ?? statusStyles.upcoming}>{cleanStatus}</Badge>
+          {cleanType && (
+            <Badge class={badgeClasses[cleanType] ?? 'bg-muted text-muted-foreground'}>{cleanType}</Badge>
+          )}
+        </div>
+
+        {formattedDate && (
+          <div class="text-lg text-muted-foreground">
+            <time datetime={event.date ?? undefined}>
+              {formattedDate}{formattedTime && ` at ${formattedTime}`}
+            </time>
+            {formattedEndDate && (
+              <span>
+                {' '}&mdash;{' '}
+                <time datetime={event.endDate ?? undefined}>
+                  {formattedEndDate}{formattedEndTime && ` at ${formattedEndTime}`}
+                </time>
+              </span>
+            )}
+          </div>
+        )}
+
+        {event.location && (
+          <p class="text-muted-foreground">{event.location}</p>
+        )}
+      </div>
+
+      {event.description && (
+        <div>
+          <h2 class="text-2xl font-bold mb-4">Description</h2>
+          <p class="text-lg leading-relaxed">{event.description}</p>
+        </div>
+      )}
+
+      <a href="/" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">
+        &larr; Back to Events
+      </a>
+    </SectionContent>
+  </Section>
+</Layout>
