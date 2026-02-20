@@ -59,7 +59,7 @@ Visitor → Cloudflare CDN (static HTML from edge cache)
 | **Queues** | Planned (Story 9.13) | Async notification creation pipeline |
 | **Analytics Engine** | Planned (Stories 9.9, 9.15) | Portal activity tracking + admin analytics |
 | **Cron Triggers** | Planned (Story 9.13) | Daily event reminder notifications |
-| **Turnstile** | Planned | Bot protection for contact form |
+| **Turnstile** | Active | Bot protection for contact form (Story 6.1) |
 
 ### Key Files
 
@@ -564,6 +564,10 @@ The $5/month Workers Paid plan removes all remaining daily limits and unlocks St
 | `CLOUDFLARE_API_TOKEN` | API token for `wrangler pages deploy` | GitHub Actions secrets (only if using manual deploy) |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID | GitHub Actions secrets (only if using manual deploy) |
 | `PUBLIC_SITE_URL` | Production URL | CF Pages dashboard, `.env` (local) |
+| `PUBLIC_TURNSTILE_SITE_KEY` | Turnstile widget site key (client-side) | CF Pages dashboard (Production + Preview), `.env` (local) |
+| `TURNSTILE_SECRET_KEY` | Turnstile secret key (server-side verification) | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
+| `SANITY_API_WRITE_TOKEN` | Sanity write token for form submissions | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
+| `DISCORD_WEBHOOK_URL` | Discord webhook for form submission notifications | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
 
 ### Where to Set Them
 
@@ -574,6 +578,10 @@ The $5/month Workers Paid plan removes all remaining daily limits and unlocks St
    - `CF_ACCESS_TEAM_DOMAIN` → Plaintext → `https://ywcc-capstone-pages.cloudflareaccess.com`
    - `CF_ACCESS_AUD` → **Secret (encrypted)** → your 64-char hex AUD tag
    - `PUBLIC_SITE_URL` → Plaintext → `https://ywcc-capstone.pages.dev`
+   - `PUBLIC_TURNSTILE_SITE_KEY` → Plaintext → your Turnstile site key (from Turnstile dashboard)
+   - `TURNSTILE_SECRET_KEY` → **Secret (encrypted)** → your Turnstile secret key
+   - `SANITY_API_WRITE_TOKEN` → **Secret (encrypted)** → Sanity API token with Editor role
+   - `DISCORD_WEBHOOK_URL` → **Secret (encrypted)** → Discord webhook URL for notifications
 
 **Local development (`astro-app/.env`, not committed):**
 
@@ -781,6 +789,22 @@ The email is not in the Allow policy. Add it (see [Section 3.5](#35-add-sponsor-
 **Public routes showing auth prompt:**
 - Verify Access Application path is `/portal/` (not `/`)
 - Check for other Access Applications with broader path rules
+
+### Turnstile
+
+**Error 400020 (widget fails to load):**
+- This means the domain is not authorized for the site key
+- `pages.dev` is on the [Public Suffix List](https://publicsuffix.org/) — `preview.ywcc-capstone.pages.dev` and `ywcc-capstone.pages.dev` are treated as **separate registrable domains**, not subdomains
+- In the Turnstile dashboard, add **each** hostname explicitly: `ywcc-capstone.pages.dev`, `preview.ywcc-capstone.pages.dev`, `localhost`
+- Verify you are using the **Site Key** (not the Secret Key) in `PUBLIC_TURNSTILE_SITE_KEY` — both can start with `0x4...`
+
+**Form submission returns 400/403 after widget loads:**
+- `TURNSTILE_SECRET_KEY` is missing or wrong in CF Pages secrets — this is a server-side secret accessed via `context.locals.runtime.env`, not `import.meta.env`
+- The test secret key (`1x0000000000000000000000000000000AA`) only works with the test site key (`1x00000000000000000000AA`) — don't mix test and production keys
+
+**Turnstile widget not appearing:**
+- Check `PUBLIC_TURNSTILE_SITE_KEY` is set in CF Pages env vars — this is a `PUBLIC_` var baked in at build time, so a redeploy is required after changing it
+- In local dev, use the always-pass test keys: site key `1x00000000000000000000AA`, secret key `1x0000000000000000000000000000000AA`
 
 ### GTM
 
