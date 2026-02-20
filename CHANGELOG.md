@@ -1,3 +1,32 @@
+## [1.8.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.7.0...v1.8.0) (2026-02-20)
+
+### Features
+
+* add contact form submission pipeline with Astro Actions ([1bd2e3c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1bd2e3cf5e6e318212cf23b917b9b1ed6a1fd412))
+* add Figma Storybook capture scripts — free alternative to $100+/mo SaaS tools ([93f0ed2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/93f0ed29da80b74490a6507ad45b3c0242c3dbfe))
+* optimize images for LCP <2s with urlFor(), LQIP placeholders, and preload ([e2d953e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e2d953eb4e45bf61129d9070af1c6f8274cc88f7))
+
+### Bug Fixes
+
+* add Cloudflare Turnstile to CSP script-src and frame-src ([cd3eb6c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cd3eb6c647b05d34dc7cead0a1019948f9f855bb))
+* address Sanity code review findings for contact form ([9408957](https://github.com/gsinghjay/astro-shadcn-sanity/commit/94089574871c3ffa7d849ce35fbf5be15655c660))
+
+### Documentation
+
+* add preview links to status report pages and routes tables ([81aec4b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/81aec4bc23ff6ac229bbf598e427cde451188091))
+* add Turnstile env vars and troubleshooting to cloudflare guide ([0af4208](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0af4208a5c463831e4e5241a74f8221dce009c33))
+* consolidate 3 Cloudflare docs into single cloudflare-guide.md ([4f9fb17](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4f9fb17efcb41704c1b5bec1aed611380e251c62))
+* generate comprehensive project documentation via parallel agent team ([0df48f2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0df48f2855fff1e6fefbccb77a36373331a02579))
+* move Figma/Chromatic references into scripts README, delete tracking doc ([5e52d27](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5e52d2716baa6ef2292a8c2566c52f46eac519d4))
+* remove 29 files replaced by GitHub wiki ([7d75736](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7d75736b2ab5a014c9c8849fe88fe1e2539b3706))
+* update Cloudflare guide with Queues, Analytics Engine, Cron Triggers ([daabf24](https://github.com/gsinghjay/astro-shadcn-sanity/commit/daabf24a2bf0e8548cfa71ebf3f3d56aa166f48e))
+* update status report with Story 6.1 contact form completion ([2c431fc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2c431fccaabfd32c1458efe75e08dcab7c35582c))
+
+### Miscellaneous
+
+* add .dev.vars to gitignore ([af8a8ef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/af8a8ef04bd69a5ec64ded27f8cd8f71e5f7dcc4))
+* cleanup docs ([364a2e1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/364a2e18703bdbc6a5b41989ca2eae016fa6325a))
+
 ## [1.7.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.6.0...v1.7.0) (2026-02-20)
 
 ### Features
