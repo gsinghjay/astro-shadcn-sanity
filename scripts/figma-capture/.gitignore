@@ -1,0 +1,5 @@
+# Runtime files (generated during capture runs)
+capture-map.json
+capture-progress.json
+capture-ids.txt
+*.log
