@@ -380,7 +380,7 @@ All services run on the **Workers Free** plan ($0/month). These are the hard lim
 | Requests | 100,000/day |
 | CPU time | **10 ms/invocation** (hard cap — exceeding returns 503) |
 | Memory | 128 MB/invocation |
-| Subrequests | 50/invocation |
+| Subrequests | 50/invocation (external); 1,000/invocation (to CF services like D1) |
 | Worker size | 3 MB compressed |
 
 ### D1 (Database)
@@ -420,7 +420,7 @@ D1 limits reset daily at 00:00 UTC. Exceeding them blocks all queries until rese
 | Access Applications | Unlimited |
 | Identity providers | Unlimited |
 
-A "seat" is consumed when a user authenticates. Seats release after 30 days of inactivity. Monitor at **Cloudflare One → Settings → Account → Usage**.
+A "seat" is consumed when a user authenticates. Seats are held indefinitely by default. To auto-release inactive seats, enable seat expiration in **Cloudflare One → Settings → Account** (configurable: 1 month to 1 year). Monitor usage at **Cloudflare One → Settings → Account → Usage**.
 
 ---
 
@@ -557,7 +557,7 @@ PUBLIC_SITE_URL=http://localhost:4321
 |:---------|:------|
 | `PUBLIC_SANITY_STUDIO_PROJECT_ID` | `49nk9b0w` |
 | `PUBLIC_SANITY_STUDIO_DATASET` | `production` |
-| `PUBLIC_GA_MEASUREMENT_ID` | Your GA4 ID or empty |
+| `PUBLIC_GTM_ID` | Your GTM container ID or empty |
 | `PUBLIC_SITE_URL` | `https://ywcc-capstone.pages.dev` |
 
 ### Runtime Access Patterns
@@ -626,7 +626,7 @@ Workers metrics retention: 3 months (queryable in 1-week increments).
 
 ### 8.2 Workers Observability MCP Server
 
-Cloudflare provides an MCP server for Workers observability (`github.com/cloudflare/mcp-server-cloudflare` → `apps/workers-observability`). Add it to `.mcp.json` to query metrics, logs, and traces from your dev environment.
+Cloudflare provides an MCP server for Workers observability (`github.com/cloudflare/mcp-server-cloudflare` → `apps/workers-observability`). Add it to `.mcp.json` to query metrics, logs, and traces from your dev environment. Note: this only covers standalone Workers, not Pages Functions/SSR workers. For Pages worker metrics, use the CF Pages dashboard directly.
 
 ### 8.3 D1 Query-Level Monitoring
 
@@ -693,7 +693,7 @@ Informational warning from the Cloudflare adapter about KV sessions. Does not af
 
 **GitHub Actions workflow fails:**
 - Verify secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `SANITY_API_READ_TOKEN`
-- Verify variables: `PUBLIC_SANITY_STUDIO_PROJECT_ID`, `PUBLIC_SANITY_STUDIO_DATASET`, `PUBLIC_GA_MEASUREMENT_ID`, `PUBLIC_SITE_URL`
+- Verify variables: `PUBLIC_SANITY_STUDIO_PROJECT_ID`, `PUBLIC_SANITY_STUDIO_DATASET`, `PUBLIC_GTM_ID`, `PUBLIC_SITE_URL`
 - Check the API token has `Cloudflare Pages: Edit` permission
 
 **Wrangler local preview shows errors:**
@@ -742,10 +742,10 @@ The email is not in the Allow policy. Add it (see [Section 3.5](#35-add-sponsor-
 - Verify Access Application path is `/portal/` (not `/`)
 - Check for other Access Applications with broader path rules
 
-### GA4
+### GTM
 
-**GA4 script not appearing in page source:**
-- Confirm `PUBLIC_GA_MEASUREMENT_ID` is set (not empty)
+**GTM script not appearing in page source:**
+- Confirm `PUBLIC_GTM_ID` is set (not empty)
 - Rebuild after changing `.env` — env vars are baked in at build time
 
 ---
