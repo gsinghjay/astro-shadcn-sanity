@@ -19,6 +19,7 @@
     "sanity"
   ],
   "dependencies": {
+    "@sanity/form-toolkit": "^2.2.3",
     "@sanity/vision": "^5.10.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",

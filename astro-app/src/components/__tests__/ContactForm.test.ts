@@ -14,7 +14,7 @@ describe('ContactForm', () => {
     expect(html).toContain('We would love to hear from you.');
   });
 
-  test('renders form fields', async () => {
+  test('renders form fields from CMS data', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
       props: contactFormFull,
@@ -23,6 +23,14 @@ describe('ContactForm', () => {
     expect(html).toContain('Full Name');
     expect(html).toContain('Email');
     expect(html).toContain('Message');
+  });
+
+  test('renders submit button with CMS text', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
     expect(html).toContain('Submit Inquiry');
   });
 
@@ -44,7 +52,7 @@ describe('ContactForm', () => {
     expect(html).toContain('Thank you for your inquiry');
   });
 
-  test('handles minimal data without crashing', async () => {
+  test('handles minimal data (no form) without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {
       props: contactFormMinimal,
@@ -60,5 +68,35 @@ describe('ContactForm', () => {
     });
 
     expect(html).toContain('data-gtm-form="contact"');
+  });
+
+  test('renders hidden form_id input', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('name="form_id"');
+    expect(html).toContain('value="form-test-1"');
+  });
+
+  test('renders Turnstile widget container', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('cf-turnstile');
+  });
+
+  test('renders state-toggle CSS', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('data-form-success');
+    expect(html).toContain('data-form-error');
+    expect(html).toContain('data-form-fields');
   });
 });

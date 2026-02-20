@@ -2,7 +2,8 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
-import {CogIcon} from '@sanity/icons'
+import {CogIcon, EnvelopeIcon} from '@sanity/icons'
+import {formSchema} from '@sanity/form-toolkit/form-schema'
 import {schemaTypes} from './src/schemaTypes'
 import {resolve} from './src/presentation/resolve'
 
@@ -32,10 +33,19 @@ export default defineConfig({
               .child(
                 S.document().schemaType('siteSettings').documentId('siteSettings'),
               ),
+            S.listItem()
+              .title('Submissions')
+              .icon(EnvelopeIcon)
+              .child(
+                S.documentTypeList('submission')
+                  .title('Submissions')
+                  .defaultOrdering([{field: 'submittedAt', direction: 'desc'}]),
+              ),
             S.divider(),
-            // All other document types (excluding singletons)
+            // All other document types (excluding singletons and custom nav items)
             ...S.documentTypeListItems().filter(
-              (listItem) => !singletonTypes.has(listItem.getId()!),
+              (listItem) =>
+                !singletonTypes.has(listItem.getId()!) && listItem.getId() !== 'submission',
             ),
           ]),
     }),
@@ -48,6 +58,7 @@ export default defineConfig({
       },
     }),
     visionTool(),
+    formSchema(),
   ],
   schema: {
     types: schemaTypes,
