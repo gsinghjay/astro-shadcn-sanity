@@ -24,5 +24,13 @@ export const contactForm = defineBlock({
       type: 'string',
       description: 'Shown after successful form submission',
     }),
+    defineField({
+      name: 'form',
+      title: 'Form',
+      type: 'reference',
+      to: [{type: 'form'}],
+      description: 'Select the form to display. Create forms in the "Forms" section.',
+      validation: (Rule) => Rule.required(),
+    }),
   ],
 })

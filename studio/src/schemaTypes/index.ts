@@ -17,6 +17,7 @@ import {sponsor} from './documents/sponsor'
 import {project} from './documents/project'
 import {testimonial} from './documents/testimonial'
 import {event} from './documents/event'
+import {submission} from './documents/submission'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -52,6 +53,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   project,
   testimonial,
   event,
+  submission,
   // Blocks — homepage
   heroBanner,
   featureGrid,

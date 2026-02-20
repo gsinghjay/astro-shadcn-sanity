@@ -36,6 +36,49 @@ describe('HeroBanner', () => {
     expect(html).toContain('Test background');
   });
 
+  test('first slide has fetchpriority="high" and loading="eager"', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HeroBanner, {
+      props: heroFull,
+    });
+
+    // First slide should be eager-loaded with high priority
+    expect(html).toContain('fetchpriority="high"');
+    expect(html).toContain('loading="eager"');
+  });
+
+  test('carousel images use urlFor() with dimensions and auto=format', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HeroBanner, {
+      props: heroFull,
+    });
+
+    expect(html).toContain('auto=format');
+    expect(html).toContain('w=1920');
+    expect(html).toContain('h=1080');
+  });
+
+  test('renders LQIP blur placeholder on slides', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HeroBanner, {
+      props: heroFull,
+    });
+
+    expect(html).toContain('data:image/jpeg;base64,/9j/2wBDAAYEBQY');
+    expect(html).toContain('background-image');
+    expect(html).toContain('background-size: cover');
+  });
+
+  test('subsequent slides have loading="lazy"', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(HeroBanner, {
+      props: heroFull,
+    });
+
+    // Should have at least one lazy-loaded slide (slide 2+)
+    expect(html).toContain('loading="lazy"');
+  });
+
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(HeroBanner, {

@@ -1,245 +1,380 @@
 # Development Guide
 
-**Generated:** 2026-02-13 | **Mode:** Exhaustive Rescan | **Workflow:** document-project v1.2.0
+This guide covers how to set up, develop, test, and deploy the YWCC Capstone monorepo (Astro frontend + Sanity Studio).
 
 ## Prerequisites
 
-- **Node.js:** 22+ (24 recommended)
-- **npm:** 10+ (included with Node)
-- **Docker:** Optional, for containerized development
+Install the following before starting:
 
-## Getting Started
+- **Node.js** -- version 22 (used in CI) or 24 (used in Docker)
+- **npm** -- ships with Node.js; used for workspace management
+- **Docker** (optional) -- for containerized development with `docker compose`
 
-### Option 1: Native Setup
+## Quick Start
+
+### Native (recommended)
 
 ```bash
-# Clone the repository
 git clone https://github.com/gsinghjay/astro-shadcn-sanity.git
 cd astro-shadcn-sanity
-
-# Install all workspace dependencies
-npm ci
-
-# Copy environment files
+npm install
 cp astro-app/.env.example astro-app/.env
 cp studio/.env.example studio/.env
-# Edit .env files with your Sanity project ID, dataset, and API tokens
-
-# Start both dev servers concurrently
+# Edit both .env files with your Sanity project credentials
 npm run dev
 ```
 
-### Option 2: Docker Setup
+This starts both the Astro dev server on `http://localhost:4321` and Sanity Studio on `http://localhost:3333`.
+
+### Docker
 
 ```bash
-# Copy environment files first
 cp astro-app/.env.example astro-app/.env
 cp studio/.env.example studio/.env
-
-# Start Astro + Studio
+# Edit both .env files with your Sanity project credentials
 docker compose up
+```
 
-# With Storybook (optional profile)
+Docker runs three services:
+
+| Service | Port | Profile |
+|:--------|:-----|:--------|
+| astro-app | 4321 | default |
+| studio | 3333 | default |
+| storybook | 6006 | `storybook` (opt-in) |
+
+To include Storybook in Docker:
+
+```bash
 docker compose --profile storybook up
 ```
 
-### Dev Server Ports
-
-| Service | Port | Command |
-|---------|------|---------|
-| Astro (frontend) | 4321 | `npm run dev -w astro-app` |
-| Sanity Studio | 3333 | `npm run dev -w studio` |
-| Storybook | 6006 | `npm run storybook -w astro-app` |
-
-## Environment Variables
+## Environment Setup
 
 ### astro-app/.env
 
 | Variable | Required | Description |
-|----------|----------|-------------|
+|:---------|:---------|:------------|
 | `PUBLIC_SANITY_STUDIO_PROJECT_ID` | Yes | Sanity project ID |
-| `PUBLIC_SANITY_STUDIO_DATASET` | Yes | Dataset name (default: production) |
-| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | No | Enable Visual Editing (true/false) |
-| `SANITY_API_READ_TOKEN` | For VE | API read token for draft content |
-| `PUBLIC_GA_MEASUREMENT_ID` | No | GA4 tracking ID |
-| `PUBLIC_SANITY_STUDIO_URL` | No | Studio URL (default: http://localhost:3333) |
-| `PUBLIC_SITE_URL` | No | Production site URL |
+| `PUBLIC_SANITY_STUDIO_DATASET` | Yes | Dataset name (usually `production`) |
+| `SANITY_API_READ_TOKEN` | Yes | API token for draft/preview content |
+| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | No | Set `true` to enable Visual Editing |
+| `PUBLIC_SANITY_STUDIO_URL` | No | Studio URL for "Edit in Studio" links (defaults to `http://localhost:3333`) |
+| `PUBLIC_SITE_URL` | No | Production URL for canonical URLs and sitemap |
+| `PUBLIC_GTM_ID` | No | Google Tag Manager container ID |
+| `CF_ACCESS_TEAM_DOMAIN` | No | Cloudflare Access team domain for portal auth |
+| `CF_ACCESS_AUD` | No | Cloudflare Access Application Audience tag |
 
 ### studio/.env
 
 | Variable | Required | Description |
-|----------|----------|-------------|
+|:---------|:---------|:------------|
 | `SANITY_STUDIO_PROJECT_ID` | Yes | Sanity project ID |
-| `SANITY_STUDIO_DATASET` | Yes | Dataset name (default: production) |
-| `SANITY_STUDIO_PREVIEW_ORIGIN` | No | Preview app URL (default: http://localhost:4321) |
-| `SANITY_STUDIO_STUDIO_HOST` | No | Custom Studio host |
+| `SANITY_STUDIO_DATASET` | Yes | Dataset name (usually `production`) |
+| `SANITY_STUDIO_STUDIO_HOST` | No | Custom Studio hostname |
+| `SANITY_STUDIO_PREVIEW_ORIGIN` | No | Astro preview URL (defaults to `http://localhost:4321`) |
 
-## Commands Reference
+### tests/.env
 
-### Root (Monorepo)
+| Variable | Required | Description |
+|:---------|:---------|:------------|
+| `TEST_ENV` | No | Target environment: `local`, `staging`, or `production` |
+| `BASE_URL` | No | Override the default `http://localhost:4321` base URL |
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Astro + Studio concurrently |
-| `npm run dev:storybook` | Start Astro + Studio + Storybook |
-| `npm run test` | Run all tests (unit + E2E) |
-| `npm run test:unit` | Vitest unit + component tests |
-| `npm run test:e2e` | Playwright E2E (builds first) |
-| `npm run test:chromium` | Playwright Chromium only (fast feedback) |
-| `npm run test:headed` | Playwright with visible browser |
-| `npm run test:ui` | Playwright interactive UI mode |
-| `npm run storybook` | Start Storybook dev server |
-| `npm run typegen` | Extract schema + generate TypeScript types |
+## Development Commands
 
-### astro-app
+All commands run from the repository root unless noted otherwise.
+
+### Core Development
 
 | Command | Description |
-|---------|-------------|
-| `npm run dev -w astro-app` | Astro dev server |
-| `npm run build -w astro-app` | `astro check && astro build` |
-| `npm run preview -w astro-app` | Preview with Wrangler (Cloudflare) |
-| `npm run test:unit -w astro-app` | Vitest run |
-| `npm run test:unit:watch -w astro-app` | Vitest watch mode |
-| `npm run test:unit:coverage -w astro-app` | Vitest with coverage |
+|:--------|:------------|
+| `npm run dev` | Start Astro (4321) + Studio (3333) concurrently |
+| `npm run dev:storybook` | Start Astro + Studio + Storybook (6006) |
+| `npm run dev -w astro-app` | Start Astro dev server only |
+| `npm run dev -w studio` | Start Sanity Studio only |
+| `npm run storybook` | Start Storybook only (port 6006) |
 
-### studio
+### Building
 
 | Command | Description |
-|---------|-------------|
-| `npm run dev -w studio` | Sanity Studio dev server |
-| `npm run build -w studio` | Build Studio for production |
-| `npm run deploy -w studio` | Deploy Studio to Sanity Cloud |
-| `npx sanity schema deploy` | Deploy schema to Content Lake (run from studio/) |
-| `npm run typegen -w studio` | Extract schema + generate types |
+|:--------|:------------|
+| `npm run build -w astro-app` | Build the Astro site to `astro-app/dist/` |
+| `npm run build -w studio` | Build Sanity Studio for deployment |
+| `npm run deploy -w astro-app` | Build Astro and deploy to Cloudflare Pages |
+| `npm run deploy -w studio` | Deploy Sanity Studio |
 
-## Git Workflow
+### Testing
+
+| Command | Description |
+|:--------|:------------|
+| `npm run test` | Run unit tests then E2E tests |
+| `npm run test:unit` | Run Vitest unit and component tests |
+| `npm run test:unit:watch` | Run Vitest in watch mode |
+| `npm run test:unit:coverage` | Run Vitest with V8 coverage report |
+| `npm run test:e2e` | Run Playwright across all 5 browser projects |
+| `npm run test:chromium` | Run Playwright with Chromium only (fast feedback) |
+| `npm run test:headed` | Run Playwright with a visible browser (Chromium) |
+| `npm run test:ui` | Open Playwright's interactive UI mode |
+
+### Schema and Types
+
+| Command | Description |
+|:--------|:------------|
+| `npm run typegen` | Extract schema and generate TypeScript types |
+| `npx sanity schema deploy` | Deploy schema to Content Lake (run from `studio/`) |
+
+## Project Structure Overview
+
+```
+astro-shadcn-sanity/
+  astro-app/           # Astro frontend (Cloudflare Pages)
+    src/
+      components/      # UI components (Astro + React)
+      layouts/         # Page layouts
+      pages/           # File-based routing
+      lib/             # Utilities, queries, data loading
+    .storybook/        # Storybook configuration
+  studio/              # Sanity Studio
+    src/
+      schemaTypes/     # Content schema definitions
+  tests/               # Playwright E2E tests
+    e2e/               # Test specs
+    support/           # Fixtures and helpers
+  docs/                # Project documentation
+  .github/workflows/   # CI/CD pipeline definitions
+```
+
+For a complete file tree with descriptions, see [source-tree-analysis.md](source-tree-analysis.md).
+
+## Development Workflow
 
 ### Branch Strategy
 
+The project uses a three-tier branching model:
+
 ```
-feature branch → preview → main
+feature/* --> preview --> main
 ```
 
-- **Feature branches** — Created from `preview`, merged back via PR
-- **`preview`** — Integration/staging branch, runs CI on PRs
-- **`main`** — Production branch, triggers release + deploy
+1. Create a feature branch from `preview`.
+2. Open a PR targeting `preview`. CI runs unit tests and Lighthouse on PRs to `preview`.
+3. After merge to `preview`, open a PR from `preview` to `main`.
+4. On merge to `main`, semantic-release creates a versioned release and the `sync-preview` workflow merges `main` back into `preview`.
 
-### Branch Rules
+Branch protection rules enforced by CI:
 
-- PRs to `main` must come from `preview` only (enforced by CI)
-- PRs from `main` to `preview` are blocked (sync is automated)
-- After release on `main`, auto-sync merges back into `preview`
+- Only `preview` can merge into `main` (enforced by `enforce-preview-branch.yml`).
+- `main` cannot open PRs to `preview` (enforced by `enforce-preview-source.yml`).
 
 ### Commit Convention
 
-Uses [Conventional Commits](https://www.conventionalcommits.org/) for semantic-release:
+Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages. Semantic-release reads these to determine version bumps and generate changelogs.
 
+| Prefix | Version Bump | Example |
+|:-------|:-------------|:--------|
+| `fix:` | Patch | `fix: resolve null pointer in sponsor query` |
+| `feat:` | Minor | `feat: add event list block component` |
+| `feat!:` or `BREAKING CHANGE:` | Major | `feat!: redesign page builder schema` |
+| `chore:` | No release | `chore: update dev dependencies` |
+| `docs:` | No release | `docs: add testing guide` |
+| `refactor:` | No release | `refactor: extract hero banner logic` |
+
+### Pull Requests
+
+- Target `preview` for feature branches.
+- CI must pass before merging.
+- Reference related issues in the PR description.
+
+## Schema and Content Workflow
+
+Sanity schema definitions live in `studio/src/schemaTypes/`. Follow this workflow when changing schemas:
+
+1. **Edit schema files** in `studio/src/schemaTypes/`. Add new types to the barrel export in `studio/src/schemaTypes/index.ts`.
+
+2. **Generate types** from the root:
+
+   ```bash
+   npm run typegen
+   ```
+
+   This extracts the schema to `studio/schema.json` and generates TypeScript types in `studio/sanity.types.ts`. Type errors surface drift between schema, fixtures, and components.
+
+3. **Deploy schema** to the Content Lake (from the `studio/` directory):
+
+   ```bash
+   cd studio
+   npx sanity schema deploy
+   ```
+
+   Deploy is required before MCP content tools work with new types.
+
+4. **Update fixtures and components** to match any changed or new fields.
+
+## Testing Guide
+
+The project uses a four-layer testing architecture.
+
+### Unit Tests (Vitest)
+
+**Location:** `astro-app/src/lib/__tests__/`
+
+Test pure functions like `cn()`, `loadQuery`, and GROQ query strings.
+
+```bash
+npm run test:unit              # Single run
+npm run test:unit:watch        # Watch mode
+npm run test:unit:coverage     # With coverage report
 ```
-feat: add new feature        → minor version bump
-fix: fix a bug               → patch version bump
-feat!: breaking change       → major version bump
-docs: update documentation   → no release
-refactor: code refactor      → no release
-```
 
-## Testing
+The Vitest config uses `getViteConfig()` from `astro/config` to resolve Astro virtual modules. The `sanity:client` module is mocked via an alias in `astro-app/vitest.config.ts`.
 
-### Test Architecture
+### Component Tests (Vitest + Container API)
 
-| Layer | Runner | Location | Purpose |
-|-------|--------|----------|---------|
-| Unit | Vitest | `astro-app/src/lib/__tests__/` | Pure functions |
-| Component | Vitest + Container API | `astro-app/src/components/__tests__/` | Astro component rendering |
-| SSR Smoke | Vitest | `astro-app/src/cloudflare/__tests__/` | Cloudflare Worker validation |
-| Integration | Vitest | `tests/integration/` | Schema, data wiring, type checks |
-| E2E | Playwright | `tests/e2e/` | Real browser tests (5 projects) |
+**Location:** `astro-app/src/components/__tests__/`
 
-### Writing Tests
-
-**Component tests** use Astro Container API:
+Test Astro components using the Container API with mocked Sanity data:
 
 ```typescript
-import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 const container = await AstroContainer.create();
 const html = await container.renderToString(Component, { props: { block } });
 expect(html).toContain('expected content');
 ```
 
-**Test fixtures** are typed from `sanity.types.ts`:
+Fixtures are typed from `sanity.types.ts` and live in `__fixtures__/` directories alongside tests.
 
-```typescript
-// Located in __fixtures__/ directories
-import type { HeroBannerBlock } from '../../../lib/types';
-export const heroBannerFixture: HeroBannerBlock = { ... };
+### SSR Smoke Tests (Vitest + Miniflare)
+
+**Location:** `astro-app/src/cloudflare/__tests__/`
+
+Verify the Cloudflare Worker does not crash during server-side rendering.
+
+### E2E Tests (Playwright)
+
+**Location:** `tests/e2e/`
+
+Run real browser tests across 5 projects: Chromium, Firefox, WebKit, Mobile Chrome (Pixel 7), and Mobile Safari (iPhone 14).
+
+```bash
+npm run test:e2e               # All browsers
+npm run test:chromium           # Chromium only (fast feedback)
+npm run test:headed             # Visible browser
+npm run test:ui                 # Interactive UI mode
 ```
 
-**Sanity client mock** via Vitest alias in `vitest.config.ts`:
+Playwright builds the Astro site and serves it via Wrangler before running tests. E2E tests import fixtures from `tests/support/fixtures/` (not `@playwright/test` directly).
 
-```
-"sanity:client" → "./src/lib/__tests__/__mocks__/sanity-client.ts"
-```
+### When to Write Tests
 
-### E2E Test Browser Matrix
+| Change | Test type |
+|:-------|:----------|
+| New block component | Container API test with full + minimal fixture data |
+| New GROQ query | Verify query string contains expected type/field references |
+| Schema change | Run `npm run typegen` (type errors surface fixture/component drift) |
+| Interactive behavior (carousel, forms) | Playwright E2E spec (never use jsdom for client-side JS) |
 
-| Project | Device |
-|---------|--------|
-| chromium | Desktop Chrome |
-| firefox | Desktop Firefox |
-| webkit | Desktop Safari |
-| mobile-chrome | Pixel 7 |
-| mobile-safari | iPhone 14 |
+## Storybook
 
-### Accessibility Testing
+Storybook renders Astro components in isolation using the `storybook-astro` framework adapter.
 
-E2E tests include WCAG 2.1 AA audits via axe-core:
+### Running Storybook
 
-```typescript
-import { expectAccessible } from '../support/helpers/a11y';
-await expectAccessible(page);
+```bash
+npm run storybook              # Standalone on port 6006
+npm run dev:storybook          # Alongside Astro + Studio
 ```
 
-## Adding a New Block
+### Writing Stories
 
-1. **Create schema** in `studio/src/schemaTypes/blocks/my-block.ts` using `defineBlock()`
-2. **Register schema** in `studio/src/schemaTypes/index.ts`
-3. **Add to page schema** in `studio/src/schemaTypes/documents/page.ts` blocks array
-4. **Deploy schema:** `npx sanity schema deploy` from `studio/`
-5. **Run typegen:** `npm run typegen` from root
-6. **Create component** in `astro-app/src/components/blocks/custom/MyBlock.astro`
-7. **Add GROQ projection** to `PAGE_BY_SLUG_QUERY` in `astro-app/src/lib/sanity.ts`
-8. **Export type** in `astro-app/src/lib/types.ts`
-9. **Write tests:**
-   - Fixture in `__fixtures__/my-block.ts`
-   - Component test in `__tests__/MyBlock.test.ts`
-   - Storybook story in `blocks/custom/MyBlock.stories.ts`
+Place story files next to the components they document:
+
+```
+astro-app/src/components/blocks/HeroBanner/
+  HeroBanner.astro
+  HeroBanner.stories.ts
+```
+
+Stories are discovered by the glob pattern `astro-app/src/**/*.stories.@(js|jsx|ts|tsx)`.
+
+The Storybook config includes Vite plugins that stub Astro virtual modules (`sanity:client`, `astro:assets`, `virtual:astro-icon`) so components render outside the Astro build pipeline.
+
+### Building Storybook
+
+```bash
+npm run build-storybook -w astro-app
+```
+
+Storybook is deployed to GitHub Pages automatically when changes to `astro-app/src/`, `astro-app/.storybook/`, or `astro-app/package.json` are pushed to `main`.
 
 ## Deployment
 
-### Production (Cloudflare Pages)
+### Manual Deployment
 
-Triggered by:
-- Sanity content publish webhook → `sanity-deploy.yml`
-- Release on main → manual deploy or webhook
+Deploy the Astro site to Cloudflare Pages:
 
 ```bash
-# Manual deploy
-npm run build -w astro-app
-npx wrangler pages deploy astro-app/dist --project-name=ywcc-capstone
+npm run deploy -w astro-app
 ```
 
-### Sanity Studio
+This runs `astro build && wrangler pages deploy dist/`.
+
+Deploy Sanity Studio:
 
 ```bash
 npm run deploy -w studio
 ```
 
-### Storybook (GitHub Pages)
+### CI/CD Workflows
 
-Auto-deployed on push to `main` when `astro-app/src/` changes.
+Seven GitHub Actions workflows automate the pipeline:
 
-## Performance Targets
+| Workflow | Trigger | Purpose |
+|:---------|:--------|:--------|
+| **CI** | PR to `preview` | Run unit tests and Lighthouse |
+| **Release** | Push to `main` | Semantic-release: version bump, changelog, GitHub release |
+| **Deploy Storybook** | Push to `main` (src/storybook changes) | Build and deploy Storybook to GitHub Pages |
+| **Sanity Content Deploy** | `repository_dispatch` (content published) | Rebuild and deploy Astro site to Cloudflare Pages |
+| **Sync Preview** | After Release completes | Merge `main` back into `preview` |
+| **Enforce Preview Branch** | PR to `main` | Block PRs to `main` from any branch other than `preview` |
+| **Enforce Preview Source** | PR to `preview` | Block PRs from `main` to `preview` (sync-preview handles this) |
 
-- Lighthouse 90+ across all categories
-- < 5KB total client-side JavaScript
-- Zero runtime API calls in production (static HTML)
-- Page load < 5 seconds (E2E performance budget)
+### Cloudflare Pages
+
+The Astro site builds as a static site with the `@astrojs/cloudflare` adapter. The build output is in `astro-app/dist/` and deploys to Cloudflare Pages via Wrangler. See [cloudflare-guide.md](cloudflare-guide.md) for detailed Cloudflare configuration.
+
+## Troubleshooting
+
+### `sanity:client` module not found
+
+This virtual module is only available inside the Astro build pipeline. In tests, it is mocked via the alias in `astro-app/vitest.config.ts`. In Storybook, it is stubbed by a Vite plugin in `astro-app/.storybook/main.ts`.
+
+### Type errors after schema changes
+
+Run `npm run typegen` to regenerate TypeScript types from the current schema. Update any fixtures or component props that reference changed fields.
+
+### Playwright tests fail to start
+
+Playwright builds the site before running tests. Verify that:
+
+- Environment variables are set in `astro-app/.env`.
+- `npm run build -w astro-app` succeeds on its own.
+- Port 4321 is not already in use.
+
+### Docker volumes out of sync
+
+If dependencies change and Docker containers have stale `node_modules`:
+
+```bash
+docker compose down -v
+docker compose up --build
+```
+
+The `-v` flag removes named volumes (`node_modules`, `astro_node_modules`, `studio_node_modules`), forcing a fresh `npm ci` on next build.
+
+### Storybook build errors
+
+Storybook uses custom Vite plugins to stub Astro internals. If a new Astro virtual module is imported by a component, add a stub for it in the `astroVirtualModuleStubs()` plugin in `astro-app/.storybook/main.ts`.
+
+### Schema deploy fails
+
+Run `npx sanity schema deploy` from the `studio/` directory (not the repo root). Verify that `SANITY_STUDIO_PROJECT_ID` and `SANITY_STUDIO_DATASET` are set in `studio/.env`.
