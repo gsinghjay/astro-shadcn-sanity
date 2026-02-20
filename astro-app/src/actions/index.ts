@@ -40,7 +40,7 @@ export const server = {
       const writeClient = createClient({
         projectId: import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID,
         dataset: import.meta.env.PUBLIC_SANITY_STUDIO_DATASET,
-        apiVersion: '2024-01-01',
+        apiVersion: '2025-05-01',
         useCdn: false,
         token: env.SANITY_API_WRITE_TOKEN,
       });

@@ -85,6 +85,8 @@ const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
 
       <div
         data-form-success
+        role="status"
+        aria-live="polite"
         class="text-center py-12"
       >
         <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
@@ -139,6 +141,7 @@ const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
       const emailField = form.querySelector<HTMLInputElement>('[type="email"]');
       if (emailField?.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField.value)) {
         emailField.setAttribute('aria-invalid', 'true');
+        emailField.setAttribute('aria-describedby', `${emailField.name}-error`);
         valid = false;
       }
       if (!valid) {
@@ -147,6 +150,7 @@ const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
       }
 
       // Submit via Astro Action
+      const originalText = btn?.textContent ?? '';
       if (btn) {
         btn.disabled = true;
         btn.textContent = 'Sending...';
@@ -170,7 +174,7 @@ const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
         }
         if (btn) {
           btn.disabled = false;
-          btn.textContent = 'Submit Inquiry';
+          btn.textContent = originalText;
         }
       } else {
         wrapper.dataset.formState = 'success';
