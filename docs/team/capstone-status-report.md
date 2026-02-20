@@ -1,7 +1,7 @@
 # YWCC Capstone Website -- Status Report
 
 **Generated:** 2026-02-19
-**Last updated:** 2026-02-20
+**Last updated:** 2026-02-20 (Story 6.1 contact form backend marked done)
 **Source:** Automated codebase audit against `docs/team/capstone-stakeholders.pdf`
 
 ---
@@ -125,7 +125,7 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 | How to Become a Sponsor | `how-to-become-a-sponsor` | `911c1cfa-4cf3-4d6f-99c5-8f7d43ccd6d8` | 11 | Test content -- needs WP content migration |
 | Events & Engagement | `events` | `ca81cc32-6d67-4cda-8933-633dfae1904d` | 4 | Test content |
 | Testimonials | `testimonials` | `ada5ce67-a539-448c-b3c7-79b34911c19a` | 4 | Test content |
-| Contact | `contact` | `9449931a-adef-41b0-b3e1-390b45849574` | 3 | Test content -- form is simulated |
+| Contact | `contact` | `9449931a-adef-41b0-b3e1-390b45849574` | 3 | **Form backend live** (Story 6.1) -- Astro Action + Turnstile + Sanity submissions + Discord webhook |
 | **Research & Development** | `rnd` | `2d09c2a5-e300-4084-92de-3c81cb45da4a` | 6 | **Created 2026-02-20** with real WP content + images |
 | Pranav (test) | `pranav` | `9288ba72-d543-4510-882e-02b49fe5099b` | 1 | Test page -- should be deleted |
 
@@ -224,7 +224,7 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 | 4.1 Homepage | **Updated** -- hero images + heading from WP, logoCloud added. Still needs Featured Projects block. |
 | 4.2 About the Capstone Program | Page exists with test content -- needs WP content migration. Sponsorship Levels need comparison block. |
 | 4.3 Industry Projects Showcase | Projects are still test data -- 9 real projects scraped from WP, need to be migrated. |
-| 4.4 Sponsorship Opportunities | Partially done -- form submission is fake, tiers need comparison block |
+| 4.4 Sponsorship Opportunities | **Form backend live** (Story 6.1) -- Turnstile bot protection, Sanity submissions, Discord notifications. Tiers comparison block still needed. |
 | 4.5 Research and Development | **Done** -- R&D page created with 6 blocks + images from WP content |
 | 4.6 Testimonials and Success Stories | Page exists with test content (industry/student/byProject modes work) |
 | 4.7 Events and Engagement | Page exists with test data -- needs standalone `/events` listing page |
@@ -250,14 +250,15 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 - [ ] Add content covering mentorship and collaboration (can add blocks to R&D page)
 - [ ] *(Optional stretch)* Create `publication` document type if structured publication data is needed
 
-#### 4.4 Contact/Sponsor Inquiry Form -- backend
+#### 4.4 Contact/Sponsor Inquiry Form -- backend (DONE -- Story 6.1)
 
-- [ ] Replace simulated form submission in `main.ts` `initContactForm()` with a real backend
-- [ ] Create a server-side API endpoint (e.g., `pages/api/contact.ts` with `prerender = false`) that receives form data
-- [ ] Integrate email delivery (Cloudflare Email Workers, Resend, SendGrid, or similar)
-- [ ] Add server-side validation and rate limiting
-- [ ] Store submissions in Sanity as a `formSubmission` document type, or forward to an external CRM
-- [ ] Update `ContactForm.astro` to POST to the new endpoint and handle success/error responses
+- [x] ~~Replace simulated form submission in `main.ts` `initContactForm()` with a real backend~~ (Done: Astro Action in `src/actions/index.ts`)
+- [x] ~~Create a server-side API endpoint that receives form data~~ (Done: Astro Action with `accept: 'form'` + Zod validation)
+- [x] ~~Integrate notification delivery~~ (Done: Discord webhook notification on submission)
+- [x] ~~Add server-side validation~~ (Done: Zod schema + Cloudflare Turnstile bot protection)
+- [x] ~~Store submissions in Sanity~~ (Done: `submission` document type, viewable in Studio)
+- [x] ~~Update `ContactForm.astro` to submit and handle success/error responses~~ (Done: `import { actions } from 'astro:actions'`)
+- [ ] Add Subject field, office hours, program director info from WP (content gap, not backend)
 
 ### P1 -- High Priority (core stakeholder requirements)
 
