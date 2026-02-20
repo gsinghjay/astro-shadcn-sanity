@@ -118,16 +118,16 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 #### Pages
 
-| Page | Slug | ID | Blocks | Status |
-|---|---|---|---|---|
-| Home | `home` | `99664be0-7a28-45a0-b9be-df5554b35438` | 7 | **Updated 2026-02-20:** hero images (3), heading updated, logoCloud block added |
-| About the Capstone Program | `about-the-capstone-program` | `bf3c96a6-16e3-48d0-978b-6ca4f2f934b0` | 7 | Test content -- needs WP content migration |
-| How to Become a Sponsor | `how-to-become-a-sponsor` | `911c1cfa-4cf3-4d6f-99c5-8f7d43ccd6d8` | 11 | Test content -- needs WP content migration |
-| Events & Engagement | `events` | `ca81cc32-6d67-4cda-8933-633dfae1904d` | 4 | Test content |
-| Testimonials | `testimonials` | `ada5ce67-a539-448c-b3c7-79b34911c19a` | 4 | Test content |
-| Contact | `contact` | `9449931a-adef-41b0-b3e1-390b45849574` | 3 | **Form backend live** (Story 6.1) -- Astro Action + Turnstile + Sanity submissions + Discord webhook |
-| **Research & Development** | `rnd` | `2d09c2a5-e300-4084-92de-3c81cb45da4a` | 6 | **Created 2026-02-20** with real WP content + images |
-| Pranav (test) | `pranav` | `9288ba72-d543-4510-882e-02b49fe5099b` | 1 | Test page -- should be deleted |
+| Page | Slug | ID | Blocks | Preview Link | Status |
+|---|---|---|---|---|---|
+| Home | `home` | `99664be0` | 7 | [/](https://preview.ywcc-capstone.pages.dev/) | **Updated 2026-02-20:** hero images (3), heading updated, logoCloud block added |
+| About the Capstone Program | `about-the-capstone-program` | `bf3c96a6` | 7 | [/about-the-capstone-program](https://preview.ywcc-capstone.pages.dev/about-the-capstone-program/) | Test content -- needs WP content migration |
+| How to Become a Sponsor | `how-to-become-a-sponsor` | `911c1cfa` | 11 | [/how-to-become-a-sponsor](https://preview.ywcc-capstone.pages.dev/how-to-become-a-sponsor/) | Test content -- needs WP content migration |
+| Events & Engagement | `events` | `ca81cc32` | 4 | [/events](https://preview.ywcc-capstone.pages.dev/events/) | Test content |
+| Testimonials | `testimonials` | `ada5ce67` | 4 | [/testimonials](https://preview.ywcc-capstone.pages.dev/testimonials/) | Test content |
+| Contact | `contact` | `9449931a` | 3 | [/contact](https://preview.ywcc-capstone.pages.dev/contact/) | **Form backend live** (Story 6.1) -- Astro Action + Turnstile + Sanity submissions + Discord webhook |
+| **Research & Development** | `rnd` | `2d09c2a5` | 6 | [/rnd](https://preview.ywcc-capstone.pages.dev/rnd/) | **Created 2026-02-20** with real WP content + images |
+| Pranav (test) | `pranav` | `9288ba72` | 1 | [/pranav](https://preview.ywcc-capstone.pages.dev/pranav/) | Test page -- should be deleted |
 
 #### Projects -- STILL TEST DATA
 
@@ -155,17 +155,17 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 ### Implemented Routes
 
-| URL | Source | Rendering |
-|---|---|---|
-| `/` | `pages/index.astro` | SSG -- Homepage (page builder blocks from Sanity) |
-| `/sponsors` | `pages/sponsors/index.astro` | SSG -- Sponsor listing grid |
-| `/sponsors/[slug]` | `pages/sponsors/[slug].astro` | SSG -- Sponsor detail (logo, tier, industry, projects, JSON-LD) |
-| `/projects` | `pages/projects/index.astro` | SSG -- Project listing with client-side tag/industry filtering |
-| `/projects/[slug]` | `pages/projects/[slug].astro` | SSG -- Project detail (Portable Text content, team, mentor, outcome, testimonials) |
-| `/events/[slug]` | `pages/events/[slug].astro` | SSG -- Event detail (date/time, location, type, JSON-LD Event) |
-| `/portal` | `pages/portal/index.astro` | SSR -- Sponsor portal (authenticated, placeholder cards) |
-| `/portal/api/me` | `pages/portal/api/me.ts` | SSR -- JSON endpoint for authenticated user |
-| `/[...slug]` | `pages/[...slug].astro` | SSG -- Catch-all for CMS pages (about, contact, testimonials, R&D, etc.) |
+| URL | Source | Rendering | Preview Link |
+|---|---|---|---|
+| `/` | `pages/index.astro` | SSG -- Homepage (page builder blocks from Sanity) | [Home](https://preview.ywcc-capstone.pages.dev/) |
+| `/sponsors` | `pages/sponsors/index.astro` | SSG -- Sponsor listing grid | [Sponsors](https://preview.ywcc-capstone.pages.dev/sponsors/) |
+| `/sponsors/[slug]` | `pages/sponsors/[slug].astro` | SSG -- Sponsor detail (logo, tier, industry, projects, JSON-LD) | [Verizon](https://preview.ywcc-capstone.pages.dev/sponsors/verizon/), [Cisco](https://preview.ywcc-capstone.pages.dev/sponsors/cisco/), [BoA](https://preview.ywcc-capstone.pages.dev/sponsors/bank-of-america/), [Forbes](https://preview.ywcc-capstone.pages.dev/sponsors/forbes/), [UPS](https://preview.ywcc-capstone.pages.dev/sponsors/ups/), [Eco](https://preview.ywcc-capstone.pages.dev/sponsors/eco-enterprise/), [Angeles](https://preview.ywcc-capstone.pages.dev/sponsors/angeles-de-medellin/) |
+| `/projects` | `pages/projects/index.astro` | SSG -- Project listing with client-side tag/industry filtering | [Projects](https://preview.ywcc-capstone.pages.dev/projects/) |
+| `/projects/[slug]` | `pages/projects/[slug].astro` | SSG -- Project detail (Portable Text content, team, mentor, outcome, testimonials) | [AI Knowledge Base](https://preview.ywcc-capstone.pages.dev/projects/ai-powered-enterprise-knowledge-base/), [Fraud Detection](https://preview.ywcc-capstone.pages.dev/projects/fraud-detection-real-time-payments/), [Supply Chain](https://preview.ywcc-capstone.pages.dev/projects/predictive-analytics-supply-chain/) |
+| `/events/[slug]` | `pages/events/[slug].astro` | SSG -- Event detail (date/time, location, type, JSON-LD Event) | [Spring 2026 Showcase](https://preview.ywcc-capstone.pages.dev/events/spring-2026-capstone-showcase/), [Sponsor Kickoff](https://preview.ywcc-capstone.pages.dev/events/sponsor-onboarding-kickoff-spring-2026/) |
+| `/portal` | `pages/portal/index.astro` | SSR -- Sponsor portal (authenticated, placeholder cards) | [Portal](https://preview.ywcc-capstone.pages.dev/portal/) (requires CF Access auth) |
+| `/portal/api/me` | `pages/portal/api/me.ts` | SSR -- JSON endpoint for authenticated user | -- |
+| `/[...slug]` | `pages/[...slug].astro` | SSG -- Catch-all for CMS pages (about, contact, testimonials, R&D, etc.) | See Pages table above |
 
 ### How It Works
 
