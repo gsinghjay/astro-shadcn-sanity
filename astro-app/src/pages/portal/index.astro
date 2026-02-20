@@ -1,19 +1,93 @@
 ---
 export const prerender = false;
 
+import PortalLayout from "@/layouts/PortalLayout.astro";
+import { Icon } from "@/components/ui/icon";
+import { Tile, TileContent, TileTitle, TileDescription, TileMedia } from "@/components/ui/tile";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+
 const user = Astro.locals.user;
+
+// TODO (Story 9.2): Look up sponsor by email
+// const sponsor = await loadQuery(SPONSOR_BY_EMAIL_QUERY, { email: user?.email });
+// if (sponsor) throw Astro.redirect(`/portal/${sponsor.slug}`);
+
+const cards = [
+  {
+    title: "My Projects",
+    description: "View your sponsored capstone projects, student teams, and technologies used",
+    icon: "lucide:folder",
+    href: "/portal/projects",
+    disabled: true,
+    story: "9.2",
+  },
+  {
+    title: "Project Progress",
+    description: "Track milestones, sprint updates, deliverables, and student presentations",
+    icon: "lucide:git-pull-request",
+    href: "/portal/progress",
+    disabled: true,
+    story: "9.2",
+  },
+  {
+    title: "Events & Schedule",
+    description: "Capstone showcases, networking events, workshops, and RSVP with reminders",
+    icon: "lucide:calendar",
+    href: "/portal/events",
+    disabled: true,
+    story: "9.3",
+  },
+  {
+    title: "My Sponsorship",
+    description: "Sponsorship tier, agreements, expectations, and program contact information",
+    icon: "lucide:handshake",
+    href: "/portal/sponsorship",
+    disabled: true,
+    story: "9.4",
+  },
+];
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex" />
-    <title>Portal Access Verified</title>
-  </head>
-  <body style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem;">
-    <h1>Portal Access Verified</h1>
-    <p>Authenticated as <strong>{user?.email ?? "unknown"}</strong></p>
-    <p><a href="/">← Back to public site</a></p>
-  </body>
-</html>
+<PortalLayout title="Sponsor Portal" activeNav="/portal/">
+  <div class="flex flex-col gap-8">
+    {/* Welcome heading */}
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-bold tracking-tight">Welcome to the Sponsor Portal</h1>
+      <p class="text-muted-foreground">
+        Signed in as <strong>{user?.email ?? "unknown"}</strong>
+      </p>
+    </div>
+
+    {/* Skeleton placeholder cards */}
+    <div class="grid gap-6 sm:grid-cols-2">
+      {cards.map((card) => (
+        <Tile variant="floating" class={card.disabled ? "opacity-60 pointer-events-none" : ""}>
+          <TileMedia variant="icon">
+            <Icon name={card.icon} />
+          </TileMedia>
+          <TileContent>
+            <div class="flex items-center gap-2">
+              <TileTitle>{card.title}</TileTitle>
+              {card.disabled && (
+                <Badge variant="secondary" class="text-2xs">Coming Soon</Badge>
+              )}
+            </div>
+            <TileDescription>{card.description}</TileDescription>
+            {/* Skeleton placeholder — replaced with real data in Story {card.story} */}
+            <div class="mt-3 flex flex-col gap-2">
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-3/4" />
+            </div>
+          </TileContent>
+        </Tile>
+      ))}
+    </div>
+  </div>
+</PortalLayout>
+
+{/* GTM: portal landing page view */}
+<script>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: "portal_landing_view" });
+</script>

@@ -29,23 +29,43 @@ const slot = await Astro.slots.render("default")
     const dialog = sheet.querySelector("[data-slot='sheet-dialog']")
     if (!(dialog instanceof HTMLDialogElement)) return
 
+    const content = dialog.querySelector<HTMLElement>("[data-slot='sheet-content']")
+
+    function openSheet() {
+      // Preserve scroll position — showModal() can trigger focus-scroll
+      const scrollY = window.scrollY
+      dialog.showModal()
+      window.scrollTo(0, scrollY)
+      // Set translate to 0 via inline style (overrides the Tailwind translate class)
+      requestAnimationFrame(() => {
+        if (content) content.style.translate = "0"
+      })
+    }
+
+    function closeSheet() {
+      // Remove inline override — reverts to the Tailwind translate class (off-screen)
+      if (content) content.style.translate = ""
+      const cleanup = () => {
+        dialog.close()
+      }
+      content?.addEventListener("transitionend", cleanup, { once: true })
+      // Fallback if transition doesn't fire
+      setTimeout(() => {
+        if (dialog.open) dialog.close()
+      }, 600)
+    }
+
     // Close on backdrop click
     dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) dialog.close()
+      if (event.target === dialog) closeSheet()
     })
 
-    const triggers = sheet.querySelectorAll("[data-slot='sheet-trigger']")
-    triggers.forEach((trigger) => {
-      trigger.addEventListener("click", () => {
-        dialog.showModal()
-      })
+    sheet.querySelectorAll("[data-slot='sheet-trigger']").forEach((trigger) => {
+      trigger.addEventListener("click", () => openSheet())
     })
 
-    const closes = sheet.querySelectorAll("[data-slot='sheet-close']")
-    closes.forEach((close) => {
-      close.addEventListener("click", () => {
-        dialog.close()
-      })
+    sheet.querySelectorAll("[data-slot='sheet-close']").forEach((close) => {
+      close.addEventListener("click", () => closeSheet())
     })
   })
 </script>

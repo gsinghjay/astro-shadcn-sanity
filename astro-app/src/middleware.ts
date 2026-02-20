@@ -7,6 +7,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
+  // Local dev bypass — no CF Access edge auth available locally
+  if (import.meta.env.DEV) {
+    context.locals.user = { email: "dev@localhost" };
+    return next();
+  }
+
   // Get Cloudflare runtime env (wrangler.jsonc vars + CF dashboard secrets)
   const runtimeEnv = context.locals.runtime?.env;
 
