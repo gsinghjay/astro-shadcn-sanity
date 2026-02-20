@@ -461,3 +461,14 @@ flowchart TB
 | **MCP** | Model Context Protocol — how AI coding tools (Claude Code, Cursor, etc.) talk to external services like Figma |
 | **CSP** | Content Security Policy — browser headers that restrict where scripts can make network requests |
 | **Progress file** | JSON tracking which stories have been captured, enabling crash-safe resume |
+
+## Project references
+
+These are specific to this project's capture run. Replace them with your own when adapting the scripts.
+
+| Resource | Value |
+|----------|-------|
+| **Figma file** | `5SmFEQZkbuFRDmqcRPcHRt` — [Astro Shadcn Component Library](https://www.figma.com/integrations/claim/5SmFEQZkbuFRDmqcRPcHRt) |
+| **Storybook (hosted)** | [Chromatic](https://6988f7ff380de2443babfbc5-yoacximcio.chromatic.com/) — 153 components, 241 stories |
+| **Chromatic project** | App ID `6988f7ff380de2443babfbc5` — [Setup](https://www.chromatic.com/setup?appId=6988f7ff380de2443babfbc5) |
+| **Components captured** | 153/153 across 5 automated runs |
