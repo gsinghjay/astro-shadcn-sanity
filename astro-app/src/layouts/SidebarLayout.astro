@@ -5,15 +5,7 @@
  * On mobile, sidebar stacks above content for filter-first UX.
  */
 import Layout from './Layout.astro';
-
-interface SeoProps {
-  metaTitle?: string | null;
-  metaDescription?: string | null;
-  ogImage?: {
-    asset?: { _id: string; url?: string | null; metadata?: { lqip?: string | null; dimensions?: unknown } | null } | null;
-    alt?: string | null;
-  } | null;
-}
+import type { SeoProps } from "@/lib/types";
 
 interface Props {
   title?: string;
