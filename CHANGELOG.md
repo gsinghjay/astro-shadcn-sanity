@@ -1,3 +1,44 @@
+## [1.7.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.6.0...v1.7.0) (2026-02-20)
+
+### Features
+
+* add Chromatic visual testing and Figma design sync ([31eb349](https://github.com/gsinghjay/astro-shadcn-sanity/commit/31eb3490b8ac9db9a6068b5897733f9f819c6a57))
+* add Cloudflare Access auth for sponsor portal (Story 9.1) ([008d9f1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/008d9f180a4543b7380e9a24975535ecb1b80e05))
+* add Docker support for discord-bot and fix Main entry point ([567c202](https://github.com/gsinghjay/astro-shadcn-sanity/commit/567c2027147eea93790aaa282b0af26daac10b80))
+* add event detail pages at /events/[slug] (Story 2.14) ([861dd18](https://github.com/gsinghjay/astro-shadcn-sanity/commit/861dd185d96c77f67db503cad9bb5f6b2c54286f))
+* add GTM-ready data attributes and dataLayer integration ([0400d19](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0400d195d724bf2f4c78879f3b258b72ebc2de18))
+* add portal landing page layout and skeleton UI (Story 9.1b) ([e7539bd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e7539bd6456b410b6e61ed6188555ce890f1542f))
+* add SEO structured data and social sharing metadata (Story 5.11) ([ea0dedb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ea0dedba7d6f68c2d620ec74af887968e5fdaa21))
+* migrate GA4 gtag.js to Google Tag Manager (Story 5.8) ([7bde29f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7bde29f0797b91a952bbdab265aeb75e211d64ec))
+
+### Bug Fixes
+
+* add [@id](https://github.com/id) to JSON-LD organizations and remove invalid industry property ([d2a3ed3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d2a3ed3a5c41eae93a6c1fa94e75ddac6ac3ae3a))
+* add googletagmanager.com to CSP connect-src for GTM container fetches ([6684572](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6684572f91f3d15a6f05a2f6716820a20f4f8e2a))
+* consolidate event detail page into single Section to fix spacing ([a14884a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a14884a0fa1ee7ee89188a8c0a49f5718c2c3afb)), closes [#270](https://github.com/gsinghjay/astro-shadcn-sanity/issues/270)
+* correct team domain to ywcc-capstone-pages and add logout docs ([5d953bb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5d953bbb8d78fadb9007b7414335f1f4480ae704))
+* enable Sheet slide animation for Tailwind v4 ([97cdbeb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/97cdbebfec1f1bf6d89078de2b948fe27685f266))
+* flush sidebar to left edge and add dev auth bypass ([3adbd9d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3adbd9dee88af10aad36a3415d2872521263a178))
+* merge double-Section layout in detail pages and add GTM attrs to ProjectCard sponsor link ([4e28d35](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4e28d35036205aa3015f535a6e49e82c6e9ac484))
+* portal code review — use PortalCard/PortalSkeleton, add PortalIcon, dedupe SeoProps ([72a159c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/72a159c18094c88f19255cf7f06dc5f6f19e3715))
+* remove off-screen translate from Sheet content variants ([8db0507](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8db050701a9df031c327cce055c3c4a89911b00e))
+* use Cloudflare runtime env for JWT validation instead of process.env ([a5e51e6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a5e51e6bf3dcde2d62e236370f7b17ee537d3e8d))
+* use EventScheduled for all events in JSON-LD structured data ([0883e08](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0883e08772a8ce904768909dda4e8ab31d4527ca))
+
+### Documentation
+
+* add beginner-friendly JSDoc to portal React components ([fe94886](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fe94886cf2280a64e799f776b2a4ce86e5a52f41))
+* add pranav to team section ([5b39bc2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5b39bc2598af7a1fcb2b879949a38394acf64087))
+* explain how SSR works with output: static in portal guide ([7590a15](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7590a15d7995bb57548d819174d3ed6af27127c1))
+
+### Miscellaneous
+
+* add CODEOWNERS rule for discord-bot directory ([2c5898c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2c5898cdc4c69c2b18e4f3f6bf7c887bc16e1235))
+
+### Refactoring
+
+* align portal placeholders with stakeholder requirements ([5876b17](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5876b17bba6ebc28799f73ba339e4c70e80e7c47))
+
 ## [1.6.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.5.2...v1.6.0) (2026-02-18)
 
 ### Features
