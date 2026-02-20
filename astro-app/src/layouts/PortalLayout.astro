@@ -155,13 +155,13 @@ const logoutUrl =
       <span class="text-sm font-semibold">Sponsor Portal</span>
     </div>
 
-    {/* Desktop grid — sidebar LEFT, content RIGHT */}
+    {/* Desktop grid — sidebar LEFT (viewport edge), content RIGHT */}
     <div
-      class="mx-auto w-full max-w-[var(--breakpoint-xl)] flex flex-col lg:grid lg:gap-0"
+      class="w-full flex flex-col lg:grid lg:gap-0"
       style="--sidebar-width: 260px;"
       data-portal-layout
     >
-      {/* Desktop sidebar — hidden below lg */}
+      {/* Desktop sidebar — flush to left edge, hidden below lg */}
       <aside class="hidden lg:flex flex-col border-r bg-sidebar text-sidebar-foreground min-h-[calc(100vh-4rem)]">
         {/* User identity */}
         <div class="flex items-center gap-3 p-4">
@@ -213,8 +213,8 @@ const logoutUrl =
         </div>
       </aside>
 
-      {/* Main content area */}
-      <div class="flex-1 p-6 lg:p-8">
+      {/* Main content area — constrained width */}
+      <div class="flex-1 p-6 lg:p-8 lg:max-w-[var(--breakpoint-xl)]">
         <slot />
       </div>
     </div>
