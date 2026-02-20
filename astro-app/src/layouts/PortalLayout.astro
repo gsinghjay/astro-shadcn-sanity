@@ -22,19 +22,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import type { PortalNavItem } from "@/components/portal/types";
-
-interface SeoProps {
-  metaTitle?: string | null;
-  metaDescription?: string | null;
-  ogImage?: {
-    asset?: {
-      _id: string;
-      url?: string | null;
-      metadata?: { lqip?: string | null; dimensions?: unknown } | null;
-    } | null;
-    alt?: string | null;
-  } | null;
-}
+import type { SeoProps } from "@/lib/types";
 
 interface Props {
   title?: string;
@@ -56,28 +44,24 @@ const navItems: PortalNavItem[] = [
     label: "My Projects",
     icon: "lucide:folder",
     disabled: true,
-    badge: "Coming Soon",
   },
   {
     href: "/portal/progress",
     label: "Project Progress",
     icon: "lucide:git-pull-request",
     disabled: true,
-    badge: "Coming Soon",
   },
   {
     href: "/portal/events",
     label: "Events & Schedule",
     icon: "lucide:calendar",
     disabled: true,
-    badge: "Coming Soon",
   },
   {
     href: "/portal/sponsorship",
     label: "My Sponsorship",
     icon: "lucide:handshake",
     disabled: true,
-    badge: "Coming Soon",
   },
 ];
 

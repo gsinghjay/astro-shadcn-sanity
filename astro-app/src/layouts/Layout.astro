@@ -6,15 +6,7 @@ import VisualEditingMPA from "../components/VisualEditingMPA";
 import { getSiteSettings } from "../lib/sanity";
 import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
-
-interface SeoProps {
-  metaTitle?: string | null;
-  metaDescription?: string | null;
-  ogImage?: {
-    asset?: { _id: string; url?: string | null; metadata?: { lqip?: string | null; dimensions?: unknown } | null } | null;
-    alt?: string | null;
-  } | null;
-}
+import type { SeoProps } from "@/lib/types";
 
 interface Props {
   title?: string;

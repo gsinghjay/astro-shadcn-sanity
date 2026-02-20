@@ -2,10 +2,8 @@
 export const prerender = false;
 
 import PortalLayout from "@/layouts/PortalLayout.astro";
-import { Icon } from "@/components/ui/icon";
-import { Tile, TileContent, TileTitle, TileDescription, TileMedia } from "@/components/ui/tile";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import PortalCard from "@/components/portal/PortalCard";
+import PortalSkeleton from "@/components/portal/PortalSkeleton";
 
 const user = Astro.locals.user;
 
@@ -59,28 +57,19 @@ const cards = [
       </p>
     </div>
 
-    {/* Skeleton placeholder cards */}
+    {/* Skeleton placeholder cards — no client directive, SSR-only */}
     <div class="grid gap-6 sm:grid-cols-2">
       {cards.map((card) => (
-        <Tile variant="floating" class={card.disabled ? "opacity-60 pointer-events-none" : ""}>
-          <TileMedia variant="icon">
-            <Icon name={card.icon} />
-          </TileMedia>
-          <TileContent>
-            <div class="flex items-center gap-2">
-              <TileTitle>{card.title}</TileTitle>
-              {card.disabled && (
-                <Badge variant="secondary" class="text-2xs">Coming Soon</Badge>
-              )}
-            </div>
-            <TileDescription>{card.description}</TileDescription>
-            {/* Skeleton placeholder — replaced with real data in Story {card.story} */}
-            <div class="mt-3 flex flex-col gap-2">
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-3/4" />
-            </div>
-          </TileContent>
-        </Tile>
+        <PortalCard
+          title={card.title}
+          description={card.description}
+          icon={card.icon}
+          href={card.href}
+          disabled={card.disabled}
+          badge="Coming Soon"
+        >
+          <PortalSkeleton lines={2} />
+        </PortalCard>
       ))}
     </div>
   </div>
