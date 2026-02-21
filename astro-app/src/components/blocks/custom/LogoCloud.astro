@@ -2,8 +2,7 @@
 import type { Sponsor } from '@/lib/sanity';
 import { Section } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props {
   heading?: string | null;
@@ -26,18 +25,11 @@ const { heading, sponsors } = Astro.props;
 
   <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
     {sponsors?.map((sponsor) => {
-      let logoUrl: string | null = null;
-      if (sponsor.logo?.asset) {
-        try {
-          logoUrl = urlFor(sponsor.logo as unknown as Image).width(120).height(40).fit('max').url();
-        } catch {
-          logoUrl = sponsor.logo.asset.url || null;
-        }
-      }
+      const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
       const content = (
         <div class="bg-muted p-6 flex items-center justify-center h-24 hover:bg-background transition-colors duration-200">
           {logoUrl ? (
-            <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" />
+            <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
           ) : (
             <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
           )}
