@@ -56,7 +56,7 @@ const TemplateComponent = templates[template] ?? DefaultTemplate;
     </TemplateComponent>
     {islandSyncTags.length > 0 && (
       <script define:vars={{ syncTags: islandSyncTags }}>
-        window.__SANITY_SYNC_TAGS__ = syncTags;
+        window.__SANITY_SYNC_TAGS__ = Array.from(new Set([...(window.__SANITY_SYNC_TAGS__ || []), ...syncTags]));
       </script>
     )}
   </>

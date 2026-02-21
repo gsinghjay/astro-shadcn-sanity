@@ -20,7 +20,7 @@ import { createLiveClient, startLiveSubscription } from '@/lib/sanity-live';
 beforeEach(() => {
   vi.restoreAllMocks();
   // Reset window sync tags
-  (window as any).__SANITY_SYNC_TAGS__ = [];
+  window.__SANITY_SYNC_TAGS__ = [];
 });
 
 describe('createLiveClient()', () => {
@@ -94,7 +94,7 @@ describe('startLiveSubscription()', () => {
     } as any;
 
     // Set page sync tags
-    (window as any).__SANITY_SYNC_TAGS__ = ['s1:abc', 's1:def'];
+    window.__SANITY_SYNC_TAGS__ = ['s1:abc', 's1:def'];
 
     startLiveSubscription(mockClient, onMatch, onRestart);
 
@@ -124,7 +124,7 @@ describe('startLiveSubscription()', () => {
       },
     } as any;
 
-    (window as any).__SANITY_SYNC_TAGS__ = ['s1:abc'];
+    window.__SANITY_SYNC_TAGS__ = ['s1:abc'];
 
     startLiveSubscription(mockClient, onMatch, vi.fn());
 
@@ -190,7 +190,7 @@ describe('startLiveSubscription()', () => {
       },
     } as any;
 
-    delete (window as any).__SANITY_SYNC_TAGS__;
+    delete window.__SANITY_SYNC_TAGS__;
 
     startLiveSubscription(mockClient, onMatch, vi.fn());
 
