@@ -1,0 +1,33 @@
+---
+import type { Mark, Props as PTProps } from 'astro-portabletext/types';
+import { stegaClean } from '@sanity/client/stega';
+
+type InternalLinkMark = {
+  reference?: {
+    _ref?: string;
+    _type?: string;
+    slug?: string;
+  };
+};
+type Props = PTProps<Mark<InternalLinkMark>>;
+
+const { node } = Astro.props;
+const ref = node.markDef?.reference;
+
+let href = '#';
+if (ref?.slug) {
+  const slug = stegaClean(ref.slug);
+  const refType = stegaClean(ref._type);
+  if (refType === 'sponsor') {
+    href = `/sponsors/${slug}`;
+  } else if (refType === 'project') {
+    href = `/projects/${slug}`;
+  } else if (refType === 'event') {
+    href = `/events/${slug}`;
+  } else {
+    href = `/${slug}`;
+  }
+}
+---
+
+<a href={href}><slot /></a>

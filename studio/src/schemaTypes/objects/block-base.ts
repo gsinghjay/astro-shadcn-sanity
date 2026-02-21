@@ -7,7 +7,12 @@ export const blockBaseFields = [
     type: 'string',
     fieldset: 'layout',
     options: {
-      list: ['white', 'light', 'dark', 'primary'],
+      list: [
+        {title: 'White', value: 'white'},
+        {title: 'Light', value: 'light'},
+        {title: 'Dark', value: 'dark'},
+        {title: 'Primary', value: 'primary'},
+      ],
       layout: 'radio',
     },
     initialValue: 'white',
@@ -18,7 +23,12 @@ export const blockBaseFields = [
     type: 'string',
     fieldset: 'layout',
     options: {
-      list: ['none', 'small', 'default', 'large'],
+      list: [
+        {title: 'None', value: 'none'},
+        {title: 'Small', value: 'small'},
+        {title: 'Default', value: 'default'},
+        {title: 'Large', value: 'large'},
+      ],
       layout: 'radio',
     },
     initialValue: 'default',
@@ -29,7 +39,11 @@ export const blockBaseFields = [
     type: 'string',
     fieldset: 'layout',
     options: {
-      list: ['narrow', 'default', 'full'],
+      list: [
+        {title: 'Narrow', value: 'narrow'},
+        {title: 'Default', value: 'default'},
+        {title: 'Full', value: 'full'},
+      ],
       layout: 'radio',
     },
     initialValue: 'default',

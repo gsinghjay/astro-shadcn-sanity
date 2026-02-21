@@ -18,11 +18,13 @@ export const featureGrid = defineBlock({
       title: 'Items',
       type: 'array',
       of: [defineArrayMember({type: 'featureItem'})],
+      validation: (Rule) => Rule.min(1).error('Add at least one feature'),
     }),
     defineField({
       name: 'columns',
       title: 'Columns',
       type: 'number',
+      fieldset: 'layout',
       options: {
         list: [2, 3, 4],
       },

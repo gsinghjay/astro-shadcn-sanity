@@ -25,7 +25,12 @@ export const buttonFields = [
     title: 'Variant',
     type: 'string',
     options: {
-      list: ['default', 'secondary', 'outline', 'ghost'],
+      list: [
+        {title: 'Default', value: 'default'},
+        {title: 'Secondary', value: 'secondary'},
+        {title: 'Outline', value: 'outline'},
+        {title: 'Ghost', value: 'ghost'},
+      ],
     },
   }),
 ]

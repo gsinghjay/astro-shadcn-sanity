@@ -42,6 +42,7 @@ export const submission = defineType({
       name: 'submittedAt',
       title: 'Submitted At',
       type: 'datetime',
+      validation: (Rule) => Rule.required(),
     }),
   ],
   preview: {

@@ -1,0 +1,70 @@
+---
+/**
+ * SanityLiveUpdater — client-side live content update island.
+ *
+ * Conditionally rendered when live content or visual editing is enabled.
+ * Subscribes to Sanity Live Content API sync tag events and triggers
+ * a page refresh when matching content changes are detected.
+ *
+ * Uses location.reload() for content refresh in MPA mode.
+ *
+ * Security: When Visual Editing is enabled (non-production only), the read token
+ * is injected server-side via define:vars — never imported in client JS bundles.
+ * The token MUST have viewer (read-only) permissions only.
+ */
+const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+
+// Only pass token to client when visual editing is enabled (non-production)
+const liveToken = visualEditingEnabled ? (import.meta.env.SANITY_API_READ_TOKEN ?? '') : '';
+---
+
+{/* Server-side token injection — only when visual editing is active */}
+{visualEditingEnabled && liveToken && (
+  <script define:vars={{ liveToken }}>
+    window.__SANITY_LIVE_TOKEN__ = liveToken;
+  </script>
+)}
+
+{/* Bundled client module — processed by Vite, can import from project modules */}
+<script>
+  import { createLiveClient, startLiveSubscription } from '@/lib/sanity-live';
+
+  const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
+  const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET || 'production';
+  const apiVersion = '2025-03-01';
+  const visualEditing = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+
+  if (projectId) {
+    const token = visualEditing ? window.__SANITY_LIVE_TOKEN__ : undefined;
+
+    const client = createLiveClient({
+      projectId,
+      dataset,
+      apiVersion,
+      useCdn: !visualEditing,
+      ...(token ? { token } : {}),
+    });
+
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const DEBOUNCE_MS = 500;
+
+    function scheduleRefresh() {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => {
+        window.location.reload();
+      }, DEBOUNCE_MS);
+    }
+
+    const cleanup = startLiveSubscription(
+      client,
+      (_lastLiveEventId) => scheduleRefresh(),
+      () => scheduleRefresh(),
+    );
+
+    // Cleanup on page unload to prevent orphaned connections
+    window.addEventListener('beforeunload', cleanup);
+
+    // Also cleanup on Astro View Transitions swap (if active)
+    document.addEventListener('astro:before-swap', cleanup as EventListener);
+  }
+</script>

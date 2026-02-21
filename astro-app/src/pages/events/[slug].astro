@@ -70,7 +70,7 @@ const eventJsonLd = {
 };
 ---
 
-<Layout title={event.title ?? 'Event'} seo={{ metaDescription: event.description }} template="detail">
+<Layout title={event.title ?? 'Event'} seo={event.seo ?? (event.description ? { metaDescription: event.description } : undefined)} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(eventJsonLd)} />
 
   <Section>

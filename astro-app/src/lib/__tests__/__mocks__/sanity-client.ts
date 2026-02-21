@@ -5,7 +5,7 @@
 import { vi } from "vitest";
 
 export const sanityClient = {
-  fetch: vi.fn().mockResolvedValue({ result: null }),
+  fetch: vi.fn().mockResolvedValue({ result: null, syncTags: [] }),
   config: vi.fn().mockReturnValue({
     projectId: "test-project",
     dataset: "test-dataset",

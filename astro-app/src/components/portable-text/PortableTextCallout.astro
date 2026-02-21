@@ -1,0 +1,25 @@
+---
+import type { Props as PTProps } from 'astro-portabletext/types';
+import { stegaClean } from '@sanity/client/stega';
+
+interface CalloutNode {
+  _type: 'callout';
+  tone?: 'info' | 'warning' | 'success';
+  text?: string;
+}
+
+type Props = PTProps<CalloutNode>;
+
+const { node } = Astro.props;
+const tone = stegaClean(node.tone) || 'info';
+
+const toneStyles: Record<string, string> = {
+  info: 'border-blue-500 bg-blue-50 text-blue-900',
+  warning: 'border-amber-500 bg-amber-50 text-amber-900',
+  success: 'border-green-500 bg-green-50 text-green-900',
+};
+---
+
+<aside class:list={['my-6 rounded-lg border-l-4 p-4', toneStyles[tone] || toneStyles.info]} role="note">
+  <p>{node.text}</p>
+</aside>

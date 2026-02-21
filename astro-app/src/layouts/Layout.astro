@@ -3,7 +3,8 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import VisualEditingMPA from "../components/VisualEditingMPA";
-import { getSiteSettings } from "../lib/sanity";
+import SanityLiveUpdater from "../components/SanityLiveUpdater.astro";
+import { getSiteSettings, getSyncTags } from "../lib/sanity";
 import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
 import type { SeoProps } from "@/lib/types";
@@ -53,6 +54,11 @@ const ogImageUrl = seo?.ogImage?.asset
   ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
   : null;
 
+const liveContentEnabled =
+  import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED === "true";
+
+const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
+
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
@@ -87,6 +93,11 @@ const orgJsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     <title>{fullTitle}</title>
+    {(liveContentEnabled || visualEditingEnabled) && syncTags.length > 0 && (
+      <script define:vars={{ syncTags }}>
+        window.__SANITY_SYNC_TAGS__ = syncTags;
+      </script>
+    )}
     {gtmId && (
       <script define:vars={{ gtmId }}>
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -124,5 +135,6 @@ const orgJsonLd = {
     {!hideNav && <Footer />}
     <script src="../scripts/main.ts"></script>
     {visualEditingEnabled && <VisualEditingMPA client:only="react" />}
+    {(liveContentEnabled || visualEditingEnabled) && <SanityLiveUpdater />}
   </body>
 </html>

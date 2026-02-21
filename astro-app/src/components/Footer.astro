@@ -1,8 +1,7 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
+import { safeUrlFor } from '@/lib/image';
 import {
   Footer as FooterUI,
   FooterDescription,
@@ -30,14 +29,7 @@ const {
   socialLinks,
 } = settings;
 
-let footerLogoUrl = '/logos/njit-logo-plain-light.svg';
-if (logoLight?.asset) {
-  try {
-    footerLogoUrl = urlFor(logoLight as unknown as Image).width(160).height(40).fit('max').url();
-  } catch {
-    footerLogoUrl = logoLight.asset.url || footerLogoUrl;
-  }
-}
+const footerLogoUrl = safeUrlFor(logoLight)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain-light.svg';
 const footerLogoAlt = logoLight?.alt || 'NJIT';
 
 // Split siteName for footer display
@@ -57,7 +49,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
     <!-- About Section - Takes more space on desktop -->
     <div class="lg:col-span-4">
       <Logo href="/" class="mb-6">
-        <img src={footerLogoUrl} alt={footerLogoAlt} class="h-10 w-auto" />
+        <img src={footerLogoUrl} alt={footerLogoAlt} class="h-10 w-auto" width="160" height="40" loading="lazy" />
         <LogoText class="text-background">
           <span class="flex flex-col">
             <span class="text-sm font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>

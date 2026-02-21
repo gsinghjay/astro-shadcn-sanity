@@ -24,6 +24,7 @@ export const ctaBanner = defineBlock({
       title: 'CTA Buttons',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
+      validation: (Rule) => Rule.min(1).error('Add at least one button'),
     }),
   ],
 })

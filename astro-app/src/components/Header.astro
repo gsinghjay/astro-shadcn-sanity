@@ -7,21 +7,13 @@ import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/co
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
+import { safeUrlFor } from '@/lib/image';
 
 const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo } = settings;
 const currentPath = Astro.url.pathname;
 
-let logoUrl = '/logos/njit-logo-plain.svg';
-if (logo?.asset) {
-  try {
-    logoUrl = urlFor(logo as unknown as Image).width(160).height(40).fit('max').url();
-  } catch {
-    logoUrl = logo.asset.url || logoUrl;
-  }
-}
+const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';
 const ctaText = ctaButton?.text || 'Become a Sponsor';
 const ctaHref = ctaButton?.url || '/contact';
@@ -34,7 +26,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
 
 <HeaderUI class="border-b-2 border-foreground">
   <Logo href="/">
-    <img src={logoUrl} alt={logoAlt} class="h-8 w-auto" />
+    <img src={logoUrl} alt={logoAlt} class="h-8 w-auto" width="160" height="40" />
     <LogoText>
       <span class="flex flex-col">
         <span class="text-xs font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>

@@ -22,6 +22,10 @@ jobs:
         env:
           PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
           PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+          PUBLIC_SANITY_STUDIO_URL: ${{ vars.PUBLIC_SANITY_STUDIO_URL }}
+          PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
+          PUBLIC_SANITY_VISUAL_EDITING_ENABLED: ${{ vars.PUBLIC_SANITY_VISUAL_EDITING_ENABLED }}
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy astro-app/dist --project-name=ywcc-capstone --branch=main

@@ -134,6 +134,7 @@ export const siteSettings = defineType({
               options: {
                 list: ['github', 'linkedin', 'twitter', 'instagram', 'youtube'],
               },
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'url',
@@ -160,6 +161,7 @@ export const siteSettings = defineType({
           name: 'email',
           title: 'Email',
           type: 'string',
+          validation: (Rule) => Rule.email().warning(),
         }),
         defineField({
           name: 'phone',
