@@ -13,6 +13,8 @@ const {
   getAllProjects,
   getProjectBySlug,
   resolveBlockSponsors,
+  getSyncTags,
+  resetSyncTags,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
   ALL_SPONSORS_QUERY,
@@ -168,9 +170,10 @@ describe("loadQuery()", () => {
     const mockResult = { title: "Test" };
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: mockResult,
+      syncTags: ["s1:abc"],
     } as never);
 
-    const result = await loadQuery<{ title: string }>({
+    const response = await loadQuery<{ title: string }>({
       query: '*[_type == "test"]',
       params: { id: "123" },
     });
@@ -183,12 +186,14 @@ describe("loadQuery()", () => {
         perspective: "published",
       }),
     );
-    expect(result).toEqual(mockResult);
+    expect(response.result).toEqual(mockResult);
+    expect(response.syncTags).toEqual(["s1:abc"]);
   });
 
   it("defaults params to empty object when not provided", async () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: null,
+      syncTags: [],
     } as never);
 
     await loadQuery({ query: '*[_type == "test"]' });
@@ -203,6 +208,7 @@ describe("loadQuery()", () => {
   it("uses published perspective when visual editing is disabled", async () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: null,
+      syncTags: [],
     } as never);
 
     await loadQuery({ query: "*" });
@@ -215,6 +221,70 @@ describe("loadQuery()", () => {
         stega: false,
       }),
     );
+  });
+
+  it("returns empty syncTags when API response omits them", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: { title: "Test" },
+    } as never);
+
+    const response = await loadQuery<{ title: string }>({
+      query: '*[_type == "test"]',
+    });
+
+    expect(response.syncTags).toEqual([]);
+  });
+});
+
+describe("getSyncTags() and resetSyncTags()", () => {
+  it("collects sync tags from loadQuery calls", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: { title: "A" },
+      syncTags: ["s1:tag1", "s1:tag2"],
+    } as never);
+
+    await loadQuery({ query: "*" });
+    expect(getSyncTags()).toEqual(["s1:tag1", "s1:tag2"]);
+  });
+
+  it("deduplicates sync tags across multiple loadQuery calls", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch)
+      .mockResolvedValueOnce({
+        result: null,
+        syncTags: ["s1:tag1", "s1:tag2"],
+      } as never)
+      .mockResolvedValueOnce({
+        result: null,
+        syncTags: ["s1:tag2", "s1:tag3"],
+      } as never);
+
+    await loadQuery({ query: "*" });
+    await loadQuery({ query: "*" });
+
+    const tags = getSyncTags();
+    expect(tags).toHaveLength(3);
+    expect(tags).toContain("s1:tag1");
+    expect(tags).toContain("s1:tag2");
+    expect(tags).toContain("s1:tag3");
+  });
+
+  it("resetSyncTags clears collected tags", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+      syncTags: ["s1:tag1"],
+    } as never);
+
+    await loadQuery({ query: "*" });
+    expect(getSyncTags()).toHaveLength(1);
+
+    resetSyncTags();
+    expect(getSyncTags()).toEqual([]);
   });
 });
 

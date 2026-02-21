@@ -8,7 +8,7 @@
  * The component fetches its own data, selects the template, and renders blocks.
  */
 import BlockRenderer from '@/components/BlockRenderer.astro';
-import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '@/lib/sanity';
+import { getPage, getAllSponsors, getAllTestimonials, getAllEvents, getSyncTags, resetSyncTags } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
@@ -34,19 +34,32 @@ const { slug } = Astro.props;
 // Ensure fresh draft data on every request — no caching for preview content
 Astro.response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
+// Reset sync tags for this server island request to get page-scoped tags
+resetSyncTags();
+
 const page = await getPage(slug);
 const sponsors = await getAllSponsors();
 const testimonials = await getAllTestimonials();
 const events = await getAllEvents();
+
+// Collect sync tags from all queries run during this island's render
+const islandSyncTags = getSyncTags();
 
 const template = page ? (stegaClean(page.template) as keyof typeof templates) : 'default';
 const TemplateComponent = templates[template] ?? DefaultTemplate;
 ---
 
 {page ? (
-  <TemplateComponent>
-    <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
-  </TemplateComponent>
+  <>
+    <TemplateComponent>
+      <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
+    </TemplateComponent>
+    {islandSyncTags.length > 0 && (
+      <script define:vars={{ syncTags: islandSyncTags }}>
+        window.__SANITY_SYNC_TAGS__ = syncTags;
+      </script>
+    )}
+  </>
 ) : (
   <div class="mx-auto max-w-7xl px-4 py-12 text-center">
     <p class="text-muted-foreground">Page not found for slug: {slug}</p>

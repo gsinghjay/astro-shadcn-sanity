@@ -56,8 +56,27 @@ export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
 export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
 
 /**
+ * Module-level sync tag collector.
+ * Accumulates sync tags from all loadQuery() calls during a page render.
+ * Use getSyncTags() to retrieve and resetSyncTags() to clear between pages.
+ */
+const _syncTagsCollector: Set<string> = new Set();
+
+/** Returns all sync tags collected since last reset. */
+export function getSyncTags(): string[] {
+  return [..._syncTagsCollector];
+}
+
+/** Clears collected sync tags. Call at the start of each page render. */
+export function resetSyncTags(): void {
+  _syncTagsCollector.clear();
+}
+
+/**
  * Fetch wrapper that enables stega encoding + draft perspective
  * when visual editing is active (Presentation tool).
+ * Returns { result, syncTags } — sync tags are also accumulated in the
+ * module-level collector for serialization into the HTML response.
  */
 export async function loadQuery<T>({
   query,
@@ -65,7 +84,7 @@ export async function loadQuery<T>({
 }: {
   query: string;
   params?: QueryParams;
-}): Promise<T> {
+}): Promise<{ result: T; syncTags: string[] }> {
   if (visualEditingEnabled && !token) {
     throw new Error(
       "The `SANITY_API_READ_TOKEN` environment variable is required during Visual Editing.",
@@ -74,7 +93,7 @@ export async function loadQuery<T>({
 
   const perspective = visualEditingEnabled ? "drafts" : "published";
 
-  const { result } = await sanityClient.fetch<T>(query, params ?? {}, {
+  const response = await sanityClient.fetch<T>(query, params ?? {}, {
     filterResponse: false,
     perspective,
     resultSourceMap: visualEditingEnabled ? "withKeyArraySelector" : false,
@@ -82,7 +101,10 @@ export async function loadQuery<T>({
     ...(visualEditingEnabled ? { token } : {}),
   });
 
-  return result;
+  const syncTags: string[] = (response as any).syncTags ?? [];
+  syncTags.forEach(tag => _syncTagsCollector.add(tag));
+
+  return { result: (response as any).result, syncTags };
 }
 
 /**
@@ -114,7 +136,7 @@ let _siteSettingsCache: NonNullable<SITE_SETTINGS_QUERY_RESULT> | null = null;
 export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY_RESULT>> {
   if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
 
-  const result = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
+  const { result } = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
     query: SITE_SETTINGS_QUERY,
   });
 
@@ -153,7 +175,7 @@ let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
 
 export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
   if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
-  const result = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
+  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
 }
@@ -179,10 +201,11 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
  * Fetch a single sponsor by slug from Sanity.
  */
 export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
     query: SPONSOR_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -229,7 +252,7 @@ let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
 
 export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _projectsCache) return _projectsCache;
-  const result = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
+  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
   _projectsCache = result ?? [];
   return _projectsCache;
 }
@@ -261,10 +284,11 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
  * Fetch a single project by slug from Sanity.
  */
 export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
     query: PROJECT_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -286,7 +310,7 @@ let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
 
 export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
   if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
-  const result = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
+  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
   _testimonialsCache = result ?? [];
   return _testimonialsCache;
 }
@@ -327,7 +351,7 @@ let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
 
 export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _eventsCache) return _eventsCache;
-  const result = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
+  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
   _eventsCache = result ?? [];
   return _eventsCache;
 }
@@ -380,10 +404,11 @@ export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.c
  * Fetch a single event by slug from Sanity.
  */
 export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
     query: EVENT_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -495,7 +520,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
     chunks.push(slugs.slice(i, i + concurrency));
   }
   for (const chunk of chunks) {
-    const results = await Promise.all(
+    const responses = await Promise.all(
       chunk.map(slug =>
         loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
           query: PAGE_BY_SLUG_QUERY,
@@ -503,7 +528,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
         }),
       ),
     );
-    chunk.forEach((slug, i) => _pageCache.set(slug, results[i]));
+    chunk.forEach((slug, i) => _pageCache.set(slug, responses[i].result));
   }
 }
 
@@ -513,8 +538,9 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
  */
 export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> {
   if (!visualEditingEnabled && _pageCache.has(slug)) return _pageCache.get(slug)!;
-  return loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
