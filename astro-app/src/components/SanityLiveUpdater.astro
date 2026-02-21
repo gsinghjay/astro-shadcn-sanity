@@ -35,7 +35,7 @@ const liveToken = visualEditingEnabled ? (import.meta.env.SANITY_API_READ_TOKEN 
   const visualEditing = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
   if (projectId) {
-    const token = visualEditing ? (window as any).__SANITY_LIVE_TOKEN__ : undefined;
+    const token = visualEditing ? window.__SANITY_LIVE_TOKEN__ : undefined;
 
     const client = createLiveClient({
       projectId,

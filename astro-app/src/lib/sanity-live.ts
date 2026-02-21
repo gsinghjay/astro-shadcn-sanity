@@ -32,8 +32,8 @@ export function createLiveClient(config: {
     projectId: config.projectId,
     dataset: config.dataset,
     apiVersion: config.apiVersion,
-    useCdn: config.useCdn ?? true,
-    ...(config.token ? { token: config.token, useCdn: false } : {}),
+    useCdn: config.token ? false : (config.useCdn ?? true),
+    ...(config.token ? { token: config.token } : {}),
   });
 }
 
@@ -53,9 +53,10 @@ export function startLiveSubscription(
 ): () => void {
   let reconnectAttempts = 0;
   let subscription: { unsubscribe: () => void } | null = null;
+  let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
   function getSyncTags(): string[] {
-    return (window as any).__SANITY_SYNC_TAGS__ ?? [];
+    return window.__SANITY_SYNC_TAGS__ ?? [];
   }
 
   function subscribe() {
@@ -111,13 +112,18 @@ export function startLiveSubscription(
     if (import.meta.env.DEV) {
       console.log(`[sanity-live] Reconnecting in ${delay}ms (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
     }
-    setTimeout(() => {
+    reconnectTimer = setTimeout(() => {
+      reconnectTimer = null;
       cleanup();
       subscribe();
     }, delay);
   }
 
   function cleanup() {
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
     if (subscription) {
       subscription.unsubscribe();
       subscription = null;
