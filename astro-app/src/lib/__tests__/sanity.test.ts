@@ -22,6 +22,7 @@ const {
   ALL_PROJECT_SLUGS_QUERY,
   PROJECT_BY_SLUG_QUERY,
   PAGE_BY_SLUG_QUERY,
+  EVENT_BY_SLUG_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -71,6 +72,7 @@ describe("GROQ query definitions", () => {
     expect(SPONSOR_BY_SLUG_QUERY).toContain("website");
     expect(SPONSOR_BY_SLUG_QUERY).toContain("industry");
     expect(SPONSOR_BY_SLUG_QUERY).toContain("featured");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("SPONSOR_BY_SLUG_QUERY includes projects sub-query", () => {
@@ -100,11 +102,24 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("team[]");
     expect(PROJECT_BY_SLUG_QUERY).toContain("mentor");
     expect(PROJECT_BY_SLUG_QUERY).toContain("outcome");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("PROJECT_BY_SLUG_QUERY includes testimonials sub-query", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain('_type == "testimonial"');
     expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
+  });
+
+  it("EVENT_BY_SLUG_QUERY fetches single event by slug with all fields", () => {
+    expect(EVENT_BY_SLUG_QUERY).toContain('_type == "event"');
+    expect(EVENT_BY_SLUG_QUERY).toContain("$slug");
+    expect(EVENT_BY_SLUG_QUERY).toContain("date");
+    expect(EVENT_BY_SLUG_QUERY).toContain("endDate");
+    expect(EVENT_BY_SLUG_QUERY).toContain("location");
+    expect(EVENT_BY_SLUG_QUERY).toContain("description");
+    expect(EVENT_BY_SLUG_QUERY).toContain("eventType");
+    expect(EVENT_BY_SLUG_QUERY).toContain("status");
+    expect(EVENT_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("PAGE_BY_SLUG_QUERY includes all block type projections", () => {

@@ -104,12 +104,6 @@ export const project = defineType({
       group: 'team',
     }),
     defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: 'seo',
-      group: 'seo',
-    }),
-    defineField({
       name: 'technologyTags',
       title: 'Technologies',
       type: 'array',
@@ -191,6 +185,12 @@ export const project = defineType({
       ],
       options: {layout: 'tags'},
       validation: (Rule) => Rule.unique(),
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      group: 'seo',
     }),
   ],
 })
