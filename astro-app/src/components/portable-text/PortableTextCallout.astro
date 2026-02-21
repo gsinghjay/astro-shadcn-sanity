@@ -1,5 +1,6 @@
 ---
 import type { Props as PTProps } from 'astro-portabletext/types';
+import { stegaClean } from '@sanity/client/stega';
 
 interface CalloutNode {
   _type: 'callout';
@@ -10,7 +11,7 @@ interface CalloutNode {
 type Props = PTProps<CalloutNode>;
 
 const { node } = Astro.props;
-const tone = node.tone || 'info';
+const tone = stegaClean(node.tone) || 'info';
 
 const toneStyles: Record<string, string> = {
   info: 'border-blue-500 bg-blue-50 text-blue-900',
