@@ -536,7 +536,6 @@ export type Project = {
     _key: string;
   }>;
   mentor?: string;
-  seo?: Seo;
   technologyTags?: Array<
     | "5G Technology"
     | "802.1X Authentication"
@@ -605,6 +604,7 @@ export type Project = {
     | "Workforce Analytics"
     | "Zero Trust Architecture"
   >;
+  seo?: Seo;
 };
 
 export type Seo = {
