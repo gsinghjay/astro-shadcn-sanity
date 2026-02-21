@@ -14,20 +14,39 @@ type Props = PTProps<ImageNode>;
 const { node } = Astro.props;
 const { alt, caption } = node;
 
-const src = safeUrlFor(node)?.width(800).url() ?? null;
+const maxWidth = 1200;
+const dims = node.asset?.metadata?.dimensions;
+const width = Math.min(dims?.width ?? 800, maxWidth);
+const height = dims ? Math.round(width * (dims.height / dims.width)) : 600;
+const lqip = node.asset?.metadata?.lqip;
+const src = safeUrlFor(node)?.width(width).url() ?? null;
 ---
 
 {src && (
   <figure class="my-8">
-    <img
-      src={src}
-      alt={alt || ''}
-      width="800"
-      height="600"
-      loading="lazy"
-      decoding="async"
-      class="rounded-lg w-full h-auto"
-    />
+    {lqip ? (
+      <div style={`background-image: url(${lqip}); background-size: cover;`}>
+        <img
+          src={src}
+          alt={alt || ''}
+          width={width}
+          height={height}
+          loading="lazy"
+          decoding="async"
+          class="rounded-lg w-full h-auto"
+        />
+      </div>
+    ) : (
+      <img
+        src={src}
+        alt={alt || ''}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+        class="rounded-lg w-full h-auto"
+      />
+    )}
     {caption && (
       <figcaption class="mt-2 text-center text-sm text-muted-foreground">{caption}</figcaption>
     )}

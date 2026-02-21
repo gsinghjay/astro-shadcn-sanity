@@ -4,8 +4,7 @@ import { Section, SectionSplit, SectionContent, SectionMedia } from '@/component
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props extends TextWithImageBlock {
   class?: string;
@@ -14,9 +13,7 @@ interface Props extends TextWithImageBlock {
 
 const { heading, content, image, imagePosition } = Astro.props;
 const isRight = stegaClean(imagePosition) !== 'left';
-const imgSrc = image?.asset
-  ? urlFor(image as unknown as Image).width(800).height(600).fit('crop').url()
-  : null;
+const imgSrc = safeUrlFor(image)?.width(800).height(600).fit('crop').url() ?? null;
 const lqip = image?.asset?.metadata?.lqip;
 ---
 

@@ -18,6 +18,15 @@ export { sanityClient, groq };
 
 const IMAGE_PROJECTION = `asset->{ _id, url, metadata { lqip, dimensions } }`;
 
+const PORTABLE_TEXT_PROJECTION = `{
+  ...,
+  _type == "image" => { ${IMAGE_PROJECTION}, alt, caption },
+  markDefs[]{
+    ...,
+    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }
+  }
+}`;
+
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
@@ -235,7 +244,7 @@ export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && 
  */
 export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug][0]{
   _id, title, "slug": slug.current,
-  content,
+  content[]${PORTABLE_TEXT_PROJECTION},
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
   technologyTags,
   semester,
@@ -419,7 +428,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "textWithImage" => {
       heading,
-      content[]{...},
+      content[]${PORTABLE_TEXT_PROJECTION},
       image{ ${IMAGE_PROJECTION}, alt },
       imagePosition
     },
@@ -435,11 +444,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       ctaButtons[]{ _key, text, url, variant }
     },
     _type == "richText" => {
-      content[]{...}
+      content[]${PORTABLE_TEXT_PROJECTION}
     },
     _type == "faqSection" => {
       heading,
-      items[]{ _key, question, answer }
+      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
     },
     _type == "contactForm" => {
       heading,
