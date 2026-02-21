@@ -1,5 +1,5 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
-import {ProjectsIcon} from '@sanity/icons'
+import {ProjectsIcon, SearchIcon} from '@sanity/icons'
 
 export const project = defineType({
   name: 'project',
@@ -11,6 +11,7 @@ export const project = defineType({
     {name: 'content', title: 'Content'},
     {name: 'team', title: 'Team'},
     {name: 'tags', title: 'Tags'},
+    {name: 'seo', title: 'SEO', icon: SearchIcon},
   ],
   preview: {
     select: {title: 'title', subtitle: 'semester', media: 'sponsor.logo'},
@@ -101,6 +102,12 @@ export const project = defineType({
       title: 'Mentor',
       type: 'string',
       group: 'team',
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      group: 'seo',
     }),
     defineField({
       name: 'technologyTags',

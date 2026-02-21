@@ -41,7 +41,7 @@ const sponsorJsonLd = {
 };
 ---
 
-<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined} template="detail">
+<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.seo ?? (sponsor.description ? { metaDescription: sponsor.description } : undefined)} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
   <Section>
     <SectionContent>

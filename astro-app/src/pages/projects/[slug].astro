@@ -45,7 +45,7 @@ const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
-<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article" template="detail">
+<Layout title={project.title ?? 'Project'} seo={project.seo ?? (project.outcome ? { metaDescription: project.outcome } : undefined)} ogType="article" template="detail">
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
