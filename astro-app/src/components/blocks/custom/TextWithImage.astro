@@ -2,6 +2,7 @@
 import type { TextWithImageBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
+import { portableTextComponents } from '@/components/portable-text';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
 import type { Image } from '@sanity/types';
@@ -27,7 +28,7 @@ const lqip = image?.asset?.metadata?.lqip;
       )}
       {content && (
         <div class="text-muted-foreground leading-relaxed prose">
-          <PortableText value={content} />
+          <PortableText value={content} components={portableTextComponents} />
         </div>
       )}
     </SectionContent>

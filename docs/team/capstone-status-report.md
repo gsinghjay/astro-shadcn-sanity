@@ -1,7 +1,7 @@
 # YWCC Capstone Website -- Status Report
 
 **Generated:** 2026-02-19
-**Last updated:** 2026-02-20 (P1 content migration complete + P0/P2 MCP content updates: R&D publications/mentorship blocks, homepage stats, case-studies page, sponsorship-opportunities page)
+**Last updated:** 2026-02-20 (Story 7-14: technology tags formalized as predefined list of 66 — PR #330; Story 7-15: code review fixes — safeUrlFor() typed wrapper, block registry typed, image CLS attributes, HSTS + X-Frame-Options headers, CI env vars, GROQ fragment extraction, Portable Text custom components)
 **Source:** Automated codebase audit against `docs/team/capstone-stakeholders.pdf`
 
 ---
@@ -96,7 +96,7 @@ step4      -> image-b58cfccc754c1c5c735fcb5b63ef9e2b368a1368-1024x1024-png
 
 | Category | Types |
 |---|---|
-| **Documents (6)** | `page`, `siteSettings` (singleton), `sponsor`, `project`, `testimonial`, `event` |
+| **Documents (6)** | `page`, `siteSettings` (singleton), `sponsor`, `project` (technologyTags: predefined list of 66 — Story 7-14), `testimonial`, `event` |
 | **Objects (8)** | `seo`, `button`, `link`, `portableText`, `faqItem`, `featureItem`, `statItem`, `stepItem` |
 | **Page Builder Blocks (13)** | `heroBanner`, `featureGrid`, `ctaBanner`, `statsRow`, `textWithImage`, `logoCloud`, `sponsorSteps`, `richText`, `faqSection`, `contactForm`, `sponsorCards`, `testimonials`, `eventList` |
 
@@ -132,7 +132,7 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 #### Projects -- REPLACED with real data (2026-02-20)
 
-All 9 real projects from WP migrated. Each has: title, slug, Portable Text content, outcome, and sponsor reference (except YWCC Capstone Website which is internal). **Gap:** `technologies`, `teamMembers`, and `mentor` fields are null on all 9 projects.
+All 9 real projects from WP migrated. Each has: title, slug, Portable Text content, outcome, sponsor reference (except YWCC Capstone Website which is internal), technology tags (now constrained to predefined list of 66 — Story 7-14), and team members. **Remaining gap:** `mentor` field is null (not available in WP data).
 
 | Project | ID | Sponsor Ref | Content | Outcome | Tech Tags | Team |
 |---|---|---|---|---|---|---|
@@ -214,7 +214,7 @@ All 9 real projects from WP migrated. Each has: title, slug, Portable Text conte
 
 | Layer | Count | Details |
 |---|---|---|
-| Unit (Vitest) | 3 test files | `cn()` util, image URL helpers, GROQ query strings |
+| Unit (Vitest) | 3 test files | `cn()` util, image URL helpers (`urlFor` + `safeUrlFor`), GROQ query strings |
 | Component (Vitest + Container API) | 17 test files | All 13 block types + BlockRenderer, BlockWrapper, ProjectCard, Breadcrumb, Header |
 | SSR Smoke (Vitest + Miniflare) | 3 test files | Worker smoke, build output, wrangler config |
 | Integration (Vitest) | Multiple suites | Schema registration, data fetching, architecture validation |
@@ -226,7 +226,8 @@ All 9 real projects from WP migrated. Each has: title, slug, Portable Text conte
 - **Visual Editing** -- Full Sanity Presentation tool integration with stega + Server Islands
 - **GTM Analytics** -- Page views, form events, FAQ expand, carousel nav, link click tracking
 - **JSON-LD Structured Data** -- EducationalOrganization, Organization, Event, BreadcrumbList
-- **SEO** -- Per-page meta, OG/Twitter cards, Content Security Policy
+- **SEO** -- Per-page meta, OG/Twitter cards, Content Security Policy, X-Frame-Options, HSTS
+- **Portable Text** -- Custom renderers for inline images (responsive + lazy), callout blocks (tone-based styling), external links (noopener), and internal link resolution
 - **Build Caching** -- Module-level data caching with parallel batch pre-fetching
 - **Storybook** -- Component documentation deployed to GitHub Pages (~95 pre-built blocks)
 - **Multi-Template System** -- 5 layout templates selectable per-page in CMS
@@ -240,7 +241,7 @@ All 9 real projects from WP migrated. Each has: title, slug, Portable Text conte
 |---|---|
 | 4.1 Homepage | **Updated** -- hero images + heading from WP, logoCloud added, stats updated to real numbers. Still needs Featured Projects block (`projectCards`). Block reorder pending (Sanity Studio drag-and-drop). |
 | 4.2 About the Capstone Program | **Content migrated** -- stats updated with real numbers. Images still placeholder. Sponsorship Levels comparison block still needed. |
-| 4.3 Industry Projects Showcase | **Projects migrated** -- 9 real projects with content, outcomes, sponsor refs. Gap: `technologies`, `teamMembers`, `mentor` fields still null. Sorting controls not yet added. |
+| 4.3 Industry Projects Showcase | **Projects migrated** -- 9 real projects with content, outcomes, sponsor refs, technology tags (predefined list of 66 — Story 7-14, PR #330), team members. Gap: `mentor` field still null (not available in WP data). Sorting controls not yet added. |
 | 4.4 Sponsorship Opportunities | **Standalone page created** (draft) at `/sponsorship-opportunities` with 7 blocks (hero, why sponsor, benefits, stats, testimonials, contact form, logos). Form backend live (Story 6.1). Tiers comparison block still needed. |
 | 4.5 Research and Development | **Done** -- R&D page with 8 blocks: WP content + images, publications/conferences, mentorship/collaboration. Optional stretch: `publication` doc type. |
 | 4.6 Testimonials and Success Stories | **Done** -- 9 real testimonials (7 industry, 2 student) linked to projects. Case Studies page created (draft) at `/case-studies` with byProject testimonials + narrative. |
@@ -250,7 +251,7 @@ All 9 real projects from WP migrated. Each has: title, slug, Portable Text conte
 | 6.2 Event Calendar and Notifications | Partially done -- event list exists, no calendar view or reminders |
 | 7. Design/UX | Done -- responsive, professional, easy CMS editing |
 | 8. CMS | Done (Sanity, not WordPress as originally specified) -- role-based access via Cloudflare Access |
-| 9. Security | Done -- SSL, JWT auth, CSP headers, HTTPS enforced |
+| 9. Security | Done -- SSL, JWT auth, CSP headers, X-Frame-Options, HSTS, HTTPS enforced |
 
 ---
 

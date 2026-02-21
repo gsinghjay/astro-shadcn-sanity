@@ -23,7 +23,9 @@ export interface SanityImageSource {
 export function safeUrlFor(image: SanityImageSource | null | undefined): ReturnType<typeof urlFor> | null {
   if (!image?.asset) return null;
   try {
-    return urlFor(image as unknown as Image);
+    const img = urlFor(image as unknown as Image);
+    img.url(); // eagerly validate the asset ref is parseable
+    return img;
   } catch {
     return null;
   }

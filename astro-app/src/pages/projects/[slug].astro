@@ -10,6 +10,7 @@ import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
+import { portableTextComponents } from '@/components/portable-text';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY);
@@ -114,7 +115,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
         <div>
           <h2 class="text-2xl font-bold mb-4">Problem & Approach</h2>
           <div class="prose max-w-none">
-            <PortableText value={project.content} />
+            <PortableText value={project.content} components={portableTextComponents} />
           </div>
         </div>
       )}

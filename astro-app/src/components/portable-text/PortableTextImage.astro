@@ -1,7 +1,6 @@
 ---
 import type { Props as PTProps } from 'astro-portabletext/types';
-import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
+import { safeUrlFor } from '@/lib/image';
 
 interface ImageNode {
   _type: 'image';
@@ -15,14 +14,7 @@ type Props = PTProps<ImageNode>;
 const { node } = Astro.props;
 const { alt, caption } = node;
 
-let src: string | null = null;
-if (node.asset) {
-  try {
-    src = urlFor(node as unknown as Image).width(800).auto('format').url();
-  } catch {
-    src = null;
-  }
-}
+const src = safeUrlFor(node)?.width(800).url() ?? null;
 ---
 
 {src && (

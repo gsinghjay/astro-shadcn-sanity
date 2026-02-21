@@ -183,6 +183,7 @@ export const project = defineType({
         }),
       ],
       options: {layout: 'tags'},
+      validation: (Rule) => Rule.unique(),
     }),
   ],
 })
