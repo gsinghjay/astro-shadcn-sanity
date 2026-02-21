@@ -1,0 +1,31 @@
+---
+import type { Mark, Props as PTProps } from 'astro-portabletext/types';
+
+type InternalLinkMark = {
+  reference?: {
+    _ref?: string;
+    _type?: string;
+    slug?: { current?: string };
+  };
+};
+type Props = PTProps<Mark<InternalLinkMark>>;
+
+const { node } = Astro.props;
+const ref = node.markDef?.reference;
+
+let href = '#';
+if (ref?.slug?.current) {
+  const refType = ref._type;
+  if (refType === 'sponsor') {
+    href = `/sponsors/${ref.slug.current}`;
+  } else if (refType === 'project') {
+    href = `/projects/${ref.slug.current}`;
+  } else if (refType === 'event') {
+    href = `/events/${ref.slug.current}`;
+  } else {
+    href = `/${ref.slug.current}`;
+  }
+}
+---
+
+<a href={href}><slot /></a>

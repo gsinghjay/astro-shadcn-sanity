@@ -1,0 +1,43 @@
+---
+import type { Props as PTProps } from 'astro-portabletext/types';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
+
+interface ImageNode {
+  _type: 'image';
+  asset?: { _ref?: string; _id?: string; url?: string; metadata?: { lqip?: string; dimensions?: { width: number; height: number } } };
+  alt?: string;
+  caption?: string;
+}
+
+type Props = PTProps<ImageNode>;
+
+const { node } = Astro.props;
+const { alt, caption } = node;
+
+let src: string | null = null;
+if (node.asset) {
+  try {
+    src = urlFor(node as unknown as Image).width(800).auto('format').url();
+  } catch {
+    src = null;
+  }
+}
+---
+
+{src && (
+  <figure class="my-8">
+    <img
+      src={src}
+      alt={alt || ''}
+      width="800"
+      height="600"
+      loading="lazy"
+      decoding="async"
+      class="rounded-lg w-full h-auto"
+    />
+    {caption && (
+      <figcaption class="mt-2 text-center text-sm text-muted-foreground">{caption}</figcaption>
+    )}
+  </figure>
+)}

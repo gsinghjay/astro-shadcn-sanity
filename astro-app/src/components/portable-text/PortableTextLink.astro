@@ -1,0 +1,15 @@
+---
+import type { Mark, Props as PTProps } from 'astro-portabletext/types';
+
+type LinkMark = { href?: string };
+type Props = PTProps<Mark<LinkMark>>;
+
+const { node } = Astro.props;
+const href = node.markDef?.href || '#';
+const isExternal = href.startsWith('http') || href.startsWith('mailto:') || href.startsWith('tel:');
+---
+
+<a
+  href={href}
+  {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+><slot /></a>

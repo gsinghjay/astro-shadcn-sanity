@@ -16,6 +16,8 @@ import type {
 
 export { sanityClient, groq };
 
+const IMAGE_PROJECTION = `asset->{ _id, url, metadata { lqip, dimensions } }`;
+
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
@@ -80,8 +82,8 @@ export async function loadQuery<T>({
 export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings"][0]{
   siteName,
   siteDescription,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
-  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  logo{ ${IMAGE_PROJECTION}, alt },
+  logoLight{ ${IMAGE_PROJECTION}, alt },
   navigationItems[]{ _key, label, href, children[]{ _key, label, href } },
   ctaButton{ text, url },
   footerContent{ text, copyrightText },
@@ -129,7 +131,7 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
  */
 export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor"] | order(name asc){
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured
 }`);
 
@@ -158,7 +160,7 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
  */
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug][0]{
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
   "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }
 }`);
@@ -202,7 +204,7 @@ export function resolveBlockSponsors(
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project"] | order(title asc){
   _id, title, "slug": slug.current,
   content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry },
   technologyTags,
   semester,
   status,
@@ -234,14 +236,14 @@ export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && 
 export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug][0]{
   _id, title, "slug": slug.current,
   content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
   technologyTags,
   semester,
   status,
   team[]{ _key, name, role },
   mentor,
   outcome,
-  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
 /**
@@ -260,7 +262,7 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
  */
 export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial"] | order(name asc){
   _id, name, quote, role, organization, type,
-  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   project->{ _id, title, "slug": slug.current }
 }`);
 
@@ -386,7 +388,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   seo {
     metaTitle,
     metaDescription,
-    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }
+    ogImage { ${IMAGE_PROJECTION}, alt }
   },
   blocks[]{
     _type,
@@ -397,13 +399,13 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "heroBanner" => {
       heading,
       subheading,
-      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
       ctaButtons[]{ _key, text, url, variant },
       alignment
     },
     _type == "featureGrid" => {
       heading,
-      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },
+      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
       columns
     },
     _type == "ctaBanner" => {
@@ -418,7 +420,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "textWithImage" => {
       heading,
       content[]{...},
-      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+      image{ ${IMAGE_PROJECTION}, alt },
       imagePosition
     },
     _type == "logoCloud" => {

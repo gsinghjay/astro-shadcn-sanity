@@ -20,10 +20,10 @@
   ],
   "dependencies": {
     "@sanity/form-toolkit": "^2.2.3",
-    "@sanity/vision": "^5.10.0",
+    "@sanity/vision": "^5.11.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "sanity": "^5.10.0",
+    "sanity": "^5.11.0",
     "styled-components": "^6.3.9"
   },
   "devDependencies": {

@@ -246,28 +246,6 @@ export type Submission = {
   submittedAt?: string;
 };
 
-export type Event = {
-  _id: string;
-  _type: "event";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  date?: string;
-  endDate?: string;
-  location?: string;
-  description?: string;
-  eventType?: "showcase" | "networking" | "workshop";
-  status?: "upcoming" | "past";
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type ProjectReference = {
   _ref: string;
   _type: "reference";
@@ -311,102 +289,6 @@ export type SanityImageHotspot = {
   y?: number;
   height?: number;
   width?: number;
-};
-
-export type Project = {
-  _id: string;
-  _type: "project";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  sponsor?: SponsorReference;
-  status?: "active" | "completed" | "archived";
-  semester?: string;
-  content?: PortableText;
-  outcome?: string;
-  team?: Array<{
-    name?: string;
-    role?: string;
-    _key: string;
-  }>;
-  mentor?: string;
-  technologyTags?: Array<string>;
-};
-
-export type PageReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "page";
-};
-
-export type PortableText = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
-      listItem?: "bullet" | "number";
-      markDefs?: Array<
-        | {
-            href?: string;
-            _type: "link";
-            _key: string;
-          }
-        | {
-            reference?: PageReference;
-            _type: "internalLink";
-            _key: string;
-          }
-      >;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }
-  | {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      caption?: string;
-      _type: "image";
-      _key: string;
-    }
-  | {
-      tone?: "info" | "warning" | "success";
-      text?: string;
-      _type: "callout";
-      _key: string;
-    }
->;
-
-export type Sponsor = {
-  _id: string;
-  _type: "sponsor";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  slug?: Slug;
-  logo?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  description?: string;
-  website?: string;
-  industry?: string;
-  tier?: "platinum" | "gold" | "silver" | "bronze";
-  featured?: boolean;
 };
 
 export type SiteSettings = {
@@ -520,6 +402,68 @@ export type FaqItem = {
   answer?: PortableText;
 };
 
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type EventReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "event";
+};
+
+export type PortableText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<
+        | {
+            href?: string;
+            _type: "link";
+            _key: string;
+          }
+        | {
+            reference?:
+              | PageReference
+              | SponsorReference
+              | ProjectReference
+              | EventReference;
+            _type: "internalLink";
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }
+  | {
+      tone?: "info" | "warning" | "success";
+      text?: string;
+      _type: "callout";
+      _key: string;
+    }
+>;
+
 export type Page = {
   _id: string;
   _type: "page";
@@ -571,6 +515,140 @@ export type Page = {
         _key: string;
       } & EventList)
   >;
+};
+
+export type Project = {
+  _id: string;
+  _type: "project";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  sponsor?: SponsorReference;
+  status?: "active" | "completed" | "archived";
+  semester?: string;
+  content?: PortableText;
+  outcome?: string;
+  team?: Array<{
+    name?: string;
+    role?: string;
+    _key: string;
+  }>;
+  mentor?: string;
+  technologyTags?: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "CSS"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "Custom Theme"
+    | "DNS Security"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "HTML"
+    | "Healthcare IoT"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "NLP"
+    | "Network Security"
+    | "Next.js"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "REST API"
+    | "React"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "VLAN Configuration"
+    | "Video Processing"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  >;
+};
+
+export type Event = {
+  _id: string;
+  _type: "event";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  date?: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+  eventType?: "showcase" | "networking" | "workshop";
+  status?: "upcoming" | "past";
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Sponsor = {
+  _id: string;
+  _type: "sponsor";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  description?: string;
+  website?: string;
+  industry?: string;
+  tier?: "platinum" | "gold" | "silver" | "bronze";
+  featured?: boolean;
 };
 
 export type Seo = {
@@ -772,22 +850,23 @@ export type AllSanitySchemaTypes =
   | FeatureGrid
   | HeroBanner
   | Submission
-  | Event
-  | Slug
   | ProjectReference
   | Testimonial
   | SanityImageCrop
   | SanityImageHotspot
-  | Project
-  | PageReference
-  | PortableText
-  | Sponsor
   | SiteSettings
   | StepItem
   | StatItem
   | FeatureItem
   | FaqItem
+  | PageReference
+  | EventReference
+  | PortableText
   | Page
+  | Project
+  | Event
+  | Slug
+  | Sponsor
   | Seo
   | Link
   | Button
@@ -984,7 +1063,74 @@ export type ALL_PROJECTS_QUERY_RESULT = Array<{
     } | null;
     industry: string | null;
   } | null;
-  technologyTags: Array<string> | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
   semester: string | null;
   status: "active" | "archived" | "completed" | null;
   outcome: string | null;
@@ -1027,7 +1173,74 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     description: string | null;
     website: string | null;
   } | null;
-  technologyTags: Array<string> | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
   semester: string | null;
   status: "active" | "archived" | "completed" | null;
   team: Array<{
@@ -1329,7 +1542,11 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               listItem?: "bullet" | "number";
               markDefs?: Array<
                 | {
-                    reference?: PageReference;
+                    reference?:
+                      | EventReference
+                      | PageReference
+                      | ProjectReference
+                      | SponsorReference;
                     _type: "internalLink";
                     _key: string;
                   }
@@ -1445,7 +1662,11 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               listItem?: "bullet" | "number";
               markDefs?: Array<
                 | {
-                    reference?: PageReference;
+                    reference?:
+                      | EventReference
+                      | PageReference
+                      | ProjectReference
+                      | SponsorReference;
                     _type: "internalLink";
                     _key: string;
                   }
