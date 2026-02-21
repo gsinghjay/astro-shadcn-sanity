@@ -70,6 +70,29 @@ export const event = defineType({
       group: 'main',
     }),
     defineField({
+      name: 'isAllDay',
+      title: 'All-Day Event',
+      type: 'boolean',
+      group: 'main',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'color',
+      title: 'Calendar Color',
+      type: 'string',
+      group: 'main',
+      description: 'Optional calendar color override. Falls back to event type color if not set.',
+      options: {
+        list: [
+          {title: 'Red', value: 'red'},
+          {title: 'Blue', value: 'blue'},
+          {title: 'Green', value: 'green'},
+          {title: 'Orange', value: 'orange'},
+          {title: 'Purple', value: 'purple'},
+        ],
+      },
+    }),
+    defineField({
       name: 'eventType',
       title: 'Event Type',
       type: 'string',
