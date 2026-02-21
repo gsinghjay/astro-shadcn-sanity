@@ -22,6 +22,9 @@ export default defineConfig({
   adapter: cloudflare({ platformProxy: { enabled: true } }),
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      noExternal: ["nanostores", "@nanostores/react"],
+    },
     define: {
       // Explicitly pass PUBLIC_* vars through Vite's define for .astro files.
       // The @astrojs/cloudflare adapter's define: { "process.env": "process.env" }

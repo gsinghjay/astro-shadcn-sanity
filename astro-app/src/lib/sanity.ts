@@ -387,6 +387,18 @@ export function resolveBlockEvents(
 }
 
 /**
+ * GROQ query: fetch events within a date range for calendar month navigation.
+ * For future use when event volume grows — current implementation uses pre-fetched getAllEvents().
+ */
+export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
+  && dateTime(date) >= dateTime($monthStart)
+  && dateTime(date) <= dateTime($monthEnd)
+] | order(date asc) {
+  _id, title, "slug": slug.current, date, endDate,
+  location, eventType, status
+}`);
+
+/**
  * GROQ query: fetch all event slugs for static path generation.
  */
 export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defined(slug.current)]{ "slug": slug.current }`);

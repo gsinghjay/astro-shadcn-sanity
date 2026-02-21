@@ -1,0 +1,52 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import EventCard from '@/components/EventCard.astro';
+import { Section, SectionContent } from '@/components/ui/section';
+import { getAllEvents } from '@/lib/sanity';
+import CalendarViewToggle from '@/components/react/CalendarViewToggle';
+import EventCalendarIsland from '@/components/react/EventCalendarIsland';
+
+const events = await getAllEvents();
+---
+
+<Layout title="Events" seo={{ metaDescription: 'Browse upcoming and past events from the YWCC Industry Capstone program.' }}>
+  <Section>
+    <SectionContent>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: 'Events' },
+      ]} />
+
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Events</h1>
+        <CalendarViewToggle client:idle />
+      </div>
+
+      <div id="events-list">
+        {events.length > 0 ? (
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {events.map((e) => (
+              <EventCard event={e} />
+            ))}
+          </div>
+        ) : (
+          <p class="text-muted-foreground text-center py-8">No events to display.</p>
+        )}
+      </div>
+
+      <EventCalendarIsland client:idle events={JSON.stringify(events)} />
+    </SectionContent>
+  </Section>
+</Layout>
+
+<script>
+  import { isCalendarView } from '@/stores/calendarStore';
+
+  const listEl = document.getElementById('events-list');
+  if (listEl) {
+    isCalendarView.subscribe((show) => {
+      listEl.style.display = show ? 'none' : '';
+    });
+  }
+</script>
