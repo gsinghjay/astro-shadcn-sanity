@@ -7,7 +7,7 @@ export const testimonial = defineType({
   type: 'document',
   icon: CommentIcon,
   preview: {
-    select: {title: 'name', subtitle: 'organization'},
+    select: {title: 'name', subtitle: 'organization', media: 'photo'},
   },
   fields: [
     defineField({

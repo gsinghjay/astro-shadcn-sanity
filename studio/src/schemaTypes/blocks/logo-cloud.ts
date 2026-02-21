@@ -31,6 +31,14 @@ export const logoCloud = defineBlock({
           to: [{type: 'sponsor'}],
         }),
       ],
+      validation: (Rule) =>
+        Rule.custom((sponsors, context) => {
+          const parent = context.parent as {autoPopulate?: boolean}
+          if (parent?.autoPopulate === false && (!sponsors || sponsors.length === 0)) {
+            return 'Add at least one sponsor when auto-populate is off'
+          }
+          return true
+        }),
     }),
   ],
 })

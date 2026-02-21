@@ -91,10 +91,11 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
 
       const options = tierField.options?.list
       expect(options).toBeDefined()
-      expect(options).toEqual(
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(
         expect.arrayContaining(['platinum', 'gold', 'silver', 'bronze']),
       )
-      expect(options).toHaveLength(4)
+      expect(values).toHaveLength(4)
     })
 
     test('[P0] 3.1-INT-010 — featured field is boolean with initialValue false', () => {

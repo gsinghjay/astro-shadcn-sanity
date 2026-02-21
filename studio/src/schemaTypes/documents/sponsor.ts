@@ -6,6 +6,9 @@ export const sponsor = defineType({
   title: 'Sponsor',
   type: 'document',
   icon: CreditCardIcon,
+  preview: {
+    select: {title: 'name', subtitle: 'tier', media: 'logo'},
+  },
   fields: [
     defineField({
       name: 'name',
@@ -55,7 +58,12 @@ export const sponsor = defineType({
       title: 'Tier',
       type: 'string',
       options: {
-        list: ['platinum', 'gold', 'silver', 'bronze'],
+        list: [
+          {title: 'Platinum', value: 'platinum'},
+          {title: 'Gold', value: 'gold'},
+          {title: 'Silver', value: 'silver'},
+          {title: 'Bronze', value: 'bronze'},
+        ],
       },
     }),
     defineField({

@@ -39,6 +39,14 @@ export const testimonials = defineBlock({
           to: [{type: 'testimonial'}],
         }),
       ],
+      validation: (Rule) =>
+        Rule.custom((testimonials, context) => {
+          const parent = context.parent as {displayMode?: string}
+          if (parent?.displayMode === 'manual' && (!testimonials || testimonials.length === 0)) {
+            return 'Add at least one testimonial in manual mode'
+          }
+          return true
+        }),
     }),
   ],
 })

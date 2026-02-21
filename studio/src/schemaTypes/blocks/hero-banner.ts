@@ -48,6 +48,7 @@ export const heroBanner = defineBlock({
       name: 'alignment',
       title: 'Alignment',
       type: 'string',
+      fieldset: 'layout',
       options: {
         list: ['left', 'center', 'right'],
         layout: 'radio',

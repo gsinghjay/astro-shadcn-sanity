@@ -51,6 +51,7 @@ export const project = defineType({
         ],
       },
       initialValue: 'active',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'semester',

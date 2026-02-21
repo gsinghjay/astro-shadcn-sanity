@@ -24,6 +24,48 @@ const locateDocument: DocumentLocationResolver = (params, context) => {
       )
   }
 
+  if (params.type === 'project') {
+    return context.documentStore
+      .listenQuery(`*[_id == $id][0]{ title, "slug": slug.current }`, {id: params.id})
+      .pipe(
+        map((doc: Record<string, string> | null) =>
+          doc
+            ? {
+                locations: [
+                  {
+                    title: doc.title || 'Untitled',
+                    href: `/projects/${doc.slug}`,
+                  },
+                  {
+                    title: 'All Projects',
+                    href: '/projects',
+                  },
+                ],
+              }
+            : null,
+        ),
+      )
+  }
+
+  if (params.type === 'event') {
+    return context.documentStore
+      .listenQuery(`*[_id == $id][0]{ title, "slug": slug.current }`, {id: params.id})
+      .pipe(
+        map((doc: Record<string, string> | null) =>
+          doc
+            ? {
+                locations: [
+                  {
+                    title: doc.title || 'Untitled',
+                    href: `/events/${doc.slug}`,
+                  },
+                ],
+              }
+            : null,
+        ),
+      )
+  }
+
   if (params.type === 'siteSettings') {
     // Query ALL page documents so the editor can preview nav/footer on any page
     return context.documentStore

@@ -40,6 +40,9 @@ export const page = defineType({
   title: 'Page',
   type: 'document',
   icon: DocumentIcon,
+  preview: {
+    select: {title: 'title', subtitle: 'slug.current'},
+  },
   groups: [
     {name: 'layout', title: 'Layout', default: true},
     {name: 'content', title: 'Content'},
