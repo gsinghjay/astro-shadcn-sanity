@@ -5,11 +5,12 @@ import Breadcrumb from '@/components/Breadcrumb.astro';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import type { Testimonial } from '@/lib/sanity';
 import { sanityClient, ALL_PROJECT_SLUGS_QUERY, getProjectBySlug } from '@/lib/sanity';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
+import { portableTextComponents } from '@/components/portable-text';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY);
@@ -38,17 +39,13 @@ const sponsor = project.sponsor;
 const cleanTier = stegaClean(sponsor?.tier) || 'silver';
 const sponsorSlug = sponsor ? stegaClean(sponsor.slug) : null;
 
-function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
-  return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(200).height(200).url() : null;
-}
-
-const logoUrl = sponsor?.logo ? sponsorLogoUrl(sponsor.logo) : null;
+const logoUrl = safeUrlFor(sponsor?.logo)?.width(200).height(200).url() ?? null;
 const team = project.team ?? [];
 const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
 ---
 
-<Layout title={project.title ?? 'Project'} seo={project.outcome ? { metaDescription: project.outcome } : undefined} ogType="article" template="detail">
+<Layout title={project.title ?? 'Project'} seo={project.seo ?? (project.outcome ? { metaDescription: project.outcome } : undefined)} ogType="article" template="detail">
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
@@ -114,7 +111,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
         <div>
           <h2 class="text-2xl font-bold mb-4">Problem & Approach</h2>
           <div class="prose max-w-none">
-            <PortableText value={project.content} />
+            <PortableText value={project.content} components={portableTextComponents} />
           </div>
         </div>
       )}

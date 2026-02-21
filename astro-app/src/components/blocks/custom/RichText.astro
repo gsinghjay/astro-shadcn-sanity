@@ -2,6 +2,7 @@
 import type { RichTextBlock } from '@/lib/types';
 import { Section, SectionProse } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
+import { portableTextComponents } from '@/components/portable-text';
 
 interface Props extends RichTextBlock {
   class?: string;
@@ -13,6 +14,6 @@ const { content } = Astro.props;
 
 <Section data-animate>
   <SectionProse>
-    {content && <PortableText value={content} />}
+    {content && <PortableText value={content} components={portableTextComponents} />}
   </SectionProse>
 </Section>

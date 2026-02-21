@@ -18,7 +18,11 @@ export const sponsorCards = defineBlock({
       title: 'Display Mode',
       type: 'string',
       options: {
-        list: ['all', 'featured', 'manual'],
+        list: [
+          {title: 'All', value: 'all'},
+          {title: 'Featured', value: 'featured'},
+          {title: 'Manual', value: 'manual'},
+        ],
       },
       initialValue: 'all',
     }),
@@ -33,6 +37,14 @@ export const sponsorCards = defineBlock({
           to: [{type: 'sponsor'}],
         }),
       ],
+      validation: (Rule) =>
+        Rule.custom((sponsors, context) => {
+          const parent = context.parent as {displayMode?: string}
+          if (parent?.displayMode === 'manual' && (!sponsors || sponsors.length === 0)) {
+            return 'Add at least one sponsor in manual mode'
+          }
+          return true
+        }),
     }),
   ],
 })
