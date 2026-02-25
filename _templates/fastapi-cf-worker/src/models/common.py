@@ -5,7 +5,7 @@ These provide consistent response shapes for the OpenAPI docs (Swagger UI)
 and automatic request/response validation.
 """
 
-from typing import Generic, TypeVar
+from typing import Generic, Literal, TypeVar
 from pydantic import BaseModel, ConfigDict
 
 T = TypeVar("T")
@@ -30,7 +30,7 @@ class ErrorResponse(BaseModel):
 class ServiceCheck(BaseModel):
     """Result of a single service health probe."""
 
-    status: str       # "ok" | "error" | "not_configured"
+    status: Literal["ok", "error", "not_configured", "degraded"]
     latency_ms: float | None = None  # round-trip time for the probe
     message: str | None = None       # error details or extra info
 
@@ -47,7 +47,7 @@ class ServiceCheck(BaseModel):
 class HealthResponse(BaseModel):
     """Response from GET /health."""
 
-    status: str  # "ok" | "degraded" | "down"
+    status: Literal["ok", "degraded"]
     checks: dict[str, ServiceCheck]
     timestamp: str  # ISO 8601 UTC timestamp
 

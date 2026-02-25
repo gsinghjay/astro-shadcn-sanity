@@ -408,3 +408,56 @@ cp -r _templates/fastapi-cf-worker/ platform-api/
 - [x] `docker compose run worker uv run pywrangler deploy` deploys from container (API token auth works — upload succeeds, fails only on placeholder binding IDs)
 - [ ] Both Discord bot dev and API dev can fork and deploy within 15 minutes following README
 - [x] No hardcoded secrets — all sensitive values via `.dev.vars` or `npx wrangler secret put`
+
+---
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Amelia (Dev Agent) — 2026-02-25
+**Scope:** Security, Cloudflare MCP docs validation, FastAPI best practices
+**Result:** 9 issues fixed (4 High, 5 Medium), 12/12 tests passing
+
+### Issues Found & Fixed
+
+| # | Severity | File | Issue | Fix |
+|---|----------|------|-------|-----|
+| H1 | HIGH | `src/app.py` | CORS `allow_origins=["*"]` + `allow_credentials=True` allows any origin credentialed access (OWASP misconfiguration) | Removed `allow_credentials=True` |
+| H2 | HIGH | `src/dependencies.py` | API key comparison used `!=` (timing attack vulnerable) | Replaced with `hmac.compare_digest()` |
+| H3 | HIGH | `src/routers/health.py` | Unauthenticated `/health` leaked KV values, secret names, env var values | Redacted to counts only — no names or values in output |
+| H4 | HIGH | `src/routers/health.py` | `not_configured` status fell through to `"ok"`; `"down"` status never produced | Simplified: any `error`/`degraded` → `"degraded"`, removed unreachable `"down"` |
+| M1 | MEDIUM | `src/models/settings.py` | `_get_binding` used truthy check (`if val`) instead of `is not None` — may swallow valid JS proxy objects | Changed to `if val is not None` |
+| M2 | MEDIUM | `src/dependencies.py` | `WorkerSettings.from_worker_env()` called on every `Depends()` — no caching | Cached on `request.state` per-request |
+| M3 | MEDIUM | `src/services/http_client.py` | `http_get`/`http_post` annotated `-> dict` but `response.json()` returns `Any` | Removed incorrect return type annotation |
+| M4 | MEDIUM | `.dockerignore` | Missing `.venv-workers/`, `python_modules/`, `.pytest_cache/`, `*.egg-info/` | Added all entries |
+| M5 | MEDIUM | `scripts/seed_kv.sh` | Unquoted `$ENVIRONMENT` expansion could word-split | Refactored to bash array |
+
+### Remaining (not fixed — cosmetic)
+
+| # | Severity | Note |
+|---|----------|------|
+| L3 | LOW | AC12 spec doesn't list `pytest-asyncio` but implementation correctly includes it |
+| L4 | LOW | Story comment says `python_workers` flag "may be auto-detected" — CF docs confirm it's still required |
+
+### Cloudflare Docs Validation Summary
+
+| Pattern | Validated Against | Status |
+|---------|-------------------|--------|
+| `WorkerEntrypoint` class | CF changelog 2025-08-14 | Correct |
+| `asgi.fetch(app, request, self.env)` | CF Python Workers + FastAPI page | Correct |
+| `python_workers` compat flag | D1 Python Workers example (2026-02-07) | Required — not auto-detected |
+| `request.scope["env"]` binding access | CF Bindings page + D1 docs | Correct |
+| `/cdn-cgi/handler/scheduled` endpoint | CF Scheduled Handler docs | Correct (JS uses `/__scheduled`) |
+| `except BaseException` | Not documented by CF | Defensible (JS/Pyodide bridge errors) |
+| `http2=False` for httpx | Not documented by CF | Empirical — safe default |
+
+### File List (changed in review)
+
+- `_templates/fastapi-cf-worker/src/app.py` — CORS fix
+- `_templates/fastapi-cf-worker/src/dependencies.py` — hmac + caching
+- `_templates/fastapi-cf-worker/src/models/common.py` — Literal types
+- `_templates/fastapi-cf-worker/src/models/settings.py` — binding truthiness fix
+- `_templates/fastapi-cf-worker/src/routers/health.py` — info leak + status logic
+- `_templates/fastapi-cf-worker/src/services/http_client.py` — return type fix
+- `_templates/fastapi-cf-worker/.dockerignore` — added missing entries
+- `_templates/fastapi-cf-worker/scripts/seed_kv.sh` — bash array fix
+- `_templates/fastapi-cf-worker/tests/test_health.py` — updated assertions for redacted messages

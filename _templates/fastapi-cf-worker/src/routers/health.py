@@ -36,7 +36,7 @@ async def _check_kv(settings: WorkerSettings) -> ServiceCheck:
     try:
         val = await settings.kv.get("config:version")
         ms = (time.monotonic() - start) * 1000
-        msg = f"config:version={val}" if val else "readable (key not found)"
+        msg = "readable (key found)" if val else "readable (key not found)"
         return ServiceCheck(status="ok", latency_ms=round(ms, 2), message=msg)
     except BaseException as e:
         ms = (time.monotonic() - start) * 1000
@@ -68,40 +68,38 @@ def _check_ai(settings: WorkerSettings) -> ServiceCheck:
 def _check_env_vars(settings: WorkerSettings) -> ServiceCheck:
     """Verify env vars from wrangler.jsonc vars — reads from settings.env_vars."""
     env_vars = settings.env_vars
-    found = [f"{k}={v}" for k, v in env_vars.items() if v is not None]
+    found = [k for k, v in env_vars.items() if v is not None]
     missing = [k for k, v in env_vars.items() if v is None]
 
     if missing:
-        return ServiceCheck(status="error", message=f"missing: {', '.join(missing)}")
-    return ServiceCheck(status="ok", message="; ".join(found))
+        return ServiceCheck(status="error", message=f"{len(missing)} env var(s) missing")
+    return ServiceCheck(status="ok", message=f"{len(found)} env var(s) configured")
 
 
 def _check_secrets(settings: WorkerSettings) -> ServiceCheck:
-    """Verify required secrets are set (never logs values)."""
+    """Verify required secrets are set (never logs names or values)."""
     required = settings.required_secrets
-    configured = [k for k, v in required.items() if v is not None]
-    missing = [k for k, v in required.items() if v is None]
+    configured_count = sum(1 for v in required.values() if v is not None)
+    total = len(required)
 
-    if missing:
+    if configured_count < total:
         return ServiceCheck(
             status="degraded",
-            message=f"missing: {', '.join(missing)}; configured: {', '.join(configured) or 'none'}",
+            message=f"{configured_count} of {total} required secret(s) configured",
         )
-    return ServiceCheck(status="ok", message=f"{len(configured)} required secret(s) configured")
+    return ServiceCheck(status="ok", message=f"{configured_count} required secret(s) configured")
 
 
 def _check_optional_secrets(settings: WorkerSettings) -> ServiceCheck:
-    """Report which optional secrets are configured (informational)."""
+    """Report how many optional secrets are configured (no names leaked)."""
     optional = settings.optional_secrets
-    configured = [k for k, v in optional.items() if v is not None]
-    not_set = [k for k, v in optional.items() if v is None]
+    configured_count = sum(1 for v in optional.values() if v is not None)
+    total = len(optional)
 
-    msg_parts = []
-    if configured:
-        msg_parts.append(f"configured: {', '.join(configured)}")
-    if not_set:
-        msg_parts.append(f"not set: {', '.join(not_set)}")
-    return ServiceCheck(status="ok", message="; ".join(msg_parts))
+    return ServiceCheck(
+        status="ok",
+        message=f"{configured_count} of {total} optional secret(s) configured",
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -135,12 +133,9 @@ async def health(settings: WorkerSettings = Depends(get_settings)):
     checks["optional_secrets"] = _check_optional_secrets(settings)
 
     # Determine overall status
+    # "not_configured" is neutral (template may not use every binding)
     statuses = [c.status for c in checks.values()]
-    if all(s == "ok" for s in statuses):
-        status = "ok"
-    elif any(s == "error" for s in statuses):
-        status = "degraded"
-    elif any(s == "degraded" for s in statuses):
+    if any(s == "error" for s in statuses) or any(s == "degraded" for s in statuses):
         status = "degraded"
     else:
         status = "ok"

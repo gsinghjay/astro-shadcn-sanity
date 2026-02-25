@@ -21,6 +21,8 @@ FastAPI runs sync dependencies in a thread pool, which cannot access
 the JS-backed scope in the Workers Pyodide runtime.
 """
 
+import hmac
+
 from fastapi import Request, HTTPException, Depends
 
 from models.settings import WorkerSettings
@@ -38,11 +40,14 @@ async def get_env(request: Request):
 async def get_settings(request: Request) -> WorkerSettings:
     """Extract and validate all env vars, secrets, and bindings into a typed model.
 
-    This is the primary dependency for route handlers. It reads the raw
-    Workers env proxy once and returns a validated Pydantic model.
+    This is the primary dependency for route handlers. Cached on
+    request.state so repeated Depends() calls in the same request
+    don't re-extract from the JS env proxy.
     """
-    env = request.scope["env"]
-    return WorkerSettings.from_worker_env(env)
+    if not hasattr(request.state, "worker_settings"):
+        env = request.scope["env"]
+        request.state.worker_settings = WorkerSettings.from_worker_env(env)
+    return request.state.worker_settings
 
 
 async def verify_api_key(
@@ -58,7 +63,7 @@ async def verify_api_key(
         raise HTTPException(status_code=503, detail="API key not configured")
 
     key = request.headers.get("X-API-Key")
-    if not key or key != settings.api_key:
+    if not key or not hmac.compare_digest(key, settings.api_key):
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
     return key
 
