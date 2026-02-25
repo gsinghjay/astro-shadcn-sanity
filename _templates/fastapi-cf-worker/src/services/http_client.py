@@ -51,9 +51,9 @@ def raise_for_status(response: httpx.Response):
         )
 
 
-async def http_get(url: str, **kwargs) -> dict:
+async def http_get(url: str, **kwargs):
     """
-    Make a GET request and return the JSON response.
+    Make a GET request and return the parsed JSON response.
 
     Raises HTTPException on error status codes.
     """
@@ -63,9 +63,9 @@ async def http_get(url: str, **kwargs) -> dict:
         return response.json()
 
 
-async def http_post(url: str, **kwargs) -> dict:
+async def http_post(url: str, **kwargs):
     """
-    Make a POST request and return the JSON response.
+    Make a POST request and return the parsed JSON response.
 
     Raises HTTPException on error status codes.
     """

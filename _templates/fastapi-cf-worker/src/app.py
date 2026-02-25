@@ -26,11 +26,13 @@ app = FastAPI(
     redoc_url="/redoc",      # ReDoc at /redoc
 )
 
-# CORS — adjust origins for your frontend domains
+# CORS — lock down origins before deploying to production!
+# Do NOT combine allow_origins=["*"] with allow_credentials=True —
+# Starlette reflects the request origin, granting any site credentialed access.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],     # Lock this down in production!
-    allow_credentials=True,
+    allow_origins=["*"],     # Replace with explicit origins in production
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

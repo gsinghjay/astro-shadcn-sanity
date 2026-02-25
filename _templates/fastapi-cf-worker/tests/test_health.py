@@ -22,7 +22,7 @@ def test_health_returns_ok(client):
 
 
 def test_health_checks_kv(client, mock_settings):
-    """KV probe should report ok and include latency."""
+    """KV probe should report ok and include latency (no value leak)."""
     mock_settings.kv._store["config:version"] = "1.0.0"
 
     response = client.get("/health")
@@ -31,7 +31,9 @@ def test_health_checks_kv(client, mock_settings):
     kv = response.json()["checks"]["kv"]
     assert kv["status"] == "ok"
     assert kv["latency_ms"] is not None
-    assert "config:version=1.0.0" in kv["message"]
+    assert "readable (key found)" in kv["message"]
+    # Must never contain actual KV values
+    assert "1.0.0" not in kv["message"]
 
 
 def test_health_checks_d1(client):
@@ -51,11 +53,13 @@ def test_health_checks_ai(client):
 
 
 def test_health_checks_env_vars(client):
-    """Env vars probe should show ENVIRONMENT value."""
+    """Env vars probe should report count, not values."""
     response = client.get("/health")
     env_vars = response.json()["checks"]["env_vars"]
     assert env_vars["status"] == "ok"
-    assert "environment=test" in env_vars["message"]
+    assert "configured" in env_vars["message"]
+    # Must never leak env var values
+    assert "test" not in env_vars["message"]
 
 
 def test_health_checks_required_secrets(client):
@@ -70,12 +74,14 @@ def test_health_checks_required_secrets(client):
 
 
 def test_health_checks_optional_secrets(client):
-    """Optional secrets probe should report which are configured."""
+    """Optional secrets probe should report count, not names."""
     response = client.get("/health")
     optional = response.json()["checks"]["optional_secrets"]
     assert optional["status"] == "ok"
-    # None of the optional secrets are set in mock_settings
-    assert "not set" in optional["message"]
+    # Should show count only, no secret names
+    assert "0 of 7" in optional["message"]
+    # Must never leak secret names
+    assert "discord_bot_token" not in optional["message"]
 
 
 def test_health_degraded_when_kv_fails(client, mock_settings):
@@ -100,7 +106,9 @@ def test_health_degraded_when_secret_missing(client, mock_settings):
     data = response.json()
     assert data["status"] == "degraded"
     assert data["checks"]["secrets"]["status"] == "degraded"
-    assert "api_key" in data["checks"]["secrets"]["message"]
+    assert "1 of 2" in data["checks"]["secrets"]["message"]
+    # Must never leak secret names
+    assert "api_key" not in data["checks"]["secrets"]["message"]
 
 
 def test_health_kv_not_configured(client, mock_settings):

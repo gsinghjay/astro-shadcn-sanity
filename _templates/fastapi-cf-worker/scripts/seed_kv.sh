@@ -26,18 +26,24 @@ else
     ENVIRONMENT="--preview"
 fi
 
+# Build args array to avoid word-splitting issues with ENVIRONMENT
+ARGS=(--namespace-id="$KV_NAMESPACE_ID")
+if [[ -n "$ENVIRONMENT" ]]; then
+    ARGS+=($ENVIRONMENT)
+fi
+
 # --- Seed values ---
 echo "Setting config:version..."
-npx wrangler kv key put --namespace-id="$KV_NAMESPACE_ID" $ENVIRONMENT \
+npx wrangler kv key put "${ARGS[@]}" \
     "config:version" '"1.0.0"'
 
 echo "Setting config:features..."
-npx wrangler kv key put --namespace-id="$KV_NAMESPACE_ID" $ENVIRONMENT \
+npx wrangler kv key put "${ARGS[@]}" \
     "config:features" '{"notifications": true, "maintenance_mode": false}'
 
 # Example: webhook mapping for Discord notifications
 echo "Setting webhooks:general..."
-npx wrangler kv key put --namespace-id="$KV_NAMESPACE_ID" $ENVIRONMENT \
+npx wrangler kv key put "${ARGS[@]}" \
     "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
 echo ""

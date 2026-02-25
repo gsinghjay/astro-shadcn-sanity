@@ -110,7 +110,7 @@ class WorkerSettings(BaseModel):
         def _get_binding(name: str):
             try:
                 val = getattr(env, name, None)
-                return val if val else None
+                return val if val is not None else None
             except BaseException:
                 return None
 
