@@ -67,4 +67,11 @@
       // "0 14 * * 1"     // Weekly on Monday at 14:00 UTC
     ]
   }
+
+  // Observability — enable to push Worker logs to an analytics destination
+  // Docs: https://developers.cloudflare.com/workers/observability/
+  // "observability": {
+  //   "enabled": true,
+  //   "head_sampling_rate": 1   // 0–1; 1 = log every request (dev), lower for high-traffic prod
+  // }
 }

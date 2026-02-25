@@ -32,6 +32,7 @@ Overall status logic:
     because this is a template — not every fork needs every binding.
 """
 
+import asyncio
 import time
 from datetime import datetime, timezone
 
@@ -250,9 +251,13 @@ async def health(settings: WorkerSettings = Depends(get_settings)):
     """
     checks: dict[str, ServiceCheck] = {}
 
-    # I/O probes (async — they make actual calls to Cloudflare services)
-    checks["kv"] = await _check_kv(settings)
-    checks["d1"] = await _check_d1(settings)
+    # I/O probes (async — run concurrently since they're independent)
+    kv_result, d1_result = await asyncio.gather(
+        _check_kv(settings),
+        _check_d1(settings),
+    )
+    checks["kv"] = kv_result
+    checks["d1"] = d1_result
 
     # Binding existence checks (sync — just checks if the proxy is set)
     checks["ai"] = _check_ai(settings)

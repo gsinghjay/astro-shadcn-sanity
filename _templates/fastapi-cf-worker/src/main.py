@@ -88,7 +88,7 @@ class Default(WorkerEntrypoint):
         """
         return await asgi.fetch(app, request, self.env)
 
-    async def scheduled(self, event, env, ctx):
+    async def scheduled(self, controller, env, ctx):
         """Handle cron trigger events (scheduled tasks).
 
         Cloudflare calls this method based on cron patterns defined in
@@ -99,13 +99,16 @@ class Default(WorkerEntrypoint):
             ``"0 14 * * 1"`` = Monday 14:00 UTC = 9:00 AM US Eastern (EST).
 
         Args:
-            event: A cron event object with a ``.cron`` attribute containing
-                the matching cron expression string (e.g., ``"0 14 * * 1"``).
-                Use this to dispatch to different handlers.
+            controller: A ``ScheduledController`` object with:
+                - ``.cron`` — the matching cron expression string
+                  (e.g., ``"0 14 * * 1"``). Use to dispatch handlers.
+                - ``.type`` — always ``"scheduled"``.
+                - ``.scheduledTime`` — milliseconds since epoch when
+                  the event was scheduled to fire.
             env: The same bindings proxy as ``self.env``. Provides access to
                 KV, D1, AI, secrets, and env vars. Both ``env`` and
                 ``self.env`` work identically here.
-            ctx: Execution context. Use ``ctx.wait_until(coroutine)`` to run
+            ctx: Execution context. Use ``ctx.waitUntil(coroutine)`` to run
                 background work that continues after this method returns.
                 Useful for fire-and-forget tasks like logging or analytics.
 
@@ -118,13 +121,13 @@ class Default(WorkerEntrypoint):
             Note: Python Workers use ``/cdn-cgi/handler/scheduled``, NOT
             ``/__scheduled`` (which is for JavaScript Workers only).
         """
-        cron = event.cron
+        cron = controller.cron
         # Route to the right handler based on cron pattern.
         # Uncomment and customize for your worker:
         # if cron == "*/5 * * * *":
-        #     await self._five_minute_check()
+        #     ctx.waitUntil(self._five_minute_check())
         # elif cron == "0 14 * * 1":
-        #     await self._weekly_digest()
+        #     ctx.waitUntil(self._weekly_digest())
         print(f"Cron trigger fired: {cron}")
 
     # async def _five_minute_check(self):
