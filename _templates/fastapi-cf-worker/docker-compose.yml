@@ -1,0 +1,13 @@
+services:
+  worker:
+    build: .
+    ports:
+      - "8787:8787"
+    volumes:
+      - .:/app
+      - /app/node_modules   # Anonymous volume — don't overwrite container's node_modules
+      - /app/.venv           # Anonymous volume — don't overwrite container's venv
+    env_file:
+      - path: .dev.vars
+        required: false
+    command: uv run pywrangler dev --ip 0.0.0.0

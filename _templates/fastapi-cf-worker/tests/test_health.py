@@ -1,0 +1,125 @@
+"""
+Tests for the /health endpoint.
+
+Run with: uv run pytest tests/
+"""
+
+from models.settings import WorkerSettings
+
+
+def test_health_returns_ok(client):
+    """Health check should return status ok when all bindings are working."""
+    response = client.get("/health")
+    assert response.status_code == 200
+
+    data = response.json()
+    assert data["status"] == "ok"
+    assert "timestamp" in data
+
+    # Every check should have a status field
+    for name, check in data["checks"].items():
+        assert "status" in check, f"check '{name}' missing status field"
+
+
+def test_health_checks_kv(client, mock_settings):
+    """KV probe should report ok and include latency."""
+    mock_settings.kv._store["config:version"] = "1.0.0"
+
+    response = client.get("/health")
+    assert response.status_code == 200
+
+    kv = response.json()["checks"]["kv"]
+    assert kv["status"] == "ok"
+    assert kv["latency_ms"] is not None
+    assert "config:version=1.0.0" in kv["message"]
+
+
+def test_health_checks_d1(client):
+    """D1 probe should report ok with latency."""
+    response = client.get("/health")
+    d1 = response.json()["checks"]["d1"]
+    assert d1["status"] == "ok"
+    assert d1["latency_ms"] is not None
+
+
+def test_health_checks_ai(client):
+    """AI probe should confirm binding is available."""
+    response = client.get("/health")
+    ai = response.json()["checks"]["ai"]
+    assert ai["status"] == "ok"
+    assert ai["message"] == "binding available"
+
+
+def test_health_checks_env_vars(client):
+    """Env vars probe should show ENVIRONMENT value."""
+    response = client.get("/health")
+    env_vars = response.json()["checks"]["env_vars"]
+    assert env_vars["status"] == "ok"
+    assert "environment=test" in env_vars["message"]
+
+
+def test_health_checks_required_secrets(client):
+    """Secrets probe should confirm required secrets are set without leaking values."""
+    response = client.get("/health")
+    secrets = response.json()["checks"]["secrets"]
+    assert secrets["status"] == "ok"
+    assert "configured" in secrets["message"]
+    # Must never contain actual secret values
+    assert "test-api-key" not in secrets["message"]
+    assert "test-admin-key" not in secrets["message"]
+
+
+def test_health_checks_optional_secrets(client):
+    """Optional secrets probe should report which are configured."""
+    response = client.get("/health")
+    optional = response.json()["checks"]["optional_secrets"]
+    assert optional["status"] == "ok"
+    # None of the optional secrets are set in mock_settings
+    assert "not set" in optional["message"]
+
+
+def test_health_degraded_when_kv_fails(client, mock_settings):
+    """Health should report degraded when a binding probe fails."""
+    async def failing_get(key, **kwargs):
+        raise RuntimeError("connection refused")
+
+    mock_settings.kv.get = failing_get
+
+    response = client.get("/health")
+    data = response.json()
+    assert data["status"] == "degraded"
+    assert data["checks"]["kv"]["status"] == "error"
+    assert "RuntimeError" in data["checks"]["kv"]["message"]
+
+
+def test_health_degraded_when_secret_missing(client, mock_settings):
+    """Health should report degraded when a required secret is missing."""
+    mock_settings.api_key = None
+
+    response = client.get("/health")
+    data = response.json()
+    assert data["status"] == "degraded"
+    assert data["checks"]["secrets"]["status"] == "degraded"
+    assert "api_key" in data["checks"]["secrets"]["message"]
+
+
+def test_health_kv_not_configured(client, mock_settings):
+    """KV probe should report not_configured when binding is None."""
+    mock_settings.kv = None
+
+    response = client.get("/health")
+    kv = response.json()["checks"]["kv"]
+    assert kv["status"] == "not_configured"
+
+
+def test_root_returns_404(client):
+    """Root path should return 404 (no route defined for /)."""
+    response = client.get("/")
+    assert response.status_code == 404
+
+
+def test_docs_available(client):
+    """Swagger UI should be accessible at /docs."""
+    response = client.get("/docs")
+    assert response.status_code == 200
+    assert "swagger" in response.text.lower()
