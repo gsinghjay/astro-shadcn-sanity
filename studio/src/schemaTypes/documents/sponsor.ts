@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {CreditCardIcon, SearchIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const sponsor = defineType({
   name: 'sponsor',
@@ -29,6 +30,7 @@ export const sponsor = defineType({
       options: {source: 'name'},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'main'},
     defineField({
       name: 'logo',
       title: 'Logo',

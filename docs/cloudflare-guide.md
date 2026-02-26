@@ -1,7 +1,7 @@
 ---
 title: "Cloudflare Guide"
 description: "Single source of truth for Cloudflare Pages, Workers, Access, D1, and all related services in this project."
-date: 2026-02-19
+date: 2026-02-25
 status: active
 ---
 
@@ -16,13 +16,14 @@ Everything you need to deploy, authenticate, monitor, and optimize this project 
 1. [Overview](#1-overview)
 2. [Pages Setup and Deployment](#2-pages-setup-and-deployment)
 3. [Authentication (Cloudflare Access)](#3-authentication-cloudflare-access)
-4. [Free Tier Limits](#4-free-tier-limits)
+4. [Plan Comparison: Free vs Workers Paid ($5/month)](#4-plan-comparison-free-vs-workers-paid-5month)
 5. [Cost Optimization and Descoping](#5-cost-optimization-and-descoping)
 6. [Environment Variables](#6-environment-variables)
 7. [Testing](#7-testing)
 8. [Monitoring and Observability](#8-monitoring-and-observability)
 9. [Troubleshooting](#9-troubleshooting)
 10. [VPS Migration Path](#10-vps-migration-path)
+11. [Phase 3 Platform Capabilities](#11-phase-3-platform-capabilities)
 
 ---
 
@@ -59,6 +60,9 @@ Visitor → Cloudflare CDN (static HTML from edge cache)
 | **Queues** | Planned (Story 9.13) | Async notification creation pipeline |
 | **Analytics Engine** | Planned (Stories 9.9, 9.15) | Portal activity tracking + admin analytics |
 | **Cron Triggers** | Planned (Story 9.13) | Daily event reminder notifications |
+| **Workers AI** | Planned (Phase 3) | RAG chatbot generation + form classification |
+| **Durable Objects** | Available | SQLite-backed stateful coordination (not currently planned) |
+| **Aggregated API** | Planned (Phase 3) | FastAPI Python Worker — unified typed REST API for all services |
 | **Turnstile** | Active | Bot protection for contact form (Story 6.1) |
 
 ### Key Files
@@ -362,11 +366,125 @@ In local dev, the middleware bypasses JWT validation and sets a mock user when `
 
 ---
 
-## 4. Free Tier Limits
+## 4. Plan Comparison: Free vs Workers Paid ($5/month)
 
-All services run on the **Workers Free** plan ($0/month). These are the hard limits.
+The Workers Paid plan ($5/month) has been approved for this project alongside Sanity Growth ($15/month) — $20/month total. This section documents every service limit on both plans and maps estimated usage to the features that consume each resource.
 
-### Pages
+### 4.1 Why Upgrade to Workers Paid
+
+The free plan supports the current portal-only architecture. The paid plan unlocks the Phase 3 platform capabilities brainstormed on 2026-02-24:
+
+- **5-minute CPU time** (vs 10ms) — required for Python Workers (FastAPI Aggregated API, Discord bot)
+- **No daily request cap** — eliminates the 100K/day ceiling as features multiply
+- **10,000 subrequests/invocation** (vs 50) — the Aggregated API fans out to multiple services per request
+- **25 billion D1 rows read/month** (vs 5M/day) — monthly budgets are easier to manage than daily cliffs
+- **250 Cron Triggers** (vs 5) — one cron per scheduled task (neuron reset, D1 sync, notification digest, cache warm, health check)
+- **14-day Queue retention** (vs 24 hours) — fault-tolerant message replay after outages
+
+### 4.2 Service-by-Service Comparison
+
+All data sourced from Cloudflare documentation as of 2026-02-25.
+
+#### Workers (Compute)
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Requests | 100,000/day | No limit (10M included/mo, +$0.30/M) | Daily / Monthly |
+| CPU time | **10 ms** | **5 min** | Per invocation |
+| Memory | 128 MB | 128 MB | Per invocation |
+| Subrequests (external) | 50/request | 10,000/request | Per invocation |
+| Worker size | 3 MB | 10 MB | Per deploy |
+| Number of Workers | 100 | 500 | Per account |
+| Cron Triggers | 5 | 250 | Per account |
+| Environment variables | 64/Worker | 128/Worker | Per Worker |
+
+**10ms CPU cap is the single biggest free-plan constraint.** Python Workers (FastAPI, Discord bot) require hundreds of milliseconds. The Aggregated API and Discord bot cannot run on the free plan.
+
+#### D1 (Database)
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Rows read | 5M/day | 25B/month included (+$0.001/M) | Daily / Monthly |
+| Rows written | 100K/day | 50M/month included (+$1.00/M) | Daily / Monthly |
+| Storage | 5 GB total (500 MB/DB) | 5 GB included (10 GB/DB, +$0.75/GB-mo) | — |
+| Databases | 10 | 50,000 | Per account |
+| Queries per invocation | 50 | 1,000 | Per invocation |
+| Time Travel (point-in-time recovery) | 7 days | 30 days | — |
+
+Free-plan D1 limits reset daily at 00:00 UTC. Exceeding them blocks all queries until reset — no graceful degradation. Paid-plan monthly budgets eliminate daily cliffs.
+
+#### KV (Key-Value)
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Reads | 100,000/day | 10M/month included (+$0.50/M) | Daily / Monthly |
+| Writes | 1,000/day | 1M/month included (+$5.00/M) | Daily / Monthly |
+| Deletes | 1,000/day | 1M/month included (+$5.00/M) | Daily / Monthly |
+| Storage | 1 GB | 1 GB included (+$0.50/GB-mo) | — |
+
+#### R2 (Object Storage)
+
+R2 has a generous always-free tier regardless of Workers plan. No difference between free and paid.
+
+| Resource | Always-Free Included | Overage |
+|:---------|:---------------------|:--------|
+| Storage | 10 GB/month | $0.015/GB-mo |
+| Class A ops (writes) | 1M/month | $4.50/M |
+| Class B ops (reads) | 10M/month | $0.36/M |
+| Egress | Free (always) | Free |
+
+#### Queues
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Operations (read + write + delete) | 10,000/day | 1M/month included (+$0.40/M) | Daily / Monthly |
+| Message retention | 24 hours (non-configurable) | 14 days (configurable) | — |
+| Queues per account | 10,000 | 10,000 | Per account |
+| Message size | 128 KB | 128 KB | Per message |
+
+Each message delivery costs 3 operations (1 write + 1 read + 1 delete). Free plan supports ~3,333 messages/day. Queue consumers must be standalone Workers — Pages Functions can only produce to queues.
+
+#### Workers AI
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Neurons | 10,000/day | 10,000/day free + $0.011/1K Neurons | Daily |
+
+The free neuron allocation is the same on both plans. The paid plan allows overflow at $0.011 per 1,000 Neurons instead of hard-blocking.
+
+#### Analytics Engine
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Data points written | 100,000/day | 10M/month included (+$0.25/M) | Daily / Monthly |
+| Read queries (SQL API) | 10,000/day | 1M/month included (+$1.00/M) | Daily / Monthly |
+| Data retention | 31 days | 31 days | — |
+
+**Key advantage:** SQL API reads run on Cloudflare's infrastructure via HTTP (`api.cloudflare.com`), NOT inside your Worker. Aggregations (GROUP BY, SUM, COUNT) consume zero Worker CPU time and zero D1 rows-read budget. Writes via `writeDataPoint()` are fire-and-forget I/O calls from Workers.
+
+#### Durable Objects (SQLite-backed)
+
+| Resource | Free | Paid ($5/mo) | Reset |
+|:---------|:-----|:-------------|:------|
+| Requests | Daily limit | 1M/month included (+$0.15/M) | Daily / Monthly |
+| Duration | Daily limit | 400K GB-s/month included (+$12.50/M GB-s) | Daily / Monthly |
+| Storage | 5 GB | 5 GB included (+$0.75/GB-mo) | — |
+| Storage per object | 10 GB | 10 GB | — |
+| Classes per account | 100 | 500 | Per account |
+| CPU per request | 30s | 30s (configurable to 5 min) | Per invocation |
+
+Only SQLite-backed Durable Objects are available on the free plan. The paid plan additionally supports the legacy key-value storage backend.
+
+#### Cron Triggers
+
+| Resource | Free | Paid ($5/mo) |
+|:---------|:-----|:-------------|
+| Triggers per account | 5 | 250 |
+| CPU time per invocation | 10 ms | 5 min |
+
+#### Pages
+
+Pages limits are the same on both plans.
 
 | Resource | Limit | Our Usage |
 |:---------|:------|:----------|
@@ -376,79 +494,9 @@ All services run on the **Workers Free** plan ($0/month). These are the hard lim
 | Bandwidth | Unlimited | N/A |
 | Static asset files | 20,000/deploy | ~200-500 |
 
-### Workers
+#### Access (Zero Trust)
 
-| Resource | Limit |
-|:---------|:------|
-| Requests | 100,000/day |
-| CPU time | **10 ms/invocation** (hard cap — exceeding returns 503) |
-| Memory | 128 MB/invocation |
-| Subrequests | 50/invocation (external); 1,000/invocation (to CF services like D1) |
-| Worker size | 3 MB compressed |
-
-### D1 (Database)
-
-| Resource | Limit |
-|:---------|:------|
-| Rows read | 5,000,000/day |
-| Rows written | 100,000/day |
-| Storage | 5 GB total / 500 MB per DB |
-| Databases | 10 per account |
-| Queries per invocation | 50 |
-
-D1 limits reset daily at 00:00 UTC. Exceeding them blocks all queries until reset — no graceful degradation.
-
-### KV (Key-Value)
-
-| Resource | Limit |
-|:---------|:------|
-| Reads | 100,000/day |
-| Writes | 1,000/day |
-| Storage | 1 GB |
-
-### R2 (Object Storage)
-
-| Resource | Limit |
-|:---------|:------|
-| Storage | 10 GB/month |
-| Class A ops (writes) | 1,000,000/month |
-| Class B ops (reads) | 10,000,000/month |
-| Egress | Free (always) |
-
-### Queues
-
-| Resource | Limit |
-|:---------|:------|
-| Operations (read + write + delete) | 10,000/day |
-| Queues per account | 10,000 |
-| Message size | 128 KB |
-| Message retention | 24 hours (free) / 14 days (paid) |
-| Consumer batch size | 100 messages max |
-| Consumer batch timeout | 60 seconds max |
-
-Queues are available on the free plan (added Feb 2026). Queue consumers must be standalone Workers — Pages Functions can only produce to queues.
-
-### Analytics Engine
-
-| Resource | Limit |
-|:---------|:------|
-| Data points written | 100,000/day |
-| SQL API read queries | 10,000/day |
-| Data retention | 31 days |
-| Index columns | 1 (string) |
-| Blob columns | 20 (string) |
-| Double columns | 20 (numeric) |
-
-**Key advantage:** SQL API reads run on Cloudflare's infrastructure via HTTP (`api.cloudflare.com`), NOT inside your Worker. This means aggregations (GROUP BY, SUM, COUNT) consume zero Worker CPU time and zero D1 rows-read budget. Writes via `writeDataPoint()` are fire-and-forget I/O calls from Workers.
-
-### Cron Triggers
-
-| Resource | Limit |
-|:---------|:------|
-| Cron Triggers per account | 5 (free) / 250 (paid) |
-| CPU time per invocation | 10 ms (same as Workers) |
-
-### Access (Zero Trust)
+Access limits are the same on both plans.
 
 | Resource | Limit |
 |:---------|:------|
@@ -457,6 +505,52 @@ Queues are available on the free plan (added Feb 2026). Queue consumers must be 
 | Identity providers | Unlimited |
 
 A "seat" is consumed when a user authenticates. Seats are held indefinitely by default. To auto-release inactive seats, enable seat expiration in **Cloudflare One → Settings → Account** (configurable: 1 month to 1 year). Monitor usage at **Cloudflare One → Settings → Account → Usage**.
+
+### 4.3 Estimated Usage by Feature
+
+This matrix maps each project feature to the Cloudflare resources it consumes and estimates monthly usage on the paid plan.
+
+#### Resource Consumption Matrix
+
+| Feature | Workers Requests | CPU Time | D1 Rows Read | D1 Rows Written | KV Reads | KV Writes | Queue Ops | AI Neurons | AE Writes |
+|:--------|:----------------|:---------|:-------------|:----------------|:---------|:----------|:----------|:-----------|:----------|
+| **Public site (static)** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| **Sponsor Portal (SSR)** | ~7.5K/mo | 3-6ms each | ~22K/mo | ~3K/mo | 0 | 0 | 0 | 0 | 0 |
+| **Queue Event Bus** | ~3K/mo | <1ms each | 0 | 0 | 0 | 0 | ~9K/mo | 0 | ~3K/mo |
+| **RAG Chatbot** | ~1.5K/mo | 5-50ms each | 0 | 0 | ~3K/mo | ~1.5K/mo | 0 | ~150K-300K/mo | ~1.5K/mo |
+| **Aggregated API** | ~50-100K/mo | 50-500ms each | ~50K/mo | ~5K/mo | ~10K/mo | ~1K/mo | ~5K/mo | 0 | ~5K/mo |
+| **Discord Bot** | ~15K/mo | 100-300ms each | 0 | 0 | ~5K/mo | ~500 | 0 | 0 | ~2K/mo |
+| **Selective Rebuild** | ~600/mo | <1ms each | 0 | 0 | 0 | 0 | ~1.8K/mo | 0 | ~600/mo |
+| **Analytics Logging** | 0 (fire-and-forget) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ~30K/mo |
+| **Cron Jobs** | ~900/mo | 1-5ms each | ~5K/mo | ~1K/mo | ~1K/mo | ~900 | 0 | 0 | ~900/mo |
+| **JSON-LD Utility** | 0 (build-time) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| **TOTAL (estimated)** | **~80-130K/mo** | — | **~77K/mo** | **~9K/mo** | **~19K/mo** | **~4K/mo** | **~16K/mo** | **~150-300K/mo** | **~43K/mo** |
+
+#### Usage vs Paid Plan Included Limits
+
+| Resource | Estimated Monthly Usage | Paid Plan Included | Utilization | Headroom |
+|:---------|:-----------------------|:-------------------|:------------|:---------|
+| Worker requests | ~80-130K | 10M | ~1% | 77-125x |
+| D1 rows read | ~77K | 25B | <0.001% | 324,000x |
+| D1 rows written | ~9K | 50M | <0.001% | 5,500x |
+| KV reads | ~19K | 10M | <0.01% | 526x |
+| KV writes | ~4K | 1M | <0.01% | 250x |
+| Queue operations | ~16K | 1M | ~1.6% | 62x |
+| Workers AI neurons | ~5-10K/day | 10K/day free | ~50-100% | **Near cap** |
+| Analytics Engine writes | ~43K | 10M | <0.01% | 232x |
+| R2 storage | ~500 MB | 10 GB | ~5% | 20x |
+
+**Workers AI neurons are the only resource near capacity.** The chatbot's graceful degradation system (curated FAQ index checked first, D1 semantic cache, KV neuron counter with threshold) keeps usage within the free 10K/day allocation. Overflow on heavy days costs $0.011 per 1,000 neurons.
+
+#### What Cannot Run on the Free Plan
+
+| Feature | Blocking Constraint | Paid Plan Resolution |
+|:--------|:-------------------|:---------------------|
+| **Aggregated API (FastAPI)** | 10ms CPU cap — Python Workers need 50-500ms | 5-minute CPU cap |
+| **Discord Bot (Python)** | 10ms CPU cap — Python Workers need 100-300ms | 5-minute CPU cap |
+| **Multiple Cron Triggers** | 5 cron limit — need ~6-8 for all scheduled tasks | 250 cron triggers |
+| **Queue retry tolerance** | 24-hour retention — outages can lose messages | 14-day retention |
+| **Subrequest fan-out** | 50/request — Aggregated API calls 3-5 services per request | 10,000/request |
 
 ---
 
@@ -549,7 +643,7 @@ Three previously blocked stories were un-descoped/un-deferred (2026-02-20) by re
 - **9.9 + 9.15:** Workers Analytics Engine (writes from Worker, reads via HTTP SQL API — zero D1 pressure)
 - **9.13:** Cloudflare Queues + KV (async notification pipeline, single-key reads instead of D1 table queries)
 
-The $5/month Workers Paid plan removes all remaining daily limits and unlocks Story 9.11 (Evaluations) with zero architectural changes.
+The $5/month Workers Paid plan (now approved) removes all remaining daily limits and unlocks Story 9.11 (Evaluations) with zero architectural changes. It also enables the Phase 3 platform capabilities described in [Section 11](#11-phase-3-platform-capabilities): Python Workers for the Aggregated API and Discord bot, 250 Cron Triggers for scheduled tasks, and 14-day Queue message retention for fault tolerance.
 
 ---
 
@@ -846,3 +940,264 @@ A full migration plan exists at [`docs/vps-migration-plan.md`](vps-migration-pla
 ### Recommendation
 
 Start with Cloudflare (free, zero-ops). Migrate when the program outgrows the free tier. The code patterns translate directly — both use path-based auth on `/portal/*`, just with different headers.
+
+---
+
+## 11. Phase 3 Platform Capabilities
+
+Phase 3 (Mar 10 – Apr 23) introduces platform features beyond the base Astro + Sanity site, leveraging the Workers Paid plan and Sanity Growth plan ($20/month total). These ideas were brainstormed on 2026-02-24 and refined through morphological analysis, first-principles evaluation, and implementation planning.
+
+### 11.1 Architecture Overview
+
+```mermaid
+flowchart TD
+    subgraph "Content Sources"
+        Studio[Sanity Studio]
+        Forms[Contact Forms]
+        Cron[Cron Triggers]
+    end
+
+    subgraph "Event Bus (Queues)"
+        Router[Router Worker]
+        Q[platform-events Queue]
+        C1[Site Rebuilder]
+        C2[Discord Notifier]
+        C3[Cache Invalidator]
+        C4[Analytics Logger]
+    end
+
+    subgraph "API Layer"
+        API[Aggregated API\nFastAPI Python Worker\n/api/v1/*]
+    end
+
+    subgraph "AI Layer"
+        Chat[Chatbot Worker]
+        Embed[Sanity Embeddings]
+        WAI[Workers AI]
+        Cache[D1 Semantic Cache]
+    end
+
+    subgraph "Storage"
+        D1[(D1)]
+        KV[(KV)]
+        R2[(R2)]
+        AE[(Analytics Engine)]
+    end
+
+    subgraph "Consumers"
+        Astro[Astro SSR\nPortal + Public]
+        Discord[Discord Bot\nPython Worker]
+        Widget[Chat Widget\nAstro Island]
+    end
+
+    Studio -->|webhook| Router
+    Forms -->|submission| Router
+    Cron -->|scheduled| Router
+    Router --> Q
+    Q --> C1 & C2 & C3 & C4
+
+    API --> D1 & KV & R2 & AE
+    API --> Chat
+    Chat --> Embed --> WAI
+    Chat --> Cache
+
+    Astro --> API
+    Discord --> API
+    Widget --> Chat
+```
+
+### 11.2 Queue Event Bus
+
+**Replaces:** Single webhook-to-deploy-hook pipeline.
+
+A Router Worker receives Sanity webhooks and fans out events to a Cloudflare Queue (`platform-events`). Independent consumers process events in parallel:
+
+| Consumer | Trigger | Action |
+|:---------|:--------|:-------|
+| Site Rebuilder | Document publish | Inspects `dataset` and `site` fields, fires deploy hook for the correct site only |
+| Discord Notifier | Document publish, schema change | Posts formatted notification to the appropriate Discord channel |
+| Cache Invalidator | Document publish | Purges chatbot D1 cache entries referencing the changed document |
+| Analytics Logger | All events | Writes operational event to Analytics Engine via `writeDataPoint()` |
+
+**Queue message schema:**
+
+```json
+{
+  "docId": "abc123",
+  "docType": "event",
+  "dataset": "capstone",
+  "site": "capstone",
+  "action": "publish",
+  "timestamp": "2026-03-15T14:30:00Z"
+}
+```
+
+**Resource usage:** ~300 operations/day (100 messages x 3 ops each). Free plan ceiling is 10K/day; paid plan is 1M/month.
+
+### 11.3 RAG Chatbot
+
+**Concept:** Public-facing AI assistant powered by Sanity Embeddings (retrieval) + Workers AI (generation), with a three-tier degradation strategy when the daily neuron budget is exhausted.
+
+**Request flow:**
+
+1. Check editor-curated FAQ index (Sanity Embeddings) — high-similarity match serves KV-cached answer at **0 neurons**
+2. Check D1 semantic cache — cosine similarity match on previously generated answers at **0 neurons**
+3. Query per-site Sanity Embeddings index for relevant content
+4. Generate response via Workers AI (consumes neurons)
+5. Cache response in D1 with TTL
+6. Increment KV neuron counter
+
+**Degradation tiers:**
+
+| Budget Status | Behavior |
+|:-------------|:---------|
+| Under threshold | Full RAG — Embeddings retrieval + Workers AI generation |
+| Approaching threshold | Embeddings-only — returns relevant content snippets without LLM generation |
+| Exhausted | Static FAQ links — serves curated answers from KV |
+
+**Editor controls:** A `chatbotConfig` Sanity document lets editors control which content types and sites are included in the chatbot's knowledge scope via Studio checkboxes. A `chatbotFAQ` document type lets editors write priority Q&A pairs that are checked first (0 neurons). Analytics Engine logs which questions trigger full RAG, so editors can promote frequent questions to curated status.
+
+**Resource usage:** ~50 queries/day, ~100-200 neurons/query = ~5K-10K neurons/day (within 10K/day free allocation). Curated FAQ hits and D1 cache hits reduce actual neuron consumption.
+
+### 11.4 Aggregated API (FastAPI Python Worker)
+
+**Concept:** A unified FastAPI Python Worker that aggregates all backend services behind one documented, typed REST API. Auto-generates OpenAPI/Swagger docs at `/docs`. Future teams call one API instead of learning 5+ service APIs.
+
+**Endpoint structure:**
+
+```
+FastAPI Python Worker: /api/v1/
+
+├── /content
+│   ├── GET  /content/pages?site=capstone         → Sanity GROQ query
+│   ├── GET  /content/events?site=rwc-us          → Sanity GROQ query
+│   ├── GET  /content/sponsors                    → Sanity GROQ query
+│   ├── POST /content/search                      → Sanity Embeddings Index
+│   └── POST /content/mutations                   → Sanity Mutations API
+│
+├── /chat
+│   ├── POST /chat/query                          → Embeddings + Workers AI
+│   ├── GET  /chat/budget                         → KV neuron counter status
+│   └── GET  /chat/config                         → chatbotConfig (cached in KV)
+│
+├── /platform
+│   ├── GET  /platform/deploy-status              → CF Pages API
+│   ├── POST /platform/rebuild?site=capstone      → CF Pages deploy hook
+│   ├── GET  /platform/health                     → Aggregated health check
+│   └── GET  /platform/analytics                  → Analytics Engine query
+│
+├── /forms
+│   ├── POST /forms/submit                        → Turnstile verify + Sanity create
+│   └── GET  /forms/submissions?dataset=capstone  → Sanity query
+│
+└── /discord
+    ├── POST /discord/notify                      → Discord webhook
+    └── POST /discord/interactions                → Discord bot interaction handler
+```
+
+**Technology stack:**
+
+| Component | Technology | Rationale |
+|:----------|:-----------|:----------|
+| Framework | FastAPI | Auto-docs, Pydantic validation, dependency injection |
+| Validation | Pydantic v2 | Typed request/response models |
+| HTTP client | httpx | Async calls to Sanity, Discord, CF APIs |
+| AI/LLM (future) | LangChain | Available on Python Workers for RAG sophistication |
+| Auth | API key + CF Access headers | Simple for internal consumers |
+
+**Why paid plan is required:** Python Workers need 50-500ms CPU per request (vs 10ms free cap). The Aggregated API also makes 3-5 subrequests per request (vs 50 free cap limit).
+
+### 11.5 Discord Bot Enhancements
+
+**Concept:** Python Worker bot with slash commands that query and mutate Sanity content via the Aggregated API.
+
+**Query commands:**
+
+- `/capstone events upcoming` — upcoming events from Sanity
+- `/rwc status` — RWC program status
+- `/capstone sponsors tier:gold` — filtered sponsor list
+
+**Write commands (with emoji-react confirmation):**
+
+- Create draft events
+- Update document statuses
+- Trigger publishes
+
+All writes create drafts first. Audit trail logged to Analytics Engine.
+
+### 11.6 Schema-Driven JSON-LD
+
+**Concept:** Extract the existing per-page inline JSON-LD into a centralized build-time utility that maps Sanity `_type` to Schema.org structured data. Future devs add a new content type to a single mapping table and JSON-LD appears automatically — no Schema.org knowledge required.
+
+**Current state:** JSON-LD is already implemented inline in four places:
+
+| File | Schema.org Type |
+|:-----|:----------------|
+| `Layout.astro` | `EducationalOrganization` (site-wide) |
+| `Breadcrumb.astro` | `BreadcrumbList` (every page with breadcrumbs) |
+| `events/[slug].astro` | `Event` |
+| `sponsors/[slug].astro` | `Organization` |
+
+**What changes:** A `lib/jsonld.ts` utility provides typed builder functions per Schema.org type. Each page calls a one-liner instead of constructing the JSON-LD object inline. The mapping table lives in one file, so the next team sees every content type → Schema.org relationship at a glance.
+
+```typescript
+// lib/jsonld.ts — centralized mapping
+import type { Event, Sponsor } from '@/sanity.types';
+
+export function eventJsonLd(event: Event, siteUrl: string) { /* ... */ }
+export function organizationJsonLd(sponsor: Sponsor) { /* ... */ }
+export function breadcrumbJsonLd(items: BreadcrumbItem[], baseUrl: string) { /* ... */ }
+// Future team adds: export function projectJsonLd(project: Project) { /* ... */ }
+```
+
+**Extensibility for the next team:**
+
+| Sanity `_type` | Schema.org Type | Status |
+|:---------------|:----------------|:-------|
+| `event` | `Event` | Exists (extract from `events/[slug].astro`) |
+| `sponsor` | `Organization` | Exists (extract from `sponsors/[slug].astro`) |
+| (all pages) | `BreadcrumbList` | Exists (extract from `Breadcrumb.astro`) |
+| (site-wide) | `EducationalOrganization` | Exists (extract from `Layout.astro`) |
+| `project` | `CreativeWork` | Next team adds |
+| `team` | `Person` | Next team adds |
+| `chatbotFAQ` | `FAQPage` | Next team adds (if chatbot ships) |
+
+**Runtime cost:** Zero. All JSON-LD is generated at build time during `astro build`. The utility is pure TypeScript with no Worker or API calls.
+
+### 11.7 Selective Site Rebuild
+
+**Concept:** The Queue Event Bus Router Worker inspects the `dataset` and `site` field on published documents to trigger rebuilds only for affected sites.
+
+With the two-dataset architecture (decided 2026-02-24):
+
+| Dataset | Site Field | Deploy Hook Triggered |
+|:--------|:-----------|:---------------------|
+| `capstone` | (not needed) | Capstone site only |
+| `rwc` | `rwc-us` | RWC US site only |
+| `rwc` | `rwc-intl` | RWC International site only |
+| `rwc` | (shared content) | Both RWC sites |
+
+Eliminates unnecessary rebuilds and saves Pages build minutes.
+
+### 11.8 Implementation Sequence
+
+**Foundation (Week 1):** Queue Event Bus — Router Worker, `platform-events` Queue, Site Rebuilder consumer, Discord notifier consumer, schema pipeline consumer.
+
+**Chatbot Core (Week 2):** Sanity Embeddings indices (capstone + rwc), Chatbot Worker with Embeddings lookup + Workers AI generation, KV neuron budget management, graceful degradation, Cron Trigger daily reset.
+
+**Chatbot Polish + JSON-LD (Week 3):** chatbotConfig + chatbotFAQ schemas in Studio, Worker reads config from KV, Queue consumer for cache invalidation, extract inline JSON-LD into centralized `lib/jsonld.ts` utility.
+
+**Portal + API + Integration (Weeks 4-5):** Sponsor Portal SSR, Aggregated API endpoints, form pipeline, content migration, Discord bot query/write commands, cross-site integration testing.
+
+### 11.9 Deferred to Phase 6
+
+These features are incremental enhancements on the Phase 3 foundation:
+
+| Feature | Depends On | Value |
+|:--------|:-----------|:------|
+| D1 semantic response cache | Chatbot Worker + D1 | Biggest chatbot performance win |
+| Structured content cards in chatbot | Chatbot Worker | Events with RSVP links, sponsor comparisons |
+| Deploy progress tracker in Studio | KV + Studio plugin | Real-time build status for editors |
+| Editor-curated FAQ feedback loop | Analytics Engine + chatbotFAQ | Self-improving chatbot knowledge |
+| D1 portal data cache | D1 + Cron Trigger | Edge-native portal reads (~1ms vs ~100ms) |
+| Operational dashboard in Studio | Analytics Engine + Studio plugin | Unified content + ops intelligence |

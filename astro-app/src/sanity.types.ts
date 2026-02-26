@@ -260,6 +260,7 @@ export type Testimonial = {
   _updatedAt: string;
   _rev: string;
   name?: string;
+  site?: "rwc-us" | "rwc-intl";
   quote?: string;
   role?: string;
   organization?: string;
@@ -298,6 +299,7 @@ export type SiteSettings = {
   _updatedAt: string;
   _rev: string;
   siteName?: string;
+  site?: "rwc-us" | "rwc-intl";
   siteDescription?: string;
   logo?: {
     asset?: SanityImageAssetReference;
@@ -472,6 +474,7 @@ export type Page = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
   template?: "default" | "fullWidth" | "landing" | "sidebar" | "twoColumn";
   seo?: Seo;
   blocks?: Array<
@@ -525,6 +528,7 @@ export type Project = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
   sponsor?: SponsorReference;
   status?: "active" | "completed" | "archived";
   semester?: string;
@@ -629,6 +633,7 @@ export type Event = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
   date?: string;
   endDate?: string;
   location?: string;
@@ -654,6 +659,7 @@ export type Sponsor = {
   _rev: string;
   name?: string;
   slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
   logo?: {
     asset?: SanityImageAssetReference;
     media?: unknown;

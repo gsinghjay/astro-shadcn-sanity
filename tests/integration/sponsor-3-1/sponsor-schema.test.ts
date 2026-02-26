@@ -26,9 +26,10 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
 
     test('[P0] 3.1-INT-002 — sponsor schema has all required fields', () => {
       const fieldNames = (sponsor as any).fields.map((f: any) => f.name)
-      expect(fieldNames).toHaveLength(9)
+      expect(fieldNames).toHaveLength(10)
       expect(fieldNames).toContain('name')
       expect(fieldNames).toContain('slug')
+      expect(fieldNames).toContain('site')
       expect(fieldNames).toContain('logo')
       expect(fieldNames).toContain('description')
       expect(fieldNames).toContain('website')
