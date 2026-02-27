@@ -1,12 +1,11 @@
 services:
   worker:
     build: .
+    user: "${UID:-1000}:${GID:-1000}"
     ports:
       - "8787:8787"
     volumes:
       - .:/app
-      - /app/node_modules   # Anonymous volume — don't overwrite container's node_modules
-      - /app/.venv           # Anonymous volume — don't overwrite container's venv
     env_file:
       - path: .dev.vars
         required: false

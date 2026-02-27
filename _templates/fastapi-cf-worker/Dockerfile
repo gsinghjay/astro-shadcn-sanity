@@ -6,15 +6,21 @@ RUN apt-get update \
     && npm install -g wrangler \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install uv — the fast Python package manager used by Pywrangler
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.local/bin:$PATH"
+# Install uv to a system-wide location (accessible to non-root users)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && cp /root/.local/bin/uv /usr/local/bin/ \
+    && cp /root/.local/bin/uvx /usr/local/bin/ \
+    && rm -rf /root/.local
+
+# Docker's venv lives outside the project directory so it never conflicts
+# with the host's .venv when the project is bind-mounted
+ENV UV_PROJECT_ENVIRONMENT="/opt/venv"
 
 WORKDIR /app
 
 # Install Python dependencies first (layer caching)
 COPY pyproject.toml ./
-RUN uv sync
+RUN uv sync && chmod -R a+rwX /opt/venv
 
 # Copy the rest of the project
 COPY . .
