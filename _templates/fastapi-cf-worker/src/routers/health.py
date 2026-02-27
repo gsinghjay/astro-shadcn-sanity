@@ -234,20 +234,20 @@ def _check_optional_secrets(settings: WorkerSettings) -> ServiceCheck:
 async def health(settings: WorkerSettings = Depends(get_settings)):
     """Probe every Cloudflare service binding and return a health report.
 
-    This endpoint is the first thing to check after deploying. It runs
-    independent probes against each configured service and returns a
-    structured JSON response.
+This endpoint is the first thing to check after deploying. It runs
+independent probes against each configured service and returns a
+structured JSON response.
 
-    Probes:
-        - **kv**: Reads a test key from the KV namespace.
-        - **d1**: Runs ``SELECT 1`` against the D1 database.
-        - **ai**: Checks that the Workers AI binding exists.
-        - **env_vars**: Confirms ``wrangler.jsonc`` vars are accessible.
-        - **secrets**: Confirms required secrets are set (counts only).
-        - **optional_secrets**: Reports optional secret counts.
+Probes:
 
-    Returns:
-        A ``HealthResponse`` with overall status and per-check details.
+- **kv**: Reads a test key from the KV namespace.
+- **d1**: Runs `SELECT 1` against the D1 database.
+- **ai**: Checks that the Workers AI binding exists.
+- **env_vars**: Confirms `wrangler.jsonc` vars are accessible.
+- **secrets**: Confirms required secrets are set (counts only).
+- **optional_secrets**: Reports optional secret counts.
+
+Returns: A `HealthResponse` with overall status and per-check details.
     """
     checks: dict[str, ServiceCheck] = {}
 
