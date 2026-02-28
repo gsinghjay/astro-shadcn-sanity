@@ -2,13 +2,13 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
-import { sanityClient, ALL_EVENT_SLUGS_QUERY, getEventBySlug, getSiteSettings } from '@/lib/sanity';
+import { sanityClient, ALL_EVENT_SLUGS_QUERY, getEventBySlug, getSiteSettings, getSiteParams } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const events = await sanityClient.fetch<Array<{ slug: string }>>(ALL_EVENT_SLUGS_QUERY);
+  const events = await sanityClient.fetch<Array<{ slug: string }>>(ALL_EVENT_SLUGS_QUERY, getSiteParams());
   return events.map((e) => ({ params: { slug: e.slug } }));
 };
 

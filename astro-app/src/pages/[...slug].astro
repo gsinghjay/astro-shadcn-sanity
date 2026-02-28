@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, getAllEvents, prefetchPages } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
 import type { Image } from '@sanity/types';
@@ -26,7 +26,7 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 
 // getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY);
+  const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY, getSiteParams());
   // Pre-fetch all pages in parallel batches to populate the cache
   await prefetchPages(pages.map(p => p.slug));
   return pages.map((page) => ({

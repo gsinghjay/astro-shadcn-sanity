@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
-import { sanityClient, ALL_SPONSOR_SLUGS_QUERY, getSponsorBySlug } from '@/lib/sanity';
+import { sanityClient, ALL_SPONSOR_SLUGS_QUERY, getSponsorBySlug, getSiteParams } from '@/lib/sanity';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +10,7 @@ import { Icon } from '@/components/ui/icon';
 import { Section, SectionContent } from '@/components/ui/section';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const sponsors = await sanityClient.fetch<Array<{ slug: string }>>(ALL_SPONSOR_SLUGS_QUERY);
+  const sponsors = await sanityClient.fetch<Array<{ slug: string }>>(ALL_SPONSOR_SLUGS_QUERY, getSiteParams());
   return sponsors.map((s) => ({ params: { slug: s.slug } }));
 };
 
