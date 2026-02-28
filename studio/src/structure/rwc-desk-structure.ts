@@ -1,13 +1,13 @@
+import type {ComponentType} from 'react'
 import {CogIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
-
-const CONTENT_TYPES = ['page', 'sponsor', 'project', 'testimonial', 'event']
+import {SITE_AWARE_TYPES} from '../constants'
 
 function siteGroup(
   S: StructureBuilder,
   siteId: string,
   title: string,
-  icon: React.ComponentType,
+  icon: ComponentType,
 ) {
   return S.listItem()
     .title(title)
@@ -25,7 +25,7 @@ function siteGroup(
                 .documentId(`siteSettings-${siteId}`),
             ),
           S.divider(),
-          ...CONTENT_TYPES.map((type) =>
+          ...SITE_AWARE_TYPES.map((type) =>
             S.listItem()
               .title(type.charAt(0).toUpperCase() + type.slice(1) + 's')
               .child(

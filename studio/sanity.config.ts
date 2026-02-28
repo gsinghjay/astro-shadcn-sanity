@@ -8,19 +8,15 @@ import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {rwcDeskStructure} from './src/structure/rwc-desk-structure'
 import {resolve} from './src/presentation/resolve'
+import {
+  CAPSTONE_SINGLETON_TYPES,
+  SITE_AWARE_TYPES,
+  RWC_SITES,
+  RWC_SINGLETON_IDS,
+} from './src/constants'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '<your project ID>'
-
-// Singleton document types — only one instance allowed (capstone workspace)
-const singletonTypes = new Set(['siteSettings'])
-
-// Site-aware document types for RWC initial value templates
-const SITE_TYPES = ['page', 'sponsor', 'project', 'testimonial', 'event']
-const SITES = [
-  {id: 'rwc-us', title: 'RWC US'},
-  {id: 'rwc-intl', title: 'RWC International'},
-]
 
 export default defineConfig([
   // ─── Capstone Workspace ───────────────────────────────────
@@ -50,7 +46,7 @@ export default defineConfig([
     },
     document: {
       actions: (input, context) =>
-        singletonTypes.has(context.schemaType)
+        CAPSTONE_SINGLETON_TYPES.has(context.schemaType)
           ? input.filter(
               ({action}) =>
                 action &&
@@ -59,7 +55,8 @@ export default defineConfig([
           : input,
       newDocumentOptions: (prev) =>
         prev.filter(
-          (templateItem) => !singletonTypes.has(templateItem.templateId),
+          (templateItem) =>
+            !CAPSTONE_SINGLETON_TYPES.has(templateItem.templateId),
         ),
     },
   },
@@ -92,12 +89,12 @@ export default defineConfig([
         // Remove default templates for site-aware types + siteSettings
         const filtered = prev.filter(
           (t) =>
-            !SITE_TYPES.includes(t.schemaType) &&
+            !SITE_AWARE_TYPES.includes(t.schemaType) &&
             t.schemaType !== 'siteSettings',
         )
         // Add site-specific templates (page-rwc-us, page-rwc-intl, etc.)
-        const siteTemplates = SITES.flatMap(({id: siteId, title: siteTitle}) =>
-          SITE_TYPES.map((type) => ({
+        const siteTemplates = RWC_SITES.flatMap(({id: siteId, title: siteTitle}) =>
+          SITE_AWARE_TYPES.map((type) => ({
             id: `${type}-${siteId}`,
             title: `${type.charAt(0).toUpperCase() + type.slice(1)} (${siteTitle})`,
             schemaType: type,
@@ -109,12 +106,8 @@ export default defineConfig([
     },
     document: {
       actions: (input, context) => {
-        // Guard both RWC siteSettings singletons
-        const rwcSingletonIds = ['siteSettings-rwc-us', 'siteSettings-rwc-intl']
-        if (
-          context.schemaType === 'siteSettings' ||
-          rwcSingletonIds.includes(context.documentId || '')
-        ) {
+        // Guard RWC siteSettings singletons by fixed document ID
+        if (RWC_SINGLETON_IDS.includes(context.documentId || '')) {
           return input.filter(
             ({action}) =>
               action &&

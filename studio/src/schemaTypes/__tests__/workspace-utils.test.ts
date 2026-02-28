@@ -81,4 +81,13 @@ describe('Story 15-2: createSchemaTypesForWorkspace', () => {
     expect(schemaTypes).toHaveLength(originalLength)
     expect(schemaTypes[0]).toBe(originalFirst)
   })
+
+  test('unknown dataset (e.g., "staging"): site field defaults to visible', () => {
+    const result = createSchemaTypesForWorkspace('staging')
+    for (const typeName of SITE_AWARE_TYPES) {
+      const typeDef = result.find((t: any) => t.name === typeName)
+      const siteField = (typeDef as any).fields?.find((f: any) => f.name === 'site')
+      expect(siteField.hidden).toBe(false)
+    }
+  })
 })

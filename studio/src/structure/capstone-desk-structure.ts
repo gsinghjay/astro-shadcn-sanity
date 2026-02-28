@@ -1,8 +1,6 @@
 import {CogIcon, EnvelopeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
-
-/** Singleton document types — only one instance allowed */
-const singletonTypes = new Set(['siteSettings'])
+import {CAPSTONE_SINGLETON_TYPES} from '../constants'
 
 export const capstoneDeskStructure = (S: StructureBuilder) =>
   S.list()
@@ -28,7 +26,7 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
       // All other document types (excluding singletons and custom nav items)
       ...S.documentTypeListItems().filter(
         (listItem) =>
-          !singletonTypes.has(listItem.getId()!) &&
+          !CAPSTONE_SINGLETON_TYPES.has(listItem.getId()!) &&
           listItem.getId() !== 'submission',
       ),
     ])
