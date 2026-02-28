@@ -66,6 +66,7 @@
     display: block;
   }
 
+  /* var() in ::selection requires Chrome 62+, Firefox 62+, Safari 14.1+ */
   ::selection {
     background-color: var(--primary);
     color: var(--primary-foreground);

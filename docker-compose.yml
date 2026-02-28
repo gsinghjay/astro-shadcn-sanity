@@ -54,6 +54,7 @@ services:
       - PUBLIC_SANITY_DATASET=rwc
       - PUBLIC_SITE_ID=rwc-us
       - PUBLIC_SITE_THEME=blue
+      - PUBLIC_SITE_URL=http://localhost:4322
     profiles:
       - rwc
 
@@ -76,6 +77,7 @@ services:
       - PUBLIC_SANITY_DATASET=rwc
       - PUBLIC_SITE_ID=rwc-intl
       - PUBLIC_SITE_THEME=green
+      - PUBLIC_SITE_URL=http://localhost:4323
     profiles:
       - rwc
 

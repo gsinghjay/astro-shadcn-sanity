@@ -31,6 +31,9 @@ jobs:
         env:
           PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
           PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+          PUBLIC_SANITY_DATASET: ${{ vars.PUBLIC_SANITY_DATASET || 'production' }}
+          PUBLIC_SITE_ID: ${{ vars.PUBLIC_SITE_ID || 'capstone' }}
+          PUBLIC_SITE_THEME: ${{ vars.PUBLIC_SITE_THEME || 'red' }}
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
           PUBLIC_SANITY_STUDIO_URL: ${{ vars.PUBLIC_SANITY_STUDIO_URL }}
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
