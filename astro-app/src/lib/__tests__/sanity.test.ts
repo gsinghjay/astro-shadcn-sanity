@@ -15,7 +15,6 @@ const {
   resolveBlockSponsors,
   getSyncTags,
   resetSyncTags,
-  getSiteFilter,
   getSiteParams,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
@@ -316,7 +315,7 @@ describe("getSiteSettings()", () => {
     );
   });
 
-  it("returns site settings when document exists", async () => {
+  it("returns site settings when document exists and passes siteSettingsId param", async () => {
     const mockSettings = {
       siteName: "Test Site",
       siteDescription: "A test site",
@@ -327,6 +326,11 @@ describe("getSiteSettings()", () => {
 
     const result = await getSiteSettings();
     expect(result).toEqual(mockSettings);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      SITE_SETTINGS_QUERY,
+      { siteSettingsId: "siteSettings" },
+      expect.objectContaining({ filterResponse: false, perspective: "published" }),
+    );
   });
 });
 
@@ -618,14 +622,6 @@ describe("prefetchPages() and getPage() cache", () => {
   });
 });
 
-describe("getSiteFilter() (production defaults)", () => {
-  it("returns empty string for production dataset", () => {
-    // Default env: PUBLIC_SANITY_DATASET is 'production' (or not set)
-    const filter = getSiteFilter();
-    expect(filter).toBe("");
-  });
-});
-
 describe("getSiteParams() (production defaults)", () => {
   it("returns { site: '' } for production dataset", () => {
     const params = getSiteParams();
@@ -638,17 +634,7 @@ describe("getSiteParams() (production defaults)", () => {
   });
 });
 
-describe("getSiteFilter() and getSiteParams() (rwc dataset)", () => {
-  it("getSiteFilter returns site filter for rwc dataset", async () => {
-    vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
-    vi.stubEnv("PUBLIC_SANITY_DATASET", "rwc");
-    vi.stubEnv("PUBLIC_SITE_ID", "rwc-us");
-    const freshModule = await import("@/lib/sanity");
-
-    expect(freshModule.getSiteFilter()).toBe("&& site == $site");
-  });
-
+describe("getSiteParams() (rwc dataset)", () => {
   it("getSiteParams returns site ID for rwc dataset", async () => {
     vi.resetModules();
     vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");

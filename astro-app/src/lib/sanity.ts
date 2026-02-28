@@ -41,20 +41,6 @@ const SITE_ID = import.meta.env.PUBLIC_SITE_ID || 'capstone';
 const isMultiSite = DATASET === 'rwc';
 
 /**
- * Returns a GROQ filter fragment for site-aware queries.
- * - rwc dataset: `&& site == $site` (filters by site)
- * - production dataset: `` (empty string, no-op)
- *
- * Note: Not used in defineQuery() calls due to TypeGen's inability to
- * statically parse function calls in template literals. Queries use the
- * always-present filter pattern instead: `&& ($site == "" || site == $site)`.
- * Kept as a utility for dynamic query construction outside defineQuery().
- */
-export function getSiteFilter(): string {
-  return isMultiSite ? '&& site == $site' : '';
-}
-
-/**
  * Returns GROQ query params for site-aware queries.
  * Always includes `site` key for the always-present filter pattern:
  * - rwc dataset: `{ site: "rwc-us" }` (or "rwc-intl")
@@ -218,7 +204,7 @@ let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
 
 export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
   if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
-  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY, params: { ...getSiteParams() } });
+  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY, params: getSiteParams() });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
 }
@@ -295,7 +281,7 @@ let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
 
 export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _projectsCache) return _projectsCache;
-  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY, params: { ...getSiteParams() } });
+  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY, params: getSiteParams() });
   _projectsCache = result ?? [];
   return _projectsCache;
 }
@@ -353,7 +339,7 @@ let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
 
 export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
   if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
-  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY, params: { ...getSiteParams() } });
+  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY, params: getSiteParams() });
   _testimonialsCache = result ?? [];
   return _testimonialsCache;
 }
@@ -394,7 +380,7 @@ let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
 
 export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _eventsCache) return _eventsCache;
-  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY, params: { ...getSiteParams() } });
+  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY, params: getSiteParams() });
   _eventsCache = result ?? [];
   return _eventsCache;
 }

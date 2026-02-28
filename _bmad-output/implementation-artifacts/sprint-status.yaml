@@ -802,7 +802,7 @@ development_status:
   epic-15: in-progress  # NEW (2026-02-26): Multi-Site Infrastructure — 2 Sanity datasets, 2 Studio workspaces, 3 CF Pages projects. Assigned to Jay (Team A). ~4 days.
   15-1-create-rwc-dataset-deploy-schemas: done  # rwc dataset created, siteField added to 6 schemas, deployed to both datasets, 531 tests pass
   15-2-studio-multi-workspace-configuration: done  # Depends on 15.1. defineConfig([...]) with capstone + rwc workspaces, RWC desk structure, initial value templates.
-  15-3-astro-multi-site-data-fetching: review  # Depends on 15.1. GROQ query parameterization by PUBLIC_SANITY_DATASET + PUBLIC_SITE_ID.
+  15-3-astro-multi-site-data-fetching: done  # Depends on 15.1. GROQ query parameterization by PUBLIC_SANITY_DATASET + PUBLIC_SITE_ID.
   15-4-per-site-theming-css-custom-properties: backlog  # Depends on 15.3. CSS [data-theme] selectors for red/blue/green themes.
   15-5-cloudflare-pages-multi-project-deployment: backlog  # Depends on 15.3 + 15.4. Three CF Pages projects with per-site env vars + deploy hooks.
   15-6-embeddings-index-for-rwc-dataset: deferred  # Depends on 15.1 + 14.1. Deferred until RWC content exists.
