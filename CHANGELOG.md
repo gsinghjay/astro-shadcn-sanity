@@ -1,3 +1,36 @@
+## [1.9.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.8.0...v1.9.0) (2026-02-28)
+
+### Features
+
+* add FastAPI + Cloudflare Python Worker template (Story 0.1) ([6a56e7f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6a56e7fb3e0aefb9d9b156ce61b8ed227e44eba4))
+* add public events calendar view with list/calendar toggle (Story 2-15) ([c2a5999](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c2a59996857e7f8b4b59bb216834e0b0e39014ed))
+* add reusable site field for multi-site content filtering (Story 15.1) ([ca1d5ce](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ca1d5ce84cea6cbdcad614b2ff067b23c0ee8e8e))
+* add Sanity Live Content API for real-time content updates (Story 5-12) ([c157cfd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c157cfd610a71b2b8c57e138936525d082f93f5f))
+* apply code review fixes — safeUrlFor consistency, PT components wiring, status updates (Story 7-15) ([dc01391](https://github.com/gsinghjay/astro-shadcn-sanity/commit/dc01391d9ed67298bf18c2d40b97a64c04a0ec5e))
+* **studio:** add schema validations, previews, and resolver polish (Story 7-12) ([b750b8f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b750b8f76e48ae6c79cc236d48bb9c0944d8ce6d))
+* **studio:** add SEO object to sponsor, project, and event schemas (Story 7-13) ([c489bcc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c489bcca6e30594f572db9f1f395f39747cd9a4c))
+* **studio:** formalize technology tags as predefined list (Story 7-14) ([425431c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/425431cec33cd58dbefa21c9c8fd1eb9664935bd))
+
+### Bug Fixes
+
+* align template with Cloudflare docs best practices ([da1e3e4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/da1e3e4cbccc1da57f8b7198391fdcb8264a38ae))
+* code review fixes — seo test assertions, project.ts field order (Story 7-13 review) ([d1dcdfc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d1dcdfc0cb6e9ea9f48c4e070e4184010e9f9d83))
+* format health endpoint docstring as proper markdown for Swagger UI ([a058b60](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a058b60144ea639a8384791cc14f1fe7b85b441b))
+* prevent Docker from creating root-owned dirs on host filesystem ([b2f65fe](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b2f65fe65c1c6782306f14f9d827b583691c6c25))
+* resolve code review issues in Sanity Live Content API (Story 5-12) ([755435c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/755435c53afc8113ee8d42aaf22d00732d793fb1))
+* resolve EventCalendarIsland rendering errors (Story 2-15) ([4a5565b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4a5565b3097b5a2bc01f5b0713ddb09311e1656e))
+* resolve PT internal link dead anchors, optimize PT image delivery (Story 7-15 review) ([8cf91ff](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8cf91ffc266fb1f40a446c3698975487c61130ca))
+* security hardening and best practices for FastAPI CF Worker template (Story 0.1) ([8c7c608](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8c7c608e8429f7ae0c3185e81b83564be7921c5e))
+
+### Documentation
+
+* add PEP 257 docstrings explaining Cloudflare concepts for beginners ([cced0a6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cced0a6dae6d9f6c02740fa44e690a559dd566a7))
+
+### Miscellaneous
+
+* ignored the wiki folder ([ca6aeb6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ca6aeb631cd828631714b4d9253af337c1a35a12))
+* remove tracked _bmad-output file that should be gitignored ([8555664](https://github.com/gsinghjay/astro-shadcn-sanity/commit/85556647aa65bd3894c5e589e89105d20cd66816))
+
 ## [1.8.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.7.0...v1.8.0) (2026-02-20)
 
 ### Features
