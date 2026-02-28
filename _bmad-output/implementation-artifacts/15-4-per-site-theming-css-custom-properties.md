@@ -1,6 +1,6 @@
 # Story 15.4: Per-Site Theming with CSS Custom Properties
 
-Status: review
+Status: done
 
 ## Story
 
@@ -314,15 +314,17 @@ No issues encountered. All tasks completed in a single pass.
 ### Change Log
 
 - 2026-02-28: Implemented per-site theming with CSS custom properties (Story 15-4). Added PUBLIC_SITE_THEME env var, data-site-theme HTML attribute, blue/green CSS overrides, and ::selection fix.
+- 2026-02-28: Code review fixes — H1: added VALID_SITE_THEMES validation in astro.config.mjs with build-time warning. M1: replaced tautological env var tests with CSS selector parsing, config verification, and Layout attribute tests (13 meaningful tests). M2: annotated .env as gitignored in File List. M3: added PUBLIC_SITE_URL overrides to Docker RWC services. L1: added ImportMetaEnv type declarations to env.d.ts. L2: added browser compat comment on ::selection.
 
 ### File List
 
-- `astro-app/.env` — Added `PUBLIC_SITE_THEME="red"`
+- `astro-app/.env` — Added `PUBLIC_SITE_THEME="red"` (local-only, gitignored)
 - `astro-app/.env.example` — Added `PUBLIC_SITE_THEME` with per-site documentation
-- `astro-app/astro.config.mjs` — Added `siteTheme` resolution and `vite.define` entry
+- `astro-app/astro.config.mjs` — Added `siteTheme` resolution with VALID_SITE_THEMES validation and `vite.define` entry
 - `astro-app/src/layouts/Layout.astro` — Added `siteTheme` const and `data-site-theme` attribute on `<html>`
-- `astro-app/src/styles/global.css` — Updated `::selection`, added `[data-site-theme="blue"]`, `[data-site-theme="green"]`, `.dark[data-site-theme="blue"]`, `.dark[data-site-theme="green"]` overrides
-- `astro-app/src/lib/__tests__/site-theme.test.ts` — New: 5 unit tests for theme env var resolution
+- `astro-app/src/styles/global.css` — Updated `::selection` (with browser compat comment), added `[data-site-theme="blue"]`, `[data-site-theme="green"]`, `.dark[data-site-theme="blue"]`, `.dark[data-site-theme="green"]` overrides
+- `astro-app/src/lib/__tests__/site-theme.test.ts` — 13 tests: CSS selector verification, config validation, Layout attribute checks
+- `astro-app/src/env.d.ts` — Added ImportMetaEnv interface with all PUBLIC_* env var type declarations
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated story status
-- `docker-compose.yml` — Added `astro-rwc-us` and `astro-rwc-intl` services with `rwc` profile
+- `docker-compose.yml` — Added `astro-rwc-us` and `astro-rwc-intl` services with `rwc` profile and `PUBLIC_SITE_URL` overrides
 - `_bmad-output/implementation-artifacts/15-4-per-site-theming-css-custom-properties.md` — Updated story status, tasks, dev agent record
