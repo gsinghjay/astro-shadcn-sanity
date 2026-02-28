@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {CalendarIcon, SearchIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const event = defineType({
   name: 'event',
@@ -34,6 +35,7 @@ export const event = defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'main'},
     defineField({
       name: 'date',
       title: 'Start Date',

@@ -1,6 +1,7 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import type {SanityDocument} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 /**
  * Block types that may not render well in constrained-column templates.
@@ -64,6 +65,7 @@ export const page = defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'layout'},
     defineField({
       name: 'template',
       title: 'Page Template',
