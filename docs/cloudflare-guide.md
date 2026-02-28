@@ -49,7 +49,7 @@ Visitor → Cloudflare CDN (static HTML from edge cache)
 
 | Service | Status | Purpose |
 |:--------|:-------|:--------|
-| **Pages** | Active | Static hosting + CDN |
+| **Pages** (3 projects) | Active | Static hosting + CDN — `ywcc-capstone`, `rwc-us`, `rwc-intl` |
 | **Workers** (SSR) | Active | `/portal/*` and `/_server-islands/*` routes |
 | **Access / Zero Trust** | Active | Auth gate for `/portal/*` |
 | **Deploy Hook** | Active | Sanity webhook triggers production rebuild |
@@ -232,6 +232,106 @@ Cloudflare Pages caches dependencies and build outputs across deployments.
 - `Content-Security-Policy: frame-ancestors 'self' https://*.sanity.studio https://*.sanity.io`
 
 These are only active on deployed Cloudflare Pages, not in local dev.
+
+### 2.8 Multi-Project Deployment (Epic 15)
+
+The same Astro codebase deploys as **three independent CF Pages projects**, each with different environment variables for dataset, site identity, and theme.
+
+#### Projects
+
+| CF Pages Project | Dataset | Site ID | Theme | URL |
+|:-----------------|:--------|:--------|:------|:----|
+| `ywcc-capstone` | `production` | `capstone` | `red` | `ywcc-capstone.pages.dev` |
+| `rwc-us` | `rwc` | `rwc-us` | `blue` | `rwc-us.pages.dev` |
+| `rwc-intl` | `rwc` | `rwc-intl` | `green` | `rwc-intl.pages.dev` |
+
+All three share the same repository (`gsinghjay/astro-shadcn-sanity`), build command, and build output directory. Only the environment variables differ.
+
+#### Build Configuration (identical for all projects)
+
+| Setting | Value |
+|:--------|:------|
+| Framework preset | Astro |
+| Build command | `npm run build --workspace=astro-app` |
+| Build output directory | `astro-app/dist` |
+| Root directory | `/` (monorepo root — npm workspaces need root `package.json`) |
+
+> **Critical:** Root directory must be `/`, NOT `astro-app/`. The build command uses npm workspaces which requires the monorepo root `package.json`.
+
+#### Build Watch Paths
+
+Configured per project to avoid unnecessary rebuilds:
+
+- **Include:** `astro-app/*`
+- **Exclude:** `studio/*`, `_templates/*`, `docs/*`, `_bmad/*`, `_bmad-output/*`, `_wp-scrape/*`, `tests/*`, `.github/*`
+
+Schema changes in `studio/` don't directly trigger builds — `npm run typegen` updates `astro-app/src/sanity.types.ts`, which IS in the watch path.
+
+#### Per-Project Environment Variables
+
+Set in CF Pages dashboard **Settings → Environment variables** (both Production and Preview):
+
+| Variable | `ywcc-capstone` | `rwc-us` | `rwc-intl` |
+|:---------|:----------------|:---------|:-----------|
+| `PUBLIC_SANITY_STUDIO_PROJECT_ID` | `49nk9b0w` | `49nk9b0w` | `49nk9b0w` |
+| `PUBLIC_SANITY_DATASET` | `production` | `rwc` | `rwc` |
+| `PUBLIC_SITE_ID` | `capstone` | `rwc-us` | `rwc-intl` |
+| `PUBLIC_SITE_THEME` | `red` | `blue` | `green` |
+| `PUBLIC_SITE_URL` | (project domain) | (project domain) | (project domain) |
+| `PUBLIC_SANITY_STUDIO_URL` | studio URL | studio URL | studio URL |
+| `PUBLIC_GTM_ID` | (shared or per-site) | (shared or per-site) | (shared or per-site) |
+| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | `true` | `true` | `true` |
+| `SANITY_API_READ_TOKEN` | (shared token) | (shared token) | (shared token) |
+
+Secrets (encrypted, dashboard Secrets section):
+- `CF_ACCESS_AUD` — per-project or shared Access Application Audience tag
+- `TURNSTILE_SECRET_KEY` — shared Turnstile secret
+- `SANITY_API_WRITE_TOKEN` — shared Sanity write token
+- `DISCORD_WEBHOOK_URL` — shared or per-site Discord webhook
+
+#### Deploy Hooks (Content Rebuild)
+
+Each project has a deploy hook for Sanity content rebuilds:
+
+| Project | Hook Name | Branch |
+|:--------|:----------|:-------|
+| `ywcc-capstone` | `sanity-content-update-capstone` | `main` |
+| `rwc-us` | `sanity-content-update-rwc-us` | `main` |
+| `rwc-intl` | `sanity-content-update-rwc-intl` | `main` |
+
+Deploy hook URLs are secrets — never commit them to source code.
+
+**Content rebuild pipeline:**
+
+```
+Sanity publish → GROQ webhook (per dataset)
+    ├── Dataset: production → POST capstone deploy hook
+    └── Dataset: rwc       → POST rwc-us + rwc-intl deploy hooks
+```
+
+#### Build Limits
+
+| Resource | Free Plan | Paid Plan ($5/mo) |
+|:---------|:----------|:------------------|
+| Builds per month | 500 | 5,000 |
+| Concurrent builds | 1 | 6 |
+| Projects per repo | 5 (we use 3) | 5 |
+
+With 3 projects, each push triggers up to 3 builds. On the free plan they queue sequentially (~60-90s each).
+
+#### How It Works (Code)
+
+The Astro codebase reads environment variables at build time via `vite.define` in `astro.config.mjs`:
+
+- `PUBLIC_SANITY_DATASET` → which Sanity dataset to query
+- `PUBLIC_SITE_ID` → site-specific GROQ filtering via `getSiteParams()`
+- `PUBLIC_SITE_THEME` → `data-site-theme` attribute on `<html>` for CSS overrides
+
+No code branching per site — the same code paths serve all sites. Env vars control behavior.
+
+#### `wrangler.jsonc` and Multi-Project
+
+`astro-app/wrangler.jsonc` is for **local dev only** (`wrangler pages dev`). It references `ywcc-capstone` as the project name. Per-project production config is managed entirely in the CF Pages dashboard. Do not duplicate dashboard env vars in `wrangler.jsonc`.
 
 ---
 
@@ -617,33 +717,33 @@ const [rsvps, agreements, prefs] = await db.batch([
 ]);
 ```
 
-### 5.5 Epic 9 Descoping Decisions
+### 5.5 Epic 9 Scope Status
 
-Some stories exceed free-tier limits and were descoped or deferred:
+All 15 Epic 9 stories are **fully in scope** as of 2026-02-27. The Workers Paid plan ($5/month) removes all free-tier daily limits, and architectural pivots (2026-02-20) to Analytics Engine and Queues+KV further reduce D1 pressure.
 
-| Story | Status | Rationale |
-|:------|:-------|:----------|
+| Story | Status | Notes |
+|:------|:-------|:------|
 | 9.1 — CF Access | **IN** | Auth foundation, zero D1 |
 | 9.2 — Sponsor Project View | **IN** | SSR + Sanity only |
 | 9.3 — Events & Program Info | **IN** | SSR + Sanity only |
 | 9.4 — GitHub Dev Dashboard | **IN** | Low-traffic admin page |
 | 9.5 — Site Health CI | **IN** | R2/KV writes in CI, not Workers |
 | 9.6 — Site Health Dashboard | **IN** | Low-traffic, minimal R2/KV reads |
-| 9.7 — Submission Dashboard | **PARTIAL** | Submissions panel only; GA4 engagement panel deferred |
-| 9.8 — D1 Setup | **REDUCED** | 4 tables instead of 6 (removed `portal_activity`) |
-| 9.9 — Activity Tracking | **UN-DESCOPED** | Analytics Engine replaces D1 — `writeDataPoint()` is I/O, SQL API reads run outside Worker |
+| 9.7 — Submission Dashboard | **IN** | Full dashboard: submissions + GA4 engagement panel |
+| 9.8 — D1 Setup | **IN** | All 6 tables. Paid plan: 25B reads/mo, 50M writes/mo |
+| 9.9 — Activity Tracking | **IN** | Analytics Engine `writeDataPoint()` + SQL API reads |
 | 9.10 — Event RSVPs | **IN** | Low D1 volume (~100 writes/semester) |
-| 9.11 — Evaluations | **DEFERRED** | Low priority for MVP |
+| 9.11 — Evaluations | **IN** | Unblocked by paid plan — zero architectural changes |
 | 9.12 — Agreement Signatures | **IN** | One-time writes, legally required |
-| 9.13 — Notifications | **UN-DEFERRED** | Queues + KV replace D1 — single KV read per page load, Queue for async creation |
+| 9.13 — Notifications | **IN** | Queues + KV architecture (async pipeline, single-key reads) |
 | 9.14 — Multi-Provider Auth | **IN** | Dashboard config only |
-| 9.15 — Admin Analytics | **UN-DESCOPED** | Analytics Engine SQL API replaces D1 GROUP BY — aggregations run on CF infra, not Worker |
+| 9.15 — Admin Analytics | **IN** | Analytics Engine SQL API for aggregations |
 
-Three previously blocked stories were un-descoped/un-deferred (2026-02-20) by replacing D1 with purpose-built free services:
-- **9.9 + 9.15:** Workers Analytics Engine (writes from Worker, reads via HTTP SQL API — zero D1 pressure)
-- **9.13:** Cloudflare Queues + KV (async notification pipeline, single-key reads instead of D1 table queries)
+**Architectural pivots retained** (2026-02-20) — these remain optimal even on the paid plan:
+- **9.9 + 9.15:** Workers Analytics Engine (purpose-built for time-series writes and aggregate reads)
+- **9.13:** Cloudflare Queues + KV (async notification pipeline, single-key reads)
 
-The $5/month Workers Paid plan (now approved) removes all remaining daily limits and unlocks Story 9.11 (Evaluations) with zero architectural changes. It also enables the Phase 3 platform capabilities described in [Section 11](#11-phase-3-platform-capabilities): Python Workers for the Aggregated API and Discord bot, 250 Cron Triggers for scheduled tasks, and 14-day Queue message retention for fault tolerance.
+The Workers Paid plan also enables Phase 3 platform capabilities described in [Section 11](#11-phase-3-platform-capabilities): Python Workers for the Aggregated API and Discord bot, 250 Cron Triggers for scheduled tasks, and 14-day Queue message retention for fault tolerance.
 
 ---
 

@@ -1,4 +1,11 @@
 // astro-app/wrangler.jsonc
+//
+// LOCAL DEV ONLY. This file is for `wrangler pages dev` and is NOT the source
+// of truth for production. Per-project env vars and secrets are managed in the
+// CF Pages dashboard for each project:
+//   - ywcc-capstone  (dataset: production, site: capstone, theme: red)
+//   - rwc-us         (dataset: rwc, site: rwc-us, theme: blue)
+//   - rwc-intl       (dataset: rwc, site: rwc-intl, theme: green)
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
   "name": "ywcc-capstone",
