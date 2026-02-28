@@ -36,8 +36,8 @@ describe('Story 15-1: siteField definition', () => {
     expect(options.layout).toBe('radio')
   })
 
-  test('hidden is a function', () => {
-    expect(typeof siteField.hidden).toBe('function')
+  test('hidden defaults to true (overridden per workspace by createSchemaTypesForWorkspace)', () => {
+    expect(siteField.hidden).toBe(true)
   })
 
   test('validation is a function', () => {
