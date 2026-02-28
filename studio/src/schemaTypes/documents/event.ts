@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {CalendarIcon, SearchIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const event = defineType({
   name: 'event',
@@ -34,6 +35,7 @@ export const event = defineType({
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'main'},
     defineField({
       name: 'date',
       title: 'Start Date',
@@ -68,6 +70,29 @@ export const event = defineType({
       title: 'Description',
       type: 'text',
       group: 'main',
+    }),
+    defineField({
+      name: 'isAllDay',
+      title: 'All-Day Event',
+      type: 'boolean',
+      group: 'main',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'color',
+      title: 'Calendar Color',
+      type: 'string',
+      group: 'main',
+      description: 'Optional calendar color override. Falls back to event type color if not set.',
+      options: {
+        list: [
+          {title: 'Red', value: 'red'},
+          {title: 'Blue', value: 'blue'},
+          {title: 'Green', value: 'green'},
+          {title: 'Orange', value: 'orange'},
+          {title: 'Purple', value: 'purple'},
+        ],
+      },
     }),
     defineField({
       name: 'eventType',

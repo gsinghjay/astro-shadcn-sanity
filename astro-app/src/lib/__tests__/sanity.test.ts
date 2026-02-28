@@ -25,6 +25,7 @@ const {
   PROJECT_BY_SLUG_QUERY,
   PAGE_BY_SLUG_QUERY,
   EVENT_BY_SLUG_QUERY,
+  EVENTS_BY_MONTH_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -110,6 +111,17 @@ describe("GROQ query definitions", () => {
   it("PROJECT_BY_SLUG_QUERY includes testimonials sub-query", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain('_type == "testimonial"');
     expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
+  });
+
+  it("EVENTS_BY_MONTH_QUERY filters events by date range with expected fields", () => {
+    expect(EVENTS_BY_MONTH_QUERY).toContain('_type == "event"');
+    expect(EVENTS_BY_MONTH_QUERY).toContain("$monthStart");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("$monthEnd");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("dateTime(date)");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("order(date asc)");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("slug.current");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("eventType");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("status");
   });
 
   it("EVENT_BY_SLUG_QUERY fetches single event by slug with all fields", () => {

@@ -1,5 +1,6 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {ProjectsIcon, SearchIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const project = defineType({
   name: 'project',
@@ -32,6 +33,7 @@ export const project = defineType({
       options: {source: 'title'},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'main'},
     defineField({
       name: 'sponsor',
       title: 'Sponsor',

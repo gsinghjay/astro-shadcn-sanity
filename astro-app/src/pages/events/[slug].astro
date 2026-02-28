@@ -77,7 +77,7 @@ const eventJsonLd = {
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
-        { label: 'Events', href: '/' },
+        { label: 'Events', href: '/events' },
         { label: event.title ?? 'Event' },
       ]} />
 
@@ -120,7 +120,7 @@ const eventJsonLd = {
         </div>
       )}
 
-      <a href="/" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">
+      <a href="/events" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">
         &larr; Back to Events
       </a>
     </SectionContent>
