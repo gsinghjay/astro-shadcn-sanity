@@ -54,6 +54,8 @@ const ogImageUrl = seo?.ogImage?.asset
   ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
   : null;
 
+const siteTheme = import.meta.env.PUBLIC_SITE_THEME || 'red';
+
 const liveContentEnabled =
   import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED === "true";
 
@@ -70,7 +72,7 @@ const orgJsonLd = {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-site-theme={siteTheme}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
