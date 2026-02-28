@@ -67,8 +67,8 @@
   }
 
   ::selection {
-    background-color: var(--color-swiss-red);
-    color: var(--color-swiss-white);
+    background-color: var(--primary);
+    color: var(--primary-foreground);
   }
 }
 
@@ -175,6 +175,39 @@
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
   --ring: #e30613;
+}
+
+/* Per-site theme overrides (Story 15-4)
+   Red theme = :root defaults (no override needed).
+   Blue/green override primary-related tokens only. */
+[data-site-theme="blue"] {
+  --primary: #2563eb;
+  --ring: #2563eb;
+  --destructive: #1e40af;
+  --chart-1: #2563eb;
+  --sidebar-primary: #2563eb;
+  --sidebar-ring: #2563eb;
+}
+
+[data-site-theme="green"] {
+  --primary: #059669;
+  --ring: #059669;
+  --destructive: #047857;
+  --chart-1: #059669;
+  --sidebar-primary: #059669;
+  --sidebar-ring: #059669;
+}
+
+.dark[data-site-theme="blue"] {
+  --primary: #2563eb;
+  --ring: #2563eb;
+  --destructive: #1e40af;
+}
+
+.dark[data-site-theme="green"] {
+  --primary: #059669;
+  --ring: #059669;
+  --destructive: #047857;
 }
 
 @layer base {

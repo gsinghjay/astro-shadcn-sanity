@@ -35,6 +35,50 @@ services:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
 
+  astro-rwc-us:
+    build:
+      context: .
+      target: dev-astro
+    ports:
+      - "4322:4321"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - astro_node_modules:/app/astro-app/node_modules
+      - studio_node_modules:/app/studio/node_modules
+    env_file:
+      - astro-app/.env
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - PUBLIC_SANITY_DATASET=rwc
+      - PUBLIC_SITE_ID=rwc-us
+      - PUBLIC_SITE_THEME=blue
+    profiles:
+      - rwc
+
+  astro-rwc-intl:
+    build:
+      context: .
+      target: dev-astro
+    ports:
+      - "4323:4321"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+      - astro_node_modules:/app/astro-app/node_modules
+      - studio_node_modules:/app/studio/node_modules
+    env_file:
+      - astro-app/.env
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - PUBLIC_SANITY_DATASET=rwc
+      - PUBLIC_SITE_ID=rwc-intl
+      - PUBLIC_SITE_THEME=green
+    profiles:
+      - rwc
+
   storybook:
     build:
       context: .

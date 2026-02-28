@@ -4,7 +4,7 @@ import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import type { Testimonial } from '@/lib/sanity';
-import { sanityClient, ALL_PROJECT_SLUGS_QUERY, getProjectBySlug } from '@/lib/sanity';
+import { sanityClient, ALL_PROJECT_SLUGS_QUERY, getProjectBySlug, getSiteParams } from '@/lib/sanity';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +13,7 @@ import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY);
+  const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
   return projects.map((p) => ({ params: { slug: p.slug } }));
 };
 

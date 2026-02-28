@@ -15,6 +15,7 @@ const {
   resolveBlockSponsors,
   getSyncTags,
   resetSyncTags,
+  getSiteParams,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
   ALL_SPONSORS_QUERY,
@@ -26,6 +27,9 @@ const {
   PAGE_BY_SLUG_QUERY,
   EVENT_BY_SLUG_QUERY,
   EVENTS_BY_MONTH_QUERY,
+  ALL_EVENTS_QUERY,
+  ALL_EVENT_SLUGS_QUERY,
+  ALL_TESTIMONIALS_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -311,7 +315,7 @@ describe("getSiteSettings()", () => {
     );
   });
 
-  it("returns site settings when document exists", async () => {
+  it("returns site settings when document exists and passes siteSettingsId param", async () => {
     const mockSettings = {
       siteName: "Test Site",
       siteDescription: "A test site",
@@ -322,6 +326,11 @@ describe("getSiteSettings()", () => {
 
     const result = await getSiteSettings();
     expect(result).toEqual(mockSettings);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      SITE_SETTINGS_QUERY,
+      { siteSettingsId: "siteSettings" },
+      expect.objectContaining({ filterResponse: false, perspective: "published" }),
+    );
   });
 });
 
@@ -384,7 +393,7 @@ describe("getSponsorBySlug()", () => {
     expect(result).toEqual(mockSponsor);
     expect(sanityClient.fetch).toHaveBeenCalledWith(
       SPONSOR_BY_SLUG_QUERY,
-      { slug: "acme-corp" },
+      { slug: "acme-corp", site: "" },
       expect.objectContaining({
         filterResponse: false,
         perspective: "published",
@@ -458,7 +467,7 @@ describe("getProjectBySlug()", () => {
     expect(result).toEqual(mockProject);
     expect(sanityClient.fetch).toHaveBeenCalledWith(
       PROJECT_BY_SLUG_QUERY,
-      { slug: "smart-campus" },
+      { slug: "smart-campus", site: "" },
       expect.objectContaining({
         filterResponse: false,
         perspective: "published",
@@ -610,5 +619,90 @@ describe("prefetchPages() and getPage() cache", () => {
       expect(page).toEqual({ _id: slug, title: slug });
     }
     expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getSiteParams() (production defaults)", () => {
+  it("returns { site: '' } for production dataset", () => {
+    const params = getSiteParams();
+    expect(params).toEqual({ site: "" });
+  });
+
+  it("always includes a 'site' key", () => {
+    const params = getSiteParams();
+    expect(params).toHaveProperty("site");
+  });
+});
+
+describe("getSiteParams() (rwc dataset)", () => {
+  it("getSiteParams returns site ID for rwc dataset", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.stubEnv("PUBLIC_SANITY_DATASET", "rwc");
+    vi.stubEnv("PUBLIC_SITE_ID", "rwc-us");
+    const freshModule = await import("@/lib/sanity");
+
+    expect(freshModule.getSiteParams()).toEqual({ site: "rwc-us" });
+  });
+
+  it("getSiteParams returns rwc-intl for international site", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.stubEnv("PUBLIC_SANITY_DATASET", "rwc");
+    vi.stubEnv("PUBLIC_SITE_ID", "rwc-intl");
+    const freshModule = await import("@/lib/sanity");
+
+    expect(freshModule.getSiteParams()).toEqual({ site: "rwc-intl" });
+  });
+});
+
+describe("Multi-site query patterns", () => {
+  it("SITE_SETTINGS_QUERY uses $siteSettingsId parameter for deterministic lookup", () => {
+    expect(SITE_SETTINGS_QUERY).toContain("_id == $siteSettingsId");
+  });
+
+  it("all list queries include the always-present site filter", () => {
+    const listQueries = [
+      { name: "ALL_PAGE_SLUGS_QUERY", query: ALL_PAGE_SLUGS_QUERY },
+      { name: "ALL_SPONSORS_QUERY", query: ALL_SPONSORS_QUERY },
+      { name: "ALL_SPONSOR_SLUGS_QUERY", query: ALL_SPONSOR_SLUGS_QUERY },
+      { name: "ALL_PROJECTS_QUERY", query: ALL_PROJECTS_QUERY },
+      { name: "ALL_PROJECT_SLUGS_QUERY", query: ALL_PROJECT_SLUGS_QUERY },
+      { name: "ALL_TESTIMONIALS_QUERY", query: ALL_TESTIMONIALS_QUERY },
+      { name: "ALL_EVENTS_QUERY", query: ALL_EVENTS_QUERY },
+      { name: "ALL_EVENT_SLUGS_QUERY", query: ALL_EVENT_SLUGS_QUERY },
+      { name: "EVENTS_BY_MONTH_QUERY", query: EVENTS_BY_MONTH_QUERY },
+    ];
+
+    for (const { name, query } of listQueries) {
+      expect(query, `${name} should contain site filter`).toContain('$site == "" || site == $site');
+    }
+  });
+
+  it("detail queries include the always-present site filter", () => {
+    const detailQueries = [
+      { name: "SPONSOR_BY_SLUG_QUERY", query: SPONSOR_BY_SLUG_QUERY },
+      { name: "PROJECT_BY_SLUG_QUERY", query: PROJECT_BY_SLUG_QUERY },
+      { name: "EVENT_BY_SLUG_QUERY", query: EVENT_BY_SLUG_QUERY },
+      { name: "PAGE_BY_SLUG_QUERY", query: PAGE_BY_SLUG_QUERY },
+    ];
+
+    for (const { name, query } of detailQueries) {
+      expect(query, `${name} should contain site filter`).toContain('$site == "" || site == $site');
+    }
+  });
+
+  it("SPONSOR_BY_SLUG_QUERY has site filter on nested projects sub-query", () => {
+    // Nested sub-query: *[_type == "project" && references(^._id) && ($site == "" || site == $site)]
+    expect(SPONSOR_BY_SLUG_QUERY).toContain(
+      '*[_type == "project" && references(^._id) && ($site == "" || site == $site)]',
+    );
+  });
+
+  it("PROJECT_BY_SLUG_QUERY has site filter on nested testimonials sub-query", () => {
+    // Nested sub-query: *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]
+    expect(PROJECT_BY_SLUG_QUERY).toContain(
+      '*[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]',
+    );
   });
 });
