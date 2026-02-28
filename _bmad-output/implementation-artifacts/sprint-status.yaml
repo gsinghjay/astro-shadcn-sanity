@@ -1,0 +1,809 @@
+# generated: 2026-02-10
+# project: astro-shadcn-sanity
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: /home/jay/github/astro-shadcn-sanity/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+#
+# CHANGE LOG:
+# ===========
+# 2026-02-07: Sprint Change Proposal approved
+#   - Story 1.2 replaced: schema-infrastructure → migrate-reference-project
+#   - Story 1.3 added (was 1.2): schema-infrastructure (renumbered)
+#   - Story 1.4 replaced: mobile-navigation-and-breadcrumbs → storybook-setup
+#   - Original 1.3 (layout/header/footer) absorbed into 1.2 migration
+#   - Original 1.4 (mobile-nav/breadcrumbs) absorbed into 1.2 migration
+#   - Epic 2 refocused: block schemas + Sanity integration (frontend from migration)
+#   - Story 2.1 replaced: core-block-schemas (combines original 2.1-2.4 schema work)
+#   - Story 2.2 replaced: groq-queries-and-page-data-fetching (new)
+#   - Story 2.3 retained: page-composition-system
+#   - Story 2.4 removed: absorbed into 2.1
+#   - Epics 3-4 compressed: schema/GROQ focus only (frontend already migrated)
+#   - Block naming: architecture camelCase names retained (heroBanner, ctaBanner, etc.)
+#   - P0 blocks promoted: statsRow, textWithImage, teamGrid moved from P1 to P0
+#
+# 2026-02-08: Homepage-first delivery split
+#   - Story 2.1 scoped to 6 homepage blocks only (heroBanner, featureGrid, ctaBanner, statsRow, textWithImage, logoCloud)
+#   - Story 2.1b added: remaining 6 block schemas (richText, faqSection, contactForm, sponsorCards, timeline, teamGrid)
+#   - Story 2.2 scoped to homepage GROQ queries and data fetching only
+#   - Story 2.2b added: remaining pages GROQ queries and data fetching
+#   - Story 3.1 created: sponsor document schema (homepage dependency for logoCloud)
+#   - Homepage demo path: 2.1 → 3.1 → 2.2
+#
+# 2026-02-08: Storybook production build stories added
+#   - Story 1.5 added: storybook-production-build (fix empty iframe in storybook build)
+#   - Story 1.6 added: storybook-github-pages-deploy (deploy working build to GH Pages)
+#   - Epic 1 reopened: in-progress (was done, new stories added)
+#   - Story 1.6 blocked by 1.5
+#
+# 2026-02-09: Sprint status refresh
+#   - Stories 2.4–2.8 added: fulldev/ui block Sanity schemas (5 parallel stories, 102 blocks total)
+#   - Story 2.9 added: custom-block-fulldev-ui-conversion (unify block dispatch pattern)
+#   - Story 5.2 renamed: GA4, Security Headers & Cloudflare Pages Deploy (was GitHub Pages)
+#   - Story 5.3 removed: Matomo self-hosted analytics on VPS (descoped)
+#   - Story 6.1 renamed: Contact Form with Formsite Integration (was custom Sanity API route)
+#   - Epic 6 no longer deferred
+#   - Story 2.2b upgraded: backlog → ready-for-dev (file exists)
+#   - Story 6.1 upgraded: backlog → ready-for-dev (file exists)
+#
+# 2026-02-09: Epic 7 added (Sanity Code Quality & Type Safety)
+#   - Source: Sanity Code Review (docs/code-review/sanity-code-review_20260209_130832.md)
+#   - 5 stories addressing 18 review findings (1 Critical, 3 High, 4 Medium, 7 Low)
+#   - Story 7.1: Fix visual editing (stegaClean + loadQuery) — Critical
+#   - Story 7.2: Query completeness & defineQuery — High
+#   - Story 7.3: Schema best practices — High+Medium
+#   - Story 7.4: TypeGen & type replacement — High (blocked by 7.2)
+#   - Story 7.5: Config & dead code cleanup — Low
+#
+# 2026-02-09: Story 5.4 added (Preview & Publish Architecture)
+#   - New comprehensive story: webhook auto-rebuild, SSR cache fix, perspective deprecation
+#   - Completes the content publishing loop (edit → preview → publish → auto-rebuild)
+#   - Scope: Sanity webhook config, Cloudflare deploy hook, sanity.ts fixes
+#   - Epic 5 remains in-progress
+#   - Priority: before continuing Epic 2 stories 2.4–2.9
+#
+# 2026-02-10: Epic 7 updated from new Sanity code review
+#   - Source: Sanity Code Review (2026-02-10) — _bmad-output/sanity-code-review.md
+#   - Old Story 7.1 (Fix Visual Editing) removed — stegaClean/loadQuery issues now passing
+#   - Old Story 7.5 (Config & Dead Code) removed — items not flagged in current review
+#   - Stories reorganized from 5 to 4:
+#   - NEW 7.1: Query completeness, defineQuery & SEO stega fix (combines old 7.2 + new findings)
+#   - NEW 7.2: Schema best practices (reduced scope from old 7.3)
+#   - NEW 7.3: TypeGen & type replacement (renumbered from old 7.4, blocked by 7.1)
+#   - NEW 7.4: Server islands preview optimization (from existing artifact)
+#
+# 2026-02-10: Story 5.5 added (Cloudflare Native Preview Deployments)
+#   - Migrate from GitHub Actions direct upload to Cloudflare Pages git integration
+#   - Eliminates: preview branch, sync-main.yml, double builds, .env writing hack
+#   - CF Pages dashboard handles Production vs Preview env vars
+#   - GitHub Actions retained for CI only (tests/lint), not deployment
+#   - Requires new CF Pages project (cannot migrate direct upload → git integration)
+#   - Epic 5 remains in-progress
+#
+# 2026-02-10: Story 7.5 added (Schema Polish, SEO Projection & Cleanup)
+#   - Source: Sanity Code Review (docs/code-review/sanity-code-review_20260210_175957.md)
+#   - 7 of 8 remaining findings from review (10 already fixed by 7-1/7-2/7-3)
+#   - Finding #17 excluded (dead schema files are intentional Epic 4 placeholders)
+#   - Scope: defineArrayMember wrappers, button URL relative paths, SEO projection,
+#     singleton action guards, object icons, radio layouts, legacy data cleanup
+#   - Epic 7 remains in-progress
+#
+# 2026-02-10: TeamGrid and Timeline removed
+#   - TeamGrid and Timeline blocks deleted — team/event document schemas no longer planned
+#   - Story 2.10 (TeamGrid Inline Block) removed
+#   - Story 4.1 (Project & Team Document Schemas + TeamGrid Upgrade) removed
+#   - Story 4.2 (Event Document Schema & Timeline Block) removed
+#   - Schema files, Astro components, and story files deleted
+#
+# 2026-02-10: Story 7.5 marked done, Story 7.6 added
+#   - Story 7.5 (Schema Polish, SEO Projection & Cleanup) marked done — code review complete
+#   - Story 7.6 added: Block stegaClean & Studio Polish
+#   - Source: Sanity Code Review (docs/code-review/sanity-code-review_20260210_02.md)
+#   - 7 findings addressed: stegaClean on 4 block components (#5/#6), fieldset grouping (#3),
+#     siteSettings array preview (#10), portable-text annotations (#14), typo/fallbacks (#13/#16)
+#   - 9 findings excluded (already fixed by 7-3/7-5 or not actionable)
+#   - Epic 7 remains in-progress
+#
+# 2026-02-11: Stories 7.7-7.10 added from Content Modeling Review
+#   - Source: Content Modeling Review (docs/code-review/content-modeling-review_20260211_052554.md)
+#   - Cross-referenced with Sanity MCP Rules: sanity-schema, sanity-groq, sanity-page-builder
+#   - Story 7.7: Extract link object & siteSettings consolidation (Quick Wins #1 + #2)
+#   - Story 7.8: Fix Portable Text rendering — FAQ + RichText (Quick Wins #3 + #4)
+#   - Story 7.9: Implement blockBaseFields in BlockRenderer (Medium #6)
+#   - Story 7.10: Extract reusable inline object types — faqItem, featureItem, statItem, stepItem (Medium #7)
+#   - Deferred: Semantic rename of blockBaseFields (Medium #5) — high-risk migration, do after 7.9
+#   - Deferred: Taxonomy system, FAQ-as-document, testimonials — future scope expansion
+#
+# 2026-02-11: Story 7.11 added (Navigation & Footer Studio Editing Experience)
+#   - Source: UX review of old About page conversion + Sanity best practices
+#   - Scope: Field groups (tabs) for siteSettings, array item previews,
+#     Presentation Tool document location for siteSettings → homepage preview
+#   - No schema data model changes, no frontend changes — Studio UX only
+#   - Informed by sanity-schema, sanity-studio-structure, sanity-visual-editing rules
+#   - Epic 7 remains in-progress
+#   - Epic 7 remains in-progress
+#
+# 2026-02-13: Epic 8 added (Analytics & Accessibility Monitoring - Dev B)
+#   - Independent BIS team member track (non-code, GA4/GTM/Monsido focused)
+#   - Story 8.1: GA4 Dashboard Setup & Configuration (Sprint 2, Feb 24 - Mar 5)
+#   - Story 8.2: Accessibility Monitoring Setup with Monsido (Sprint 3, Mar 10 - Mar 19)
+#   - Story 8.3: Cross-Site Analytics & Conversion Tracking (Sprint 4-5, Mar 24 - Apr 16)
+#   - Story 8.4: Analytics Report & Optimization Recommendations (Sprint 5/Buffer, Apr 7 - Apr 23)
+#   - Midterm deliverable (Apr 3): Live GA4 dashboard + Monsido accessibility baseline report
+#   - Final deliverable (May 3): Cross-site analytics report + recommendations + presentation
+#   - Story 8.1 depends on Story 5.2 (GA4 snippet in Layout.astro)
+#   - Story 8.3 depends on Epic 6 Stories 6.2/6.3 (RWC sites deployed)
+#
+# 2026-02-13: Story 6.1 rewritten (Contact Form Submission Pipeline)
+#   - Formsite integration replaced with @sanity/form-toolkit + CF Turnstile + D1 + Discord webhook
+#   - Form structure CMS-managed via formSchema plugin (editors define fields in Studio)
+#   - Submissions stored in Cloudflare D1 (not Sanity) — zero Sanity documents consumed
+#   - Discord notification sent directly from CF Worker — zero Sanity webhooks consumed
+#   - Turnstile replaces honeypot for bot protection (free, invisible CAPTCHA)
+#   - Old story file (6-1-submission-schema-form-api-route.md) replaced with 6-1-contact-form-submission-pipeline.md
+#   - Epic 6 status: backlog → in-progress
+#
+# 2026-02-17: Story 5.6 added (Build-Time Optimization)
+#   - Source: Sanity build-time performance review (conversation with Jay)
+#   - 4 optimizations: CDN toggle, build script decoupling, sponsor query hoisting, parallel page fetches
+#   - Reduces Sanity API calls from N+1+S to N+2 per build (S = redundant sponsor fetches eliminated)
+#   - No new files — 9 existing files modified
+#   - Epic 5 remains in-progress
+#
+# 2026-02-17: Story 5.7 added (Presentation Tool & Preview Hardening)
+#   - Source: Sanity best practices review of preview/presentation layer
+#   - Cross-referenced with sanity-visual-editing and sanity-astro MCP rules + Sanity docs
+#   - 4 changes: conditional output mode (server for preview), allowOrigins, mainDocuments resolver, previewUrl.initial
+#   - Closes 5-5 gap where AC3 expected output:"server" but code stayed "static"
+#   - 3 files modified: astro.config.mjs, studio/sanity.config.ts, studio/src/presentation/resolve.ts
+#   - Epic 5 remains in-progress
+#
+# 2026-02-17: Sprint Change Proposal — Stakeholder Requirements Alignment
+#   - Source: capstone-stakeholders.pdf gap analysis (9 gaps identified)
+#   - Stories 2.11, 2.12 added to Epic 2: testimonial schema + testimonials block, event schema + eventList block
+#   - Story 4.4 added to Epic 4: project detail pages at /projects/[slug]
+#   - NEW Epic 9 (Sponsor Portal): 3 stories (9.1 CF Access, 9.2 portal project view, 9.3 portal events)
+#   - NEW Epic 10 (Discord Community & Notifications): 8 stories (10.1-10.3 webhook, 10.4-10.8 bot)
+#   - Story 8.2 renamed: accessibility-monitoring-monsido → accessibility-monitoring-matomo
+#   - 16 new story entries added, all status: backlog
+#   - Closes 7 of 9 stakeholder requirement gaps; 2 deferred with justification
+#   - Parallel track identified: Stories 10.4 (bot infra) → 10.5 (slash commands) have zero
+#     dependencies on other epics and can be developed independently from day one.
+#     Stories 10.1-10.3 and 10.6-10.8 require upstream epics (5.4, 6, 9) to land first.
+#
+# 2026-02-18: Sprint Change Proposal — Discord Bot Java/JDA Migration
+#   - Source: sprint-change-proposal-2026-02-18.md
+#   - Stories 10.4, 10.5 rewritten: Python (PyNaCl + HTTP Interactions API) → Java (JDA + Gateway API)
+#   - Deployment: CF Workers/FastAPI dual option → single VPS target with systemd
+#   - Eliminated: Ed25519 signature verification, custom deferred response module, command registration script
+#   - JDA provides native: Gateway auth, slash commands, deferred replies, EmbedBuilder, channel management
+#   - Architecture.md updated: directory tree, data flow, integration points, FR coverage table
+#   - Epics.md updated: Epic 10 description, stories 10.4/10.5/10.8 summaries
+#   - Stories 10.6-10.8 remain backlog — will be authored fresh with JDA patterns
+#   - No impact to stories 10.1-10.3 (webhook-based, CF Workers)
+#   - No impact to MVP scope, epic ordering, or other epics
+#
+# 2026-02-18: Story 2.14 added (Event Detail Pages)
+#   - Individual event pages at /events/[slug] following sponsor/project detail page pattern
+#   - GROQ queries: ALL_EVENT_SLUGS_QUERY + EVENT_BY_SLUG_QUERY + getEventBySlug()
+#   - EventCard updated to link titles to detail pages
+#   - Simplest detail page — no images, no references, no Portable Text
+#   - Depends on Story 2.12 (event schema)
+#   - Implement BEFORE Story 2.13 (event reminder notifications)
+#   - FR66 added: Event detail pages at /events/[slug]
+#   - 1 new file, 2 modified files
+#   - Epic 2 remains in-progress
+#
+# 2026-02-18: Story 2.13 added (Event Reminder Notifications)
+#   - CF Workers Cron trigger checks Sanity for events within N days
+#   - D1 table stores subscriber preferences (email, discord, remind_days_before)
+#   - Discord webhook sends reminder to sponsor channel
+#   - SendGrid free tier (100/day) sends email reminders to subscribed sponsors
+#   - Depends on Story 2.12 (event schema)
+#   - Separate from Epic 10 Discord bot — this is lightweight cron + webhook, not bot infra
+#   - Cost: $0/month (CF Workers Cron free, D1 free, SendGrid free tier)
+#   - Stakeholder PDF 6.2: "Sponsors can subscribe for updates and reminders"
+#
+# 2026-02-18: Story 5.10 added (GTM-Ready Data Attributes & DataLayer Integration)
+#   - Adds data-gtm-* attributes to all interactive elements (buttons, links, cards, nav)
+#   - Adds data-gtm-section to BlockWrapper for GTM element visibility triggers
+#   - Adds page-level dataLayer.push with page metadata (path, title, template)
+#   - Adds interaction dataLayer events: form_start, form_submit, faq_expand, carousel_navigate
+#   - No Sanity schema changes — all tracking data derived from existing fields
+#   - Depends on Story 5.8 (GTM container snippet)
+#   - Informs Story 8.1 (Dev B can self-serve all GTM tags)
+#   - 15 files modified, 1-2 new files (E2E test + type declaration)
+#   - Epic 5 remains in-progress
+#
+# 2026-02-18: Story 8.5 added (GTM Tag, Trigger & Variable Configuration)
+#   - Dev B BIS story: configure all GTM tags/triggers/variables in GTM web interface
+#   - Leverages full tracking surface from Story 5.10 (data-gtm-* attributes + dataLayer events)
+#   - Creates GA4 Event tags for: page_view, form_start, form_submit, faq_expand, carousel_navigate
+#   - Creates element_click tag using data-gtm-category/action/label attributes
+#   - Creates section_view tag using data-gtm-section visibility triggers
+#   - Supersedes Story 8.1 Tasks 2-3 (basic GTM setup, written before 5.10 existed)
+#   - Depends on: Story 5.8 (GTM container snippet) + Story 5.10 (tracking hooks)
+#   - No code changes — all work in GTM dashboard (tagmanager.google.com)
+#   - Epic 8 remains backlog
+#
+# 2026-02-18: Story 5.5 marked done (Cloudflare Native Preview Deployments)
+#   - All 9 tasks completed: git integration, env vars, preview/production deploys, webhook, cleanup
+#   - Sanity webhook reconfigured: CF deploy hook replaces GitHub repository_dispatch pipeline
+#   - Content rebuilds now ~45-75s (CF build cache) vs ~2-3 min (old GitHub Actions path)
+#   - sanity-deploy.yml can be deleted — CF handles content rebuilds directly
+#   - GitHub Fine-Grained PAT can be revoked — no longer needed
+#   - cloudflare-setup-guide.md Section 10 rewritten with mermaid diagrams
+#
+# 2026-02-18: Story 5.9 added (Self-Hosted GitHub Actions Runner on VPS)
+#   - Install GitHub Actions self-hosted runner on existing VPS
+#   - Change ci.yml and sanity-deploy.yml from ubuntu-latest to self-hosted
+#   - Warm node_modules cache reduces build time from ~2 min to ~30s
+#   - deploy-storybook.yml remains on ubuntu-latest (unaffected)
+#   - Zero application code changes — infrastructure only
+#   - Fallback: single-line revert to ubuntu-latest if VPS runner goes offline
+#   - Epic 5 remains in-progress
+#
+# 2026-02-17: Story 5.8 added (Migrate GA4 gtag.js to Google Tag Manager)
+#   - Replaces raw gtag.js snippet in Layout.astro with GTM container snippet
+#   - GTM container ID: GTM-NS9N926Q (provided by Dev B)
+#   - Env var changes: PUBLIC_GA_MEASUREMENT_ID → PUBLIC_GTM_ID
+#   - GA4 continues via GTM container (GA4 tag configured in GTM dashboard)
+#   - Unblocks Story 8.1 Task 2 (GTM setup — Dev B BIS track)
+#   - Requires Story 5.2 complete + Dev B's GTM container ready with GA4 tag
+#   - Epic 5 remains in-progress
+#
+# 2026-02-17: Stakeholder PDF gap analysis — Stories 2.11, 4.3, 4.4 updated
+#   - Story 2.11: Added project reference field to testimonial schema for Impact Case Studies (PDF 4.3)
+#   - Story 2.11: Added byProject displayMode to Testimonials block
+#   - Story 4.3: Project schema expanded — description→content (Portable Text), +team (array), +mentor, +outcome
+#   - Story 4.3: Added client-side filtering by technology tags and sponsor industry (PDF 4.3 "sortable")
+#   - Story 4.4: Detail page now renders team roster, mentor, outcome/impact, linked testimonials
+#   - FR61-FR65 added to epics.md
+#   - FR10, FR12, FR13, FR14 updated in requirements inventory
+#   - No new stories required — all gaps addressed within existing stories
+#
+# 2026-02-18: Story 9.4 added (GitHub Dev Dashboard)
+#   - SSR page at /dev protected by CF Access (same OTP auth as portal)
+#   - Server-side GitHub REST API fetching with plain fetch (CF Workers compatible)
+#   - React island (DevDashboard.tsx) for interactive dashboard UI
+#   - Sections: repo overview, open issues, pull requests, releases, resource links
+#   - Fine-grained GitHub PAT stored as CF Worker secret (5K req/hr)
+#   - Depends on Story 9.1 (CF Access infrastructure + lib/auth.ts)
+#   - No Sanity schema changes — all data from GitHub API
+#   - Epic 9 remains in-progress
+#
+# 2026-02-18: Story 5.11 added (SEO Structured Data & Social Sharing)
+#   - Source: SEO audit of all pages and Sanity-connected components
+#   - Complements Story 5.1 (canonical, sitemap, robots) — this covers structured data + social
+#   - Twitter Card metadata in Layout.astro (twitter:card, twitter:title, twitter:description, twitter:image)
+#   - JSON-LD Organization (site-wide, from siteSettings) in Layout.astro
+#   - JSON-LD BreadcrumbList in Breadcrumb.astro (Google breadcrumb rich results)
+#   - JSON-LD Organization per sponsor detail page
+#   - Dynamic og:type prop in Layout.astro (website vs article)
+#   - Meta descriptions for sponsor/project detail pages and listing pages
+#   - All JSON-LD values stegaClean'd for Visual Editing compatibility
+#   - No Sanity schema changes — all data derived from existing fields
+#   - 6 files modified, 0 new files
+#   - Epic 5 remains in-progress
+#
+# 2026-02-19: Story 5.12 added (Real-Time Content Listeners)
+#   - Source: Gap Analysis #7 (sanity-astro-native-features-gap-analysis.md)
+#   - Implements Sanity Live Content API (client.live.events()) — NOT legacy client.listen()
+#   - Sync tag-based client-side subscription for instant content freshness
+#   - Leverages existing filterResponse: false in loadQuery() — sync tags already returned but discarded
+#   - Client-side only (browser) — no Cloudflare Worker persistent connection needed
+#   - Complements existing webhook → rebuild pipeline (instant vs full-rebuild)
+#   - Gated by PUBLIC_SANITY_LIVE_CONTENT_ENABLED env var — zero impact on static builds
+#   - No schema changes, no Studio changes — astro-app/ only
+#   - Epic 5 remains in-progress
+#
+# 2026-02-19: Stories 9.5, 9.6 added (Site Health CI Pipeline + Dashboard)
+#   - Story 9.5: Lighthouse CI + Pa11y CI GitHub Action, R2 storage, KV index
+#   - Story 9.6: Protected portal dashboard at /portal/site-health (React island)
+#   - Lighthouse provides: Performance, Accessibility, Best Practices, SEO scores + Core Web Vitals
+#   - Pa11y provides: deep WCAG 2.1 AA violation detection per URL
+#   - Storage: R2 for full JSON reports, KV for lightweight summary index
+#   - Dashboard: score gauges, Web Vitals cards, trend charts, per-page drill-down
+#   - 9.5 depends on 5.5 (deployed site), 9.6 depends on 9.1 (CF Access) + 9.5 (data)
+#   - Replaces need for external analytics dashboard (GA4 Data API) for performance monitoring
+#   - Epic 9 remains in-progress
+#
+# 2026-02-19: Epic 9 Free-Tier Descoping — Cloudflare Workers Free Plan Constraint Analysis
+#   - Source: Cloudflare free-tier analysis using Cloudflare MCP documentation search
+#   - Analysis doc: docs/cloudflare-free-tier-analysis.md
+#   - Current site is 100% static (output:"static"), zero Workers/D1/KV/R2/Access usage, $0/month
+#   - Epic 9 introduces SSR routes + D1 + KV + R2 + CF Access — must fit within free limits
+#   - Critical constraint: Workers Free CPU limit is 10ms/invocation (hard cap, returns 503)
+#   - D1 Free: 5M rows read/day, 100K rows written/day, 5GB storage, 50 queries/invocation
+#   - CF Access Free: 50 users (sufficient for capstone program)
+#   - R2 Free: 10GB storage, 10M reads/month (sufficient for site health reports)
+#   - KV Free: 100K reads/day, 1K writes/day (sufficient for health index)
+#
+#   DESCOPED STORIES (removed from scope until $5/mo paid plan approved):
+#   - 9.9 (Sponsor Activity Tracking): Logs every portal interaction to D1 — write amplifier.
+#     Replace with GTM dataLayer events (client-side, $0). Activity data flows to GA4 instead.
+#   - 9.15 (Admin Analytics Dashboard): GROUP BY aggregations across portal_activity = full table
+#     scans that blow through 5M rows-read/day limit. Admin reporting via wrangler CLI or GA4.
+#
+#   DEFERRED STORIES (lower priority for MVP, reduce D1 surface area):
+#   - 9.11 (Sponsor Evaluation Forms): Nice-to-have for MVP. Low write volume but complex UI.
+#     Deferred to reduce SSR page count and implementation risk.
+#   - 9.13 (Sponsor Notification System): Cross-cutting D1 reads on every portal page load
+#     (unread count check). Adds per-page D1 query overhead. Defer to minimize query budget.
+#
+#   REDESIGNED STORIES (reduced scope to fit free tier):
+#   - 9.7 (Submission & Engagement Dashboard): Keep submissions panel (Sanity-based, no D1).
+#     Defer GA4 engagement panel — reduces CPU time + subrequest pressure on SSR page.
+#   - 9.8 (D1 Database Setup): Reduced from 6 tables to 4. Removed portal_activity table
+#     (was only for descoped Story 9.9). Remaining: event_rsvps, evaluations (placeholder),
+#     agreement_signatures, notification_preferences (placeholder for future 9.13).
+#     NOTE: evaluations and notification tables still created in migration for forward compat,
+#     but no app code reads/writes them until 9.11 and 9.13 are un-deferred.
+#
+#   IN-SCOPE STORIES (fit within free tier):
+#   - 9.1 (CF Access): Auth foundation, 50 free seats, zero D1
+#   - 9.2 (Portal Project View): SSR + Sanity only, no D1
+#   - 9.3 (Portal Events): SSR + Sanity only, no D1
+#   - 9.4 (GitHub Dev Dashboard): Low-traffic admin page, 4 GitHub API calls
+#   - 9.5 (Site Health CI): R2/KV writes in GitHub Actions (not Workers), negligible volume
+#   - 9.6 (Site Health Dashboard): 1 KV read + 1 R2 read per view, admin-only
+#   - 9.10 (Event RSVPs): ~100 D1 writes per semester total, well within limits
+#   - 9.12 (Agreement Signatures): One-time writes per sponsor, critical for legal compliance
+#   - 9.14 (Multi-Provider Auth): CF dashboard config only, zero code changes
+#
+#   KEY OPTIMIZATION DECISIONS:
+#   - Keep output:"static" as default — public site stays at $0 compute
+#   - Only /portal/* and /dev routes use SSR (prerender = false)
+#   - Cache JWKS public key in module-level variable to reduce JWT validation CPU
+#   - Use db.batch() to combine D1 queries (reduces subrequest count from 50/invocation cap)
+#   - Index every column that appears in WHERE clauses
+#   - CPU time measures JS execution only — network I/O (Sanity/D1 fetches) is wall-clock, not CPU
+#   - Estimated CPU per SSR page: 3-6ms (under 10ms cap if queries are indexed)
+#   - Estimated daily Worker invocations: ~250 (50 sponsors x 5 pages, well under 100K)
+#   - Estimated daily D1 rows read: ~655 (0.01% of 5M limit)
+#
+#   UPGRADE TRIGGER: Upgrade to $5/mo Workers Paid when:
+#   - Any SSR route consistently returns 503 (CPU exceeded)
+#   - D1 daily limit hit (queries fail before midnight UTC)
+#   - Business requires descoped stories (9.9, 9.15, full 9.7)
+#   - User count exceeds 50 seats
+#
+#   Monitoring: CF Dashboard (Workers/D1/KV/R2 metrics), GraphQL Analytics API,
+#   Workers Observability MCP (github.com/cloudflare/mcp-server-cloudflare → workers-observability)
+#   - Epic 9 remains in-progress (reduced scope)
+#
+# 2026-02-19: Story 9.1b in-progress, Story 9.1c split out
+#   - 9-1b-portal-landing-page: ready-for-dev → in-progress
+#     PortalLayout, landing page, skeleton cards, components/portal/ all implemented.
+#     Mobile Sheet drawer broken (panel stayed off-screen — translate classes never removed).
+#     Fixed by removing dead translate classes from Sheet contentVariants.
+#     Slide animation deferred to new Story 9.1c.
+#   - 9-1c-sheet-slide-animation: NEW (ready-for-dev)
+#     Sheet component mobile drawer currently opens/closes instantly (no animation).
+#     Original had translate-x-full classes + transition-transform but no mechanism to remove them.
+#     Attempted fixes: rAF class toggle (caused right-side bounce), @starting-style (broke portal CSS).
+#     Correct approach: CSS @starting-style + --sheet-translate custom property (zero-frame-gap).
+#     Scope: sheet-content.astro, sheet.astro, Storybook stories + deviation docs.
+#     Affects: portal mobile drawer (side=left) + public nav mobile drawer (side=right).
+#   - Epic 9 remains in-progress
+#
+# 2026-02-19: Story 9.1b code review + documentation pass
+#   - Code review (Sanity plugin /review): 1 HIGH (unused icon prop), 2 MEDIUM (dead components, hardcoded URL), 2 LOW
+#   - Created PortalIcon.tsx: React icon wrapper using @iconify/utils (same lib as Astro Icon, zero new deps)
+#   - PortalCard.tsx: icon now renders via PortalIcon, added badge prop
+#   - PortalSkeleton.tsx: removed rounded-md (Swiss design = sharp corners)
+#   - portal/index.astro: replaced Tile/Skeleton UI components with PortalCard/PortalSkeleton
+#   - Extracted shared SeoProps type to lib/types.ts — all 3 layouts import from single source
+#   - JSDoc added to all portal React components (types.ts, PortalIcon, PortalCard, PortalSkeleton)
+#     — beginner-friendly for React devs new to Astro (client directives, SSR, bundle size)
+#   - Created components/portal/CLAUDE.md: lean best practices for React-first portal dev (local only, gitignored)
+#   - Added "How SSR works with output: static" section to portal-react-islands-guide.md
+#     — explains prerender=false + Cloudflare adapter per-route SSR mechanism
+#   - PR #322: fix/9-1b-portal-code-review → preview
+#   - 9-1b status remains: review (code review fixes applied, awaiting merge)
+#   - Epic 9 remains in-progress
+#
+# 2026-02-19: Stories 2-15 and 9-3 created (Calendar Feature)
+#   - Source: Calendar Feature Research (docs/team/astro-sanity-docs/calendar-feature-research.md)
+#   - Library chosen: Schedule-X (MIT, ~30-50kB gzipped, same library for both surfaces)
+#   - Story 2-15 (Public Events Calendar): static list default + Schedule-X calendar toggle via React island
+#     - List view: zero JS (Astro component), calendar: client:visible (~35-45kB incremental)
+#     - Nano Stores for toggle state between islands
+#     - Schema evolution: isAllDay, color fields added to event document
+#     - EVENTS_BY_MONTH_QUERY added for future date-range filtering
+#     - New events listing page at /events/
+#   - Story 9-3 (Portal Events Calendar): full-featured Schedule-X with all views + drag-and-drop
+#     - SSR page (prerender=false), client:load for immediate calendar rendering
+#     - Month/week/day/list views, color-coded by eventType, responsive mobile views
+#     - Portal API endpoint (/portal/api/events) for lazy month loading
+#     - Shared calendar-utils.ts transformer between both stories
+#     - EventDetailPopover for click-to-view event info
+#   - Both stories depend on 2-12 (event schema — done)
+#   - 9-3 additionally depends on 9-1 (CF Access — done) and 9-1b (portal landing — done)
+#   - Shared code: calendar-utils.ts, Schedule-X deps, EVENTS_BY_MONTH_QUERY
+#   - Epic 2 remains in-progress, Epic 9 remains in-progress
+#
+# 2026-02-20: Stories 9.9, 9.13, 9.15 un-descoped/un-deferred via free CF services
+#   - Source: Cloudflare MCP documentation search — free-tier service discovery
+#   - Story 9.9 (Activity Tracking): DESCOPED → ready-for-dev
+#     Workers Analytics Engine replaces D1 for activity logging.
+#     writeDataPoint() is fire-and-forget I/O (no CPU cost).
+#     SQL API reads run on CF infra (no Worker invocation, no D1 rows-read).
+#     Free: 100K writes/day, 10K SQL queries/day, 31-day retention.
+#   - Story 9.13 (Notifications): deferred → ready-for-dev
+#     Cloudflare KV replaces D1 for notification storage (single-key read per sponsor).
+#     Cloudflare Queues for async notification creation (decoupled, guaranteed delivery).
+#     Standalone consumer Worker + Cron Trigger for daily event reminders.
+#     Free: KV 100K reads/day + 1K writes/day, Queues 10K ops/day.
+#   - Story 9.15 (Admin Analytics): DESCOPED → ready-for-dev
+#     Analytics Engine SQL API replaces D1 GROUP BY aggregations.
+#     Aggregations (SUM, COUNT, GROUP BY) run on CF infrastructure, not Worker.
+#     D1 only used for simple indexed lookups (RSVPs, evaluations).
+#     Depends on Story 9.9 (provides the portal_activity dataset).
+#   - cloudflare-guide.md updated: Services table, Free Tier Limits (Queues, Analytics Engine,
+#     Cron Triggers sections added), Section 5.5 descoping table revised.
+#   - Epic 9 remains in-progress (expanded scope — only Story 9.11 still deferred)
+#
+# 2026-02-20: Story 5.14 added (Image Optimization & LCP Fix)
+#   - Source: LCP audit of HeroBanner, TextWithImage, and urlFor() pipeline
+#   - HeroBanner downloads full-res originals via raw <img src={asset.url}> — no sizing, no priority, no format
+#   - TextWithImage same pattern — raw <img> with no urlFor()
+#   - LQIP metadata fetched in ALL GROQ queries but never rendered as blur placeholders
+#   - urlFor() helper missing .auto('format') — no WebP/AVIF content negotiation
+#   - 6 tasks: urlFor upgrade, SanityImage component, HeroBanner fix, TextWithImage fix, audit, Lighthouse verification
+#   - Zero new dependencies, zero GROQ changes, zero schema changes
+#   - Target: LCP <2s, Lighthouse Performance 95+ (architecture NFR)
+#   - Epic 5 remains in-progress
+#
+# 2026-02-20: Epic 11 added (PayloadCMS + Next.js Migration)
+#   - Source: Migration Assessment (docs/payload-nextjs-migration-assessment.md)
+#   - Option B: full React + shadcn/ui + Next.js + PayloadCMS on VPS Docker (4 containers)
+#   - 32 stories across 7 phases, ~65 SP, 8-10 calendar weeks with 3-4 devs
+#   - Phase 1 (CMS Foundation, 7 stories) added to tracking now — remaining 25 stories in Phases 2-7 backlog
+#   - Develop locally (PostgreSQL/SQLite + next dev), deploy to VPS later (Phase 5)
+#   - REPO DECISION: Separate repo (not monorepo workspace). Use `claude --add-dir` to reference
+#     astro-shadcn-sanity patterns during development. Keeps active Epics 1-10 clean.
+#     Epic file Story 11.1 AC says payload/ workspace — override: standalone repo instead.
+#   - Phases 1-4 + 6-7 have zero VPS dependency; Phase 5 (infra) slots in when ready
+#   - Summer 2026 target — can run in parallel with current Astro stack
+#   - Epic 11 status: backlog (Phase 1 stories tracked, not yet started)
+#
+# 2026-02-20: Story 7.12 added (Schema Validation, Preview & Resolver Polish)
+#   - Source: Sanity Code Review (2026-02-20) — comprehensive review of all schemas, queries, frontend
+#   - 9 ACs addressing 15 new findings not covered by stories 7.1–7.11
+#   - AC1: defineBlock preview helper enhancement (quick win — fixes all 13 blocks)
+#   - AC2-3: Array min-length + conditional manual-mode validations (8 block schemas)
+#   - AC4: Document field validations (siteSettings, submission, project)
+#   - AC5: Document preview configs (sponsor, page, testimonial)
+#   - AC6: Presentation Tool resolvers for project + event
+#   - AC7: Expand internalLink PT annotation to all routable types
+#   - AC8: Move presentation fields to layout fieldset (3 blocks)
+#   - AC9: Standardize list options to {title, value} format (4 schemas)
+#   - 7 findings intentionally deferred with rationale (naming collisions, SEO scope, etc.)
+#   - Epic 7 remains in-progress
+#
+# 2026-02-20: Stories 7.13, 7.14 added (Content Modeling Best Practices)
+#   - Source: Content Modeling Best Practice Review (2026-02-20) via Sanity MCP schema + data audit
+#   - Story 7.13: Add SEO object to routable document types (sponsor, project, event)
+#     - Reuses existing `seo` object type — zero new schemas
+#     - GROQ projections added to 3 detail queries (matches PAGE_BY_SLUG_QUERY pattern)
+#     - 3 detail pages wired with graceful fallback for 17 documents with no SEO data
+#     - 6 files modified, 0 new files
+#   - Story 7.14: Formalize technology tags as predefined list
+#     - Converts free-text `technologyTags` string array to `options.list` with {title, value}
+#     - Storage format unchanged (string[]) — zero GROQ, frontend, or type changes
+#     - Predefined list populated from existing production data + standard technologies
+#     - 1 file modified, 0 new files
+#   - Person/mentor document type intentionally excluded — embedding acceptable at project scale
+#   - Epic 7 remains in-progress
+#
+# 2026-02-20: Story 7.15 added (Code Review Fixes — Type Safety, Image Handling, CI Config & Security)
+#   - Source: Multi-agent code review (2026-02-20) — Sanity (/sanity-plugin:review), Astro, Cloudflare
+#   - 3 review agents ran in parallel: sanity-reviewer, astro-reviewer, cloudflare-reviewer
+#   - 8 ACs addressing findings NOT covered by stories 7.1–7.14 or 5.2/5.14:
+#   - AC1: safeUrlFor() typed wrapper — eliminates raw asset.url fallback in Header/Footer/LogoCloud
+#   - AC2: Type block-registry.ts with AstroComponentFactory (was Record<string, any>)
+#   - AC3: Add missing width/height/loading/fetchpriority on 4 image locations (CLS + LCP)
+#   - AC4: Add X-Frame-Options + HSTS security headers to public/_headers
+#   - AC5: Add PUBLIC_* env vars to sanity-deploy.yml + ci.yml (fixes wrong canonical URLs)
+#   - AC6: Document CF_ACCESS_AUD configuration requirement in wrangler.jsonc
+#   - AC7: Extract shared GROQ IMAGE_PROJECTION constant (~10 repetitions deduplicated)
+#   - AC8: Create custom Portable Text renderers (image, callout, link, internalLink)
+#   - 5 new files (portable-text components), 15 modified files, 0 schema changes
+#   - Epic 7 remains in-progress
+#
+# 2026-02-25: Epic 11 cancelled, Epic 10 revised, Epic 12 added
+#   - Epic 11 (PayloadCMS + Next.js Migration): CANCELLED
+#     Stack decision finalized: Sanity (Growth) + Cloudflare Workers ($5/mo).
+#     8-10 week migration effort not justified — current stack covers all requirements.
+#     Files deleted: epic-11-payloadcms-nextjs-migration.md, 11-1-payloadcms-project-initialization.md,
+#       docs/payload-nextjs-migration-assessment.md
+#     Files updated: epic-list.md, index.md (struck-through REMOVED entries)
+#   - Epic 10 (Discord Community & Notifications): Architecture revised
+#     JDA Java bot on VPS → FastAPI Python Worker on Cloudflare
+#     Discord HTTP Interactions API replaces Gateway API (no WebSocket, no VPS)
+#     Cron Triggers replace JVM ScheduledExecutorService for digests/reminders
+#     Stories 10.4-10.8 rewritten for Python Workers + FastAPI + httpx
+#     Story 10.4 renamed: discord-bot-application → fastapi-discord-bot-worker
+#     Story 10.5 renamed: slash-commands → slash-commands-content-queries
+#     Story 10.9 added: Slash Commands — Content Write Operations (from brainstorming I9)
+#     Comprehensive Cloudflare developer guide added for first-time Workers developers
+#   - Epic 12 (Aggregated Platform API): NEW
+#     Source: brainstorming session Infrastructure #11
+#     FastAPI Python Worker at /api/v1/* — unified typed API for all backend services
+#     Assigned to: API Developer (TBD Assistant PM + Portal Dev, Team B)
+#     7 stories: scaffold, content, chat, forms, platform, discord notify, docs+testing+handoff
+#     Technology: FastAPI + Pydantic v2 + httpx on Python Workers ($5/mo plan)
+#     Comprehensive Cloudflare developer guide added for first-time Workers developers
+#
+# 2026-02-21: Story 11.1 completed (PayloadCMS Project Initialization)
+#   - DECISION OVERRIDE: Implemented as monorepo workspace (payload/) instead of separate repo
+#     Jay directed development in a git worktree branched from `preview`
+#     Simplifies development — shared lockfile, single `npm install`, workspace scripts
+#   - PayloadCMS 3.77.0 scaffolded manually (create-payload-app interactive CLI not usable)
+#   - Next.js 16.1.6 (latest stable) — requires .npmrc legacy-peer-deps=true
+#     PayloadCMS peer dep range is >=16.2.0-canary.10; 16.1.6 builds/runs without issues
+#   - postgresAdapter configured via DATABASE_URI env var
+#   - Build passes: 8.8s compile (Turbopack), 0 errors, strict TypeScript
+#   - Routes: / (static), /admin/[[...segments]] (dynamic), /api/[...slug] (dynamic)
+#   - Worktree: .claude/worktrees/fluffy-fluttering-walrus (branch: worktree-fluffy-fluttering-walrus)
+#   - 18 new files in payload/, 1 modified root file (package.json)
+#   - Epic 11 status: in-progress (first story complete)
+#
+# 2026-02-25: Sprint Planning refresh
+#   - Story 6.2 (Contact Form Subject Field) added — exists in epic-6 file but was missing from sprint-status.
+#     No story file exists → backlog.
+#   - Story 0.1 (FastAPI CF Worker Template) remains as standalone ad-hoc story (not tracked under any epic).
+#   - Epics 13 + 14 added with all stories after epic files created.
+#   - Epic 13: Event-Driven Publishing Pipeline (5 stories: 3 active, 2 deferred)
+#   - Epic 14: Zero-Cost RAG Chatbot (8 stories: 5 active, 3 deferred)
+#   - Updated epic-list.md with Epic 13 + 14 entries.
+#
+# 2026-02-26: Epic 15 added (Multi-Site Infrastructure) + Story 15.1 completed
+#   - Source: Gap analysis during sprint planning — Epics 13/14 assume multi-site infra exists
+#   - Epic file: epic-15-multi-site-infrastructure.md (5 active stories + 1 deferred)
+#   - Story 15.1 (Create RWC Dataset & Deploy Schemas): review → done
+#     - `rwc` dataset created via `npx sanity dataset create rwc --visibility public`
+#     - Reusable `siteField` helper created in `studio/src/schemaTypes/fields/site-field.ts`
+#     - `site` field added to 6 schemas: page, sponsor, project, testimonial, event, siteSettings
+#     - `submission` schema correctly excluded (AC #6)
+#     - Hidden on `production` (env var), required on `rwc` (validation callback)
+#     - Schemas deployed to both `production` and `rwc` datasets
+#     - TypeGen passes (14 queries, 49 schema types)
+#     - Full test suite: 47 files, 531 tests pass, 0 failures
+#     - Code review: 0 blockers, 0 warnings, 2 minor, 1 suggestion — PASS
+#   - Epic 15 status: in-progress
+#
+# 2026-02-26: Epic 8 updated — Monsido/Matomo descoped, Pa11y + Lighthouse CI pivot
+#   - Source: Scope matrix review + SM session with Jay
+#   - Monsido and Matomo both descoped from Epic 8 — replaced with Pa11y + Lighthouse CI
+#   - Pa11y + Lighthouse CI infrastructure delivered by Story 9.5 (Jay's track)
+#   - Dev B (mi329-gif) role: analyze scan output and produce reports, not build pipeline
+#   - Epic 8 status: backlog → in-progress (B.1 sub-issues actively in-progress)
+#   - Story 8.1 status: ready-for-dev → in-progress (mi329-gif working B.1.1–B.1.6)
+#   - Story 8.2 renamed: accessibility-monitoring-matomo → accessibility-baseline-pa11y-lighthouse
+#   - Story 8.2 rewritten: Monsido setup → Pa11y + Lighthouse CI data analysis + baseline report
+#   - Story 8.3 renamed: cross-site-analytics → cross-site-analytics-accessibility
+#   - Story 8.3 updated: Monsido references → Pa11y + Lighthouse CI cross-site comparison
+#   - Story 8.4 updated: Monsido scores → Pa11y/Lighthouse scores. Presentation slides confirmed.
+#   - Story 8.5 (GTM Tag Configuration): GitHub issue #360 created, added to project board
+#   - GitHub issues updated: #187 (B.2), #196–#200 (B.2.1–B.2.5), #188 (B.3), #204, #205, #358 (B.4)
+#   - GitHub issue created: #360 (B.5) — assigned to mi329-gif, milestone Sprint 3
+
+# 2026-02-27: SM-1.40–SM-1.42 — Jay's track GitHub issues + review→done sweep
+#   - 15 stories changed from review → done (SM convention: review = done)
+#     1-6, 2-9, 2-15, 4-4, 5-2, 5-6, 5-8, 5-10, 5-14, 7-3, 7-7, 7-8, 7-9, 7-10, 7-12
+#   - Epic 1: in-progress → done (all 6 stories done)
+#   - Epic 3: in-progress → done (all 3 stories done)
+#   - 9 completed epic issues created: #462 (replaces deleted #236), #419–#426 (all closed, Done on board, Sprint 1 milestone)
+#   - 35 remaining story issues created: #427–#461 (all on board with start/due dates)
+#   - Cross-track dependency diagram created
+#   - Time management doc updated with all issue numbers
+
+generated: 2026-02-27
+project: astro-shadcn-sanity
+project_key: NOKEY
+tracking_system: file-system
+story_location: /home/jay/github/astro-shadcn-sanity/_bmad-output/implementation-artifacts
+
+development_status:
+  # Shared infrastructure (cross-cutting)
+  0-1-fastapi-cf-worker-template: ready-for-dev  # NEW (2026-02-25): FastAPI + CF Python Worker template. Unblocks 10.4 + 12.1. Assigned to Jay.
+
+  epic-1: done  # All 6 stories done. GitHub #462 (replaces deleted #236). Sprint 1 milestone.
+  1-1-reconfigure-starter-and-set-up-design-system: done
+  1-2-migrate-reference-project: done
+  1-3-schema-infrastructure: done
+  1-4-storybook-setup: done
+  1-5-storybook-production-build: done
+  1-6-storybook-github-pages-deploy: done  # review → done (2026-02-27): review counts as done per SM convention
+  epic-1-retrospective: optional
+
+  epic-2: in-progress
+  2-0-template-layout-system: done
+  2-1-homepage-block-schemas: done
+  2-1b-remaining-block-schemas: done
+  2-2-homepage-data-fetching: done
+  2-2b-remaining-pages-data-fetching: done
+  2-3a-site-settings-wiring: done
+  2-3-page-composition-system: ready-for-dev
+  2-4-ui-blocks-hero-banner: ready-for-dev
+  2-5-ui-blocks-content-articles: ready-for-dev
+  2-6-ui-blocks-cta-features: ready-for-dev
+  2-7-ui-blocks-products-services: ready-for-dev
+  2-8-ui-blocks-media-misc: ready-for-dev
+  2-9-custom-block-fulldev-ui-conversion: done  # review → done (2026-02-27)
+  2-11-testimonial-schema-and-block: done
+  2-12-event-schema-and-eventlist-block: done
+  2-14-event-detail-pages: done
+  2-15-public-events-calendar: done  # review → done (2026-02-27)
+  2-16-project-cards-block: ready-for-dev
+  2-17-sponsorship-tiers-block: ready-for-dev
+  2-18-ical-export-add-to-calendar: ready-for-dev
+  2-19-video-testimonial-support: ready-for-dev
+  2-20-activities-page: ready-for-dev
+  2-13-event-reminder-notifications: backlog
+  epic-2-retrospective: optional
+
+  epic-3: done  # All 3 stories done. GitHub #420. Sprint 1 milestone.
+  3-1-sponsor-document-schema-and-studio-management: done
+  3-2-sponsor-cards-block-and-listing-page: done
+  3-3-sponsor-detail-pages: done
+  epic-3-retrospective: optional
+
+  epic-4: in-progress
+  4-3-project-listing-and-cross-reference-navigation: done
+  4-4-project-detail-pages: done  # review → done (2026-02-27)
+  4-5-detail-page-builder-hybrid: ready-for-dev
+  4-6-project-sorting-controls: ready-for-dev
+  epic-4-retrospective: optional
+
+  epic-5: in-progress
+  5-1-seo-metadata-and-sitemap: backlog
+  5-2-ga4-security-headers-cloudflare-deploy: done  # review → done (2026-02-27)
+  5-4-preview-publish-architecture: in-progress
+  5-5-cloudflare-native-preview-deployments: done
+  5-6-build-time-optimization: done  # review → done (2026-02-27)
+  5-7-presentation-tool-preview-hardening: ready-for-dev
+  5-8-migrate-ga4-to-gtm: done  # review → done (2026-02-27)
+  5-9-self-hosted-github-actions-runner: ready-for-dev
+  5-10-gtm-ready-data-attributes: done  # review → done (2026-02-27)
+  5-11-seo-structured-data-and-social-sharing: done
+  5-12-real-time-content-listeners: done
+  5-13-astro-env-schema-validation: ready-for-dev
+  5-14-image-optimization-lcp: done  # review → done (2026-02-27)
+  5-15-site-wide-search: ready-for-dev
+  5-16-gdpr-cookie-consent: ready-for-dev
+  epic-5-retrospective: optional
+
+  epic-6: in-progress
+  6-1-contact-form-submission-pipeline: done
+  6-2-contact-form-subject-field: backlog  # NEW (2026-02-25): Sprint planning refresh — existed in epic-6 file but was missing from sprint-status.
+  epic-6-retrospective: optional
+
+  epic-7: in-progress
+  7-1-query-completeness-definequery-and-seo-stega-fix: done
+  7-2-schema-best-practices: done
+  7-3-typegen-and-type-replacement: done  # review → done (2026-02-27)
+  7-4-server-islands-preview-optimization: done
+  7-5-schema-polish-seo-projection-and-cleanup: done
+  7-6-block-stega-clean-and-studio-polish: done
+  7-7-extract-link-object-and-sitesettings-consolidation: done  # review → done (2026-02-27)
+  7-8-fix-portable-text-rendering: done  # review → done (2026-02-27)
+  7-9-implement-block-base-fields-in-renderer: done  # review → done (2026-02-27)
+  7-10-extract-reusable-inline-object-types: done  # review → done (2026-02-27)
+  7-11-navigation-footer-studio-editing: done
+  7-12-schema-validation-preview-and-resolver-polish: done  # review → done (2026-02-27)
+  7-13-seo-on-routable-document-types: done
+  7-14-technology-taxonomy: ready-for-dev
+  7-15-code-review-fixes-type-safety-ci-security: ready-for-dev
+  epic-7-retrospective: optional
+
+  epic-8: in-progress  # B.1 sub-issues in-progress on project board (mi329-gif). Monsido/Matomo descoped (2026-02-26) → Pa11y + Lighthouse CI.
+  8-1-ga4-dashboard-setup: in-progress  # mi329-gif actively working (B.1.1–B.1.6 in-progress on project board)
+  8-2-accessibility-baseline-pa11y-lighthouse: ready-for-dev  # Rewritten (2026-02-26): Monsido/Matomo → Pa11y + Lighthouse CI analysis. Depends on 9.5. GitHub #187.
+  8-3-cross-site-analytics-accessibility: ready-for-dev  # Updated (2026-02-26): Monsido refs replaced with Pa11y + Lighthouse CI. Depends on 8.1, 8.2, 8.5, Epic 15.
+  8-4-analytics-report-recommendations: ready-for-dev  # Updated (2026-02-26): Monsido → Pa11y/Lighthouse scores. Includes presentation slides (5-10). GitHub #358.
+  8-5-gtm-tag-configuration: ready-for-dev  # GitHub #360 created (2026-02-26). Depends on 5.8 + 5.10.
+  epic-8-retrospective: optional
+
+  epic-9: in-progress  # FULL scope restored (2026-02-27) — Workers Paid plan ($5/mo) removes all free-tier limits
+  9-1-cloudflare-access-configuration: done  # IN: auth foundation, 50 free seats — deployed to preview, code review clean
+  9-1b-portal-landing-page: done  # Foundation: PortalLayout, landing hub, skeleton cards, components/portal/ seed — code review fixes in PR #322 merged
+  9-1c-sheet-slide-animation: ready-for-dev  # NEW: Sheet component slide animation using CSS @starting-style — affects portal + public nav mobile drawers + Storybook docs
+  9-2-portal-sponsor-project-view: ready-for-dev  # IN: SSR + Sanity only, no D1
+  9-3-portal-events-and-program-info: ready-for-dev  # IN: SSR + Sanity only, no D1
+  9-4-github-dev-dashboard: ready-for-dev  # IN: low-traffic admin page
+  9-5-site-health-ci-pipeline: ready-for-dev  # IN: R2/KV writes in CI, negligible
+  9-6-site-health-dashboard: ready-for-dev  # IN: 1 KV + 1 R2 read per view
+  9-7-submission-engagement-dashboard: ready-for-dev  # IN (2026-02-27): Full dashboard — submissions + GA4 engagement panel. Paid plan removes CPU/request limits.
+  9-8-cloudflare-d1-database-setup: ready-for-dev  # IN (2026-02-27): All 6 tables restored. Paid plan: 25B reads/mo, 50M writes/mo — no daily caps.
+  9-9-sponsor-activity-tracking: ready-for-dev  # UN-DESCOPED (2026-02-20): Rewritten with Workers Analytics Engine. writeDataPoint() replaces D1 writes. SQL API for reads (runs outside Worker). 100K writes/day free.
+  9-10-event-rsvp-system: ready-for-dev  # IN: ~100 D1 writes/semester, well within limits
+  9-11-sponsor-evaluation-forms: ready-for-dev  # IN (2026-02-27): Unblocked by Workers Paid plan. D1 paid tier: 25B reads/mo, 50M writes/mo. Zero architectural changes needed.
+  9-12-agreement-nda-signature-tracking: ready-for-dev  # IN: one-time writes, critical for legal compliance
+  9-13-sponsor-notification-system: ready-for-dev  # UN-DEFERRED (2026-02-20): Rewritten with Queues + KV architecture. KV replaces D1 for notification storage (single-key reads). Queue for async creation. Consumer Worker + Cron Trigger for event reminders. All within free tier.
+  9-14-multi-provider-authentication: ready-for-dev  # IN: CF dashboard config only, zero code changes
+  9-15-program-admin-analytics-dashboard: ready-for-dev  # UN-DESCOPED (2026-02-20): Rewritten with Analytics Engine SQL API. Aggregations run on CF infra (not Worker). D1 only for indexed RSVP/eval lookups. Depends on 9.9.
+  9-16-portal-my-sponsorship: ready-for-dev
+  epic-9-retrospective: optional
+
+  epic-10: backlog  # Architecture revised (2026-02-25): JDA Java bot on VPS → FastAPI Python Worker on Cloudflare. Story 10.9 added.
+  10-1-discord-webhook-infrastructure: backlog
+  10-2-content-change-notifications: backlog
+  10-3-portal-activity-notifications: backlog
+  10-4-fastapi-discord-bot-worker: ready-for-dev  # Rewritten: JDA/VPS → FastAPI Python Worker + Discord HTTP Interactions API
+  10-5-slash-commands-content-queries: ready-for-dev  # Rewritten: JDA slash commands → FastAPI routes + deferred responses + /capstone search
+  10-6-per-project-discord-channels: backlog  # Rewritten: JDA Gateway → httpx Discord REST API
+  10-7-sponsor-onboarding-flow: backlog  # Rewritten: JDA → httpx Discord REST API
+  10-8-automated-digests-and-reminders: backlog  # Rewritten: JVM ScheduledExecutorService → Cron Triggers via on_scheduled
+  10-9-slash-commands-content-write-operations: backlog  # NEW (2026-02-25): draft creation, status updates, confirmation buttons, audit trail
+  epic-10-retrospective: optional
+
+  epic-11: cancelled  # REMOVED (2026-02-25): PayloadCMS + Next.js Migration cancelled. Stack decision: Sanity (Growth) + Cloudflare Workers ($5/mo).
+
+  epic-12: backlog  # NEW (2026-02-25): Aggregated Platform API — FastAPI Python Worker at /api/v1/*. Assigned to API Developer (Team B).
+  12-1-fastapi-project-scaffold-and-health: backlog
+  12-2-content-api-endpoints: backlog
+  12-3-chat-api-endpoints: backlog
+  12-4-forms-api-endpoints: backlog
+  12-5-platform-api-endpoints: backlog
+  12-6-discord-notification-endpoint: backlog
+  12-7-openapi-docs-testing-and-handoff: backlog
+  epic-12-retrospective: optional
+
+  epic-13: backlog  # NEW (2026-02-25): Event-Driven Publishing Pipeline — Cloudflare Queues event bus. Assigned to Jay (Team A). ~3 days.
+  13-1-queue-event-bus-and-router-worker: backlog
+  13-2-selective-site-rebuild-consumer: backlog
+  13-3-schema-change-pipeline-consumer: backlog
+  13-4-chatbot-cache-invalidation-consumer: deferred  # Depends on Epic 14 chatbot existing
+  13-5-publish-impact-preview-in-studio: deferred  # Phase 6 enhancement
+  epic-13-retrospective: optional
+
+  epic-14: in-progress  # NEW (2026-02-25): Zero-Cost RAG Chatbot — Sanity Embeddings + Workers AI. Assigned to Jay (Team A). ~5-7 days.
+  14-1-sanity-embeddings-index-setup: ready-for-dev
+  14-2-chatbot-worker-core: backlog
+  14-3-neuron-budget-and-graceful-degradation: backlog
+  14-4-editor-controlled-knowledge-scope: backlog
+  14-5-chat-widget-astro-island: backlog
+  14-6-d1-semantic-response-cache: deferred  # Phase 6 enhancement
+  14-7-structured-content-cards-in-responses: deferred  # Phase 6 enhancement
+  14-8-editor-curated-faq-and-feedback-loop: deferred  # Phase 6 enhancement
+  epic-14-retrospective: optional
+
+  epic-15: in-progress  # NEW (2026-02-26): Multi-Site Infrastructure — 2 Sanity datasets, 2 Studio workspaces, 3 CF Pages projects. Assigned to Jay (Team A). ~4 days.
+  15-1-create-rwc-dataset-deploy-schemas: done  # rwc dataset created, siteField added to 6 schemas, deployed to both datasets, 531 tests pass
+  15-2-studio-multi-workspace-configuration: done  # Depends on 15.1. defineConfig([...]) with capstone + rwc workspaces, RWC desk structure, initial value templates.
+  15-3-astro-multi-site-data-fetching: ready-for-dev  # Depends on 15.1. GROQ query parameterization by PUBLIC_SANITY_DATASET + PUBLIC_SITE_ID.
+  15-4-per-site-theming-css-custom-properties: backlog  # Depends on 15.3. CSS [data-theme] selectors for red/blue/green themes.
+  15-5-cloudflare-pages-multi-project-deployment: backlog  # Depends on 15.3 + 15.4. Three CF Pages projects with per-site env vars + deploy hooks.
+  15-6-embeddings-index-for-rwc-dataset: deferred  # Depends on 15.1 + 14.1. Deferred until RWC content exists.
+  epic-15-retrospective: optional

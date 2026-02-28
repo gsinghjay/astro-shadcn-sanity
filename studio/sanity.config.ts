@@ -2,7 +2,7 @@ import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
-import {RocketIcon, EarthGlobeIcon} from '@sanity/icons'
+import {RocketIcon, UsersIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
 import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
@@ -66,7 +66,7 @@ export default defineConfig([
     name: 'rwc',
     title: 'RWC Programs',
     basePath: '/rwc',
-    icon: EarthGlobeIcon,
+    icon: UsersIcon,
     projectId,
     dataset: 'rwc',
     plugins: [
@@ -106,8 +106,11 @@ export default defineConfig([
     },
     document: {
       actions: (input, context) => {
-        // Guard RWC siteSettings singletons by fixed document ID
-        if (RWC_SINGLETON_IDS.includes(context.documentId || '')) {
+        // Guard RWC siteSettings singletons by schemaType + fixed document ID
+        if (
+          context.schemaType === 'siteSettings' ||
+          RWC_SINGLETON_IDS.includes(context.documentId || '')
+        ) {
           return input.filter(
             ({action}) =>
               action &&
