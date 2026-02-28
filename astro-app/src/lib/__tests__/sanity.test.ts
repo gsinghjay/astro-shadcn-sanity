@@ -13,6 +13,8 @@ const {
   getAllProjects,
   getProjectBySlug,
   resolveBlockSponsors,
+  getSyncTags,
+  resetSyncTags,
   SITE_SETTINGS_QUERY,
   ALL_PAGE_SLUGS_QUERY,
   ALL_SPONSORS_QUERY,
@@ -22,6 +24,8 @@ const {
   ALL_PROJECT_SLUGS_QUERY,
   PROJECT_BY_SLUG_QUERY,
   PAGE_BY_SLUG_QUERY,
+  EVENT_BY_SLUG_QUERY,
+  EVENTS_BY_MONTH_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -71,6 +75,7 @@ describe("GROQ query definitions", () => {
     expect(SPONSOR_BY_SLUG_QUERY).toContain("website");
     expect(SPONSOR_BY_SLUG_QUERY).toContain("industry");
     expect(SPONSOR_BY_SLUG_QUERY).toContain("featured");
+    expect(SPONSOR_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("SPONSOR_BY_SLUG_QUERY includes projects sub-query", () => {
@@ -100,11 +105,35 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("team[]");
     expect(PROJECT_BY_SLUG_QUERY).toContain("mentor");
     expect(PROJECT_BY_SLUG_QUERY).toContain("outcome");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("PROJECT_BY_SLUG_QUERY includes testimonials sub-query", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain('_type == "testimonial"');
     expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
+  });
+
+  it("EVENTS_BY_MONTH_QUERY filters events by date range with expected fields", () => {
+    expect(EVENTS_BY_MONTH_QUERY).toContain('_type == "event"');
+    expect(EVENTS_BY_MONTH_QUERY).toContain("$monthStart");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("$monthEnd");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("dateTime(date)");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("order(date asc)");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("slug.current");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("eventType");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("status");
+  });
+
+  it("EVENT_BY_SLUG_QUERY fetches single event by slug with all fields", () => {
+    expect(EVENT_BY_SLUG_QUERY).toContain('_type == "event"');
+    expect(EVENT_BY_SLUG_QUERY).toContain("$slug");
+    expect(EVENT_BY_SLUG_QUERY).toContain("date");
+    expect(EVENT_BY_SLUG_QUERY).toContain("endDate");
+    expect(EVENT_BY_SLUG_QUERY).toContain("location");
+    expect(EVENT_BY_SLUG_QUERY).toContain("description");
+    expect(EVENT_BY_SLUG_QUERY).toContain("eventType");
+    expect(EVENT_BY_SLUG_QUERY).toContain("status");
+    expect(EVENT_BY_SLUG_QUERY).toContain("seo");
   });
 
   it("PAGE_BY_SLUG_QUERY includes all block type projections", () => {
@@ -153,9 +182,10 @@ describe("loadQuery()", () => {
     const mockResult = { title: "Test" };
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: mockResult,
+      syncTags: ["s1:abc"],
     } as never);
 
-    const result = await loadQuery<{ title: string }>({
+    const response = await loadQuery<{ title: string }>({
       query: '*[_type == "test"]',
       params: { id: "123" },
     });
@@ -168,12 +198,14 @@ describe("loadQuery()", () => {
         perspective: "published",
       }),
     );
-    expect(result).toEqual(mockResult);
+    expect(response.result).toEqual(mockResult);
+    expect(response.syncTags).toEqual(["s1:abc"]);
   });
 
   it("defaults params to empty object when not provided", async () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: null,
+      syncTags: [],
     } as never);
 
     await loadQuery({ query: '*[_type == "test"]' });
@@ -188,6 +220,7 @@ describe("loadQuery()", () => {
   it("uses published perspective when visual editing is disabled", async () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
       result: null,
+      syncTags: [],
     } as never);
 
     await loadQuery({ query: "*" });
@@ -200,6 +233,70 @@ describe("loadQuery()", () => {
         stega: false,
       }),
     );
+  });
+
+  it("returns empty syncTags when API response omits them", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: { title: "Test" },
+    } as never);
+
+    const response = await loadQuery<{ title: string }>({
+      query: '*[_type == "test"]',
+    });
+
+    expect(response.syncTags).toEqual([]);
+  });
+});
+
+describe("getSyncTags() and resetSyncTags()", () => {
+  it("collects sync tags from loadQuery calls", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: { title: "A" },
+      syncTags: ["s1:tag1", "s1:tag2"],
+    } as never);
+
+    await loadQuery({ query: "*" });
+    expect(getSyncTags()).toEqual(["s1:tag1", "s1:tag2"]);
+  });
+
+  it("deduplicates sync tags across multiple loadQuery calls", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch)
+      .mockResolvedValueOnce({
+        result: null,
+        syncTags: ["s1:tag1", "s1:tag2"],
+      } as never)
+      .mockResolvedValueOnce({
+        result: null,
+        syncTags: ["s1:tag2", "s1:tag3"],
+      } as never);
+
+    await loadQuery({ query: "*" });
+    await loadQuery({ query: "*" });
+
+    const tags = getSyncTags();
+    expect(tags).toHaveLength(3);
+    expect(tags).toContain("s1:tag1");
+    expect(tags).toContain("s1:tag2");
+    expect(tags).toContain("s1:tag3");
+  });
+
+  it("resetSyncTags clears collected tags", async () => {
+    resetSyncTags();
+
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+      syncTags: ["s1:tag1"],
+    } as never);
+
+    await loadQuery({ query: "*" });
+    expect(getSyncTags()).toHaveLength(1);
+
+    resetSyncTags();
+    expect(getSyncTags()).toEqual([]);
   });
 });
 

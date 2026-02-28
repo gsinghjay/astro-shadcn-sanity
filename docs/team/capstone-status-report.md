@@ -1,7 +1,7 @@
 # YWCC Capstone Website -- Status Report
 
 **Generated:** 2026-02-19
-**Last updated:** 2026-02-20 (Story 6.1 contact form backend marked done)
+**Last updated:** 2026-02-20 (Story 7-14: technology tags formalized as predefined list of 66 — PR #330; Story 7-15: code review fixes — safeUrlFor() typed wrapper, block registry typed, image CLS attributes, HSTS + X-Frame-Options headers, CI env vars, GROQ fragment extraction, Portable Text custom components)
 **Source:** Automated codebase audit against `docs/team/capstone-stakeholders.pdf`
 
 ---
@@ -35,15 +35,15 @@ The original WordPress site at `https://ywcccapstone1.com/` was fully scraped on
 
 | WP Page | URL | Migrated? |
 |---|---|---|
-| Homepage | `/` | **Partially** -- hero images + heading updated, logoCloud added |
-| About the Capstone Program | `/about-the-capstone-program/` | Not yet (Sanity page exists with test content) |
-| Research & Development | `/research-development/` | **Done** -- created as `/rnd` with 6 blocks + images |
-| Sponsor Guide | `/sponsor-guide/` | Not yet (maps to existing `/how-to-become-a-sponsor`) |
+| Homepage | `/` | **Done** -- hero images + heading, logoCloud, stats updated to real WP numbers (84+ teams, 417+ students, 32+ judges, 100% satisfaction) |
+| About the Capstone Program | `/about-the-capstone-program/` | **Done** -- text content migrated, stats updated. Images still placeholder. |
+| Research & Development | `/research-development/` | **Done** -- created as `/rnd` with 8 blocks + images (added publications/conferences + mentorship/collaboration) |
+| Sponsor Guide | `/sponsor-guide/` | **Done** -- migrated to `/how-to-become-a-sponsor` with 11 blocks |
 | Partner With Us | `/partner-with-us/` | Not yet (partnership inquiry form with Formsite embed) |
-| Events | `/events/` | Not yet (only 1 real event: Spring 2026 Showcase, May 7) |
+| Events | `/events/` | **Done** -- 1 real event migrated (Spring 2026 Showcase, May 7 2-5 PM) |
 | Activities | `/activities/` | Not yet (no equivalent page in Astro site) |
-| Contact | `/contact/` | Not yet (has Subject field + office hours our form lacks) |
-| Featured Projects | `/past-project/` | Not yet (9 real projects scraped) |
+| Contact | `/contact/` | **Done** -- director info, office hours, location populated. Subject field needs code change. |
+| Featured Projects | `/past-project/` | **Done** -- 9 real projects migrated (missing: technologies, teamMembers, mentor) |
 | Website Capstone Team | `/website-capstone-team/` | Not yet |
 
 ### Downloaded Images Inventory
@@ -52,13 +52,13 @@ The original WordPress site at `https://ywcccapstone1.com/` was fully scraped on
 
 **Hero/banner (4):** hero-1.png, hero-2.jpg, hero-3.png, featured-img7985.jpg -- **hero-1/2/3 uploaded to Sanity**
 
-**About page (5):** about-logo.webp, about-teams-at-work.jpg, about-screenshot.png, about-img7146.jpg -- **Not yet uploaded**
+**About page (5):** about-logo.webp, about-teams-at-work.jpg, about-screenshot.png, about-img7146.jpg -- **All uploaded to Sanity**
 
 **Step icons (4):** step1.png, step2.png, step3.png, step4.png -- **All uploaded to Sanity**
 
 **R&D (2):** rnd-hero.jpg, rnd-step3.png -- **All uploaded to Sanity**
 
-**Activities (4):** activities-hero.jpg, activities-1.jpg, activities-2.jpg, activities-3.jpg -- **Not yet uploaded**
+**Activities (4):** activities-hero.jpg, activities-1.jpg, activities-2.jpg, activities-3.jpg -- **All uploaded to Sanity**
 
 ### Sanity Image Asset IDs (already uploaded)
 
@@ -96,7 +96,7 @@ step4      -> image-b58cfccc754c1c5c735fcb5b63ef9e2b368a1368-1024x1024-png
 
 | Category | Types |
 |---|---|
-| **Documents (6)** | `page`, `siteSettings` (singleton), `sponsor`, `project`, `testimonial`, `event` |
+| **Documents (6)** | `page`, `siteSettings` (singleton), `sponsor`, `project` (technologyTags: predefined list of 66 — Story 7-14), `testimonial`, `event` |
 | **Objects (8)** | `seo`, `button`, `link`, `portableText`, `faqItem`, `featureItem`, `statItem`, `stepItem` |
 | **Page Builder Blocks (13)** | `heroBanner`, `featureGrid`, `ctaBanner`, `statsRow`, `textWithImage`, `logoCloud`, `sponsorSteps`, `richText`, `faqSection`, `contactForm`, `sponsorCards`, `testimonials`, `eventList` |
 
@@ -120,38 +120,55 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 | Page | Slug | ID | Blocks | Preview Link | Status |
 |---|---|---|---|---|---|
-| Home | `home` | `99664be0` | 7 | [/](https://preview.ywcc-capstone.pages.dev/) | **Updated 2026-02-20:** hero images (3), heading updated, logoCloud block added |
-| About the Capstone Program | `about-the-capstone-program` | `bf3c96a6` | 7 | [/about-the-capstone-program](https://preview.ywcc-capstone.pages.dev/about-the-capstone-program/) | Test content -- needs WP content migration |
-| How to Become a Sponsor | `how-to-become-a-sponsor` | `911c1cfa` | 11 | [/how-to-become-a-sponsor](https://preview.ywcc-capstone.pages.dev/how-to-become-a-sponsor/) | Test content -- needs WP content migration |
+| Home | `home` | `99664be0` | 7 | [/](https://preview.ywcc-capstone.pages.dev/) | **Updated 2026-02-20:** hero images (3), heading updated, logoCloud added, stats updated to real WP numbers (84+/417+/32+/100%). Block reorder pending (drag in Studio). |
+| About the Capstone Program | `about-the-capstone-program` | `bf3c96a6` | 7 | [/about-the-capstone-program](https://preview.ywcc-capstone.pages.dev/about-the-capstone-program/) | **Done** -- WP text, real stats, real images uploaded |
+| How to Become a Sponsor | `how-to-become-a-sponsor` | `911c1cfa` | 11 | [/how-to-become-a-sponsor](https://preview.ywcc-capstone.pages.dev/how-to-become-a-sponsor/) | **Content migrated** -- WP Sponsor Guide 5.1-5.5, FAQs, timeline, logos, testimonials |
 | Events & Engagement | `events` | `ca81cc32` | 4 | [/events](https://preview.ywcc-capstone.pages.dev/events/) | Test content |
 | Testimonials | `testimonials` | `ada5ce67` | 4 | [/testimonials](https://preview.ywcc-capstone.pages.dev/testimonials/) | Test content |
 | Contact | `contact` | `9449931a` | 3 | [/contact](https://preview.ywcc-capstone.pages.dev/contact/) | **Form backend live** (Story 6.1) -- Astro Action + Turnstile + Sanity submissions + Discord webhook |
-| **Research & Development** | `rnd` | `2d09c2a5` | 6 | [/rnd](https://preview.ywcc-capstone.pages.dev/rnd/) | **Created 2026-02-20** with real WP content + images |
-| Pranav (test) | `pranav` | `9288ba72` | 1 | [/pranav](https://preview.ywcc-capstone.pages.dev/pranav/) | Test page -- should be deleted |
+| **Research & Development** | `rnd` | `2d09c2a5` | 8 | [/rnd](https://preview.ywcc-capstone.pages.dev/rnd/) | **Updated 2026-02-20:** 6→8 blocks. Added publications/conferences featureGrid + mentorship/collaboration textWithImage (with image) |
+| **Impact Case Studies** | `case-studies` | `3be9f3cd` | 5 | [/case-studies](https://preview.ywcc-capstone.pages.dev/case-studies/) | **Created 2026-02-20** (draft). Hero, intro richText, testimonials (byProject mode), stats, CTA |
+| **Sponsorship Opportunities** | `sponsorship-opportunities` | `c4d2001e` | 7 | [/sponsorship-opportunities](https://preview.ywcc-capstone.pages.dev/sponsorship-opportunities/) | **Created 2026-02-20** (draft). Hero, Why Sponsor? textWithImage, 6-item benefits grid, stats ($0 cost), testimonials, contactForm, logoCloud |
 
-#### Projects -- STILL TEST DATA
+#### Projects -- REPLACED with real data (2026-02-20)
 
-7 fictitious projects remain. Need to be replaced with the 9 real projects scraped from WP:
+All 9 real projects from WP migrated. Each has: title, slug, Portable Text content, outcome, sponsor reference (except YWCC Capstone Website which is internal), technology tags (now constrained to predefined list of 66 — Story 7-14), and team members. **Remaining gap:** `mentor` field is null (not available in WP data).
 
-| Real Project (from WP) | Sponsor | Technologies | Mapped to Existing ID? |
+| Project | ID | Sponsor Ref | Content | Outcome | Tech Tags | Team |
+|---|---|---|---|---|---|---|
+| Zero Trust Microsegmentation Network | `025360c6` | Cisco ✓ | ✓ | ✓ | 6 tags ✓ | 3 real names ✓ |
+| 5G-Enabled Alzheimer's Care Application | `9045cdc6` | Verizon ✓ | ✓ | ✓ | 6 tags ✓ | 4 placeholder ✓ |
+| Educational Platform for At-Risk Youth | `245f6b00` | Angeles ✓ | ✓ | ✓ | 7 tags ✓ | 4 placeholder ✓ |
+| Blockchain-Secured DNS Infrastructure | `21871347` | Cisco ✓ | ✓ | ✓ | 6 tags ✓ | 3 real names ✓ |
+| ML Article Appeal Prediction | `5b83bfe3` | Forbes ✓ | ✓ | ✓ | 4 tags ✓ | 4 placeholder ✓ |
+| Azure ML Resource Optimization | `c46bba9f` | UPS ✓ | ✓ | ✓ | 4 tags ✓ | 4 placeholder ✓ |
+| Sentiment Analysis & Workforce Optimization | `a6d4f90f` | Bank of America ✓ | ✓ | ✓ | 4 tags ✓ | 6 placeholder ✓ |
+| Eco-Strategy Client Sustainability Portal 3.0 | `26f878bd` | Eco-Enterprise ✓ | ✓ | ✓ | 4 tags ✓ | 8 placeholder ✓ |
+| YWCC Capstone Website | `b42bb888` | None (internal) | ✓ | ✓ | 6 tags ✓ | 4 placeholder ✓ |
+
+#### Testimonials -- REPLACED with real data (2026-02-20)
+
+9 testimonials derived from real project outcomes. All linked to project documents via reference. Mix of 7 industry + 2 student testimonials.
+
+| Testimonial | Org | Type | Project Ref |
 |---|---|---|---|
-| Zero Trust Microsegmentation Network | Cisco | Network Security, VLAN, 802.1X, RADIUS | Not yet |
-| 5G-Enabled Alzheimer's Care Application | Verizon | 5G, Healthcare IoT, AI/ML, Edge Computing | Not yet |
-| Educational Platform for At-Risk Youth | Angeles de Medellin | React, Node.js, MongoDB, WebRTC | Not yet |
-| Blockchain-Secured DNS Infrastructure | Cisco | Blockchain, DNS, Ethereum, Smart Contracts | Not yet |
-| ML Article Appeal Prediction | Forbes | ML, NLP, Data Analytics | Not yet |
-| Azure ML Resource Optimization | UPS | Azure ML, Cloud, Predictive Analytics | Not yet |
-| Sentiment Analysis & Workforce Optimization | Bank of America | Data Science, Sentiment Analysis | Not yet |
-| Eco-Strategy Sustainability Portal 3.0 | Eco-Enterprise | Sustainability, Gamification, IoT, Blockchain | Not yet |
-| YWCC Capstone Website | NJIT (internal) | WordPress, PHP, Elementor | Not yet |
+| Verizon 5G Innovation Lab | Verizon | industry | 5G Alzheimer's Care |
+| Cisco Network Security Team | Cisco | industry | Zero Trust |
+| Bank of America Hiring Team | Bank of America | industry | Sentiment Analysis |
+| Forbes Digital Team | Forbes | industry | ML Article Appeal |
+| UPS Operations Team | UPS | industry | Azure ML |
+| Eco-Enterprise Leadership | Eco-Enterprise | industry | Sustainability Portal |
+| Angeles de Medellin Foundation | Angeles | industry | Educational Platform |
+| D'Angelo Morales | NJIT Graduate | student | Zero Trust |
+| Filip Mangoski | NJIT Graduate | student | Blockchain DNS |
 
-#### Testimonials -- STILL TEST DATA
+#### Events -- REPLACED with real data (2026-02-20)
 
-10 fictitious testimonials remain. The WP site does not have individual testimonials pages, but project outcomes contain testimonial-worthy content (e.g., "All 8 students hired as equity partners").
+7 test events replaced with 1 real event from WP.
 
-#### Events -- STILL TEST DATA
-
-7 fictitious events remain. The WP site has only 1 real event: Spring 2026 Capstone Showcase (May 7, 2026, 2-5 PM, Campus Center Ballroom).
+| Event | ID | Date | Location | Type | Status |
+|---|---|---|---|---|---|
+| Spring 2026 Capstone Showcase | `25d4614e` | May 7, 2026 2-5 PM | Campus Center Ballroom | showcase | upcoming |
 
 ### Implemented Routes
 
@@ -161,8 +178,8 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 | `/sponsors` | `pages/sponsors/index.astro` | SSG -- Sponsor listing grid | [Sponsors](https://preview.ywcc-capstone.pages.dev/sponsors/) |
 | `/sponsors/[slug]` | `pages/sponsors/[slug].astro` | SSG -- Sponsor detail (logo, tier, industry, projects, JSON-LD) | [Verizon](https://preview.ywcc-capstone.pages.dev/sponsors/verizon/), [Cisco](https://preview.ywcc-capstone.pages.dev/sponsors/cisco/), [BoA](https://preview.ywcc-capstone.pages.dev/sponsors/bank-of-america/), [Forbes](https://preview.ywcc-capstone.pages.dev/sponsors/forbes/), [UPS](https://preview.ywcc-capstone.pages.dev/sponsors/ups/), [Eco](https://preview.ywcc-capstone.pages.dev/sponsors/eco-enterprise/), [Angeles](https://preview.ywcc-capstone.pages.dev/sponsors/angeles-de-medellin/) |
 | `/projects` | `pages/projects/index.astro` | SSG -- Project listing with client-side tag/industry filtering | [Projects](https://preview.ywcc-capstone.pages.dev/projects/) |
-| `/projects/[slug]` | `pages/projects/[slug].astro` | SSG -- Project detail (Portable Text content, team, mentor, outcome, testimonials) | [AI Knowledge Base](https://preview.ywcc-capstone.pages.dev/projects/ai-powered-enterprise-knowledge-base/), [Fraud Detection](https://preview.ywcc-capstone.pages.dev/projects/fraud-detection-real-time-payments/), [Supply Chain](https://preview.ywcc-capstone.pages.dev/projects/predictive-analytics-supply-chain/) |
-| `/events/[slug]` | `pages/events/[slug].astro` | SSG -- Event detail (date/time, location, type, JSON-LD Event) | [Spring 2026 Showcase](https://preview.ywcc-capstone.pages.dev/events/spring-2026-capstone-showcase/), [Sponsor Kickoff](https://preview.ywcc-capstone.pages.dev/events/sponsor-onboarding-kickoff-spring-2026/) |
+| `/projects/[slug]` | `pages/projects/[slug].astro` | SSG -- Project detail (Portable Text content, team, mentor, outcome, testimonials) | [Zero Trust](https://preview.ywcc-capstone.pages.dev/projects/zero-trust-microsegmentation-network/), [5G Alzheimer's](https://preview.ywcc-capstone.pages.dev/projects/5g-enabled-alzheimers-care-application/), [Blockchain DNS](https://preview.ywcc-capstone.pages.dev/projects/blockchain-secured-dns-infrastructure/) |
+| `/events/[slug]` | `pages/events/[slug].astro` | SSG -- Event detail (date/time, location, type, JSON-LD Event) | [Spring 2026 Showcase](https://preview.ywcc-capstone.pages.dev/events/spring-2026-capstone-showcase/) |
 | `/portal` | `pages/portal/index.astro` | SSR -- Sponsor portal (authenticated, placeholder cards) | [Portal](https://preview.ywcc-capstone.pages.dev/portal/) (requires CF Access auth) |
 | `/portal/api/me` | `pages/portal/api/me.ts` | SSR -- JSON endpoint for authenticated user | -- |
 | `/[...slug]` | `pages/[...slug].astro` | SSG -- Catch-all for CMS pages (about, contact, testimonials, R&D, etc.) | See Pages table above |
@@ -197,7 +214,7 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 | Layer | Count | Details |
 |---|---|---|
-| Unit (Vitest) | 3 test files | `cn()` util, image URL helpers, GROQ query strings |
+| Unit (Vitest) | 3 test files | `cn()` util, image URL helpers (`urlFor` + `safeUrlFor`), GROQ query strings |
 | Component (Vitest + Container API) | 17 test files | All 13 block types + BlockRenderer, BlockWrapper, ProjectCard, Breadcrumb, Header |
 | SSR Smoke (Vitest + Miniflare) | 3 test files | Worker smoke, build output, wrangler config |
 | Integration (Vitest) | Multiple suites | Schema registration, data fetching, architecture validation |
@@ -209,7 +226,8 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 - **Visual Editing** -- Full Sanity Presentation tool integration with stega + Server Islands
 - **GTM Analytics** -- Page views, form events, FAQ expand, carousel nav, link click tracking
 - **JSON-LD Structured Data** -- EducationalOrganization, Organization, Event, BreadcrumbList
-- **SEO** -- Per-page meta, OG/Twitter cards, Content Security Policy
+- **SEO** -- Per-page meta, OG/Twitter cards, Content Security Policy, X-Frame-Options, HSTS
+- **Portable Text** -- Custom renderers for inline images (responsive + lazy), callout blocks (tone-based styling), external links (noopener), and internal link resolution
 - **Build Caching** -- Module-level data caching with parallel batch pre-fetching
 - **Storybook** -- Component documentation deployed to GitHub Pages (~95 pre-built blocks)
 - **Multi-Template System** -- 5 layout templates selectable per-page in CMS
@@ -221,19 +239,19 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 | Stakeholder Section | Status |
 |---|---|
-| 4.1 Homepage | **Updated** -- hero images + heading from WP, logoCloud added. Still needs Featured Projects block. |
-| 4.2 About the Capstone Program | Page exists with test content -- needs WP content migration. Sponsorship Levels need comparison block. |
-| 4.3 Industry Projects Showcase | Projects are still test data -- 9 real projects scraped from WP, need to be migrated. |
-| 4.4 Sponsorship Opportunities | **Form backend live** (Story 6.1) -- Turnstile bot protection, Sanity submissions, Discord notifications. Tiers comparison block still needed. |
-| 4.5 Research and Development | **Done** -- R&D page created with 6 blocks + images from WP content |
-| 4.6 Testimonials and Success Stories | Page exists with test content (industry/student/byProject modes work) |
-| 4.7 Events and Engagement | Page exists with test data -- needs standalone `/events` listing page |
-| 5. How to Become a Sponsor | Page exists with test content -- WP Sponsor Guide has richer content to migrate |
+| 4.1 Homepage | **Updated** -- hero images + heading from WP, logoCloud added, stats updated to real numbers. Still needs Featured Projects block (`projectCards`). Block reorder pending (Sanity Studio drag-and-drop). |
+| 4.2 About the Capstone Program | **Content migrated** -- stats updated with real numbers. Images still placeholder. Sponsorship Levels comparison block still needed. |
+| 4.3 Industry Projects Showcase | **Projects migrated** -- 9 real projects with content, outcomes, sponsor refs, technology tags (predefined list of 66 — Story 7-14, PR #330), team members. Gap: `mentor` field still null (not available in WP data). Sorting controls not yet added. |
+| 4.4 Sponsorship Opportunities | **Standalone page created** (draft) at `/sponsorship-opportunities` with 7 blocks (hero, why sponsor, benefits, stats, testimonials, contact form, logos). Form backend live (Story 6.1). Tiers comparison block still needed. |
+| 4.5 Research and Development | **Done** -- R&D page with 8 blocks: WP content + images, publications/conferences, mentorship/collaboration. Optional stretch: `publication` doc type. |
+| 4.6 Testimonials and Success Stories | **Done** -- 9 real testimonials (7 industry, 2 student) linked to projects. Case Studies page created (draft) at `/case-studies` with byProject testimonials + narrative. |
+| 4.7 Events and Engagement | **Event migrated** -- 1 real event (Spring 2026 Showcase). Still needs standalone `/events` listing page. |
+| 5. How to Become a Sponsor | **Content migrated** -- all WP Sponsor Guide sections (5.1-5.5, FAQs, timeline) in 11 blocks |
 | 6.1 Interactive Sponsor Dashboard | Stub only -- auth works, all features are placeholder cards |
 | 6.2 Event Calendar and Notifications | Partially done -- event list exists, no calendar view or reminders |
 | 7. Design/UX | Done -- responsive, professional, easy CMS editing |
 | 8. CMS | Done (Sanity, not WordPress as originally specified) -- role-based access via Cloudflare Access |
-| 9. Security | Done -- SSL, JWT auth, CSP headers, HTTPS enforced |
+| 9. Security | Done -- SSL, JWT auth, CSP headers, X-Frame-Options, HSTS, HTTPS enforced |
 
 ---
 
@@ -246,8 +264,8 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 - [x] ~~Create R&D CMS page in Sanity with slug `rnd` so the existing nav link works~~ (Done 2026-02-20)
 - [x] ~~Add `textWithImage` / `featureGrid` / `richText` blocks with real-world research focus~~ (Done: 6 blocks)
 - [x] ~~Add hero + textWithImage images from WP site~~ (Done: rnd-hero.jpg + rnd-step3.png)
-- [ ] Add content covering publication and conference opportunities (can add a `richText` or `featureGrid` block to the existing R&D page)
-- [ ] Add content covering mentorship and collaboration (can add blocks to R&D page)
+- [x] ~~Add content covering publication and conference opportunities~~ (Done 2026-02-20: featureGrid block with 3 items — Conference Presentations, Research Publications, Industry Recognition)
+- [x] ~~Add content covering mentorship and collaboration~~ (Done 2026-02-20: textWithImage block with dual-mentorship model, sponsor commitment, Agile practices + about-teams-at-work image)
 - [ ] *(Optional stretch)* Create `publication` document type if structured publication data is needed
 
 #### 4.4 Contact/Sponsor Inquiry Form -- backend (DONE -- Story 6.1)
@@ -258,20 +276,22 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 - [x] ~~Add server-side validation~~ (Done: Zod schema + Cloudflare Turnstile bot protection)
 - [x] ~~Store submissions in Sanity~~ (Done: `submission` document type, viewable in Studio)
 - [x] ~~Update `ContactForm.astro` to submit and handle success/error responses~~ (Done: `import { actions } from 'astro:actions'`)
-- [ ] Add Subject field, office hours, program director info from WP (content gap, not backend)
+- [x] ~~Add office hours, program director info from WP~~ (Done 2026-02-20: featureGrid block with director, office hours, location)
+- [ ] Add Subject field to contact form (requires schema/code change -- not content migration)
 
 ### P1 -- High Priority (core stakeholder requirements)
 
 #### Content migration from WP (Sanity MCP tasks)
 
-- [ ] **Replace 7 test projects** with 9 real projects from WP scrape (see project table above). Each needs: title, slug, sponsor reference, status, semester, content (Portable Text), outcome, team members, mentor, technology tags. Source: `_wp-scrape/scraped-content.md` Projects section.
-- [ ] **Update events** -- replace 7 test events with real event(s). Only 1 real event from WP: Spring 2026 Capstone Showcase (May 7, 2-5 PM, Campus Center Ballroom).
-- [ ] **Update About page** (`bf3c96a6`) -- migrate WP content (mission, core values, 4-step process, 6 benefit cards). Images to upload: about-teams-at-work.jpg, about-screenshot.png, about-img7146.jpg.
-- [ ] **Update How to Become a Sponsor page** (`911c1cfa`) -- WP Sponsor Guide has richer content (5.1-5.5 sections, FAQs). May need to restructure blocks.
-- [ ] **Update Contact page** (`9449931a`) -- add Subject field, office hours, program director info from WP.
-- [ ] **Update testimonials** -- replace test testimonials with content derived from real project outcomes (WP has no dedicated testimonials but projects have notable outcomes).
-- [ ] **Update siteSettings** -- update contact info to match WP (323 Dr MLK Jr Blvd, office hours, social links with Facebook added).
-- [ ] **Delete Pranav test page** (`9288ba72`)
+- [x] ~~**Replace 7 test projects** with 9 real projects from WP scrape~~ (Done 2026-02-20: 9 projects with title, slug, sponsor ref, content, outcome. **Remaining gap:** `technologies`, `teamMembers`, `mentor` fields still null on all 9.)
+- [x] ~~**Backfill project metadata** -- `technologyTags` on all 9, `team` on all 9 (2 with real names from WP, 7 with placeholder members matching WP team sizes: 4-8 per project)~~ (Done 2026-02-20. `mentor` not available in WP data.)
+- [x] ~~**Update events** -- replace 7 test events with real event(s)~~ (Done 2026-02-20: 1 real event -- Spring 2026 Capstone Showcase, May 7 2-5 PM, Campus Center Ballroom)
+- [x] ~~**Update About page** (`bf3c96a6`) -- text content migrated, stats updated with real numbers, images replaced with WP originals (about-teams-at-work.jpg, about-img7146.jpg)~~ (Done 2026-02-20)
+- [x] ~~**Update How to Become a Sponsor page** (`911c1cfa`) -- already migrated: 11 blocks covering WP Sponsor Guide 5.1-5.5 (Applying, Recruitment, Collaboration, Your Contributions, Team Contributions), Timeline, FAQs, logoCloud, testimonials.~~
+- [x] ~~**Update Contact page** (`9449931a`) -- office hours, program director info, and location already populated from WP.~~ **Remaining gap:** Subject field requires schema/code change to the form, not content migration.
+- [x] ~~**Update testimonials** -- replace test testimonials with content derived from real project outcomes~~ (Done 2026-02-20: 9 testimonials -- 7 industry + 2 student -- all linked to project refs)
+- [x] ~~**Update siteSettings** -- patched `contactInfo` (address, email, phone) from WP~~ (Done 2026-02-20. Note: Facebook social link can't be added -- schema `socialLinks.platform` enum only supports github/linkedin/twitter/instagram/youtube. Schema change needed to add Facebook.)
+- [x] ~~**Delete Pranav test page** (`9288ba72`)~~ (Done 2026-02-20)
 
 #### 4.1 Homepage gaps
 
@@ -310,25 +330,38 @@ All 7 sponsors replaced with real companies from the WordPress site. Document ID
 
 #### 4.3 Impact Case Studies
 
-- [ ] *(Option A -- lightweight)* Create a CMS page with slug `case-studies` using `testimonials` blocks in `byProject` display mode combined with `richText` blocks for narrative
+- [x] ~~*(Option A -- lightweight)* Create a CMS page with slug `case-studies` using `testimonials` blocks in `byProject` display mode combined with `richText` blocks for narrative~~ (Done 2026-02-20: 5 blocks — hero, intro richText, testimonials byProject, stats, CTA. Draft ID: `3be9f3cd`)
 - [ ] *(Option B -- structured)* Create a `caseStudy` document type with fields: project reference, challenge, solution, results, sponsor testimonial, and metrics
 - [ ] If Option B: build `CaseStudyCards` page builder block and `CaseStudy` detail page route
 
 #### 4.4 Sponsorship Opportunities standalone page
 
-- [ ] Create a CMS page in Sanity with slug `sponsorship-opportunities` (or consolidate with existing "How to Become a Sponsor" page)
-- [ ] Ensure it includes: Why Sponsor (`textWithImage`/`featureGrid`), Sponsorship Tiers (new block from P1), and Inquiry Form (`contactForm`)
+- [x] ~~Create a CMS page in Sanity with slug `sponsorship-opportunities`~~ (Done 2026-02-20: 7 blocks — hero, Why Sponsor? textWithImage, 6-item benefits featureGrid, stats with $0 cost, testimonials, contactForm, logoCloud. Draft ID: `c4d2001e`. Note: `/sponsors` is a hardcoded Astro route so a separate CMS page was created.)
+- [ ] Add Sponsorship Tiers comparison block once the `sponsorshipTiers` block schema is created (P1)
 
 #### Homepage content arrangement (CMS-only tasks)
 
-- [ ] Review Home page blocks in Sanity Studio and reorder/add blocks to match stakeholder spec order: Hero -> Program Overview -> Sponsor CTA -> Featured Projects -> Sponsor Logos
-- [ ] Update homepage stats to match real program data (84+ teams, 400+ students, 30+ judges, 100% satisfaction)
+- [x] ~~Update homepage stats to match real program data~~ (Done 2026-02-20: 84+ teams, 417+ students, 32+ judges, 100% satisfaction)
+- [ ] Reorder Home page blocks in Sanity Studio (drag-and-drop) to move Testimonials before CTA Banner for better conversion flow. Target order: Hero → Stats → Program Highlights → Testimonials → CTA → Sponsor Steps → Logo Cloud
 
 #### Remaining image uploads
 
-- [ ] Upload about page images: about-teams-at-work.jpg, about-screenshot.png, about-img7146.jpg, about-logo.webp
-- [ ] Upload activities images: activities-hero.jpg, activities-1.jpg, activities-2.jpg, activities-3.jpg
-- [ ] Upload featured-img7985.jpg (projects banner)
+- [x] ~~Upload about page images: about-teams-at-work.jpg, about-screenshot.png, about-img7146.jpg, about-logo.webp~~ (Done 2026-02-20 via API)
+- [x] ~~Upload activities images: activities-hero.jpg, activities-1.jpg, activities-2.jpg, activities-3.jpg~~ (Done 2026-02-20 via API)
+- [x] ~~Upload featured-img7985.jpg (projects banner)~~ (Done 2026-02-20 via API)
+
+**Uploaded image asset IDs:**
+```
+about-teams-at-work  -> image-4e0ce2d181bf3171abf59924b0363252144a0a91-1920x1078-jpg
+about-screenshot     -> image-f0e8060516dbac8e78932f06932a17252b37164b-1920x1006-png
+about-img7146        -> image-73cbcec87cb346397bf7617af9b866cd2d827be0-1921x1441-jpg
+about-logo           -> image-526748e6980d684ad21fdbd7273c2731ed2f43a0-780x585-webp
+featured-img7985     -> image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg
+activities-hero      -> image-7203ad7a8e72a3bfd66d976594a68fc8ba555efc-1024x576-jpg
+activities-1         -> image-3d472828569d9ffdf7d232396c15a0f1fb71c6a2-300x168-jpg
+activities-2         -> image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg
+activities-3         -> image-dbfd7b51588285fc737b6cb0384c838a3b5992bb-293x172-jpg
+```
 
 ### P3 -- Lower Priority (nice-to-have / deferred features)
 

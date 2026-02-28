@@ -37,6 +37,7 @@ export const textWithImage = defineBlock({
       name: 'imagePosition',
       title: 'Image Position',
       type: 'string',
+      fieldset: 'layout',
       options: {
         list: ['left', 'right'],
       },

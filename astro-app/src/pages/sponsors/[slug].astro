@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import { sanityClient, ALL_SPONSOR_SLUGS_QUERY, getSponsorBySlug } from '@/lib/sanity';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
@@ -27,11 +27,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
 
-function sponsorLogoUrl(logo: NonNullable<typeof sponsor>['logo']) {
-  return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(200).height(200).url() : null;
-}
-
-const logoUrl = sponsorLogoUrl(sponsor.logo);
+const logoUrl = safeUrlFor(sponsor.logo)?.width(200).height(200).url() ?? null;
 const projects = sponsor.projects ?? [];
 
 const sponsorJsonLd = {
@@ -45,7 +41,7 @@ const sponsorJsonLd = {
 };
 ---
 
-<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.description ? { metaDescription: sponsor.description } : undefined} template="detail">
+<Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.seo ?? (sponsor.description ? { metaDescription: sponsor.description } : undefined)} template="detail">
   <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
   <Section>
     <SectionContent>
@@ -65,6 +61,7 @@ const sponsorJsonLd = {
               width="200"
               height="200"
               loading="eager"
+              fetchpriority="high"
             />
           </div>
         )}

@@ -14,6 +14,7 @@ const siteUrl = env.PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || "http://lo
 const studioUrl = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 const gtmId = env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID || "";
 const visualEditingEnabled = env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || "";
+const liveContentEnabled = env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED || process.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED || "";
 
 export default defineConfig({
   output: "static",
@@ -21,12 +22,16 @@ export default defineConfig({
   adapter: cloudflare({ platformProxy: { enabled: true } }),
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      noExternal: ["nanostores", "@nanostores/react"],
+    },
     define: {
       // Explicitly pass PUBLIC_* vars through Vite's define for .astro files.
       // The @astrojs/cloudflare adapter's define: { "process.env": "process.env" }
       // prevents Vite from picking these up via its normal envPrefix mechanism.
       "import.meta.env.PUBLIC_GTM_ID": JSON.stringify(gtmId),
       "import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED": JSON.stringify(visualEditingEnabled),
+      "import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED": JSON.stringify(liveContentEnabled),
     },
   },
   integrations: [

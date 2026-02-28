@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {CommentIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const testimonial = defineType({
   name: 'testimonial',
@@ -7,7 +8,7 @@ export const testimonial = defineType({
   type: 'document',
   icon: CommentIcon,
   preview: {
-    select: {title: 'name', subtitle: 'organization'},
+    select: {title: 'name', subtitle: 'organization', media: 'photo'},
   },
   fields: [
     defineField({
@@ -16,6 +17,7 @@ export const testimonial = defineType({
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
+    siteField,
     defineField({
       name: 'quote',
       title: 'Quote',

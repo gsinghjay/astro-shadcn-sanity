@@ -70,8 +70,9 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(bgField!.type).toBe('string')
 
       const options = (bgField as any).options?.list
-      expect(options).toEqual(expect.arrayContaining(['white', 'light', 'dark', 'primary']))
-      expect(options).toHaveLength(4)
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(expect.arrayContaining(['white', 'light', 'dark', 'primary']))
+      expect(values).toHaveLength(4)
     })
 
     test('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', () => {
@@ -80,8 +81,9 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(spacingField!.type).toBe('string')
 
       const options = (spacingField as any).options?.list
-      expect(options).toEqual(expect.arrayContaining(['none', 'small', 'default', 'large']))
-      expect(options).toHaveLength(4)
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(expect.arrayContaining(['none', 'small', 'default', 'large']))
+      expect(values).toHaveLength(4)
     })
 
     test('[P0] 1.3-INT-006 — blockBaseFields contains maxWidth with constrained presets', () => {
@@ -90,8 +92,9 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(maxWidthField!.type).toBe('string')
 
       const options = (maxWidthField as any).options?.list
-      expect(options).toEqual(expect.arrayContaining(['narrow', 'default', 'full']))
-      expect(options).toHaveLength(3)
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(expect.arrayContaining(['narrow', 'default', 'full']))
+      expect(values).toHaveLength(3)
     })
   })
 
@@ -168,7 +171,8 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(variantField.type).toBe('string')
 
       const options = variantField.options?.list
-      expect(options).toEqual(
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(
         expect.arrayContaining(['default', 'secondary', 'outline', 'ghost']),
       )
     })

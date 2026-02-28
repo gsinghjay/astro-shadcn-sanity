@@ -246,28 +246,6 @@ export type Submission = {
   submittedAt?: string;
 };
 
-export type Event = {
-  _id: string;
-  _type: "event";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  date?: string;
-  endDate?: string;
-  location?: string;
-  description?: string;
-  eventType?: "showcase" | "networking" | "workshop";
-  status?: "upcoming" | "past";
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type ProjectReference = {
   _ref: string;
   _type: "reference";
@@ -282,6 +260,7 @@ export type Testimonial = {
   _updatedAt: string;
   _rev: string;
   name?: string;
+  site?: "rwc-us" | "rwc-intl";
   quote?: string;
   role?: string;
   organization?: string;
@@ -313,102 +292,6 @@ export type SanityImageHotspot = {
   width?: number;
 };
 
-export type Project = {
-  _id: string;
-  _type: "project";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  sponsor?: SponsorReference;
-  status?: "active" | "completed" | "archived";
-  semester?: string;
-  content?: PortableText;
-  outcome?: string;
-  team?: Array<{
-    name?: string;
-    role?: string;
-    _key: string;
-  }>;
-  mentor?: string;
-  technologyTags?: Array<string>;
-};
-
-export type PageReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "page";
-};
-
-export type PortableText = Array<
-  | {
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
-      listItem?: "bullet" | "number";
-      markDefs?: Array<
-        | {
-            href?: string;
-            _type: "link";
-            _key: string;
-          }
-        | {
-            reference?: PageReference;
-            _type: "internalLink";
-            _key: string;
-          }
-      >;
-      level?: number;
-      _type: "block";
-      _key: string;
-    }
-  | {
-      asset?: SanityImageAssetReference;
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      alt?: string;
-      caption?: string;
-      _type: "image";
-      _key: string;
-    }
-  | {
-      tone?: "info" | "warning" | "success";
-      text?: string;
-      _type: "callout";
-      _key: string;
-    }
->;
-
-export type Sponsor = {
-  _id: string;
-  _type: "sponsor";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  slug?: Slug;
-  logo?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  description?: string;
-  website?: string;
-  industry?: string;
-  tier?: "platinum" | "gold" | "silver" | "bronze";
-  featured?: boolean;
-};
-
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -416,6 +299,7 @@ export type SiteSettings = {
   _updatedAt: string;
   _rev: string;
   siteName?: string;
+  site?: "rwc-us" | "rwc-intl";
   siteDescription?: string;
   logo?: {
     asset?: SanityImageAssetReference;
@@ -520,6 +404,68 @@ export type FaqItem = {
   answer?: PortableText;
 };
 
+export type PageReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "page";
+};
+
+export type EventReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "event";
+};
+
+export type PortableText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "normal" | "h2" | "h3" | "h4" | "blockquote";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<
+        | {
+            href?: string;
+            _type: "link";
+            _key: string;
+          }
+        | {
+            reference?:
+              | PageReference
+              | SponsorReference
+              | ProjectReference
+              | EventReference;
+            _type: "internalLink";
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      caption?: string;
+      _type: "image";
+      _key: string;
+    }
+  | {
+      tone?: "info" | "warning" | "success";
+      text?: string;
+      _type: "callout";
+      _key: string;
+    }
+>;
+
 export type Page = {
   _id: string;
   _type: "page";
@@ -528,6 +474,7 @@ export type Page = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
   template?: "default" | "fullWidth" | "landing" | "sidebar" | "twoColumn";
   seo?: Seo;
   blocks?: Array<
@@ -573,6 +520,97 @@ export type Page = {
   >;
 };
 
+export type Project = {
+  _id: string;
+  _type: "project";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  sponsor?: SponsorReference;
+  status?: "active" | "completed" | "archived";
+  semester?: string;
+  content?: PortableText;
+  outcome?: string;
+  team?: Array<{
+    name?: string;
+    role?: string;
+    _key: string;
+  }>;
+  mentor?: string;
+  technologyTags?: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "CSS"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "Custom Theme"
+    | "DNS Security"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "HTML"
+    | "Healthcare IoT"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "NLP"
+    | "Network Security"
+    | "Next.js"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "REST API"
+    | "React"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "VLAN Configuration"
+    | "Video Processing"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  >;
+  seo?: Seo;
+};
+
 export type Seo = {
   _type: "seo";
   metaTitle?: string;
@@ -585,6 +623,57 @@ export type Seo = {
     alt?: string;
     _type: "image";
   };
+};
+
+export type Event = {
+  _id: string;
+  _type: "event";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  date?: string;
+  endDate?: string;
+  location?: string;
+  description?: string;
+  isAllDay?: boolean;
+  color?: "red" | "blue" | "green" | "orange" | "purple";
+  eventType?: "showcase" | "networking" | "workshop";
+  status?: "upcoming" | "past";
+  seo?: Seo;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Sponsor = {
+  _id: string;
+  _type: "sponsor";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  logo?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  description?: string;
+  website?: string;
+  industry?: string;
+  tier?: "platinum" | "gold" | "silver" | "bronze";
+  featured?: boolean;
+  seo?: Seo;
 };
 
 export type Link = {
@@ -772,23 +861,24 @@ export type AllSanitySchemaTypes =
   | FeatureGrid
   | HeroBanner
   | Submission
-  | Event
-  | Slug
   | ProjectReference
   | Testimonial
   | SanityImageCrop
   | SanityImageHotspot
-  | Project
-  | PageReference
-  | PortableText
-  | Sponsor
   | SiteSettings
   | StepItem
   | StatItem
   | FeatureItem
   | FaqItem
+  | PageReference
+  | EventReference
+  | PortableText
   | Page
+  | Project
   | Seo
+  | Event
+  | Slug
+  | Sponsor
   | Link
   | Button
   | FormField
@@ -927,7 +1017,7 @@ export type ALL_SPONSOR_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SPONSOR_BY_SLUG_QUERY
-// Query: *[_type == "sponsor" && slug.current == $slug][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }}
+// Query: *[_type == "sponsor" && slug.current == $slug][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }}
 export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   _id: string;
   name: string | null;
@@ -950,6 +1040,21 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   website: string | null;
   featured: boolean | null;
   industry: string | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
   projects: Array<{
     _id: string;
     title: string | null;
@@ -984,7 +1089,74 @@ export type ALL_PROJECTS_QUERY_RESULT = Array<{
     } | null;
     industry: string | null;
   } | null;
-  technologyTags: Array<string> | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
   semester: string | null;
   status: "active" | "archived" | "completed" | null;
   outcome: string | null;
@@ -999,12 +1171,80 @@ export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  content,  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor,  outcome,  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+// Query: *[_type == "project" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor,  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
   slug: string | null;
-  content: PortableText | null;
+  content: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs: Array<
+          | {
+              reference:
+                | {
+                    _type: "event";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "page";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "project";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "sponsor";
+                    slug: string | null;
+                  }
+                | null;
+              _type: "internalLink";
+              _key: string;
+            }
+          | {
+              href?: string;
+              _type: "link";
+              _key: string;
+            }
+        > | null;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        tone?: "info" | "success" | "warning";
+        text?: string;
+        _type: "callout";
+        _key: string;
+        markDefs: null;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: SanityImageDimensions | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt: string | null;
+        caption: string | null;
+        _type: "image";
+        _key: string;
+        markDefs: null;
+      }
+  > | null;
   sponsor: {
     _id: string;
     name: string | null;
@@ -1027,7 +1267,74 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     description: string | null;
     website: string | null;
   } | null;
-  technologyTags: Array<string> | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
   semester: string | null;
   status: "active" | "archived" | "completed" | null;
   team: Array<{
@@ -1037,6 +1344,21 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   }> | null;
   mentor: string | null;
   outcome: string | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
   testimonials: Array<{
     _id: string;
     name: string | null;
@@ -1106,6 +1428,20 @@ export type ALL_EVENTS_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: EVENTS_BY_MONTH_QUERY
+// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status}
+export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  date: string | null;
+  endDate: string | null;
+  location: string | null;
+  eventType: "networking" | "showcase" | "workshop" | null;
+  status: "past" | "upcoming" | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_EVENT_SLUGS_QUERY
 // Query: *[_type == "event" && defined(slug.current)]{ "slug": slug.current }
 export type ALL_EVENT_SLUGS_QUERY_RESULT = Array<{
@@ -1114,7 +1450,7 @@ export type ALL_EVENT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENT_BY_SLUG_QUERY
-// Query: *[_type == "event" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status}
+// Query: *[_type == "event" && slug.current == $slug][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
 export type EVENT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1125,11 +1461,26 @@ export type EVENT_BY_SLUG_QUERY_RESULT = {
   description: string | null;
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{...},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{...}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    }  }}
+// Query: *[_type == "page" && slug.current == $slug][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1242,7 +1593,75 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         items: Array<{
           _key: string;
           question: string | null;
-          answer: PortableText | null;
+          answer: Array<
+            | {
+                children?: Array<{
+                  marks?: Array<string>;
+                  text?: string;
+                  _type: "span";
+                  _key: string;
+                }>;
+                style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                listItem?: "bullet" | "number";
+                markDefs: Array<
+                  | {
+                      reference:
+                        | {
+                            _type: "event";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "page";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "project";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "sponsor";
+                            slug: string | null;
+                          }
+                        | null;
+                      _type: "internalLink";
+                      _key: string;
+                    }
+                  | {
+                      href?: string;
+                      _type: "link";
+                      _key: string;
+                    }
+                > | null;
+                level?: number;
+                _type: "block";
+                _key: string;
+              }
+            | {
+                tone?: "info" | "success" | "warning";
+                text?: string;
+                _type: "callout";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt: string | null;
+                caption: string | null;
+                _type: "image";
+                _key: string;
+                markDefs: null;
+              }
+          > | null;
         }> | null;
       }
     | {
@@ -1327,9 +1746,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               }>;
               style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
               listItem?: "bullet" | "number";
-              markDefs?: Array<
+              markDefs: Array<
                 | {
-                    reference?: PageReference;
+                    reference:
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
                     _type: "internalLink";
                     _key: string;
                   }
@@ -1338,7 +1774,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                     _type: "link";
                     _key: string;
                   }
-              >;
+              > | null;
               level?: number;
               _type: "block";
               _key: string;
@@ -1348,16 +1784,25 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               text?: string;
               _type: "callout";
               _key: string;
+              markDefs: null;
             }
           | {
-              asset?: SanityImageAssetReference;
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
               media?: unknown;
               hotspot?: SanityImageHotspot;
               crop?: SanityImageCrop;
-              alt?: string;
-              caption?: string;
+              alt: string | null;
+              caption: string | null;
               _type: "image";
               _key: string;
+              markDefs: null;
             }
         > | null;
       }
@@ -1443,9 +1888,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               }>;
               style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
               listItem?: "bullet" | "number";
-              markDefs?: Array<
+              markDefs: Array<
                 | {
-                    reference?: PageReference;
+                    reference:
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
                     _type: "internalLink";
                     _key: string;
                   }
@@ -1454,7 +1916,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                     _type: "link";
                     _key: string;
                   }
-              >;
+              > | null;
               level?: number;
               _type: "block";
               _key: string;
@@ -1464,16 +1926,25 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               text?: string;
               _type: "callout";
               _key: string;
+              markDefs: null;
             }
           | {
-              asset?: SanityImageAssetReference;
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
               media?: unknown;
               hotspot?: SanityImageHotspot;
               crop?: SanityImageCrop;
-              alt?: string;
-              caption?: string;
+              alt: string | null;
+              caption: string | null;
               _type: "image";
               _key: string;
+              markDefs: null;
             }
         > | null;
         image: {
@@ -1500,14 +1971,15 @@ declare module "@sanity/client" {
     '*[_type == "page" && defined(slug.current)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor"] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && defined(slug.current)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor" && slug.current == $slug][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor" && slug.current == $slug][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "project"] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },\n  technologyTags,\n  semester,\n  status,\n  outcome\n}': ALL_PROJECTS_QUERY_RESULT;
     '*[_type == "project" && defined(slug.current)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
-    '*[_type == "project" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial"] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "event"] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status\n}': ALL_EVENTS_QUERY_RESULT;
+    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
-    '*[_type == "event" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status\n}': EVENT_BY_SLUG_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{...},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{...}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "event" && slug.current == $slug][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

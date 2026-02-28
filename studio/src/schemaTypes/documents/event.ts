@@ -1,11 +1,16 @@
 import {defineType, defineField} from 'sanity'
-import {CalendarIcon} from '@sanity/icons'
+import {CalendarIcon, SearchIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const event = defineType({
   name: 'event',
   title: 'Event',
   type: 'document',
   icon: CalendarIcon,
+  groups: [
+    {name: 'main', title: 'Main', default: true},
+    {name: 'seo', title: 'SEO', icon: SearchIcon},
+  ],
   orderings: [
     {title: 'Date (newest)', name: 'dateDesc', by: [{field: 'date', direction: 'desc'}]},
     {title: 'Date (oldest)', name: 'dateAsc', by: [{field: 'date', direction: 'asc'}]},
@@ -19,25 +24,30 @@ export const event = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'main',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'main',
       options: {source: 'title', maxLength: 96},
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'main'},
     defineField({
       name: 'date',
       title: 'Start Date',
       type: 'datetime',
+      group: 'main',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'endDate',
       title: 'End Date',
       type: 'datetime',
+      group: 'main',
       validation: (Rule) =>
         Rule.custom((endDate, context) => {
           const startDate = (context.document as Record<string, unknown>)?.date as
@@ -53,16 +63,42 @@ export const event = defineType({
       name: 'location',
       title: 'Location',
       type: 'string',
+      group: 'main',
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      group: 'main',
+    }),
+    defineField({
+      name: 'isAllDay',
+      title: 'All-Day Event',
+      type: 'boolean',
+      group: 'main',
+      initialValue: false,
+    }),
+    defineField({
+      name: 'color',
+      title: 'Calendar Color',
+      type: 'string',
+      group: 'main',
+      description: 'Optional calendar color override. Falls back to event type color if not set.',
+      options: {
+        list: [
+          {title: 'Red', value: 'red'},
+          {title: 'Blue', value: 'blue'},
+          {title: 'Green', value: 'green'},
+          {title: 'Orange', value: 'orange'},
+          {title: 'Purple', value: 'purple'},
+        ],
+      },
     }),
     defineField({
       name: 'eventType',
       title: 'Event Type',
       type: 'string',
+      group: 'main',
       options: {
         list: [
           {title: 'Showcase', value: 'showcase'},
@@ -76,6 +112,7 @@ export const event = defineType({
       name: 'status',
       title: 'Status',
       type: 'string',
+      group: 'main',
       options: {
         list: [
           {title: 'Upcoming', value: 'upcoming'},
@@ -84,6 +121,12 @@ export const event = defineType({
         layout: 'radio',
       },
       initialValue: 'upcoming',
+    }),
+    defineField({
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      group: 'seo',
     }),
   ],
 })

@@ -12,6 +12,11 @@ interface DefineBlockConfig {
 }
 
 export function defineBlock(config: DefineBlockConfig) {
+  const selectFields: Record<string, string> = {
+    heading: 'heading',
+    ...(config.preview?.select ?? {}),
+  }
+
   return defineType({
     name: config.name,
     title: config.title,
@@ -21,7 +26,16 @@ export function defineBlock(config: DefineBlockConfig) {
       ...(config.fieldsets ?? []),
     ],
     fields: [...blockBaseFields, ...config.fields],
-    preview: config.preview,
+    preview: {
+      select: selectFields,
+      prepare(selection) {
+        return {
+          title: (selection.heading as string) || config.title,
+          subtitle: config.title,
+          media: config.icon,
+        }
+      },
+    },
     icon: config.icon,
   })
 }

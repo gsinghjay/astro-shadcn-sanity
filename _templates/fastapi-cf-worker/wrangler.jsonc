@@ -1,0 +1,77 @@
+{
+  // IDE autocompletion for all wrangler config fields
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // Worker name — this is how it appears in the Cloudflare dashboard
+  // Change this when you fork the template (e.g., "discord-bot", "platform-api")
+  "name": "fastapi-cf-worker",
+
+  // Entrypoint — must point to the Python file containing the WorkerEntrypoint class
+  "main": "src/main.py",
+
+  // Runtime feature date — controls which Workers runtime features are available
+  // Use a recent date; newer dates enable newer default behaviors
+  "compatibility_date": "2026-02-09",
+
+  // Required flags:
+  // - "python_workers": enables the Python runtime (may be auto-detected from .py entrypoint,
+  //   but explicit is safer and makes the intent clear)
+  "compatibility_flags": ["python_workers"],
+
+  // ──────────────────────────────────────────────
+  // BINDINGS — how your Python code accesses Cloudflare services
+  // Each binding creates a property on the `env` object (e.g., env.KV, env.DB)
+  // ──────────────────────────────────────────────
+
+  // KV Namespace — fast key-value storage (< 25 MiB per value)
+  // Access in Python: env.KV.get("key"), env.KV.put("key", "value")
+  // Create with: npx wrangler kv namespace create "KV"
+  // Then paste the id here:
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "<your-kv-namespace-id>"
+    }
+  ],
+
+  // D1 Database — serverless SQLite
+  // Access in Python: env.DB.prepare("SELECT * FROM users").all()
+  // Create with: npx wrangler d1 create <db-name>
+  // Then paste the id here:
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "<your-db-name>",
+      "database_id": "<your-d1-database-id>"
+    }
+  ],
+
+  // Workers AI — run ML models on Cloudflare's GPU network
+  // Access in Python: env.AI.run("@cf/meta/llama-3-8b-instruct", { "prompt": "..." })
+  "ai": {
+    "binding": "AI"
+  },
+
+  // Non-sensitive config variables — visible in the CF dashboard
+  // Access in Python: env.ENVIRONMENT (returns the string value)
+  "vars": {
+    "ENVIRONMENT": "development"
+  },
+
+  // Cron Triggers — scheduled tasks (all times are UTC!)
+  // Each pattern triggers the scheduled() method on your WorkerEntrypoint class
+  // Tip: 0 14 * * 1 = 14:00 UTC Monday = 9:00 AM ET (EST) / 10:00 AM ET (EDT)
+  "triggers": {
+    "crons": [
+      // "*/5 * * * *"    // Every 5 minutes (uncomment to enable)
+      // "0 14 * * 1"     // Weekly on Monday at 14:00 UTC
+    ]
+  }
+
+  // Observability — enable to push Worker logs to an analytics destination
+  // Docs: https://developers.cloudflare.com/workers/observability/
+  // "observability": {
+  //   "enabled": true,
+  //   "head_sampling_rate": 1   // 0–1; 1 = log every request (dev), lower for high-traffic prod
+  // }
+}

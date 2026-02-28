@@ -24,17 +24,19 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
       expect(sponsor.type).toBe('document')
     })
 
-    test('[P0] 3.1-INT-002 — sponsor schema has all 8 required fields', () => {
+    test('[P0] 3.1-INT-002 — sponsor schema has all required fields', () => {
       const fieldNames = (sponsor as any).fields.map((f: any) => f.name)
-      expect(fieldNames).toHaveLength(8)
+      expect(fieldNames).toHaveLength(10)
       expect(fieldNames).toContain('name')
       expect(fieldNames).toContain('slug')
+      expect(fieldNames).toContain('site')
       expect(fieldNames).toContain('logo')
       expect(fieldNames).toContain('description')
       expect(fieldNames).toContain('website')
       expect(fieldNames).toContain('industry')
       expect(fieldNames).toContain('tier')
       expect(fieldNames).toContain('featured')
+      expect(fieldNames).toContain('seo')
     })
 
     test('[P0] 3.1-INT-003 — name field is required string', () => {
@@ -91,10 +93,11 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
 
       const options = tierField.options?.list
       expect(options).toBeDefined()
-      expect(options).toEqual(
+      const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
+      expect(values).toEqual(
         expect.arrayContaining(['platinum', 'gold', 'silver', 'bronze']),
       )
-      expect(options).toHaveLength(4)
+      expect(values).toHaveLength(4)
     })
 
     test('[P0] 3.1-INT-010 — featured field is boolean with initialValue false', () => {

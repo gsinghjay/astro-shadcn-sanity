@@ -16,6 +16,17 @@ import type {
 
 export { sanityClient, groq };
 
+const IMAGE_PROJECTION = `asset->{ _id, url, metadata { lqip, dimensions } }`;
+
+const PORTABLE_TEXT_PROJECTION = `{
+  ...,
+  _type == "image" => { ${IMAGE_PROJECTION}, alt, caption },
+  markDefs[]{
+    ...,
+    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }
+  }
+}`;
+
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
@@ -45,8 +56,27 @@ export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
 export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
 
 /**
+ * Module-level sync tag collector.
+ * Accumulates sync tags from all loadQuery() calls during a page render.
+ * Use getSyncTags() to retrieve and resetSyncTags() to clear between pages.
+ */
+const _syncTagsCollector: Set<string> = new Set();
+
+/** Returns all sync tags collected since last reset. */
+export function getSyncTags(): string[] {
+  return [..._syncTagsCollector];
+}
+
+/** Clears collected sync tags. Call at the start of each page render. */
+export function resetSyncTags(): void {
+  _syncTagsCollector.clear();
+}
+
+/**
  * Fetch wrapper that enables stega encoding + draft perspective
  * when visual editing is active (Presentation tool).
+ * Returns { result, syncTags } — sync tags are also accumulated in the
+ * module-level collector for serialization into the HTML response.
  */
 export async function loadQuery<T>({
   query,
@@ -54,7 +84,7 @@ export async function loadQuery<T>({
 }: {
   query: string;
   params?: QueryParams;
-}): Promise<T> {
+}): Promise<{ result: T; syncTags: string[] }> {
   if (visualEditingEnabled && !token) {
     throw new Error(
       "The `SANITY_API_READ_TOKEN` environment variable is required during Visual Editing.",
@@ -63,7 +93,7 @@ export async function loadQuery<T>({
 
   const perspective = visualEditingEnabled ? "drafts" : "published";
 
-  const { result } = await sanityClient.fetch<T>(query, params ?? {}, {
+  const response = await sanityClient.fetch<T>(query, params ?? {}, {
     filterResponse: false,
     perspective,
     resultSourceMap: visualEditingEnabled ? "withKeyArraySelector" : false,
@@ -71,7 +101,10 @@ export async function loadQuery<T>({
     ...(visualEditingEnabled ? { token } : {}),
   });
 
-  return result;
+  const syncTags: string[] = (response as any).syncTags ?? [];
+  syncTags.forEach(tag => _syncTagsCollector.add(tag));
+
+  return { result: (response as any).result, syncTags };
 }
 
 /**
@@ -80,8 +113,8 @@ export async function loadQuery<T>({
 export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings"][0]{
   siteName,
   siteDescription,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
-  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+  logo{ ${IMAGE_PROJECTION}, alt },
+  logoLight{ ${IMAGE_PROJECTION}, alt },
   navigationItems[]{ _key, label, href, children[]{ _key, label, href } },
   ctaButton{ text, url },
   footerContent{ text, copyrightText },
@@ -103,7 +136,7 @@ let _siteSettingsCache: NonNullable<SITE_SETTINGS_QUERY_RESULT> | null = null;
 export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY_RESULT>> {
   if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
 
-  const result = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
+  const { result } = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
     query: SITE_SETTINGS_QUERY,
   });
 
@@ -129,7 +162,7 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
  */
 export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor"] | order(name asc){
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured
 }`);
 
@@ -142,7 +175,7 @@ let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
 
 export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
   if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
-  const result = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
+  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
 }
@@ -158,8 +191,9 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
  */
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug][0]{
   _id, name, "slug": slug.current,
-  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
+  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }
 }`);
 
@@ -167,10 +201,11 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
  * Fetch a single sponsor by slug from Sanity.
  */
 export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
     query: SPONSOR_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -202,7 +237,7 @@ export function resolveBlockSponsors(
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project"] | order(title asc){
   _id, title, "slug": slug.current,
   content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry },
   technologyTags,
   semester,
   status,
@@ -217,7 +252,7 @@ let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
 
 export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _projectsCache) return _projectsCache;
-  const result = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
+  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
   _projectsCache = result ?? [];
   return _projectsCache;
 }
@@ -233,25 +268,27 @@ export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && 
  */
 export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug][0]{
   _id, title, "slug": slug.current,
-  content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },
+  content[]${PORTABLE_TEXT_PROJECTION},
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
   technologyTags,
   semester,
   status,
   team[]{ _key, name, role },
   mentor,
   outcome,
-  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }
+  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
 /**
  * Fetch a single project by slug from Sanity.
  */
 export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
     query: PROJECT_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -260,7 +297,7 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
  */
 export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial"] | order(name asc){
   _id, name, quote, role, organization, type,
-  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },
+  photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   project->{ _id, title, "slug": slug.current }
 }`);
 
@@ -273,7 +310,7 @@ let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
 
 export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
   if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
-  const result = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
+  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
   _testimonialsCache = result ?? [];
   return _testimonialsCache;
 }
@@ -314,7 +351,7 @@ let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
 
 export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _eventsCache) return _eventsCache;
-  const result = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
+  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
   _eventsCache = result ?? [];
   return _eventsCache;
 }
@@ -350,6 +387,18 @@ export function resolveBlockEvents(
 }
 
 /**
+ * GROQ query: fetch events within a date range for calendar month navigation.
+ * For future use when event volume grows — current implementation uses pre-fetched getAllEvents().
+ */
+export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
+  && dateTime(date) >= dateTime($monthStart)
+  && dateTime(date) <= dateTime($monthEnd)
+] | order(date asc) {
+  _id, title, "slug": slug.current, date, endDate,
+  location, eventType, status
+}`);
+
+/**
  * GROQ query: fetch all event slugs for static path generation.
  */
 export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defined(slug.current)]{ "slug": slug.current }`);
@@ -359,17 +408,19 @@ export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defi
  */
 export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug][0]{
   _id, title, "slug": slug.current,
-  date, endDate, location, description, eventType, status
+  date, endDate, location, description, eventType, status,
+  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
 }`);
 
 /**
  * Fetch a single event by slug from Sanity.
  */
 export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
-  return loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
     query: EVENT_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }
 
 /**
@@ -386,7 +437,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   seo {
     metaTitle,
     metaDescription,
-    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }
+    ogImage { ${IMAGE_PROJECTION}, alt }
   },
   blocks[]{
     _type,
@@ -397,13 +448,13 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "heroBanner" => {
       heading,
       subheading,
-      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
       ctaButtons[]{ _key, text, url, variant },
       alignment
     },
     _type == "featureGrid" => {
       heading,
-      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },
+      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
       columns
     },
     _type == "ctaBanner" => {
@@ -417,8 +468,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "textWithImage" => {
       heading,
-      content[]{...},
-      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },
+      content[]${PORTABLE_TEXT_PROJECTION},
+      image{ ${IMAGE_PROJECTION}, alt },
       imagePosition
     },
     _type == "logoCloud" => {
@@ -433,11 +484,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       ctaButtons[]{ _key, text, url, variant }
     },
     _type == "richText" => {
-      content[]{...}
+      content[]${PORTABLE_TEXT_PROJECTION}
     },
     _type == "faqSection" => {
       heading,
-      items[]{ _key, question, answer }
+      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
     },
     _type == "contactForm" => {
       heading,
@@ -481,7 +532,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
     chunks.push(slugs.slice(i, i + concurrency));
   }
   for (const chunk of chunks) {
-    const results = await Promise.all(
+    const responses = await Promise.all(
       chunk.map(slug =>
         loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
           query: PAGE_BY_SLUG_QUERY,
@@ -489,7 +540,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
         }),
       ),
     );
-    chunk.forEach((slug, i) => _pageCache.set(slug, results[i]));
+    chunk.forEach((slug, i) => _pageCache.set(slug, responses[i].result));
   }
 }
 
@@ -499,8 +550,9 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
  */
 export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> {
   if (!visualEditingEnabled && _pageCache.has(slug)) return _pageCache.get(slug)!;
-  return loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
+  const { result } = await loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
     params: { slug },
   });
+  return result;
 }

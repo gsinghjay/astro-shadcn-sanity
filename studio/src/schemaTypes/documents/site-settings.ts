@@ -2,6 +2,7 @@ import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CogIcon, ImageIcon, MenuIcon, BlockContentIcon, UsersIcon} from '@sanity/icons'
 import {linkFields} from '../objects/link'
 import {buttonFields} from '../objects/button'
+import {siteField} from '../fields/site-field'
 
 // Singleton document — use desk structure to limit to a single instance
 export const siteSettings = defineType({
@@ -23,6 +24,7 @@ export const siteSettings = defineType({
       group: 'branding',
       validation: (Rule) => Rule.required(),
     }),
+    {...siteField, group: 'branding'},
     defineField({
       name: 'siteDescription',
       title: 'Site Description',
@@ -134,6 +136,7 @@ export const siteSettings = defineType({
               options: {
                 list: ['github', 'linkedin', 'twitter', 'instagram', 'youtube'],
               },
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'url',
@@ -160,6 +163,7 @@ export const siteSettings = defineType({
           name: 'email',
           title: 'Email',
           type: 'string',
+          validation: (Rule) => Rule.email().warning(),
         }),
         defineField({
           name: 'phone',

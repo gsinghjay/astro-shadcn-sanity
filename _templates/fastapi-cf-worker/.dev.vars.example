@@ -1,0 +1,32 @@
+# ============================================================
+# Local Development Secrets
+# ============================================================
+# Copy this file to .dev.vars:
+#   cp .dev.vars.example .dev.vars
+#
+# NEVER commit .dev.vars — it contains real secrets!
+# The .gitignore already excludes it.
+# ============================================================
+
+# --- API Authentication ---
+# Used by the verify_api_key dependency to protect routes
+API_KEY="your-api-key-here"
+ADMIN_API_KEY="your-admin-api-key-here"
+
+# --- Sanity CMS ---
+SANITY_API_READ_TOKEN="sk..."
+SANITY_API_WRITE_TOKEN="sk..."
+
+# --- Discord (bot workers only) ---
+DISCORD_BOT_TOKEN="your-bot-token"
+DISCORD_APP_ID="your-app-id"
+DISCORD_PUBLIC_KEY="your-public-key"
+
+# --- Cloudflare API (optional — for workers that call CF APIs) ---
+CF_API_TOKEN="your-cf-api-token"
+TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
+
+# --- Wrangler Auth (for deploy from Docker / CI) ---
+# Create at: https://dash.cloudflare.com/profile/api-tokens
+# Use the "Edit Cloudflare Workers" template
+# CLOUDFLARE_API_TOKEN="your-wrangler-api-token"

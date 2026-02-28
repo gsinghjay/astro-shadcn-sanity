@@ -537,7 +537,6 @@ Optimize for fast First Contentful Paint and Largest Contentful Paint on 4G conn
 | Pranav Chintala | [@pac27-cloud](https://github.com/pac27-cloud) | Team Member |
 | | | |
 | | | |
-| | | |
 
 > **Team members:** Add your name, GitHub link, and role by editing this table on a feature branch and opening a PR to `preview`.
 
