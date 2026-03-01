@@ -68,9 +68,9 @@ function excerptFromPortableText(
   if (!content || !Array.isArray(content)) return '';
   const texts: string[] = [];
   for (const block of content) {
-    if (block._type === 'block' && Array.isArray((block as any).children)) {
-      for (const child of (block as any).children) {
-        if (child._type === 'span' && typeof child.text === 'string') {
+    if (block._type === 'block' && block.children) {
+      for (const child of block.children) {
+        if (child._type === 'span' && child.text) {
           texts.push(child.text);
         }
       }

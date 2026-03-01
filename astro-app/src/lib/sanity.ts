@@ -12,7 +12,6 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
-  SPONSOR_BY_EMAIL_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };

@@ -4,48 +4,68 @@ export const prerender = false;
 import PortalLayout from '@/layouts/PortalLayout.astro';
 import SponsorProjects from '@/components/portal/SponsorProjects';
 import { loadQuery, SPONSOR_PORTAL_QUERY, getSiteParams } from '@/lib/sanity';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import type { SPONSOR_PORTAL_QUERY_RESULT } from '@/sanity.types';
 
 const user = Astro.locals.user;
 const slug = Astro.params.sponsorSlug;
 
-if (!slug) {
-  return new Response('Not Found', { status: 404 });
+// Fetch sponsor with projects (only when slug present)
+let sponsor: SPONSOR_PORTAL_QUERY_RESULT = null;
+if (slug) {
+  const { result } = await loadQuery<SPONSOR_PORTAL_QUERY_RESULT>({
+    query: SPONSOR_PORTAL_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  sponsor = result;
 }
 
-// Fetch sponsor with projects
-const { result: sponsor } = await loadQuery<SPONSOR_PORTAL_QUERY_RESULT>({
-  query: SPONSOR_PORTAL_QUERY,
-  params: { slug, ...getSiteParams() },
-});
-
-// 404 — sponsor not found
+// Set 404 status when sponsor not found
 if (!sponsor) {
-  return new Response('Not Found', { status: 404 });
+  Astro.response.status = 404;
 }
 
 // Authorization check — stegaClean needed because Visual Editing injects invisible chars
-const cleanContactEmail = stegaClean(sponsor.contactEmail);
-const cleanAllowedEmails = sponsor.allowedEmails?.map(e => stegaClean(e)) ?? [];
-const isAuthorized =
-  user?.email === cleanContactEmail ||
-  cleanAllowedEmails.includes(user?.email ?? '');
+let isAuthorized = false;
+if (sponsor) {
+  const cleanContactEmail = stegaClean(sponsor.contactEmail);
+  const cleanAllowedEmails = sponsor.allowedEmails?.map(e => stegaClean(e)) ?? [];
+  isAuthorized =
+    user?.email === cleanContactEmail ||
+    cleanAllowedEmails.includes(user?.email ?? '');
+}
 
-// Build logo URL via urlFor()
-const logoUrl = sponsor.logo
-  ? urlFor(sponsor.logo as any).width(120).height(120).url()
-  : null;
-const logoLqip = sponsor.logo?.asset?.metadata?.lqip ?? undefined;
-
-// Tier badge label
-const tierLabel = sponsor.tier
-  ? sponsor.tier.charAt(0).toUpperCase() + sponsor.tier.slice(1)
-  : null;
+// Logo + tier (only computed when authorized)
+let logoUrl: string | null = null;
+let logoLqip: string | undefined;
+let tierLabel: string | null = null;
+if (isAuthorized && sponsor) {
+  const logoBuilder = sponsor.logo ? safeUrlFor(sponsor.logo) : null;
+  logoUrl = logoBuilder?.width(120).height(120).url() ?? null;
+  logoLqip = sponsor.logo?.asset?.metadata?.lqip ?? undefined;
+  tierLabel = sponsor.tier
+    ? sponsor.tier.charAt(0).toUpperCase() + sponsor.tier.slice(1)
+    : null;
+}
 ---
 
-{!isAuthorized ? (
+{!sponsor ? (
+  <PortalLayout title="Not Found">
+    <div class="flex flex-col gap-4 items-center text-center py-12">
+      <h1 class="text-2xl font-bold">Sponsor Not Found</h1>
+      <p class="text-muted-foreground max-w-md">
+        The sponsor page you're looking for doesn't exist or may have been removed.
+      </p>
+      <a
+        href="/portal/"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+      >
+        &larr; Back to Portal
+      </a>
+    </div>
+  </PortalLayout>
+) : !isAuthorized ? (
   <PortalLayout title="Access Denied" activeNav="/portal/">
     <div class="flex flex-col gap-4 items-center text-center py-12">
       <h1 class="text-2xl font-bold">Access Denied</h1>
@@ -118,8 +138,10 @@ const tierLabel = sponsor.tier
   </PortalLayout>
 )}
 
-{/* GTM: portal sponsor view */}
-<script define:vars={{ sponsorSlug: slug }}>
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: 'portal_sponsor_view', sponsor_slug: sponsorSlug });
-</script>
+{/* GTM: portal sponsor view — only fires for authorized users */}
+{isAuthorized && (
+  <script define:vars={{ sponsorSlug: slug }}>
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'portal_sponsor_view', sponsor_slug: sponsorSlug });
+  </script>
+)}
