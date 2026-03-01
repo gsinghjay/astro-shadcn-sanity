@@ -66,7 +66,10 @@ export default function PortalCalendar({ events }: PortalCalendarProps) {
     },
     callbacks: {
       onEventClick(calendarEvent) {
-        setSelectedEvent(calendarEvent as CalendarEvent);
+        // Schedule-X preserves extra properties (_meta) on event objects
+        const event = calendarEvent as CalendarEvent;
+        if (!event._meta) return;
+        setSelectedEvent(event);
         setPopoverPosition({
           top: Math.min(window.innerHeight - 400, window.innerHeight / 3),
           left: Math.min(window.innerWidth - 340, window.innerWidth / 2 - 160),
@@ -81,7 +84,9 @@ export default function PortalCalendar({ events }: PortalCalendarProps) {
 
   // Sync dark mode on mount and when .dark class toggles
   useEffect(() => {
-    setDark(isDarkMode());
+    const initialDark = isDarkMode();
+    setDark(initialDark);
+    if (calendar) calendar.setTheme(initialDark ? 'dark' : 'light');
 
     const observer = new MutationObserver(() => {
       const nowDark = isDarkMode();

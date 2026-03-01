@@ -81,6 +81,110 @@ test.describe('Story 9.3: Portal Events Calendar', () => {
   });
 });
 
+test.describe('Story 9.3: Portal Events — View Switching', () => {
+  test('calendar view selector dropdown has multiple views', async ({ page }) => {
+    await page.goto('/portal/events');
+
+    // Wait for Schedule-X to fully hydrate
+    const calendarHeader = page.locator('.sx__calendar-header');
+    await expect(calendarHeader).toBeVisible({ timeout: 15000 });
+
+    // Schedule-X uses a dropdown for view selection
+    const viewDropdown = page.locator('.sx__view-selection-selected-item');
+    await expect(viewDropdown).toBeVisible();
+
+    // Open the dropdown
+    await viewDropdown.click();
+
+    // Verify dropdown items appear (day, week, month grid, month agenda = 4 views)
+    const viewItems = page.locator('.sx__view-selection-item');
+    await expect(viewItems.first()).toBeVisible({ timeout: 5000 });
+    const count = await viewItems.count();
+    expect(count).toBeGreaterThanOrEqual(2);
+
+    // Click a different view to verify switching works
+    await viewItems.nth(0).click();
+
+    // Calendar should still be rendered after switching
+    await expect(calendarHeader).toBeVisible();
+  });
+});
+
+test.describe('Story 9.3: Portal Events — Event Colors', () => {
+  test('calendar renders event calendars with color configuration', async ({ page }) => {
+    await page.goto('/portal/events');
+
+    const calendarWrapper = page.locator('.sx-react-calendar-wrapper.relative');
+    await expect(calendarWrapper).toBeVisible({ timeout: 15000 });
+
+    // Verify the color legend shows all three event types with correct color swatches
+    const showcaseSwatch = calendarWrapper.locator('span.bg-red-600').first();
+    const networkingSwatch = calendarWrapper.locator('span.bg-blue-600').first();
+    const workshopSwatch = calendarWrapper.locator('span.bg-green-600').first();
+
+    await expect(showcaseSwatch).toBeVisible();
+    await expect(networkingSwatch).toBeVisible();
+    await expect(workshopSwatch).toBeVisible();
+  });
+});
+
+test.describe('Story 9.3: Portal Events — Event Popover', () => {
+  test('clicking an event shows detail popover with expected elements', async ({ page }) => {
+    await page.goto('/portal/events');
+
+    const calendarWrapper = page.locator('.sx-react-calendar-wrapper.relative');
+    await expect(calendarWrapper).toBeVisible({ timeout: 15000 });
+
+    // Find any rendered event in the calendar
+    const calendarEvent = page.locator('.sx__event').first();
+    const eventExists = (await calendarEvent.count()) > 0;
+
+    if (eventExists) {
+      await calendarEvent.click();
+
+      // Popover should appear
+      const popover = page.locator('[data-event-popover]');
+      await expect(popover).toBeVisible({ timeout: 5000 });
+
+      // Should have a title (h3)
+      await expect(popover.locator('h3')).toBeVisible();
+
+      // Should have a close button
+      const closeBtn = popover.locator('button[aria-label="Close"]');
+      await expect(closeBtn).toBeVisible();
+
+      // Should have an event type badge
+      const badge = popover.locator('span.inline-flex.w-fit');
+      await expect(badge).toBeVisible();
+
+      // Close via button
+      await closeBtn.click();
+      await expect(popover).not.toBeVisible();
+    }
+    // If no events rendered in current month, test passes — we can't force Sanity data
+  });
+
+  test('popover closes on Escape key', async ({ page }) => {
+    await page.goto('/portal/events');
+
+    const calendarWrapper = page.locator('.sx-react-calendar-wrapper.relative');
+    await expect(calendarWrapper).toBeVisible({ timeout: 15000 });
+
+    const calendarEvent = page.locator('.sx__event').first();
+    const eventExists = (await calendarEvent.count()) > 0;
+
+    if (eventExists) {
+      await calendarEvent.click();
+
+      const popover = page.locator('[data-event-popover]');
+      await expect(popover).toBeVisible({ timeout: 5000 });
+
+      await page.keyboard.press('Escape');
+      await expect(popover).not.toBeVisible();
+    }
+  });
+});
+
 test.describe('Story 9.3: Portal Events — Mobile Responsive', () => {
   test('calendar renders on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });

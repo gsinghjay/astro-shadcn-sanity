@@ -38,19 +38,19 @@ const { result: events } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({
       </p>
     </div>
 
-    <div class="min-h-[600px]">
+    <div class="portal-events-calendar min-h-[600px]">
       <PortalCalendar client:load events={JSON.stringify(events ?? [])} />
     </div>
   </div>
 </PortalLayout>
 
 <style is:global>
-  .sx-react-calendar-wrapper {
+  .portal-events-calendar .sx-react-calendar-wrapper {
     width: 100%;
     height: 600px;
   }
   @media (min-width: 1024px) {
-    .sx-react-calendar-wrapper {
+    .portal-events-calendar .sx-react-calendar-wrapper {
       height: 700px;
     }
   }

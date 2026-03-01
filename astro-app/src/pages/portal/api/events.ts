@@ -14,15 +14,19 @@ export const GET: APIRoute = async ({ locals, url }) => {
     });
   }
 
-  const start = url.searchParams.get('start');
-  const end = url.searchParams.get('end');
+  const rawStart = url.searchParams.get('start');
+  const rawEnd = url.searchParams.get('end');
 
-  if (!start || !end) {
+  if (!rawStart || !rawEnd) {
     return new Response(JSON.stringify({ error: 'Missing required query params: start, end (ISO date strings)' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
   }
+
+  // Strip Temporal IANA annotations (e.g. "[UTC]") — Schedule-X sends these via onRangeUpdate
+  const start = rawStart.replace(/\[.*\]$/, '');
+  const end = rawEnd.replace(/\[.*\]$/, '');
 
   // Validate ISO date format
   if (isNaN(Date.parse(start)) || isNaN(Date.parse(end))) {

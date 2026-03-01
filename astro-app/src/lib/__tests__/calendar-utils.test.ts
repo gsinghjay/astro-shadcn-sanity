@@ -96,4 +96,26 @@ describe('toCalendarEvent', () => {
     const result = toCalendarEvent(makeSanityEvent());
     expect(result.people).toEqual([]);
   });
+
+  it('Temporal.ZonedDateTime.toString() can be stripped for Date parsing', () => {
+    // Regression: EventDetailPopover.formatDateRange fed Temporal strings to new Date()
+    // Temporal.ZonedDateTime.toString() includes [TimeZone] annotation that breaks Date()
+    const event = makeSanityEvent();
+    const result = toCalendarEvent(event);
+    const startStr = result.start.toString();
+    // ZonedDateTime toString has [UTC] suffix
+    expect(startStr).toContain('[');
+    // After stripping annotation, Date should parse successfully
+    const stripped = startStr.replace(/\[.*\]$/, '');
+    expect(isNaN(new Date(stripped).getTime())).toBe(false);
+  });
+
+  it('Temporal.PlainDate.toString() is directly Date-parseable', () => {
+    const event = makeSanityEvent({ isAllDay: true });
+    const result = toCalendarEvent(event);
+    const startStr = result.start.toString();
+    // PlainDate toString is "YYYY-MM-DD" — no annotation
+    expect(startStr).not.toContain('[');
+    expect(isNaN(new Date(startStr).getTime())).toBe(false);
+  });
 });

@@ -627,8 +627,40 @@
 #   - 35 remaining story issues created: #427–#461 (all on board with start/due dates)
 #   - Cross-track dependency diagram created
 #   - Time management doc updated with all issue numbers
+#
+# 2026-03-01: Epic 16 added (Student Authentication & Portal)
+#   - Source: Auth architecture research session — CF Access for sponsors, Better Auth for students
+#   - Architecture: Dual-auth middleware — /portal* (CF Access JWT, existing) + /student* (Better Auth session, new)
+#   - Better Auth + D1 (user/session storage) + KV (session cache) + Google OAuth
+#   - Google OAuth only — no password hashing, fits CF Workers Free Plan 10ms CPU limit
+#   - ~400 students/semester, max 50 concurrent — well within free plan limits
+#   - D1 migration: users + sessions tables with indexed lookups (~2-3ms CPU per auth check)
+#   - App.Locals.user extended with role: 'sponsor' | 'student' for path discrimination
+#   - Story 16.1 (Student Google OAuth Authentication): ready-for-dev
+#   - Dependencies: Google Cloud Console OAuth credentials (Jay), D1 database, KV namespace
+#   - Cost: $0/mo (free plan) → $5/mo upgrade trigger documented in story
+#   - Epic 16 status: in-progress
+#
+# 2026-03-01b: Epic 16 decomposed (scope review with SM)
+#   - Original Story 16.1 split into 3 stories:
+#     16.1: Spike — Better Auth + Drizzle on CF Workers Validation (SP:1, timeboxed 4hr)
+#     16.2: D1 Schema & Better Auth Infrastructure (SP:3, blocked by 16.1 go decision)
+#     16.3: Dual-Auth Middleware Integration (SP:2, blocked by 16.2)
+#   - Error/edge-case ACs added to 16.2 and 16.3:
+#     Google OAuth unavailable, D1 unreachable, tampered session cookies, suspended Google accounts
+#   - Story 16.4+: Student Portal Pages — TBD after auth infra complete
+#   - Story 16.1 (spike) is the new entry point — go/no-go gate for the rest
+#   - Total SP: 1 + 3 + 2 = 6 (was uncounted single story)
+#
+# 2026-03-01c: Epic 16 resequenced — Story 9.8 prerequisite, shared D1 database
+#   - Story 9.8 (D1 Database Setup) must complete before Story 16.1 (spike)
+#   - Single shared D1 database: ywcc-capstone-portal / PORTAL_DB (not separate student-auth-db)
+#   - Auth tables added as migration 0001_student_auth.sql (after 9.8's 0000_init.sql)
+#   - Spike scope reduced: D1 provisioning, bindings, env.d.ts types already done by 9.8
+#   - Dependency chain: 9.8 → 16.1 (spike) → 16.2 (auth infra) → 16.3 (middleware)
+#   - Old story file 16-1-student-google-oauth-authentication.md renamed to match new scope
 
-generated: 2026-02-27
+generated: 2026-03-01
 project: astro-shadcn-sanity
 project_key: NOKEY
 tracking_system: file-system
@@ -740,7 +772,7 @@ development_status:
   9-1b-portal-landing-page: done  # Foundation: PortalLayout, landing hub, skeleton cards, components/portal/ seed — code review fixes in PR #322 merged
   9-1c-sheet-slide-animation: ready-for-dev  # NEW: Sheet component slide animation using CSS @starting-style — affects portal + public nav mobile drawers + Storybook docs
   9-2-portal-sponsor-project-view: done  # IN: SSR + Sanity only, no D1
-  9-3-portal-events-and-program-info: review  # IN: SSR + Sanity only, no D1
+  9-3-portal-events-and-program-info: done  # IN: SSR + Sanity only, no D1
   9-4-github-dev-dashboard: ready-for-dev  # IN: low-traffic admin page
   9-5-site-health-ci-pipeline: ready-for-dev  # IN: R2/KV writes in CI, negligible
   9-6-site-health-dashboard: ready-for-dev  # IN: 1 KV + 1 R2 read per view
@@ -807,3 +839,10 @@ development_status:
   15-5-cloudflare-pages-multi-project-deployment: in-progress  # Depends on 15.3 + 15.4. Three CF Pages projects with per-site env vars + deploy hooks.
   15-6-embeddings-index-for-rwc-dataset: deferred  # Depends on 15.1 + 14.1. Deferred until RWC content exists.
   epic-15-retrospective: optional
+
+  epic-16: in-progress  # NEW (2026-03-01): Student Authentication & Portal — Better Auth + D1 + Google OAuth on CF Workers Free Plan. Decomposed 2026-03-01b. Resequenced 2026-03-01c. Assigned to Jay (Team A).
+  16-1-spike-better-auth-drizzle-cf-workers: backlog  # SP:1. Blocked by 9.8. Timeboxed 4hr. Validate Better Auth + Drizzle ORM against existing PORTAL_DB. Go/no-go gate for 16.2+.
+  16-2-d1-schema-better-auth-infrastructure: backlog  # SP:3. Blocked by 16.1 + 9.8. Shared DB (ywcc-capstone-portal). Migration 0001_student_auth.sql. Better Auth config, Google OAuth, API routes, error handling.
+  16-3-dual-auth-middleware-integration: backlog  # SP:2. Blocked by 16.2. Extend middleware: /portal* CF Access + /student* Better Auth + public pass-through. KV session cache optional. Regression tests.
+  # 16-4+: Student Portal Pages — TBD after auth infra complete (dashboard, assignments, calendar, program info)
+  epic-16-retrospective: optional
