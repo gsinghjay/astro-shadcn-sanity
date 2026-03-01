@@ -12,6 +12,7 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  SPONSOR_BY_EMAIL_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -452,6 +453,46 @@ export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Portal queries (Story 9.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a sponsor by email (contactEmail or allowedEmails match).
+ * Used by the portal landing page to redirect sponsors to their project view.
+ */
+export const SPONSOR_BY_EMAIL_QUERY = defineQuery(groq`*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current
+}`);
+
+/**
+ * GROQ query: fetch a sponsor by slug with authorization fields and associated projects.
+ * Used by the sponsor portal page for profile rendering and project list.
+ */
+export const SPONSOR_PORTAL_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current,
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  tier, description, website, industry, featured,
+  contactEmail, allowedEmails,
+  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {
+    _id, title, "slug": slug.current,
+    status, semester, technologyTags,
+    team[]{ _key, name, role },
+    content
+  }
+}`);
+
+/**
+ * GROQ query: fetch projects for a specific sponsor by sponsor ID.
+ * Used by the portal API endpoint for JSON responses.
+ */
+export const SPONSOR_PROJECTS_API_QUERY = defineQuery(groq`*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {
+  _id, title, "slug": slug.current,
+  status, semester, technologyTags,
+  team[]{ _key, name, role },
+  content
+}`);
 
 /**
  * GROQ query: fetch a single page by slug with template and blocks.

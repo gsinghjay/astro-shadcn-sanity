@@ -1,0 +1,125 @@
+---
+export const prerender = false;
+
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import SponsorProjects from '@/components/portal/SponsorProjects';
+import { loadQuery, SPONSOR_PORTAL_QUERY, getSiteParams } from '@/lib/sanity';
+import { urlFor } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
+import type { SPONSOR_PORTAL_QUERY_RESULT } from '@/sanity.types';
+
+const user = Astro.locals.user;
+const slug = Astro.params.sponsorSlug;
+
+if (!slug) {
+  return new Response('Not Found', { status: 404 });
+}
+
+// Fetch sponsor with projects
+const { result: sponsor } = await loadQuery<SPONSOR_PORTAL_QUERY_RESULT>({
+  query: SPONSOR_PORTAL_QUERY,
+  params: { slug, ...getSiteParams() },
+});
+
+// 404 — sponsor not found
+if (!sponsor) {
+  return new Response('Not Found', { status: 404 });
+}
+
+// Authorization check — stegaClean needed because Visual Editing injects invisible chars
+const cleanContactEmail = stegaClean(sponsor.contactEmail);
+const cleanAllowedEmails = sponsor.allowedEmails?.map(e => stegaClean(e)) ?? [];
+const isAuthorized =
+  user?.email === cleanContactEmail ||
+  cleanAllowedEmails.includes(user?.email ?? '');
+
+// Build logo URL via urlFor()
+const logoUrl = sponsor.logo
+  ? urlFor(sponsor.logo as any).width(120).height(120).url()
+  : null;
+const logoLqip = sponsor.logo?.asset?.metadata?.lqip ?? undefined;
+
+// Tier badge label
+const tierLabel = sponsor.tier
+  ? sponsor.tier.charAt(0).toUpperCase() + sponsor.tier.slice(1)
+  : null;
+---
+
+{!isAuthorized ? (
+  <PortalLayout title="Access Denied" activeNav="/portal/">
+    <div class="flex flex-col gap-4 items-center text-center py-12">
+      <h1 class="text-2xl font-bold">Access Denied</h1>
+      <p class="text-muted-foreground max-w-md">
+        Your email (<strong>{user?.email}</strong>) is not authorized to view this sponsor's portal.
+      </p>
+      <p class="text-sm text-muted-foreground max-w-md">
+        If you believe this is an error, please contact the program administrator to have your email added to the sponsor's authorized list.
+      </p>
+      <a
+        href="/portal/"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+      >
+        &larr; Back to Portal
+      </a>
+    </div>
+  </PortalLayout>
+) : (
+  <PortalLayout title={`${sponsor.name} — Projects`} sponsorSlug={sponsor.slug}>
+    <div class="flex flex-col gap-8">
+      {/* Sponsor profile — pure Astro markup, zero JS */}
+      <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
+        {logoUrl && (
+          <div class="shrink-0">
+            <img
+              src={logoUrl}
+              alt={sponsor.logo?.alt ?? `${sponsor.name} logo`}
+              width="120"
+              height="120"
+              loading="eager"
+              style={logoLqip ? `background-image: url(${logoLqip}); background-size: cover;` : undefined}
+              class="border bg-white object-contain p-2"
+            />
+          </div>
+        )}
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold tracking-tight">{sponsor.name}</h1>
+            {tierLabel && (
+              <span class="bg-primary text-primary-foreground px-2 py-0.5 text-xs font-medium uppercase tracking-wider">
+                {tierLabel}
+              </span>
+            )}
+          </div>
+          {sponsor.description && (
+            <p class="text-muted-foreground max-w-2xl">{sponsor.description}</p>
+          )}
+          {sponsor.website && (
+            <a
+              href={sponsor.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm text-primary hover:underline"
+            >
+              {sponsor.website}
+            </a>
+          )}
+        </div>
+      </div>
+
+      {/* Separator */}
+      <hr class="border-border" />
+
+      {/* Projects section — React island */}
+      <div class="flex flex-col gap-4">
+        <h2 class="text-xl font-semibold">Sponsored Projects</h2>
+        <SponsorProjects client:load projects={sponsor.projects} />
+      </div>
+    </div>
+  </PortalLayout>
+)}
+
+{/* GTM: portal sponsor view */}
+<script define:vars={{ sponsorSlug: slug }}>
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'portal_sponsor_view', sponsor_slug: sponsorSlug });
+</script>

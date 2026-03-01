@@ -4,20 +4,24 @@ export const prerender = false;
 import PortalLayout from "@/layouts/PortalLayout.astro";
 import PortalCard from "@/components/portal/PortalCard";
 import PortalSkeleton from "@/components/portal/PortalSkeleton";
+import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams } from "@/lib/sanity";
+import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
 
 const user = Astro.locals.user;
 
-// TODO (Story 9.2): Look up sponsor by email
-// const sponsor = await loadQuery(SPONSOR_BY_EMAIL_QUERY, { email: user?.email });
-// if (sponsor) throw Astro.redirect(`/portal/${sponsor.slug}`);
+// Look up sponsor by email to enable "My Projects" card link
+const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
+  query: SPONSOR_BY_EMAIL_QUERY,
+  params: { email: user?.email ?? '', ...getSiteParams() },
+});
 
 const cards = [
   {
     title: "My Projects",
     description: "View your sponsored capstone projects, student teams, and technologies used",
     icon: "lucide:folder",
-    href: "/portal/projects",
-    disabled: true,
+    href: sponsor?.slug ? `/portal/${sponsor.slug}` : undefined,
+    disabled: !sponsor?.slug,
     story: "9.2",
   },
   {
@@ -47,7 +51,7 @@ const cards = [
 ];
 ---
 
-<PortalLayout title="Sponsor Portal" activeNav="/portal/">
+<PortalLayout title="Sponsor Portal" activeNav="/portal/" sponsorSlug={sponsor?.slug}>
   <div class="flex flex-col gap-8">
     {/* Welcome heading */}
     <div class="flex flex-col gap-2">
@@ -66,9 +70,9 @@ const cards = [
           icon={card.icon}
           href={card.href}
           disabled={card.disabled}
-          badge="Coming Soon"
+          badge={card.disabled ? "Coming Soon" : undefined}
         >
-          <PortalSkeleton lines={2} />
+          {card.disabled && <PortalSkeleton lines={2} />}
         </PortalCard>
       ))}
     </div>
