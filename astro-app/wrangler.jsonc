@@ -23,5 +23,11 @@
       "database_name": "ywcc-capstone-portal",
       "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
     }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "SESSION_CACHE",
+      "id": "f78af5695075451c9d3d7887368e90dc"
+    }
   ]
 }
