@@ -24,6 +24,8 @@
       "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
     }
   ],
+  // KV session cache for student auth (optional — middleware degrades gracefully without it).
+  // Replace "id" with your actual namespace ID from: wrangler kv namespace create SESSION_CACHE
   "kv_namespaces": [
     {
       "binding": "SESSION_CACHE",

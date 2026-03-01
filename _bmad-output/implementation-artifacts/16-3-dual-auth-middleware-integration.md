@@ -1,6 +1,6 @@
 # Story 16.3: Dual-Auth Middleware Integration
 
-Status: review
+Status: done
 
 ## Story
 
@@ -309,9 +309,9 @@ const session = await auth.api.getSession({
 - No new dependencies needed — `better-auth`, `drizzle-orm` already installed
 - The auth env object construction (`{ GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, BETTER_AUTH_SECRET, BETTER_AUTH_URL }`) is identical in middleware and `[...all].ts`. Extracting a `getAuthEnv(runtimeEnv)` helper is optional — only two call sites, so inline is acceptable.
 
-### KV Session Cache (Task 5 — deferred to 16.3b)
+### KV Session Cache (Task 5 — originally recommended to defer, implemented)
 
-**Recommendation: DEFER.** Better Auth's `cookieCache` (5-min, already configured in 16.2) eliminates most D1 reads. KV adds complexity (namespace provisioning, wrangler config, error handling, 1K writes/day free limit) for marginal benefit at ~400 students. If implementing later: add `SESSION_CACHE` KV binding to `wrangler.jsonc` and `SESSION_CACHE?: KVNamespace` to Runtime type in `env.d.ts`. Use `env.SESSION_CACHE.get(token, { type: 'json' })` for reads (async I/O, free CPU) and `.put(token, data, { expirationTtl: 300 })` for writes.
+**Original recommendation was DEFER**, but the Dev Agent implemented it during initial development. Better Auth's `cookieCache` (5-min, already configured in 16.2) eliminates most D1 reads, making KV optional. The middleware degrades gracefully when `SESSION_CACHE` is not configured (skips KV entirely via optional chaining). KV cache has a 5-min TTL, meaning revoked sessions may persist in cache for up to 5 minutes — this matches the same trade-off as Better Auth's cookie cache.
 
 ### CPU Budget Analysis
 
@@ -429,7 +429,7 @@ Claude Opus 4.6
 ### Completion Notes List
 
 - **Task 1 complete:** Extended `App.Locals` user type with `role: 'sponsor' | 'student'` and `name?: string`. Added `SESSION_CACHE?: KVNamespace` to Runtime type. Additive change — zero TypeScript breakage in existing portal pages.
-- **Tasks 2+3 complete:** Three-branch middleware routing implemented. Public routes → zero overhead. Portal → CF Access JWT + `role: 'sponsor'`. Student → Better Auth session validation + `role: 'student'` + 503 on errors. Dev mode bypass handles both roles. Imports updated to `@/lib/` aliases.
+- **Tasks 2+3 complete:** Three-branch middleware routing implemented. Public routes → zero overhead. Portal → CF Access JWT + `role: 'sponsor'`. Student → Better Auth session validation + `role: 'student'` + 503 on errors. Dev mode bypass handles both roles. Imports updated to `@/lib/` aliases. **Task 2.5 (redirect URL verification):** Not verified via live dev server — unit test confirms the hardcoded redirect string matches expectations. Manual QA needed to confirm Better Auth handles `/api/auth/sign-in/social?provider=google&callbackURL=/student/` correctly in a deployed environment.
 - **Task 4 complete:** 13 unit tests covering all three branches, dev mode, error handling, and auth env passthrough. Mock pattern uses `vi.hoisted()` + `vi.mock()` consistent with `auth-route.test.ts`.
 - **Task 5 complete (KV session cache):** `SESSION_CACHE` KV namespace added to `wrangler.jsonc` and Runtime type. Middleware checks KV before D1, caches on miss with 5-min TTL. Fire-and-forget write pattern. 5 additional tests for KV cache hit/miss/skip/no-write/unconfigured.
 - **Task 6 complete:** 638 tests pass (up from 620). E2E failure is pre-existing (Vitest/Playwright compatibility, not a regression). Portal pages unaffected by additive type change.
@@ -440,12 +440,13 @@ Claude Opus 4.6
 - **2026-03-01 — Story created by SM agent (Bob).** Comprehensive context engine analysis completed. Cloudflare MCP + Astro MCP research incorporated. Previous story intelligence from 16.1 and 16.2 applied. KV session cache marked optional (Better Auth cookie cache sufficient for MVP).
 - **2026-03-01 — Quality validation applied.** 5 critical fixes (redirect URL verification task, `/portal/api/*` acknowledgment, `me.ts` API contract change note, test directory creation note, `import.meta.env.DEV` mock pattern), 7 enhancements (additional test cases, forward references, null handling notes), 3 optimizations (KV section condensed, budget table consolidated, references trimmed).
 - **2026-03-01 — Implementation complete (Dev Agent, Claude Opus 4.6).** All 6 tasks implemented including KV session cache. 18 new unit tests (638 total, zero regressions). Three-branch middleware routing with type-safe `role` discriminator. Middleware imports changed from relative to `@/lib/` aliases for testability.
+- **2026-03-01 — Code review fixes (Dev Agent, Claude Opus 4.6).** 3 HIGH + 4 MEDIUM issues found and fixed. H1: KV cache write now logs errors instead of swallowing silently. H2: Added test for KV `get()` failure → 503. H3: Documented Task 2.5 redirect URL as needing manual QA verification. M1: Added 3 `extractSessionToken` edge case tests (cookie without session key, multi-cookie header, KV outage). M2: Updated Dev Notes to reflect KV cache was implemented despite deferral recommendation. M3: Added wrangler.jsonc comment about replacing KV namespace ID. M4: Added comment noting redirect URL dependency on basePath config. 21 tests total (641 total, zero regressions).
 
 ### File List
 
 - `astro-app/src/env.d.ts` — Added `role`, `name` to user type; added `SESSION_CACHE?: KVNamespace` to Runtime
-- `astro-app/src/middleware.ts` — Three-branch routing (public/portal/student), KV session cache, dev mode bypass for both roles, `extractSessionToken` helper
-- `astro-app/src/__tests__/middleware.test.ts` — **NEW** 18 unit tests for middleware routing, dev mode, error handling, KV cache
-- `astro-app/wrangler.jsonc` — Added `SESSION_CACHE` KV namespace binding
+- `astro-app/src/middleware.ts` — Three-branch routing (public/portal/student), KV session cache, dev mode bypass for both roles, `extractSessionToken` helper; **CR fix:** KV write error logging, basePath dependency comment
+- `astro-app/src/__tests__/middleware.test.ts` — **NEW** 21 unit tests for middleware routing, dev mode, error handling, KV cache; **CR fix:** KV get() failure, extractSessionToken edge cases
+- `astro-app/wrangler.jsonc` — Added `SESSION_CACHE` KV namespace binding; **CR fix:** comment about replacing namespace ID
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated 16-3 status to in-progress → review
-- `_bmad-output/implementation-artifacts/16-3-dual-auth-middleware-integration.md` — Story file updated with completion records
+- `_bmad-output/implementation-artifacts/16-3-dual-auth-middleware-integration.md` — Story file updated with completion records + code review fixes

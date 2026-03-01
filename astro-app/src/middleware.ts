@@ -70,13 +70,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       // Cache session in KV (fire-and-forget, 5-min TTL)
       if (kvCache && sessionToken) {
-        kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch(() => {});
+        kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
       }
 
       return next();
     }
 
     // No valid session — redirect to Google OAuth sign-in
+    // Path must match basePath in student-auth.ts ("/api/auth")
     return context.redirect("/api/auth/sign-in/social?provider=google&callbackURL=/student/");
   } catch (error) {
     console.error("[middleware] Student auth error:", error);

@@ -287,6 +287,43 @@ describe('middleware — three-branch routing', () => {
       expect(mockKvPut).not.toHaveBeenCalled();
     });
 
+    it('returns 503 when KV get() throws (KV outage)', async () => {
+      mockKvGet.mockRejectedValue(new Error('KV unavailable'));
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      const result = await onRequest(ctx as any, mockNext);
+
+      expect(result.status).toBe(503);
+      const text = await result.text();
+      expect(text).toBe('Service Unavailable');
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('skips KV when cookie has no session token key', async () => {
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Test Student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: 'other_cookie=abc; foo=bar' } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockKvGet).not.toHaveBeenCalled();
+      expect(mockGetSession).toHaveBeenCalled();
+      expect(ctx.locals.user).toEqual({ email: 'student@test.com', name: 'Test Student', role: 'student' });
+    });
+
+    it('extracts session token when it appears after other cookies', async () => {
+      mockKvGet.mockResolvedValue({ email: 'cached@test.com', name: 'Cached' });
+      const multiCookie = 'theme=dark; lang=en; better-auth.session_token=multi-token-456; other=val';
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: multiCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockKvGet).toHaveBeenCalledWith('multi-token-456', { type: 'json' });
+      expect(ctx.locals.user).toEqual({ email: 'cached@test.com', name: 'Cached', role: 'student' });
+    });
+
     it('works without KV configured (SESSION_CACHE undefined)', async () => {
       mockEnv.SESSION_CACHE = undefined;
       mockGetSession.mockResolvedValue({
