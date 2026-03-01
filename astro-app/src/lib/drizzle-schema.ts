@@ -57,7 +57,6 @@ export const account = sqliteTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    // TODO(16.2): Evaluate encrypting tokens at rest for production.
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),

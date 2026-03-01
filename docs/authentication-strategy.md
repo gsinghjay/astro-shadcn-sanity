@@ -6,7 +6,7 @@ date: 2026-03-01
 
 # Authentication Strategy: Why We Use Two Systems
 
-This document explains how authentication works in the YWCC Capstone Portal, why we use two different systems, and why that is the right call for a project that runs at $0/month on Cloudflare's free plan.
+The YWCC Capstone Portal uses two authentication systems — Cloudflare Access for sponsors and Better Auth for students. This page covers how they work, why each is the right tool for its job, and why keeping both is the correct call for a $0/month Cloudflare deployment.
 
 ## Who Uses the Portal
 
@@ -17,7 +17,7 @@ The site serves two distinct groups with very different needs:
 | **Sponsors** | ~20 (stable, known individuals) | Email OTP or Google via a Cloudflare login screen | `/portal/*` dashboard pages |
 | **Students** | ~400/semester (open, rotating population) | Google sign-in (`@njit.edu` accounts) | `/student/*` pages |
 
-These groups differ in population size, turnover rate, and trust model. One auth system cannot serve both without compromise.
+These groups differ in population size, turnover rate, and trust model. No single auth system serves both without compromise.
 
 ## What Each System Does
 
@@ -25,7 +25,7 @@ These groups differ in population size, turnover rate, and trust model. One auth
 
 Cloudflare Access is a security gate built into Cloudflare's network. It sits *between* the visitor and the server. When a sponsor visits `/portal/`, Cloudflare itself blocks the request and shows a login screen before the request ever reaches our code.
 
-```
+```text
 Sponsor visits /portal/dashboard
         │
         ▼
@@ -59,7 +59,7 @@ Sponsor visits /portal/dashboard
 
 Better Auth is an authentication library that runs inside our Astro application. When a student visits `/student/`, our code handles the entire login flow: redirecting to Google, receiving the callback, creating a user record in our D1 database, and setting a session cookie.
 
-```
+```text
 Student visits /student/projects
         │
         ▼
@@ -123,7 +123,7 @@ The operational simplicity of "one auth system" is real, but it is not worth wha
 
 Both systems converge on the same result: a `user` object in `Astro.locals` that the rest of the application uses without caring which system authenticated the request.
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │                Astro Middleware                  │
 │                                                 │
@@ -179,14 +179,14 @@ If any of these change:
 | Student count exceeds D1 free tier | Upgrade to Workers Paid plan ($5/month) — no architecture change needed |
 | Project moves to VPS | Replace CF Access with Authentik, replace D1 with PostgreSQL — both auth systems change, but the middleware pattern stays the same |
 
-The VPS migration path is documented separately in `docs/vps-migration-plan.md`. The middleware `if/else` pattern works identically regardless of which providers sit behind it.
+The VPS migration path is documented separately in [VPS migration plan](vps-migration-plan.md). The middleware `if/else` pattern works identically regardless of which providers sit behind it.
 
 ## Summary
 
 Two user groups with different sizes, turnover rates, and security requirements call for two authentication systems — each chosen because it is the best fit for its specific job.
 
-| | Sponsors (CF Access) | Students (Better Auth) |
-|:--|:---------------------|:-----------------------|
+| Attribute | Sponsors (CF Access) | Students (Better Auth) |
+|:----------|:---------------------|:-----------------------|
 | **Population** | ~20 stable, known individuals | ~400/semester, rotating |
 | **Seat limit** | 50 (comfortable fit) | Unlimited within D1 free tier |
 | **Where auth runs** | Cloudflare edge (before our code) | Inside our Astro server |
