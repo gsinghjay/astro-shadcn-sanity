@@ -23,6 +23,7 @@ interface AuthEnv {
 }
 
 export function createAuth(env: AuthEnv) {
+  // TODO(16.2): Share a single Drizzle instance with getDrizzle() from db.ts per request.
   const db = drizzle(env.PORTAL_DB, { schema });
 
   return betterAuth({

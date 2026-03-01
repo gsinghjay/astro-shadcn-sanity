@@ -57,12 +57,14 @@ export const account = sqliteTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
+    // TODO(16.2): Evaluate encrypting tokens at rest for production.
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),
     accessTokenExpiresAt: integer('access_token_expires_at', { mode: 'timestamp_ms' }),
     refreshTokenExpiresAt: integer('refresh_token_expires_at', { mode: 'timestamp_ms' }),
     scope: text('scope'),
+    // Required by Better Auth schema even though we only use Google OAuth (no email/password).
     password: text('password'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

@@ -1074,27 +1074,27 @@ Customize the login page under **System → Brands** to match the YWCC site desi
 
 ## 11. Epic 9 Impact Assessment
 
-Every story that was descoped, deferred, or redesigned for Cloudflare's free tier becomes feasible on the VPS:
+> **Note (2026-02-27):** All 15 Epic 9 stories are now fully in scope on Cloudflare with the Workers Paid plan ($5/mo). The CF column below reflects the updated paid-plan status. VPS remains a viable alternative with its own advantages.
 
-| Story | CF Free Tier Status | VPS Status | What Changes |
+| Story | CF Paid Plan Status | VPS Status | What Changes (VPS) |
 |-------|-------------------|------------|--------------|
-| 9.1 — CF Access Config | IN (50 seats) | **IN** (no seat limit) | Authentik replaces CF Access |
-| 9.2 — Sponsor Project View | IN (10ms CPU cap) | **IN** (no cap) | Node.js adapter instead of Workers |
-| 9.3 — Events & Program Info | IN (10ms CPU cap) | **IN** (no cap) | Same |
-| 9.4 — GitHub Dev Dashboard | IN (moderate CPU risk) | **IN** (no risk) | Same |
-| 9.5 — Site Health CI | IN | **IN** | Write to filesystem + PostgreSQL instead of R2/KV |
-| 9.6 — Site Health Dashboard | IN | **IN** | Read from filesystem + PostgreSQL instead of R2/KV |
-| 9.7 — Submission Dashboard | **PARTIAL** (GA4 panel deferred) | **FULL** | GA4 Data API calls have no CPU limit |
-| 9.8 — D1 Setup | **REDUCED** (4 tables) | **FULL** (all tables) | PostgreSQL, no table or row limit |
-| 9.9 — Activity Tracking | **DESCOPED** (D1 write limits) | **IN** | PostgreSQL writes have no daily limit |
-| 9.10 — Event RSVPs | IN | **IN** | Same patterns, PostgreSQL instead of D1 |
-| 9.11 — Evaluations | **DEFERRED** (complexity) | **IN** | JSONB columns simplify score storage |
-| 9.12 — Agreement Signatures | IN | **IN** | Same |
-| 9.13 — Notifications | **DEFERRED** (cross-cutting D1 reads) | **IN** | No per-page query budget |
-| 9.14 — Multi-Provider Auth | IN (CF dashboard) | **IN** | Authentik federation (Google, GitHub, SAML) |
-| 9.15 — Admin Analytics | **DESCOPED** (full table scans) | **IN** | PostgreSQL query planner handles aggregates efficiently |
+| 9.1 — CF Access Config | **IN** (50 seats) | **IN** (no seat limit) | Authentik replaces CF Access |
+| 9.2 — Sponsor Project View | **IN** | **IN** (no cap) | Node.js adapter instead of Workers |
+| 9.3 — Events & Program Info | **IN** | **IN** (no cap) | Same |
+| 9.4 — GitHub Dev Dashboard | **IN** | **IN** (no risk) | Same |
+| 9.5 — Site Health CI | **IN** | **IN** | Write to filesystem + PostgreSQL instead of R2/KV |
+| 9.6 — Site Health Dashboard | **IN** | **IN** | Read from filesystem + PostgreSQL instead of R2/KV |
+| 9.7 — Submission Dashboard | **IN** (full dashboard) | **IN** | GA4 Data API calls have no CPU limit |
+| 9.8 — D1 Setup | **IN** (all 6 tables) | **IN** (all tables) | PostgreSQL, no table or row limit |
+| 9.9 — Activity Tracking | **IN** (Analytics Engine) | **IN** | PostgreSQL writes have no daily limit |
+| 9.10 — Event RSVPs | **IN** | **IN** | Same patterns, PostgreSQL instead of D1 |
+| 9.11 — Evaluations | **IN** (paid plan unlocks) | **IN** | JSONB columns simplify score storage |
+| 9.12 — Agreement Signatures | **IN** | **IN** | Same |
+| 9.13 — Notifications | **IN** (Queues + KV) | **IN** | No per-page query budget |
+| 9.14 — Multi-Provider Auth | **IN** (CF dashboard) | **IN** | Authentik federation (Google, GitHub, SAML) |
+| 9.15 — Admin Analytics | **IN** (Analytics Engine SQL API) | **IN** | PostgreSQL query planner handles aggregates efficiently |
 
-**Result:** All 15 stories are feasible. Zero descoping required.
+**Result:** All 15 stories are feasible on both platforms. Zero descoping required.
 
 ---
 
