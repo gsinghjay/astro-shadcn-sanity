@@ -1416,7 +1416,7 @@ export type ALL_TESTIMONIALS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_EVENTS_QUERY
-// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status}
+// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status, isAllDay, color}
 export type ALL_EVENTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1427,11 +1427,13 @@ export type ALL_EVENTS_QUERY_RESULT = Array<{
   description: string | null;
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
+  isAllDay: boolean | null;
+  color: "blue" | "green" | "orange" | "purple" | "red" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENTS_BY_MONTH_QUERY
-// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status}
+// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status, description, isAllDay, color}
 export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1441,6 +1443,9 @@ export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   location: string | null;
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
+  description: string | null;
+  isAllDay: boolean | null;
+  color: "blue" | "green" | "orange" | "purple" | "red" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -2182,8 +2187,8 @@ declare module "@sanity/client" {
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
     '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
-    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status\n}': ALL_EVENTS_QUERY_RESULT;
-    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status\n}': EVENTS_BY_MONTH_QUERY_RESULT;
+    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, color\n}': ALL_EVENTS_QUERY_RESULT;
+    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, color\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
     '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;

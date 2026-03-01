@@ -739,8 +739,8 @@ development_status:
   9-1-cloudflare-access-configuration: done  # IN: auth foundation, 50 free seats — deployed to preview, code review clean
   9-1b-portal-landing-page: done  # Foundation: PortalLayout, landing hub, skeleton cards, components/portal/ seed — code review fixes in PR #322 merged
   9-1c-sheet-slide-animation: ready-for-dev  # NEW: Sheet component slide animation using CSS @starting-style — affects portal + public nav mobile drawers + Storybook docs
-  9-2-portal-sponsor-project-view: review  # IN: SSR + Sanity only, no D1
-  9-3-portal-events-and-program-info: ready-for-dev  # IN: SSR + Sanity only, no D1
+  9-2-portal-sponsor-project-view: done  # IN: SSR + Sanity only, no D1
+  9-3-portal-events-and-program-info: review  # IN: SSR + Sanity only, no D1
   9-4-github-dev-dashboard: ready-for-dev  # IN: low-traffic admin page
   9-5-site-health-ci-pipeline: ready-for-dev  # IN: R2/KV writes in CI, negligible
   9-6-site-health-dashboard: ready-for-dev  # IN: 1 KV + 1 R2 read per view

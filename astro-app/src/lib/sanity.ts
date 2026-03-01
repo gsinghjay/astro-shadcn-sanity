@@ -368,7 +368,7 @@ export function resolveBlockTestimonials(
  */
 export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event" && ($site == "" || site == $site)] | order(date asc){
   _id, title, "slug": slug.current, date, endDate, location,
-  description, eventType, status
+  description, eventType, status, isAllDay, color
 }`);
 
 /**
@@ -425,7 +425,7 @@ export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
   && ($site == "" || site == $site)
 ] | order(date asc) {
   _id, title, "slug": slug.current, date, endDate,
-  location, eventType, status
+  location, eventType, status, description, isAllDay, color
 }`);
 
 /**
