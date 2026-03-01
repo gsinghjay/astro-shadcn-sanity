@@ -841,7 +841,7 @@ development_status:
   epic-15-retrospective: optional
 
   epic-16: in-progress  # NEW (2026-03-01): Student Authentication & Portal — Better Auth + D1 + Google OAuth on CF Workers Free Plan. Decomposed 2026-03-01b. Resequenced 2026-03-01c. Assigned to Jay (Team A).
-  16-1-spike-better-auth-drizzle-cf-workers: in-progress  # SP:1. Blocked by 9.8. Timeboxed 4hr. Validate Better Auth + Drizzle ORM against existing PORTAL_DB. Go/no-go gate for 16.2+.
+  16-1-spike-better-auth-drizzle-cf-workers: review  # SP:1. Blocked by 9.8. Timeboxed 4hr. Validate Better Auth + Drizzle ORM against existing PORTAL_DB. Go/no-go gate for 16.2+.
   16-2-d1-schema-better-auth-infrastructure: backlog  # SP:3. Blocked by 16.1 + 9.8. Shared DB (ywcc-capstone-portal). Migration 0001_student_auth.sql. Better Auth config, Google OAuth, API routes, error handling.
   16-3-dual-auth-middleware-integration: backlog  # SP:2. Blocked by 16.2. Extend middleware: /portal* CF Access + /student* Better Auth + public pass-through. KV session cache optional. Regression tests.
   # 16-4+: Student Portal Pages — TBD after auth infra complete (dashboard, assignments, calendar, program info)
