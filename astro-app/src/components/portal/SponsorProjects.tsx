@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react';
 import type { SPONSOR_PORTAL_QUERY_RESULT } from '@/sanity.types';
 
-/** Project type extracted from the portal query result. */
-type PortalProject = NonNullable<SPONSOR_PORTAL_QUERY_RESULT>['projects'][number];
+/** Project data with server-computed excerpt (content stripped to reduce hydration payload). */
+type PortalProject = Omit<NonNullable<SPONSOR_PORTAL_QUERY_RESULT>['projects'][number], 'content'> & {
+  excerpt: string;
+};
 
 /** Inline SVG icons — avoids shipping 500KB PortalIcon JSON to client. */
 const ChevronDown = ({ className }: { className?: string }) => (
@@ -50,36 +52,11 @@ const FolderIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-/** Status badge colors — Swiss design, no rounded corners. */
 const STATUS_STYLES: Record<string, string> = {
   active: 'bg-green-600 text-white',
   completed: 'bg-blue-600 text-white',
   archived: 'bg-muted text-muted-foreground',
 };
-
-/**
- * Extract a plain-text excerpt from Portable Text content.
- * Returns the first `maxLength` characters of concatenated text spans.
- */
-function excerptFromPortableText(
-  content: PortalProject['content'],
-  maxLength = 150,
-): string {
-  if (!content || !Array.isArray(content)) return '';
-  const texts: string[] = [];
-  for (const block of content) {
-    if (block._type === 'block' && block.children) {
-      for (const child of block.children) {
-        if (child._type === 'span' && child.text) {
-          texts.push(child.text);
-        }
-      }
-    }
-  }
-  const full = texts.join(' ');
-  if (full.length <= maxLength) return full;
-  return full.slice(0, maxLength).trimEnd() + '…';
-}
 
 interface SponsorProjectsProps {
   projects: PortalProject[];
@@ -189,18 +166,18 @@ export default function SponsorProjects({ projects }: SponsorProjectsProps) {
                   </div>
 
                   {/* Description excerpt */}
-                  {project.content && (
+                  {project.excerpt && (
                     <p className="text-sm text-muted-foreground">
-                      {excerptFromPortableText(project.content)}
+                      {project.excerpt}
                     </p>
                   )}
 
                   {/* Technology tags */}
                   {project.technologyTags && project.technologyTags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
-                      {project.technologyTags.map(tag => (
+                      {project.technologyTags.map((tag, idx) => (
                         <span
-                          key={tag}
+                          key={`${tag}-${idx}`}
                           className="bg-secondary text-secondary-foreground px-2 py-0.5 text-xs font-medium"
                         >
                           {tag}
