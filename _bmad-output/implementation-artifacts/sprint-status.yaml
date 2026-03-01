@@ -773,11 +773,11 @@ development_status:
   9-1c-sheet-slide-animation: ready-for-dev  # NEW: Sheet component slide animation using CSS @starting-style — affects portal + public nav mobile drawers + Storybook docs
   9-2-portal-sponsor-project-view: done  # IN: SSR + Sanity only, no D1
   9-3-portal-events-and-program-info: done  # IN: SSR + Sanity only, no D1
-  9-4-github-dev-dashboard: ready-for-dev  # IN: low-traffic admin page
-  9-5-site-health-ci-pipeline: ready-for-dev  # IN: R2/KV writes in CI, negligible
-  9-6-site-health-dashboard: ready-for-dev  # IN: 1 KV + 1 R2 read per view
+  9-4-github-dev-dashboard: backlog  # IN: low-traffic admin page
+  9-5-site-health-ci-pipeline: backlog  # IN: R2/KV writes in CI, negligible
+  9-6-site-health-dashboard: backlog  # IN: 1 KV + 1 R2 read per view
   9-7-submission-engagement-dashboard: ready-for-dev  # IN (2026-02-27): Full dashboard — submissions + GA4 engagement panel. Paid plan removes CPU/request limits.
-  9-8-cloudflare-d1-database-setup: ready-for-dev  # IN (2026-02-27): All 6 tables restored. Paid plan: 25B reads/mo, 50M writes/mo — no daily caps.
+  9-8-cloudflare-d1-database-setup: review  # IN (2026-02-27): All 6 tables restored. Paid plan: 25B reads/mo, 50M writes/mo — no daily caps.
   9-9-sponsor-activity-tracking: ready-for-dev  # UN-DESCOPED (2026-02-20): Rewritten with Workers Analytics Engine. writeDataPoint() replaces D1 writes. SQL API for reads (runs outside Worker). 100K writes/day free.
   9-10-event-rsvp-system: ready-for-dev  # IN: ~100 D1 writes/semester, well within limits
   9-11-sponsor-evaluation-forms: ready-for-dev  # IN (2026-02-27): Unblocked by Workers Paid plan. D1 paid tier: 25B reads/mo, 50M writes/mo. Zero architectural changes needed.

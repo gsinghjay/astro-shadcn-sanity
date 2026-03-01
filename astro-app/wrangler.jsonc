@@ -18,5 +18,12 @@
     // Cloudflare dashboard for production. The empty default is intentional — local
     // dev bypasses auth via the `import.meta.env.DEV` check in lib/auth.ts.
     "CF_ACCESS_AUD": ""
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "PORTAL_DB",
+      "database_name": "ywcc-capstone-portal",
+      "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
+    }
+  ]
 }
