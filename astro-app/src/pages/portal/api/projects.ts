@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
   if (!user?.email) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status: 401,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
     });
   }
 
@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
     if (!sponsor || sponsor._id !== sponsorId) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
       });
     }
 
@@ -37,7 +37,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
     });
 
     return new Response(JSON.stringify(projects ?? []), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
     });
   }
 
@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ locals, url }) => {
   if (!sponsor) {
     return new Response(JSON.stringify({ error: 'No sponsor found for this email' }), {
       status: 404,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
     });
   }
 
@@ -60,6 +60,6 @@ export const GET: APIRoute = async ({ locals, url }) => {
   });
 
   return new Response(JSON.stringify(projects ?? []), {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' },
   });
 };

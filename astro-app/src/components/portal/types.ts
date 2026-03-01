@@ -79,8 +79,8 @@ export interface PortalUser {
  * ```
  */
 export interface PortalNavItem {
-  /** The URL path this nav item links to (e.g., "/portal/projects"). */
-  href: string;
+  /** The URL path this nav item links to (e.g., "/portal/projects"). Omit for disabled items. */
+  href?: string;
   /** Display text shown in the sidebar. */
   label: string;
   /**
