@@ -26,6 +26,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   TURNSTILE_SECRET_KEY: string;
   DISCORD_WEBHOOK_URL: string;
   SANITY_API_WRITE_TOKEN: string;
+  PORTAL_DB: D1Database;
 }>;
 
 declare namespace App {
