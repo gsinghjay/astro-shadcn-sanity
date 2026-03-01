@@ -31,10 +31,11 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   GOOGLE_CLIENT_SECRET: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
+  SESSION_CACHE?: KVNamespace;
 }>;
 
 declare namespace App {
   interface Locals extends Runtime {
-    user?: { email: string };
+    user?: { email: string; role: 'sponsor' | 'student'; name?: string };
   }
 }
