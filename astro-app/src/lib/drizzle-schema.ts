@@ -1,6 +1,5 @@
 /**
  * Drizzle ORM schema for Better Auth tables on Cloudflare D1.
- * Spike 16.1 — validates Better Auth + Drizzle on CF Workers free plan.
  *
  * Tables: user, session, account, verification
  * These are the core tables Better Auth expects.

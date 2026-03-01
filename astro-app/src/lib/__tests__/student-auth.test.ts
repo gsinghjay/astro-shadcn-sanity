@@ -114,4 +114,9 @@ describe('createAuth() — auth factory', () => {
     const badEnv = { ...mockEnv, GOOGLE_CLIENT_SECRET: '' };
     expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('GOOGLE_CLIENT_SECRET');
   });
+
+  it('throws when env var is whitespace-only', () => {
+    const badEnv = { ...mockEnv, BETTER_AUTH_SECRET: '   ' };
+    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('BETTER_AUTH_SECRET');
+  });
 });

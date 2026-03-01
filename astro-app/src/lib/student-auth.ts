@@ -34,7 +34,7 @@ interface CreateAuthOptions {
 export function createAuth({ db, env }: CreateAuthOptions) {
   const required: (keyof AuthEnv)[] = ['BETTER_AUTH_SECRET', 'BETTER_AUTH_URL', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
   for (const key of required) {
-    if (!env[key]) {
+    if (!env[key]?.trim()) {
       throw new Error(`Missing required auth environment variable: ${key}`);
     }
   }

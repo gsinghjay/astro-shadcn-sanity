@@ -45,4 +45,9 @@ describe('getDrizzle() — shared Drizzle ORM instance', () => {
     const call = mockDrizzle.mock.calls[0];
     expect(call[1]).toHaveProperty('schema');
   });
+
+  it('propagates error when PORTAL_DB binding is missing', () => {
+    const locals = { runtime: { env: {} } } as unknown as App.Locals;
+    expect(() => getDrizzle(locals)).toThrow('PORTAL_DB binding not available');
+  });
 });
