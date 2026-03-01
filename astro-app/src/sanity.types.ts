@@ -670,6 +670,8 @@ export type Sponsor = {
   };
   description?: string;
   website?: string;
+  contactEmail?: string;
+  allowedEmails?: Array<string>;
   industry?: string;
   tier?: "platinum" | "gold" | "silver" | "bronze";
   featured?: boolean;
@@ -1479,6 +1481,210 @@ export type EVENT_BY_SLUG_QUERY_RESULT = {
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_BY_EMAIL_QUERY
+// Query: *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current}
+export type SPONSOR_BY_EMAIL_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  slug: string | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_PORTAL_QUERY
+// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, industry, featured,  contactEmail, allowedEmails,  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {    _id, title, "slug": slug.current,    status, semester, technologyTags,    team[]{ _key, name, role },    content  }}
+export type SPONSOR_PORTAL_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  logo: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
+  tier: "bronze" | "gold" | "platinum" | "silver" | null;
+  description: string | null;
+  website: string | null;
+  industry: string | null;
+  featured: boolean | null;
+  contactEmail: string | null;
+  allowedEmails: Array<string> | null;
+  projects: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    status: "active" | "archived" | "completed" | null;
+    semester: string | null;
+    technologyTags: Array<
+      | "5G Technology"
+      | "802.1X Authentication"
+      | "AI/ML"
+      | "Angular"
+      | "Astro"
+      | "AWS"
+      | "Azure ML"
+      | "Big Data"
+      | "Blockchain"
+      | "Cisco Packet Tracer"
+      | "Cloud Computing"
+      | "Computer Vision"
+      | "CSS"
+      | "Custom Theme"
+      | "Data Analytics"
+      | "Data Science"
+      | "Data Visualization"
+      | "Distributed Systems"
+      | "DNS Security"
+      | "Docker"
+      | "Edge Computing"
+      | "EdTech"
+      | "Elementor"
+      | "Ethereum"
+      | "Firebase"
+      | "FormSite"
+      | "Gamification"
+      | "Git"
+      | "GraphQL"
+      | "Healthcare IoT"
+      | "HTML"
+      | "IoT"
+      | "Java"
+      | "JavaScript"
+      | "Kubernetes"
+      | "Machine Learning"
+      | "MongoDB"
+      | "MySQL"
+      | "Network Security"
+      | "Next.js"
+      | "NLP"
+      | "Node.js"
+      | "Optimization"
+      | "PHP"
+      | "PostgreSQL"
+      | "Proof-of-Stake"
+      | "Publishing"
+      | "Python"
+      | "RADIUS Server"
+      | "React"
+      | "REST API"
+      | "Sentiment Analysis"
+      | "Smart Contracts"
+      | "Smart Slider 3"
+      | "Social Impact"
+      | "Sustainability"
+      | "Tailwind CSS"
+      | "TypeScript"
+      | "Video Processing"
+      | "VLAN Configuration"
+      | "Vue.js"
+      | "Web Development"
+      | "WebRTC"
+      | "WordPress"
+      | "Workforce Analytics"
+      | "Zero Trust Architecture"
+    > | null;
+    team: Array<{
+      _key: string;
+      name: string | null;
+      role: string | null;
+    }> | null;
+    content: PortableText | null;
+  }>;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_PROJECTS_API_QUERY
+// Query: *[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {  _id, title, "slug": slug.current,  status, semester, technologyTags,  team[]{ _key, name, role },  content}
+export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  status: "active" | "archived" | "completed" | null;
+  semester: string | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
+  team: Array<{
+    _key: string;
+    name: string | null;
+    role: string | null;
+  }> | null;
+  content: PortableText | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
 // Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
@@ -1980,6 +2186,9 @@ declare module "@sanity/client" {
     '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
     '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
+    '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
+    '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

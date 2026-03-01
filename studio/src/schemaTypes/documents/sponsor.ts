@@ -1,4 +1,4 @@
-import {defineType, defineField} from 'sanity'
+import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon, SearchIcon} from '@sanity/icons'
 import {siteField} from '../fields/site-field'
 
@@ -58,6 +58,22 @@ export const sponsor = defineType({
       title: 'Website',
       type: 'url',
       group: 'main',
+    }),
+    defineField({
+      name: 'contactEmail',
+      title: 'Contact Email',
+      type: 'string',
+      group: 'main',
+      description: 'Email address for portal authentication matching',
+      validation: (Rule) => Rule.email(),
+    }),
+    defineField({
+      name: 'allowedEmails',
+      title: 'Allowed Emails',
+      type: 'array',
+      group: 'main',
+      description: 'Additional emails authorized to access this sponsor portal',
+      of: [defineArrayMember({type: 'string', validation: (Rule) => Rule.email()})],
     }),
     defineField({
       name: 'industry',

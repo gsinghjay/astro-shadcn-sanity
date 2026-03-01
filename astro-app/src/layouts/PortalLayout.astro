@@ -28,9 +28,10 @@ interface Props {
   title?: string;
   seo?: SeoProps | null;
   activeNav?: string;
+  sponsorSlug?: string | null;
 }
 
-const { title = "Sponsor Portal", seo, activeNav } = Astro.props;
+const { title = "Sponsor Portal", seo, activeNav, sponsorSlug } = Astro.props;
 const user = Astro.locals.user;
 const currentPath = activeNav ?? Astro.url.pathname;
 
@@ -40,10 +41,10 @@ const isActive = (href: string) =>
 const navItems: PortalNavItem[] = [
   { href: "/portal/", label: "Dashboard", icon: "lucide:layout-dashboard" },
   {
-    href: "/portal/projects",
+    href: sponsorSlug ? `/portal/${sponsorSlug}` : undefined,
     label: "My Projects",
     icon: "lucide:folder",
-    disabled: true,
+    disabled: !sponsorSlug,
   },
   {
     href: "/portal/progress",

@@ -9,7 +9,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Local dev bypass — no CF Access edge auth available locally
   if (import.meta.env.DEV) {
-    context.locals.user = { email: "dev@localhost" };
+    context.locals.user = { email: "dev@example.com" };
     return next();
   }
 
