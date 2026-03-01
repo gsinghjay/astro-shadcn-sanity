@@ -13,11 +13,9 @@
   "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
   "pages_build_output_dir": "./dist",
   "vars": {
-    "CF_ACCESS_TEAM_DOMAIN": "https://ywcc-capstone-pages.cloudflareaccess.com",
-    // CF_ACCESS_AUD must be set via `wrangler secret put CF_ACCESS_AUD` or the
-    // Cloudflare dashboard for production. The empty default is intentional — local
-    // dev bypasses auth via the `import.meta.env.DEV` check in lib/auth.ts.
-    "CF_ACCESS_AUD": ""
+    "CF_ACCESS_TEAM_DOMAIN": "https://ywcc-capstone-pages.cloudflareaccess.com"
+    // CF_ACCESS_AUD is set via the CF Pages dashboard as a secret.
+    // Local dev bypasses auth via the `import.meta.env.DEV` check in lib/auth.ts.
   },
   "d1_databases": [
     {
