@@ -18,9 +18,6 @@ import {project} from './documents/project'
 import {testimonial} from './documents/testimonial'
 import {event} from './documents/event'
 import {submission} from './documents/submission'
-import {capstoneStudent} from './documents/capstone-student'
-import {team} from './documents/team'
-import {studentResource} from './documents/student-resource'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -57,9 +54,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   event,
   submission,
-  capstoneStudent,
-  team,
-  studentResource,
   // Blocks — homepage
   heroBanner,
   featureGrid,
