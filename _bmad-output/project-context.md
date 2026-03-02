@@ -404,9 +404,14 @@ tests/
 
 #### Hosting
 
-- **Target**: Cloudflare Pages. `@astrojs/cloudflare` adapter configured with `platformProxy: { enabled: true }`.
+- **Target**: Cloudflare Pages with **three projects** from the same repo (Epic 15):
+  - `ywcc-capstone` — dataset: `production`, site: `capstone`, theme: `red`
+  - `rwc-us` — dataset: `rwc`, site: `rwc-us`, theme: `blue`
+  - `rwc-intl` — dataset: `rwc`, site: `rwc-intl`, theme: `green`
+- **Adapter**: `@astrojs/cloudflare` configured with `platformProxy: { enabled: true }`.
+- **Builds**: CF Pages git integration builds all three projects on push to `main`. Content changes trigger per-project deploy hooks.
 - **Preview**: `wrangler pages dev dist/` for local Cloudflare Workers emulation.
-- **Deploy**: `astro build && wrangler pages deploy dist/`.
+- **Env var source of truth**: CF Pages dashboard per-project (not `wrangler.jsonc`).
 
 #### CI/CD
 

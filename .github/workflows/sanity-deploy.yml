@@ -1,4 +1,16 @@
-name: Sanity Content Deploy
+# SUPERSEDED by CF Pages git integration + Sanity deploy hooks (Story 15-5).
+#
+# With multi-project CF Pages (ywcc-capstone, rwc-us, rwc-intl), the preferred
+# content rebuild pipeline is:
+#
+#   Sanity publish → GROQ webhook → CF Pages deploy hook (per-project)
+#
+# Each CF Pages project builds automatically from git on push AND via deploy
+# hooks on content changes. This workflow is retained as a FALLBACK for the
+# capstone project only — disable it once deploy hooks are verified stable.
+#
+# To re-enable: send a repository_dispatch event with type "sanity-content-published".
+name: Sanity Content Deploy (Legacy Fallback)
 
 on:
   repository_dispatch:
@@ -22,6 +34,9 @@ jobs:
         env:
           PUBLIC_SANITY_STUDIO_PROJECT_ID: ${{ vars.PUBLIC_SANITY_STUDIO_PROJECT_ID }}
           PUBLIC_SANITY_STUDIO_DATASET: ${{ vars.PUBLIC_SANITY_STUDIO_DATASET }}
+          PUBLIC_SANITY_DATASET: ${{ vars.PUBLIC_SANITY_DATASET || 'production' }}
+          PUBLIC_SITE_ID: ${{ vars.PUBLIC_SITE_ID || 'capstone' }}
+          PUBLIC_SITE_THEME: ${{ vars.PUBLIC_SITE_THEME || 'red' }}
           PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
           PUBLIC_SANITY_STUDIO_URL: ${{ vars.PUBLIC_SANITY_STUDIO_URL }}
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}

@@ -12,6 +12,8 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  STUDENT_TEAM_QUERY_RESULT,
+  STUDENT_PROGRAM_RESOURCES_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -30,6 +32,34 @@ const PORTABLE_TEXT_PROJECTION = `{
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
+
+/**
+ * Multi-site context constants — resolved at build time via Vite's
+ * static replacement of `import.meta.env` values.
+ * Each CF Pages build is isolated (one site = one set of env vars).
+ */
+const DATASET = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
+const SITE_ID = import.meta.env.PUBLIC_SITE_ID || 'capstone';
+const isMultiSite = DATASET === 'rwc';
+
+/**
+ * Returns GROQ query params for site-aware queries.
+ * Always includes `site` key for the always-present filter pattern:
+ * - rwc dataset: `{ site: "rwc-us" }` (or "rwc-intl")
+ * - production dataset: `{ site: "" }` (empty string short-circuits the filter)
+ */
+export function getSiteParams(): Record<string, string> {
+  return isMultiSite ? { site: SITE_ID } : { site: '' };
+}
+
+/**
+ * Returns the siteSettings document ID for the current site.
+ * - rwc dataset: `siteSettings-rwc-us` or `siteSettings-rwc-intl`
+ * - production dataset: `siteSettings`
+ */
+function getSiteSettingsId(): string {
+  return isMultiSite ? `siteSettings-${SITE_ID}` : 'siteSettings';
+}
 
 /**
  * Sponsor type — derived from the generated ALL_SPONSORS_QUERY_RESULT.
@@ -110,7 +140,7 @@ export async function loadQuery<T>({
 /**
  * GROQ query: fetch the singleton site settings document.
  */
-export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings"][0]{
+export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings" && _id == $siteSettingsId][0]{
   siteName,
   siteDescription,
   logo{ ${IMAGE_PROJECTION}, alt },
@@ -138,6 +168,7 @@ export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY
 
   const { result } = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
     query: SITE_SETTINGS_QUERY,
+    params: { siteSettingsId: getSiteSettingsId() },
   });
 
   if (!result) {
@@ -154,13 +185,13 @@ export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY
 /**
  * GROQ query: fetch all page slugs for static path generation.
  */
-export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && defined(slug.current)]{ "slug": slug.current }`);
+export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch all sponsors for build-time caching.
  * Fetched once per build and shared across all blocks that need sponsor data.
  */
-export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor"] | order(name asc){
+export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && ($site == "" || site == $site)] | order(name asc){
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured
@@ -175,7 +206,7 @@ let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
 
 export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
   if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
-  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY });
+  const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY, params: getSiteParams() });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
 }
@@ -183,18 +214,18 @@ export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
 /**
  * GROQ query: fetch all sponsor slugs for static path generation.
  */
-export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && defined(slug.current)]{ "slug": slug.current }`);
+export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single sponsor by slug with all fields and associated projects.
  * The projects sub-query returns an empty array until Epic 4 creates the project schema.
  */
-export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug][0]{
+export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
-  "projects": *[_type == "project" && references(^._id)]{ _id, title, "slug": slug.current }
+  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
 }`);
 
 /**
@@ -203,7 +234,7 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
 export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QUERY_RESULT> {
   const { result } = await loadQuery<SPONSOR_BY_SLUG_QUERY_RESULT>({
     query: SPONSOR_BY_SLUG_QUERY,
-    params: { slug },
+    params: { slug, ...getSiteParams() },
   });
   return result;
 }
@@ -234,7 +265,7 @@ export function resolveBlockSponsors(
 /**
  * GROQ query: fetch all projects with resolved sponsor references.
  */
-export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project"] | order(title asc){
+export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
   _id, title, "slug": slug.current,
   content,
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry },
@@ -252,7 +283,7 @@ let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
 
 export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _projectsCache) return _projectsCache;
-  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY });
+  const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY, params: getSiteParams() });
   _projectsCache = result ?? [];
   return _projectsCache;
 }
@@ -260,13 +291,13 @@ export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
 /**
  * GROQ query: fetch all project slugs for static path generation.
  */
-export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && defined(slug.current)]{ "slug": slug.current }`);
+export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single project by slug with full data and linked testimonials.
  * The testimonials sub-query returns [] until Story 2.11 creates the testimonial schema.
  */
-export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug][0]{
+export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   content[]${PORTABLE_TEXT_PROJECTION},
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
@@ -277,7 +308,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   mentor,
   outcome,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
-  "testimonials": *[_type == "testimonial" && project._ref == ^._id]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
 /**
@@ -286,7 +317,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
 export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QUERY_RESULT> {
   const { result } = await loadQuery<PROJECT_BY_SLUG_QUERY_RESULT>({
     query: PROJECT_BY_SLUG_QUERY,
-    params: { slug },
+    params: { slug, ...getSiteParams() },
   });
   return result;
 }
@@ -295,7 +326,7 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
  * GROQ query: fetch all testimonials for build-time caching.
  * Fetched once per build and shared across all blocks that need testimonial data.
  */
-export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial"] | order(name asc){
+export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){
   _id, name, quote, role, organization, type,
   photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   project->{ _id, title, "slug": slug.current }
@@ -310,7 +341,7 @@ let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
 
 export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
   if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
-  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY });
+  const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY, params: getSiteParams() });
   _testimonialsCache = result ?? [];
   return _testimonialsCache;
 }
@@ -337,9 +368,9 @@ export function resolveBlockTestimonials(
  * GROQ query: fetch all events for build-time caching.
  * Fetched once per build and shared across all blocks that need event data.
  */
-export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event"] | order(date asc){
+export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event" && ($site == "" || site == $site)] | order(date asc){
   _id, title, "slug": slug.current, date, endDate, location,
-  description, eventType, status
+  description, eventType, status, isAllDay, color
 }`);
 
 /**
@@ -351,7 +382,7 @@ let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
 
 export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
   if (!visualEditingEnabled && _eventsCache) return _eventsCache;
-  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY });
+  const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY, params: getSiteParams() });
   _eventsCache = result ?? [];
   return _eventsCache;
 }
@@ -393,20 +424,21 @@ export function resolveBlockEvents(
 export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
   && dateTime(date) >= dateTime($monthStart)
   && dateTime(date) <= dateTime($monthEnd)
+  && ($site == "" || site == $site)
 ] | order(date asc) {
   _id, title, "slug": slug.current, date, endDate,
-  location, eventType, status
+  location, eventType, status, description, isAllDay, color
 }`);
 
 /**
  * GROQ query: fetch all event slugs for static path generation.
  */
-export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defined(slug.current)]{ "slug": slug.current }`);
+export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single event by slug with all fields.
  */
-export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug][0]{
+export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   date, endDate, location, description, eventType, status,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
@@ -418,10 +450,50 @@ export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.c
 export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
   const { result } = await loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
     query: EVENT_BY_SLUG_QUERY,
-    params: { slug },
+    params: { slug, ...getSiteParams() },
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Portal queries (Story 9.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a sponsor by email (contactEmail or allowedEmails match).
+ * Used by the portal landing page to redirect sponsors to their project view.
+ */
+export const SPONSOR_BY_EMAIL_QUERY = defineQuery(groq`*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current
+}`);
+
+/**
+ * GROQ query: fetch a sponsor by slug with authorization fields and associated projects.
+ * Used by the sponsor portal page for profile rendering and project list.
+ */
+export const SPONSOR_PORTAL_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current,
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  tier, description, website, industry, featured,
+  contactEmail, allowedEmails,
+  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {
+    _id, title, "slug": slug.current,
+    status, semester, technologyTags,
+    team[]{ _key, name, role },
+    content
+  }
+}`);
+
+/**
+ * GROQ query: fetch projects for a specific sponsor by sponsor ID.
+ * Used by the portal API endpoint for JSON responses.
+ */
+export const SPONSOR_PROJECTS_API_QUERY = defineQuery(groq`*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {
+  _id, title, "slug": slug.current,
+  status, semester, technologyTags,
+  team[]{ _key, name, role },
+  content
+}`);
 
 /**
  * GROQ query: fetch a single page by slug with template and blocks.
@@ -429,7 +501,7 @@ export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
  * and resolved per-block via resolveBlockSponsors().
  */
-export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.current == $slug][0]{
+export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id,
   title,
   "slug": slug.current,
@@ -536,7 +608,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
       chunk.map(slug =>
         loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
           query: PAGE_BY_SLUG_QUERY,
-          params: { slug },
+          params: { slug, ...getSiteParams() },
         }),
       ),
     );
@@ -552,7 +624,91 @@ export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> 
   if (!visualEditingEnabled && _pageCache.has(slug)) return _pageCache.get(slug)!;
   const { result } = await loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
-    params: { slug },
+    params: { slug, ...getSiteParams() },
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Student portal queries (Story 16.4)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a student's team by email.
+ * No site filter — capstoneStudent/team schemas are capstone-only (no site field).
+ * Ordered by _createdAt desc so returning students get their most recent team.
+ */
+export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email in members[]->email] | order(_createdAt desc) [0]{
+  _id,
+  name,
+  semester,
+  maxMembers,
+  githubRepoUrl,
+  discordChannelUrl,
+  project->{
+    _id,
+    title,
+    "slug": slug.current,
+    sponsor->{
+      _id,
+      name,
+      "slug": slug.current,
+      logo{
+        ${IMAGE_PROJECTION},
+        alt,
+        hotspot,
+        crop
+      }
+    },
+    technologyTags
+  },
+  "pm": pm->{ name, email, githubUsername },
+  "assistantPm": assistantPm->{ name, email, githubUsername },
+  "members": members[]->{ _id, name, email, githubUsername, discordUsername },
+  "memberCount": count(members),
+  "isPM": pm->email == $email,
+  "isAPM": assistantPm->email == $email,
+  teamResources[]{ label, url, category }
+}`);
+
+/**
+ * GROQ query: fetch all program-wide student resources ordered by sortOrder.
+ * No site filter — studentResource is capstone-only.
+ */
+export const STUDENT_PROGRAM_RESOURCES_QUERY = defineQuery(groq`*[_type == "studentResource"] | order(sortOrder asc) {
+  _id,
+  title,
+  description,
+  url,
+  category
+}`);
+
+/**
+ * Fetch a student's team data by email.
+ * Returns null immediately for empty/missing email to avoid unnecessary API calls.
+ */
+export async function getStudentTeam(email: string): Promise<STUDENT_TEAM_QUERY_RESULT> {
+  if (!email) return null as STUDENT_TEAM_QUERY_RESULT;
+  const { result } = await loadQuery<STUDENT_TEAM_QUERY_RESULT>({
+    query: STUDENT_TEAM_QUERY,
+    params: { email },
+  });
+  return result;
+}
+
+/**
+ * Fetch all program-wide student resources.
+ */
+export async function getStudentProgramResources(): Promise<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT> {
+  const { result } = await loadQuery<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT>({
+    query: STUDENT_PROGRAM_RESOURCES_QUERY,
+    params: {},
+  });
+  return result ?? [];
+}
+
+/** Student team type — derived from STUDENT_TEAM_QUERY_RESULT. */
+export type StudentTeam = NonNullable<STUDENT_TEAM_QUERY_RESULT>;
+
+/** Student program resource type — derived from STUDENT_PROGRAM_RESOURCES_QUERY_RESULT. */
+export type StudentProgramResource = STUDENT_PROGRAM_RESOURCES_QUERY_RESULT[number];
