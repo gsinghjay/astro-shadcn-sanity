@@ -9,7 +9,14 @@ const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
 // Fallback to process.env for Cloudflare Pages builds (no .env file on CF)
 const projectId = env.PUBLIC_SANITY_STUDIO_PROJECT_ID || process.env.PUBLIC_SANITY_STUDIO_PROJECT_ID || env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID || "placeholder";
-const dataset = env.PUBLIC_SANITY_STUDIO_DATASET || process.env.PUBLIC_SANITY_STUDIO_DATASET || env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || "production";
+const dataset = env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET || env.PUBLIC_SANITY_STUDIO_DATASET || process.env.PUBLIC_SANITY_STUDIO_DATASET || "production";
+const siteId = env.PUBLIC_SITE_ID || process.env.PUBLIC_SITE_ID || "capstone";
+const VALID_SITE_THEMES = ["red", "blue", "green"];
+const siteThemeRaw = env.PUBLIC_SITE_THEME || process.env.PUBLIC_SITE_THEME || "red";
+if (!VALID_SITE_THEMES.includes(siteThemeRaw)) {
+  console.warn(`[astro.config] Invalid PUBLIC_SITE_THEME="${siteThemeRaw}". Valid values: ${VALID_SITE_THEMES.join(", ")}. Falling back to "red".`);
+}
+const siteTheme = VALID_SITE_THEMES.includes(siteThemeRaw) ? siteThemeRaw : "red";
 const siteUrl = env.PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || "http://localhost:4321";
 const studioUrl = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
 const gtmId = env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID || "";
@@ -32,6 +39,9 @@ export default defineConfig({
       "import.meta.env.PUBLIC_GTM_ID": JSON.stringify(gtmId),
       "import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED": JSON.stringify(visualEditingEnabled),
       "import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED": JSON.stringify(liveContentEnabled),
+      "import.meta.env.PUBLIC_SANITY_DATASET": JSON.stringify(dataset),
+      "import.meta.env.PUBLIC_SITE_ID": JSON.stringify(siteId),
+      "import.meta.env.PUBLIC_SITE_THEME": JSON.stringify(siteTheme),
     },
   },
   integrations: [
