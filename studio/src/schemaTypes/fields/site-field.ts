@@ -17,13 +17,8 @@ export const siteField = defineField({
     ],
     layout: 'radio',
   },
-  hidden: ({document}) => {
-    // process.env.SANITY_STUDIO_DATASET is statically replaced at build time.
-    // Defaults to 'production' when not set, keeping the field hidden for capstone editors.
-    // Story 15.2 may refine this to runtime detection for multi-workspace support.
-    const dataset = process.env.SANITY_STUDIO_DATASET || 'production'
-    return dataset === 'production'
-  },
+  // Default: hidden. Overridden per workspace via createSchemaTypesForWorkspace().
+  hidden: true,
   validation: (Rule) =>
     Rule.custom((value, context) => {
       const {dataset} = context.getClient({apiVersion: '2024-01-01'}).config()

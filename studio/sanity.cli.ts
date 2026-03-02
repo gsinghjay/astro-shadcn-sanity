@@ -20,6 +20,9 @@ export default defineCliConfig({
     appId: 'zi1cig2o607y1js5cfoyird6',
     autoUpdates: true,
   },
+  schemaExtraction: {
+    workspace: 'capstone',
+  },
   typegen: {
     path: '../astro-app/src/**/*.{ts,tsx,js,jsx}',
     schema: 'schema.json',
