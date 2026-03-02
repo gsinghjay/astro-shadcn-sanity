@@ -14,14 +14,16 @@ import { team } from '../../../studio/src/schemaTypes/documents/team'
 import { studentResource } from '../../../studio/src/schemaTypes/documents/student-resource'
 import { schemaTypes } from '../../../studio/src/schemaTypes/index'
 
-// Helper to extract field names from a schema
-function fieldNames(schema: any): string[] {
-  return schema.fields.map((f: any) => f.name)
+// Schema test helpers — use Record<string, any> for deep Sanity field property access in assertions
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SchemaFieldRecord = Record<string, any>;
+
+function fieldNames(schema: { fields: Array<{ name: string }> }): string[] {
+  return schema.fields.map((f) => f.name)
 }
 
-// Helper to find a field by name
-function findField(schema: any, name: string): any {
-  return schema.fields.find((f: any) => f.name === name)
+function findField(schema: { fields: SchemaFieldRecord[] }, name: string): SchemaFieldRecord | undefined {
+  return schema.fields.find((f) => f.name === name)
 }
 
 describe('Story 16-4: Student Portal Schemas', () => {

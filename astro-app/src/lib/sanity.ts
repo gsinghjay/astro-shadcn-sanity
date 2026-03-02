@@ -636,8 +636,9 @@ export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> 
 /**
  * GROQ query: find a student's team by email.
  * No site filter — capstoneStudent/team schemas are capstone-only (no site field).
+ * Ordered by _createdAt desc so returning students get their most recent team.
  */
-export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email in members[]->email][0]{
+export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email in members[]->email] | order(_createdAt desc) [0]{
   _id,
   name,
   semester,
@@ -648,7 +649,6 @@ export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email i
     _id,
     title,
     "slug": slug.current,
-    content,
     sponsor->{
       _id,
       name,
@@ -685,8 +685,10 @@ export const STUDENT_PROGRAM_RESOURCES_QUERY = defineQuery(groq`*[_type == "stud
 
 /**
  * Fetch a student's team data by email.
+ * Returns null immediately for empty/missing email to avoid unnecessary API calls.
  */
 export async function getStudentTeam(email: string): Promise<STUDENT_TEAM_QUERY_RESULT> {
+  if (!email) return null as STUDENT_TEAM_QUERY_RESULT;
   const { result } = await loadQuery<STUDENT_TEAM_QUERY_RESULT>({
     query: STUDENT_TEAM_QUERY,
     params: { email },
