@@ -43,6 +43,7 @@
 | Document | Description |
 |----------|-------------|
 | [Cloudflare Guide](./cloudflare-guide.md) | Consolidated Cloudflare deployment, Workers, and configuration guide |
+| [Cloudflare Serverless Primer](./cloudflare-serverless-primer.md) | Beginner-friendly guide to Workers and Pages for developers coming from Docker/VPS |
 | [Capstone Status Report](./capstone-status-report.md) | Project status and milestone tracking |
 | [VPS Migration Plan](./vps-migration-plan.md) | Migration planning documentation |
 
