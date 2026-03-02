@@ -117,6 +117,14 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
   });
 
+  it("ALL_EVENTS_QUERY includes calendar-friendly fields (isAllDay, color)", () => {
+    expect(ALL_EVENTS_QUERY).toContain('_type == "event"');
+    expect(ALL_EVENTS_QUERY).toContain("isAllDay");
+    expect(ALL_EVENTS_QUERY).toContain("color");
+    expect(ALL_EVENTS_QUERY).toContain("description");
+    expect(ALL_EVENTS_QUERY).toContain("eventType");
+  });
+
   it("EVENTS_BY_MONTH_QUERY filters events by date range with expected fields", () => {
     expect(EVENTS_BY_MONTH_QUERY).toContain('_type == "event"');
     expect(EVENTS_BY_MONTH_QUERY).toContain("$monthStart");
@@ -126,6 +134,9 @@ describe("GROQ query definitions", () => {
     expect(EVENTS_BY_MONTH_QUERY).toContain("slug.current");
     expect(EVENTS_BY_MONTH_QUERY).toContain("eventType");
     expect(EVENTS_BY_MONTH_QUERY).toContain("status");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("description");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("isAllDay");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("color");
   });
 
   it("EVENT_BY_SLUG_QUERY fetches single event by slug with all fields", () => {
