@@ -15,7 +15,11 @@ export const prerender = false;
   <body>
     <p>Redirecting to Google sign-in...</p>
     <script>
-      import { authClient } from "@/lib/auth-client";
+      import { createAuthClient } from "better-auth/client";
+
+      const authClient = createAuthClient({
+        baseURL: window.location.origin + "/api/auth",
+      });
 
       authClient.signIn.social({
         provider: "google",
