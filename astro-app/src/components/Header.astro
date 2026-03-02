@@ -6,6 +6,30 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Icon } from '@/components/ui/icon';
 import { Separator } from '@/components/ui/separator';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuSub,
+  NavigationMenuSubItem,
+  NavigationMenuSubLink,
+  NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 
@@ -35,23 +59,61 @@ const brandSecondary = nameParts.slice(1).join(' ');
     </LogoText>
   </Logo>
 
-  <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
-    {(navigationItems || []).map((item) => (
-      <a
-        href={item.href}
-        class:list={[
-          'text-xs font-bold uppercase tracking-widest transition-colors duration-150',
-          currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href || ''))
-            ? 'text-primary'
-            : 'text-foreground hover:text-primary',
-        ]}
-        data-gtm-category="navigation"
-        data-gtm-label={stegaClean(item.label)}
-      >
-        {item.label}
-      </a>
-    ))}
-  </nav>
+  <NavigationMenu class="hidden md:flex" aria-label="Main navigation">
+    <NavigationMenuList>
+      {(navigationItems || []).map((item) => {
+        const hasChildren = item.children && item.children.length > 0;
+        const isActive = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href || ''));
+        return (
+          <NavigationMenuItem>
+            {hasChildren ? (
+              <>
+                <NavigationMenuTrigger
+                  class:list={[
+                    'inline-flex h-8 items-center bg-transparent px-3 py-0 text-xs font-bold uppercase tracking-widest',
+                    isActive ? 'text-primary' : '',
+                  ]}
+                  href={item.href}
+                  data-gtm-category="navigation"
+                  data-gtm-label={stegaClean(item.label)}
+                >
+                  {item.label}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <NavigationMenuSub>
+                    {item.children!.map((child) => (
+                      <NavigationMenuSubItem>
+                        <NavigationMenuSubLink
+                          href={child.href}
+                          data-gtm-category="navigation"
+                          data-gtm-label={stegaClean(child.label)}
+                        >
+                          {child.label}
+                        </NavigationMenuSubLink>
+                      </NavigationMenuSubItem>
+                    ))}
+                  </NavigationMenuSub>
+                </NavigationMenuContent>
+              </>
+            ) : (
+              <NavigationMenuLink
+                class:list={[
+                  'inline-flex h-8 items-center bg-transparent px-3 py-0 text-xs font-bold uppercase tracking-widest',
+                  isActive ? 'text-primary' : '',
+                ]}
+                variant="trigger"
+                href={item.href}
+                data-gtm-category="navigation"
+                data-gtm-label={stegaClean(item.label)}
+              >
+                {item.label}
+              </NavigationMenuLink>
+            )}
+          </NavigationMenuItem>
+        );
+      })}
+    </NavigationMenuList>
+  </NavigationMenu>
 
   <HeaderActions>
     <Button href={ctaHref} class="hidden md:inline-flex" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
@@ -64,23 +126,52 @@ const brandSecondary = nameParts.slice(1).join(' ');
           <SheetHeader>
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
-          <nav class="flex flex-col gap-2 p-4">
-            {(navigationItems || []).map((item) => (
-              <a
-                href={item.href}
-                class:list={[
-                  'text-lg font-bold uppercase tracking-wider py-2',
-                  currentPath === item.href ? 'text-primary' : 'text-foreground',
-                ]}
-                data-gtm-category="navigation"
-                data-gtm-label={stegaClean(item.label)}
-              >
-                {item.label}
-              </a>
-            ))}
+          <SidebarMenu class="p-4">
+            {(navigationItems || []).map((item) => {
+              const hasChildren = item.children && item.children.length > 0;
+              return (
+                <SidebarMenuItem>
+                  {hasChildren ? (
+                    <Collapsible>
+                      <CollapsibleTrigger>
+                        <SidebarMenuButton class="h-10 rounded-md px-4 text-lg font-bold uppercase tracking-wider">
+                          {item.label}
+                        </SidebarMenuButton>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <SidebarMenuSub>
+                          {item.children!.map((child) => (
+                            <SidebarMenuSubItem>
+                              <SidebarMenuSubButton
+                                href={child.href}
+                                data-gtm-category="navigation"
+                                data-gtm-label={stegaClean(child.label)}
+                              >
+                                {child.label}
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  ) : (
+                    <SidebarMenuButton
+                      class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider has-[>svg]:px-4"
+                      href={item.href}
+                      data-gtm-category="navigation"
+                      data-gtm-label={stegaClean(item.label)}
+                    >
+                      {item.label}
+                    </SidebarMenuButton>
+                  )}
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+          <div class="px-4">
             <Separator class="my-2" />
             <Button href={ctaHref} class="w-full justify-center" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
-          </nav>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
