@@ -13,6 +13,7 @@ const handleAuth: APIRoute = async ({ locals, request }) => {
   try {
     const env = locals.runtime.env;
     const db = getDrizzle(locals);
+    const requestOrigin = new URL(request.url).origin;
     const auth = createAuth({
       db,
       env: {
@@ -21,6 +22,7 @@ const handleAuth: APIRoute = async ({ locals, request }) => {
         BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: env.BETTER_AUTH_URL,
       },
+      requestOrigin,
     });
     return await auth.handler(request);
   } catch (error) {

@@ -58,6 +58,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         BETTER_AUTH_SECRET: runtimeEnv!.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: runtimeEnv!.BETTER_AUTH_URL,
       },
+      requestOrigin: context.url.origin,
     });
 
     const session = await auth.api.getSession({

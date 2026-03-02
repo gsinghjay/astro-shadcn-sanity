@@ -183,6 +183,7 @@ describe('middleware — three-branch routing', () => {
           BETTER_AUTH_SECRET: 'test-auth-secret',
           BETTER_AUTH_URL: 'http://localhost:4321',
         },
+        requestOrigin: 'http://localhost:4321',
       });
     });
   });
