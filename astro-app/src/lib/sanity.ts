@@ -12,6 +12,8 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  STUDENT_TEAM_QUERY_RESULT,
+  STUDENT_PROGRAM_RESOURCES_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -368,7 +370,7 @@ export function resolveBlockTestimonials(
  */
 export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event" && ($site == "" || site == $site)] | order(date asc){
   _id, title, "slug": slug.current, date, endDate, location,
-  description, eventType, status
+  description, eventType, status, isAllDay, color
 }`);
 
 /**
@@ -425,7 +427,7 @@ export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
   && ($site == "" || site == $site)
 ] | order(date asc) {
   _id, title, "slug": slug.current, date, endDate,
-  location, eventType, status
+  location, eventType, status, description, isAllDay, color
 }`);
 
 /**
@@ -452,6 +454,46 @@ export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Portal queries (Story 9.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a sponsor by email (contactEmail or allowedEmails match).
+ * Used by the portal landing page to redirect sponsors to their project view.
+ */
+export const SPONSOR_BY_EMAIL_QUERY = defineQuery(groq`*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current
+}`);
+
+/**
+ * GROQ query: fetch a sponsor by slug with authorization fields and associated projects.
+ * Used by the sponsor portal page for profile rendering and project list.
+ */
+export const SPONSOR_PORTAL_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current,
+  logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  tier, description, website, industry, featured,
+  contactEmail, allowedEmails,
+  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {
+    _id, title, "slug": slug.current,
+    status, semester, technologyTags,
+    team[]{ _key, name, role },
+    content
+  }
+}`);
+
+/**
+ * GROQ query: fetch projects for a specific sponsor by sponsor ID.
+ * Used by the portal API endpoint for JSON responses.
+ */
+export const SPONSOR_PROJECTS_API_QUERY = defineQuery(groq`*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {
+  _id, title, "slug": slug.current,
+  status, semester, technologyTags,
+  team[]{ _key, name, role },
+  content
+}`);
 
 /**
  * GROQ query: fetch a single page by slug with template and blocks.
@@ -586,3 +628,87 @@ export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> 
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Student portal queries (Story 16.4)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a student's team by email.
+ * No site filter — capstoneStudent/team schemas are capstone-only (no site field).
+ * Ordered by _createdAt desc so returning students get their most recent team.
+ */
+export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email in members[]->email] | order(_createdAt desc) [0]{
+  _id,
+  name,
+  semester,
+  maxMembers,
+  githubRepoUrl,
+  discordChannelUrl,
+  project->{
+    _id,
+    title,
+    "slug": slug.current,
+    sponsor->{
+      _id,
+      name,
+      "slug": slug.current,
+      logo{
+        ${IMAGE_PROJECTION},
+        alt,
+        hotspot,
+        crop
+      }
+    },
+    technologyTags
+  },
+  "pm": pm->{ name, email, githubUsername },
+  "assistantPm": assistantPm->{ name, email, githubUsername },
+  "members": members[]->{ _id, name, email, githubUsername, discordUsername },
+  "memberCount": count(members),
+  "isPM": pm->email == $email,
+  "isAPM": assistantPm->email == $email,
+  teamResources[]{ label, url, category }
+}`);
+
+/**
+ * GROQ query: fetch all program-wide student resources ordered by sortOrder.
+ * No site filter — studentResource is capstone-only.
+ */
+export const STUDENT_PROGRAM_RESOURCES_QUERY = defineQuery(groq`*[_type == "studentResource"] | order(sortOrder asc) {
+  _id,
+  title,
+  description,
+  url,
+  category
+}`);
+
+/**
+ * Fetch a student's team data by email.
+ * Returns null immediately for empty/missing email to avoid unnecessary API calls.
+ */
+export async function getStudentTeam(email: string): Promise<STUDENT_TEAM_QUERY_RESULT> {
+  if (!email) return null as STUDENT_TEAM_QUERY_RESULT;
+  const { result } = await loadQuery<STUDENT_TEAM_QUERY_RESULT>({
+    query: STUDENT_TEAM_QUERY,
+    params: { email },
+  });
+  return result;
+}
+
+/**
+ * Fetch all program-wide student resources.
+ */
+export async function getStudentProgramResources(): Promise<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT> {
+  const { result } = await loadQuery<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT>({
+    query: STUDENT_PROGRAM_RESOURCES_QUERY,
+    params: {},
+  });
+  return result ?? [];
+}
+
+/** Student team type — derived from STUDENT_TEAM_QUERY_RESULT. */
+export type StudentTeam = NonNullable<STUDENT_TEAM_QUERY_RESULT>;
+
+/** Student program resource type — derived from STUDENT_PROGRAM_RESOURCES_QUERY_RESULT. */
+export type StudentProgramResource = STUDENT_PROGRAM_RESOURCES_QUERY_RESULT[number];
