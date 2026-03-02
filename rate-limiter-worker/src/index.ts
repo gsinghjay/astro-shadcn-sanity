@@ -6,12 +6,15 @@ export interface RateLimitResult {
   retryAfterMs: number;
 }
 
+/** Default window for alarm cleanup when no persisted value exists */
+const DEFAULT_WINDOW_MS = 60_000;
+
 export class SlidingWindowRateLimiter extends DurableObject {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.ctx.storage.sql.exec(`
       CREATE TABLE IF NOT EXISTS requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY,
         timestamp_ms INTEGER NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_requests_ts ON requests(timestamp_ms);
@@ -47,6 +50,9 @@ export class SlidingWindowRateLimiter extends DurableObject {
     // Record this request
     this.ctx.storage.sql.exec("INSERT INTO requests (timestamp_ms) VALUES (?)", now);
 
+    // Persist windowMs so alarm() uses the correct expiry (survives hibernation)
+    await this.ctx.storage.put("windowMs", windowMs);
+
     // Schedule alarm for cleanup after the window expires
     const currentAlarm = await this.ctx.storage.getAlarm();
     if (currentAlarm === null) {
@@ -61,9 +67,10 @@ export class SlidingWindowRateLimiter extends DurableObject {
   }
 
   async alarm(): Promise<void> {
+    const windowMs = (await this.ctx.storage.get<number>("windowMs")) ?? DEFAULT_WINDOW_MS;
     const now = Date.now();
-    // Prune all expired entries
-    this.ctx.storage.sql.exec("DELETE FROM requests WHERE timestamp_ms < ?", now);
+    // Prune entries outside the sliding window (not just older than now)
+    this.ctx.storage.sql.exec("DELETE FROM requests WHERE timestamp_ms < ?", now - windowMs);
 
     // Check if any entries remain
     const { count } = this.ctx.storage.sql
@@ -76,18 +83,11 @@ export class SlidingWindowRateLimiter extends DurableObject {
         .exec<{ timestamp_ms: number }>("SELECT timestamp_ms FROM requests ORDER BY timestamp_ms ASC LIMIT 1")
         .one();
 
-      // Schedule next alarm for when the oldest entry expires
-      // Using a generous window — entries from `oldest.timestamp_ms` will expire
-      // after 60s (the default window). We don't know the exact windowMs here,
-      // so schedule for oldest + 60_000 as a reasonable default.
-      await this.ctx.storage.setAlarm(oldest.timestamp_ms + 60_000);
+      // Schedule next alarm for when the oldest entry expires using persisted window
+      await this.ctx.storage.setAlarm(oldest.timestamp_ms + windowMs);
     }
     // If count === 0, don't reschedule — DO will hibernate automatically
   }
-}
-
-interface Env {
-  RATE_LIMITER: DurableObjectNamespace<SlidingWindowRateLimiter>;
 }
 
 export default {

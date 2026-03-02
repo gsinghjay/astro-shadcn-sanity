@@ -367,6 +367,7 @@ describe('middleware — three-branch routing', () => {
       expect(result.status).toBe(429);
       expect(result.headers.get('Retry-After')).toBe('30');
       expect(result.headers.get('X-RateLimit-Remaining')).toBe('0');
+      expect(result.headers.get('X-RateLimit-Limit')).toBe('100');
       expect(mockNext).not.toHaveBeenCalled();
       expect(mockValidateAccessJWT).not.toHaveBeenCalled();
     });

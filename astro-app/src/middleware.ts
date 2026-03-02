@@ -3,6 +3,10 @@ import { validateAccessJWT } from "@/lib/auth";
 import { getDrizzle } from "@/lib/db";
 import { createAuth } from "@/lib/student-auth";
 
+/** Rate limiting configuration (AC 5: configurable via constants) */
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 100;
+
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
   const isPortal = pathname.startsWith("/portal");
@@ -32,7 +36,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     try {
       const id = rateLimiter.idFromName(`ip:${ip}`);
       const stub = rateLimiter.get(id);
-      const result = await stub.checkLimit(60_000, 100);
+      const result = await stub.checkLimit(RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS);
       if (!result.allowed) {
         const retryAfterSeconds = Math.ceil(result.retryAfterMs / 1000);
         return new Response("Too Many Requests", {
@@ -40,6 +44,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
           headers: {
             "Retry-After": String(retryAfterSeconds),
             "X-RateLimit-Remaining": "0",
+            "X-RateLimit-Limit": String(RATE_LIMIT_MAX_REQUESTS),
           },
         });
       }
