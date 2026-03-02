@@ -12,6 +12,8 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  STUDENT_TEAM_QUERY_RESULT,
+  STUDENT_PROGRAM_RESOURCES_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -626,3 +628,83 @@ export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> 
   });
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// Student portal queries (Story 16.4)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: find a student's team by email.
+ * No site filter — capstoneStudent/team schemas are capstone-only (no site field).
+ */
+export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email in members[]->email][0]{
+  _id,
+  name,
+  semester,
+  maxMembers,
+  githubRepoUrl,
+  discordChannelUrl,
+  project->{
+    _id,
+    title,
+    "slug": slug.current,
+    content,
+    sponsor->{
+      _id,
+      name,
+      "slug": slug.current,
+      logo{
+        ${IMAGE_PROJECTION},
+        alt
+      }
+    },
+    technologyTags
+  },
+  "pm": pm->{ name, email, githubUsername },
+  "assistantPm": assistantPm->{ name, email, githubUsername },
+  "members": members[]->{ _id, name, email, githubUsername, discordUsername },
+  "memberCount": count(members),
+  "isPM": pm->email == $email,
+  "isAPM": assistantPm->email == $email,
+  teamResources[]{ label, url, category }
+}`);
+
+/**
+ * GROQ query: fetch all program-wide student resources ordered by sortOrder.
+ * No site filter — studentResource is capstone-only.
+ */
+export const STUDENT_PROGRAM_RESOURCES_QUERY = defineQuery(groq`*[_type == "studentResource"] | order(sortOrder asc) {
+  _id,
+  title,
+  description,
+  url,
+  category
+}`);
+
+/**
+ * Fetch a student's team data by email.
+ */
+export async function getStudentTeam(email: string): Promise<STUDENT_TEAM_QUERY_RESULT> {
+  const { result } = await loadQuery<STUDENT_TEAM_QUERY_RESULT>({
+    query: STUDENT_TEAM_QUERY,
+    params: { email },
+  });
+  return result;
+}
+
+/**
+ * Fetch all program-wide student resources.
+ */
+export async function getStudentProgramResources(): Promise<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT> {
+  const { result } = await loadQuery<STUDENT_PROGRAM_RESOURCES_QUERY_RESULT>({
+    query: STUDENT_PROGRAM_RESOURCES_QUERY,
+    params: {},
+  });
+  return result ?? [];
+}
+
+/** Student team type — derived from STUDENT_TEAM_QUERY_RESULT. */
+export type StudentTeam = NonNullable<STUDENT_TEAM_QUERY_RESULT>;
+
+/** Student program resource type — derived from STUDENT_PROGRAM_RESOURCES_QUERY_RESULT. */
+export type StudentProgramResource = STUDENT_PROGRAM_RESOURCES_QUERY_RESULT[number];
