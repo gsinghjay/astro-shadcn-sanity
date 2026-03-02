@@ -187,8 +187,25 @@ const displayEmail = user?.email || '';
     baseURL: window.location.origin + '/api/auth',
   });
 
+  let signingOut = false;
+
   function handleSignOut(e: Event) {
     e.preventDefault();
+    if (signingOut) return;
+    signingOut = true;
+
+    // Disable both buttons and update text
+    for (const id of ['student-sign-out', 'student-sign-out-mobile']) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.setAttribute('disabled', '');
+        btn.style.opacity = '0.5';
+        btn.style.pointerEvents = 'none';
+        const label = btn.querySelector('span');
+        if (label) label.textContent = 'Signing out…';
+      }
+    }
+
     authClient.signOut().then(() => {
       window.location.href = '/student/';
     });
