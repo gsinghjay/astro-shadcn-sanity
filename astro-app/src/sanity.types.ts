@@ -232,6 +232,78 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
+export type StudentResource = {
+  _id: string;
+  _type: "studentResource";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  description?: string;
+  url?: string;
+  category?:
+    | "calendar"
+    | "academic"
+    | "communication"
+    | "development"
+    | "general";
+  sortOrder?: number;
+};
+
+export type ProjectReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "project";
+};
+
+export type CapstoneStudentReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "capstoneStudent";
+};
+
+export type Team = {
+  _id: string;
+  _type: "team";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  semester?: "Spring 2026" | "Fall 2026";
+  project?: ProjectReference;
+  maxMembers?: number;
+  pm?: CapstoneStudentReference;
+  assistantPm?: CapstoneStudentReference;
+  members?: Array<
+    {
+      _key: string;
+    } & CapstoneStudentReference
+  >;
+  githubRepoUrl?: string;
+  discordChannelUrl?: string;
+  teamResources?: Array<{
+    label?: string;
+    url?: string;
+    category?: "communication" | "development" | "documents" | "general";
+    _key: string;
+  }>;
+};
+
+export type CapstoneStudent = {
+  _id: string;
+  _type: "capstoneStudent";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  email?: string;
+  semester?: "Spring 2026" | "Fall 2026";
+  githubUsername?: string;
+  discordUsername?: string;
+};
+
 export type Submission = {
   _id: string;
   _type: "submission";
@@ -244,13 +316,6 @@ export type Submission = {
   message?: string;
   form?: FormReference;
   submittedAt?: string;
-};
-
-export type ProjectReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "project";
 };
 
 export type Testimonial = {
@@ -862,8 +927,12 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
-  | Submission
+  | StudentResource
   | ProjectReference
+  | CapstoneStudentReference
+  | Team
+  | CapstoneStudent
+  | Submission
   | Testimonial
   | SanityImageCrop
   | SanityImageHotspot
@@ -1416,7 +1485,7 @@ export type ALL_TESTIMONIALS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_EVENTS_QUERY
-// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status}
+// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status, isAllDay, color}
 export type ALL_EVENTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1427,11 +1496,13 @@ export type ALL_EVENTS_QUERY_RESULT = Array<{
   description: string | null;
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
+  isAllDay: boolean | null;
+  color: "blue" | "green" | "orange" | "purple" | "red" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENTS_BY_MONTH_QUERY
-// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status}
+// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status, description, isAllDay, color}
 export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1441,6 +1512,9 @@ export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   location: string | null;
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
+  description: string | null;
+  isAllDay: boolean | null;
+  color: "blue" | "green" | "orange" | "purple" | "red" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -2169,6 +2243,151 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
   > | null;
 } | null;
 
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: STUDENT_TEAM_QUERY
+// Query: *[_type == "team" && $email in members[]->email] | order(_createdAt desc) [0]{  _id,  name,  semester,  maxMembers,  githubRepoUrl,  discordChannelUrl,  project->{    _id,    title,    "slug": slug.current,    sponsor->{      _id,      name,      "slug": slug.current,      logo{        asset->{ _id, url, metadata { lqip, dimensions } },        alt,        hotspot,        crop      }    },    technologyTags  },  "pm": pm->{ name, email, githubUsername },  "assistantPm": assistantPm->{ name, email, githubUsername },  "members": members[]->{ _id, name, email, githubUsername, discordUsername },  "memberCount": count(members),  "isPM": pm->email == $email,  "isAPM": assistantPm->email == $email,  teamResources[]{ label, url, category }}
+export type STUDENT_TEAM_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  semester: "Fall 2026" | "Spring 2026" | null;
+  maxMembers: number | null;
+  githubRepoUrl: string | null;
+  discordChannelUrl: string | null;
+  project: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    sponsor: {
+      _id: string;
+      name: string | null;
+      slug: string | null;
+      logo: {
+        asset: {
+          _id: string;
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: SanityImageDimensions | null;
+          } | null;
+        } | null;
+        alt: string | null;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+      } | null;
+    } | null;
+    technologyTags: Array<
+      | "5G Technology"
+      | "802.1X Authentication"
+      | "AI/ML"
+      | "Angular"
+      | "Astro"
+      | "AWS"
+      | "Azure ML"
+      | "Big Data"
+      | "Blockchain"
+      | "Cisco Packet Tracer"
+      | "Cloud Computing"
+      | "Computer Vision"
+      | "CSS"
+      | "Custom Theme"
+      | "Data Analytics"
+      | "Data Science"
+      | "Data Visualization"
+      | "Distributed Systems"
+      | "DNS Security"
+      | "Docker"
+      | "Edge Computing"
+      | "EdTech"
+      | "Elementor"
+      | "Ethereum"
+      | "Firebase"
+      | "FormSite"
+      | "Gamification"
+      | "Git"
+      | "GraphQL"
+      | "Healthcare IoT"
+      | "HTML"
+      | "IoT"
+      | "Java"
+      | "JavaScript"
+      | "Kubernetes"
+      | "Machine Learning"
+      | "MongoDB"
+      | "MySQL"
+      | "Network Security"
+      | "Next.js"
+      | "NLP"
+      | "Node.js"
+      | "Optimization"
+      | "PHP"
+      | "PostgreSQL"
+      | "Proof-of-Stake"
+      | "Publishing"
+      | "Python"
+      | "RADIUS Server"
+      | "React"
+      | "REST API"
+      | "Sentiment Analysis"
+      | "Smart Contracts"
+      | "Smart Slider 3"
+      | "Social Impact"
+      | "Sustainability"
+      | "Tailwind CSS"
+      | "TypeScript"
+      | "Video Processing"
+      | "VLAN Configuration"
+      | "Vue.js"
+      | "Web Development"
+      | "WebRTC"
+      | "WordPress"
+      | "Workforce Analytics"
+      | "Zero Trust Architecture"
+    > | null;
+  } | null;
+  pm: {
+    name: string | null;
+    email: string | null;
+    githubUsername: string | null;
+  } | null;
+  assistantPm: {
+    name: string | null;
+    email: string | null;
+    githubUsername: string | null;
+  } | null;
+  members: Array<{
+    _id: string;
+    name: string | null;
+    email: string | null;
+    githubUsername: string | null;
+    discordUsername: string | null;
+  }> | null;
+  memberCount: number | null;
+  isPM: boolean;
+  isAPM: boolean;
+  teamResources: Array<{
+    label: string | null;
+    url: string | null;
+    category: "communication" | "development" | "documents" | "general" | null;
+  }> | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: STUDENT_PROGRAM_RESOURCES_QUERY
+// Query: *[_type == "studentResource"] | order(sortOrder asc) {  _id,  title,  description,  url,  category}
+export type STUDENT_PROGRAM_RESOURCES_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  description: string | null;
+  url: string | null;
+  category:
+    | "academic"
+    | "calendar"
+    | "communication"
+    | "development"
+    | "general"
+    | null;
+}>;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -2182,13 +2401,15 @@ declare module "@sanity/client" {
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
     '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
-    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status\n}': ALL_EVENTS_QUERY_RESULT;
-    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status\n}': EVENTS_BY_MONTH_QUERY_RESULT;
+    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, color\n}': ALL_EVENTS_QUERY_RESULT;
+    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, color\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
     '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
     '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "team" && $email in members[]->email] | order(_createdAt desc) [0]{\n  _id,\n  name,\n  semester,\n  maxMembers,\n  githubRepoUrl,\n  discordChannelUrl,\n  project->{\n    _id,\n    title,\n    "slug": slug.current,\n    sponsor->{\n      _id,\n      name,\n      "slug": slug.current,\n      logo{\n        asset->{ _id, url, metadata { lqip, dimensions } },\n        alt,\n        hotspot,\n        crop\n      }\n    },\n    technologyTags\n  },\n  "pm": pm->{ name, email, githubUsername },\n  "assistantPm": assistantPm->{ name, email, githubUsername },\n  "members": members[]->{ _id, name, email, githubUsername, discordUsername },\n  "memberCount": count(members),\n  "isPM": pm->email == $email,\n  "isAPM": assistantPm->email == $email,\n  teamResources[]{ label, url, category }\n}': STUDENT_TEAM_QUERY_RESULT;
+    '*[_type == "studentResource"] | order(sortOrder asc) {\n  _id,\n  title,\n  description,\n  url,\n  category\n}': STUDENT_PROGRAM_RESOURCES_QUERY_RESULT;
   }
 }

@@ -1,0 +1,222 @@
+---
+/**
+ * Student portal layout — extends Layout with a left sidebar navigation.
+ * Sidebar LEFT, content RIGHT (same pattern as PortalLayout).
+ * Mobile: sidebar collapses into a Sheet drawer.
+ * Sign-out uses Better Auth (not CF Access).
+ *
+ * Props:
+ *   title     — page <title>
+ *   seo       — SEO overrides
+ *   activeNav — pathname to highlight in sidebar (defaults to current URL)
+ *   teamName  — shown in sidebar header (optional)
+ */
+import Layout from './Layout.astro';
+import { Icon } from '@/components/ui/icon';
+import { SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import type { PortalNavItem } from '@/components/portal/types';
+import type { SeoProps } from '@/lib/types';
+
+interface Props {
+  title: string;
+  seo?: SeoProps | null;
+  activeNav?: string;
+  teamName?: string;
+}
+
+const { title = 'Student Dashboard', seo, activeNav, teamName } = Astro.props;
+const user = Astro.locals.user;
+const currentPath = activeNav ?? Astro.url.pathname;
+
+const isActive = (href: string) =>
+  currentPath === href || (href !== '/student/' && currentPath.startsWith(href));
+
+const navItems: PortalNavItem[] = [
+  { href: '/student/', label: 'Dashboard', icon: 'lucide:layout-dashboard' },
+  { href: '/student/team', label: 'Team & Project', icon: 'lucide:users', disabled: true, badge: 'Coming Soon' },
+  { href: '/student/events', label: 'Events', icon: 'lucide:calendar', disabled: true, badge: 'Coming Soon' },
+  { href: '/student/resources', label: 'Resources', icon: 'lucide:book-open', disabled: true, badge: 'Coming Soon' },
+];
+
+const displayName = user?.name || user?.email?.split('@')[0] || 'Student';
+const avatarLetter = displayName.charAt(0).toUpperCase();
+const displayEmail = user?.email || '';
+---
+
+<Layout title={title} seo={seo} template="portal">
+  <Fragment slot="default">
+    <meta slot="head" name="robots" content="noindex" />
+
+    {/* Mobile header — visible below lg */}
+    <div class="lg:hidden flex items-center gap-3 border-b px-4 py-3">
+      <Sheet>
+        <SheetTrigger variant="ghost" size="icon">
+          <Icon name="lucide:menu" />
+        </SheetTrigger>
+        <SheetContent side="left">
+          <SheetHeader>
+            <SheetTitle>Student Portal</SheetTitle>
+          </SheetHeader>
+
+          {/* Mobile user identity */}
+          <div class="flex items-center gap-3 px-4 pb-3">
+            <div
+              class="flex size-8 items-center justify-center bg-primary text-primary-foreground text-sm font-bold"
+            >
+              {avatarLetter}
+            </div>
+            <div class="flex flex-col">
+              <span class="text-sm font-medium truncate max-w-[200px]">{displayName}</span>
+              <span class="text-xs text-muted-foreground truncate max-w-[200px]">{displayEmail}</span>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Mobile nav links */}
+          <nav class="flex flex-col gap-1 p-4" aria-label="Student portal navigation">
+            {navItems.map(item => (
+              <a
+                href={item.disabled ? undefined : item.href}
+                class:list={[
+                  'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
+                  item.disabled
+                    ? 'text-muted-foreground pointer-events-none opacity-50'
+                    : isActive(item.href!)
+                      ? 'bg-accent text-accent-foreground font-medium'
+                      : 'text-foreground hover:bg-accent hover:text-accent-foreground',
+                ]}
+                aria-current={!item.disabled && isActive(item.href!) ? 'page' : undefined}
+              >
+                <Icon name={item.icon} class="size-4" />
+                <span>{item.label}</span>
+                {item.badge && <Badge variant="secondary" class="ml-auto text-2xs">{item.badge}</Badge>}
+              </a>
+            ))}
+          </nav>
+
+          <Separator />
+
+          <div class="p-4">
+            <button
+              id="student-sign-out-mobile"
+              class="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
+            >
+              <Icon name="lucide:log-out" class="size-4" />
+              <span>Sign out</span>
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <span class="text-sm font-semibold">
+        {teamName ? `${teamName} — Student Portal` : 'Student Portal'}
+      </span>
+    </div>
+
+    {/* Desktop grid — sidebar LEFT (viewport edge), content RIGHT */}
+    <div
+      class="w-full flex flex-col lg:grid lg:gap-0"
+      style="--sidebar-width: 260px;"
+      data-portal-layout
+    >
+      {/* Desktop sidebar — flush to left edge, hidden below lg */}
+      <aside class="hidden lg:flex flex-col border-r bg-sidebar text-sidebar-foreground min-h-[calc(100vh-4rem)]">
+        {/* User identity */}
+        <div class="flex items-center gap-3 p-4">
+          <div
+            class="flex size-8 items-center justify-center bg-primary text-primary-foreground text-sm font-bold shrink-0"
+          >
+            {avatarLetter}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-medium truncate">{displayName}</span>
+            <span class="text-xs text-muted-foreground truncate">{displayEmail}</span>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Nav links */}
+        <nav class="flex-1 p-3" aria-label="Student portal navigation">
+          <SidebarMenu>
+            {navItems.map(item => (
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  href={item.disabled ? undefined : item.href}
+                  active={!item.disabled && isActive(item.href!)}
+                  class:list={[item.disabled && 'pointer-events-none opacity-50']}
+                  aria-current={!item.disabled && isActive(item.href!) ? 'page' : undefined}
+                >
+                  <Icon name={item.icon} />
+                  <span>{item.label}</span>
+                  {item.badge && <Badge variant="secondary" class="ml-auto text-2xs">{item.badge}</Badge>}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </nav>
+
+        {/* Footer — sign out */}
+        <div class="mt-auto p-3 border-t">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton id="student-sign-out">
+                <Icon name="lucide:log-out" />
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </div>
+      </aside>
+
+      {/* Main content area — constrained width */}
+      <div class="flex-1 p-6 lg:p-8 lg:max-w-[var(--breakpoint-xl)]">
+        <slot />
+      </div>
+    </div>
+  </Fragment>
+</Layout>
+
+<script>
+  import { createAuthClient } from 'better-auth/client';
+
+  const authClient = createAuthClient({
+    baseURL: window.location.origin + '/api/auth',
+  });
+
+  let signingOut = false;
+
+  function handleSignOut(e: Event) {
+    e.preventDefault();
+    if (signingOut) return;
+    signingOut = true;
+
+    // Disable both buttons and update text
+    for (const id of ['student-sign-out', 'student-sign-out-mobile']) {
+      const btn = document.getElementById(id);
+      if (btn) {
+        btn.setAttribute('disabled', '');
+        btn.style.opacity = '0.5';
+        btn.style.pointerEvents = 'none';
+        const label = btn.querySelector('span');
+        if (label) label.textContent = 'Signing out…';
+      }
+    }
+
+    authClient.signOut().then(() => {
+      window.location.href = '/student/';
+    });
+  }
+
+  document.getElementById('student-sign-out')?.addEventListener('click', handleSignOut);
+  document.getElementById('student-sign-out-mobile')?.addEventListener('click', handleSignOut);
+</script>
+
+<style is:global>
+  [data-portal-layout] {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+</style>
