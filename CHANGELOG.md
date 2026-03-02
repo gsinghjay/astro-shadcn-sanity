@@ -1,3 +1,57 @@
+## [1.10.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.9.0...v1.10.0) (2026-03-02)
+
+### Features
+
+* add Better Auth + Drizzle ORM spike for student auth (Story 16.1) ([e3b81af](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e3b81af64aade811ce4aea34eb40f33ae860f022))
+* add Cloudflare D1 database setup and portal schema (Story 9.8) ([a484fb5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a484fb5d600f5b043852d988f113061581569d53))
+* add Cloudflare Pages multi-project deployment (Story 15-5) ([56ccefc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/56ccefc459eabf1819d09bfdbe20f908eced080c))
+* add dual-auth middleware for sponsor + student routes (Story 16.3) ([1ff8764](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1ff8764655938b46ae77ccbad42011ad1c2552c7))
+* add multi-site data fetching with GROQ site filtering ([199afbd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/199afbdecf4438abb2b54d1c6da05b219035aa06))
+* add multi-workspace Studio configuration for Capstone and RWC ([70d5f22](https://github.com/gsinghjay/astro-shadcn-sanity/commit/70d5f22772330810240f0600d6d980126d63bb35))
+* add nested dropdown navigation support to Header component ([f7e44ab](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f7e44ab802e2aaf239aa66388761af8d91278083))
+* add per-site theming with CSS custom properties (Story 15-4) ([b2ab6c4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b2ab6c46eaddf1c2b4b7715167824320a09c016a))
+* add portal events calendar with Schedule-X (Story 9.3) ([baa25d6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/baa25d6bbc8ecb6f2af48e1ec58ec399d3968233))
+* add production Better Auth infrastructure for student auth (Story 16.2) ([a09f898](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a09f8984d35c3e0f141c0a8d5ce7e594f75131ac))
+* add Sanity schemas for team, capstoneStudent, and studentResource (Story 16.4) ([b1a7d45](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b1a7d456dd5398c882fc9718a3e05b69fa213331))
+* add sponsor portal project view (Story 9.2) ([a74bd98](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a74bd98c857d75e6e972ded998fc16cc7b82c2d0))
+* add student layout and dashboard page (Story 16.5) ([89460fa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/89460fa12bdd8af83952c8b9234c09aa29dd6d96))
+
+### Bug Fixes
+
+* add missing hotspot/crop to sponsor logo projection in STUDENT_TEAM_QUERY (Story 16.4) ([e50c0de](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e50c0dedfaefec79bf6c7c97edf5173f7676ef5d))
+* address code review findings for Better Auth infrastructure (Story 16.2) ([919c5df](https://github.com/gsinghjay/astro-shadcn-sanity/commit/919c5df88171fd39da479f986b10bbf85aeb2713))
+* address code review findings for Better Auth spike (Story 16.1) ([458335f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/458335fca6c9fd123d98f9490356ad593ac0a882))
+* address code review findings for D1 database setup (Story 9.8) ([c307aa2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c307aa24dd20fd2694a2ef6f2121f72f299f0015))
+* address code review findings for dual-auth middleware (Story 16.3) ([a77eea3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a77eea345cd575c859fd25b8794359bd46c9b456))
+* address code review findings for multi-site data fetching ([48aa3cb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/48aa3cb9e2d07af2811ae486baeac7ad7c6a2cce))
+* address code review findings for multi-workspace config ([80b626c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/80b626c2de53c23db3f640f045c53b464d9e1d65))
+* address code review findings for per-site theming (Story 15-4) ([203a8cd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/203a8cd76e10543b48b2cc50ef6a177da41367de))
+* address code review findings for portal events calendar (Story 9.3) ([ab5f2e4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ab5f2e4eccce967e82a9d15e261ed2fadf42e638)), closes [AC#2](https://github.com/gsinghjay/AC/issues/2) [AC#3](https://github.com/gsinghjay/AC/issues/3) [AC#4](https://github.com/gsinghjay/AC/issues/4)
+* address code review findings for sponsor portal (Story 9.2) ([04ac42e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/04ac42efc05b1e34bc0a32df52684e6bb1c5b64b))
+* address code review findings for Story 16.4 GROQ queries and tests ([14aae96](https://github.com/gsinghjay/astro-shadcn-sanity/commit/14aae96c6aa93796773b96d852afab7399d18029))
+* address code review findings for Story 16.5 accessibility and UX ([3b0be12](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3b0be12c01e01921f6a26a1943ba206d50ece34f))
+* address Sanity code review findings for sponsor portal (Story 9.2) ([1379100](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1379100ff32640be2d94f443b4d1daa7af462eca))
+* address second code review findings for multi-workspace config ([3b15d81](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3b15d81a2f66ec2b6fda20ab457b2abaf666c585))
+* derive Better Auth baseURL from request origin for preview deployments ([948bbc6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/948bbc678d01eb6fd438f49ca600a36efe0caf40))
+* redirect unauthenticated students to login page instead of API endpoint ([a068406](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a0684069357642f573e76f1522ceeb978791d2b2))
+* use absolute URL for auth client in student login page ([8e36668](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8e366689ad6d4cb04e2d04e76044b1573a5a1a5e))
+
+### Documentation
+
+* update professional development guide for all 7 team roles ([41a6416](https://github.com/gsinghjay/astro-shadcn-sanity/commit/41a6416dacf82b9412d1667c9a5bca2e7c795c62))
+
+### Miscellaneous
+
+* add placeholder student page for middleware auth testing (Story 16.3) ([afa26de](https://github.com/gsinghjay/astro-shadcn-sanity/commit/afa26de44ca83889b7188e7e326c2afc0eace66b))
+* add sign-out button to placeholder student page ([3036975](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3036975279087e499a392de347f68d732e74445d))
+* Sanity CLI update ([dbab00a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/dbab00a665daaf2ec12d4511ff13e48629d14b91))
+* update sprint status for spike 16.1 to review ([ccd5b5b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ccd5b5b1c2949914f3995d5b0def6eab80fc28e3))
+* update story 16.3 with preview testing findings and file list ([596746a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/596746a6ac503cd5dfc3c03756290b82c2d35f65))
+
+### Tests
+
+* add E2E and integration tests for Story 15-3 coverage expansion ([08aee95](https://github.com/gsinghjay/astro-shadcn-sanity/commit/08aee95d322dd6dd9e598d08fb3c3d5be3291125))
+
 ## [1.9.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.8.0...v1.9.0) (2026-02-28)
 
 ### Features
