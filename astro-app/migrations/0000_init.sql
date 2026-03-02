@@ -1,6 +1,10 @@
 -- Portal D1 Schema — Story 9.8
 -- Creates transactional data tables for the sponsor portal.
 -- Sanity remains the content layer; D1 handles relational, user-specific state.
+--
+-- NOTE: `updated_at DEFAULT (datetime('now'))` only fires on INSERT.
+-- D1/SQLite has no UPDATE triggers — application code MUST set
+-- `updated_at = datetime('now')` explicitly in every UPDATE/UPSERT query.
 
 -- Portal Activity Tracking (Story 9.9)
 CREATE TABLE IF NOT EXISTS portal_activity (
