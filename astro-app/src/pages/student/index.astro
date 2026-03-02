@@ -1,0 +1,22 @@
+---
+/**
+ * Student portal landing page (placeholder for Story 16.4+).
+ * Must be SSR — middleware auth depends on runtime locals.
+ */
+export const prerender = false;
+
+const user = Astro.locals.user;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Student Portal</title>
+  </head>
+  <body>
+    <h1>Student Portal</h1>
+    <p>Welcome, {user?.name ?? user?.email}!</p>
+    <p>Role: {user?.role}</p>
+    <p><em>This is a placeholder page for testing middleware auth (Story 16.3). Full student portal is Story 16.4+.</em></p>
+  </body>
+</html>
