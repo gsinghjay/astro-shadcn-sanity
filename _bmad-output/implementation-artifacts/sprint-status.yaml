@@ -876,7 +876,7 @@ development_status:
   16-2-d1-schema-better-auth-infrastructure: done  # SP:3. Blocked by 16.1 + 9.8. Shared DB (ywcc-capstone-portal). Migration 0001_student_auth.sql. Better Auth config, Google OAuth, API routes, error handling.
   16-3-dual-auth-middleware-integration: done  # SP:2. Blocked by 16.2. Extend middleware: /portal* CF Access + /student* Better Auth + public pass-through. KV session cache optional. Regression tests.
   16-4-sanity-schema-team-capstone-student-resource: done  # SP:2. Blocked by 16.3. Three Sanity document schemas (team, capstoneStudent, studentResource) + GROQ queries + typegen.
-  16-5-student-layout-dashboard-page: backlog  # SP:3. Blocked by 16.4. Fork PortalLayout → StudentLayout + dashboard at /student/. STUDENT_TEAM_QUERY.
+  16-5-student-layout-dashboard-page: done  # SP:3. Blocked by 16.4. Fork PortalLayout → StudentLayout + dashboard at /student/. STUDENT_TEAM_QUERY.
   16-6-team-project-detail-page: backlog  # SP:3. Blocked by 16.5. Full team roster, project details, PM/APM management UI (wired in 16.9).
   16-7-student-events-calendar: backlog  # SP:1. Blocked by 16.5. Reuses PortalCalendar + EventDetailPopover from 9.3. StudentLayout wrapper.
   16-8-program-resources-page: backlog  # SP:2. Blocked by 16.4. studentResource docs from Sanity, grouped by category, sorted by sortOrder.
