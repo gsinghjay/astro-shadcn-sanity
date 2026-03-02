@@ -215,8 +215,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return next();
     }
 
-    // No valid session — redirect to Google OAuth sign-in
-    return context.redirect("/api/auth/sign-in/social?provider=google&callbackURL=/student/");
+    // No valid session — redirect to login page (outside /student/* to avoid loop)
+    // Login page uses auth client to POST to Better Auth's social sign-in endpoint
+    return context.redirect("/auth/student-login");
   } catch (error) {
     console.error("[middleware] Student auth error:", error);
     return new Response("Service Unavailable", { status: 503 });
@@ -425,11 +426,14 @@ Claude Opus 4.6
 - Middleware import path fix: `vi.mock('@/lib/auth')` only matches `@/` alias imports, not relative `./lib/auth` imports. Changed middleware to use `@/lib/` aliases for consistency with project conventions and testability.
 - `astro:middleware` virtual module mock: Added `vi.mock('astro:middleware', () => ({ defineMiddleware: (fn: any) => fn }))` since `defineMiddleware` is an identity function that can't resolve outside Astro build context.
 - Pre-existing E2E failure: `@vitest/expect` Symbol conflict with Playwright's global `expect` — crashes before any test runs. Identical on clean stash (commit 919c5df). Not a 16.3 regression.
+- **Redirect URL discovery (preview testing):** Better Auth's `/api/auth/sign-in/social` endpoint only accepts POST, not GET. The middleware's `context.redirect()` produces a 302 → browser follows with GET → 404. Fixed by redirecting to `/auth/student-login` page that uses `authClient.signIn.social()` (client-side POST). This also resolved Task 2.5 — the redirect URL was verified against a live preview deployment.
+- **Auth client base URL:** `createAuthClient({ baseURL: '/api/auth' })` fails in the browser — Better Auth requires an absolute URL. Fixed by using `window.location.origin + '/api/auth'` at runtime in the login page instead of the shared `auth-client.ts`.
+- **CF Pages preview build fixes:** (1) Missing `PUBLIC_*` env vars caused Sanity prerendering to fail (`Dataset not found`). Added all PUBLIC vars to preview config via API. (2) `destination_dir: "dist"` was wrong for monorepo — output is at `astro-app/dist`. Updated to `astro-app/dist`. (3) No `/student/*` page existed, so CF Pages served static fallback instead of invoking the Worker — added placeholder `student/index.astro`.
 
 ### Completion Notes List
 
 - **Task 1 complete:** Extended `App.Locals` user type with `role: 'sponsor' | 'student'` and `name?: string`. Added `SESSION_CACHE?: KVNamespace` to Runtime type. Additive change — zero TypeScript breakage in existing portal pages.
-- **Tasks 2+3 complete:** Three-branch middleware routing implemented. Public routes → zero overhead. Portal → CF Access JWT + `role: 'sponsor'`. Student → Better Auth session validation + `role: 'student'` + 503 on errors. Dev mode bypass handles both roles. Imports updated to `@/lib/` aliases. **Task 2.5 (redirect URL verification):** Not verified via live dev server — unit test confirms the hardcoded redirect string matches expectations. Manual QA needed to confirm Better Auth handles `/api/auth/sign-in/social?provider=google&callbackURL=/student/` correctly in a deployed environment.
+- **Tasks 2+3 complete:** Three-branch middleware routing implemented. Public routes → zero overhead. Portal → CF Access JWT + `role: 'sponsor'`. Student → Better Auth session validation + `role: 'student'` + 503 on errors. Dev mode bypass handles both roles. Imports updated to `@/lib/` aliases. **Task 2.5 (redirect URL verification):** Verified via CF Pages preview deployment — Better Auth's `/sign-in/social` endpoint is POST-only, so middleware now redirects to `/auth/student-login` page which triggers OAuth client-side.
 - **Task 4 complete:** 13 unit tests covering all three branches, dev mode, error handling, and auth env passthrough. Mock pattern uses `vi.hoisted()` + `vi.mock()` consistent with `auth-route.test.ts`.
 - **Task 5 complete (KV session cache):** `SESSION_CACHE` KV namespace added to `wrangler.jsonc` and Runtime type. Middleware checks KV before D1, caches on miss with 5-min TTL. Fire-and-forget write pattern. 5 additional tests for KV cache hit/miss/skip/no-write/unconfigured.
 - **Task 6 complete:** 638 tests pass (up from 620). E2E failure is pre-existing (Vitest/Playwright compatibility, not a regression). Portal pages unaffected by additive type change.
@@ -441,12 +445,15 @@ Claude Opus 4.6
 - **2026-03-01 — Quality validation applied.** 5 critical fixes (redirect URL verification task, `/portal/api/*` acknowledgment, `me.ts` API contract change note, test directory creation note, `import.meta.env.DEV` mock pattern), 7 enhancements (additional test cases, forward references, null handling notes), 3 optimizations (KV section condensed, budget table consolidated, references trimmed).
 - **2026-03-01 — Implementation complete (Dev Agent, Claude Opus 4.6).** All 6 tasks implemented including KV session cache. 18 new unit tests (638 total, zero regressions). Three-branch middleware routing with type-safe `role` discriminator. Middleware imports changed from relative to `@/lib/` aliases for testability.
 - **2026-03-01 — Code review fixes (Dev Agent, Claude Opus 4.6).** 3 HIGH + 4 MEDIUM issues found and fixed. H1: KV cache write now logs errors instead of swallowing silently. H2: Added test for KV `get()` failure → 503. H3: Documented Task 2.5 redirect URL as needing manual QA verification. M1: Added 3 `extractSessionToken` edge case tests (cookie without session key, multi-cookie header, KV outage). M2: Updated Dev Notes to reflect KV cache was implemented despite deferral recommendation. M3: Added wrangler.jsonc comment about replacing KV namespace ID. M4: Added comment noting redirect URL dependency on basePath config. 21 tests total (641 total, zero regressions).
+- **2026-03-01 — Preview deployment testing (Dev Agent, Claude Opus 4.6).** Deployed to CF Pages preview via MCP API. Three issues discovered and fixed: (1) Better Auth social sign-in is POST-only — middleware redirect changed from `/api/auth/sign-in/social` to `/auth/student-login` page with client-side OAuth initiation. (2) Auth client requires absolute base URL — used `window.location.origin` at runtime. (3) CF Pages build config fixes: added missing `PUBLIC_*` env vars, corrected `destination_dir` to `astro-app/dist`, added placeholder `/student/index.astro` for Worker invocation. Preview branch config and env vars set via Cloudflare API.
 
 ### File List
 
 - `astro-app/src/env.d.ts` — Added `role`, `name` to user type; added `SESSION_CACHE?: KVNamespace` to Runtime
-- `astro-app/src/middleware.ts` — Three-branch routing (public/portal/student), KV session cache, dev mode bypass for both roles, `extractSessionToken` helper; **CR fix:** KV write error logging, basePath dependency comment
-- `astro-app/src/__tests__/middleware.test.ts` — **NEW** 21 unit tests for middleware routing, dev mode, error handling, KV cache; **CR fix:** KV get() failure, extractSessionToken edge cases
+- `astro-app/src/middleware.ts` — Three-branch routing (public/portal/student), KV session cache, dev mode bypass for both roles, `extractSessionToken` helper; **CR fix:** KV write error logging; **Preview fix:** redirect to `/auth/student-login` instead of API endpoint
+- `astro-app/src/__tests__/middleware.test.ts` — **NEW** 21 unit tests for middleware routing, dev mode, error handling, KV cache; **CR fix:** KV get() failure, extractSessionToken edge cases; updated redirect URL assertion
+- `astro-app/src/pages/auth/student-login.astro` — **NEW** Student login page, auto-triggers Google OAuth via Better Auth client (outside `/student/*` to avoid middleware loop)
+- `astro-app/src/pages/student/index.astro` — **NEW** Placeholder student portal page (SSR, `prerender = false`) so CF Pages Worker invokes middleware
 - `astro-app/wrangler.jsonc` — Added `SESSION_CACHE` KV namespace binding; **CR fix:** comment about replacing namespace ID
-- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated 16-3 status to in-progress → review
-- `_bmad-output/implementation-artifacts/16-3-dual-auth-middleware-integration.md` — Story file updated with completion records + code review fixes
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Updated 16-3 status to done
+- `_bmad-output/implementation-artifacts/16-3-dual-auth-middleware-integration.md` — Story file updated with all records
