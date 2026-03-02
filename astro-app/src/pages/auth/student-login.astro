@@ -1,0 +1,26 @@
+---
+/**
+ * Student sign-in page — auto-triggers Google OAuth via Better Auth client.
+ * Located outside /student/* to avoid middleware auth redirect loop.
+ * Must be SSR since it depends on client-side auth flow at runtime.
+ */
+export const prerender = false;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Student Sign In</title>
+  </head>
+  <body>
+    <p>Redirecting to Google sign-in...</p>
+    <script>
+      import { authClient } from "@/lib/auth-client";
+
+      authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/student/",
+      });
+    </script>
+  </body>
+</html>

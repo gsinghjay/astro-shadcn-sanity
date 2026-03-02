@@ -76,9 +76,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return next();
     }
 
-    // No valid session — redirect to Google OAuth sign-in
-    // Path must match basePath in student-auth.ts ("/api/auth")
-    return context.redirect("/api/auth/sign-in/social?provider=google&callbackURL=/student/");
+    // No valid session — redirect to login page (outside /student/* to avoid loop)
+    // Login page uses auth client to POST to Better Auth's social sign-in endpoint
+    return context.redirect("/auth/student-login");
   } catch (error) {
     console.error("[middleware] Student auth error:", error);
     return new Response("Service Unavailable", { status: 503 });

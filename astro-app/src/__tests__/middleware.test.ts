@@ -139,9 +139,7 @@ describe('middleware — three-branch routing', () => {
       const result = await onRequest(ctx as any, mockNext);
 
       expect(result.status).toBe(302);
-      expect(result.headers.get('Location')).toBe(
-        '/api/auth/sign-in/social?provider=google&callbackURL=/student/',
-      );
+      expect(result.headers.get('Location')).toBe('/auth/student-login');
       expect(mockNext).not.toHaveBeenCalled();
     });
 
