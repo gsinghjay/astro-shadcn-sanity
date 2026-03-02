@@ -658,9 +658,38 @@
 #   - Auth tables added as migration 0001_student_auth.sql (after 9.8's 0000_init.sql)
 #   - Spike scope reduced: D1 provisioning, bindings, env.d.ts types already done by 9.8
 #   - Dependency chain: 9.8 → 16.1 (spike) → 16.2 (auth infra) → 16.3 (middleware)
+#
+# 2026-03-01d: Story 16.4 created (Sanity Schema — team, capstoneStudent, studentResource)
+#   - Three new Sanity document schemas for student portal data model
+#   - GROQ queries: STUDENT_TEAM_QUERY (team by email), STUDENT_PROGRAM_RESOURCES_QUERY
+#   - Zero modifications to existing project schema (team references project, not vice versa)
+#   - Sanity best practices applied: defineField, defineArrayMember, icons, groups, validation
+#   - Stories 16.5–16.10 all depend on 16.4 schemas and queries
 #   - Old story file 16-1-student-google-oauth-authentication.md renamed to match new scope
+#
+# 2026-03-01e: Sprint planning refresh — Epic 16 portal pages added
+#   - Stories 16.5–16.10 added from brainstorming session (2026-03-01d epic file update)
+#   - 16.5: Student Layout + Dashboard Page (SP:3, blocked by 16.4)
+#   - 16.6: Team & Project Detail Page (SP:3, blocked by 16.5)
+#   - 16.7: Student Events Calendar (SP:1, blocked by 16.5, reuses 9.3 components)
+#   - 16.8: Program Resources Page (SP:2, blocked by 16.4)
+#   - 16.9: PM/APM Team Management (SP:4, P1, blocked by 16.6)
+#   - 16.10: Sponsor Portal Team Visibility (SP:1, P1, blocked by 16.4)
+#   - P0 MVP (Apr 23): Stories 16.4–16.8 = 12 SP
+#   - P1 Fast Follow: Stories 16.9–16.10 = 6 SP (total 18 SP)
+#   - All new stories status: backlog (no story files created yet)
+#   - Epic 16 remains in-progress
+#
+# 2026-03-01: Stories 9.17-9.18 added (Auth Consolidation)
+#   - Source: Authentication strategy review — edge security vs maintenance cost trade-off
+#   - Story 9.17: Durable Objects rate limiter (sliding window, per-IP, SQLite storage, fail-open)
+#   - Story 9.18: Migrate sponsors from CF Access to Better Auth (blocked by 9.17)
+#     - Deletes lib/auth.ts, removes jose, unifies middleware to single session check
+#     - Adds role column to D1 user table, sponsor allowlist via env var
+#     - CF Access dashboard removal documented as manual step
+#   - Epic 9 remains in-progress
 
-generated: 2026-03-01
+generated: 2026-03-01b
 project: astro-shadcn-sanity
 project_key: NOKEY
 tracking_system: file-system
@@ -786,6 +815,8 @@ development_status:
   9-14-multi-provider-authentication: ready-for-dev  # IN: CF dashboard config only, zero code changes
   9-15-program-admin-analytics-dashboard: ready-for-dev  # UN-DESCOPED (2026-02-20): Rewritten with Analytics Engine SQL API. Aggregations run on CF infra (not Worker). D1 only for indexed RSVP/eval lookups. Depends on 9.9.
   9-16-portal-my-sponsorship: ready-for-dev
+  9-17-durable-objects-rate-limiting: ready-for-dev  # NEW (2026-03-01): Sliding window rate limiter via Durable Objects + SQLite. Replaces CF Access edge-blocking before 9.18 removes it. Per-IP sharding, fail-open design, alarm cleanup.
+  9-18-better-auth-sponsor-migration: ready-for-dev  # NEW (2026-03-01): Migrate sponsors from CF Access to Better Auth. Deletes lib/auth.ts, removes jose, unifies middleware. Blocked by 9.17. Adds role column to D1 user table, sponsor allowlist.
   epic-9-retrospective: optional
 
   epic-10: backlog  # Architecture revised (2026-02-25): JDA Java bot on VPS → FastAPI Python Worker on Cloudflare. Story 10.9 added.
@@ -844,5 +875,11 @@ development_status:
   16-1-spike-better-auth-drizzle-cf-workers: done  # SP:1. Blocked by 9.8. Timeboxed 4hr. Validate Better Auth + Drizzle ORM against existing PORTAL_DB. Go/no-go gate for 16.2+.
   16-2-d1-schema-better-auth-infrastructure: done  # SP:3. Blocked by 16.1 + 9.8. Shared DB (ywcc-capstone-portal). Migration 0001_student_auth.sql. Better Auth config, Google OAuth, API routes, error handling.
   16-3-dual-auth-middleware-integration: done  # SP:2. Blocked by 16.2. Extend middleware: /portal* CF Access + /student* Better Auth + public pass-through. KV session cache optional. Regression tests.
-  # 16-4+: Student Portal Pages — TBD after auth infra complete (dashboard, assignments, calendar, program info)
+  16-4-sanity-schema-team-capstone-student-resource: done  # SP:2. Blocked by 16.3. Three Sanity document schemas (team, capstoneStudent, studentResource) + GROQ queries + typegen.
+  16-5-student-layout-dashboard-page: done  # SP:3. Blocked by 16.4. Fork PortalLayout → StudentLayout + dashboard at /student/. STUDENT_TEAM_QUERY.
+  16-6-team-project-detail-page: backlog  # SP:3. Blocked by 16.5. Full team roster, project details, PM/APM management UI (wired in 16.9).
+  16-7-student-events-calendar: backlog  # SP:1. Blocked by 16.5. Reuses PortalCalendar + EventDetailPopover from 9.3. StudentLayout wrapper.
+  16-8-program-resources-page: backlog  # SP:2. Blocked by 16.4. studentResource docs from Sanity, grouped by category, sorted by sortOrder.
+  16-9-pm-apm-team-management: backlog  # SP:4. P1. Blocked by 16.6. API routes for invite/remove/update team. Scoped Sanity write token. maxMembers enforcement.
+  16-10-sponsor-portal-team-visibility: backlog  # SP:1. P1. Blocked by 16.4. Sponsor portal shows team assigned to their project. Read-only.
   epic-16-retrospective: optional
