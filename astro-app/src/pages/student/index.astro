@@ -18,5 +18,18 @@ const user = Astro.locals.user;
     <p>Welcome, {user?.name ?? user?.email}!</p>
     <p>Role: {user?.role}</p>
     <p><em>This is a placeholder page for testing middleware auth (Story 16.3). Full student portal is Story 16.4+.</em></p>
+    <button id="logout-btn">Sign Out</button>
+    <script>
+      import { createAuthClient } from "better-auth/client";
+
+      const authClient = createAuthClient({
+        baseURL: window.location.origin + "/api/auth",
+      });
+
+      document.getElementById("logout-btn")?.addEventListener("click", async () => {
+        await authClient.signOut();
+        window.location.href = "/";
+      });
+    </script>
   </body>
 </html>
