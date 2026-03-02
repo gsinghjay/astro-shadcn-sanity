@@ -21,6 +21,7 @@ import { onRequest } from '../middleware';
 
 const mockKvGet = vi.fn();
 const mockKvPut = vi.fn().mockResolvedValue(undefined);
+const mockCheckLimit = vi.fn();
 
 const mockEnv = {
   CF_ACCESS_TEAM_DOMAIN: 'https://test.cloudflareaccess.com',
@@ -31,7 +32,15 @@ const mockEnv = {
   BETTER_AUTH_SECRET: 'test-auth-secret',
   BETTER_AUTH_URL: 'http://localhost:4321',
   SESSION_CACHE: undefined as any,
+  RATE_LIMITER: undefined as any,
 };
+
+function createMockRateLimiter() {
+  return {
+    idFromName: vi.fn().mockReturnValue('mock-do-id'),
+    get: vi.fn().mockReturnValue({ checkLimit: mockCheckLimit }),
+  };
+}
 
 function createMockContext(pathname: string, options?: { headers?: Record<string, string>; overrides?: Partial<App.Locals> }) {
   return {
@@ -49,10 +58,12 @@ describe('middleware — three-branch routing', () => {
     vi.clearAllMocks();
     import.meta.env.DEV = false;
     mockEnv.SESSION_CACHE = undefined;
+    mockEnv.RATE_LIMITER = undefined;
     mockGetDrizzle.mockReturnValue({ __drizzle: true });
     mockCreateAuth.mockReturnValue({ api: { getSession: mockGetSession } });
     mockKvGet.mockReset();
     mockKvPut.mockReset().mockResolvedValue(undefined);
+    mockCheckLimit.mockReset();
   });
 
   afterEach(() => {
@@ -336,6 +347,148 @@ describe('middleware — three-branch routing', () => {
       expect(mockKvGet).not.toHaveBeenCalled();
       expect(mockKvPut).not.toHaveBeenCalled();
       expect(ctx.locals.user).toEqual({ email: 'student@test.com', name: 'Test Student', role: 'student' });
+    });
+  });
+
+  describe('Rate limiting — Durable Object', () => {
+    beforeEach(() => {
+      mockEnv.RATE_LIMITER = createMockRateLimiter();
+      mockCheckLimit.mockResolvedValue({ allowed: true, remaining: 99, retryAfterMs: 0 });
+    });
+
+    it('returns 429 with Retry-After and X-RateLimit-Remaining headers when rate limit exceeded', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: false, remaining: 0, retryAfterMs: 30_000 });
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      const result = await onRequest(ctx as any, mockNext);
+
+      expect(result.status).toBe(429);
+      expect(result.headers.get('Retry-After')).toBe('30');
+      expect(result.headers.get('X-RateLimit-Remaining')).toBe('0');
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockValidateAccessJWT).not.toHaveBeenCalled();
+    });
+
+    it('passes through to auth when rate limit OK', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: true, remaining: 95, retryAfterMs: 0 });
+      mockValidateAccessJWT.mockResolvedValue({ email: 'sponsor@test.com' });
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockCheckLimit).toHaveBeenCalledWith(60_000, 100);
+      expect(mockValidateAccessJWT).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('fails open when DO throws an error (DO outage)', async () => {
+      mockCheckLimit.mockRejectedValue(new Error('DO unavailable'));
+      mockValidateAccessJWT.mockResolvedValue({ email: 'sponsor@test.com' });
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[middleware] Rate limiter error, failing open:',
+        expect.any(Error),
+      );
+      expect(mockValidateAccessJWT).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it('uses "unknown" fallback key when CF-Connecting-IP header is missing', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: true, remaining: 99, retryAfterMs: 0 });
+      mockValidateAccessJWT.mockResolvedValue({ email: 'sponsor@test.com' });
+      const ctx = createMockContext('/portal/index');
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockEnv.RATE_LIMITER.idFromName).toHaveBeenCalledWith('ip:unknown');
+      expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('derives DO name from CF-Connecting-IP header', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: true, remaining: 99, retryAfterMs: 0 });
+      mockValidateAccessJWT.mockResolvedValue({ email: 'sponsor@test.com' });
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '10.20.30.40' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockEnv.RATE_LIMITER.idFromName).toHaveBeenCalledWith('ip:10.20.30.40');
+    });
+
+    it('rate limits student routes too', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: false, remaining: 0, retryAfterMs: 5_000 });
+      const ctx = createMockContext('/student/dashboard', {
+        headers: { 'CF-Connecting-IP': '5.6.7.8' },
+      });
+
+      const result = await onRequest(ctx as any, mockNext);
+
+      expect(result.status).toBe(429);
+      expect(result.headers.get('Retry-After')).toBe('5');
+      expect(mockNext).not.toHaveBeenCalled();
+      expect(mockGetSession).not.toHaveBeenCalled();
+    });
+
+    it('skips rate limiting in dev mode', async () => {
+      import.meta.env.DEV = true;
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockCheckLimit).not.toHaveBeenCalled();
+      expect(ctx.locals.user).toEqual({ email: 'dev@example.com', role: 'sponsor' });
+      expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('skips rate limiting when RATE_LIMITER binding is not configured', async () => {
+      mockEnv.RATE_LIMITER = undefined;
+      mockValidateAccessJWT.mockResolvedValue({ email: 'sponsor@test.com' });
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockCheckLimit).not.toHaveBeenCalled();
+      expect(mockValidateAccessJWT).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('does not rate limit public routes', async () => {
+      const ctx = createMockContext('/about', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockCheckLimit).not.toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('rounds Retry-After up to nearest second', async () => {
+      mockCheckLimit.mockResolvedValue({ allowed: false, remaining: 0, retryAfterMs: 1_500 });
+      const ctx = createMockContext('/portal/index', {
+        headers: { 'CF-Connecting-IP': '1.2.3.4' },
+      });
+
+      const result = await onRequest(ctx as any, mockNext);
+
+      expect(result.status).toBe(429);
+      expect(result.headers.get('Retry-After')).toBe('2');
     });
   });
 });

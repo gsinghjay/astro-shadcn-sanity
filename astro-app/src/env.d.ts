@@ -20,6 +20,15 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker) */
+interface RateLimiterDO {
+  checkLimit(windowMs: number, maxRequests: number): Promise<{
+    allowed: boolean;
+    remaining: number;
+    retryAfterMs: number;
+  }>;
+}
+
 type Runtime = import("@astrojs/cloudflare").Runtime<{
   CF_ACCESS_TEAM_DOMAIN: string;
   CF_ACCESS_AUD: string;
@@ -32,6 +41,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   SESSION_CACHE?: KVNamespace;
+  RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
 }>;
 
 declare namespace App {

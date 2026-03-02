@@ -13,7 +13,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Dev mode bypass — both roles
+  // Dev mode bypass — both roles (also skips rate limiting)
   if (import.meta.env.DEV) {
     if (isPortal) {
       context.locals.user = { email: "dev@example.com", role: "sponsor" };
@@ -24,6 +24,30 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   const runtimeEnv = context.locals.runtime?.env;
+
+  // Rate limiting — per-IP sliding window via Durable Object (fail-open)
+  const rateLimiter = runtimeEnv?.RATE_LIMITER;
+  if (rateLimiter) {
+    const ip = context.request.headers.get("CF-Connecting-IP") ?? "unknown";
+    try {
+      const id = rateLimiter.idFromName(`ip:${ip}`);
+      const stub = rateLimiter.get(id);
+      const result = await stub.checkLimit(60_000, 100);
+      if (!result.allowed) {
+        const retryAfterSeconds = Math.ceil(result.retryAfterMs / 1000);
+        return new Response("Too Many Requests", {
+          status: 429,
+          headers: {
+            "Retry-After": String(retryAfterSeconds),
+            "X-RateLimit-Remaining": "0",
+          },
+        });
+      }
+    } catch (e) {
+      console.error("[middleware] Rate limiter error, failing open:", e);
+      // Continue to auth — don't block legitimate users
+    }
+  }
 
   // Branch 2: Portal — CF Access JWT (unchanged logic, add role)
   if (isPortal) {

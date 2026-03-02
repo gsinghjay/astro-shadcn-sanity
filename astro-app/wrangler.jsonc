@@ -31,5 +31,16 @@
       "binding": "SESSION_CACHE",
       "id": "f78af5695075451c9d3d7887368e90dc"
     }
-  ]
+  ],
+  // Durable Object rate limiter — hosted in a separate worker (Pages can't export DO classes).
+  // The rate-limiter-worker must be deployed before the main app.
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "RATE_LIMITER",
+        "class_name": "SlidingWindowRateLimiter",
+        "script_name": "rate-limiter-worker"
+      }
+    ]
+  }
 }
