@@ -655,7 +655,9 @@ export const STUDENT_TEAM_QUERY = defineQuery(groq`*[_type == "team" && $email i
       "slug": slug.current,
       logo{
         ${IMAGE_PROJECTION},
-        alt
+        alt,
+        hotspot,
+        crop
       }
     },
     technologyTags

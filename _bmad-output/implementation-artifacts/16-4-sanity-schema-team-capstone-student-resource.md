@@ -576,6 +576,7 @@ None — clean implementation, no blockers.
 - Schema deployed to Content Lake (both workspaces)
 - TypeGen produces `CapstoneStudent`, `Team`, `StudentResource` types + `STUDENT_TEAM_QUERY_RESULT`, `STUDENT_PROGRAM_RESOURCES_QUERY_RESULT` query result types
 - Fixed GROQ projection: story spec had `technologies` but actual project field is `technologyTags`
+- Fixed GROQ projection: added missing `hotspot, crop` to sponsor logo in `STUDENT_TEAM_QUERY` (found during code review — matches pattern used by all other sponsor queries)
 - GROQ queries have no `site` filter — student portal types are capstone-only
 - Desk structure auto-discovers new types via `S.documentTypeListItems().filter()`
 - 31 new schema tests pass, 672 total tests pass (zero regressions)
