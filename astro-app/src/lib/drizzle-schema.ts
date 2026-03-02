@@ -1,6 +1,5 @@
 /**
  * Drizzle ORM schema for Better Auth tables on Cloudflare D1.
- * Spike 16.1 — validates Better Auth + Drizzle on CF Workers free plan.
  *
  * Tables: user, session, account, verification
  * These are the core tables Better Auth expects.
@@ -63,6 +62,7 @@ export const account = sqliteTable(
     accessTokenExpiresAt: integer('access_token_expires_at', { mode: 'timestamp_ms' }),
     refreshTokenExpiresAt: integer('refresh_token_expires_at', { mode: 'timestamp_ms' }),
     scope: text('scope'),
+    // Required by Better Auth schema even though we only use Google OAuth (no email/password).
     password: text('password'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

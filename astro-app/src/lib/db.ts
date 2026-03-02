@@ -7,7 +7,7 @@ export function getDb(locals: App.Locals): D1Database {
   return db;
 }
 
-/** Drizzle ORM instance wrapping the PORTAL_DB D1 binding. */
+/** Creates a Drizzle ORM instance wrapping the PORTAL_DB D1 binding. Call once per request. */
 export function getDrizzle(locals: App.Locals) {
   return drizzle(getDb(locals), { schema });
 }
