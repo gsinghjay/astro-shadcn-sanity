@@ -829,7 +829,7 @@ development_status:
   9-15-program-admin-analytics-dashboard: ready-for-dev  # UN-DESCOPED (2026-02-20): Rewritten with Analytics Engine SQL API. Aggregations run on CF infra (not Worker). D1 only for indexed RSVP/eval lookups. Depends on 9.9.
   9-16-portal-my-sponsorship: ready-for-dev
   9-17-durable-objects-rate-limiting: done  # NEW (2026-03-01): Sliding window rate limiter via Durable Objects + SQLite. Replaces CF Access edge-blocking before 9.18 removes it. Per-IP sharding, fail-open design, alarm cleanup.
-  9-18-better-auth-sponsor-migration: ready-for-dev  # NEW (2026-03-01), REFINED (2026-03-02): Migrate sponsors from CF Access to Better Auth. Three login methods: Google OAuth, GitHub OAuth, Magic Link (Resend). Sanity-managed whitelist (reuses contactEmail/allowedEmails on sponsor schema). /portal/login.astro with 3 sign-in options. Deletes lib/auth.ts, removes jose, unifies middleware. Blocked by 9.17.
+  9-18-better-auth-sponsor-migration: review  # NEW (2026-03-01), REFINED (2026-03-02): Migrate sponsors from CF Access to Better Auth. Three login methods: Google OAuth, GitHub OAuth, Magic Link (Resend). Sanity-managed whitelist (reuses contactEmail/allowedEmails on sponsor schema). /portal/login.astro with 3 sign-in options. Deletes lib/auth.ts, removes jose, unifies middleware. Blocked by 9.17.
   epic-9-retrospective: optional
 
   epic-10: backlog  # Architecture revised (2026-02-25): JDA Java bot on VPS → FastAPI Python Worker on Cloudflare. Story 10.9 added.

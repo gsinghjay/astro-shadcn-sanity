@@ -1,11 +1,13 @@
 import { defineMiddleware } from "astro:middleware";
-import { validateAccessJWT } from "@/lib/auth";
 import { getDrizzle } from "@/lib/db";
-import { createAuth } from "@/lib/student-auth";
+import { createAuth, checkSponsorWhitelist } from "@/lib/auth-config";
 
-/** Rate limiting configuration (AC 5: configurable via constants) */
+/** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 100;
+
+/** Paths under /portal/* that skip auth checks */
+const PORTAL_PUBLIC_PATHS = ["/portal/login", "/portal/denied"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -17,10 +19,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
+  // Whitelist login/denied pages from auth check
+  if (PORTAL_PUBLIC_PATHS.includes(pathname)) {
+    return next();
+  }
+
   // Dev mode bypass — both roles (also skips rate limiting)
   if (import.meta.env.DEV) {
     if (isPortal) {
-      context.locals.user = { email: "dev@example.com", role: "sponsor" };
+      context.locals.user = { email: "dev@example.com", name: "Dev Sponsor", role: "sponsor" };
     } else {
       context.locals.user = { email: "dev-student@example.com", name: "Dev Student", role: "student" };
     }
@@ -54,63 +61,87 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  // Branch 2: Portal — CF Access JWT (unchanged logic, add role)
-  if (isPortal) {
-    const result = await validateAccessJWT(context.request, runtimeEnv);
-    if (result) {
-      context.locals.user = { email: result.email, role: "sponsor" };
-      return next();
-    }
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  // Branch 3: Student — Better Auth session validation
+  // Unified session check — one path for both sponsors and students
   try {
     const kvCache = runtimeEnv?.SESSION_CACHE;
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
+    let userData: { email: string; name: string; role: string } | null = null;
+
     // KV cache check — skip D1 if session is cached
     if (kvCache && sessionToken) {
-      const cached = await kvCache.get<{ email: string; name: string }>(sessionToken, { type: "json" });
+      const cached = await kvCache.get<{ email: string; name: string; role: string }>(sessionToken, { type: "json" });
       if (cached) {
-        context.locals.user = { email: cached.email, name: cached.name, role: "student" };
-        return next();
+        userData = cached;
       }
     }
 
-    const db = getDrizzle(context.locals);
-    const auth = createAuth({
-      db,
-      env: {
-        GOOGLE_CLIENT_ID: runtimeEnv!.GOOGLE_CLIENT_ID,
-        GOOGLE_CLIENT_SECRET: runtimeEnv!.GOOGLE_CLIENT_SECRET,
-        BETTER_AUTH_SECRET: runtimeEnv!.BETTER_AUTH_SECRET,
-        BETTER_AUTH_URL: runtimeEnv!.BETTER_AUTH_URL,
-      },
-      requestOrigin: context.url.origin,
-    });
+    // D1 fallback via Better Auth
+    if (!userData && sessionToken) {
+      const db = getDrizzle(context.locals);
+      const auth = createAuth({
+        db,
+        env: {
+          GOOGLE_CLIENT_ID: runtimeEnv!.GOOGLE_CLIENT_ID,
+          GOOGLE_CLIENT_SECRET: runtimeEnv!.GOOGLE_CLIENT_SECRET,
+          GITHUB_CLIENT_ID: runtimeEnv!.GITHUB_CLIENT_ID,
+          GITHUB_CLIENT_SECRET: runtimeEnv!.GITHUB_CLIENT_SECRET,
+          BETTER_AUTH_SECRET: runtimeEnv!.BETTER_AUTH_SECRET,
+          BETTER_AUTH_URL: runtimeEnv!.BETTER_AUTH_URL,
+          RESEND_API_KEY: runtimeEnv!.RESEND_API_KEY,
+        },
+        requestOrigin: context.url.origin,
+      });
 
-    const session = await auth.api.getSession({
-      headers: context.request.headers,
-    });
+      const session = await auth.api.getSession({
+        headers: context.request.headers,
+      });
 
-    if (session) {
-      const userData = { email: session.user.email, name: session.user.name };
-      context.locals.user = { ...userData, role: "student" };
+      if (session?.user) {
+        userData = {
+          email: session.user.email,
+          name: session.user.name ?? "",
+          role: (session.user as { role?: string }).role ?? "student",
+        };
 
-      // Cache session in KV (fire-and-forget, 5-min TTL)
-      if (kvCache && sessionToken) {
-        kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+        // Cache session in KV (fire-and-forget, 5-min TTL)
+        if (kvCache) {
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+        }
       }
-
-      return next();
     }
 
-    // No valid session — redirect to login page (outside /student/* to avoid loop)
-    // Login page uses auth client to POST to Better Auth's social sign-in endpoint
-    return context.redirect("/auth/student-login");
+    // No session → redirect to appropriate login page
+    if (!userData) {
+      const loginUrl = isPortal
+        ? `/portal/login?redirect=${encodeURIComponent(pathname)}`
+        : `/auth/login?redirect=${encodeURIComponent(pathname)}`;
+      return context.redirect(loginUrl);
+    }
+
+    // Sanity whitelist check for portal routes (role escalation for existing users)
+    if (isPortal && userData.role !== "sponsor") {
+      const isSponsor = await checkSponsorWhitelist(userData.email);
+      if (isSponsor) {
+        userData.role = "sponsor";
+        // Update KV cache with correct role
+        if (kvCache && sessionToken) {
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+        }
+      } else {
+        return context.redirect("/portal/denied");
+      }
+    }
+
+    // Role-based authorization
+    if (isStudent && userData.role !== "student") {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    context.locals.user = { email: userData.email, name: userData.name, role: userData.role as 'sponsor' | 'student' };
+    return next();
   } catch (error) {
-    console.error("[middleware] Student auth error:", error);
+    console.error("[middleware] Auth error:", error);
     return new Response("Service Unavailable", { status: 503 });
   }
 });

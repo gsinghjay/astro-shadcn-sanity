@@ -2,9 +2,12 @@
 /**
  * Student sign-in page — auto-triggers Google OAuth via Better Auth client.
  * Located outside /student/* to avoid middleware auth redirect loop.
+ * Accepts ?redirect= query parameter for post-login navigation.
  * Must be SSR since it depends on client-side auth flow at runtime.
  */
 export const prerender = false;
+
+const redirect = Astro.url.searchParams.get('redirect') || '/student/';
 ---
 
 <html lang="en">
@@ -14,16 +17,18 @@ export const prerender = false;
   </head>
   <body>
     <p>Redirecting to Google sign-in...</p>
-    <script>
+    <script define:vars={{ redirect }}>
       import { createAuthClient } from "better-auth/client";
 
       const authClient = createAuthClient({
         baseURL: window.location.origin + "/api/auth",
       });
 
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || redirect;
+
       authClient.signIn.social({
         provider: "google",
-        callbackURL: "/student/",
+        callbackURL: redirectParam,
       });
     </script>
   </body>

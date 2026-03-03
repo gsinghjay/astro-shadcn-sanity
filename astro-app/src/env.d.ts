@@ -30,16 +30,17 @@ interface RateLimiterDO {
 }
 
 type Runtime = import("@astrojs/cloudflare").Runtime<{
-  CF_ACCESS_TEAM_DOMAIN: string;
-  CF_ACCESS_AUD: string;
   TURNSTILE_SECRET_KEY: string;
   DISCORD_WEBHOOK_URL: string;
   SANITY_API_WRITE_TOKEN: string;
   PORTAL_DB: D1Database;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
+  RESEND_API_KEY: string;
   SESSION_CACHE?: KVNamespace;
   RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
 }>;

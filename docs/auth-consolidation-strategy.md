@@ -370,3 +370,35 @@ The migration has zero cost impact. Every component involved — including the e
 The 50-seat ceiling is permanently eliminated. Sponsor count can grow to hundreds without triggering a plan upgrade or a VPS migration. The only remaining constraint that matters is the 10ms CPU cap per Worker invocation, which has 2-3x headroom and is unaffected by this change.
 
 For full details on free-tier limits and upgrade triggers, see [Cost Optimization Strategy](cost-optimization-strategy.md).
+
+---
+
+## Implementation Notes (Story 9.18 — Completed)
+
+### What Was Done
+
+- **`lib/auth.ts` deleted** — CF Access JWT validation via `jose` JWKS removed
+- **`jose` removed** from `package.json` dependencies
+- **`CF_ACCESS_TEAM_DOMAIN` and `CF_ACCESS_AUD`** removed from `wrangler.jsonc`, `env.d.ts`, and `.env.example`
+- **`lib/student-auth.ts` renamed to `lib/auth-config.ts`** — now configures both roles
+- **GitHub OAuth** added as second social provider
+- **Magic Link** plugin added with Resend email delivery
+- **`user.additionalFields.role`** added for `getSession().user.role` support
+- **`databaseHooks.user.create.before`** queries Sanity whitelist to assign role on user creation
+- **`/portal/login.astro`** — sponsor login page with Google, GitHub, Magic Link
+- **`/portal/denied.astro`** — access denied page for non-whitelisted emails
+- **Middleware unified** — single session check for both `/portal/*` and `/student/*`
+- **Role-based authorization** — sponsors get `/portal/*`, students get `/student/*`, cross-access blocked
+- **KV cache** includes `role` field in cached sessions
+- **D1 migration** `0002_add_user_role.sql` adds `role` column to `user` table
+
+### Cloudflare Access Dashboard Removal (Manual Steps)
+
+After deploying Story 9.18 to production:
+
+1. Go to [Cloudflare Zero Trust dashboard](https://one.dash.cloudflare.com/) → Access → Applications
+2. Find the application protecting `/portal/*` routes
+3. **Disable** the application first (toggle off) — verify sponsors can still log in via Better Auth
+4. After 24h of successful sponsor logins, **delete** the application
+5. Remove any associated Access Policies
+6. Note: The 50-seat Access plan can be downgraded or cancelled after removal

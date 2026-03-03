@@ -1,0 +1,10 @@
+-- Migration: Backfill existing users with sponsor role
+-- Story: 9.18 — One-time backfill for users whose email matches a sponsor document.
+-- Run manually via: wrangler d1 execute ywcc-capstone-portal --command="<SQL>"
+-- Replace the email list below with actual sponsor emails from Sanity.
+--
+-- Example:
+-- UPDATE user SET role = 'sponsor' WHERE email IN ('sponsor1@company.com', 'sponsor2@company.com');
+--
+-- To find sponsor emails, query Sanity:
+-- *[_type == "sponsor"]{ contactEmail, allowedEmails }
