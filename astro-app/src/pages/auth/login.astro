@@ -15,16 +15,17 @@ const redirect = Astro.url.searchParams.get('redirect') || '/student/';
     <meta charset="utf-8" />
     <title>Student Sign In</title>
   </head>
-  <body>
+  <body data-redirect={redirect}>
     <p>Redirecting to Google sign-in...</p>
-    <script define:vars={{ redirect }}>
+    <script>
       import { createAuthClient } from "better-auth/client";
 
       const authClient = createAuthClient({
         baseURL: window.location.origin + "/api/auth",
       });
 
-      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || redirect;
+      const serverRedirect = document.body.getAttribute('data-redirect') || '/student/';
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || serverRedirect;
 
       authClient.signIn.social({
         provider: "google",

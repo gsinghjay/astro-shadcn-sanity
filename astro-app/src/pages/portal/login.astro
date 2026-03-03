@@ -75,7 +75,7 @@ const redirect = Astro.url.searchParams.get('redirect') || '/portal/';
     </style>
   </head>
   <body>
-    <div class="login-card">
+    <div class="login-card" data-redirect={redirect}>
       <h1>Sponsor Portal</h1>
       <p class="subtitle">Sign in to access your capstone project dashboard.</p>
 
@@ -104,14 +104,17 @@ const redirect = Astro.url.searchParams.get('redirect') || '/portal/';
       <div class="error-msg" id="error-msg" hidden></div>
     </div>
 
-    <script define:vars={{ redirect }}>
+    <script>
       import { createAuthClient } from "better-auth/client";
+      import { magicLinkClient } from "better-auth/client/plugins";
 
       const authClient = createAuthClient({
         baseURL: window.location.origin + "/api/auth",
+        plugins: [magicLinkClient()],
       });
 
-      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || redirect;
+      const serverRedirect = document.querySelector('.login-card')?.getAttribute('data-redirect') || '/portal/';
+      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || serverRedirect;
 
       document.getElementById('google-signin')?.addEventListener('click', () => {
         authClient.signIn.social({ provider: "google", callbackURL: redirectParam });
@@ -123,15 +126,15 @@ const redirect = Astro.url.searchParams.get('redirect') || '/portal/';
 
       document.getElementById('magic-link-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const emailInput = document.getElementById('email');
+        const emailInput = document.getElementById('email') as HTMLInputElement;
         const email = emailInput.value;
-        const errorEl = document.getElementById('error-msg');
+        const errorEl = document.getElementById('error-msg')!;
         errorEl.hidden = true;
 
         try {
           await authClient.signIn.magicLink({ email, callbackURL: redirectParam });
-          document.getElementById('magic-link-form').hidden = true;
-          document.getElementById('magic-link-success').hidden = false;
+          document.getElementById('magic-link-form')!.hidden = true;
+          document.getElementById('magic-link-success')!.hidden = false;
         } catch (err) {
           errorEl.textContent = 'Failed to send sign-in link. Please try again.';
           errorEl.hidden = false;

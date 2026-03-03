@@ -6,8 +6,16 @@ import { createAuth, checkSponsorWhitelist } from "@/lib/auth-config";
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQUESTS = 100;
 
-/** Paths under /portal/* that skip auth checks */
-const PORTAL_PUBLIC_PATHS = ["/portal/login", "/portal/denied"];
+/** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
+const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
+
+/** Better Auth session user shape including custom additionalFields */
+interface SessionUser {
+  id: string;
+  email: string;
+  name?: string;
+  role?: string;
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -19,8 +27,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Whitelist login/denied pages from auth check
-  if (PORTAL_PUBLIC_PATHS.includes(pathname)) {
+  // Whitelist login/denied pages from auth check (normalize trailing slash)
+  const cleanPath = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  if (PORTAL_PUBLIC_PATHS.has(cleanPath)) {
     return next();
   }
 
@@ -98,10 +107,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
       });
 
       if (session?.user) {
+        const sessionUser = session.user as SessionUser;
         userData = {
-          email: session.user.email,
-          name: session.user.name ?? "",
-          role: (session.user as { role?: string }).role ?? "student",
+          email: sessionUser.email,
+          name: sessionUser.name ?? "",
+          role: sessionUser.role ?? "student",
         };
 
         // Cache session in KV (fire-and-forget, 5-min TTL)
@@ -124,9 +134,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const isSponsor = await checkSponsorWhitelist(userData.email);
       if (isSponsor) {
         userData.role = "sponsor";
-        // Update KV cache with correct role
+        // Persist escalated role to KV cache (fire-and-forget)
         if (kvCache && sessionToken) {
           kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+        }
+        // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
+        if (runtimeEnv?.PORTAL_DB) {
+          runtimeEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE email = ?')
+            .bind('sponsor', userData.email)
+            .run()
+            .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
         }
       } else {
         return context.redirect("/portal/denied");

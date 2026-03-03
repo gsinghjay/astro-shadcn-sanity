@@ -24,9 +24,12 @@ import { onRequest } from '../middleware';
 const mockKvGet = vi.fn();
 const mockKvPut = vi.fn().mockResolvedValue(undefined);
 const mockCheckLimit = vi.fn();
+const mockD1Run = vi.fn().mockResolvedValue({});
+const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run });
+const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
 
 const mockEnv = {
-  PORTAL_DB: {},
+  PORTAL_DB: { prepare: mockD1Prepare } as any,
   GOOGLE_CLIENT_ID: 'test-google-id',
   GOOGLE_CLIENT_SECRET: 'test-google-secret',
   GITHUB_CLIENT_ID: 'test-github-id',
@@ -68,6 +71,9 @@ describe('middleware — unified auth routing', () => {
     mockKvPut.mockReset().mockResolvedValue(undefined);
     mockCheckLimit.mockReset();
     mockCheckSponsorWhitelist.mockReset().mockResolvedValue(false);
+    mockD1Run.mockReset().mockResolvedValue({});
+    mockD1Bind.mockReset().mockReturnValue({ run: mockD1Run });
+    mockD1Prepare.mockReset().mockReturnValue({ bind: mockD1Bind });
   });
 
   afterEach(() => {
@@ -103,6 +109,23 @@ describe('middleware — unified auth routing', () => {
 
     it('passes through /portal/denied without auth check', async () => {
       const ctx = createMockContext('/portal/denied');
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(ctx.locals.user).toBeUndefined();
+    });
+
+    it('passes through /portal/login/ with trailing slash', async () => {
+      const ctx = createMockContext('/portal/login/');
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(mockGetSession).not.toHaveBeenCalled();
+      expect(ctx.locals.user).toBeUndefined();
+    });
+
+    it('passes through /portal/denied/ with trailing slash', async () => {
+      const ctx = createMockContext('/portal/denied/');
       await onRequest(ctx as any, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
@@ -173,6 +196,39 @@ describe('middleware — unified auth routing', () => {
         role: 'sponsor',
       });
       expect(mockNext).toHaveBeenCalled();
+    });
+
+    it('persists escalated role to D1 on whitelist match', async () => {
+      mockGetSession.mockResolvedValue({
+        user: { id: '3', email: 'new-sponsor@company.com', name: 'New Sponsor', role: 'student' },
+        session: { id: 's3', token: 'tok3' },
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(true);
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockD1Prepare).toHaveBeenCalledWith('UPDATE user SET role = ? WHERE email = ?');
+      expect(mockD1Bind).toHaveBeenCalledWith('sponsor', 'new-sponsor@company.com');
+      expect(mockD1Run).toHaveBeenCalled();
+    });
+
+    it('continues when D1 role update fails (fire-and-forget)', async () => {
+      mockD1Run.mockRejectedValue(new Error('D1 write failed'));
+      mockGetSession.mockResolvedValue({
+        user: { id: '3', email: 'new-sponsor@company.com', name: 'New Sponsor', role: 'student' },
+        session: { id: 's3', token: 'tok3' },
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(true);
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      // Should still proceed — D1 update is fire-and-forget
+      expect(ctx.locals.user?.role).toBe('sponsor');
+      expect(mockNext).toHaveBeenCalled();
+      consoleSpy.mockRestore();
     });
 
     it('sponsor session in KV cache → cache hit works', async () => {

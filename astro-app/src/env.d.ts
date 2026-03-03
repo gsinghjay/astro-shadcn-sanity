@@ -41,6 +41,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   RESEND_API_KEY: string;
+  RESEND_FROM_EMAIL?: string;
   SESSION_CACHE?: KVNamespace;
   RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
 }>;

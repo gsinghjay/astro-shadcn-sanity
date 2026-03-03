@@ -194,6 +194,24 @@ describe('checkSponsorWhitelist()', () => {
     consoleSpy.mockRestore();
   });
 
+  it('returns false when fetch throws a network error', async () => {
+    vi.mocked(fetch).mockRejectedValue(new Error('Network error'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await checkSponsorWhitelist('sponsor@test.com');
+    expect(result).toBe(false);
+    expect(consoleSpy).toHaveBeenCalledWith('[auth] Sanity whitelist check error:', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
+  it('returns false when response is not valid JSON', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('not json', { status: 200 }));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const result = await checkSponsorWhitelist('sponsor@test.com');
+    expect(result).toBe(false);
+    expect(consoleSpy).toHaveBeenCalledWith('[auth] Sanity whitelist check error:', expect.any(Error));
+    consoleSpy.mockRestore();
+  });
+
   it('calls Sanity API with correct query URL', async () => {
     vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ result: false })));
     await checkSponsorWhitelist('test@example.com');

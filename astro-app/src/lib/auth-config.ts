@@ -23,7 +23,15 @@ export interface AuthEnv {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   RESEND_API_KEY: string;
+  RESEND_FROM_EMAIL?: string;
 }
+
+/**
+ * GROQ query for sponsor email whitelist.
+ * Not wrapped in defineQuery() because it runs via direct HTTP fetch to the Sanity API
+ * (outside of Astro's sanity:client / typegen pipeline).
+ */
+const SPONSOR_WHITELIST_QUERY = `count(*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails[])]) > 0`;
 
 interface CreateAuthOptions {
   db: DrizzleD1Database<typeof schema>;
@@ -37,20 +45,25 @@ interface CreateAuthOptions {
 /**
  * Checks if an email is on the sponsor whitelist by querying Sanity.
  * Returns true if the email matches any sponsor's contactEmail or exists in any sponsor's allowedEmails[].
+ * Fails closed (returns false) on any error — non-whitelisted users default to student role.
  */
 export async function checkSponsorWhitelist(email: string): Promise<boolean> {
-  const query = `count(*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails[])]) > 0`;
-  const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
-  const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET;
-  const url = `https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}?query=${encodeURIComponent(query)}&$email="${encodeURIComponent(email)}"`;
+  try {
+    const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
+    const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET;
+    const url = `https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}?query=${encodeURIComponent(SPONSOR_WHITELIST_QUERY)}&$email="${encodeURIComponent(email)}"`;
 
-  const response = await fetch(url);
-  if (!response.ok) {
-    console.error(`[auth] Sanity whitelist query failed: ${response.status}`);
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`[auth] Sanity whitelist query failed: ${response.status}`);
+      return false;
+    }
+    const data = await response.json();
+    return data.result === true;
+  } catch (err) {
+    console.error('[auth] Sanity whitelist check error:', err);
     return false;
   }
-  const data = await response.json();
-  return data.result === true;
 }
 
 /**
@@ -112,7 +125,7 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
         sendMagicLink: async ({ email, url }) => {
           const resendClient = new Resend(env.RESEND_API_KEY);
           await resendClient.emails.send({
-            from: 'YWCC Capstone <onboarding@resend.dev>',
+            from: env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>',
             to: email,
             subject: 'Sign in to the Sponsor Portal',
             html: `<p>Click the link below to sign in to the Sponsor Portal:</p><p><a href="${url}">Sign in to Sponsor Portal</a></p><p>This link expires in 10 minutes.</p>`,
