@@ -23,6 +23,7 @@ import { onRequest } from '../middleware';
 
 const mockKvGet = vi.fn();
 const mockKvPut = vi.fn().mockResolvedValue(undefined);
+const mockKvDelete = vi.fn().mockResolvedValue(undefined);
 const mockCheckLimit = vi.fn();
 const mockD1Run = vi.fn().mockResolvedValue({});
 const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run });
@@ -69,6 +70,7 @@ describe('middleware — unified auth routing', () => {
     mockCreateAuth.mockReturnValue({ api: { getSession: mockGetSession } });
     mockKvGet.mockReset();
     mockKvPut.mockReset().mockResolvedValue(undefined);
+    mockKvDelete.mockReset().mockResolvedValue(undefined);
     mockCheckLimit.mockReset();
     mockCheckSponsorWhitelist.mockReset().mockResolvedValue(false);
     mockD1Run.mockReset().mockResolvedValue({});
@@ -124,6 +126,22 @@ describe('middleware — unified auth routing', () => {
       expect(ctx.locals.user).toBeUndefined();
     });
 
+    it('does not intercept /portalinfo (strict prefix match)', async () => {
+      const ctx = createMockContext('/portalinfo');
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(ctx.locals.user).toBeUndefined();
+    });
+
+    it('does not intercept /studentinfo (strict prefix match)', async () => {
+      const ctx = createMockContext('/studentinfo');
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockNext).toHaveBeenCalled();
+      expect(ctx.locals.user).toBeUndefined();
+    });
+
     it('passes through /portal/denied/ with trailing slash', async () => {
       const ctx = createMockContext('/portal/denied/');
       await onRequest(ctx as any, mockNext);
@@ -164,7 +182,7 @@ describe('middleware — unified auth routing', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('redirects non-whitelisted email accessing /portal/* to /portal/denied', async () => {
+    it('redirects non-whitelisted email accessing /portal/* to /portal/denied and destroys session', async () => {
       mockGetSession.mockResolvedValue({
         user: { id: '2', email: 'random@test.com', name: 'Random User', role: 'student' },
         session: { id: 's2', token: 'tok2' },
@@ -176,8 +194,25 @@ describe('middleware — unified auth routing', () => {
 
       expect(result.status).toBe(302);
       expect(result.headers.get('Location')).toBe('/portal/denied');
+      expect(result.headers.get('Set-Cookie')).toContain('better-auth.session_token=;');
+      expect(result.headers.get('Set-Cookie')).toContain('Max-Age=0');
       expect(mockCheckSponsorWhitelist).toHaveBeenCalledWith('random@test.com');
       expect(mockNext).not.toHaveBeenCalled();
+    });
+
+    it('clears KV cache on denied redirect', async () => {
+      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '2', email: 'random@test.com', name: 'Random User', role: 'student' },
+        session: { id: 's2', token: 'tok2' },
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(false);
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockKvDelete).toHaveBeenCalledWith('sponsor-token-123');
     });
 
     it('escalates role to sponsor when Sanity whitelist matches', async () => {
@@ -232,7 +267,7 @@ describe('middleware — unified auth routing', () => {
     });
 
     it('sponsor session in KV cache → cache hit works', async () => {
-      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut };
+      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
       mockKvGet.mockResolvedValue({ email: 'cached-sponsor@co.com', name: 'Cached Sponsor', role: 'sponsor' });
       const ctx = createMockContext('/portal/dashboard', { headers: { cookie: sessionCookie } });
 
@@ -382,7 +417,7 @@ describe('middleware — unified auth routing', () => {
     const sessionCookie = 'better-auth.session_token=test-token-123; Path=/';
 
     beforeEach(() => {
-      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut };
+      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
     });
 
     it('uses cached session from KV on cache hit (student)', async () => {

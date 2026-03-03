@@ -46,7 +46,25 @@ export const prerender = false;
     <div class="card">
       <h1>Access Denied</h1>
       <p>Your email address is not authorized to access the Sponsor Portal. If you believe this is an error, please contact your program administrator.</p>
-      <a href="/portal/login">Try a different account</a>
+      <a href="/portal/login" id="retry-link">Try a different account</a>
     </div>
+
+    <script>
+      import { createAuthClient } from "better-auth/client";
+
+      const authClient = createAuthClient({
+        baseURL: window.location.origin + "/api/auth",
+      });
+
+      document.getElementById('retry-link')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await authClient.signOut();
+        } catch {
+          // Session may already be destroyed by middleware — continue to login
+        }
+        window.location.href = '/portal/login';
+      });
+    </script>
   </body>
 </html>

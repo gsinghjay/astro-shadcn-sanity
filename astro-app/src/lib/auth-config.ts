@@ -123,9 +123,13 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
     plugins: [
       magicLink({
         sendMagicLink: async ({ email, url }) => {
+          const fromAddress = env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          if (!env.RESEND_FROM_EMAIL) {
+            console.warn('[auth] RESEND_FROM_EMAIL not set — using default .pages.dev sender. Set RESEND_FROM_EMAIL to a verified domain for production.');
+          }
           const resendClient = new Resend(env.RESEND_API_KEY);
           await resendClient.emails.send({
-            from: env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>',
+            from: fromAddress,
             to: email,
             subject: 'Sign in to the Sponsor Portal',
             html: `<p>Click the link below to sign in to the Sponsor Portal:</p><p><a href="${url}">Sign in to Sponsor Portal</a></p><p>This link expires in 10 minutes.</p>`,
@@ -154,6 +158,9 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
       cookieCache: {
         enabled: true,
         maxAge: 5 * 60, // 5-minute cookie cache → reduces D1 reads
+        // cookieCache includes additionalFields (role) in the cached payload.
+        // If a future Better Auth update changes this, middleware falls back to
+        // role ?? "student" and self-heals via Sanity whitelist escalation.
       },
     },
     trustedOrigins: origins,

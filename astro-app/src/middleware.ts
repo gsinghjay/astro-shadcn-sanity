@@ -19,8 +19,8 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  const isPortal = pathname.startsWith("/portal");
-  const isStudent = pathname.startsWith("/student");
+  const isPortal = pathname.startsWith("/portal/") || pathname === "/portal";
+  const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
   // Branch 1: Public routes — zero auth overhead
   if (!isPortal && !isStudent) {
@@ -146,7 +146,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
             .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
         }
       } else {
-        return context.redirect("/portal/denied");
+        // AC 10: destroy session before redirecting to denied page
+        if (kvCache && sessionToken) {
+          kvCache.delete(sessionToken).catch((e: unknown) => console.error('[middleware] KV cache delete failed:', e));
+        }
+        return new Response(null, {
+          status: 302,
+          headers: {
+            Location: '/portal/denied',
+            'Set-Cookie': 'better-auth.session_token=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax',
+          },
+        });
       }
     }
 
