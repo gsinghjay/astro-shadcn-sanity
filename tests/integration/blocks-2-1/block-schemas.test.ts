@@ -60,14 +60,15 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(heroBanner.type).toBe('object')
     })
 
-    test('[P1] 2.1-INT-002 — heroBanner has all 5 block-specific fields', () => {
+    test('[P1] 2.1-INT-002 — heroBanner has all block-specific fields plus variant', () => {
       const fieldNames = getBlockFields(heroBanner).map((f: any) => f.name)
+      expect(fieldNames).toContain('variant')
       expect(fieldNames).toContain('heading')
       expect(fieldNames).toContain('subheading')
       expect(fieldNames).toContain('backgroundImages')
       expect(fieldNames).toContain('ctaButtons')
       expect(fieldNames).toContain('alignment')
-      expect(fieldNames).toHaveLength(5)
+      expect(fieldNames).toHaveLength(6)
     })
 
     test('[P0] 2.1-INT-003 — heroBanner heading is required string', () => {
