@@ -213,6 +213,7 @@ export type HeroBanner = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "centered" | "split" | "split-asymmetric" | "overlay" | "spread";
   heading?: string;
   subheading?: string;
   backgroundImages?: Array<{
@@ -1912,7 +1913,13 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "centered"
+          | "overlay"
+          | "split-asymmetric"
+          | "split"
+          | "spread"
+          | null;
         heading: string | null;
         subheading: string | null;
         backgroundImages: Array<{

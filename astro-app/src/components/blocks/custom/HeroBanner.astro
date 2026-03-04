@@ -1,6 +1,6 @@
 ---
 import type { HeroBannerBlock } from '@/lib/types';
-import { Section, SectionContent, SectionActions } from '@/components/ui/section';
+import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, SectionMedia } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
@@ -11,81 +11,319 @@ interface Props extends HeroBannerBlock {
   id?: string;
 }
 
-const { heading, subheading, ctaButtons, backgroundImages, alignment } = Astro.props;
+const { heading, subheading, ctaButtons, backgroundImages, alignment, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'centered';
 const isCentered = stegaClean(alignment) === 'center';
 const hasCarousel = backgroundImages && backgroundImages.length > 0;
+const firstImage = backgroundImages?.[0];
 ---
 
-<Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
-  {hasCarousel && (
-    <div class="hero-carousel absolute inset-0" data-carousel>
-      {backgroundImages?.map((image, index) => {
-        const lqip = image.asset?.metadata?.lqip;
-        const optimizedUrl = image.asset
-          ? urlFor(image as unknown as Image).width(1920).height(1080).fit('crop').url()
-          : '';
-        const isFirst = index === 0;
-        return (
-          <div
-            class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
-            data-slide={index}
-            data-state={isFirst ? 'active' : 'inactive'}
-            style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
-          >
-            <img
-              src={optimizedUrl}
-              alt={image.alt || `Slide ${index + 1}`}
-              width={1920}
-              height={1080}
-              loading={isFirst ? 'eager' : 'lazy'}
-              fetchpriority={isFirst ? 'high' : undefined}
-              decoding="async"
-              class="w-full h-full object-cover"
+{/* CENTERED variant — identical to pre-variant output (AC #4) */}
+{variant === 'centered' && (
+  <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
+    {hasCarousel && (
+      <div class="hero-carousel absolute inset-0" data-carousel>
+        {backgroundImages?.map((image, index) => {
+          const lqip = image.asset?.metadata?.lqip;
+          const optimizedUrl = image.asset
+            ? urlFor(image as unknown as Image).width(1920).height(1080).fit('crop').url()
+            : '';
+          const isFirst = index === 0;
+          return (
+            <div
+              class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
+              data-slide={index}
+              data-state={isFirst ? 'active' : 'inactive'}
+              style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+            >
+              <img
+                src={optimizedUrl}
+                alt={image.alt || `Slide ${index + 1}`}
+                width={1920}
+                height={1080}
+                loading={isFirst ? 'eager' : 'lazy'}
+                fetchpriority={isFirst ? 'high' : undefined}
+                decoding="async"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-foreground/60"></div>
+            </div>
+          );
+        })}
+        <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {backgroundImages?.map((_, index) => (
+            <button
+              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              data-dot={index}
+              data-state={index === 0 ? 'active' : 'inactive'}
+              aria-label={`Go to slide ${index + 1}`}
             />
-            <div class="absolute inset-0 bg-foreground/60"></div>
-          </div>
-        );
-      })}
-      <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {backgroundImages?.map((_, index) => (
-          <button
-            class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
-            data-dot={index}
-            data-state={index === 0 ? 'active' : 'inactive'}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  )}
-
-  <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
-    <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
-      {heading}
-    </h1>
-
-    {subheading && (
-      <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
-        {subheading}
-      </p>
     )}
 
-    {ctaButtons && ctaButtons.length > 0 && (
-      <SectionActions class={isCentered ? 'justify-center' : ''}>
-        {ctaButtons.map((btn, i) => (
-          <Button
-            href={btn.url}
-            variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-            class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
-            data-gtm-category="cta"
-            data-gtm-action="click"
-            data-gtm-label={stegaClean(btn.text)}
-          >
-            {btn.text}
-          </Button>
-        ))}
-      </SectionActions>
+    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
+        {heading}
+      </h1>
+
+      {subheading && (
+        <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
+          {subheading}
+        </p>
+      )}
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class={isCentered ? 'justify-center' : ''}>
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
+  </Section>
+)}
+
+{/* OVERLAY variant — carousel + text directly over dark overlay (no glass card) */}
+{variant === 'overlay' && (
+  <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
+    {hasCarousel && (
+      <div class="hero-carousel absolute inset-0" data-carousel>
+        {backgroundImages?.map((image, index) => {
+          const lqip = image.asset?.metadata?.lqip;
+          const optimizedUrl = image.asset
+            ? urlFor(image as unknown as Image).width(1920).height(1080).fit('crop').url()
+            : '';
+          const isFirst = index === 0;
+          return (
+            <div
+              class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
+              data-slide={index}
+              data-state={isFirst ? 'active' : 'inactive'}
+              style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+            >
+              <img
+                src={optimizedUrl}
+                alt={image.alt || `Slide ${index + 1}`}
+                width={1920}
+                height={1080}
+                loading={isFirst ? 'eager' : 'lazy'}
+                fetchpriority={isFirst ? 'high' : undefined}
+                decoding="async"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute inset-0 bg-foreground/60"></div>
+            </div>
+          );
+        })}
+        <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          {backgroundImages?.map((_, index) => (
+            <button
+              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              data-dot={index}
+              data-state={index === 0 ? 'active' : 'inactive'}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      </div>
     )}
-  </SectionContent>
-  <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
-</Section>
+
+    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''}`}>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
+        {heading}
+      </h1>
+
+      {subheading && (
+        <p class={`text-lg md:text-xl text-background/60 leading-relaxed ${isCentered ? 'max-w-2xl' : 'max-w-2xl'}`}>
+          {subheading}
+        </p>
+      )}
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class={isCentered ? 'justify-center' : ''}>
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
+  </Section>
+)}
+
+{/* SPLIT variant — text + buttons left, first image right */}
+{variant === 'split' && (
+  <Section size="lg" class="bg-foreground text-background" data-animate>
+    <SectionSplit>
+      <SectionContent>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-[-0.04em]">
+          {heading}
+        </h1>
+
+        {subheading && (
+          <p class="text-lg md:text-xl text-background/60 leading-relaxed max-w-xl">
+            {subheading}
+          </p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+
+      {firstImage?.asset && (
+        <SectionMedia>
+          <img
+            src={urlFor(firstImage as unknown as Image).width(960).height(1080).fit('crop').url()}
+            alt={firstImage.alt || ''}
+            width={960}
+            height={1080}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+          />
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{/* SPLIT-ASYMMETRIC variant — small text left, large image right (2fr:3fr) */}
+{variant === 'split-asymmetric' && (
+  <Section size="lg" class="bg-foreground text-background" data-animate>
+    <SectionSplit class="@5xl:grid-cols-[2fr_3fr]">
+      <SectionContent>
+        <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
+          {heading}
+        </h1>
+
+        {subheading && (
+          <p class="text-lg md:text-xl text-background/60 leading-relaxed">
+            {subheading}
+          </p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+
+      {firstImage?.asset && (
+        <SectionMedia>
+          <img
+            src={urlFor(firstImage as unknown as Image).width(1200).height(1080).fit('crop').url()}
+            alt={firstImage.alt || ''}
+            width={1200}
+            height={1080}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+          />
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{/* SPREAD variant — text left, buttons right, first image as background */}
+{variant === 'spread' && (
+  <Section size="lg" class="bg-foreground text-background overflow-hidden relative" data-animate>
+    {firstImage?.asset && (
+      <div class="absolute inset-0">
+        <img
+          src={urlFor(firstImage as unknown as Image).width(1920).height(1080).fit('crop').url()}
+          alt={firstImage.alt || ''}
+          width={1920}
+          height={1080}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="w-full h-full object-cover"
+          style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+        />
+        <div class="absolute inset-0 bg-foreground/60"></div>
+      </div>
+    )}
+
+    <SectionSpread class="relative z-10">
+      <SectionContent>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-[-0.04em]">
+          {heading}
+        </h1>
+
+        {subheading && (
+          <p class="text-lg md:text-xl text-background/60 leading-relaxed max-w-xl">
+            {subheading}
+          </p>
+        )}
+      </SectionContent>
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class="@5xl:flex-col @5xl:items-end">
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionSpread>
+    <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
+  </Section>
+)}
