@@ -13,7 +13,7 @@ vi.mock('@/lib/db', () => ({
   getDrizzle: mockGetDrizzle,
 }));
 
-vi.mock('@/lib/student-auth', () => ({
+vi.mock('@/lib/auth-config', () => ({
   createAuth: mockCreateAuth,
 }));
 
@@ -24,8 +24,11 @@ const mockLocals = {
     env: {
       GOOGLE_CLIENT_ID: 'test-id',
       GOOGLE_CLIENT_SECRET: 'test-secret',
+      GITHUB_CLIENT_ID: 'test-github-id',
+      GITHUB_CLIENT_SECRET: 'test-github-secret',
       BETTER_AUTH_SECRET: 'test-auth-secret',
       BETTER_AUTH_URL: 'http://localhost:4321',
+      RESEND_API_KEY: 'test-resend-key',
       PORTAL_DB: {},
     },
   },

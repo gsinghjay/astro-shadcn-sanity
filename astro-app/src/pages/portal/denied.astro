@@ -1,0 +1,70 @@
+---
+/**
+ * Access denied page — shown when an authenticated user's email
+ * is not on the sponsor whitelist.
+ * Located at /portal/denied — whitelisted in middleware (skips auth check).
+ */
+export const prerender = false;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Access Denied — Sponsor Portal</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+      h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem; color: #991b1b; }
+      p { color: #64748b; margin-bottom: 1.5rem; font-size: 0.875rem; line-height: 1.5; }
+      a {
+        display: inline-block; padding: 0.625rem 1.25rem; border-radius: 8px;
+        background: #0f172a; color: white; text-decoration: none;
+        font-size: 0.875rem; font-weight: 500;
+      }
+      a:hover { background: #1e293b; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Access Denied</h1>
+      <p>Your email address is not authorized to access the Sponsor Portal. If you believe this is an error, please contact your program administrator.</p>
+      <a href="/portal/login" id="retry-link">Try a different account</a>
+    </div>
+
+    <script>
+      import { createAuthClient } from "better-auth/client";
+
+      const authClient = createAuthClient({
+        baseURL: window.location.origin + "/api/auth",
+      });
+
+      document.getElementById('retry-link')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await authClient.signOut();
+        } catch {
+          // Session may already be destroyed by middleware — continue to login
+        }
+        window.location.href = '/portal/login';
+      });
+    </script>
+  </body>
+</html>

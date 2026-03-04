@@ -178,6 +178,8 @@ These are not limitations you can work around. The runtime model is fundamentall
 
 ## Why Not Consolidate Everything to Better Auth?
 
+> **UPDATE (Story 9.18):** This consolidation was completed. Cloudflare Access has been fully replaced by Better Auth for sponsor authentication. The dual system described below no longer exists. See `docs/auth-consolidation-strategy.md` for the migration details.
+
 Better Auth handles students well. It *could* handle sponsors too — the spike validated that it runs correctly on Cloudflare Workers. The trade-off is real code maintenance cost on one side and real security benefits on the other.
 
 ### What the dual system costs to maintain
