@@ -337,7 +337,9 @@ No code branching per site — the same code paths serve all sites. Env vars con
 
 ## 3. Authentication (Cloudflare Access)
 
-Cloudflare Access (Zero Trust) protects `/portal/*` routes. Unauthenticated requests never reach the Astro Worker.
+> **DEPRECATED (Story 9.18):** Cloudflare Access has been replaced by Better Auth for sponsor authentication. Sponsors now log in via Google OAuth, GitHub OAuth, or Magic Link at `/portal/login`. The CF Access application should be removed from the Zero Trust dashboard. See `docs/auth-consolidation-strategy.md` for the full migration details and manual teardown steps.
+
+~~Cloudflare Access (Zero Trust) protects `/portal/*` routes. Unauthenticated requests never reach the Astro Worker.~~
 
 ### 3.1 How It Works
 

@@ -14,6 +14,7 @@ export const user = sqliteTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: integer('email_verified', { mode: 'boolean' }).default(false).notNull(),
   image: text('image'),
+  role: text('role', { enum: ['student', 'sponsor'] }).default('student').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),
@@ -62,7 +63,7 @@ export const account = sqliteTable(
     accessTokenExpiresAt: integer('access_token_expires_at', { mode: 'timestamp_ms' }),
     refreshTokenExpiresAt: integer('refresh_token_expires_at', { mode: 'timestamp_ms' }),
     scope: text('scope'),
-    // Required by Better Auth schema even though we only use Google OAuth (no email/password).
+    // Required by Better Auth schema even though we only use OAuth + Magic Link (no email/password).
     password: text('password'),
     createdAt: integer('created_at', { mode: 'timestamp_ms' })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)

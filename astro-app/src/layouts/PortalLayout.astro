@@ -67,8 +67,6 @@ const navItems: PortalNavItem[] = [
 
 const email = user?.email ?? "unknown";
 const avatarLetter = email.charAt(0).toUpperCase();
-const logoutUrl =
-  "https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/logout";
 ---
 
 <Layout title={title} seo={seo} template="portal">
@@ -126,13 +124,14 @@ const logoutUrl =
           <Separator />
 
           <div class="p-4">
-            <a
-              href={logoutUrl}
-              class="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            <button
+              type="button"
+              data-portal-signout
+              class="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-full"
             >
               <Icon name="lucide:log-out" class="size-4" />
               <span>Sign out</span>
-            </a>
+            </button>
           </div>
         </SheetContent>
       </Sheet>
@@ -188,7 +187,7 @@ const logoutUrl =
         <div class="mt-auto p-3 border-t">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href={logoutUrl}>
+              <SidebarMenuButton as="button" type="button" data-portal-signout>
                 <Icon name="lucide:log-out" />
                 <span>Sign out</span>
               </SidebarMenuButton>
@@ -210,3 +209,18 @@ const logoutUrl =
     grid-template-columns: var(--sidebar-width) 1fr;
   }
 </style>
+
+<script>
+  import { createAuthClient } from "better-auth/client";
+
+  const authClient = createAuthClient({
+    baseURL: window.location.origin + "/api/auth",
+  });
+
+  document.querySelectorAll("[data-portal-signout]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await authClient.signOut();
+      window.location.href = "/portal/login";
+    });
+  });
+</script>
