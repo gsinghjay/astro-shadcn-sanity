@@ -1,6 +1,4 @@
 import { defineMiddleware } from "astro:middleware";
-import { getDrizzle } from "@/lib/db";
-import { createAuth, checkSponsorWhitelist } from "@/lib/auth-config";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -42,6 +40,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
     return next();
   }
+
+  // Lazy-load auth dependencies — avoids MiddlewareCantBeLoaded errors when
+  // better-auth/drizzle-orm/resend aren't installed (e.g., Docker dev with stale volumes)
+  const { getDrizzle } = await import("@/lib/db");
+  const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
   const runtimeEnv = context.locals.runtime?.env;
 

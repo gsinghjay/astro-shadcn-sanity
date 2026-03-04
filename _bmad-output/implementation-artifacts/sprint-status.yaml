@@ -728,7 +728,7 @@ development_status:
   2-2b-remaining-pages-data-fetching: done
   2-3a-site-settings-wiring: done
   2-3-page-composition-system: ready-for-dev
-  2-4-ui-blocks-hero-banner: ready-for-dev
+  2-4-ui-blocks-hero-banner: done
   2-5-ui-blocks-content-articles: ready-for-dev
   2-6-ui-blocks-cta-features: ready-for-dev
   2-7-ui-blocks-products-services: ready-for-dev

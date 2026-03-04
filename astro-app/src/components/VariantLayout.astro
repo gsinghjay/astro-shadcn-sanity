@@ -1,0 +1,110 @@
+---
+import type { VariantLayoutConfig } from '@/lib/variant-layouts';
+import { getVariantLayout } from '@/lib/variant-layouts';
+import { cn } from '@/lib/utils';
+import { SectionContent, SectionSplit, SectionSpread, SectionGrid, SectionMasonry, SectionMedia } from '@/components/ui/section';
+
+interface Props {
+  blockType: string;
+  variant?: string | null;
+  class?: string;
+}
+
+const { blockType, variant, class: className } = Astro.props;
+const config: VariantLayoutConfig = getVariantLayout(blockType, variant);
+
+const hasContent = Astro.slots.has('content');
+const hasMedia = Astro.slots.has('media');
+const hasActions = Astro.slots.has('actions');
+const hasSupplementary = Astro.slots.has('supplementary');
+
+// F1: Map columnRatio config to Tailwind grid-cols classes for SectionSplit
+const columnRatioClasses: Record<string, string> = {
+  '1:1': '',
+  '1:2': '@lg:grid-cols-[1fr_2fr]',
+  '2:1': '@lg:grid-cols-[2fr_1fr]',
+  '2:3': '@lg:grid-cols-[2fr_3fr]',
+  '3:2': '@lg:grid-cols-[3fr_2fr]',
+  '1:3': '@lg:grid-cols-[1fr_3fr]',
+  '3:1': '@lg:grid-cols-[3fr_1fr]',
+};
+const ratioClass = config.columnRatio ? columnRatioClasses[config.columnRatio] ?? '' : '';
+
+// F2: Map alignment config to Tailwind classes for SectionContent
+const alignmentClasses: Record<string, string> = {
+  left: 'items-start',
+  center: 'items-center text-center',
+  right: 'items-end text-right',
+};
+const alignClass = config.alignment ? alignmentClasses[config.alignment] ?? '' : '';
+
+// Config-level className from variant layout registration
+const configClass = config.className ?? '';
+---
+
+{config.layout === 'split' && (
+  <SectionSplit class={cn(ratioClass, configClass, className)}>
+    <div>
+      {hasContent && <slot name="content" />}
+      {hasActions && <slot name="actions" />}
+      {hasSupplementary && <slot name="supplementary" />}
+    </div>
+    <div>
+      {hasMedia && <slot name="media" />}
+    </div>
+  </SectionSplit>
+)}
+
+{config.layout === 'spread' && (
+  <SectionSpread class={cn(configClass, className)}>
+    <div>
+      {hasContent && <slot name="content" />}
+      {hasActions && <slot name="actions" />}
+    </div>
+    <div>
+      {hasMedia && <slot name="media" />}
+      {hasSupplementary && <slot name="supplementary" />}
+    </div>
+  </SectionSpread>
+)}
+
+{config.layout === 'grid' && (
+  <SectionGrid class={cn(configClass, className)}>
+    {hasContent && <slot name="content" />}
+    {hasMedia && <slot name="media" />}
+    {hasActions && <slot name="actions" />}
+    {hasSupplementary && <slot name="supplementary" />}
+  </SectionGrid>
+)}
+
+{config.layout === 'content' && (
+  <SectionContent class={cn(alignClass, configClass, className)}>
+    {hasContent && <slot name="content" />}
+    {hasMedia && <slot name="media" />}
+    {hasActions && <slot name="actions" />}
+    {hasSupplementary && <slot name="supplementary" />}
+  </SectionContent>
+)}
+
+{config.layout === 'masonry' && (
+  <SectionMasonry class={cn(configClass, className)}>
+    {hasContent && <slot name="content" />}
+    {hasMedia && <slot name="media" />}
+    {hasActions && <slot name="actions" />}
+    {hasSupplementary && <slot name="supplementary" />}
+  </SectionMasonry>
+)}
+
+{config.layout === 'media' && (
+  <div class={cn("relative overflow-hidden", configClass, className)} data-slot="variant-media">
+    <SectionMedia class="absolute inset-0 rounded-none">
+      {hasMedia && <slot name="media" />}
+    </SectionMedia>
+    <div class="absolute inset-0 bg-black/40" aria-hidden="true" />
+    <div class="relative z-10">
+      {hasContent && <slot name="content" />}
+      {hasActions && <slot name="actions" />}
+      {hasSupplementary && <slot name="supplementary" />}
+    </div>
+  </div>
+)}
