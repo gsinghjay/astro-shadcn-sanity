@@ -7,30 +7,67 @@
  */
 export const prerender = false;
 
-const redirect = Astro.url.searchParams.get('redirect') || '/student/';
+import "../../styles/global.css";
+
+function safeRedirect(url: string | null, fallback: string): string {
+  if (!url) return fallback;
+  if (url.startsWith('/') && !url.startsWith('//')) return url;
+  return fallback;
+}
+
+const redirect = safeRedirect(Astro.url.searchParams.get('redirect'), '/student/');
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
     <title>Student Sign In</title>
   </head>
-  <body data-redirect={redirect}>
-    <p>Redirecting to Google sign-in...</p>
+  <body class="bg-background text-foreground min-h-screen flex items-center justify-center p-4" data-redirect={redirect}>
+    <div class="text-center">
+      <p class="text-muted-foreground text-sm" id="status-msg">Redirecting to Google sign-in...</p>
+      <div id="error-fallback" hidden>
+        <p class="text-destructive text-sm mb-4">Unable to connect to Google sign-in.</p>
+        <a
+          href={`/auth/login?redirect=${encodeURIComponent(redirect)}`}
+          class="text-primary text-sm font-medium underline underline-offset-4"
+        >
+          Try again
+        </a>
+      </div>
+    </div>
     <script>
       import { createAuthClient } from "better-auth/client";
+
+      function safeRedirect(url: string | null, fallback: string): string {
+        if (!url) return fallback;
+        if (url.startsWith('/') && !url.startsWith('//')) return url;
+        return fallback;
+      }
 
       const authClient = createAuthClient({
         baseURL: window.location.origin + "/api/auth",
       });
 
       const serverRedirect = document.body.getAttribute('data-redirect') || '/student/';
-      const redirectParam = new URLSearchParams(window.location.search).get('redirect') || serverRedirect;
+      const redirectParam = safeRedirect(
+        new URLSearchParams(window.location.search).get('redirect'),
+        serverRedirect
+      );
 
-      authClient.signIn.social({
-        provider: "google",
-        callbackURL: redirectParam,
-      });
+      try {
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: redirectParam,
+        });
+      } catch {
+        const statusEl = document.getElementById('status-msg');
+        const errorEl = document.getElementById('error-fallback');
+        if (statusEl) statusEl.hidden = true;
+        if (errorEl) errorEl.hidden = false;
+      }
     </script>
   </body>
 </html>
