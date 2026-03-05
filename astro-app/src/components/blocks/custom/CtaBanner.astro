@@ -1,15 +1,21 @@
 ---
 import type { CtaBannerBlock } from '@/lib/types';
-import { Section, SectionContent, SectionActions } from '@/components/ui/section';
+import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, SectionMedia } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import type { Image } from '@sanity/types';
 
 interface Props extends CtaBannerBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, ctaButtons, backgroundVariant } = Astro.props;
+const { heading, description, ctaButtons, backgroundVariant, backgroundImages, variant: rawVariant } = Astro.props;
+
+const layoutVariant = stegaClean(rawVariant) ?? 'centered';
+
+const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
@@ -25,34 +31,169 @@ const secondaryBtnMap: Record<string, string> = {
   white: '',
 };
 
-const variant = stegaClean(backgroundVariant) ?? 'white';
+const firstImage = backgroundImages?.[0];
 ---
 
-<Section data-animate>
-  <SectionContent class="items-center text-center max-w-3xl mx-auto">
-    <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
-      {heading}
-    </h2>
+{/* CENTERED variant — identical to pre-variant output (AC #4) */}
+{layoutVariant === 'centered' && (
+  <Section data-animate>
+    <SectionContent class="items-center text-center max-w-3xl mx-auto">
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+        {heading}
+      </h2>
 
-    {description && (
-      <p class="text-lg leading-relaxed max-w-2xl opacity-80">{description}</p>
+      {description && (
+        <p class="text-lg leading-relaxed max-w-2xl opacity-80">{description}</p>
+      )}
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class="justify-center">
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i === 0 ? primaryBtnMap[bgVariant] : secondaryBtnMap[bgVariant]}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{/* SPLIT variant — text + buttons left, first image right */}
+{layoutVariant === 'split' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+          {heading}
+        </h2>
+
+        {description && (
+          <p class="text-lg leading-relaxed max-w-xl opacity-80">{description}</p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i === 0 ? primaryBtnMap[bgVariant] : secondaryBtnMap[bgVariant]}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+
+      {firstImage?.asset && (
+        <SectionMedia>
+          <img
+            src={urlFor(firstImage as unknown as Image).width(960).height(1080).fit('crop').url()}
+            alt={firstImage.alt || ''}
+            width={960}
+            height={1080}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+          />
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{/* SPREAD variant — heading + description left, buttons right (no image) */}
+{layoutVariant === 'spread' && (
+  <Section data-animate>
+    <SectionSpread>
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+          {heading}
+        </h2>
+
+        {description && (
+          <p class="text-lg leading-relaxed max-w-xl opacity-80">{description}</p>
+        )}
+      </SectionContent>
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class="@5xl:flex-col @5xl:items-end">
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i === 0 ? primaryBtnMap[bgVariant] : secondaryBtnMap[bgVariant]}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionSpread>
+  </Section>
+)}
+
+{/* OVERLAY variant — first image as full-width background, centered text + buttons on top */}
+{layoutVariant === 'overlay' && (
+  <Section class="overflow-hidden relative" data-animate>
+    {firstImage?.asset && (
+      <div class="absolute inset-0">
+        <img
+          src={urlFor(firstImage as unknown as Image).width(1920).height(600).fit('crop').url()}
+          alt={firstImage.alt || ''}
+          width={1920}
+          height={600}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          class="w-full h-full object-cover"
+          style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+        />
+        <div class="absolute inset-0 bg-foreground/60"></div>
+      </div>
     )}
 
-    {ctaButtons && ctaButtons.length > 0 && (
-      <SectionActions class="justify-center">
-        {ctaButtons.map((btn, i) => (
-          <Button
-            href={btn.url}
-            variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-            class={i === 0 ? primaryBtnMap[variant] : secondaryBtnMap[variant]}
-            data-gtm-category="cta"
-            data-gtm-action="click"
-            data-gtm-label={stegaClean(btn.text)}
-          >
-            {btn.text}
-          </Button>
-        ))}
-      </SectionActions>
-    )}
-  </SectionContent>
-</Section>
+    <SectionContent class="relative z-10 items-center text-center max-w-3xl mx-auto text-background">
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+        {heading}
+      </h2>
+
+      {description && (
+        <p class="text-lg leading-relaxed max-w-2xl opacity-80">{description}</p>
+      )}
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions class="justify-center">
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+  </Section>
+)}
