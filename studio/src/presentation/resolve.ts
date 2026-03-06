@@ -125,6 +125,10 @@ export const locations: DocumentLocationResolver = (params, context) => {
             title: doc?.title || 'Untitled',
             href: `/events/${doc?.slug}`,
           },
+          {
+            title: 'All Events',
+            href: '/events',
+          },
         ],
       }),
     }),
