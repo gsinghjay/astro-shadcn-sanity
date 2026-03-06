@@ -4,7 +4,6 @@ import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, S
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
 
 interface Props extends CtaBannerBlock {
   class?: string;
@@ -100,12 +99,11 @@ const firstImage = backgroundImages?.[0];
       {firstImage?.asset && (
         <SectionMedia>
           <img
-            src={urlFor(firstImage as unknown as Image).width(960).height(1080).fit('crop').url()}
+            src={urlFor(firstImage).width(960).height(1080).fit('crop').url()}
             alt={firstImage.alt || ''}
             width={960}
             height={1080}
-            loading="eager"
-            fetchpriority="high"
+            loading="lazy"
             decoding="async"
             style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
           />
@@ -155,12 +153,11 @@ const firstImage = backgroundImages?.[0];
     {firstImage?.asset && (
       <div class="absolute inset-0">
         <img
-          src={urlFor(firstImage as unknown as Image).width(1920).height(600).fit('crop').url()}
+          src={urlFor(firstImage).width(1920).height(600).fit('crop').url()}
           alt={firstImage.alt || ''}
           width={1920}
           height={600}
-          loading="eager"
-          fetchpriority="high"
+          loading="lazy"
           decoding="async"
           class="w-full h-full object-cover"
           style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
@@ -184,7 +181,7 @@ const firstImage = backgroundImages?.[0];
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i === 0 ? primaryBtnMap['dark'] : secondaryBtnMap['dark']}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}

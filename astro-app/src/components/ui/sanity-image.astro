@@ -1,6 +1,5 @@
 ---
 import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
 
 interface Props {
   image: {
@@ -40,7 +39,7 @@ const lqip = image.asset?.metadata?.lqip;
 const alt = image.alt || '';
 
 const optimizedUrl = image.asset
-  ? urlFor(image as unknown as Image).width(width).height(height).fit('crop').url()
+  ? urlFor(image).width(width).height(height).fit('crop').url()
   : '';
 ---
 
