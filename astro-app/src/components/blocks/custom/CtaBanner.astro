@@ -4,13 +4,14 @@ import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, S
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
+import { cn } from '@/lib/utils';
 
 interface Props extends CtaBannerBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, ctaButtons, backgroundVariant, backgroundImages, variant: rawVariant } = Astro.props;
+const { heading, description, ctaButtons, backgroundVariant, backgroundImages, variant: rawVariant, class: className, id } = Astro.props;
 
 const layoutVariant = stegaClean(rawVariant) ?? 'centered';
 
@@ -35,14 +36,14 @@ const firstImage = backgroundImages?.[0];
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
 {layoutVariant === 'centered' && (
-  <Section data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="items-center text-center max-w-3xl mx-auto">
       <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
         {heading}
       </h2>
 
       {description && (
-        <p class="text-lg leading-relaxed max-w-2xl opacity-80">{description}</p>
+        <p class="text-lg leading-relaxed max-w-2xl text-muted-foreground">{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (
@@ -67,7 +68,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT variant — text + buttons left, first image right */}
 {layoutVariant === 'split' && (
-  <Section data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionSplit>
       <SectionContent>
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
@@ -75,7 +76,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl opacity-80">{description}</p>
+          <p class="text-lg leading-relaxed max-w-xl text-muted-foreground">{description}</p>
         )}
 
         {ctaButtons && ctaButtons.length > 0 && (
@@ -115,7 +116,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPREAD variant — heading + description left, buttons right (no image) */}
 {layoutVariant === 'spread' && (
-  <Section data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionSpread>
       <SectionContent>
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
@@ -123,12 +124,12 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl opacity-80">{description}</p>
+          <p class="text-lg leading-relaxed max-w-xl text-muted-foreground">{description}</p>
         )}
       </SectionContent>
 
       {ctaButtons && ctaButtons.length > 0 && (
-        <SectionActions class="@5xl:flex-col @5xl:items-end">
+        <SectionActions>
           {ctaButtons.map((btn, i) => (
             <Button
               href={btn.url}
@@ -149,7 +150,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* OVERLAY variant — first image as full-width background, centered text + buttons on top */}
 {layoutVariant === 'overlay' && (
-  <Section class="overflow-hidden relative" data-animate>
+  <Section class={cn("bg-foreground text-background overflow-hidden relative", className)} id={id} data-animate>
     {firstImage?.asset && (
       <div class="absolute inset-0">
         <img
@@ -166,13 +167,13 @@ const firstImage = backgroundImages?.[0];
       </div>
     )}
 
-    <SectionContent class="relative z-10 items-center text-center max-w-3xl mx-auto text-background">
+    <SectionContent class="relative z-10 items-center text-center max-w-3xl mx-auto">
       <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
         {heading}
       </h2>
 
       {description && (
-        <p class="text-lg leading-relaxed max-w-2xl opacity-80">{description}</p>
+        <p class="text-lg leading-relaxed max-w-2xl">{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (

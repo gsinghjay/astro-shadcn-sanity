@@ -37,7 +37,7 @@ describe('CtaBanner', () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(CtaBanner, { props: ctaMinimal });
 
-      expect(html).not.toContain('opacity-80');
+      expect(html).not.toContain('text-muted-foreground');
     });
 
     test('renders GTM tracking attributes on CTA buttons', async () => {
@@ -132,11 +132,11 @@ describe('CtaBanner', () => {
       expect(html).not.toContain('cdn.sanity.io');
     });
 
-    test('applies @5xl column layout class for spread buttons', async () => {
+    test('uses SectionSpread layout with horizontal buttons', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(CtaBanner, { props: ctaSpread });
 
-      expect(html).toContain('@5xl:flex-col');
+      expect(html).toContain('@5xl:justify-between');
     });
 
     test('renders GTM attributes in spread variant', async () => {

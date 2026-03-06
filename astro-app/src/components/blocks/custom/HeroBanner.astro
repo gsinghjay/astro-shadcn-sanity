@@ -4,13 +4,14 @@ import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, S
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
+import { cn } from '@/lib/utils';
 
 interface Props extends HeroBannerBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, subheading, ctaButtons, backgroundImages, alignment, variant: rawVariant } = Astro.props;
+const { heading, subheading, ctaButtons, backgroundImages, alignment, variant: rawVariant, class: className, id } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'centered';
 const isCentered = stegaClean(alignment) === 'center';
 const hasCarousel = backgroundImages && backgroundImages.length > 0;
@@ -19,9 +20,9 @@ const firstImage = backgroundImages?.[0];
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
 {variant === 'centered' && (
-  <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
+  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative group", className)} id={id} data-animate>
     {hasCarousel && (
-      <div class="hero-carousel absolute inset-0" data-carousel>
+      <div class="hero-carousel absolute inset-0" data-slot="hero-carousel" data-carousel>
         {backgroundImages?.map((image, index) => {
           const lqip = image.asset?.metadata?.lqip;
           const optimizedUrl = image.asset
@@ -49,6 +50,7 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
+        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
@@ -62,13 +64,13 @@ const firstImage = backgroundImages?.[0];
       </div>
     )}
 
-    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12 rounded-lg`}>
+    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground/80 backdrop-blur-sm p-8 md:p-12`}>
       <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.95] tracking-[-0.04em]">
         {heading}
       </h1>
 
       {subheading && (
-        <p class={`text-lg md:text-xl text-background/60 leading-relaxed max-w-2xl`}>
+        <p class="text-lg md:text-xl leading-relaxed max-w-2xl">
           {subheading}
         </p>
       )}
@@ -96,9 +98,9 @@ const firstImage = backgroundImages?.[0];
 
 {/* OVERLAY variant — carousel + text directly over dark overlay (no glass card) */}
 {variant === 'overlay' && (
-  <Section size="lg" class="bg-foreground text-background overflow-hidden relative group" data-animate>
+  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative group", className)} id={id} data-animate>
     {hasCarousel && (
-      <div class="hero-carousel absolute inset-0" data-carousel>
+      <div class="hero-carousel absolute inset-0" data-slot="hero-carousel" data-carousel>
         {backgroundImages?.map((image, index) => {
           const lqip = image.asset?.metadata?.lqip;
           const optimizedUrl = image.asset
@@ -126,6 +128,7 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
+        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
@@ -145,7 +148,7 @@ const firstImage = backgroundImages?.[0];
       </h1>
 
       {subheading && (
-        <p class={`text-lg md:text-xl text-background/60 leading-relaxed max-w-2xl`}>
+        <p class="text-lg md:text-xl leading-relaxed max-w-2xl">
           {subheading}
         </p>
       )}
@@ -173,7 +176,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT variant — text + buttons left, first image right */}
 {variant === 'split' && (
-  <Section size="lg" class="bg-foreground text-background" data-animate>
+  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate>
     <SectionSplit>
       <SectionContent>
         <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold leading-[0.95] tracking-[-0.04em]">
@@ -181,7 +184,7 @@ const firstImage = backgroundImages?.[0];
         </h1>
 
         {subheading && (
-          <p class="text-lg md:text-xl text-background/60 leading-relaxed max-w-xl">
+          <p class="text-lg md:text-xl leading-relaxed max-w-xl">
             {subheading}
           </p>
         )}
@@ -224,7 +227,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT-ASYMMETRIC variant — small text left, large image right (2fr:3fr) */}
 {variant === 'split-asymmetric' && (
-  <Section size="lg" class="bg-foreground text-background" data-animate>
+  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate>
     <SectionSplit class="@5xl:grid-cols-[2fr_3fr]">
       <SectionContent>
         <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
@@ -232,7 +235,7 @@ const firstImage = backgroundImages?.[0];
         </h1>
 
         {subheading && (
-          <p class="text-lg md:text-xl text-background/60 leading-relaxed">
+          <p class="text-lg md:text-xl leading-relaxed">
             {subheading}
           </p>
         )}
@@ -275,7 +278,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPREAD variant — text left, buttons right, first image as background */}
 {variant === 'spread' && (
-  <Section size="lg" class="bg-foreground text-background overflow-hidden relative" data-animate>
+  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative", className)} id={id} data-animate>
     {firstImage?.asset && (
       <div class="absolute inset-0">
         <img
@@ -300,14 +303,14 @@ const firstImage = backgroundImages?.[0];
         </h1>
 
         {subheading && (
-          <p class="text-lg md:text-xl text-background/60 leading-relaxed max-w-xl">
+          <p class="text-lg md:text-xl leading-relaxed max-w-xl">
             {subheading}
           </p>
         )}
       </SectionContent>
 
       {ctaButtons && ctaButtons.length > 0 && (
-        <SectionActions class="@5xl:flex-col @5xl:items-end">
+        <SectionActions>
           {ctaButtons.map((btn, i) => (
             <Button
               href={btn.url}

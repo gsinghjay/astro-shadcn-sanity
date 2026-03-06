@@ -21,6 +21,7 @@ export const Default = {
   args: {
     _type: 'heroBanner',
     _key: 'story-hero-1',
+    variant: 'centered',
     heading: 'Lorem Ipsum Dolor Sit',
     subheading: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua',
     alignment: 'center',

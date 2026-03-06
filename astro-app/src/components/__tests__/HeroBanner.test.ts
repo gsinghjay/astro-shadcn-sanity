@@ -127,7 +127,7 @@ describe('HeroBanner', () => {
         props: heroMinimal,
       });
 
-      expect(html).not.toContain('text-background/60');
+      expect(html).not.toContain('leading-relaxed');
     });
 
     test('omits CTA section when no buttons', async () => {
