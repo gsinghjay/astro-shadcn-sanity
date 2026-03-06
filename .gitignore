@@ -56,3 +56,10 @@ studio/schema.json
 
 # Repomix
 .repomixignore
+
+# Agents
+.cursor/
+.gemini/
+.github/agents/
+.github/copilot-instructions.md
+.github/prompts/

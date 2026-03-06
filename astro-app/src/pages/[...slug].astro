@@ -6,7 +6,6 @@ import SanityPageContent from '@/components/SanityPageContent.astro';
 import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
-import type { Image } from '@sanity/types';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
@@ -63,7 +62,7 @@ const heroImage = firstBlock?._type === 'heroBanner'
   ? (firstBlock as { backgroundImages?: Array<{ asset?: { _id: string } | null }> }).backgroundImages?.[0]
   : null;
 const preloadImageUrl = heroImage?.asset
-  ? urlFor(heroImage as unknown as Image).width(1920).height(1080).fit('crop').url()
+  ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
 ---
 

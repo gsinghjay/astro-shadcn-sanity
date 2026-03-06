@@ -531,6 +531,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "ctaBanner" => {
       heading,
       description,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
       ctaButtons[]{ _key, text, url, variant }
     },
     _type == "statsRow" => {
