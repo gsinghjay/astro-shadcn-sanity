@@ -30,11 +30,31 @@ export const projectFull: Project = {
       crop: null,
     },
     industry: 'Technology',
+    hidden: null,
   },
   technologyTags: ['React', 'TypeScript', 'IoT'],
   semester: 'Fall 2025',
   status: 'completed',
   outcome: 'Reduced campus navigation time by 40% for new students.',
+};
+
+export const projectHiddenSponsor: Project = {
+  _id: 'project-3',
+  title: 'Hidden Sponsor Project',
+  slug: 'hidden-sponsor-project',
+  content: null,
+  sponsor: {
+    _id: 'sponsor-hidden',
+    name: 'Secret Corp',
+    slug: 'secret-corp',
+    logo: null,
+    industry: null,
+    hidden: true,
+  },
+  technologyTags: null,
+  semester: null,
+  status: null,
+  outcome: null,
 };
 
 export const projectMinimal: Project = {

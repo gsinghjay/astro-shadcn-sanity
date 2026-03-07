@@ -217,6 +217,10 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
 /**
  * GROQ query: fetch a single sponsor by slug with all fields and associated projects.
  * The projects sub-query returns an empty array until Epic 4 creates the project schema.
+ *
+ * Does NOT filter `hidden != true` — hidden sponsors are excluded from static path
+ * generation via ALL_SPONSOR_SLUGS_QUERY, so no detail page is built for them.
+ * If the site switches to SSR/hybrid output, add `hidden != true` here.
  */
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, name, "slug": slug.current,
@@ -240,6 +244,10 @@ export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QU
 /**
  * Resolve sponsors for a logoCloud or sponsorCards block from the pre-fetched cache.
  * Filters based on autoPopulate (logoCloud) or displayMode (sponsorCards) config.
+ *
+ * Note: `allSponsors` is pre-filtered by ALL_SPONSORS_QUERY (`hidden != true`),
+ * so manual selections of hidden sponsors are also excluded. This is intentional —
+ * hidden sponsors should not appear on any public page regardless of selection mode.
  */
 export function resolveBlockSponsors(
   block: { _type: string; autoPopulate?: boolean | null; displayMode?: string | null; sponsors?: Array<{ _id: string }> | null },
