@@ -94,6 +94,8 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
     origins.push(requestOrigin);
   }
 
+  const resendClient = new Resend(env.RESEND_API_KEY);
+
   return betterAuth({
     baseURL,
     secret: env.BETTER_AUTH_SECRET,
@@ -120,6 +122,9 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
         clientSecret: env.GITHUB_CLIENT_SECRET,
       },
     },
+    account: {
+      accountLinking: { enabled: true },
+    },
     plugins: [
       magicLink({
         sendMagicLink: async ({ email, url }) => {
@@ -127,12 +132,12 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
           if (!env.RESEND_FROM_EMAIL) {
             console.warn('[auth] RESEND_FROM_EMAIL not set — using default .pages.dev sender. Set RESEND_FROM_EMAIL to a verified domain for production.');
           }
-          const resendClient = new Resend(env.RESEND_API_KEY);
+          const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
           await resendClient.emails.send({
             from: fromAddress,
             to: email,
             subject: 'Sign in to the Sponsor Portal',
-            html: `<p>Click the link below to sign in to the Sponsor Portal:</p><p><a href="${url}">Sign in to Sponsor Portal</a></p><p>This link expires in 10 minutes.</p>`,
+            html: `<p>Click the link below to sign in to the Sponsor Portal:</p><p><a href="${safeUrl}">Sign in to Sponsor Portal</a></p><p>This link expires in 10 minutes.</p>`,
           });
         },
       }),

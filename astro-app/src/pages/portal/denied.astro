@@ -50,11 +50,7 @@ export const prerender = false;
     </div>
 
     <script>
-      import { createAuthClient } from "better-auth/client";
-
-      const authClient = createAuthClient({
-        baseURL: window.location.origin + "/api/auth",
-      });
+      import { authClient } from "@/lib/auth-client";
 
       document.getElementById('retry-link')?.addEventListener('click', async (e) => {
         e.preventDefault();

@@ -67,19 +67,13 @@ const redirect = safeRedirect(Astro.url.searchParams.get('redirect'), '/portal/'
     </div>
 
     <script>
-      import { createAuthClient } from "better-auth/client";
-      import { magicLinkClient } from "better-auth/client/plugins";
+      import { authClient } from "@/lib/auth-client";
 
       function safeRedirect(url: string | null, fallback: string): string {
         if (!url) return fallback;
         if (url.startsWith('/') && !url.startsWith('//')) return url;
         return fallback;
       }
-
-      const authClient = createAuthClient({
-        baseURL: window.location.origin + "/api/auth",
-        plugins: [magicLinkClient()],
-      });
 
       const serverRedirect = document.querySelector('[data-redirect]')?.getAttribute('data-redirect') || '/portal/';
       const redirectParam = safeRedirect(

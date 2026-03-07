@@ -32,8 +32,7 @@ if (!user?.email) {
       </button>
     </main>
     <script>
-      import { createAuthClient } from "better-auth/client";
-      const authClient = createAuthClient({ baseURL: window.location.origin + "/api/auth" });
+      import { authClient } from "@/lib/auth-client";
       document.getElementById("sign-out")?.addEventListener("click", async () => {
         await authClient.signOut();
         window.location.href = "/";
