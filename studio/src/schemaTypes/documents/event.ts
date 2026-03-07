@@ -92,6 +92,7 @@ export const event = defineType({
           {title: 'Competition', value: 'competition'},
           {title: 'Other', value: 'other'},
         ],
+        layout: 'radio',
       },
     }),
     defineField({
