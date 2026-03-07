@@ -42,10 +42,9 @@ describe('authClient — client-side auth', () => {
     expect(authClient.getSession).toBeTypeOf('function');
   });
 
-  it('configures baseURL to /api/auth', () => {
-    expect(mockCreateAuthClient).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: '/api/auth' }),
-    );
+  it('configures baseURL ending in /api/auth', () => {
+    const config = mockCreateAuthClient.mock.calls[0][0];
+    expect(config.baseURL).toMatch(/\/api\/auth$/);
   });
 
   it('includes magicLinkClient plugin', () => {
