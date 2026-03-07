@@ -47,9 +47,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
   const runtimeEnv = context.locals.runtime?.env;
+  if (!runtimeEnv) {
+    console.error("[middleware] Cloudflare runtime env not available");
+    return new Response("Service Unavailable", { status: 503 });
+  }
 
   // Rate limiting — per-IP sliding window via Durable Object (fail-open)
-  const rateLimiter = runtimeEnv?.RATE_LIMITER;
+  const rateLimiter = runtimeEnv.RATE_LIMITER;
   if (rateLimiter) {
     const ip = context.request.headers.get("CF-Connecting-IP") ?? "unknown";
     try {
@@ -94,13 +98,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const auth = createAuth({
         db,
         env: {
-          GOOGLE_CLIENT_ID: runtimeEnv!.GOOGLE_CLIENT_ID,
-          GOOGLE_CLIENT_SECRET: runtimeEnv!.GOOGLE_CLIENT_SECRET,
-          GITHUB_CLIENT_ID: runtimeEnv!.GITHUB_CLIENT_ID,
-          GITHUB_CLIENT_SECRET: runtimeEnv!.GITHUB_CLIENT_SECRET,
-          BETTER_AUTH_SECRET: runtimeEnv!.BETTER_AUTH_SECRET,
-          BETTER_AUTH_URL: runtimeEnv!.BETTER_AUTH_URL,
-          RESEND_API_KEY: runtimeEnv!.RESEND_API_KEY,
+          GOOGLE_CLIENT_ID: runtimeEnv.GOOGLE_CLIENT_ID,
+          GOOGLE_CLIENT_SECRET: runtimeEnv.GOOGLE_CLIENT_SECRET,
+          GITHUB_CLIENT_ID: runtimeEnv.GITHUB_CLIENT_ID,
+          GITHUB_CLIENT_SECRET: runtimeEnv.GITHUB_CLIENT_SECRET,
+          BETTER_AUTH_SECRET: runtimeEnv.BETTER_AUTH_SECRET,
+          BETTER_AUTH_URL: runtimeEnv.BETTER_AUTH_URL,
+          RESEND_API_KEY: runtimeEnv.RESEND_API_KEY,
         },
         requestOrigin: context.url.origin,
       });
@@ -176,9 +180,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 });
 
-/** Extract Better Auth session token from Cookie header */
+/** Extract Better Auth session token from Cookie header.
+ *  Handles both standard and __Secure- prefixed cookie names
+ *  (the latter is used when `advanced.useSecureCookies` is enabled). */
 function extractSessionToken(cookie: string | null): string | null {
   if (!cookie) return null;
-  const match = cookie.match(/better-auth\.session_token=([^;]+)/);
+  const match = cookie.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/);
   return match?.[1] ?? null;
 }

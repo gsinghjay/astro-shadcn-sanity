@@ -76,6 +76,12 @@ describe('createAuth() — unified auth factory', () => {
     });
   });
 
+  it('enables account linking', () => {
+    createAuth({ db: mockDb, env: mockEnv });
+    const config = mockBetterAuth.mock.calls[0][0];
+    expect(config.account.accountLinking).toEqual({ enabled: true });
+  });
+
   it('registers Magic Link plugin', () => {
     createAuth({ db: mockDb, env: mockEnv });
     expect(mockMagicLink).toHaveBeenCalled();

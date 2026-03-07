@@ -375,6 +375,35 @@ describe('middleware — unified auth routing', () => {
     });
   });
 
+  describe('Runtime env guard', () => {
+    it('returns 503 when runtime env is not available', async () => {
+      const ctx = createMockContext('/portal/index', {
+        overrides: { runtime: { env: undefined as any } } as any,
+      });
+
+      const result = await onRequest(ctx as any, mockNext);
+
+      expect(result.status).toBe(503);
+      expect(mockNext).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Cookie extraction — __Secure- prefix', () => {
+    it('extracts session token from __Secure- prefixed cookie', async () => {
+      const secureCookie = '__Secure-better-auth.session_token=secure-tok-789; Path=/';
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: secureCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(ctx.locals.user).toEqual({ email: 'student@test.com', name: 'Student', role: 'student' });
+      expect(mockNext).toHaveBeenCalled();
+    });
+  });
+
   describe('Dev mode bypass', () => {
     it('sets role "sponsor" with dev email and name for portal routes', async () => {
       import.meta.env.DEV = true;
