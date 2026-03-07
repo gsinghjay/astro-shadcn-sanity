@@ -438,7 +438,7 @@ export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defi
  */
 export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
-  date, endDate, location, description, eventType, status,
+  date, endDate, location, description, eventType, status, isAllDay, category,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
 }`);
 

@@ -100,6 +100,7 @@ export const event = defineType({
       title: 'Event Type',
       type: 'string',
       group: 'main',
+      description: 'Program format (showcase, networking, workshop). Use "Event Category" above for semantic classification that drives calendar colors.',
       options: {
         list: [
           {title: 'Showcase', value: 'showcase'},

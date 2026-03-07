@@ -107,7 +107,7 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("sponsor->");
     expect(PROJECT_BY_SLUG_QUERY).toContain("technologyTags");
     expect(PROJECT_BY_SLUG_QUERY).toContain("team[]");
-    expect(PROJECT_BY_SLUG_QUERY).toContain("mentor");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("mentor{ name, title, department }");
     expect(PROJECT_BY_SLUG_QUERY).toContain("outcome");
     expect(PROJECT_BY_SLUG_QUERY).toContain("seo");
   });
@@ -148,6 +148,8 @@ describe("GROQ query definitions", () => {
     expect(EVENT_BY_SLUG_QUERY).toContain("description");
     expect(EVENT_BY_SLUG_QUERY).toContain("eventType");
     expect(EVENT_BY_SLUG_QUERY).toContain("status");
+    expect(EVENT_BY_SLUG_QUERY).toContain("isAllDay");
+    expect(EVENT_BY_SLUG_QUERY).toContain("category");
     expect(EVENT_BY_SLUG_QUERY).toContain("seo");
   });
 
