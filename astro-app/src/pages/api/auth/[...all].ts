@@ -24,6 +24,7 @@ const handleAuth: APIRoute = async ({ locals, request }) => {
         BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: env.BETTER_AUTH_URL,
         RESEND_API_KEY: env.RESEND_API_KEY,
+        RESEND_FROM_EMAIL: env.RESEND_FROM_EMAIL,
       },
       requestOrigin,
     });
