@@ -93,6 +93,15 @@ export const project = defineType({
               name: 'role',
               title: 'Role',
               type: 'string',
+              options: {
+                list: [
+                  {title: 'Project Lead', value: 'lead'},
+                  {title: 'Developer', value: 'developer'},
+                  {title: 'Designer', value: 'designer'},
+                  {title: 'Researcher', value: 'researcher'},
+                  {title: 'QA/Testing', value: 'qa'},
+                ],
+              },
             }),
           ],
           preview: {select: {title: 'name', subtitle: 'role'}},
@@ -102,8 +111,26 @@ export const project = defineType({
     defineField({
       name: 'mentor',
       title: 'Mentor',
-      type: 'string',
+      type: 'object',
       group: 'team',
+      fields: [
+        defineField({
+          name: 'name',
+          title: 'Name',
+          type: 'string',
+          validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+        }),
+        defineField({
+          name: 'department',
+          title: 'Department',
+          type: 'string',
+        }),
+      ],
     }),
     defineField({
       name: 'technologyTags',

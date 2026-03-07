@@ -1,6 +1,6 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 
 const { testimonial: t } = Astro.props;
 const photoUrl = t.photo
-  ? urlFor(t.photo as unknown as Parameters<typeof urlFor>[0]).width(80).height(80).fit('crop').url()
+  ? safeUrlFor(t.photo)?.width(80).height(80).fit('crop').url() ?? null
   : null;
 const projectSlug = t.project ? stegaClean(t.project.slug) : null;
 ---

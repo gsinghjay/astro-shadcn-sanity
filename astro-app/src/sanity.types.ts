@@ -547,10 +547,14 @@ export type Project = {
   outcome?: string;
   team?: Array<{
     name?: string;
-    role?: string;
+    role?: "lead" | "developer" | "designer" | "researcher" | "qa";
     _key: string;
   }>;
-  mentor?: string;
+  mentor?: {
+    name?: string;
+    title?: string;
+    department?: string;
+  };
   technologyTags?: Array<
     | "5G Technology"
     | "802.1X Authentication"
@@ -650,7 +654,7 @@ export type Event = {
   location?: string;
   description?: string;
   isAllDay?: boolean;
-  color?: "red" | "blue" | "green" | "orange" | "purple";
+  category?: "workshop" | "lecture" | "social" | "competition" | "other";
   eventType?: "showcase" | "networking" | "workshop";
   status?: "upcoming" | "past";
   seo?: Seo;
@@ -1184,7 +1188,7 @@ export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor,  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1353,9 +1357,13 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   team: Array<{
     _key: string;
     name: string | null;
-    role: string | null;
+    role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
   }> | null;
-  mentor: string | null;
+  mentor: {
+    name: string | null;
+    title: string | null;
+    department: string | null;
+  } | null;
   outcome: string | null;
   seo: {
     metaTitle: string | null;
@@ -1427,7 +1435,7 @@ export type ALL_TESTIMONIALS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_EVENTS_QUERY
-// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status, isAllDay, color}
+// Query: *[_type == "event" && ($site == "" || site == $site)] | order(date asc){  _id, title, "slug": slug.current, date, endDate, location,  description, eventType, status, isAllDay, category}
 export type ALL_EVENTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1439,12 +1447,12 @@ export type ALL_EVENTS_QUERY_RESULT = Array<{
   eventType: "networking" | "showcase" | "workshop" | null;
   status: "past" | "upcoming" | null;
   isAllDay: boolean | null;
-  color: "blue" | "green" | "orange" | "purple" | "red" | null;
+  category: "competition" | "lecture" | "other" | "social" | "workshop" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENTS_BY_MONTH_QUERY
-// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status, description, isAllDay, color}
+// Query: *[_type == "event"  && dateTime(date) >= dateTime($monthStart)  && dateTime(date) <= dateTime($monthEnd)  && ($site == "" || site == $site)] | order(date asc) {  _id, title, "slug": slug.current, date, endDate,  location, eventType, status, description, isAllDay, category}
 export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1456,7 +1464,7 @@ export type EVENTS_BY_MONTH_QUERY_RESULT = Array<{
   status: "past" | "upcoming" | null;
   description: string | null;
   isAllDay: boolean | null;
-  color: "blue" | "green" | "orange" | "purple" | "red" | null;
+  category: "competition" | "lecture" | "other" | "social" | "workshop" | null;
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -1609,7 +1617,7 @@ export type SPONSOR_PORTAL_QUERY_RESULT = {
     team: Array<{
       _key: string;
       name: string | null;
-      role: string | null;
+      role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
     }> | null;
     content: PortableText | null;
   }>;
@@ -1695,7 +1703,7 @@ export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
   team: Array<{
     _key: string;
     name: string | null;
-    role: string | null;
+    role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
   }> | null;
   content: PortableText | null;
 }>;
@@ -2227,10 +2235,10 @@ declare module "@sanity/client" {
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "project" && ($site == "" || site == $site)] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },\n  technologyTags,\n  semester,\n  status,\n  outcome\n}': ALL_PROJECTS_QUERY_RESULT;
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
-    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor,\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
-    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, color\n}': ALL_EVENTS_QUERY_RESULT;
-    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, color\n}': EVENTS_BY_MONTH_QUERY_RESULT;
+    '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, category\n}': ALL_EVENTS_QUERY_RESULT;
+    '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, category\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
     '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;

@@ -303,7 +303,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   semester,
   status,
   team[]{ _key, name, role },
-  mentor,
+  mentor{ name, title, department },
   outcome,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
   "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
@@ -368,7 +368,7 @@ export function resolveBlockTestimonials(
  */
 export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event" && ($site == "" || site == $site)] | order(date asc){
   _id, title, "slug": slug.current, date, endDate, location,
-  description, eventType, status, isAllDay, color
+  description, eventType, status, isAllDay, category
 }`);
 
 /**
@@ -425,7 +425,7 @@ export const EVENTS_BY_MONTH_QUERY = defineQuery(groq`*[_type == "event"
   && ($site == "" || site == $site)
 ] | order(date asc) {
   _id, title, "slug": slug.current, date, endDate,
-  location, eventType, status, description, isAllDay, color
+  location, eventType, status, description, isAllDay, category
 }`);
 
 /**

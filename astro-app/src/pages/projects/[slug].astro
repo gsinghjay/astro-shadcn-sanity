@@ -146,10 +146,12 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
       )}
 
       <!-- Mentor -->
-      {project.mentor && (
+      {project.mentor?.name && (
         <div>
           <h2 class="text-2xl font-bold mb-4">Mentor</h2>
-          <p class="text-lg">{project.mentor}</p>
+          <p class="text-lg">{project.mentor.name}</p>
+          {project.mentor.title && <p class="text-sm text-muted-foreground">{project.mentor.title}</p>}
+          {project.mentor.department && <p class="text-sm text-muted-foreground">{project.mentor.department}</p>}
         </div>
       )}
 
