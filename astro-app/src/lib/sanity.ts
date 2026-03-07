@@ -189,7 +189,7 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
  * GROQ query: fetch all sponsors for build-time caching.
  * Fetched once per build and shared across all blocks that need sponsor data.
  */
-export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && ($site == "" || site == $site)] | order(name asc){
+export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured
@@ -212,7 +212,7 @@ export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
 /**
  * GROQ query: fetch all sponsor slugs for static path generation.
  */
-export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single sponsor by slug with all fields and associated projects.
@@ -266,7 +266,7 @@ export function resolveBlockSponsors(
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
   _id, title, "slug": slug.current,
   content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry, hidden },
   technologyTags,
   semester,
   status,
@@ -298,7 +298,7 @@ export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && 
 export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   content[]${PORTABLE_TEXT_PROJECTION},
-  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website, hidden },
   technologyTags,
   semester,
   status,

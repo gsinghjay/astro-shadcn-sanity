@@ -580,6 +580,7 @@ export type Project = {
     | "EdTech"
     | "Elementor"
     | "Ethereum"
+    | "Figma"
     | "Firebase"
     | "FormSite"
     | "Gamification"
@@ -611,6 +612,7 @@ export type Project = {
     | "Smart Contracts"
     | "Smart Slider 3"
     | "Social Impact"
+    | "Storybook"
     | "Sustainability"
     | "Tailwind CSS"
     | "TypeScript"
@@ -689,6 +691,7 @@ export type Sponsor = {
   allowedEmails?: Array<string>;
   industry?: string;
   tier?: "platinum" | "gold" | "silver" | "bronze";
+  hidden?: boolean;
   featured?: boolean;
   seo?: Seo;
 };
@@ -1001,7 +1004,7 @@ export type ALL_PAGE_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_SPONSORS_QUERY
-// Query: *[_type == "sponsor" && ($site == "" || site == $site)] | order(name asc){  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured}
+// Query: *[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured}
 export type ALL_SPONSORS_QUERY_RESULT = Array<{
   _id: string;
   name: string | null;
@@ -1027,7 +1030,7 @@ export type ALL_SPONSORS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_SPONSOR_SLUGS_QUERY
-// Query: *[_type == "sponsor" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }
+// Query: *[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }
 export type ALL_SPONSOR_SLUGS_QUERY_RESULT = Array<{
   slug: string | null;
 }>;
@@ -1081,7 +1084,7 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_PROJECTS_QUERY
-// Query: *[_type == "project" && ($site == "" || site == $site)] | order(title asc){  _id, title, "slug": slug.current,  content,  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },  technologyTags,  semester,  status,  outcome}
+// Query: *[_type == "project" && ($site == "" || site == $site)] | order(title asc){  _id, title, "slug": slug.current,  content,  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry, hidden },  technologyTags,  semester,  status,  outcome}
 export type ALL_PROJECTS_QUERY_RESULT = Array<{
   _id: string;
   title: string | null;
@@ -1105,6 +1108,7 @@ export type ALL_PROJECTS_QUERY_RESULT = Array<{
       crop: SanityImageCrop | null;
     } | null;
     industry: string | null;
+    hidden: boolean | null;
   } | null;
   technologyTags: Array<
     | "5G Technology"
@@ -1131,6 +1135,7 @@ export type ALL_PROJECTS_QUERY_RESULT = Array<{
     | "EdTech"
     | "Elementor"
     | "Ethereum"
+    | "Figma"
     | "Firebase"
     | "FormSite"
     | "Gamification"
@@ -1162,6 +1167,7 @@ export type ALL_PROJECTS_QUERY_RESULT = Array<{
     | "Smart Contracts"
     | "Smart Slider 3"
     | "Social Impact"
+    | "Storybook"
     | "Sustainability"
     | "Tailwind CSS"
     | "TypeScript"
@@ -1188,7 +1194,7 @@ export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1283,6 +1289,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     industry: string | null;
     description: string | null;
     website: string | null;
+    hidden: boolean | null;
   } | null;
   technologyTags: Array<
     | "5G Technology"
@@ -1309,6 +1316,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     | "EdTech"
     | "Elementor"
     | "Ethereum"
+    | "Figma"
     | "Firebase"
     | "FormSite"
     | "Gamification"
@@ -1340,6 +1348,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     | "Smart Contracts"
     | "Smart Slider 3"
     | "Social Impact"
+    | "Storybook"
     | "Sustainability"
     | "Tailwind CSS"
     | "TypeScript"
@@ -1573,6 +1582,7 @@ export type SPONSOR_PORTAL_QUERY_RESULT = {
       | "EdTech"
       | "Elementor"
       | "Ethereum"
+      | "Figma"
       | "Firebase"
       | "FormSite"
       | "Gamification"
@@ -1604,6 +1614,7 @@ export type SPONSOR_PORTAL_QUERY_RESULT = {
       | "Smart Contracts"
       | "Smart Slider 3"
       | "Social Impact"
+      | "Storybook"
       | "Sustainability"
       | "Tailwind CSS"
       | "TypeScript"
@@ -1659,6 +1670,7 @@ export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
     | "EdTech"
     | "Elementor"
     | "Ethereum"
+    | "Figma"
     | "Firebase"
     | "FormSite"
     | "Gamification"
@@ -1690,6 +1702,7 @@ export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
     | "Smart Contracts"
     | "Smart Slider 3"
     | "Social Impact"
+    | "Storybook"
     | "Sustainability"
     | "Tailwind CSS"
     | "TypeScript"
@@ -2232,12 +2245,12 @@ declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type == "siteSettings" && _id == $siteSettingsId][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
-    '*[_type == "sponsor" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
+    '*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
+    '*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
-    '*[_type == "project" && ($site == "" || site == $site)] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry },\n  technologyTags,\n  semester,\n  status,\n  outcome\n}': ALL_PROJECTS_QUERY_RESULT;
+    '*[_type == "project" && ($site == "" || site == $site)] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry, hidden },\n  technologyTags,\n  semester,\n  status,\n  outcome\n}': ALL_PROJECTS_QUERY_RESULT;
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
-    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, category\n}': ALL_EVENTS_QUERY_RESULT;
     '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, category\n}': EVENTS_BY_MONTH_QUERY_RESULT;

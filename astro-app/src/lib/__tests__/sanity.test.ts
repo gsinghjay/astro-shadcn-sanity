@@ -56,6 +56,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSORS_QUERY targets sponsor type with full projection", () => {
     expect(ALL_SPONSORS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSORS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSORS_QUERY).toContain("name");
     expect(ALL_SPONSORS_QUERY).toContain("slug.current");
     expect(ALL_SPONSORS_QUERY).toContain("tier");
@@ -65,6 +66,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSOR_SLUGS_QUERY targets sponsor type with slug projection", () => {
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("defined(slug.current)");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("slug.current");
   });
