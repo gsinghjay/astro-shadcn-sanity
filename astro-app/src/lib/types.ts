@@ -34,6 +34,14 @@ export type ContactFormBlock = Extract<PageBlock, { _type: 'contactForm' }>;
 export type SponsorCardsBlock = Extract<PageBlock, { _type: 'sponsorCards' }>;
 export type TestimonialsBlock = Extract<PageBlock, { _type: 'testimonials' }>;
 export type EventListBlock = Extract<PageBlock, { _type: 'eventList' }>;
+export type TeamGridBlock = Extract<PageBlock, { _type: 'teamGrid' }>;
+export type ImageGalleryBlock = Extract<PageBlock, { _type: 'imageGallery' }>;
+export type ArticleListBlock = Extract<PageBlock, { _type: 'articleList' }>;
+export type ComparisonTableBlock = Extract<PageBlock, { _type: 'comparisonTable' }>;
+export type TimelineBlock = Extract<PageBlock, { _type: 'timeline' }>;
+export type PullquoteBlock = Extract<PageBlock, { _type: 'pullquote' }>;
+export type DividerBlock = Extract<PageBlock, { _type: 'divider' }>;
+export type AnnouncementBarBlock = Extract<PageBlock, { _type: 'announcementBar' }>;
 
 // ---------------------------------------------------------------------------
 // Layout types — shared across Layout, SidebarLayout, PortalLayout

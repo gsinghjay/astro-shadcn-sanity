@@ -40,7 +40,7 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
               data-filter-tech="all"
               data-state="active"
               aria-pressed="true"
-              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
             >
               All
             </button>
@@ -48,7 +48,7 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
               <button
                 data-filter-tech={tech}
                 aria-pressed="false"
-                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+                class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
               >
                 {tech}
               </button>
@@ -65,7 +65,7 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
               data-filter-industry="all"
               data-state="active"
               aria-pressed="true"
-              class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+              class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
             >
               All Industries
             </button>
@@ -73,7 +73,7 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
               <button
                 data-filter-industry={industry}
                 aria-pressed="false"
-                class="px-3 py-1 text-sm border border-border rounded-full transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
+                class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
               >
                 {industry}
               </button>

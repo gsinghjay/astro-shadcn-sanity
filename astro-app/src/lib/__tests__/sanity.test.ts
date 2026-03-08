@@ -168,6 +168,17 @@ describe("GROQ query definitions", () => {
       "faqSection",
       "contactForm",
       "sponsorCards",
+      // Story 2.9 — content display
+      "teamGrid",
+      "imageGallery",
+      "articleList",
+      // Story 2.10 — data/editorial
+      "comparisonTable",
+      "timeline",
+      "pullquote",
+      // Story 2.11 — utility
+      "divider",
+      "announcementBar",
     ];
     for (const blockType of blockTypes) {
       expect(PAGE_BY_SLUG_QUERY).toContain(`_type == "${blockType}"`);

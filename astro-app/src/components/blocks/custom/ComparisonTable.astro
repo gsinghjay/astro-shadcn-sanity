@@ -1,0 +1,128 @@
+---
+import type { ComparisonTableBlock } from '@/lib/types';
+import { Section, SectionContent, SectionGrid, SectionActions } from '@/components/ui/section';
+import { Table, TableCaption, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Tile, TileContent, TileTitle } from '@/components/ui/tile';
+import { Button } from '@/components/ui/button';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props extends ComparisonTableBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, columns, rows, links, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'table';
+const cols = columns ?? [];
+const dataRows = rows ?? [];
+---
+
+{variant === 'table' && (
+  <Section data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+
+      <Table>
+        {heading && <TableCaption class="sr-only">{heading}</TableCaption>}
+        <TableHeader>
+          <TableRow>
+            <TableHead class="font-bold">Feature</TableHead>
+            {cols.map((col) => (
+              <TableHead class={col.highlighted ? 'bg-muted font-bold' : 'font-bold'}>{col.title}</TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {dataRows.map((row) => (
+            row.isHeader ? (
+              <TableRow>
+                <TableCell class="font-bold border-t-2 border-border pt-4" colspan={cols.length + 1}>
+                  {row.feature}
+                </TableCell>
+              </TableRow>
+            ) : (
+              <TableRow>
+                <TableCell class="font-medium">{row.feature}</TableCell>
+                {cols.map((col, i) => (
+                  <TableCell class={col.highlighted ? 'bg-muted' : ''}>
+                    {row.values?.[i] ?? ''}
+                  </TableCell>
+                ))}
+              </TableRow>
+            )
+          ))}
+        </TableBody>
+      </Table>
+
+      {links && links.length > 0 && (
+        <SectionActions>
+          {links.map((link, i) => (
+            <Button
+              href={link.url}
+              variant={link.variant || (i === 0 ? 'default' : 'outline')}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(link.text)}
+            >
+              {link.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'stacked' && (
+  <Section data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid class={`grid-cols-1 @5xl:grid-cols-${cols.length}`}>
+      {cols.map((col, colIndex) => (
+        <Tile variant={col.highlighted ? 'floating' : undefined} class={col.highlighted ? 'bg-muted' : ''}>
+          <TileContent>
+            <TileTitle class="text-lg font-bold">{col.title}</TileTitle>
+            <ul class="space-y-2 mt-4">
+              {dataRows.filter(r => !r.isHeader).map((row) => (
+                <li class="flex justify-between border-t border-border pt-2">
+                  <span class="text-muted-foreground">{row.feature}</span>
+                  <span class="font-medium">{row.values?.[colIndex] ?? ''}</span>
+                </li>
+              ))}
+            </ul>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+
+    {links && links.length > 0 && (
+      <SectionContent>
+        <SectionActions>
+          {links.map((link, i) => (
+            <Button
+              href={link.url}
+              variant={link.variant || (i === 0 ? 'default' : 'outline')}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(link.text)}
+            >
+              {link.text}
+            </Button>
+          ))}
+        </SectionActions>
+      </SectionContent>
+    )}
+  </Section>
+)}
