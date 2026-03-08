@@ -39,7 +39,7 @@ const { class: className, id, items } = Astro.props
           if (!block) return null
           const fileContent = ""
           return (
-            <div class="group relative aspect-video w-[320px] overflow-hidden rounded-lg border @5xl:w-[640px]">
+            <div class="group relative aspect-video w-[320px] overflow-hidden border @5xl:w-[640px]">
               <div class="bg-background @container h-full w-[400%] origin-top-left scale-25 @5xl:w-[200%] @5xl:scale-50">
                 <Block block={block} {...props} />
               </div>

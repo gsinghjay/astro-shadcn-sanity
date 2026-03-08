@@ -96,6 +96,14 @@ export const sponsor = defineType({
       },
     }),
     defineField({
+      name: 'hidden',
+      title: 'Hidden',
+      type: 'boolean',
+      group: 'main',
+      description: 'Hide this sponsor from public pages',
+      initialValue: false,
+    }),
+    defineField({
       name: 'featured',
       title: 'Featured',
       type: 'boolean',

@@ -26,7 +26,7 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
 
     test('[P0] 3.1-INT-002 — sponsor schema has all required fields', () => {
       const fieldNames = (sponsor as any).fields.map((f: any) => f.name)
-      expect(fieldNames).toHaveLength(12)
+      expect(fieldNames).toHaveLength(13)
       expect(fieldNames).toContain('name')
       expect(fieldNames).toContain('slug')
       expect(fieldNames).toContain('site')
@@ -37,6 +37,7 @@ describe('Story 3-1: Sponsor Document Schema (ATDD)', () => {
       expect(fieldNames).toContain('allowedEmails')
       expect(fieldNames).toContain('industry')
       expect(fieldNames).toContain('tier')
+      expect(fieldNames).toContain('hidden')
       expect(fieldNames).toContain('featured')
       expect(fieldNames).toContain('seo')
     })

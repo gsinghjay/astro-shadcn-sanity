@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import ProjectCard from '../ProjectCard.astro';
-import { projectFull, projectMinimal } from './__fixtures__/projects';
+import { projectFull, projectMinimal, projectHiddenSponsor } from './__fixtures__/projects';
 
 describe('ProjectCard', () => {
   test('renders title and links to detail page', async () => {
@@ -81,6 +81,25 @@ describe('ProjectCard', () => {
     expect(html).toContain('data-project-card');
     expect(html).toContain('data-tech-tags="React,TypeScript,IoT"');
     expect(html).toContain('data-industry="Technology"');
+  });
+
+  test('renders hidden sponsor as plain text without link', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCard, {
+      props: { project: projectHiddenSponsor },
+    });
+
+    expect(html).toContain('Secret Corp');
+    expect(html).not.toContain('href="/sponsors/secret-corp"');
+  });
+
+  test('renders visible sponsor as link', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCard, {
+      props: { project: projectFull },
+    });
+
+    expect(html).toContain('href="/sponsors/acme-corp"');
   });
 
   test('handles minimal data without crashing', async () => {
