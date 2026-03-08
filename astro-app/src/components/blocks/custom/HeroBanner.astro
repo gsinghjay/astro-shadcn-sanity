@@ -50,11 +50,10 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
-        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
-              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              class="hero-carousel-dot h-2 transition-all duration-300"
               data-dot={index}
               data-state={index === 0 ? 'active' : 'inactive'}
               aria-label={`Go to slide ${index + 1}`}
@@ -128,11 +127,10 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
-        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
-              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              class="hero-carousel-dot h-2 transition-all duration-300"
               data-dot={index}
               data-state={index === 0 ? 'active' : 'inactive'}
               aria-label={`Go to slide ${index + 1}`}
