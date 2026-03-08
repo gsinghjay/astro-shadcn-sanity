@@ -590,6 +590,52 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       filterBy,
       limit
+    },
+    _type == "teamGrid" => {
+      heading,
+      description,
+      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
+    },
+    _type == "imageGallery" => {
+      heading,
+      description,
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption },
+      columns
+    },
+    _type == "articleList" => {
+      heading,
+      description,
+      source,
+      limit,
+      links[]{ _key, text, url, variant }
+    },
+    _type == "comparisonTable" => {
+      heading,
+      description,
+      columns[]{ _key, title, highlighted },
+      rows[]{ _key, feature, values, isHeader },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "timeline" => {
+      heading,
+      description,
+      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "pullquote" => {
+      quote,
+      attribution,
+      role,
+      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
+    },
+    _type == "divider" => {
+      label
+    },
+    _type == "announcementBar" => {
+      icon,
+      text,
+      link{ label, href },
+      dismissible
     }
   }
 }`);
