@@ -1,0 +1,70 @@
+---
+import type { AnnouncementBarBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+import { Banner, BannerContent, BannerTitle } from '@/components/ui/banner';
+import { Section, SectionContent } from '@/components/ui/section';
+import { Tile, TileContent } from '@/components/ui/tile';
+import { Icon } from '@/components/ui/icon';
+import { Button } from '@/components/ui/button';
+
+interface Props extends AnnouncementBarBlock {
+  class?: string;
+  id?: string;
+}
+
+const { icon, text, link, dismissible, variant: rawVariant, class: className, id } = Astro.props;
+
+const variant = stegaClean(rawVariant) ?? 'inline';
+const isDismissible = dismissible ?? false;
+---
+
+{variant === 'inline' && (
+  <div data-announcement class={className} id={id}>
+    <Banner>
+      <BannerContent showClose={false}>
+        {icon && <Icon name={icon} class="size-5" />}
+        <BannerTitle>{text}</BannerTitle>
+        {link?.href && (
+          <Button href={link.href} variant="outline" size="sm" class="ml-auto border-current text-current hover:bg-current/10">
+            {link.label || 'Learn more'}
+          </Button>
+        )}
+        {isDismissible && (
+          <button class="announcement-dismiss ml-2 cursor-pointer opacity-70 transition-opacity hover:opacity-100" aria-label="Dismiss">
+            <Icon name="x" class="size-4" />
+          </button>
+        )}
+      </BannerContent>
+    </Banner>
+  </div>
+)}
+
+{variant === 'floating' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent>
+      <Tile variant="floating">
+        <TileContent>
+          <div class="flex items-center gap-3">
+            {icon && <Icon name={icon} class="size-5" />}
+            <span class="text-sm font-medium">{text}</span>
+            {link?.href && (
+              <Button href={link.href} variant="outline" size="sm" class="ml-auto">
+                {link.label || 'Learn more'}
+              </Button>
+            )}
+          </div>
+        </TileContent>
+      </Tile>
+    </SectionContent>
+  </Section>
+)}
+
+{isDismissible && variant === 'inline' && (
+  <script>
+    document.querySelectorAll('.announcement-dismiss').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('[data-announcement]')?.remove();
+      });
+    });
+  </script>
+)}
