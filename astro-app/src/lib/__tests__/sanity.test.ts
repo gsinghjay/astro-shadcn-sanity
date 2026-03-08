@@ -56,6 +56,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSORS_QUERY targets sponsor type with full projection", () => {
     expect(ALL_SPONSORS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSORS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSORS_QUERY).toContain("name");
     expect(ALL_SPONSORS_QUERY).toContain("slug.current");
     expect(ALL_SPONSORS_QUERY).toContain("tier");
@@ -65,6 +66,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSOR_SLUGS_QUERY targets sponsor type with slug projection", () => {
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("defined(slug.current)");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("slug.current");
   });
@@ -166,6 +168,17 @@ describe("GROQ query definitions", () => {
       "faqSection",
       "contactForm",
       "sponsorCards",
+      // Story 2.9 — content display
+      "teamGrid",
+      "imageGallery",
+      "articleList",
+      // Story 2.10 — data/editorial
+      "comparisonTable",
+      "timeline",
+      "pullquote",
+      // Story 2.11 — utility
+      "divider",
+      "announcementBar",
     ];
     for (const blockType of blockTypes) {
       expect(PAGE_BY_SLUG_QUERY).toContain(`_type == "${blockType}"`);

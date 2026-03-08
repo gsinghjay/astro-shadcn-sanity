@@ -50,11 +50,10 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
-        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
-              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              class="hero-carousel-dot h-2 transition-all duration-300"
               data-dot={index}
               data-state={index === 0 ? 'active' : 'inactive'}
               aria-label={`Go to slide ${index + 1}`}
@@ -128,11 +127,10 @@ const firstImage = backgroundImages?.[0];
             </div>
           );
         })}
-        {/* Carousel dots: rounded-full is a justified exception for functional navigation indicators */}
         <div class="hero-carousel-nav absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           {backgroundImages?.map((_, index) => (
             <button
-              class="hero-carousel-dot h-2 rounded-full transition-all duration-300"
+              class="hero-carousel-dot h-2 transition-all duration-300"
               data-dot={index}
               data-state={index === 0 ? 'active' : 'inactive'}
               aria-label={`Go to slide ${index + 1}`}
@@ -265,6 +263,58 @@ const firstImage = backgroundImages?.[0];
             alt={firstImage.alt || ''}
             width={1200}
             height={1080}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+          />
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{/* SPLIT-BLEED variant — compact text left (1fr), edge-bleed image right (3fr) */}
+{variant === 'split-bleed' && (
+  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate style="padding-inline-end: 0">
+    <SectionSplit class="@5xl:grid-cols-[1fr_3fr] @5xl:items-center">
+      <SectionContent>
+        <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.04em] text-balance">
+          {heading}
+        </h1>
+
+        {subheading && (
+          <p class="text-lg md:text-xl leading-relaxed text-balance">
+            {subheading}
+          </p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                size="lg"
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+
+      {firstImage?.asset && (
+        <SectionMedia class="rounded-r-none @5xl:-my-(--section-py)">
+          <img
+            src={urlFor(firstImage).width(1440).height(960).fit('crop').url()}
+            alt={firstImage.alt || ''}
+            width={1440}
+            height={960}
             loading="eager"
             fetchpriority="high"
             decoding="async"

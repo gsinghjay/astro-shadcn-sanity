@@ -189,7 +189,7 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
  * GROQ query: fetch all sponsors for build-time caching.
  * Fetched once per build and shared across all blocks that need sponsor data.
  */
-export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && ($site == "" || site == $site)] | order(name asc){
+export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured
@@ -212,11 +212,15 @@ export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
 /**
  * GROQ query: fetch all sponsor slugs for static path generation.
  */
-export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
 
 /**
  * GROQ query: fetch a single sponsor by slug with all fields and associated projects.
  * The projects sub-query returns an empty array until Epic 4 creates the project schema.
+ *
+ * Does NOT filter `hidden != true` — hidden sponsors are excluded from static path
+ * generation via ALL_SPONSOR_SLUGS_QUERY, so no detail page is built for them.
+ * If the site switches to SSR/hybrid output, add `hidden != true` here.
  */
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, name, "slug": slug.current,
@@ -240,6 +244,10 @@ export async function getSponsorBySlug(slug: string): Promise<SPONSOR_BY_SLUG_QU
 /**
  * Resolve sponsors for a logoCloud or sponsorCards block from the pre-fetched cache.
  * Filters based on autoPopulate (logoCloud) or displayMode (sponsorCards) config.
+ *
+ * Note: `allSponsors` is pre-filtered by ALL_SPONSORS_QUERY (`hidden != true`),
+ * so manual selections of hidden sponsors are also excluded. This is intentional —
+ * hidden sponsors should not appear on any public page regardless of selection mode.
  */
 export function resolveBlockSponsors(
   block: { _type: string; autoPopulate?: boolean | null; displayMode?: string | null; sponsors?: Array<{ _id: string }> | null },
@@ -266,7 +274,7 @@ export function resolveBlockSponsors(
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
   _id, title, "slug": slug.current,
   content,
-  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry, hidden },
   technologyTags,
   semester,
   status,
@@ -298,7 +306,7 @@ export const ALL_PROJECT_SLUGS_QUERY = defineQuery(groq`*[_type == "project" && 
 export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   content[]${PORTABLE_TEXT_PROJECTION},
-  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website },
+  sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, tier, industry, description, website, hidden },
   technologyTags,
   semester,
   status,
@@ -582,6 +590,52 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       filterBy,
       limit
+    },
+    _type == "teamGrid" => {
+      heading,
+      description,
+      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
+    },
+    _type == "imageGallery" => {
+      heading,
+      description,
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption },
+      columns
+    },
+    _type == "articleList" => {
+      heading,
+      description,
+      source,
+      limit,
+      links[]{ _key, text, url, variant }
+    },
+    _type == "comparisonTable" => {
+      heading,
+      description,
+      columns[]{ _key, title, highlighted },
+      rows[]{ _key, feature, values, isHeader },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "timeline" => {
+      heading,
+      description,
+      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "pullquote" => {
+      quote,
+      attribution,
+      role,
+      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
+    },
+    _type == "divider" => {
+      label
+    },
+    _type == "announcementBar" => {
+      icon,
+      text,
+      link{ label, href },
+      dismissible
     }
   }
 }`);

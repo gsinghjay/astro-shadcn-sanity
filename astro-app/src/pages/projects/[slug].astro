@@ -85,15 +85,19 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
             )}
             <div class="flex flex-col gap-2">
               <div class="flex items-center gap-3">
-                <a
-                  href={`/sponsors/${sponsorSlug}`}
-                  class="text-xl font-semibold text-primary hover:text-primary/80"
-                  data-gtm-category="sponsor"
-                  data-gtm-action="detail"
-                  data-gtm-label={stegaClean(sponsor.name)}
-                >
-                  {sponsor.name}
-                </a>
+                {sponsorSlug && !sponsor.hidden ? (
+                  <a
+                    href={`/sponsors/${sponsorSlug}`}
+                    class="text-xl font-semibold text-primary hover:text-primary/80"
+                    data-gtm-category="sponsor"
+                    data-gtm-action="detail"
+                    data-gtm-label={stegaClean(sponsor.name)}
+                  >
+                    {sponsor.name}
+                  </a>
+                ) : (
+                  <span class="text-xl font-semibold">{sponsor.name}</span>
+                )}
                 {sponsor.tier && (
                   <Badge class={tierStyles[cleanTier]?.badge || tierStyles.silver.badge}>{sponsor.tier}</Badge>
                 )}
@@ -134,7 +138,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
           <h2 class="text-2xl font-bold mb-4">Team</h2>
           <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {team.map((member) => (
-              <div class="flex flex-col gap-1 rounded-lg border border-border bg-card p-4">
+              <div class="flex flex-col gap-1 border border-border bg-card p-4">
                 <span class="font-semibold">{member.name}</span>
                 {member.role && (
                   <span class="text-sm text-muted-foreground">{member.role}</span>

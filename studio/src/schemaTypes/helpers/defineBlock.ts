@@ -67,8 +67,8 @@ export function defineBlock(config: DefineBlockConfig) {
       select: selectFields,
       prepare(selection) {
         return {
-          title: (selection.heading as string) || config.title,
-          subtitle: config.title,
+          title: (selection.heading as string) || (selection.title as string) || config.title,
+          subtitle: (selection.subtitle as string) || config.title,
           media: config.icon,
         }
       },

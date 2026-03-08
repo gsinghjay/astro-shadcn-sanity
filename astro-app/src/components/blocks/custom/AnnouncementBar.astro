@@ -1,0 +1,75 @@
+---
+import type { AnnouncementBarBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+import { Banner, BannerContent, BannerTitle } from '@/components/ui/banner';
+import { Section, SectionContent } from '@/components/ui/section';
+import { Tile, TileContent } from '@/components/ui/tile';
+import { Icon } from '@/components/ui/icon';
+import { Button } from '@/components/ui/button';
+
+interface Props extends AnnouncementBarBlock {
+  class?: string;
+  id?: string;
+}
+
+const { icon, text, link, dismissible, variant: rawVariant, class: className, id } = Astro.props;
+
+const variant = stegaClean(rawVariant) ?? 'inline';
+const isDismissible = dismissible ?? false;
+---
+
+{variant === 'inline' && (
+  <div data-announcement class={className} id={id}>
+    <Banner>
+      <BannerContent showClose={false} class={`flex-row items-center${isDismissible ? ' pr-8' : ''}`}>
+        <div class="flex items-center gap-2">
+          {icon && <Icon name={icon} class="size-5" />}
+          <BannerTitle>{text}</BannerTitle>
+        </div>
+        {link?.href && (
+          <a href={link.href} class="ml-auto shrink-0 border border-current px-3 py-1 text-sm font-medium text-current bg-transparent transition-colors hover:bg-current/10">
+            {link.label || 'Learn more'}
+          </a>
+        )}
+        {isDismissible && (
+          <button
+            class="announcement-dismiss absolute top-1/2 right-0 z-20 -translate-y-1/2 cursor-pointer rounded-sm bg-transparent text-inherit opacity-70 transition-opacity hover:opacity-100"
+            aria-label="Dismiss"
+          >
+            <Icon name="x" class="size-4 text-inherit" />
+          </button>
+        )}
+      </BannerContent>
+    </Banner>
+  </div>
+)}
+
+{variant === 'floating' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent>
+      <Tile variant="floating">
+        <TileContent class="w-full">
+          <div class="flex w-full items-center gap-3">
+            {icon && <Icon name={icon} class="size-5 shrink-0" />}
+            <span class="text-sm font-medium">{text}</span>
+            {link?.href && (
+              <Button href={link.href} variant="outline" size="sm" class="ml-auto shrink-0">
+                {link.label || 'Learn more'}
+              </Button>
+            )}
+          </div>
+        </TileContent>
+      </Tile>
+    </SectionContent>
+  </Section>
+)}
+
+{isDismissible && variant === 'inline' && (
+  <script>
+    document.querySelectorAll('.announcement-dismiss').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.closest('[data-announcement]')?.remove();
+      });
+    });
+  </script>
+)}
