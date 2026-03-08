@@ -21,7 +21,7 @@ const isDismissible = dismissible ?? false;
 {variant === 'inline' && (
   <div data-announcement class={className} id={id}>
     <Banner>
-      <BannerContent showClose={false}>
+      <BannerContent showClose={false} class={isDismissible ? 'pr-8' : undefined}>
         {icon && <Icon name={icon} class="size-5" />}
         <BannerTitle>{text}</BannerTitle>
         {link?.href && (
@@ -30,8 +30,11 @@ const isDismissible = dismissible ?? false;
           </Button>
         )}
         {isDismissible && (
-          <button class="announcement-dismiss ml-2 cursor-pointer opacity-70 transition-opacity hover:opacity-100" aria-label="Dismiss">
-            <Icon name="x" class="size-4" />
+          <button
+            class="announcement-dismiss absolute top-1/2 right-0 z-20 -translate-y-1/2 cursor-pointer rounded-sm bg-transparent text-inherit opacity-70 transition-opacity hover:opacity-100"
+            aria-label="Dismiss"
+          >
+            <Icon name="x" class="size-4 text-inherit" />
           </button>
         )}
       </BannerContent>
