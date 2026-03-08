@@ -21,13 +21,15 @@ const isDismissible = dismissible ?? false;
 {variant === 'inline' && (
   <div data-announcement class={className} id={id}>
     <Banner>
-      <BannerContent showClose={false} class={isDismissible ? 'pr-8' : undefined}>
-        {icon && <Icon name={icon} class="size-5" />}
-        <BannerTitle>{text}</BannerTitle>
+      <BannerContent showClose={false} class={`flex-row items-center${isDismissible ? ' pr-8' : ''}`}>
+        <div class="flex items-center gap-2">
+          {icon && <Icon name={icon} class="size-5" />}
+          <BannerTitle>{text}</BannerTitle>
+        </div>
         {link?.href && (
-          <Button href={link.href} variant="outline" size="sm" class="ml-auto border-current text-current hover:bg-current/10">
+          <a href={link.href} class="ml-auto shrink-0 border border-current px-3 py-1 text-sm font-medium text-current bg-transparent transition-colors hover:bg-current/10">
             {link.label || 'Learn more'}
-          </Button>
+          </a>
         )}
         {isDismissible && (
           <button
