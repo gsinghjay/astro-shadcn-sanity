@@ -1,0 +1,111 @@
+---
+import type { ImageGalleryBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import { Section, SectionContent, SectionMasonry } from '@/components/ui/section';
+
+interface Props extends ImageGalleryBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, images, columns: rawColumns, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'grid';
+const columns = stegaClean(rawColumns) ?? '3';
+
+const gridColsClass: Record<string, string> = {
+  '2': 'grid-cols-1 sm:grid-cols-2',
+  '3': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+  '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+};
+---
+
+{variant === 'grid' && (
+  <Section data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </SectionContent>
+    )}
+    <SectionContent>
+      <div class={`grid gap-6 ${gridColsClass[columns] || gridColsClass['3']}`}>
+        {(images ?? []).map((item) => (
+          <figure>
+            {item.image?.asset && (
+              <img
+                src={urlFor(item.image).width(800).height(600).fit('crop').url()}
+                alt={item.image.alt || ''}
+                width={800}
+                height={600}
+                class="aspect-video w-full object-cover"
+                loading="lazy"
+                style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+              />
+            )}
+            {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'masonry' && (
+  <Section data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </SectionContent>
+    )}
+    <SectionMasonry>
+      {(images ?? []).map((item) => (
+        <figure>
+          {item.image?.asset && (
+            <img
+              src={urlFor(item.image).width(800).url()}
+              alt={item.image.alt || ''}
+              width={item.image.asset.metadata?.dimensions?.width || 800}
+              height={item.image.asset.metadata?.dimensions?.height || 600}
+              class="w-full object-cover"
+              loading="lazy"
+              style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+            />
+          )}
+          {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+        </figure>
+      ))}
+    </SectionMasonry>
+  </Section>
+)}
+
+{variant === 'single' && (() => {
+  const item = images?.[0];
+  return item ? (
+    <Section data-animate>
+      {heading && (
+        <SectionContent class="max-w-3xl">
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+          {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+        </SectionContent>
+      )}
+      <SectionContent>
+        <figure>
+          {item.image?.asset && (
+            <img
+              src={urlFor(item.image).width(1600).url()}
+              alt={item.image.alt || ''}
+              width={item.image.asset.metadata?.dimensions?.width || 1600}
+              height={item.image.asset.metadata?.dimensions?.height || 900}
+              class="w-full object-cover"
+              loading="lazy"
+              style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+            />
+          )}
+          {item.caption && <figcaption class="mt-4 text-center text-sm text-muted-foreground">{item.caption}</figcaption>}
+        </figure>
+      </SectionContent>
+    </Section>
+  ) : null;
+})()}

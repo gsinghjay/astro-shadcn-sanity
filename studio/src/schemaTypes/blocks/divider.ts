@@ -1,11 +1,11 @@
 import {defineField} from 'sanity'
-import {MinusIcon} from '@sanity/icons'
+import {RemoveIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
 
 export const divider = defineBlock({
   name: 'divider',
   title: 'Divider',
-  icon: MinusIcon,
+  icon: RemoveIcon,
   preview: {select: {title: 'label'}},
   variants: [
     {name: 'line', title: 'Line'},
