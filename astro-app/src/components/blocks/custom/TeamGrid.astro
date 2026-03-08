@@ -1,0 +1,121 @@
+---
+import type { TeamGridBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+import { urlFor } from '@/lib/image';
+import { Section, SectionContent, SectionGrid, SectionSplit } from '@/components/ui/section';
+import { Tile, TileContent, TileMedia } from '@/components/ui/tile';
+
+interface Props extends TeamGridBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, items, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'grid';
+---
+
+{variant === 'grid' && (
+  <Section data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </SectionContent>
+    )}
+    <SectionGrid size="default">
+      {(items ?? []).map((member) => (
+        <Tile>
+          {member.image?.asset && (
+            <TileMedia>
+              <img
+                src={urlFor(member.image).width(400).height(400).fit('crop').url()}
+                alt={member.image.alt || member.name || ''}
+                width={400}
+                height={400}
+                class="aspect-square w-full object-cover"
+                loading="lazy"
+                style={member.image.asset.metadata?.lqip ? `background-image: url(${member.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+              />
+            </TileMedia>
+          )}
+          <TileContent>
+            <p class="font-semibold">{member.name}</p>
+            {member.role && <p class="text-sm text-muted-foreground">{member.role}</p>}
+            {member.links && member.links.length > 0 && (
+              <div class="mt-2 flex gap-2">
+                {member.links.map((link) => (
+                  <a href={stegaClean(link.href)} target="_blank" rel="noopener noreferrer" class="text-sm text-muted-foreground underline-offset-4 hover:underline">{link.label}</a>
+                ))}
+              </div>
+            )}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{variant === 'grid-compact' && (
+  <Section data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <SectionGrid size="sm">
+      {(items ?? []).map((member) => (
+        <div class="flex items-center gap-3">
+          {member.image?.asset && (
+            <img
+              src={urlFor(member.image).width(80).height(80).fit('crop').url()}
+              alt={member.image.alt || member.name || ''}
+              width={80}
+              height={80}
+              class="size-20 flex-shrink-0 object-cover"
+              loading="lazy"
+              style={member.image.asset.metadata?.lqip ? `background-image: url(${member.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+            />
+          )}
+          <div>
+            <p class="font-semibold text-sm">{member.name}</p>
+            {member.role && <p class="text-xs text-muted-foreground">{member.role}</p>}
+          </div>
+        </div>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{variant === 'split' && (
+  <Section data-animate>
+    <SectionSplit>
+      <div class="sticky top-24 self-start">
+        {heading && <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>}
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </div>
+      <div class="grid grid-cols-2 gap-6">
+        {(items ?? []).map((member) => (
+          <Tile>
+            {member.image?.asset && (
+              <TileMedia>
+                <img
+                  src={urlFor(member.image).width(400).height(400).fit('crop').url()}
+                  alt={member.image.alt || member.name || ''}
+                  width={400}
+                  height={400}
+                  class="aspect-square w-full object-cover"
+                  loading="lazy"
+                  style={member.image.asset.metadata?.lqip ? `background-image: url(${member.image.asset.metadata.lqip}); background-size: cover;` : undefined}
+                />
+              </TileMedia>
+            )}
+            <TileContent>
+              <p class="font-semibold">{member.name}</p>
+              {member.role && <p class="text-sm text-muted-foreground">{member.role}</p>}
+            </TileContent>
+          </Tile>
+        ))}
+      </div>
+    </SectionSplit>
+  </Section>
+)}

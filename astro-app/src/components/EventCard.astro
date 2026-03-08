@@ -32,7 +32,7 @@ const badgeClasses: Record<string, string> = {
 const badgeClass = cleanType ? badgeClasses[cleanType] ?? 'bg-muted text-muted-foreground' : null;
 ---
 
-<div class="flex flex-col gap-3 rounded-lg border border-border bg-card p-6">
+<div class="flex flex-col gap-3 border border-border bg-card p-6">
   <div class="flex items-center justify-between gap-2">
     {formattedDate && (
       <time datetime={e.date ?? undefined} class="text-sm font-medium text-primary">
@@ -40,7 +40,7 @@ const badgeClass = cleanType ? badgeClasses[cleanType] ?? 'bg-muted text-muted-f
       </time>
     )}
     {e.eventType && badgeClass && (
-      <span class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badgeClass}`}>
+      <span class={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium ${badgeClass}`}>
         {e.eventType}
       </span>
     )}
