@@ -48,12 +48,12 @@ const isDismissible = dismissible ?? false;
   <Section class={className} id={id} data-animate>
     <SectionContent>
       <Tile variant="floating">
-        <TileContent>
-          <div class="flex items-center gap-3">
-            {icon && <Icon name={icon} class="size-5" />}
+        <TileContent class="w-full">
+          <div class="flex w-full items-center gap-3">
+            {icon && <Icon name={icon} class="size-5 shrink-0" />}
             <span class="text-sm font-medium">{text}</span>
             {link?.href && (
-              <Button href={link.href} variant="outline" size="sm" class="ml-auto">
+              <Button href={link.href} variant="outline" size="sm" class="ml-auto shrink-0">
                 {link.label || 'Learn more'}
               </Button>
             )}
