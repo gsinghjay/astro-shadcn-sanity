@@ -3,10 +3,10 @@ import type { Project } from '@/lib/sanity';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
 import { Badge } from '@/components/ui/badge';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
 
 function sponsorLogoUrl(logo: NonNullable<Project['sponsor']>['logo']) {
-  return logo ? urlFor(logo as unknown as Parameters<typeof urlFor>[0]).width(48).height(48).url() : null;
+  return logo ? safeUrlFor(logo)?.width(48).height(48).url() ?? null : null;
 }
 
 function portableTextExcerpt(content: Project['content'], maxLength = 150): string {
@@ -68,15 +68,19 @@ const industry = sponsor?.industry ? stegaClean(sponsor.industry) : '';
               </span>
             </div>
           )}
-          <a
-            href={`/sponsors/${sponsorSlug}`}
-            class="text-sm text-primary hover:text-primary/80 font-medium no-underline"
-            data-gtm-category="sponsor"
-            data-gtm-action="detail"
-            data-gtm-label={stegaClean(sponsor.name)}
-          >
-            {sponsor.name}
-          </a>
+          {sponsorSlug && !sponsor.hidden ? (
+            <a
+              href={`/sponsors/${sponsorSlug}`}
+              class="text-sm text-primary hover:text-primary/80 font-medium no-underline"
+              data-gtm-category="sponsor"
+              data-gtm-action="detail"
+              data-gtm-label={stegaClean(sponsor.name)}
+            >
+              {sponsor.name}
+            </a>
+          ) : (
+            <span class="text-sm font-medium">{sponsor.name}</span>
+          )}
         </div>
       )}
 

@@ -1,7 +1,11 @@
 # Requires: cp astro-app/.env.example astro-app/.env && cp studio/.env.example studio/.env
 
+x-user: &host-user
+  user: "${UID:-1000}:${GID:-1000}"
+
 services:
   astro-app:
+    <<: *host-user
     build:
       context: .
       target: dev-astro
@@ -19,6 +23,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
 
   studio:
+    <<: *host-user
     build:
       context: .
       target: dev-studio
@@ -36,6 +41,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
 
   astro-rwc-us:
+    <<: *host-user
     build:
       context: .
       target: dev-astro
@@ -59,6 +65,7 @@ services:
       - rwc
 
   astro-rwc-intl:
+    <<: *host-user
     build:
       context: .
       target: dev-astro
@@ -82,6 +89,7 @@ services:
       - rwc
 
   storybook:
+    <<: *host-user
     build:
       context: .
       target: dev-storybook

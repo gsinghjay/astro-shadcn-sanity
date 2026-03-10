@@ -18,7 +18,10 @@ if (!VALID_SITE_THEMES.includes(siteThemeRaw)) {
 }
 const siteTheme = VALID_SITE_THEMES.includes(siteThemeRaw) ? siteThemeRaw : "red";
 const siteUrl = env.PUBLIC_SITE_URL || process.env.PUBLIC_SITE_URL || "http://localhost:4321";
-const studioUrl = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
+const studioUrlBase = env.PUBLIC_SANITY_STUDIO_URL || process.env.PUBLIC_SANITY_STUDIO_URL || "http://localhost:3333";
+// Append workspace basePath so stega intent links route to the correct workspace
+const studioWorkspace = dataset === "rwc" ? "/rwc" : "/capstone";
+const studioUrl = `${studioUrlBase.replace(/\/$/, "")}${studioWorkspace}`;
 const gtmId = env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID || "";
 const visualEditingEnabled = env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || "";
 const liveContentEnabled = env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED || process.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED || "";

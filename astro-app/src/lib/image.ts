@@ -1,10 +1,13 @@
 import imageUrlBuilder from "@sanity/image-url";
-import type { Image } from "@sanity/types";
 import { sanityClient } from "sanity:client";
 
 const builder = imageUrlBuilder(sanityClient);
 
-export function urlFor(source: Image) {
+/**
+ * Accepts any image source that @sanity/image-url understands:
+ * TypeGen-generated image objects, { asset: { _ref } }, plain strings, etc.
+ */
+export function urlFor(source: Parameters<typeof builder.image>[0]) {
   return builder.image(source).auto("format");
 }
 
@@ -23,7 +26,7 @@ export interface SanityImageSource {
 export function safeUrlFor(image: SanityImageSource | null | undefined): ReturnType<typeof urlFor> | null {
   if (!image?.asset) return null;
   try {
-    const img = urlFor(image as unknown as Image);
+    const img = urlFor(image);
     img.url(); // eagerly validate the asset ref is parseable
     return img;
   } catch {

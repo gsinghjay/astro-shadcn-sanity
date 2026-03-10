@@ -7,6 +7,15 @@ export const ctaBanner = defineBlock({
   title: 'CTA Banner',
   icon: BoltIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'centered', title: 'Centered'},
+    {name: 'split', title: 'Split'},
+    {name: 'spread', title: 'Spread'},
+    {name: 'overlay', title: 'Overlay'},
+  ],
+  hiddenByVariant: {
+    backgroundImages: ['centered', 'spread'],
+  },
   fields: [
     defineField({
       name: 'heading',
@@ -18,6 +27,25 @@ export const ctaBanner = defineBlock({
       name: 'description',
       title: 'Description',
       type: 'text',
+    }),
+    defineField({
+      name: 'backgroundImages',
+      title: 'Background Images',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'image',
+          options: {hotspot: true},
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+        }),
+      ],
     }),
     defineField({
       name: 'ctaButtons',

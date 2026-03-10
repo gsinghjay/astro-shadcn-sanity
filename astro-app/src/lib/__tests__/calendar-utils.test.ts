@@ -14,7 +14,7 @@ function makeSanityEvent(overrides: Partial<SanityEvent> = {}): SanityEvent {
     eventType: 'showcase',
     status: 'upcoming',
     isAllDay: false,
-    color: null,
+    category: null,
     ...overrides,
   };
 }
@@ -57,21 +57,21 @@ describe('toCalendarEvent', () => {
     expect(result.calendarId).toBe('showcase');
   });
 
-  it('uses color override when present', () => {
-    const result = toCalendarEvent(makeSanityEvent({ eventType: 'showcase', color: 'blue' }));
-    expect(result.calendarId).toBe('networking'); // blue maps to networking
+  it('uses category override when present', () => {
+    const result = toCalendarEvent(makeSanityEvent({ eventType: 'showcase', category: 'lecture' }));
+    expect(result.calendarId).toBe('networking'); // lecture maps to networking
   });
 
-  it('maps color overrides correctly', () => {
-    expect(toCalendarEvent(makeSanityEvent({ color: 'red' })).calendarId).toBe('showcase');
-    expect(toCalendarEvent(makeSanityEvent({ color: 'blue' })).calendarId).toBe('networking');
-    expect(toCalendarEvent(makeSanityEvent({ color: 'green' })).calendarId).toBe('workshop');
-    expect(toCalendarEvent(makeSanityEvent({ color: 'orange' })).calendarId).toBe('workshop');
-    expect(toCalendarEvent(makeSanityEvent({ color: 'purple' })).calendarId).toBe('networking');
+  it('maps category values to calendarIds correctly', () => {
+    expect(toCalendarEvent(makeSanityEvent({ category: 'workshop' })).calendarId).toBe('workshop');
+    expect(toCalendarEvent(makeSanityEvent({ category: 'lecture' })).calendarId).toBe('networking');
+    expect(toCalendarEvent(makeSanityEvent({ category: 'social' })).calendarId).toBe('showcase');
+    expect(toCalendarEvent(makeSanityEvent({ category: 'competition' })).calendarId).toBe('showcase');
+    expect(toCalendarEvent(makeSanityEvent({ category: 'other' })).calendarId).toBe('workshop');
   });
 
-  it('falls back to eventType when color is unknown', () => {
-    const result = toCalendarEvent(makeSanityEvent({ eventType: 'networking', color: 'unknown' as any }));
+  it('falls back to eventType when category is unknown', () => {
+    const result = toCalendarEvent(makeSanityEvent({ eventType: 'networking', category: 'unknown' as any }));
     expect(result.calendarId).toBe('networking');
   });
 

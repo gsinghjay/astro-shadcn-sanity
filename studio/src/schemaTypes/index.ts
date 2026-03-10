@@ -18,9 +18,6 @@ import {project} from './documents/project'
 import {testimonial} from './documents/testimonial'
 import {event} from './documents/event'
 import {submission} from './documents/submission'
-import {capstoneStudent} from './documents/capstone-student'
-import {team} from './documents/team'
-import {studentResource} from './documents/student-resource'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -37,6 +34,24 @@ import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
 import {testimonials} from './blocks/testimonials'
 import {eventList} from './blocks/event-list'
+// Block schemas — content display (Story 2.9)
+import {teamGrid} from './blocks/team-grid'
+import {imageGallery} from './blocks/image-gallery'
+import {articleList} from './blocks/article-list'
+// Object schemas — content display (Story 2.9)
+import {teamMember} from './objects/team-member'
+import {galleryImage} from './objects/gallery-image'
+// Object schemas — data/editorial (Story 2.10)
+import {comparisonColumn} from './objects/comparison-column'
+import {comparisonRow} from './objects/comparison-row'
+import {timelineEntry} from './objects/timeline-entry'
+// Block schemas — data/editorial (Story 2.10)
+import {comparisonTable} from './blocks/comparison-table'
+import {timeline} from './blocks/timeline'
+import {pullquote} from './blocks/pullquote'
+// Block schemas — utility (Story 2.11)
+import {divider} from './blocks/divider'
+import {announcementBar} from './blocks/announcement-bar'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -49,6 +64,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   featureItem,
   statItem,
   stepItem,
+  teamMember,
+  galleryImage,
   // Documents
   page,
   siteSettings,
@@ -57,9 +74,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   event,
   submission,
-  capstoneStudent,
-  team,
-  studentResource,
   // Blocks — homepage
   heroBanner,
   featureGrid,
@@ -75,4 +89,19 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   sponsorCards,
   testimonials,
   eventList,
+  // Blocks — content display
+  teamGrid,
+  imageGallery,
+  articleList,
+  // Objects — data/editorial
+  comparisonColumn,
+  comparisonRow,
+  timelineEntry,
+  // Blocks — data/editorial
+  comparisonTable,
+  timeline,
+  pullquote,
+  // Blocks — utility
+  divider,
+  announcementBar,
 ]

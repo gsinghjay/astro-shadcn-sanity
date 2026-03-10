@@ -1,6 +1,6 @@
 ---
 description: Patterns for Sanity Page Builder arrays, block components, and live editing.
-globs: **/*.tsx
+globs: **/*.tsx, **/*.astro, **/blocks/*.ts, **/pageBuilder*.ts
 alwaysApply: false
 ---
 

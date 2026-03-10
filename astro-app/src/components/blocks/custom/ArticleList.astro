@@ -1,0 +1,148 @@
+---
+import type { ArticleListBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+import { Section, SectionContent, SectionActions, SectionGrid, SectionSplit } from '@/components/ui/section';
+import { Tile, TileContent, TileMedia } from '@/components/ui/tile';
+import { Button } from '@/components/ui/button';
+
+interface Props extends ArticleListBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, links, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'grid';
+
+const placeholderCards = [1, 2, 3];
+const placeholderRows = [1, 2, 3, 4];
+---
+
+{variant === 'grid' && (
+  <Section data-animate data-variant="grid">
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </SectionContent>
+    )}
+    <SectionGrid>
+      {placeholderCards.map(() => (
+        <Tile>
+          <TileMedia>
+            <div class="aspect-video w-full bg-muted" />
+          </TileMedia>
+          <TileContent>
+            <div class="h-5 w-3/4 bg-muted" />
+            <div class="mt-2 h-3 w-full bg-muted/60" />
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+    <SectionContent>
+      <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
+    </SectionContent>
+    {links && links.length > 0 && (
+      <SectionActions>
+        {links.map((link, i) => (
+          <Button
+            href={link.url}
+            variant={link.variant || (i === 0 ? 'default' : 'outline')}
+            data-gtm-category="cta"
+            data-gtm-action="click"
+            data-gtm-label={stegaClean(link.text)}
+          >
+            {link.text}
+          </Button>
+        ))}
+      </SectionActions>
+    )}
+  </Section>
+)}
+
+{variant === 'split-featured' && (
+  <Section data-animate data-variant="split-featured">
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </SectionContent>
+    )}
+    <SectionSplit>
+      <div>
+        <div class="aspect-video w-full bg-muted" />
+        <div class="mt-4 space-y-2">
+          <div class="h-6 w-3/4 bg-muted" />
+          <div class="h-3 w-full bg-muted/60" />
+        </div>
+      </div>
+      <div class="grid gap-6">
+        {[1, 2].map(() => (
+          <div class="flex gap-4">
+            <div class="aspect-video w-32 flex-shrink-0 bg-muted" />
+            <div class="flex-1 space-y-2">
+              <div class="h-4 w-3/4 bg-muted" />
+              <div class="h-3 w-full bg-muted/60" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionSplit>
+    <SectionContent>
+      <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
+    </SectionContent>
+    {links && links.length > 0 && (
+      <SectionActions>
+        {links.map((link, i) => (
+          <Button
+            href={link.url}
+            variant={link.variant || (i === 0 ? 'default' : 'outline')}
+            data-gtm-category="cta"
+            data-gtm-action="click"
+            data-gtm-label={stegaClean(link.text)}
+          >
+            {link.text}
+          </Button>
+        ))}
+      </SectionActions>
+    )}
+  </Section>
+)}
+
+{variant === 'list' && (
+  <Section data-animate data-variant="list">
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <SectionContent>
+      <div class="divide-y">
+        {placeholderRows.map(() => (
+          <div class="flex gap-6 py-4">
+            <span class="w-20 flex-shrink-0 text-sm text-muted-foreground">—</span>
+            <div class="flex-1 space-y-1">
+              <div class="h-4 w-48 bg-muted" />
+              <div class="h-3 w-full bg-muted/60" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <p class="mt-4 text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
+    </SectionContent>
+    {links && links.length > 0 && (
+      <SectionActions>
+        {links.map((link, i) => (
+          <Button
+            href={link.url}
+            variant={link.variant || (i === 0 ? 'default' : 'outline')}
+            data-gtm-category="cta"
+            data-gtm-action="click"
+            data-gtm-label={stegaClean(link.text)}
+          >
+            {link.text}
+          </Button>
+        ))}
+      </SectionActions>
+    )}
+  </Section>
+)}

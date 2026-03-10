@@ -40,12 +40,18 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         'ctaBanner', 'faqSection', 'contactForm',
         'logoCloud', 'statsRow', 'textWithImage',
         'sponsorSteps', 'testimonials', 'eventList',
+        // Story 2.9 — content display
+        'teamGrid', 'imageGallery', 'articleList',
+        // Story 2.10 — data/editorial
+        'comparisonTable', 'timeline', 'pullquote',
+        // Story 2.11 — utility
+        'divider', 'announcementBar',
       ]
 
       for (const type of expectedTypes) {
         expect(blockTypeNames, `Missing block type: ${type}`).toContain(type)
       }
-      expect(blockTypeNames).toHaveLength(13)
+      expect(blockTypeNames).toHaveLength(21)
     })
 
     test('[P0] 1.3-INT-022 — page title is required string', () => {

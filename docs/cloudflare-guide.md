@@ -53,7 +53,7 @@ Visitor → Cloudflare CDN (static HTML from edge cache)
 | **Workers** (SSR) | Active | `/portal/*` and `/_server-islands/*` routes |
 | **Access / Zero Trust** | Active | Auth gate for `/portal/*` |
 | **Deploy Hook** | Active | Sanity webhook triggers production rebuild |
-| **Build Cache** | Active (beta) | Faster rebuilds (~45-75s warm) |
+| **Build Cache** | Active | Faster rebuilds (~2m with `SKIP_DEPENDENCY_INSTALL`) |
 | **D1** | Planned (Story 9.8) | Portal database (RSVPs, agreements, notification prefs) |
 | **KV** | Planned (Stories 9.5, 9.13) | Site health index + notification storage |
 | **R2** | Planned (Story 9.5) | Lighthouse/Pa11y report storage |
@@ -252,18 +252,36 @@ All three share the same repository (`gsinghjay/astro-shadcn-sanity`), build com
 | Setting | Value |
 |:--------|:------|
 | Framework preset | Astro |
-| Build command | `npm run build --workspace=astro-app` |
+| Build command | `npm install --prefer-offline --no-audit --no-fund && npm run build --workspace=astro-app` |
 | Build output directory | `astro-app/dist` |
 | Root directory | `/` (monorepo root — npm workspaces need root `package.json`) |
 
 > **Critical:** Root directory must be `/`, NOT `astro-app/`. The build command uses npm workspaces which requires the monorepo root `package.json`.
 
+#### Build Optimization: Skip Automatic Dependency Install
+
+All projects set the `SKIP_DEPENDENCY_INSTALL=true` environment variable (Production + Preview). This tells the CF Pages v3 build image to skip the automatic `npm clean-install` step, which deletes `node_modules` and reinstalls from scratch (~60s).
+
+Instead, the build command runs `npm install --prefer-offline --no-audit --no-fund` which:
+- Reuses the cached `node_modules` from previous builds
+- Only installs new/changed packages from the `.npm` global cache
+- Falls back to the network only when the cache misses
+- Skips vulnerability audit and funding checks (`--no-audit --no-fund`)
+- Is safe for both content rebuilds (same code) and code pushes (lockfile changes)
+
+Additionally, `NODE_VERSION=24.13.1` is pinned on both environments so the build image can cache the Node.js binary instead of re-downloading it each build.
+
+**Before optimization:** ~3m 24s (60s `npm ci` + 50s server build + 8s client build)
+**After optimization:** ~2m (40s `npm install` + 37s server build + 6s client build)
+
+On subsequent builds where `node_modules` is fully cached, the install step drops further.
+
 #### Build Watch Paths
 
 Configured per project to avoid unnecessary rebuilds:
 
-- **Include:** `astro-app/*`
-- **Exclude:** `studio/*`, `_templates/*`, `docs/*`, `_bmad/*`, `_bmad-output/*`, `_wp-scrape/*`, `tests/*`, `.github/*`
+- **Include:** `astro-app/*`, `package-lock.json`
+- **Exclude:** `studio/*`, `_templates/*`, `docs/*`, `_bmad/*`, `_bmad-output/*`, `_wp-scrape/*`, `tests/*`, `.github/*`, `rules/*`, `CHANGELOG.md`, `README.md`, `.cursorrules`
 
 Schema changes in `studio/` don't directly trigger builds — `npm run typegen` updates `astro-app/src/sanity.types.ts`, which IS in the watch path.
 
@@ -337,7 +355,9 @@ No code branching per site — the same code paths serve all sites. Env vars con
 
 ## 3. Authentication (Cloudflare Access)
 
-Cloudflare Access (Zero Trust) protects `/portal/*` routes. Unauthenticated requests never reach the Astro Worker.
+> **DEPRECATED (Story 9.18):** Cloudflare Access has been replaced by Better Auth for sponsor authentication. Sponsors now log in via Google OAuth, GitHub OAuth, or Magic Link at `/portal/login`. The CF Access application should be removed from the Zero Trust dashboard. See `docs/auth-consolidation-strategy.md` for the full migration details and manual teardown steps.
+
+~~Cloudflare Access (Zero Trust) protects `/portal/*` routes. Unauthenticated requests never reach the Astro Worker.~~
 
 ### 3.1 How It Works
 
@@ -958,6 +978,17 @@ Brief CDN propagation delay after publish. Wait 30 seconds and hard-refresh.
 
 **Multiple builds per publish:**
 The Sanity webhook filter should exclude drafts (Drafts: OFF). Cloudflare deduplicates builds on the same branch within a short window.
+
+### Build Optimization
+
+**Build is slow (~3+ minutes):**
+Ensure `SKIP_DEPENDENCY_INSTALL=true` is set in the project environment variables (both Production and Preview). Without it, CF Pages runs `npm clean-install` on every build which deletes and reinstalls all 2,400+ packages (~60s wasted). The build command `npm install --prefer-offline --no-audit --no-fund` handles dependency installation efficiently using the build cache.
+
+**`SKIP_DEPENDENCY_INSTALL` not working:**
+This env var is supported on CF Pages build image v3. Check that the project is using v3 (the default for new projects). The build log should show: `SKIP_DEPENDENCY_INSTALL is present in environment. Skipping automatic dependency installation.`
+
+**Build fails after skipping dependency install:**
+If `node_modules` cache is cold (first build or cache expired after 7 days), `npm install --prefer-offline` may fail on packages not in the `.npm` cache. Remove `SKIP_DEPENDENCY_INSTALL` temporarily to force a full install and repopulate the cache, then re-add it.
 
 ### Authentication
 

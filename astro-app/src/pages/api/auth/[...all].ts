@@ -5,7 +5,7 @@
  */
 import type { APIRoute } from 'astro';
 import { getDrizzle } from '@/lib/db';
-import { createAuth } from '@/lib/student-auth';
+import { createAuth } from '@/lib/auth-config';
 
 export const prerender = false;
 
@@ -19,8 +19,12 @@ const handleAuth: APIRoute = async ({ locals, request }) => {
       env: {
         GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET,
+        GITHUB_CLIENT_ID: env.GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET: env.GITHUB_CLIENT_SECRET,
         BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET,
         BETTER_AUTH_URL: env.BETTER_AUTH_URL,
+        RESEND_API_KEY: env.RESEND_API_KEY,
+        RESEND_FROM_EMAIL: env.RESEND_FROM_EMAIL,
       },
       requestOrigin,
     });

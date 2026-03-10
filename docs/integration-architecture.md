@@ -332,27 +332,24 @@ feature/* ──PR──► preview ──PR──► main
 
 ## Content Publishing Webhook Flow
 
-When editors publish content in Sanity Studio, a webhook triggers a full site rebuild and deploy.
+When editors publish content in Sanity Studio, a GROQ-powered webhook triggers a Cloudflare Pages deploy hook, which rebuilds and deploys the site directly — no GitHub Actions in the loop.
 
 ```mermaid
 sequenceDiagram
     participant Editor as Content Editor
     participant Studio as Sanity Studio
     participant Lake as Content Lake
-    participant Hook as Sanity Webhook
-    participant GH as GitHub API
-    participant GHA as GitHub Actions
+    participant Hook as Sanity GROQ Webhook
     participant CF as Cloudflare Pages
 
     Editor->>Studio: Publish document
     Studio->>Lake: Mutation committed
-    Lake->>Hook: Webhook fires
-    Hook->>GH: repository_dispatch: sanity-content-published
-    GH->>GHA: Trigger sanity-deploy.yml
-    GHA->>GHA: npm ci
-    GHA->>GHA: npm run build --workspace=astro-app
-    GHA->>CF: npx wrangler pages deploy dist/
-    CF-->>Editor: Updated site live
+    Lake->>Hook: Webhook fires (filtered by _type)
+    Hook->>CF: POST deploy hook URL
+    CF->>CF: Clone repo (main branch)
+    CF->>CF: npm install --prefer-offline --no-audit --no-fund
+    CF->>CF: npm run build --workspace=astro-app
+    CF-->>Editor: Updated site live (~2 min)
 ```
 
 ### Deploy Configuration
@@ -360,8 +357,8 @@ sequenceDiagram
 - **Build target**: `astro-app/dist` (static output from Astro build).
 - **Cloudflare project**: `ywcc-capstone` on Cloudflare Pages.
 - **Deploy branch**: `main`.
-- **Required secrets**: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`.
-- **Required vars**: `PUBLIC_SANITY_STUDIO_PROJECT_ID`, `PUBLIC_SANITY_STUDIO_DATASET`.
+- **Build optimization**: `SKIP_DEPENDENCY_INSTALL=true` + `NODE_VERSION=24.13.1` pinned.
+- **Legacy workflow**: `sanity-deploy.yml` (GitHub Actions) is disabled — deploy hooks replaced it.
 
 ## Environment Configuration
 

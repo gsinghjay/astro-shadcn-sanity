@@ -4,9 +4,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY astro-app/package.json astro-app/
 COPY studio/package.json studio/
-RUN npm ci && chown -R node:node /app
+RUN npm ci
 ENV PATH=/app/node_modules/.bin:$PATH
-USER node
 
 # ---- Astro dev server ----
 FROM base AS dev-astro
