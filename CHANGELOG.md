@@ -1,3 +1,57 @@
+## [1.11.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.10.0...v1.11.0) (2026-03-10)
+
+### Features
+
+* **2-5:** implement ctaBanner variant rendering (Tasks 3-5) ([0c0a73c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0c0a73c482f22ee716b89dfe91c8bea1a54f4165))
+* **2.10:** Swiss design blocks — comparisonTable, timeline, pullquote ([b46acb0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b46acb0ddd19181b6ece4ad2542d8fc62a54a92c))
+* **2.9:** add Swiss design content display blocks — TeamGrid, ImageGallery, ArticleList ([0d8670d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0d8670dc18cae020714b66a7ea8830033926382f))
+* add Durable Object rate limiter for sponsor/student routes (Story 9.17) ([3601f71](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3601f711da70de5a347bad8b3c3cbf62ff2cb894))
+* add layout variant infrastructure for page builder blocks (Story 2.4) ([ea9f15a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ea9f15a987695978fcfb4e49623835d600225857))
+* add layout variants to heroBanner block (Story 2.5, Tasks 1-2) ([0c2bbd7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0c2bbd79e6faa5d38a4a0ae3c62a57ab64142f5a))
+* **hero:** add split-bleed variant with edge-to-edge image ([8996212](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8996212ffdfae80f5b7651b9f9fad8d03f53bb45))
+* migrate sponsors from CF Access to Better Auth (Story 9.18) ([b637e71](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b637e715f93f015e42a571cf24daeeb8c6029447))
+* **schema:** rename event.color to semantic category, structure mentor, fix image types ([2ba3e61](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2ba3e6118e0460ea2ff6b2e877671bbbc4fcf52e))
+* **sponsor:** add hidden visibility toggle and prevent dead links ([b2cdaad](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b2cdaad5806aa9a813a0a7106b54f4f822e69f97))
+
+### Bug Fixes
+
+* **17.2:** remove rounded-full, rounded-lg, rounded-xl overrides ([71f52db](https://github.com/gsinghjay/astro-shadcn-sanity/commit/71f52db4d1405baf90087426ea05de4db8f4a89c))
+* **2-5:** Sanity code review fixes for hero/CTA variants ([c039728](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c0397282153c5c3f29b6cdb6c7425c43efc0104d))
+* **2-5:** Swiss design compliance and [#488](https://github.com/gsinghjay/astro-shadcn-sanity/issues/488) CTA banner fixes ([d491848](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d4918489c54282860eb9e334f099b781b665765d))
+* **2.11:** code review fixes — divider & announcementBar blocks ([a8d527f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a8d527fefb98b6b83248356c642e0a236613132e))
+* **2.11:** dismiss button layout and Swiss design alignment ([746b416](https://github.com/gsinghjay/astro-shadcn-sanity/commit/746b416f2f3b4c361db0390c0f200765b4311132))
+* **2.11:** floating variant button right-alignment ([0d463d8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0d463d80f60316da6a3fc48f81dca4a2a1fb2312))
+* **2.11:** inline banner layout — single row, visible button ([62860e4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/62860e418b1456e4c0d16263f23ecc122680b2f4))
+* **2.9:** ArticleList — use Button component and fix SectionSplit nesting ([c6ee26f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c6ee26f068103e71875fceac3d33aaa9f314e9fa))
+* **3-4:** code review fixes — hidden sponsor tests, fixture drift, SSG docs ([8a38ea0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8a38ea04c33533a0b678ff18fd4a03df7536e153))
+* **7-16:** code review fixes — calendar category mapping, query consistency, test assertions ([d1d9824](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d1d98244ae3cf009ceaf23f4f5b7e47f673649fd))
+* address code review [#2](https://github.com/gsinghjay/astro-shadcn-sanity/issues/2) findings for Story 9.18 auth migration ([fcc378f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fcc378ff9b5fb92f232fedb6f56767744f6b8eb9))
+* address code review findings for Story 9.17 rate limiter ([fdb312b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fdb312bf51f5c0908bc3c849324dac0864e95010))
+* address code review findings for Story 9.18 auth migration ([c26ae8c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c26ae8cfeb13d993dfd25be6d747967d431ead6a))
+* align login pages with design system and fix security/a11y issues ([33c423c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/33c423c972985397e38c10e1c4ccbc54a39d4a13))
+* **auth:** harden Better Auth with security fixes, account linking, and client consolidation ([361b071](https://github.com/gsinghjay/astro-shadcn-sanity/commit/361b0718ee0ff5c6493e211f04e376f2918cba38))
+* **auth:** pass RESEND_FROM_EMAIL through to createAuth in route handler ([16fdee8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/16fdee898e432e555d6496f978ce2d980ffb4725))
+* **auth:** use absolute URL for Better Auth client baseURL ([0795371](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0795371d511d8609383ced47b63bd73353480a63))
+* **ci:** use async exec in build tests to prevent Vitest worker RPC timeout ([cc40581](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cc40581ac501361e738a17c7f46788cc54b092c1))
+* remove unnecessary chown and USER node from Dockerfile base stage ([4a24c01](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4a24c01d7dcb5a74e9efd06de3df320a1be439e7))
+* resolve visual editing workspace routing and presentation navigation ([a508146](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a508146e1837070e72da90a8472a79fe04a0df47))
+* **schema:** add radio layout to event.category for better editor UX ([5f00e3c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5f00e3c9f237b48a26bb26d234e5ebe0cb129210))
+* **studio:** add missing "All Events" link to event location resolver ([84bf6d0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/84bf6d065493d810127f175f1e51961d5c7797bc))
+* use dynamic imports in middleware and replace CF Access logout with Better Auth ([df24557](https://github.com/gsinghjay/astro-shadcn-sanity/commit/df245571e82aca145b16a229a32aa756cca93973))
+
+### Documentation
+
+* new documentation to help understand the project ([702703b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/702703b16705ffcff88ed48940d05528426b4bb8))
+
+### Miscellaneous
+
+* descope student portal, revert 16.4/16.5 code, add auth consolidation docs ([0d8c5c4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0d8c5c462efc7450bbb311aee5a661091be85a90))
+* optimize Cloudflare Pages build pipeline ([167188f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/167188ff9db238b8a0df6db3b36560d5872c5f5c))
+* remove _bmad-output from git tracking ([9399451](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9399451bd2ea68a4354784ff10302d3a83bb289b))
+* scrapped website ([be569d1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/be569d151eb9ae9c13f3da7ebbce465bb2aaf863))
+* updated agent context ([d37829b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d37829b5bf435122c255753e51759b888ee70e6e))
+* updated Cursor rules ([a0b0ddd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a0b0ddde0241fbe9a77e721893cbf5fe298567ab))
+
 ## [1.10.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.9.0...v1.10.0) (2026-03-02)
 
 ### Features
