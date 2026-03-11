@@ -7,7 +7,13 @@ export const sponsorshipTiers = defineBlock({
   title: 'Sponsorship Tiers',
   icon: CreditCardIcon,
   preview: {
-    select: {title: 'heading'},
+    select: {title: 'heading', tiers: 'tiers'},
+    prepare({title, tiers}) {
+      return {
+        title: title || 'Untitled',
+        subtitle: `${tiers?.length ?? 0} tier${tiers?.length === 1 ? '' : 's'}`,
+      }
+    },
   },
   fields: [
     defineField({
