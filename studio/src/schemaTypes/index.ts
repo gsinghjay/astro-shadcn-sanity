@@ -34,6 +34,7 @@ import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
 import {testimonials} from './blocks/testimonials'
 import {eventList} from './blocks/event-list'
+import {projectCards} from './blocks/project-cards'
 // Block schemas — content display (Story 2.9)
 import {teamGrid} from './blocks/team-grid'
 import {imageGallery} from './blocks/image-gallery'
@@ -89,6 +90,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   sponsorCards,
   testimonials,
   eventList,
+  projectCards,
   // Blocks — content display
   teamGrid,
   imageGallery,

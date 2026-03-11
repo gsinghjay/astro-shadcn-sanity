@@ -269,6 +269,22 @@ export function resolveBlockSponsors(
 }
 
 /**
+ * Resolve projects for a projectCards block from the pre-fetched cache.
+ * Filters based on displayMode config (all/featured/manual).
+ */
+export function resolveBlockProjects(
+  block: { _type: string; displayMode?: string | null; projects?: Array<{ _id: string }> | null },
+  allProjects: Project[],
+): Project[] {
+  const mode = stegaClean(block.displayMode) ?? 'all';
+  if (mode === 'all') return allProjects;
+  if (mode === 'featured') return allProjects.filter(p => p.featured);
+  // manual
+  const manualIds = new Set(block.projects?.map(p => p._id) ?? []);
+  return allProjects.filter(p => manualIds.has(p._id));
+}
+
+/**
  * GROQ query: fetch all projects with resolved sponsor references.
  */
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
@@ -278,7 +294,8 @@ export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($sit
   technologyTags,
   semester,
   status,
-  outcome
+  outcome,
+  featured
 }`);
 
 /**
@@ -580,6 +597,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       displayMode,
       sponsors[]->{ _id }
+    },
+    _type == "projectCards" => {
+      heading,
+      displayMode,
+      projects[]->{ _id }
     },
     _type == "testimonials" => {
       heading,

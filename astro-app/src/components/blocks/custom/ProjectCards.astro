@@ -1,0 +1,30 @@
+---
+import type { Project } from '@/lib/sanity';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import ProjectCard from '@/components/ProjectCard.astro';
+
+interface Props {
+  heading?: string | null;
+  displayMode?: 'all' | 'featured' | 'manual' | null;
+  projects?: Project[];
+  class?: string;
+  id?: string;
+  [key: string]: unknown;
+}
+
+const { heading, projects } = Astro.props;
+---
+
+<Section data-animate>
+  {heading && (
+    <SectionContent>
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+    </SectionContent>
+  )}
+
+  <SectionGrid size="lg">
+    {(projects ?? []).map((project) => (
+      <ProjectCard project={project} />
+    ))}
+  </SectionGrid>
+</Section>

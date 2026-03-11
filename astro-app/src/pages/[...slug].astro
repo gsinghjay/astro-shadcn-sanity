@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
 
@@ -41,6 +41,7 @@ let page = null;
 let template: keyof typeof templates = 'default';
 let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
+let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
 let events: Awaited<ReturnType<typeof getAllEvents>> = [];
 
@@ -52,6 +53,7 @@ if (!visualEditingEnabled) {
   template = stegaClean(page.template) as keyof typeof templates;
   TemplateComponent = templates[template] ?? DefaultTemplate;
   sponsors = await getAllSponsors();
+  projects = await getAllProjects();
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
 }
@@ -88,7 +90,7 @@ const preloadImageUrl = heroImage?.asset
     </SanityPageContent>
   ) : (
     <TemplateComponent>
-      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
+      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
     </TemplateComponent>
   )}
 </Layout>
