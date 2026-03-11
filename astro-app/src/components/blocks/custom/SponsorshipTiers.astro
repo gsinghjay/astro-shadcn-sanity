@@ -57,7 +57,7 @@ const tiersList = tiers ?? [];
             {tier.ctaButton && (
               <Button
                 href={tier.ctaButton.url}
-                variant={isHighlighted ? 'default' : (tier.ctaButton.variant || 'outline')}
+                variant={isHighlighted ? 'default' : (stegaClean(tier.ctaButton.variant) || 'outline')}
                 class="w-full"
                 data-gtm-category="sponsorship"
                 data-gtm-action="click"
