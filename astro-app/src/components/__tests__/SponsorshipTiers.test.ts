@@ -70,6 +70,9 @@ describe('SponsorshipTiers', () => {
 
     expect(html).toContain('data-gtm-category="sponsorship"');
     expect(html).toContain('data-gtm-action="click"');
+    expect(html).toContain('data-gtm-label="Bronze"');
+    expect(html).toContain('data-gtm-label="Gold"');
+    expect(html).toContain('data-gtm-label="Platinum"');
   });
 
   test('handles minimal data without crashing', async () => {
@@ -91,5 +94,45 @@ describe('SponsorshipTiers', () => {
     });
 
     expect(html).not.toContain('<h2');
+  });
+
+  test('non-highlighted tiers get border styling', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('border-border');
+    expect(html).toContain('shadow-sm');
+  });
+
+  test('highlighted tier button uses default variant, non-highlighted uses outline', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    // outline variant includes shadow-xs; default variant includes bg-primary
+    expect(html).toContain('bg-primary');
+    expect(html).toContain('shadow-xs');
+  });
+
+  test('renders without crashing when tiers is null', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: { ...tiersMinimal, tiers: null } as any,
+    });
+
+    expect(html).toBeDefined();
+    expect(html).not.toContain('<h3');
+  });
+
+  test('root section has data-animate attribute', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('data-animate');
   });
 });
