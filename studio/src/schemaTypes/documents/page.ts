@@ -120,6 +120,7 @@ export const page = defineType({
         defineArrayMember({type: 'pullquote'}),
         defineArrayMember({type: 'divider'}),
         defineArrayMember({type: 'announcementBar'}),
+        defineArrayMember({type: 'sponsorshipTiers'}),
       ],
       validation: (Rule) =>
         Rule.custom((blocks, context) => {
@@ -149,7 +150,7 @@ export const page = defineType({
               title: 'Media & Stats',
               of: ['statsRow', 'featureGrid'],
             },
-            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList']},
+            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList', 'sponsorshipTiers']},
             {name: 'data', title: 'Data', of: ['comparisonTable']},
             {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm']},
             {name: 'utility', title: 'Utility', of: ['divider', 'announcementBar']},

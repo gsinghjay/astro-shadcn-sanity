@@ -23,6 +23,23 @@ export type AnnouncementBarLink = {
   href?: string;
 };
 
+export type SponsorshipTiers = {
+  _type: "sponsorshipTiers";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  heading?: string;
+  description?: string;
+  tiers?: Array<{
+    name?: string;
+    price?: string;
+    benefits?: Array<string>;
+    highlighted?: boolean;
+    ctaButton?: Button;
+    _key: string;
+  }>;
+};
+
 export type AnnouncementBar = {
   _type: "announcementBar";
   backgroundVariant?: "white" | "light" | "dark" | "primary";
@@ -767,7 +784,17 @@ export type Page = {
     | ({
         _key: string;
       } & AnnouncementBar)
+    | ({
+        _key: string;
+      } & SponsorshipTiers)
   >;
+};
+
+export type Button = {
+  _type: "button";
+  text?: string;
+  url?: string;
+  variant?: "default" | "secondary" | "outline" | "ghost";
 };
 
 export type Project = {
@@ -943,13 +970,6 @@ export type Link = {
   external?: boolean;
 };
 
-export type Button = {
-  _type: "button";
-  text?: string;
-  url?: string;
-  variant?: "default" | "secondary" | "outline" | "ghost";
-};
-
 export type FormField = {
   _type: "formField";
   type?:
@@ -1104,6 +1124,7 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | Options
   | AnnouncementBarLink
+  | SponsorshipTiers
   | AnnouncementBar
   | Divider
   | SanityImageAssetReference
@@ -1149,13 +1170,13 @@ export type AllSanitySchemaTypes =
   | EventReference
   | PortableText
   | Page
+  | Button
   | Project
   | Seo
   | Event
   | Slug
   | Sponsor
   | Link
-  | Button
   | FormField
   | Form
   | SanityImagePaletteSwatch
@@ -1981,7 +2002,7 @@ export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    }  }}
+// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -2481,6 +2502,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         }> | null;
       }
     | {
+        _type: "sponsorshipTiers";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          benefits: Array<string> | null;
+          highlighted: boolean | null;
+          ctaButton: {
+            text: string | null;
+            url: string | null;
+            variant: "default" | "ghost" | "outline" | "secondary" | null;
+          } | null;
+        }> | null;
+      }
+    | {
         _type: "sponsorSteps";
         _key: string;
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
@@ -2717,6 +2760,6 @@ declare module "@sanity/client" {
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

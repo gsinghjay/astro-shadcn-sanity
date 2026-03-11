@@ -43,6 +43,7 @@ export type TimelineBlock = Extract<PageBlock, { _type: 'timeline' }>;
 export type PullquoteBlock = Extract<PageBlock, { _type: 'pullquote' }>;
 export type DividerBlock = Extract<PageBlock, { _type: 'divider' }>;
 export type AnnouncementBarBlock = Extract<PageBlock, { _type: 'announcementBar' }>;
+export type SponsorshipTiersBlock = Extract<PageBlock, { _type: 'sponsorshipTiers' }>;
 
 // ---------------------------------------------------------------------------
 // Layout types — shared across Layout, SidebarLayout, PortalLayout

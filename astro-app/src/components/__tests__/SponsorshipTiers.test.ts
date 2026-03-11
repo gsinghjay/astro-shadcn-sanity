@@ -1,0 +1,95 @@
+import { experimental_AstroContainer as AstroContainer } from 'astro/container';
+import { describe, test, expect } from 'vitest';
+import SponsorshipTiers from '../blocks/custom/SponsorshipTiers.astro';
+import { tiersFull, tiersMinimal } from './__fixtures__/sponsorship-tiers';
+
+describe('SponsorshipTiers', () => {
+  test('renders heading and description', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('Sponsorship Tiers');
+    expect(html).toContain('Choose the sponsorship level that fits your organization.');
+  });
+
+  test('renders tier names and prices', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('Bronze');
+    expect(html).toContain('$0');
+    expect(html).toContain('Gold');
+    expect(html).toContain('$5,000');
+    expect(html).toContain('Platinum');
+    expect(html).toContain('Custom');
+  });
+
+  test('renders benefits list', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('Logo on website');
+    expect(html).toContain('Newsletter mention');
+    expect(html).toContain('Dedicated project team');
+    expect(html).toContain('Executive briefings');
+  });
+
+  test('renders CTA buttons', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('Get Started');
+    expect(html).toContain('Contact Us');
+    expect(html).toContain('Talk to Us');
+    expect(html).toContain('href="/contact"');
+  });
+
+  test('highlighted tier gets ring-primary class', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('ring-primary');
+    expect(html).toContain('Recommended');
+  });
+
+  test('GTM tracking attributes rendered on CTA buttons', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).toContain('data-gtm-category="sponsorship"');
+    expect(html).toContain('data-gtm-action="click"');
+  });
+
+  test('handles minimal data without crashing', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersMinimal,
+    });
+
+    expect(html).toBeDefined();
+    expect(html).toContain('Free');
+    expect(html).toContain('$0');
+    expect(html).toContain('Basic access');
+  });
+
+  test('minimal data does not render heading or description', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersMinimal,
+    });
+
+    expect(html).not.toContain('<h2');
+  });
+});

@@ -1,0 +1,74 @@
+---
+import type { SponsorshipTiersBlock } from '@/lib/types';
+import { Section, SectionContent } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props extends SponsorshipTiersBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, tiers } = Astro.props;
+const tiersList = tiers ?? [];
+---
+
+<Section data-animate>
+  <SectionContent>
+    {heading && (
+      <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+    )}
+    {description && (
+      <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+    )}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      {tiersList.map((tier) => {
+        const isHighlighted = tier.highlighted === true;
+        return (
+          <div
+            class:list={[
+              'relative flex flex-col rounded-lg p-6',
+              isHighlighted
+                ? 'ring-2 ring-primary shadow-lg'
+                : 'border border-border shadow-sm',
+            ]}
+          >
+            {isHighlighted && (
+              <Badge class="absolute -top-3 left-1/2 -translate-x-1/2">Recommended</Badge>
+            )}
+
+            <div class="mb-4">
+              <h3 class="text-xl font-semibold">{tier.name}</h3>
+              <p class="text-3xl font-bold mt-2">{tier.price}</p>
+            </div>
+
+            <ul class="flex-1 space-y-3 mb-6">
+              {(tier.benefits ?? []).map((benefit) => (
+                <li class="flex items-start gap-2">
+                  <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="text-sm">{benefit}</span>
+                </li>
+              ))}
+            </ul>
+
+            {tier.ctaButton && (
+              <Button
+                href={tier.ctaButton.url}
+                variant={isHighlighted ? 'default' : (tier.ctaButton.variant || 'outline')}
+                class="w-full"
+                data-gtm-category="sponsorship"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(tier.name)}
+              >
+                {tier.ctaButton.text}
+              </Button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </SectionContent>
+</Section>

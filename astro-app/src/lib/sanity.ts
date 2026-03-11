@@ -658,6 +658,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       text,
       link{ label, href },
       dismissible
+    },
+    _type == "sponsorshipTiers" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
     }
   }
 }`);
