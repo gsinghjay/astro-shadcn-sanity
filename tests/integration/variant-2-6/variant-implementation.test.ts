@@ -6,9 +6,13 @@
  * @story 2-6
  */
 import { describe, test, expect } from 'vitest'
+import { readFile } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import { textWithImage } from '../../../studio/src/schemaTypes/blocks/text-with-image'
 import { featureGrid } from '../../../studio/src/schemaTypes/blocks/feature-grid'
 import { richText } from '../../../studio/src/schemaTypes/blocks/rich-text'
+
+const fromAstroAppRoot = (path: string) => resolve(process.cwd(), path)
 
 /** Typed shape for schema field assertions */
 type BlockSchema = {
@@ -175,7 +179,7 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       const { stegaClean } = await import('@sanity/client/stega')
       // stegaClean should handle undefined or null values
       const result = stegaClean(undefined as any)
-      expect(result).toBeDefined()
+      expect(result).toBeUndefined()
     })
   })
 
@@ -228,6 +232,36 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       for (const v of variants) {
         expect(stegaClean(v)).toBe(v)
       }
+    })
+  })
+
+  // ---------------------------------------------------------------------------
+  // Source-level assertions for Story 2.6 variant behavior requirements
+  // ---------------------------------------------------------------------------
+  describe('Story 2.6 source assertions', () => {
+    test('2.6-INT-029 — default featureGrid variant uses manual div grid, not SectionGrid', async () => {
+      const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/FeatureGrid.astro'), 'utf8')
+      expect(source).toContain("{cleanVariant === 'grid' ? (")
+      expect(source).toContain('grid w-full gap-6')
+    })
+
+    test('2.6-INT-030 — horizontal-cards variant renders feature image data', async () => {
+      const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/FeatureGrid.astro'), 'utf8')
+      expect(source).toContain("cleanVariant === 'horizontal-cards'")
+      expect(source).toContain('feature.image')
+      expect(source).toContain('safeUrlFor(feature.image)')
+    })
+
+    test('2.6-INT-031 — richText narrow variant sets --section-width to 672px', async () => {
+      const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/RichText.astro'), 'utf8')
+      expect(source).toContain("cleanVariant === 'narrow'")
+      expect(source).toContain('--section-width: 672px')
+    })
+
+    test('2.6-INT-032 — richText wide variant still uses SectionProse', async () => {
+      const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/RichText.astro'), 'utf8')
+      expect(source).toContain("cleanVariant === 'wide'")
+      expect(source).toContain('<SectionProse size="lg" class="max-w-none">')
     })
   })
 })

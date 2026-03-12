@@ -14,31 +14,22 @@ const { content, variant } = Astro.props;
 
 // Clean variant value and default to 'prose'
 const cleanVariant = stegaClean(variant ?? 'prose');
-
-// Determine styles based on variant
-const getProseSize = (variant: string) => {
-  switch (variant) {
-    case 'narrow':
-      return 'sm';
-    case 'wide':
-      return 'lg';
-    default:
-      return 'default';
-  }
-};
-
-const proseSize = getProseSize(cleanVariant);
 ---
 
 <Section data-animate>
   {cleanVariant === 'wide' ? (
-    // Wide variant - full width prose without max-width constraint
-    <div class="w-full text-foreground space-y-4 text-pretty prose-wide">
+    // Wide variant keeps prose typography but removes max-width cap
+    <SectionProse size="lg" class="max-w-none">
       {content && <PortableText value={content} components={portableTextComponents} />}
-    </div>
+    </SectionProse>
+  ) : cleanVariant === 'narrow' ? (
+    // Narrow variant uses explicit section width custom property
+    <SectionProse style="--section-width: 672px; max-width: var(--section-width);" class="w-full">
+      {content && <PortableText value={content} components={portableTextComponents} />}
+    </SectionProse>
   ) : (
-    // Default and narrow variants using SectionProse with size prop
-    <SectionProse size={proseSize}>
+    // Prose default variant
+    <SectionProse>
       {content && <PortableText value={content} components={portableTextComponents} />}
     </SectionProse>
   )}

@@ -3,6 +3,7 @@ import type { FeatureGridBlock } from '@/lib/types';
 import { Section, SectionContent, SectionGrid, SectionSplit, SectionProse } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription, TileSplit, TileMedia } from '@/components/ui/tile';
 import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props extends FeatureGridBlock {
   class?: string;
@@ -17,6 +18,12 @@ const cleanVariant = stegaClean(variant ?? 'grid');
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
 const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
+const gridClass =
+  gridSize === 'lg'
+    ? 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(400px,1fr))]'
+    : gridSize === 'sm'
+      ? 'grid-cols-[repeat(auto-fit,minmax(200px,1fr))]'
+      : 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]';
 ---
 
 {cleanVariant === 'grid' ? (
@@ -28,7 +35,7 @@ const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
       </SectionContent>
     )}
 
-    <SectionGrid size={gridSize}>
+    <div class={`grid w-full gap-6 ${gridClass}`}>
       {(items ?? []).map((feature, i) => (
         <Tile variant="floating">
           <TileContent>
@@ -44,7 +51,7 @@ const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
           </TileContent>
         </Tile>
       ))}
-    </SectionGrid>
+    </div>
   </Section>
 ) : cleanVariant === 'grid-centered' ? (
   // Grid-centered variant - centered alignment
@@ -82,14 +89,26 @@ const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
       </SectionContent>
     )}
 
-    <div class="space-y-6">
+    <SectionGrid>
       {(items ?? []).map((feature, i) => (
         <Tile variant="floating">
           <TileSplit>
             <TileMedia>
-              <div class="w-full h-full bg-muted flex items-center justify-center">
-                <span class="text-sm text-muted-foreground">Image {i + 1}</span>
-              </div>
+              {feature.image ? (
+                <img
+                  src={safeUrlFor(feature.image)?.width(460).height(260).fit('crop').url() ?? ''}
+                  alt={feature.image.alt || feature.title || ''}
+                  width={460}
+                  height={260}
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="w-full h-full bg-muted flex items-center justify-center">
+                  <span class="text-sm text-muted-foreground">No image</span>
+                </div>
+              )}
             </TileMedia>
             <TileContent>
               <TileTitle>{feature.title}</TileTitle>
@@ -98,13 +117,13 @@ const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
           </TileSplit>
         </Tile>
       ))}
-    </div>
+    </SectionGrid>
   </Section>
 ) : cleanVariant === 'sidebar-grid' ? (
   // Sidebar-grid variant - sticky sidebar with grid
   <Section data-animate>
     <SectionSplit class="@5xl:grid-cols-[1fr_2fr]">
-      <SectionContent class="@5xl:sticky @5xl:top-[calc(var(--section-py,2rem)+3rem)]">
+      <SectionContent class="@5xl:sticky @5xl:top-[calc(var(--section-py)+var(--header-height,0px))]">
         <SectionProse>
           {heading && (
             <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
