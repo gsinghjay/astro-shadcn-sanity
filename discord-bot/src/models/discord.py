@@ -1,168 +1,182 @@
-import asyncio
-import json
-import os
-import subprocess
-import time
+"""
+Pydantic v2 models for Discord interaction request and response payloads.
+https://discord.com/developers/docs/interactions/receiving-and-responding
+"""
 
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
-from pydantic import ValidationError
-
-from Bot import client as discord_client
-from models import (
-    Interaction,
-    InteractionType,
-    ImmediateResponse,
-    MessageResponseData,
-)
-
-load_dotenv()
-
-PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
-VERIFY_SCRIPT = os.path.join(os.path.dirname(__file__), "verify.mjs")
-TIMESTAMP_TOLERANCE_SECONDS = 300  # 5 minutes
+from enum import IntEnum
+from typing import Any
+from pydantic import BaseModel, Field
 
 
-async def verify_discord_signature(public_key: str, signature: str, timestamp: str, body: bytes) -> bool:
-    """Verify a Discord Ed25519 signature using the Web Crypto API via Node.js FFI.
-
-    Calls verify.mjs as a subprocess, which uses crypto.subtle to verify the
-    signature. Returns True if the signature is valid, False otherwise.
-
-    Args:
-        public_key: The Discord application's public key as a hex string.
-        signature: The Ed25519 signature from the X-Signature-Ed25519 header.
-        timestamp: The request timestamp from the X-Signature-Timestamp header.
-        body: The raw request body bytes.
-
-    Returns:
-        True if the signature is valid, False otherwise.
-    """
-    try:
-        result = await asyncio.wait_for(
-            asyncio.to_thread(
-                subprocess.run,
-                ["node", VERIFY_SCRIPT, public_key, signature, timestamp, body.decode()],
-                capture_output=True,
-            ),
-            timeout=5.0,
-        )
-        return result.returncode == 0
-    except asyncio.TimeoutError:
-        print("Signature verification timed out")
-        return False
-    except Exception as e:
-        print(f"Signature verification error: {e}")
-        return False
+class InteractionType(IntEnum):
+    """Discord interaction types."""
+    PING = 1
+    APPLICATION_COMMAND = 2
+    MESSAGE_COMPONENT = 3
 
 
-def verify_timestamp(timestamp: str) -> bool:
-    """Check that the request timestamp is within the allowed replay window.
-
-    Args:
-        timestamp: The Unix timestamp string from the X-Signature-Timestamp header.
-
-    Returns:
-        True if the timestamp is within 5 minutes of the current time.
-    """
-    try:
-        request_time = int(timestamp)
-        return abs(time.time() - request_time) <= TIMESTAMP_TOLERANCE_SECONDS
-    except ValueError:
-        return False
+class InteractionResponseType(IntEnum):
+    """Discord interaction response types."""
+    PONG = 1
+    CHANNEL_MESSAGE_WITH_SOURCE = 4
+    DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
+    DEFERRED_UPDATE_MESSAGE = 6
+    UPDATE_MESSAGE = 7
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Manage the lifecycle of the FastAPI app and Discord bot.
-
-    Starts the Discord bot as a background asyncio task when the app starts,
-    and shuts it down cleanly when the app stops.
-    """
-    token = os.getenv("DISCORD_TOKEN")
-    if not token:
-        raise RuntimeError("DISCORD_TOKEN is not set.")
-    if not PUBLIC_KEY:
-        raise RuntimeError("DISCORD_PUBLIC_KEY is not set.")
-    task = asyncio.create_task(discord_client.start(token))
-    yield
-    await discord_client.close()
-    task.cancel()
+class ComponentType(IntEnum):
+    """Discord message component types."""
+    ACTION_ROW = 1
+    BUTTON = 2
+    STRING_SELECT = 3
 
 
-app = FastAPI(
-    title="My FastAPI App",
-    version="0.1.0",
-    lifespan=lifespan,
-)
+class User(BaseModel):
+    """Represents a Discord user."""
+    id: str
+    username: str
+    discriminator: str
+    global_name: str | None = None
+    avatar: str | None = None
 
 
-@app.get("/health", tags=["meta"])
-async def health() -> dict[str, str]:
-    """Return the health status of the application."""
-    return {"status": "ok"}
+class Member(BaseModel):
+    """Represents a Discord guild member."""
+    user: User | None = None
+    roles: list[str] = Field(default_factory=list)
+    nick: str | None = None
 
 
-@app.get("/", tags=["meta"])
-async def root() -> dict[str, str]:
-    """Return a welcome message."""
-    return {"message": "Hello, world!"}
+class ApplicationCommandOption(BaseModel):
+    """Represents an option passed to a slash command."""
+    name: str
+    type: int
+    value: str | int | float | bool | None = None
+    options: list["ApplicationCommandOption"] = Field(default_factory=list)
 
 
-@app.post("/interactions", tags=["interactions"])
-async def interactions(request: Request):
-    """Handle incoming Discord interactions.
+class ApplicationCommandData(BaseModel):
+    """Data payload for an APPLICATION_COMMAND interaction."""
+    id: str
+    name: str
+    type: int
+    options: list[ApplicationCommandOption] = Field(default_factory=list)
 
-    Verifies the Ed25519 signature and timestamp on every request before processing.
-    Routes interactions to the appropriate handler based on type:
-    - PING (type 1): Returns a PONG response for endpoint verification.
-    - APPLICATION_COMMAND (type 2): Handles slash commands.
-    - MESSAGE_COMPONENT (type 3): Handles button and dropdown interactions.
 
-    Raises:
-        HTTPException: 401 if signature headers are missing, invalid, or timestamp is stale.
-        HTTPException: 400 if the payload is malformed or the interaction type is unknown.
-    """
-    signature = request.headers.get("X-Signature-Ed25519")
-    timestamp = request.headers.get("X-Signature-Timestamp")
-    body = await request.body()
+class MessageComponentData(BaseModel):
+    """Data payload for a MESSAGE_COMPONENT interaction."""
+    custom_id: str
+    component_type: ComponentType
+    values: list[str] = Field(default_factory=list)
 
-    if not signature or not timestamp:
-        raise HTTPException(status_code=401, detail="Missing signature headers")
 
-    if not verify_timestamp(timestamp):
-        raise HTTPException(status_code=401, detail="Request timestamp is stale")
+class PingInteraction(BaseModel):
+    """Interaction model for a PING request from Discord."""
+    id: str
+    application_id: str
+    type: InteractionType
+    token: str
+    version: int = 1
 
-    if not await verify_discord_signature(PUBLIC_KEY, signature, timestamp, body):
-        raise HTTPException(status_code=401, detail="Invalid request signature")
 
-    try:
-        data = json.loads(body)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+class ApplicationCommandInteraction(BaseModel):
+    """Interaction model for a slash command invocation."""
+    id: str
+    application_id: str
+    type: InteractionType
+    token: str
+    version: int = 1
+    guild_id: str | None = None
+    channel_id: str | None = None
+    member: Member | None = None
+    user: User | None = None
+    data: ApplicationCommandData
 
-    try:
-        interaction = Interaction(**data)
-    except ValidationError as e:
-        raise HTTPException(status_code=400, detail=f"Invalid interaction payload: {e}")
 
-    if interaction.type == InteractionType.PING:
-        return JSONResponse(content={"type": 1})
+class MessageComponentInteraction(BaseModel):
+    """Interaction model for a button or dropdown interaction."""
+    id: str
+    application_id: str
+    type: InteractionType
+    token: str
+    version: int = 1
+    guild_id: str | None = None
+    channel_id: str | None = None
+    member: Member | None = None
+    user: User | None = None
+    data: MessageComponentData
+    message: dict[str, Any] = Field(default_factory=dict)
 
-    if interaction.type == InteractionType.APPLICATION_COMMAND:
-        command_name = interaction.data.get("name")
-        if command_name == "hello":
-            return ImmediateResponse(
-                data=MessageResponseData(content="Hello from a slash command!")
-            )
-        raise HTTPException(status_code=400, detail=f"Unknown command: {command_name}")
 
-    if interaction.type == InteractionType.MESSAGE_COMPONENT:
-        custom_id = interaction.data.get("custom_id")
-        return ImmediateResponse(
-            data=MessageResponseData(content=f"You triggered component: {custom_id}")
-        )
+class Interaction(BaseModel):
+    """Generic interaction model used for initial parsing at the route level."""
+    id: str
+    application_id: str
+    type: InteractionType
+    token: str
+    version: int = 1
+    guild_id: str | None = None
+    channel_id: str | None = None
+    member: Member | None = None
+    user: User | None = None
+    data: dict[str, Any] = Field(default_factory=dict)
+    message: dict[str, Any] = Field(default_factory=dict)
 
-    raise HTTPException(status_code=400, detail="Unknown interaction type")
+
+class EmbedFooter(BaseModel):
+    """Footer section of a Discord embed."""
+    text: str
+    icon_url: str | None = None
+
+
+class EmbedImage(BaseModel):
+    """Image or thumbnail in a Discord embed."""
+    url: str
+
+
+class EmbedField(BaseModel):
+    """A single field in a Discord embed."""
+    name: str
+    value: str
+    inline: bool = False
+
+
+class Embed(BaseModel):
+    """A Discord embed object for rich message formatting."""
+    title: str | None = None
+    description: str | None = None
+    url: str | None = None
+    color: int | None = None
+    footer: EmbedFooter | None = None
+    image: EmbedImage | None = None
+    thumbnail: EmbedImage | None = None
+    fields: list[EmbedField] = Field(default_factory=list)
+
+
+class MessageResponseData(BaseModel):
+    """Data payload for a message response to a Discord interaction."""
+    content: str | None = None
+    embeds: list[Embed] = Field(default_factory=list)
+    flags: int = 0
+
+    @classmethod
+    def ephemeral(cls, content: str) -> "MessageResponseData":
+        """Create an ephemeral message response visible only to the invoking user."""
+        return cls(content=content, flags=64)
+
+
+class ImmediateResponse(BaseModel):
+    """Send a message immediately in response to an interaction."""
+    type: InteractionResponseType = InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE
+    data: MessageResponseData
+
+
+class DeferredResponse(BaseModel):
+    """Acknowledge the interaction now; send the actual message later via followup."""
+    type: InteractionResponseType = InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+    data: dict[str, Any] = Field(default_factory=dict)
+
+
+class PongResponse(BaseModel):
+    """ACK a PING interaction."""
+    type: InteractionResponseType = InteractionResponseType.PONG
