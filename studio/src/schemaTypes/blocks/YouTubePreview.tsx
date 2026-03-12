@@ -15,7 +15,7 @@ function extractYouTubeId(url: string): string | null {
 }
 
 export function YouTubePreview(props: PreviewProps) {
-  const {title: videoUrl} = props
+  const {subtitle: videoUrl} = props
   const url = typeof videoUrl === 'string' ? videoUrl : ''
 
   if (!url) {

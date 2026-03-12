@@ -9,7 +9,7 @@ export const videoEmbed = defineBlock({
   icon: PlayIcon,
   components: {preview: YouTubePreview},
   preview: {
-    select: {title: 'videoUrl'},
+    select: {title: 'title', subtitle: 'videoUrl'},
   },
   fields: [
     defineField({

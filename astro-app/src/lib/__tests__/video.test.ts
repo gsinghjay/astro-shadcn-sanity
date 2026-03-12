@@ -1,5 +1,47 @@
 import { getEmbedUrl } from '@/lib/video';
 
+/**
+ * Mirrors extractYouTubeId() from studio/src/schemaTypes/blocks/YouTubePreview.tsx.
+ * This parity test ensures both implementations stay in sync.
+ */
+function extractYouTubeId(url: string): string | null {
+  const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
+  if (watchMatch) return watchMatch[1];
+  const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
+  if (shortMatch) return shortMatch[1];
+  const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+  if (embedMatch) return embedMatch[1];
+  return null;
+}
+
+describe('getEmbedUrl / extractYouTubeId parity', () => {
+  const testCases = [
+    { input: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', expectedId: 'dQw4w9WgXcQ' },
+    { input: 'https://youtu.be/dQw4w9WgXcQ', expectedId: 'dQw4w9WgXcQ' },
+    { input: 'https://www.youtube.com/embed/dQw4w9WgXcQ', expectedId: 'dQw4w9WgXcQ' },
+    { input: 'https://www.youtube.com/watch?v=abc123&t=60', expectedId: 'abc123' },
+    { input: 'https://vimeo.com/123456', expectedId: null },
+    { input: '', expectedId: null },
+    { input: 'not a url at all', expectedId: null },
+  ];
+
+  it.each(testCases)(
+    'both implementations agree on "$input"',
+    ({ input, expectedId }) => {
+      const studioResult = extractYouTubeId(input);
+      const astroResult = getEmbedUrl(input);
+
+      if (expectedId === null) {
+        expect(studioResult).toBeNull();
+        expect(astroResult).toBeNull();
+      } else {
+        expect(studioResult).toBe(expectedId);
+        expect(astroResult).toBe(`https://www.youtube-nocookie.com/embed/${expectedId}`);
+      }
+    },
+  );
+});
+
 describe('getEmbedUrl', () => {
   it('extracts video ID from youtube.com/watch?v= URL', () => {
     expect(getEmbedUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toBe(

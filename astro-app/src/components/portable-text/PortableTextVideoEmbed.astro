@@ -1,9 +1,19 @@
 ---
+import type { Props as PTProps } from 'astro-portabletext/types';
 import VideoEmbed from '@/components/VideoEmbed.astro';
 import { stegaClean } from '@sanity/client/stega';
 
-const node = Astro.props.node;
-const videoUrl = stegaClean(node.videoUrl);
+interface VideoEmbedNode {
+  _type: 'videoEmbed';
+  videoUrl?: string;
+  title?: string;
+  caption?: string;
+}
+
+type Props = PTProps<VideoEmbedNode>;
+
+const { node } = Astro.props;
+const videoUrl = stegaClean(node.videoUrl ?? '');
 ---
 
 <div class="my-6">
