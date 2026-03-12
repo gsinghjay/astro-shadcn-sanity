@@ -32,7 +32,7 @@ const embedUrl = t.videoUrl ? getEmbedUrl(stegaClean(t.videoUrl)) : null;
 
 <div class="flex flex-col gap-4 border border-border bg-card p-6">
   {embedUrl && (
-    <div class="aspect-video w-full overflow-hidden rounded-md mb-4">
+    <div class="aspect-video w-full overflow-hidden rounded-md">
       <iframe
         src={embedUrl}
         title={`${stegaClean(t.name)} video testimonial`}

@@ -67,7 +67,7 @@ export const testimonial = defineType({
       validation: (Rule) =>
         Rule.uri({scheme: ['https']}).custom((url) => {
           if (!url) return true
-          return /youtube\.com|youtu\.be/.test(url) || 'Only YouTube URLs are supported'
+          return /^https:\/\/(www\.)?youtube\.com\/|^https:\/\/youtu\.be\//.test(url) || 'Only YouTube URLs are supported'
         }),
     }),
     defineField({
