@@ -27,7 +27,7 @@ const photoUrl = t.photo
   ? safeUrlFor(t.photo)?.width(80).height(80).fit('crop').url() ?? null
   : null;
 const projectSlug = t.project ? stegaClean(t.project.slug) : null;
-const embedUrl = t.videoUrl ? getEmbedUrl(t.videoUrl) : null;
+const embedUrl = t.videoUrl ? getEmbedUrl(stegaClean(t.videoUrl)) : null;
 ---
 
 <div class="flex flex-col gap-4 border border-border bg-card p-6">
@@ -35,7 +35,7 @@ const embedUrl = t.videoUrl ? getEmbedUrl(t.videoUrl) : null;
     <div class="aspect-video w-full overflow-hidden rounded-md mb-4">
       <iframe
         src={embedUrl}
-        title={`${t.name} video testimonial`}
+        title={`${stegaClean(t.name)} video testimonial`}
         loading="lazy"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen

@@ -2,7 +2,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import Testimonials from '../blocks/custom/Testimonials.astro';
 import TestimonialCard from '../TestimonialCard.astro';
-import { testimonialsData, testimonialsFull, testimonialsMinimal, testimonialsByProject } from './__fixtures__/testimonials';
+import { testimonialsData, testimonialsFull, testimonialsMinimal, testimonialsByProject, testimonialEmbedUrl, testimonialInvalidUrl } from './__fixtures__/testimonials';
 
 describe('Testimonials', () => {
   test('renders heading and testimonial names', async () => {
@@ -147,5 +147,22 @@ describe('Testimonials', () => {
     });
     expect(html).toContain('<iframe');
     expect(html).toContain('This project transformed our workflow');
+  });
+
+  test('renders YouTube embed URL format video', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialEmbedUrl },
+    });
+    expect(html).toContain('youtube-nocookie.com/embed/L_jWHffIx5E');
+  });
+
+  test('does not render iframe for non-YouTube URL', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialInvalidUrl },
+    });
+    expect(html).not.toContain('<iframe');
+    expect(html).toContain('Great experience overall');
   });
 });

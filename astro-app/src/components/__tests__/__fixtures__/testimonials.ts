@@ -52,6 +52,30 @@ export const testimonialsData: Testimonial[] = [
   },
 ];
 
+export const testimonialEmbedUrl: Testimonial = {
+  _id: 'testimonial-5',
+  name: 'Pat Rivera',
+  quote: 'Embedding videos made our presentations stand out.',
+  role: 'Designer',
+  organization: 'Gamma LLC',
+  type: 'industry',
+  videoUrl: 'https://www.youtube.com/embed/L_jWHffIx5E',
+  photo: null,
+  project: null,
+};
+
+export const testimonialInvalidUrl: Testimonial = {
+  _id: 'testimonial-6',
+  name: 'Sam Taylor',
+  quote: 'Great experience overall.',
+  role: 'Manager',
+  organization: 'Delta Co',
+  type: 'industry',
+  videoUrl: 'https://vimeo.com/12345',
+  photo: null,
+  project: null,
+};
+
 export const testimonialsFull = {
   _type: 'testimonials' as const,
   _key: 'test-tm-1',

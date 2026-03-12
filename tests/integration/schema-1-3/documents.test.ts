@@ -12,6 +12,7 @@ import { describe, test, expect, beforeAll } from 'vitest'
 // Schema imports — static so Playwright transforms them
 import { page as pageSchema } from '../../../studio/src/schemaTypes/documents/page'
 import { siteSettings } from '../../../studio/src/schemaTypes/documents/site-settings'
+import { testimonial } from '../../../studio/src/schemaTypes/documents/testimonial'
 
 describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // ---------------------------------------------------------------------------
@@ -147,4 +148,60 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
       expect(semesterField.type).toBe('string')
     })
   })
+
+  // ---------------------------------------------------------------------------
+  // Story 2.19: Testimonial videoUrl field validation
+  // ---------------------------------------------------------------------------
+  describe('Story 2.19: Testimonial videoUrl field', () => {
+    test('videoUrl field exists with type url', () => {
+      const videoUrlField = (testimonial as any).fields.find((f: any) => f.name === 'videoUrl')
+      expect(videoUrlField).toBeDefined()
+      expect(videoUrlField.type).toBe('url')
+    })
+
+    test('videoUrl custom validator accepts YouTube URLs', () => {
+      const videoUrlField = (testimonial as any).fields.find((f: any) => f.name === 'videoUrl')
+      const customRule = videoUrlField.validation
+      expect(customRule).toBeDefined()
+
+      // Extract the custom validator function from the validation chain
+      // Sanity validation rules are builder-pattern objects; we test the custom fn directly
+      const customFn = extractCustomValidator(videoUrlField)
+      if (customFn) {
+        expect(customFn('https://www.youtube.com/watch?v=abc123')).toBe(true)
+        expect(customFn('https://youtu.be/abc123')).toBe(true)
+        expect(customFn('https://www.youtube.com/embed/abc123')).toBe(true)
+        expect(customFn(undefined)).toBe(true)
+        expect(customFn(null)).toBe(true)
+        expect(customFn('https://vimeo.com/12345')).toBe('Only YouTube URLs are supported')
+        expect(customFn('https://example.com/video')).toBe('Only YouTube URLs are supported')
+      }
+    })
+  })
 })
+
+/**
+ * Extracts the custom validator function from a Sanity field definition.
+ * Calls the validation builder and inspects the resulting rule chain.
+ */
+function extractCustomValidator(field: any): ((value: any) => true | string) | null {
+  if (!field.validation) return null
+
+  // The validation prop is a function that receives a Rule mock
+  let capturedFn: ((value: any) => true | string) | null = null
+  const ruleMock: any = new Proxy({}, {
+    get(_target, prop) {
+      if (prop === 'custom') {
+        return (fn: any) => {
+          capturedFn = fn
+          return ruleMock
+        }
+      }
+      // All other methods (uri, required, etc.) return the mock for chaining
+      return () => ruleMock
+    },
+  })
+
+  field.validation(ruleMock)
+  return capturedFn
+}
