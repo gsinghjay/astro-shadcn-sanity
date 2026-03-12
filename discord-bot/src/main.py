@@ -1,13 +1,12 @@
 import asyncio
 import json
 import os
+import subprocess
 
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
-from nacl.signing import VerifyKey
-from nacl.exceptions import BadSignatureError
 
 from Bot import client as discord_client
 from models import (
@@ -20,15 +19,19 @@ from models import (
 load_dotenv()
 
 PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
+VERIFY_SCRIPT = os.path.join(os.path.dirname(__file__), "verify.mjs")
 
 
-def verify_discord_signature(public_key: str, signature: str, timestamp: str, body: bytes) -> bool:
+async def verify_discord_signature(public_key: str, signature: str, timestamp: str, body: bytes) -> bool:
     try:
-        verify_key = VerifyKey(bytes.fromhex(public_key))
-        verify_key.verify(timestamp.encode() + body, bytes.fromhex(signature))
-        return True
-    except BadSignatureError as e:
-        print(f"Signature verification failed: {e}")
+        result = await asyncio.to_thread(
+            subprocess.run,
+            ["node", VERIFY_SCRIPT, public_key, signature, timestamp, body.decode()],
+            capture_output=True,
+        )
+        return result.returncode == 0
+    except Exception as e:
+        print(f"Signature verification error: {e}")
         return False
 
 
@@ -66,14 +69,10 @@ async def interactions(request: Request):
     timestamp = request.headers.get("X-Signature-Timestamp")
     body = await request.body()
 
-    print(f"Signature: {signature}")
-    print(f"Timestamp: {timestamp}")
-    print(f"Body: {body}")
-
     if not signature or not timestamp:
         raise HTTPException(status_code=401, detail="Missing signature headers")
 
-    if not verify_discord_signature(PUBLIC_KEY, signature, timestamp, body):
+    if not await verify_discord_signature(PUBLIC_KEY, signature, timestamp, body):
         raise HTTPException(status_code=401, detail="Invalid request signature")
 
     data = json.loads(body)
