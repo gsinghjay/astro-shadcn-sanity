@@ -48,12 +48,14 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         'divider', 'announcementBar',
         // Story 2.17 — sponsorship tiers
         'sponsorshipTiers',
+        // Story 2.21 — video embed
+        'videoEmbed',
       ]
 
       for (const type of expectedTypes) {
         expect(blockTypeNames, `Missing block type: ${type}`).toContain(type)
       }
-      expect(blockTypeNames).toHaveLength(23)
+      expect(blockTypeNames).toHaveLength(24)
     })
 
     test('[P0] 1.3-INT-022 — page title is required string', () => {

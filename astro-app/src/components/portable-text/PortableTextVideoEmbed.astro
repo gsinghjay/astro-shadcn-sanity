@@ -1,0 +1,11 @@
+---
+import VideoEmbed from '@/components/VideoEmbed.astro';
+import { stegaClean } from '@sanity/client/stega';
+
+const node = Astro.props.node;
+const videoUrl = stegaClean(node.videoUrl);
+---
+
+<div class="my-6">
+  {videoUrl && <VideoEmbed url={videoUrl} title={node.title ?? undefined} />}
+</div>

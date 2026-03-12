@@ -1,25 +1,11 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
 import { safeUrlFor } from '@/lib/image';
+import { getEmbedUrl } from '@/lib/video';
 import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   testimonial: Testimonial;
-}
-
-function getEmbedUrl(videoUrl: string): string | null {
-  let videoId: string | null = null;
-  const watchMatch = videoUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
-  if (watchMatch) videoId = watchMatch[1];
-  if (!videoId) {
-    const shortMatch = videoUrl.match(/youtu\.be\/([^?&]+)/);
-    if (shortMatch) videoId = shortMatch[1];
-  }
-  if (!videoId) {
-    const embedMatch = videoUrl.match(/youtube\.com\/embed\/([^?&]+)/);
-    if (embedMatch) videoId = embedMatch[1];
-  }
-  return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
 }
 
 const { testimonial: t } = Astro.props;
