@@ -12,6 +12,7 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  SPONSOR_PROJECTS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -519,6 +520,29 @@ export const SPONSOR_PROJECTS_API_QUERY = defineQuery(groq`*[_type == "project" 
 }`);
 
 /**
+ * GROQ query: fetch projects associated with a sponsor by email.
+ * Finds sponsors matching by contactEmail or allowedEmails, then returns their projects.
+ * Used by the portal progress page for repo linking.
+ */
+export const SPONSOR_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && sponsor._ref in
+  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id
+  && ($site == "" || site == $site)
+] | order(title asc) {
+  _id, title, "slug": slug.current, status
+}`);
+
+/**
+ * Fetch projects for a sponsor by email.
+ */
+export async function getSponsorProjects(email: string) {
+  const { result } = await loadQuery<SPONSOR_PROJECTS_QUERY_RESULT>({
+    query: SPONSOR_PROJECTS_QUERY,
+    params: { email, ...getSiteParams() },
+  });
+  return result ?? [];
+}
+
+/**
  * GROQ query: fetch a single page by slug with template and blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
@@ -663,6 +687,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
+    },
+    _type == "videoEmbed" => {
+      videoUrl,
+      title,
+      caption
     }
   }
 }`);
