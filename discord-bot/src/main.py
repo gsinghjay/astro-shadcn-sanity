@@ -2,11 +2,13 @@ import asyncio
 import json
 import os
 import subprocess
+import time
 
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from Bot import client as discord_client
 from models import (
@@ -20,6 +22,7 @@ load_dotenv()
 
 PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 VERIFY_SCRIPT = os.path.join(os.path.dirname(__file__), "verify.mjs")
+TIMESTAMP_TOLERANCE_SECONDS = 300  # 5 minutes
 
 
 async def verify_discord_signature(public_key: str, signature: str, timestamp: str, body: bytes) -> bool:
@@ -38,14 +41,36 @@ async def verify_discord_signature(public_key: str, signature: str, timestamp: s
         True if the signature is valid, False otherwise.
     """
     try:
-        result = await asyncio.to_thread(
-            subprocess.run,
-            ["node", VERIFY_SCRIPT, public_key, signature, timestamp, body.decode()],
-            capture_output=True,
+        result = await asyncio.wait_for(
+            asyncio.to_thread(
+                subprocess.run,
+                ["node", VERIFY_SCRIPT, public_key, signature, timestamp, body.decode()],
+                capture_output=True,
+            ),
+            timeout=5.0,
         )
         return result.returncode == 0
+    except asyncio.TimeoutError:
+        print("Signature verification timed out")
+        return False
     except Exception as e:
         print(f"Signature verification error: {e}")
+        return False
+
+
+def verify_timestamp(timestamp: str) -> bool:
+    """Check that the request timestamp is within the allowed replay window.
+
+    Args:
+        timestamp: The Unix timestamp string from the X-Signature-Timestamp header.
+
+    Returns:
+        True if the timestamp is within 5 minutes of the current time.
+    """
+    try:
+        request_time = int(timestamp)
+        return abs(time.time() - request_time) <= TIMESTAMP_TOLERANCE_SECONDS
+    except ValueError:
         return False
 
 
@@ -59,6 +84,8 @@ async def lifespan(app: FastAPI):
     token = os.getenv("DISCORD_TOKEN")
     if not token:
         raise RuntimeError("DISCORD_TOKEN is not set.")
+    if not PUBLIC_KEY:
+        raise RuntimeError("DISCORD_PUBLIC_KEY is not set.")
     task = asyncio.create_task(discord_client.start(token))
     yield
     await discord_client.close()
@@ -88,15 +115,15 @@ async def root() -> dict[str, str]:
 async def interactions(request: Request):
     """Handle incoming Discord interactions.
 
-    Verifies the Ed25519 signature on every request before processing.
+    Verifies the Ed25519 signature and timestamp on every request before processing.
     Routes interactions to the appropriate handler based on type:
     - PING (type 1): Returns a PONG response for endpoint verification.
     - APPLICATION_COMMAND (type 2): Handles slash commands.
     - MESSAGE_COMPONENT (type 3): Handles button and dropdown interactions.
 
     Raises:
-        HTTPException: 401 if signature headers are missing or invalid.
-        HTTPException: 400 if the interaction type or command is unknown.
+        HTTPException: 401 if signature headers are missing, invalid, or timestamp is stale.
+        HTTPException: 400 if the payload is malformed or the interaction type is unknown.
     """
     signature = request.headers.get("X-Signature-Ed25519")
     timestamp = request.headers.get("X-Signature-Timestamp")
@@ -105,11 +132,21 @@ async def interactions(request: Request):
     if not signature or not timestamp:
         raise HTTPException(status_code=401, detail="Missing signature headers")
 
+    if not verify_timestamp(timestamp):
+        raise HTTPException(status_code=401, detail="Request timestamp is stale")
+
     if not await verify_discord_signature(PUBLIC_KEY, signature, timestamp, body):
         raise HTTPException(status_code=401, detail="Invalid request signature")
 
-    data = json.loads(body)
-    interaction = Interaction(**data)
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    try:
+        interaction = Interaction(**data)
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=f"Invalid interaction payload: {e}")
 
     if interaction.type == InteractionType.PING:
         return JSONResponse(content={"type": 1})
