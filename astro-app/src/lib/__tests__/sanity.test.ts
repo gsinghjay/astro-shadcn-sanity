@@ -30,6 +30,7 @@ const {
   ALL_EVENTS_QUERY,
   ALL_EVENT_SLUGS_QUERY,
   ALL_TESTIMONIALS_QUERY,
+  SPONSOR_PROJECTS_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -204,6 +205,18 @@ describe("GROQ query definitions", () => {
 
   it("PAGE_BY_SLUG_QUERY sponsorCards projection includes config fields", () => {
     expect(PAGE_BY_SLUG_QUERY).toContain("displayMode");
+  });
+
+  it("SPONSOR_PROJECTS_QUERY fetches projects by sponsor email", () => {
+    expect(SPONSOR_PROJECTS_QUERY).toContain('_type == "project"');
+    expect(SPONSOR_PROJECTS_QUERY).toContain('_type == "sponsor"');
+    expect(SPONSOR_PROJECTS_QUERY).toContain("contactEmail");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("allowedEmails");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("$email");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("title");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("slug.current");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("status");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("order(title asc)");
   });
 });
 
