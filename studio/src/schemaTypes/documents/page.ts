@@ -15,6 +15,7 @@ export const wideBlockWarnings: Record<string, string[]> = {
   projectCards: ['sidebar'],
   imageGallery: ['sidebar'],
   comparisonTable: ['sidebar', 'twoColumn'],
+  videoEmbed: ['sidebar'],
 }
 
 /**
@@ -121,6 +122,7 @@ export const page = defineType({
         defineArrayMember({type: 'divider'}),
         defineArrayMember({type: 'announcementBar'}),
         defineArrayMember({type: 'sponsorshipTiers'}),
+        defineArrayMember({type: 'videoEmbed'}),
       ],
       validation: (Rule) =>
         Rule.custom((blocks, context) => {
@@ -148,7 +150,7 @@ export const page = defineType({
             {
               name: 'media',
               title: 'Media & Stats',
-              of: ['statsRow', 'featureGrid'],
+              of: ['statsRow', 'featureGrid', 'videoEmbed'],
             },
             {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList', 'sponsorshipTiers']},
             {name: 'data', title: 'Data', of: ['comparisonTable']},

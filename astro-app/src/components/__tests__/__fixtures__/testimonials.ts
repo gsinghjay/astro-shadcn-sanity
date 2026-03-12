@@ -8,6 +8,7 @@ export const testimonialsData: Testimonial[] = [
     role: 'CTO',
     organization: 'Acme Corp',
     type: 'industry',
+    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     photo: {
       asset: { _id: 'image-Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200-png', url: 'https://cdn.sanity.io/images/test-project/test-dataset/Tb9Ew8CXIwaY6R1kjMvI0uRR-200x200.png', metadata: null },
       alt: 'Jane Smith photo',
@@ -23,6 +24,7 @@ export const testimonialsData: Testimonial[] = [
     role: 'Student',
     organization: 'NJIT',
     type: 'student',
+    videoUrl: null,
     photo: null,
     project: { _id: 'project-1', title: 'AI Dashboard', slug: 'ai-dashboard' },
   },
@@ -33,6 +35,7 @@ export const testimonialsData: Testimonial[] = [
     role: 'VP of Engineering',
     organization: 'Beta Inc',
     type: 'industry',
+    videoUrl: 'https://youtu.be/jNQXAC9IVRw',
     photo: null,
     project: null,
   },
@@ -43,10 +46,35 @@ export const testimonialsData: Testimonial[] = [
     role: null,
     organization: null,
     type: 'student',
+    videoUrl: null,
     photo: null,
     project: { _id: 'project-2', title: 'Mobile App', slug: 'mobile-app' },
   },
 ];
+
+export const testimonialEmbedUrl: Testimonial = {
+  _id: 'testimonial-5',
+  name: 'Pat Rivera',
+  quote: 'Embedding videos made our presentations stand out.',
+  role: 'Designer',
+  organization: 'Gamma LLC',
+  type: 'industry',
+  videoUrl: 'https://www.youtube.com/embed/L_jWHffIx5E',
+  photo: null,
+  project: null,
+};
+
+export const testimonialInvalidUrl: Testimonial = {
+  _id: 'testimonial-6',
+  name: 'Sam Taylor',
+  quote: 'Great experience overall.',
+  role: 'Manager',
+  organization: 'Delta Co',
+  type: 'industry',
+  videoUrl: 'https://vimeo.com/12345',
+  photo: null,
+  project: null,
+};
 
 export const testimonialsFull = {
   _type: 'testimonials' as const,
