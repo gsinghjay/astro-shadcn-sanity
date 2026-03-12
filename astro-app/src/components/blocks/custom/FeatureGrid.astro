@@ -57,15 +57,15 @@ const gridClass =
   // Grid-centered variant - centered alignment
   <Section data-animate>
     {heading && (
-      <SectionContent class="max-w-3xl text-center">
+      <SectionContent class="max-w-3xl mx-auto items-center text-center">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       </SectionContent>
     )}
 
     <SectionGrid size={gridSize}>
       {(items ?? []).map((feature, i) => (
-        <Tile variant="floating" class="text-center">
-          <TileContent class="items-center">
+        <Tile variant="floating" class="items-center text-center">
+          <TileContent class="items-center text-center">
             <div class="flex flex-col items-center gap-3 w-full">
               <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
                 <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
@@ -74,7 +74,7 @@ const gridClass =
               </div>
               <TileTitle>{feature.title}</TileTitle>
             </div>
-            <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+            <TileDescription class="whitespace-pre-line text-center">{feature.description}</TileDescription>
           </TileContent>
         </Tile>
       ))}
