@@ -1,74 +1,101 @@
 # YWCC Capstone Project Documentation
 
-> Auto-generated documentation index for the astro-shadcn-sanity monorepo.
-> Last updated: 2026-02-20
+> Documentation index for the astro-shadcn-sanity monorepo.
+> Last updated: 2026-03-11 | Scan level: deep | Mode: full_rescan
 
 ## Project Overview
 
-- **Name:** ywcc-capstone-template v1.7.0
-- **Type:** Monorepo (npm workspaces) with 2 parts
-- **Primary Language:** TypeScript
-- **Architecture:** Static-first SSG with selective SSR, page builder pattern
+- **Name:** ywcc-capstone-template (YWCC Industry Capstone)
+- **Version:** 1.11.0
+- **Type:** Monorepo (npm workspaces) with 4 parts
+- **Primary Language:** TypeScript (+ Python for discord-bot)
+- **Architecture:** Jamstack + Selective SSR (Astro 5.17 + Sanity 5.14)
+- **Deployment:** Cloudflare Pages + Workers + D1 + KV + Durable Objects
+
+### Parts
+
+| Part | Type | Framework | Path |
+|------|------|-----------|------|
+| astro-app | Web Frontend (SSG + SSR) | Astro 5.17 + React 19 + Tailwind 4 | `astro-app/` |
+| studio | CMS Admin | Sanity Studio v5.14 | `studio/` |
+| rate-limiter-worker | Backend Worker | Cloudflare Durable Object | `rate-limiter-worker/` |
+| discord-bot | Backend | Python FastAPI + discord.py | `discord-bot/` |
 
 ### Quick Reference
 
-#### Astro Frontend (`astro-app/`)
+- **Routes:** 20 (8 SSG + 9 SSR + 5 API)
+- **Schema Types:** 51 (7 documents, 14 objects, 25 blocks, 5 helpers)
+- **Components:** 508+ files (23 custom blocks, 115+ generic blocks, 39 UI primitives, 15 top-level, 8 portal)
+- **Tests:** 94 test files (58 unit/component + 14 E2E + 22 integration)
+- **Storybook Stories:** 120+
+- **CI/CD Workflows:** 6 GitHub Actions
 
-- **Framework:** Astro 5.17 + React 19.2
-- **Styling:** Tailwind CSS 4.1 (CSS-first) + shadcn-astro
-- **Output:** Static site (Cloudflare Pages) with SSR portal
-- **Components:** 508 total (13 custom blocks, 101 UI blocks, 39 UI primitives)
-
-#### Sanity Studio (`studio/`)
-
-- **Framework:** Sanity Studio v5.10
-- **Schema:** 27 types (6 documents, 8 objects, 13 blocks)
-- **Content:** 40 user documents in production dataset
-- **Features:** Visual editing, presentation tool, TypeGen
+---
 
 ## Generated Documentation
 
-| Document | Description | Size |
-|----------|-------------|------|
-| [Project Overview](./project-overview.md) | Executive summary, purpose, tech stack, key features | 9 KB |
-| [Architecture](./architecture.md) | System design, patterns, rendering strategy, security, testing | 19 KB |
-| [Source Tree Analysis](./source-tree-analysis.md) | Annotated directory tree, entry points, critical file locations | 32 KB |
-| [Component Inventory](./component-inventory.md) | Full catalog of 508 components by category, block system architecture | 11 KB |
-| [Data Models](./data-models.md) | Sanity schema types, fields, GROQ queries, TypeGen pipeline | 23 KB |
-| [Development Guide](./development-guide.md) | Setup, commands, workflows, testing, CI/CD, troubleshooting | 13 KB |
-| [Integration Architecture](./integration-architecture.md) | Content delivery, visual editing, TypeGen, CI/CD, webhook flows | 18 KB |
+- [Project Overview](./project-overview.md) — Executive summary, tech stack, key metrics
+- [Architecture](./architecture.md) — System architecture, diagrams, patterns, security
+- [Source Tree Analysis](./source-tree-analysis.md) — Annotated directory tree, critical folders, entry points
+- [Component Inventory](./component-inventory.md) — Full component catalog, design system, test coverage
+- [Data Models](./data-models.md) — Sanity schema (51 types), D1 tables, GROQ queries
+- [Development Guide](./development-guide.md) — Setup, commands, common tasks, CI/CD, conventions
+- [Integration Architecture](./integration-architecture.md) — Part communication, data flows, shared deps
+
+---
 
 ## Existing Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Cloudflare Guide](./cloudflare-guide.md) | Consolidated Cloudflare deployment, Workers, and configuration guide |
-| [Cloudflare Serverless Primer](./cloudflare-serverless-primer.md) | Beginner-friendly guide to Workers and Pages for developers coming from Docker/VPS |
-| [Capstone Status Report](./capstone-status-report.md) | Project status and milestone tracking |
-| [VPS Migration Plan](./vps-migration-plan.md) | Migration planning documentation |
+### Infrastructure & Deployment
+- [Cloudflare Guide](./cloudflare-guide.md) — Cloudflare setup and usage
+- [Cloudflare Infrastructure Guide](./cloudflare-infrastructure-guide.md) — Infrastructure details
+- [Cloudflare Serverless Primer](./cloudflare-serverless-primer.md) — Workers primer
+- [VPS Migration Plan](./vps-migration-plan.md) — VPS migration strategy
+- [Cost Optimization Strategy](./cost-optimization-strategy.md) — Cost reduction tactics
+- [Rate Limiting with Durable Objects](./rate-limiting-with-durable-objects.md) — Rate limiter docs
 
-## Scan Data
+### Authentication
+- [Auth Consolidation Strategy](./auth-consolidation-strategy.md) — Authentication approach
+- [Better Auth vs Identity Servers](./better-auth-vs-identity-servers.md) — Auth tech comparison
 
-| File | Description |
-|------|-------------|
-| [Project Scan Report](./project-scan-report.json) | Machine-readable exhaustive scan results (2026-02-20) |
+### Analytics & Images
+- [GTM Analytics Strategy](./gtm-analytics-strategy.md) — Google Tag Manager strategy
+- [Image Optimization Strategy](./image-optimization-strategy.md) — Image handling + optimization
+
+---
 
 ## Getting Started
 
-1. Read the [Project Overview](./project-overview.md) for context and purpose
-2. Follow the [Development Guide](./development-guide.md) to set up your environment
-3. Review the [Architecture](./architecture.md) to understand system design
-4. Check the [Source Tree Analysis](./source-tree-analysis.md) to find specific files
-5. Reference [Data Models](./data-models.md) when working with Sanity content
-6. See [Component Inventory](./component-inventory.md) when building UI
-7. Consult [Integration Architecture](./integration-architecture.md) for cross-system flows
+### For Development
+```bash
+git clone https://github.com/gsinghjay/astro-shadcn-sanity.git
+cd astro-shadcn-sanity
+npm install
+cp astro-app/.env.example astro-app/.env
+cp studio/.env.example studio/.env
+# Edit .env files with your Sanity credentials
+npm run dev
+```
 
-## For AI Agents
+### For AI-Assisted Development
+1. Start with this index to understand project structure
+2. Read [Architecture](./architecture.md) for system design decisions
+3. Read [Component Inventory](./component-inventory.md) for reusable components
+4. Read [Data Models](./data-models.md) for content schema
+5. Read [Development Guide](./development-guide.md) for commands and conventions
 
-When working on this codebase, load documents in this priority order:
+### Key Commands
+```bash
+npm run dev                    # Astro (4321) + Studio (3333)
+npm run test:unit              # Vitest unit + component + integration
+npm run test:chromium          # Playwright Chromium (fast E2E)
+npm run typegen                # Regenerate TypeScript types from Sanity schema
+npx sanity schema deploy       # Deploy schema changes (from studio/)
+```
 
-1. **Always:** [Architecture](./architecture.md) + [Data Models](./data-models.md)
-2. **For UI work:** Add [Component Inventory](./component-inventory.md)
-3. **For content/schema work:** Add [Data Models](./data-models.md) + [Integration Architecture](./integration-architecture.md)
-4. **For DevOps/CI:** Add [Development Guide](./development-guide.md) + [Integration Architecture](./integration-architecture.md)
-5. **For new contributors:** Start with [Project Overview](./project-overview.md) + [Development Guide](./development-guide.md)
+### Brownfield PRD
+When planning new features, point the PRD workflow to this file (`docs/index.md`) as project context input.
+
+---
+
+*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan | Workflow: document-project v1.2.0*

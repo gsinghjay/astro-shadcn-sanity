@@ -53,6 +53,9 @@ import {pullquote} from './blocks/pullquote'
 // Block schemas — utility (Story 2.11)
 import {divider} from './blocks/divider'
 import {announcementBar} from './blocks/announcement-bar'
+import {sponsorshipTiers} from './blocks/sponsorship-tiers'
+// Block schemas — media (Story 2.21)
+import {videoEmbed} from './blocks/video-embed'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -106,4 +109,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Blocks — utility
   divider,
   announcementBar,
+  // Blocks — social proof (Story 2.17)
+  sponsorshipTiers,
+  // Blocks — media (Story 2.21)
+  videoEmbed,
 ]
