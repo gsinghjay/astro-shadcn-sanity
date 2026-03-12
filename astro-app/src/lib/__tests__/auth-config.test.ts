@@ -73,6 +73,7 @@ describe('createAuth() — unified auth factory', () => {
     expect(config.socialProviders.github).toEqual({
       clientId: 'test-github-id',
       clientSecret: 'test-github-secret',
+      scope: ['repo'],
     });
   });
 

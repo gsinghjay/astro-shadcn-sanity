@@ -22,6 +22,7 @@ yarn-error.log*
 .env.*
 !.env.example
 .dev.vars
+.wrangler
 
 # vercel
 .vercel
@@ -58,8 +59,13 @@ studio/schema.json
 .repomixignore
 
 # Agents
+.agents/
 .cursor/
 .gemini/
 .github/agents/
 .github/copilot-instructions.md
 .github/prompts/
+
+# Dev tooling artifacts
+repomix-output.md
+skills-lock.json

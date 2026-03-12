@@ -1,6 +1,7 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
 import { safeUrlFor } from '@/lib/image';
+import VideoEmbed from '@/components/VideoEmbed.astro';
 import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
@@ -15,6 +16,9 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
 ---
 
 <div class="flex flex-col gap-4 border border-border bg-card p-6">
+  {t.videoUrl && (
+    <VideoEmbed url={stegaClean(t.videoUrl)} title={`${stegaClean(t.name)} video testimonial`} />
+  )}
   <blockquote class="text-base italic text-card-foreground leading-relaxed">"{t.quote}"</blockquote>
   <div class="flex items-center gap-3">
     {photoUrl ? (

@@ -12,6 +12,7 @@ import type {
   ALL_TESTIMONIALS_QUERY_RESULT,
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
+  SPONSOR_PROJECTS_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -269,6 +270,22 @@ export function resolveBlockSponsors(
 }
 
 /**
+ * Resolve projects for a projectCards block from the pre-fetched cache.
+ * Filters based on displayMode config (all/featured/manual).
+ */
+export function resolveBlockProjects(
+  block: { _type: string; displayMode?: string | null; projects?: Array<{ _id: string }> | null },
+  allProjects: Project[],
+): Project[] {
+  const mode = stegaClean(block.displayMode) ?? 'all';
+  if (mode === 'all') return allProjects;
+  if (mode === 'featured') return allProjects.filter(p => p.featured);
+  // manual
+  const manualIds = new Set(block.projects?.map(p => p._id) ?? []);
+  return allProjects.filter(p => manualIds.has(p._id));
+}
+
+/**
  * GROQ query: fetch all projects with resolved sponsor references.
  */
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
@@ -278,7 +295,8 @@ export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($sit
   technologyTags,
   semester,
   status,
-  outcome
+  outcome,
+  featured
 }`);
 
 /**
@@ -314,7 +332,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   mentor{ name, title, department },
   outcome,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
-  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
 /**
@@ -333,7 +351,7 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
  * Fetched once per build and shared across all blocks that need testimonial data.
  */
 export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){
-  _id, name, quote, role, organization, type,
+  _id, name, quote, role, organization, type, videoUrl,
   photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   project->{ _id, title, "slug": slug.current }
 }`);
@@ -502,6 +520,29 @@ export const SPONSOR_PROJECTS_API_QUERY = defineQuery(groq`*[_type == "project" 
 }`);
 
 /**
+ * GROQ query: fetch projects associated with a sponsor by email.
+ * Finds sponsors matching by contactEmail or allowedEmails, then returns their projects.
+ * Used by the portal progress page for repo linking.
+ */
+export const SPONSOR_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && sponsor._ref in
+  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id
+  && ($site == "" || site == $site)
+] | order(title asc) {
+  _id, title, "slug": slug.current, status
+}`);
+
+/**
+ * Fetch projects for a sponsor by email.
+ */
+export async function getSponsorProjects(email: string) {
+  const { result } = await loadQuery<SPONSOR_PROJECTS_QUERY_RESULT>({
+    query: SPONSOR_PROJECTS_QUERY,
+    params: { email, ...getSiteParams() },
+  });
+  return result ?? [];
+}
+
+/**
  * GROQ query: fetch a single page by slug with template and blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
@@ -581,6 +622,11 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       displayMode,
       sponsors[]->{ _id }
     },
+    _type == "projectCards" => {
+      heading,
+      displayMode,
+      projects[]->{ _id }
+    },
     _type == "testimonials" => {
       heading,
       displayMode,
@@ -636,6 +682,16 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       text,
       link{ label, href },
       dismissible
+    },
+    _type == "sponsorshipTiers" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
+    },
+    _type == "videoEmbed" => {
+      videoUrl,
+      title,
+      caption
     }
   }
 }`);

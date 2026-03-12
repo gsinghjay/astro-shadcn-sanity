@@ -14,8 +14,6 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
-      - astro_node_modules:/app/astro-app/node_modules
-      - studio_node_modules:/app/studio/node_modules
     env_file:
       - astro-app/.env
     environment:
@@ -32,8 +30,6 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
-      - astro_node_modules:/app/astro-app/node_modules
-      - studio_node_modules:/app/studio/node_modules
     env_file:
       - studio/.env
     environment:
@@ -50,8 +46,6 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
-      - astro_node_modules:/app/astro-app/node_modules
-      - studio_node_modules:/app/studio/node_modules
     env_file:
       - astro-app/.env
     environment:
@@ -74,8 +68,6 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
-      - astro_node_modules:/app/astro-app/node_modules
-      - studio_node_modules:/app/studio/node_modules
     env_file:
       - astro-app/.env
     environment:
@@ -98,8 +90,6 @@ services:
     volumes:
       - .:/app
       - node_modules:/app/node_modules
-      - astro_node_modules:/app/astro-app/node_modules
-      - studio_node_modules:/app/studio/node_modules
     env_file:
       - astro-app/.env
     environment:
@@ -110,5 +100,3 @@ services:
 
 volumes:
   node_modules:
-  astro_node_modules:
-  studio_node_modules:

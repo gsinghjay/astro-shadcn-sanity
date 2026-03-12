@@ -1,0 +1,62 @@
+---
+import { Button } from '@/components/ui/button';
+import { buildGoogleCalendarUrl, buildOutlookUrl } from '@/lib/ical';
+
+interface Props {
+  title: string;
+  date: string;
+  endDate?: string | null;
+  location?: string | null;
+  description?: string | null;
+  slug: string;
+  siteUrl: string;
+}
+
+const { title, date, endDate, location, description, slug, siteUrl } = Astro.props;
+const eventUrl = `${siteUrl}/events/${slug}`;
+
+const googleUrl = buildGoogleCalendarUrl({ title, date, endDate, location, description, eventUrl });
+const outlookUrl = buildOutlookUrl({ title, date, endDate, location, description });
+const icsUrl = `/api/events/${slug}.ics`;
+---
+
+<div class="flex flex-col gap-3">
+  <h3 class="text-sm font-medium text-muted-foreground">Add to Calendar</h3>
+  <div class="flex flex-wrap gap-2">
+    <Button
+      href={googleUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="outline"
+      size="sm"
+      aria-label={`Add ${title} to Google Calendar`}
+      data-gtm-category="calendar"
+      data-gtm-label="google"
+    >
+      Google Calendar
+    </Button>
+    <Button
+      href={outlookUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="outline"
+      size="sm"
+      aria-label={`Add ${title} to Outlook`}
+      data-gtm-category="calendar"
+      data-gtm-label="outlook"
+    >
+      Outlook
+    </Button>
+    <Button
+      href={icsUrl}
+      download={`${slug}.ics`}
+      variant="outline"
+      size="sm"
+      aria-label={`Download ${title} as iCal file`}
+      data-gtm-category="calendar"
+      data-gtm-label="ical-download"
+    >
+      Download .ics
+    </Button>
+  </div>
+</div>

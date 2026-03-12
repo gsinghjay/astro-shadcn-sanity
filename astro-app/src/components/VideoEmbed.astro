@@ -1,0 +1,25 @@
+---
+import { getEmbedUrl } from '@/lib/video';
+
+interface Props {
+  url: string;
+  title?: string;
+  class?: string;
+}
+
+const { url, title, class: className } = Astro.props;
+const embedUrl = getEmbedUrl(url);
+---
+
+{embedUrl && (
+  <div class:list={['aspect-video w-full overflow-hidden rounded-md', className]}>
+    <iframe
+      src={embedUrl}
+      title={title ?? 'Video'}
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      class="h-full w-full border-0"
+    ></iframe>
+  </div>
+)}

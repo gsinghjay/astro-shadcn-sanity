@@ -1,172 +1,127 @@
 # Project Overview
 
-**ywcc-capstone-template v1.7.0** -- YWCC Capstone Spring 2026
-
 ## Executive Summary
+- Name: ywcc-capstone-template (YWCC Industry Capstone)
+- Version: 1.11.0
+- Repository type: Monorepo (npm workspaces + standalone parts)
+- Primary language: TypeScript (with Python for discord-bot)
+- Description: YWCC Capstone Websites — Astro + Sanity monorepo for the YWCC Industry Capstone Spring 2026 program
+- Purpose: Block-based CMS website with page builder, sponsor portal, student portal, event calendar, project showcase
+- Multi-site: Supports 3 site variants (Capstone red, RWC US blue, RWC International green)
 
-This repository is a production-ready portal for NJIT's Ying Wu College of Computing (YWCC) Industry Capstone program. It connects industry sponsors with capstone student teams by showcasing sponsor organizations, project proposals, team rosters, events, and program information. Content editors compose and update pages by stacking reusable UI blocks in Sanity Studio with zero code required.
+## Project Parts
 
-The site runs on Astro (static-site generation with selective SSR), backed by Sanity CMS for structured content, styled with Tailwind CSS, and deployed to Cloudflare Pages at $0/month using free tiers across all services.
-
-**Reference site:** [ywcccapstone1.com](https://ywcccapstone1.com)
-
-## Project Purpose and Context
-
-The YWCC Industry Capstone program pairs student teams with industry sponsors to work on real-world projects each semester. This platform serves as the central hub where:
-
-- **Content editors** build and update pages independently with no developer involvement
-- **Prospective sponsors** discover the program, browse past projects, and submit inquiries
-- **Students** find team assignments, project details, and key dates in one place
-- **Advisors** manage program information through a structured CMS
-
-The codebase follows a "toolkit-not-website" approach -- a block library maps editor-friendly names to component internals, making the design system invisible to non-technical users.
-
-## Repository Structure
-
-```mermaid
-graph TD
-    Root["astro-shadcn-sanity/"]
-    Root --> AstroApp["astro-app/<br/>Astro frontend"]
-    Root --> Studio["studio/<br/>Sanity Studio CMS"]
-    Root --> Tests["tests/<br/>Playwright E2E"]
-    Root --> GH[".github/workflows/<br/>CI/CD pipelines"]
-    Root --> Docs["docs/<br/>Documentation"]
-
-    AstroApp --> Comp["src/components/<br/>UI + blocks"]
-    AstroApp --> Lib["src/lib/<br/>Sanity client, queries"]
-    AstroApp --> Pages["src/pages/<br/>Routes"]
-    AstroApp --> Styles["src/styles/<br/>Tailwind CSS"]
-
-    Studio --> Schema["src/schemaTypes/<br/>Block + document schemas"]
-
-    Comp --> UI["ui/<br/>39 primitives (shadcn)"]
-    Comp --> Blocks["blocks/<br/>101 template blocks"]
-    Comp --> Custom["blocks/custom/<br/>13 custom blocks"]
-    Comp --> Registry["block-registry.ts<br/>Auto-discovery"]
-```
-
-```text
-astro-shadcn-sanity/
-├── astro-app/                 # Astro frontend (npm workspace)
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/            # 39 UI primitives (via shadcn CLI)
-│   │   │   ├── blocks/        # 101 template blocks (fulldev/ui)
-│   │   │   │   └── custom/    # 13 custom CMS-connected blocks
-│   │   │   ├── block-registry.ts
-│   │   │   └── BlockRenderer.astro
-│   │   ├── layouts/           # Base HTML layout
-│   │   ├── lib/               # Sanity client, GROQ queries, helpers
-│   │   ├── pages/             # Astro page routes + portal (SSR)
-│   │   └── styles/            # Tailwind CSS global config
-│   └── package.json
-├── studio/                    # Sanity Studio (npm workspace)
-│   └── src/schemaTypes/
-│       ├── blocks/            # Block object schemas
-│       ├── documents/         # Document schemas
-│       ├── objects/           # Shared objects (SEO, buttons, portable text)
-│       └── helpers/           # defineBlock helper
-├── tests/                     # Playwright E2E tests
-├── .github/workflows/         # 7 CI/CD workflows
-├── docs/                      # Project documentation
-├── package.json               # Root workspace config
-├── .releaserc.json            # semantic-release config
-└── CHANGELOG.md               # Auto-generated changelog
-```
+| Part | Path | Type | Framework | Version |
+|------|------|------|-----------|---------|
+| astro-app | astro-app/ | Web Frontend | Astro 5.17 + React 19 + Tailwind 4 | 0.0.1 |
+| studio | studio/ | CMS Admin | Sanity Studio v5.14 | 1.0.0 |
+| rate-limiter-worker | rate-limiter-worker/ | Backend Worker | Cloudflare Worker (TypeScript) | 1.0.0 |
+| discord-bot | discord-bot/ | Backend | Python FastAPI + discord.py | 0.1.0 |
 
 ## Technology Stack Summary
 
-| Layer | Technology | Version |
-|---|---|---|
-| Frontend framework | Astro (SSG + selective SSR) | 5.17 |
-| CMS | Sanity Studio | 5.10 |
-| Styling | Tailwind CSS (CSS-first config, `@tailwindcss/vite`) | 4.1 |
-| UI components | fulldev/ui primitives (vanilla `.astro` via shadcn CLI) | -- |
-| Reactivity | React (Sanity Visual Editing only; not used for page UI) | 19.2 |
-| Language | TypeScript | 5.9 |
-| Build tool | Vite | 7.3 |
-| Hosting | Cloudflare Pages (static production, SSR previews) | -- |
-| CMS hosting | Sanity hosted Studio | -- |
-| Storybook hosting | GitHub Pages | -- |
-| Unit testing | Vitest + jsdom + Astro Container API | 3.2 |
-| E2E testing | Playwright + axe-core | 1.58 |
-| Component dev | Storybook (storybook-astro renderer) | 10.2 |
-| CI/CD | GitHub Actions (7 workflows) | -- |
-| Releases | semantic-release (Conventional Commits) | -- |
-| Auth | Cloudflare Access (Zero Trust) | -- |
-| Analytics | GA4 + Monsido | -- |
-| Package management | npm workspaces (monorepo) | -- |
-| Runtime | Node.js | 24+ |
+### Frontend (astro-app)
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Framework | Astro | ^5.17.1 |
+| UI Library | React | ^19.2.4 |
+| Styling | Tailwind CSS | ^4.1.18 |
+| Language | TypeScript | ^5.9.3 |
+| Build Tool | Vite | ^7.3.1 |
+| Typography | @tailwindcss/typography | ^0.5.19 |
+| Animations | tw-animate-css | ^1.4.0 |
+| Icons | @iconify-json/lucide + simple-icons | ^1.2.89 |
+| Component Variants | class-variance-authority | ^0.7.1 |
+| Class Merging | clsx + tailwind-merge | ^2.1.1 / ^3.4.0 |
+| Auth | better-auth | ^1.5.0 |
+| Database ORM | drizzle-orm | ^0.45.1 |
+| State Mgmt | nanostores + @preact/signals | ^1.1.0 / ^2.8.1 |
+| Calendar | @schedule-x/calendar + react | ^4.2.0 |
+| Email | resend | ^6.9.3 |
+| Date/Time | temporal-polyfill | ^0.3.0 |
+| Portable Text | astro-portabletext + @portabletext/to-html | ^0.10.0 / ^5.0.1 |
 
-## Architecture Overview
+### CMS (studio)
+| Category | Technology | Version |
+|----------|-----------|---------|
+| CMS | Sanity | ^5.14.1 |
+| Integration | @sanity/astro | ^3.2.11 |
+| Visual Editing | @sanity/visual-editing | ^5.2.1 |
+| Image URLs | @sanity/image-url | ^1.2.0 |
+| GROQ | groq | ^5.8.1 |
+| Plugin | @sanity/form-toolkit | ^2.2.3 |
 
-The system follows a JAMstack architecture: Sanity CMS stores structured content, Astro builds static HTML at deploy time, and Cloudflare Pages serves the result globally. Preview branches use SSR for live Visual Editing with draft content.
+### Deployment
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Adapter | @astrojs/cloudflare | ^12.6.12 |
+| CLI | wrangler | ^4.63.0 |
+| Worker Name | ywcc-capstone | - |
+| Compat Date | 2025-12-01 | - |
+| Compat Flags | nodejs_compat, disable_nodejs_process_v2 | - |
+| Output Mode | static (with per-route SSR) | - |
+| Database | Cloudflare D1 (SQLite) | - |
+| KV | SESSION_CACHE (session caching) | - |
+| Durable Objects | SlidingWindowRateLimiter | - |
+| Auth | Better Auth (Google OAuth, GitHub OAuth, Magic Link) | - |
 
-```mermaid
-flowchart LR
-    Editor[Content Editor] -->|Compose pages| Studio[Sanity Studio]
-    Studio -->|Webhook trigger| Build[Astro SSG Build]
-    Build -->|Static HTML| CF[Cloudflare Pages]
-    Visitor[Site Visitor] -->|Browse| CF
-    Sponsor[Sponsor] -->|Authenticated| Portal[Sponsor Portal - SSR]
-    Portal -->|Cloudflare Access| CF
-```
+### Testing
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Unit/Component | Vitest | ^3.2.1 |
+| Coverage | @vitest/coverage-v8 | ^3.2.1 |
+| E2E | Playwright | ^1.58.2 |
+| Accessibility | @axe-core/playwright | ^4.11.1 |
+| Visual | Storybook | ^10.2.7 |
+| Storybook Framework | storybook-astro | ^0.1.0 |
+| Visual Regression | Chromatic | ^15.1.1 |
+| Performance | @lhci/cli (Lighthouse CI) | ^0.15.1 |
 
-Page rendering uses a block-based dispatch system: each page stores an array of typed blocks in Sanity, and `BlockRenderer.astro` maps each `_type` to its component via `block-registry.ts` with spread props.
+### Tooling
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Linting | ESLint | ^9.38.0 |
+| Formatting | Prettier | ^3.6.2 |
+| Concurrency | concurrently | ^9.1.0 |
+| Release | semantic-release (conventional commits) | - |
+| Node (CI) | 22 (most workflows), 24 (release) | - |
+| Node (Docker) | 24-slim | - |
+| UI Scaffolding | shadcn | ^4.0.0 |
 
-For the full architecture breakdown including SSR/SSG modes, block dispatch pipeline, and infrastructure details, see [architecture.md](architecture.md).
+## Architecture Summary
+- Output: Static-first (`output: "static"`) with per-route SSR via Cloudflare Workers
+- Public pages: Prerendered at build time (SSG) — 8 routes
+- Portal/Auth pages: Server-rendered at request time (SSR) — 9 routes
+- API endpoints: 5 server-side endpoints for auth, portal data, health checks
+- Content: All content from Sanity CMS via GROQ API (no Astro content collections)
+- Auth: Better Auth with Google OAuth, GitHub OAuth, Magic Link (Resend email)
+- Database: Cloudflare D1 (SQLite) via Drizzle ORM for auth sessions
+- Rate Limiting: Per-IP sliding window via Cloudflare Durable Objects
+- Visual Editing: Sanity Presentation tool with stega encoding
+- Live Content: Sanity Live Content API with sync tags for real-time updates
+- Multi-site: 3 variants via env vars (PUBLIC_SITE_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_DATASET)
 
-## Content Model Overview
+## Key Metrics (as of scan date 2026-03-11)
+- Routes: 20 total (8 SSG, 9 SSR, 5 API)
+- Layouts: 8 (3 main + 5 templates)
+- Block Components: 115+ (generic UI blocks) + 23 custom Sanity blocks
+- UI Primitive Families: 39
+- Schema Types: 51 (7 documents, 14 objects, 25 blocks, 5 helpers)
+- GROQ Queries: 15+ (all using defineQuery)
+- Lib Utilities: 14 files
+- Test Files: 58 unit/component + 14 E2E + 22 integration = 94 total
+- Storybook Stories: 120+
+- GitHub Actions Workflows: 6
+- Docker Services: 5 (main + 2 RWC variants + studio + storybook)
+- Environment Variables: 30+ public + 8+ server secrets
 
-The content lake (Sanity project `49nk9b0w`, dataset `production`) contains 40 user documents across 7 document types:
+## Links
+- [Architecture](./architecture.md)
+- [Source Tree Analysis](./source-tree-analysis.md)
+- [Component Inventory](./component-inventory.md)
+- [Data Models](./data-models.md)
+- [Development Guide](./development-guide.md)
+- [Integration Architecture](./integration-architecture.md)
 
-| Document Type | Count | Purpose |
-|---|---|---|
-| Page | 8 | CMS-composed pages (block arrays + SEO metadata) |
-| Sponsor | 7 | Industry partner profiles with tier, logo, description |
-| Project | 7 | Capstone project proposals with tech tags, status, sponsor reference |
-| Event | 7 | Program dates, deadlines, milestones |
-| Testimonial | 10 | Quotes from past participants |
-| Site Settings | 1 | Global configuration (navigation, footer, social links, current semester) |
-| Submission | -- | Form submissions from sponsor inquiries |
-
-The page builder supports 13 custom block types (Hero Banner, Feature Grid, Sponsor Cards, Rich Text, CTA Banner, FAQ Section, Contact Form, Stats Row, Text with Image, Logo Cloud, Sponsor Steps, and more) plus 101 template blocks from fulldev/ui.
-
-For the complete entity-relationship diagram, field definitions, and schema details, see [data-models.md](data-models.md).
-
-## Key Features
-
-- **Page builder with 13 block types** -- Content editors compose pages by stacking blocks in Sanity Studio; no code changes needed
-- **5 page templates** -- Pre-configured layouts for common page patterns
-- **Visual editing** -- Real-time preview of draft content on the `preview` branch (SSR mode)
-- **Sponsor portal (SSR)** -- Authenticated area for sponsors, protected by Cloudflare Access (Zero Trust)
-- **Block auto-discovery** -- `block-registry.ts` automatically registers all block components; no manual wiring
-- **508 components** -- 13 custom blocks, 101 template blocks, 39 UI primitives, 14 top-level, and 5 portal components
-- **153 Storybook stories** -- Component documentation and visual testing
-- **563 test cases** -- Unit tests (Vitest), component tests (Container API), and E2E tests (Playwright + axe-core)
-- **GTM analytics** -- Google Tag Manager integration for event tracking
-- **Automated releases** -- semantic-release with Conventional Commits generates changelogs, tags, and GitHub Releases
-- **$0/month hosting** -- Free tiers across Cloudflare Pages, Sanity, and GitHub
-
-## Deployment Targets
-
-| Target | Platform | Trigger | Mode |
-|---|---|---|---|
-| Production site | Cloudflare Pages | Push to `main` | Static (SSG) |
-| Preview deployments | Cloudflare Pages | Push to any branch | SSR (Visual Editing ON) |
-| Sanity Studio | Sanity hosted | `npx sanity deploy` | Hosted |
-| Storybook | GitHub Pages | Push to `main` (component changes) | Static |
-| CI checks | GitHub Actions | Pull requests | 7 workflows |
-
-Branch strategy: `feature/*` --> `preview` --> `main`. Merges to `main` trigger semantic-release for automated versioning.
-
-## Related Documentation
-
-| Document | Description |
-|---|---|
-| [README.md](../README.md) | Getting started, development commands, contributing guide |
-| [Architecture](architecture.md) | SSR/SSG modes, block dispatch pipeline, infrastructure diagram |
-| [Data Models](data-models.md) | Full content model, entity relationships, schema definitions |
-| [Cloudflare Guide](cloudflare-guide.md) | Deployment configuration, environment variables, Cloudflare Access |
-| [GitHub Issues and Projects Guide](team/github-issues-and-projects-guide.md) | Issue tracking, project board setup, workflow automation |
-| [CHANGELOG](../CHANGELOG.md) | Auto-generated version history |
+---
+*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*

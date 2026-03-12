@@ -8,7 +8,7 @@
  * The component fetches its own data, selects the template, and renders blocks.
  */
 import BlockRenderer from '@/components/BlockRenderer.astro';
-import { getPage, getAllSponsors, getAllTestimonials, getAllEvents, getSyncTags, resetSyncTags } from '@/lib/sanity';
+import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getSyncTags, resetSyncTags } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 
 import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
@@ -39,6 +39,7 @@ resetSyncTags();
 
 const page = await getPage(slug);
 const sponsors = await getAllSponsors();
+const projects = await getAllProjects();
 const testimonials = await getAllTestimonials();
 const events = await getAllEvents();
 
@@ -52,7 +53,7 @@ const TemplateComponent = templates[template] ?? DefaultTemplate;
 {page ? (
   <>
     <TemplateComponent>
-      <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
+      <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
     </TemplateComponent>
     {islandSyncTags.length > 0 && (
       <script define:vars={{ syncTags: islandSyncTags }}>

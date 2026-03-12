@@ -120,6 +120,7 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
       github: {
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET,
+        scope: ['repo'],
       },
     },
     account: {
