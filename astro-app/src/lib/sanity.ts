@@ -331,7 +331,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   mentor{ name, title, department },
   outcome,
   seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
-  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
+  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
 /**
@@ -350,7 +350,7 @@ export async function getProjectBySlug(slug: string): Promise<PROJECT_BY_SLUG_QU
  * Fetched once per build and shared across all blocks that need testimonial data.
  */
 export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){
-  _id, name, quote, role, organization, type,
+  _id, name, quote, role, organization, type, videoUrl,
   photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   project->{ _id, title, "slug": slug.current }
 }`);

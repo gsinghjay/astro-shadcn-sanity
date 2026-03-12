@@ -1,7 +1,8 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import Testimonials from '../blocks/custom/Testimonials.astro';
-import { testimonialsFull, testimonialsMinimal, testimonialsByProject } from './__fixtures__/testimonials';
+import TestimonialCard from '../TestimonialCard.astro';
+import { testimonialsData, testimonialsFull, testimonialsMinimal, testimonialsByProject } from './__fixtures__/testimonials';
 
 describe('Testimonials', () => {
   test('renders heading and testimonial names', async () => {
@@ -97,5 +98,54 @@ describe('Testimonials', () => {
       props: testimonialsMinimal,
     });
     expect(html).toBeDefined();
+  });
+
+  test('renders YouTube video embed with privacy-enhanced URL', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[0] },
+    });
+    expect(html).toContain('youtube-nocookie.com/embed/dQw4w9WgXcQ');
+  });
+
+  test('renders YouTube short URL video embed', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[2] },
+    });
+    expect(html).toContain('youtube-nocookie.com/embed/jNQXAC9IVRw');
+  });
+
+  test('uses lazy loading on video iframes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[0] },
+    });
+    expect(html).toContain('loading="lazy"');
+  });
+
+  test('sets accessible title on video iframes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[0] },
+    });
+    expect(html).toContain('title="Jane Smith video testimonial"');
+  });
+
+  test('does not render iframe when videoUrl is null', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[1] },
+    });
+    expect(html).not.toContain('<iframe');
+  });
+
+  test('renders quote text below video embed', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(TestimonialCard, {
+      props: { testimonial: testimonialsData[0] },
+    });
+    expect(html).toContain('<iframe');
+    expect(html).toContain('This project transformed our workflow');
   });
 });

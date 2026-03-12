@@ -7,14 +7,42 @@ interface Props {
   testimonial: Testimonial;
 }
 
+function getEmbedUrl(videoUrl: string): string | null {
+  let videoId: string | null = null;
+  const watchMatch = videoUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
+  if (watchMatch) videoId = watchMatch[1];
+  if (!videoId) {
+    const shortMatch = videoUrl.match(/youtu\.be\/([^?&]+)/);
+    if (shortMatch) videoId = shortMatch[1];
+  }
+  if (!videoId) {
+    const embedMatch = videoUrl.match(/youtube\.com\/embed\/([^?&]+)/);
+    if (embedMatch) videoId = embedMatch[1];
+  }
+  return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
+}
+
 const { testimonial: t } = Astro.props;
 const photoUrl = t.photo
   ? safeUrlFor(t.photo)?.width(80).height(80).fit('crop').url() ?? null
   : null;
 const projectSlug = t.project ? stegaClean(t.project.slug) : null;
+const embedUrl = t.videoUrl ? getEmbedUrl(t.videoUrl) : null;
 ---
 
 <div class="flex flex-col gap-4 border border-border bg-card p-6">
+  {embedUrl && (
+    <div class="aspect-video w-full overflow-hidden rounded-md mb-4">
+      <iframe
+        src={embedUrl}
+        title={`${t.name} video testimonial`}
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        class="h-full w-full border-0"
+      ></iframe>
+    </div>
+  )}
   <blockquote class="text-base italic text-card-foreground leading-relaxed">"{t.quote}"</blockquote>
   <div class="flex items-center gap-3">
     {photoUrl ? (

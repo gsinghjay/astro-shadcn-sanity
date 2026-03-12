@@ -60,6 +60,17 @@ export const testimonial = defineType({
       ],
     }),
     defineField({
+      name: 'videoUrl',
+      title: 'Video URL',
+      type: 'url',
+      description: 'Optional YouTube URL for video testimonials',
+      validation: (Rule) =>
+        Rule.uri({scheme: ['https']}).custom((url) => {
+          if (!url) return true
+          return /youtube\.com|youtu\.be/.test(url) || 'Only YouTube URLs are supported'
+        }),
+    }),
+    defineField({
       name: 'project',
       title: 'Project',
       type: 'reference',
