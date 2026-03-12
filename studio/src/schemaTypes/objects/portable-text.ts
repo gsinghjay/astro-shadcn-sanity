@@ -74,6 +74,7 @@ export const portableText = defineType({
         }),
       ],
     }),
+    defineArrayMember({type: 'videoEmbed'}),
     defineArrayMember({
       name: 'callout',
       type: 'object',

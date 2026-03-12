@@ -11,6 +11,7 @@ interface DefineBlockConfig {
   icon?: ComponentType
   variants?: {name: string; title: string}[]
   hiddenByVariant?: Record<string, string[]>
+  components?: {preview?: ComponentType<any>}
 }
 
 export function defineBlock(config: DefineBlockConfig) {
@@ -74,5 +75,6 @@ export function defineBlock(config: DefineBlockConfig) {
       },
     },
     icon: config.icon,
+    ...(config.components ? {components: config.components} : {}),
   })
 }
