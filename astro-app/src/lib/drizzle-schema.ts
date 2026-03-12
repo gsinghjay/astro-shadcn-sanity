@@ -95,6 +95,23 @@ export const verification = sqliteTable(
   table => [index('verification_identifier_idx').on(table.identifier)],
 );
 
+// ── Project GitHub Repos (sponsor self-serve repo linking) ───────────
+export const projectGithubRepos = sqliteTable(
+  'project_github_repos',
+  {
+    id: text('id').primaryKey(),
+    userEmail: text('user_email').notNull(),
+    projectSanityId: text('project_sanity_id').notNull(),
+    githubRepo: text('github_repo').notNull(),
+    linkedAt: integer('linked_at', { mode: 'timestamp_ms' })
+      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
+      .notNull(),
+  },
+  table => [
+    index('idx_github_repos_user').on(table.userEmail),
+  ],
+);
+
 // ── Relations ─────────────────────────────────────────────────────────
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
