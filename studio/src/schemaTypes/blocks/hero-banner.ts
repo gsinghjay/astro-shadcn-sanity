@@ -7,6 +7,16 @@ export const heroBanner = defineBlock({
   title: 'Hero Banner',
   icon: RocketIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'centered', title: 'Centered'},
+    {name: 'split', title: 'Split'},
+    {name: 'split-asymmetric', title: 'Split Asymmetric'},
+    {name: 'overlay', title: 'Overlay'},
+    {name: 'spread', title: 'Spread'},
+  ],
+  hiddenByVariant: {
+    alignment: ['split', 'split-asymmetric', 'spread'],
+  },
   fields: [
     defineField({
       name: 'heading',

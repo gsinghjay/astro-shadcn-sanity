@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
+import AddToCalendar from '@/components/AddToCalendar.astro';
 import { sanityClient, ALL_EVENT_SLUGS_QUERY, getEventBySlug, getSiteSettings, getSiteParams } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
@@ -118,6 +119,18 @@ const eventJsonLd = {
           <h2 class="text-2xl font-bold mb-4">Description</h2>
           <p class="text-lg leading-relaxed">{event.description}</p>
         </div>
+      )}
+
+      {event.date && (
+        <AddToCalendar
+          title={stegaClean(event.title) ?? ''}
+          date={event.date}
+          endDate={event.endDate}
+          location={event.location ? stegaClean(event.location) : null}
+          description={event.description ? stegaClean(event.description) : null}
+          slug={stegaClean(event.slug) ?? slug}
+          siteUrl={Astro.site?.origin ?? 'https://ywcc-capstone.pages.dev'}
+        />
       )}
 
       <a href="/events" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">

@@ -1,6 +1,7 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
-import { urlFor } from '@/lib/image';
+import { safeUrlFor } from '@/lib/image';
+import VideoEmbed from '@/components/VideoEmbed.astro';
 import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
@@ -9,12 +10,15 @@ interface Props {
 
 const { testimonial: t } = Astro.props;
 const photoUrl = t.photo
-  ? urlFor(t.photo as unknown as Parameters<typeof urlFor>[0]).width(80).height(80).fit('crop').url()
+  ? safeUrlFor(t.photo)?.width(80).height(80).fit('crop').url() ?? null
   : null;
 const projectSlug = t.project ? stegaClean(t.project.slug) : null;
 ---
 
-<div class="flex flex-col gap-4 rounded-lg border border-border bg-card p-6">
+<div class="flex flex-col gap-4 border border-border bg-card p-6">
+  {t.videoUrl && (
+    <VideoEmbed url={stegaClean(t.videoUrl)} title={`${stegaClean(t.name)} video testimonial`} />
+  )}
   <blockquote class="text-base italic text-card-foreground leading-relaxed">"{t.quote}"</blockquote>
   <div class="flex items-center gap-3">
     {photoUrl ? (
@@ -24,10 +28,10 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
         width="48"
         height="48"
         loading="lazy"
-        class="rounded-full object-cover w-12 h-12 flex-shrink-0"
+        class="object-cover w-12 h-12 flex-shrink-0"
       />
     ) : (
-      <div class="w-12 h-12 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+      <div class="w-12 h-12 bg-muted flex items-center justify-center flex-shrink-0">
         <span class="text-sm font-bold text-muted-foreground">
           {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
         </span>

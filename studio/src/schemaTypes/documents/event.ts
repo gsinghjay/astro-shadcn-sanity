@@ -79,19 +79,20 @@ export const event = defineType({
       initialValue: false,
     }),
     defineField({
-      name: 'color',
-      title: 'Calendar Color',
+      name: 'category',
+      title: 'Event Category',
       type: 'string',
       group: 'main',
-      description: 'Optional calendar color override. Falls back to event type color if not set.',
+      description: 'Semantic event category. The frontend maps categories to calendar colors.',
       options: {
         list: [
-          {title: 'Red', value: 'red'},
-          {title: 'Blue', value: 'blue'},
-          {title: 'Green', value: 'green'},
-          {title: 'Orange', value: 'orange'},
-          {title: 'Purple', value: 'purple'},
+          {title: 'Workshop', value: 'workshop'},
+          {title: 'Lecture', value: 'lecture'},
+          {title: 'Social', value: 'social'},
+          {title: 'Competition', value: 'competition'},
+          {title: 'Other', value: 'other'},
         ],
+        layout: 'radio',
       },
     }),
     defineField({
@@ -99,6 +100,7 @@ export const event = defineType({
       title: 'Event Type',
       type: 'string',
       group: 'main',
+      description: 'Program format (showcase, networking, workshop). Use "Event Category" above for semantic classification that drives calendar colors.',
       options: {
         list: [
           {title: 'Showcase', value: 'showcase'},

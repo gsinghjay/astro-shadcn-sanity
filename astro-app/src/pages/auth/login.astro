@@ -1,0 +1,69 @@
+---
+/**
+ * Student sign-in page — auto-triggers Google OAuth via Better Auth client.
+ * Located outside /student/* to avoid middleware auth redirect loop.
+ * Accepts ?redirect= query parameter for post-login navigation.
+ * Must be SSR since it depends on client-side auth flow at runtime.
+ */
+export const prerender = false;
+
+import "../../styles/global.css";
+
+function safeRedirect(url: string | null, fallback: string): string {
+  if (!url) return fallback;
+  if (url.startsWith('/') && !url.startsWith('//')) return url;
+  return fallback;
+}
+
+const redirect = safeRedirect(Astro.url.searchParams.get('redirect'), '/student/');
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Student Sign In</title>
+  </head>
+  <body class="bg-background text-foreground min-h-screen flex items-center justify-center p-4" data-redirect={redirect}>
+    <div class="text-center">
+      <p class="text-muted-foreground text-sm" id="status-msg">Redirecting to Google sign-in...</p>
+      <div id="error-fallback" hidden>
+        <p class="text-destructive text-sm mb-4">Unable to connect to Google sign-in.</p>
+        <a
+          href={`/auth/login?redirect=${encodeURIComponent(redirect)}`}
+          class="text-primary text-sm font-medium underline underline-offset-4"
+        >
+          Try again
+        </a>
+      </div>
+    </div>
+    <script>
+      import { authClient } from "@/lib/auth-client";
+
+      function safeRedirect(url: string | null, fallback: string): string {
+        if (!url) return fallback;
+        if (url.startsWith('/') && !url.startsWith('//')) return url;
+        return fallback;
+      }
+
+      const serverRedirect = document.body.getAttribute('data-redirect') || '/student/';
+      const redirectParam = safeRedirect(
+        new URLSearchParams(window.location.search).get('redirect'),
+        serverRedirect
+      );
+
+      try {
+        await authClient.signIn.social({
+          provider: "google",
+          callbackURL: redirectParam,
+        });
+      } catch {
+        const statusEl = document.getElementById('status-msg');
+        const errorEl = document.getElementById('error-fallback');
+        if (statusEl) statusEl.hidden = true;
+        if (errorEl) errorEl.hidden = false;
+      }
+    </script>
+  </body>
+</html>

@@ -4,7 +4,6 @@ import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
 import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '../lib/sanity';
 import { urlFor } from '../lib/image';
-import type { Image } from '@sanity/types';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
@@ -30,7 +29,7 @@ const heroImage = firstBlock?._type === 'heroBanner'
   ? (firstBlock as { backgroundImages?: Array<{ asset?: { _id: string } | null }> }).backgroundImages?.[0]
   : null;
 const preloadImageUrl = heroImage?.asset
-  ? urlFor(heroImage as unknown as Image).width(1920).height(1080).fit('crop').url()
+  ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
 ---
 

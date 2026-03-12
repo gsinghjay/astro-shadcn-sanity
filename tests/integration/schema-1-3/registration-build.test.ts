@@ -8,9 +8,12 @@
  * @phase GREEN
  */
 import { describe, test, expect, beforeAll } from 'vitest'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
+import { promisify } from 'util'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
+
+const execAsync = promisify(exec)
 
 import { BUILD_TIMEOUT_MS } from '../../support/constants'
 
@@ -78,8 +81,8 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
   // AC10: Studio Build Verification
   // ---------------------------------------------------------------------------
   describe('AC10: Studio Build Verification', () => {
-    test('[P0] 1.3-INT-034 — studio builds without schema errors', () => {
-      const result = execSync('npm run build', {
+    test('[P0] 1.3-INT-034 — studio builds without schema errors', async () => {
+      const result = await execAsync('npm run build', {
         cwd: STUDIO_ROOT,
         encoding: 'utf-8',
         timeout: BUILD_TIMEOUT_MS,
@@ -92,7 +95,7 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         },
       })
 
-      expect(result).toBeDefined()
+      expect(result.stdout).toBeDefined()
     }, BUILD_TIMEOUT_MS)
   })
 })

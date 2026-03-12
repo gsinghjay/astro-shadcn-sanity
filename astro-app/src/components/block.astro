@@ -12,6 +12,7 @@ const matchedEntry = blockName
   ? Object.entries(allBlocks).find(([path]) => path.includes(`/${blockName}.astro`))
   : undefined
 
+// import.meta.glob returns Record<string, unknown> — .default access requires type assertion
 const BlockComponent = matchedEntry ? (matchedEntry[1] as any).default : undefined
 ---
 

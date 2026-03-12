@@ -1,0 +1,29 @@
+---
+import type { DividerBlock } from '@/lib/types';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props extends DividerBlock {
+  class?: string;
+  id?: string;
+}
+
+const { label, variant: rawVariant } = Astro.props;
+
+const variant = stegaClean(rawVariant) ?? 'line';
+---
+
+{variant === 'line' && (
+  <hr class="border-t border-border w-full" />
+)}
+
+{variant === 'short' && (
+  <div class="w-16 border-t border-border mx-auto"></div>
+)}
+
+{variant === 'labeled' && (
+  <div class="flex items-center gap-4 w-full">
+    <div class="flex-grow border-t border-border"></div>
+    <span class="label-caps text-muted-foreground">{label}</span>
+    <div class="flex-grow border-t border-border"></div>
+  </div>
+)}

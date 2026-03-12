@@ -4,10 +4,13 @@
  * @story 1-4
  */
 import { describe, test, expect, beforeAll } from 'vitest'
-import { execSync } from 'child_process'
+import { exec } from 'child_process'
+import { promisify } from 'util'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
+
+const execAsync = promisify(exec)
 
 import { BLOCK_NAMES, BUILD_TIMEOUT_MS } from '../support/constants'
 
@@ -210,11 +213,11 @@ describe('Story 1-4: Storybook Setup', () => {
   // AC8: Build Verification
   // ---------------------------------------------------------------------------
   describe('AC8: Build Verification', () => {
-    test('[P0] 1.4-INT-011 — storybook build succeeds and produces valid iframe.html', () => {
-      let result: string
+    test('[P0] 1.4-INT-011 — storybook build succeeds and produces valid iframe.html', async () => {
+      let result: { stdout: string; stderr: string }
 
       try {
-        result = execSync('npm run build-storybook', {
+        result = await execAsync('npm run build-storybook', {
           cwd: ASTRO_APP,
           encoding: 'utf-8',
           timeout: BUILD_TIMEOUT_MS,
@@ -231,7 +234,7 @@ describe('Story 1-4: Storybook Setup', () => {
         )
       }
 
-      expect(result).toBeDefined()
+      expect(result.stdout).toBeDefined()
 
       // Verify iframe.html exists and is not an empty chunk (Story 1.5 fix)
       const iframePath = path.join(ASTRO_APP, 'storybook-static', 'iframe.html')

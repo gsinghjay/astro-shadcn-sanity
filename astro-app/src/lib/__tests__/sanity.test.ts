@@ -30,6 +30,7 @@ const {
   ALL_EVENTS_QUERY,
   ALL_EVENT_SLUGS_QUERY,
   ALL_TESTIMONIALS_QUERY,
+  SPONSOR_PROJECTS_QUERY,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -56,6 +57,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSORS_QUERY targets sponsor type with full projection", () => {
     expect(ALL_SPONSORS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSORS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSORS_QUERY).toContain("name");
     expect(ALL_SPONSORS_QUERY).toContain("slug.current");
     expect(ALL_SPONSORS_QUERY).toContain("tier");
@@ -65,6 +67,7 @@ describe("GROQ query definitions", () => {
 
   it("ALL_SPONSOR_SLUGS_QUERY targets sponsor type with slug projection", () => {
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain('_type == "sponsor"');
+    expect(ALL_SPONSOR_SLUGS_QUERY).toContain("hidden != true");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("defined(slug.current)");
     expect(ALL_SPONSOR_SLUGS_QUERY).toContain("slug.current");
   });
@@ -107,7 +110,7 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("sponsor->");
     expect(PROJECT_BY_SLUG_QUERY).toContain("technologyTags");
     expect(PROJECT_BY_SLUG_QUERY).toContain("team[]");
-    expect(PROJECT_BY_SLUG_QUERY).toContain("mentor");
+    expect(PROJECT_BY_SLUG_QUERY).toContain("mentor{ name, title, department }");
     expect(PROJECT_BY_SLUG_QUERY).toContain("outcome");
     expect(PROJECT_BY_SLUG_QUERY).toContain("seo");
   });
@@ -117,10 +120,10 @@ describe("GROQ query definitions", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain("project._ref == ^._id");
   });
 
-  it("ALL_EVENTS_QUERY includes calendar-friendly fields (isAllDay, color)", () => {
+  it("ALL_EVENTS_QUERY includes calendar-friendly fields (isAllDay, category)", () => {
     expect(ALL_EVENTS_QUERY).toContain('_type == "event"');
     expect(ALL_EVENTS_QUERY).toContain("isAllDay");
-    expect(ALL_EVENTS_QUERY).toContain("color");
+    expect(ALL_EVENTS_QUERY).toContain("category");
     expect(ALL_EVENTS_QUERY).toContain("description");
     expect(ALL_EVENTS_QUERY).toContain("eventType");
   });
@@ -136,7 +139,7 @@ describe("GROQ query definitions", () => {
     expect(EVENTS_BY_MONTH_QUERY).toContain("status");
     expect(EVENTS_BY_MONTH_QUERY).toContain("description");
     expect(EVENTS_BY_MONTH_QUERY).toContain("isAllDay");
-    expect(EVENTS_BY_MONTH_QUERY).toContain("color");
+    expect(EVENTS_BY_MONTH_QUERY).toContain("category");
   });
 
   it("EVENT_BY_SLUG_QUERY fetches single event by slug with all fields", () => {
@@ -148,6 +151,8 @@ describe("GROQ query definitions", () => {
     expect(EVENT_BY_SLUG_QUERY).toContain("description");
     expect(EVENT_BY_SLUG_QUERY).toContain("eventType");
     expect(EVENT_BY_SLUG_QUERY).toContain("status");
+    expect(EVENT_BY_SLUG_QUERY).toContain("isAllDay");
+    expect(EVENT_BY_SLUG_QUERY).toContain("category");
     expect(EVENT_BY_SLUG_QUERY).toContain("seo");
   });
 
@@ -164,6 +169,17 @@ describe("GROQ query definitions", () => {
       "faqSection",
       "contactForm",
       "sponsorCards",
+      // Story 2.9 — content display
+      "teamGrid",
+      "imageGallery",
+      "articleList",
+      // Story 2.10 — data/editorial
+      "comparisonTable",
+      "timeline",
+      "pullquote",
+      // Story 2.11 — utility
+      "divider",
+      "announcementBar",
     ];
     for (const blockType of blockTypes) {
       expect(PAGE_BY_SLUG_QUERY).toContain(`_type == "${blockType}"`);
@@ -189,6 +205,18 @@ describe("GROQ query definitions", () => {
 
   it("PAGE_BY_SLUG_QUERY sponsorCards projection includes config fields", () => {
     expect(PAGE_BY_SLUG_QUERY).toContain("displayMode");
+  });
+
+  it("SPONSOR_PROJECTS_QUERY fetches projects by sponsor email", () => {
+    expect(SPONSOR_PROJECTS_QUERY).toContain('_type == "project"');
+    expect(SPONSOR_PROJECTS_QUERY).toContain('_type == "sponsor"');
+    expect(SPONSOR_PROJECTS_QUERY).toContain("contactEmail");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("allowedEmails");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("$email");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("title");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("slug.current");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("status");
+    expect(SPONSOR_PROJECTS_QUERY).toContain("order(title asc)");
   });
 });
 

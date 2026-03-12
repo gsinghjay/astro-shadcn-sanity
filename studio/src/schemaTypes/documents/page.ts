@@ -12,6 +12,10 @@ export const wideBlockWarnings: Record<string, string[]> = {
   statsRow: ['sidebar'],
   logoCloud: ['sidebar'],
   sponsorCards: ['sidebar'],
+  projectCards: ['sidebar'],
+  imageGallery: ['sidebar'],
+  comparisonTable: ['sidebar', 'twoColumn'],
+  videoEmbed: ['sidebar'],
 }
 
 /**
@@ -108,6 +112,17 @@ export const page = defineType({
         defineArrayMember({type: 'textWithImage'}),
         defineArrayMember({type: 'testimonials'}),
         defineArrayMember({type: 'eventList'}),
+        defineArrayMember({type: 'projectCards'}),
+        defineArrayMember({type: 'teamGrid'}),
+        defineArrayMember({type: 'imageGallery'}),
+        defineArrayMember({type: 'articleList'}),
+        defineArrayMember({type: 'comparisonTable'}),
+        defineArrayMember({type: 'timeline'}),
+        defineArrayMember({type: 'pullquote'}),
+        defineArrayMember({type: 'divider'}),
+        defineArrayMember({type: 'announcementBar'}),
+        defineArrayMember({type: 'sponsorshipTiers'}),
+        defineArrayMember({type: 'videoEmbed'}),
       ],
       validation: (Rule) =>
         Rule.custom((blocks, context) => {
@@ -125,15 +140,22 @@ export const page = defineType({
             {
               name: 'content',
               title: 'Content',
-              of: ['richText', 'textWithImage', 'faqSection'],
+              of: ['richText', 'textWithImage', 'faqSection', 'articleList', 'timeline', 'pullquote'],
+            },
+            {
+              name: 'display',
+              title: 'Display',
+              of: ['teamGrid', 'imageGallery'],
             },
             {
               name: 'media',
               title: 'Media & Stats',
-              of: ['statsRow', 'featureGrid'],
+              of: ['statsRow', 'featureGrid', 'videoEmbed'],
             },
-            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList']},
+            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList', 'sponsorshipTiers']},
+            {name: 'data', title: 'Data', of: ['comparisonTable']},
             {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm']},
+            {name: 'utility', title: 'Utility', of: ['divider', 'announcementBar']},
           ],
           views: [
             {name: 'list'},

@@ -1,0 +1,97 @@
+---
+import type { PullquoteBlock } from '@/lib/types';
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
+
+interface Props extends PullquoteBlock {
+  class?: string;
+  id?: string;
+}
+
+const { quote, attribution, role, image, variant: rawVariant } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'centered';
+const imgSrc = safeUrlFor(image)?.width(120).height(120).fit('crop').url() ?? null;
+const lqip = image?.asset?.metadata?.lqip;
+const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '';
+---
+
+{variant === 'centered' && (
+  <Section data-animate>
+    <SectionContent class="items-center text-center max-w-4xl mx-auto">
+      <div class="text-8xl text-primary font-serif leading-none select-none" aria-hidden="true">&ldquo;</div>
+      <blockquote class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">
+        {quote}
+      </blockquote>
+      {attribution && (
+        <div class="flex items-center gap-3 mt-6">
+          {imgSrc && (
+            <Avatar>
+              <AvatarImage
+                src={imgSrc}
+                alt={image?.alt || attribution}
+                style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+              />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+          )}
+          <div class="text-muted-foreground">
+            <span class="font-medium text-foreground">{attribution}</span>
+            {role && <span class="block text-sm">{role}</span>}
+          </div>
+        </div>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'split' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionContent class="justify-center">
+        <div class="text-8xl text-primary font-serif leading-none select-none" aria-hidden="true">&ldquo;</div>
+        <blockquote class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.1]">
+          {quote}
+        </blockquote>
+      </SectionContent>
+
+      <SectionContent class="justify-center">
+        {imgSrc && (
+          <Avatar class="w-16 h-16">
+            <AvatarImage
+              src={imgSrc}
+              alt={image?.alt || attribution || ''}
+              style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+            />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+        )}
+        {attribution && (
+          <div class="text-muted-foreground">
+            <span class="font-medium text-foreground text-lg">{attribution}</span>
+            {role && <span class="block text-sm">{role}</span>}
+          </div>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{variant === 'sidebar' && (
+  <Section data-animate>
+    <SectionContent class="max-w-2xl">
+      <blockquote class="border-l-4 border-primary pl-6">
+        <div class="text-xl font-bold tracking-[-0.03em] leading-[1.2]">
+          {quote}
+        </div>
+        {attribution && (
+          <div class="text-muted-foreground mt-4">
+            <span class="font-medium text-foreground">{attribution}</span>
+            {role && <span class="block text-sm">{role}</span>}
+          </div>
+        )}
+      </blockquote>
+    </SectionContent>
+  </Section>
+)}

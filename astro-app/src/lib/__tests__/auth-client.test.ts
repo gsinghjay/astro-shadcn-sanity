@@ -1,16 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
 
-const { mockCreateAuthClient } = vi.hoisted(() => {
+const { mockCreateAuthClient, mockMagicLinkClient } = vi.hoisted(() => {
   const mockCreateAuthClient = vi.fn().mockReturnValue({
-    signIn: { social: vi.fn() },
+    signIn: { social: vi.fn(), magicLink: vi.fn() },
     signOut: vi.fn(),
     getSession: vi.fn(),
   });
-  return { mockCreateAuthClient };
+  const mockMagicLinkClient = vi.fn().mockReturnValue({ id: 'magic-link' });
+  return { mockCreateAuthClient, mockMagicLinkClient };
 });
 
 vi.mock('better-auth/client', () => ({
   createAuthClient: mockCreateAuthClient,
+}));
+
+vi.mock('better-auth/client/plugins', () => ({
+  magicLinkClient: mockMagicLinkClient,
 }));
 
 import { authClient } from '@/lib/auth-client';
@@ -25,6 +30,10 @@ describe('authClient — client-side auth', () => {
     expect(authClient.signIn.social).toBeTypeOf('function');
   });
 
+  it('provides signIn.magicLink method', () => {
+    expect(authClient.signIn.magicLink).toBeTypeOf('function');
+  });
+
   it('provides signOut method', () => {
     expect(authClient.signOut).toBeTypeOf('function');
   });
@@ -33,9 +42,17 @@ describe('authClient — client-side auth', () => {
     expect(authClient.getSession).toBeTypeOf('function');
   });
 
-  it('configures baseURL to /api/auth', () => {
+  it('configures baseURL ending in /api/auth', () => {
+    const config = mockCreateAuthClient.mock.calls[0][0];
+    expect(config.baseURL).toMatch(/\/api\/auth$/);
+  });
+
+  it('includes magicLinkClient plugin', () => {
+    expect(mockMagicLinkClient).toHaveBeenCalled();
     expect(mockCreateAuthClient).toHaveBeenCalledWith(
-      expect.objectContaining({ baseURL: '/api/auth' }),
+      expect.objectContaining({
+        plugins: expect.arrayContaining([{ id: 'magic-link' }]),
+      }),
     );
   });
 });

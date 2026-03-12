@@ -14,6 +14,11 @@ interface SanityEventData {
   date: string | null;
   endDate: string | null;
   eventType: string | null;
+  isAllDay: boolean | null;
+  description: string | null;
+  location: string | null;
+  status: string | null;
+  category: string | null;
 }
 
 /** Strip stega invisible characters from a string. */
@@ -23,8 +28,21 @@ function clean(val: string | null): string {
   return val.replace(/[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\uFE00-\uFE0F\uDB40-\uDBFF][\uDC00-\uDFFF]?/g, '');
 }
 
-/** Map eventType to calendarId for color-coding. */
-function getCalendarId(eventType: string | null): string {
+// Keep in sync with CATEGORY_TO_CALENDAR_ID in calendar-utils.ts
+const CATEGORY_TO_CALENDAR_ID: Record<string, string> = {
+  workshop: 'workshop',
+  lecture: 'networking',
+  social: 'showcase',
+  competition: 'showcase',
+  other: 'workshop',
+};
+
+/** Map category (preferred) or eventType to calendarId for color-coding. */
+function getCalendarId(category: string | null, eventType: string | null): string {
+  const cleanedCategory = clean(category);
+  if (cleanedCategory && CATEGORY_TO_CALENDAR_ID[cleanedCategory]) {
+    return CATEGORY_TO_CALENDAR_ID[cleanedCategory];
+  }
   const cleaned = clean(eventType);
   switch (cleaned) {
     case 'showcase':
@@ -38,9 +56,12 @@ function getCalendarId(eventType: string | null): string {
   }
 }
 
-/** Parse ISO date string to Temporal.ZonedDateTime via global Temporal. */
-function toTemporal(dateStr: string) {
+/** Parse ISO date string to Temporal date. Returns PlainDate for all-day, ZonedDateTime for timed. */
+function toTemporalDate(dateStr: string, isAllDay: boolean): Temporal.PlainDate | Temporal.ZonedDateTime {
   const cleaned = clean(dateStr);
+  if (isAllDay) {
+    return Temporal.PlainDate.from(cleaned.slice(0, 10));
+  }
   const instant = Temporal.Instant.from(cleaned);
   return instant.toZonedDateTimeISO('UTC');
 }
@@ -48,15 +69,18 @@ function toTemporal(dateStr: string) {
 /** Transform Sanity event to Schedule-X event format. */
 function toCalendarEvent(event: SanityEventData) {
   const now = Temporal.Now.zonedDateTimeISO('UTC');
+  const isAllDay = event.isAllDay ?? false;
   const startStr = clean(event.date);
   const endStr = clean(event.endDate) || startStr;
   return {
     id: clean(event._id),
     title: clean(event.title) || 'Untitled Event',
-    start: startStr ? toTemporal(startStr) : now,
-    end: endStr ? toTemporal(endStr) : now,
-    calendarId: getCalendarId(event.eventType),
-    _customContent: { slug: clean(event.slug) },
+    start: startStr ? toTemporalDate(startStr, isAllDay) : now,
+    end: endStr ? toTemporalDate(endStr, isAllDay) : now,
+    calendarId: getCalendarId(event.category, event.eventType),
+    location: clean(event.location) || undefined,
+    description: clean(event.description) || undefined,
+    _customContent: { slug: clean(event.slug), isAllDay },
   };
 }
 
@@ -157,15 +181,15 @@ export default function EventCalendarIsland({ events }: { events: string }) {
     <div className="sx-calendar-wrapper">
       <div className="mb-4 flex flex-wrap items-center gap-4 text-sm">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-red-600" />
+          <span className="inline-block h-4 w-4 bg-red-600" />
           Showcase
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-blue-600" />
+          <span className="inline-block h-4 w-4 bg-blue-600" />
           Networking
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-green-600" />
+          <span className="inline-block h-4 w-4 bg-green-600" />
           Workshop
         </span>
       </div>

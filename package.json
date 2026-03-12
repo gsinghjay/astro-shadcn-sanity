@@ -1,6 +1,6 @@
 {
   "name": "ywcc-capstone-template",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "YWCC Capstone Websites — Astro + Sanity monorepo",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
@@ -14,7 +14,8 @@
     "test:unit:watch": "npm run test:unit:watch --workspace=astro-app",
     "test:unit:coverage": "npm run test:unit:coverage --workspace=astro-app",
     "storybook": "npm run storybook --workspace=astro-app",
-    "typegen": "npm run typegen -w studio"
+    "typegen": "npm run typegen -w studio",
+    "deploy:rate-limiter": "cd rate-limiter-worker && npm run deploy"
   },
   "keywords": [
     "Sanity",
