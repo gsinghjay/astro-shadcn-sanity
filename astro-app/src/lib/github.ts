@@ -102,14 +102,17 @@ export async function getGitHubToken(
  * Parse "owner/repo" string into { owner, repo }.
  */
 export function parseGitHubRepo(githubRepo: string): { owner: string; repo: string } {
-  const [owner, repo] = githubRepo.split('/');
-  return { owner, repo };
+  const parts = githubRepo.split('/');
+  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+    throw new Error(`Invalid GitHub repo format: "${githubRepo}". Expected "owner/repo".`);
+  }
+  return { owner: parts[0], repo: parts[1] };
 }
 
 const GITHUB_API = 'https://api.github.com';
 const TIMEOUT_MS = 5000;
 
-async function githubFetch<T>(url: string, token: string): Promise<GitHubResult<T>> {
+async function githubFetch<T>(url: string, token: string, accept = 'application/vnd.github.v3+json'): Promise<GitHubResult<T>> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -117,7 +120,7 @@ async function githubFetch<T>(url: string, token: string): Promise<GitHubResult<
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github.v3+json',
+        Accept: accept,
         'User-Agent': 'astro-shadcn-sanity-portal',
       },
       signal: controller.signal,
@@ -213,14 +216,22 @@ export async function getReleases(config: GitHubApiConfig): Promise<GitHubResult
   return githubFetch<GitHubRelease[]>(
     `${GITHUB_API}/repos/${config.owner}/${config.repo}/releases?per_page=10`,
     config.token,
+    'application/vnd.github.full+json',
   );
+}
+
+export interface AllGitHubData {
+  overview: GitHubResult<RepoOverview>;
+  issues: GitHubResult<GitHubIssue[]>;
+  pullRequests: GitHubResult<{ open: GitHubPullRequest[]; recentlyMerged: GitHubPullRequest[] }>;
+  releases: GitHubResult<GitHubRelease[]>;
 }
 
 /**
  * Fetch all GitHub data for a repo in parallel.
  * Uses Promise.allSettled so partial failures don't block other sections.
  */
-export async function getAllGitHubData(config: GitHubApiConfig) {
+export async function getAllGitHubData(config: GitHubApiConfig): Promise<AllGitHubData> {
   const [overviewResult, issuesResult, prsResult, releasesResult] = await Promise.allSettled([
     getRepoOverview(config),
     getOpenIssues(config),

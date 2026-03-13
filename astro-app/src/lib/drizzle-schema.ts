@@ -5,7 +5,7 @@
  * These are the core tables Better Auth expects.
  */
 import { relations, sql } from 'drizzle-orm';
-import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index, unique } from 'drizzle-orm/sqlite-core';
 
 // ── User ──────────────────────────────────────────────────────────────
 export const user = sqliteTable('user', {
@@ -109,6 +109,7 @@ export const projectGithubRepos = sqliteTable(
   },
   table => [
     index('idx_github_repos_user').on(table.userEmail),
+    unique('uq_github_repos_user_project').on(table.userEmail, table.projectSanityId),
   ],
 );
 

@@ -50,6 +50,18 @@ describe('parseGitHubRepo()', () => {
       repo: 'my-repo',
     });
   });
+
+  it('throws on invalid format (no slash)', () => {
+    expect(() => parseGitHubRepo('noslash')).toThrow('Invalid GitHub repo format');
+  });
+
+  it('throws on empty string', () => {
+    expect(() => parseGitHubRepo('')).toThrow('Invalid GitHub repo format');
+  });
+
+  it('throws on too many slashes', () => {
+    expect(() => parseGitHubRepo('a/b/c')).toThrow('Invalid GitHub repo format');
+  });
 });
 
 // ── getGitHubToken ──
