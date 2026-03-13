@@ -99,7 +99,7 @@ export type GitHubResult<T> =
 
 export type GitHubTokenResult =
   | { token: string; error?: undefined }
-  | { token?: undefined; error: 'no-github-account' | 'missing-scope' };
+  | { token?: undefined; error: 'no-github-account' | 'missing-scope' | 'token-expired' };
 
 // ── Token Retrieval ──────────────────────────────────────────────────
 
@@ -111,18 +111,39 @@ export async function getGitHubToken(
   db: DrizzleD1Database<typeof schema>,
   email: string,
 ): Promise<GitHubTokenResult> {
-  const result = await db
-    .select({ accessToken: account.accessToken, scope: account.scope })
-    .from(account)
-    .innerJoin(user, eq(account.userId, user.id))
-    .where(and(eq(user.email, email), eq(account.providerId, 'github')))
-    .get();
+  let result;
+  try {
+    result = await db
+      .select({
+        accessToken: account.accessToken,
+        scope: account.scope,
+        accessTokenExpiresAt: account.accessTokenExpiresAt,
+      })
+      .from(account)
+      .innerJoin(user, eq(account.userId, user.id))
+      .where(and(eq(user.email, email), eq(account.providerId, 'github')))
+      .get();
+  } catch {
+    // D1 may not be available in dev mode (plain Astro dev server without wrangler)
+    result = null;
+  }
 
   if (!result?.accessToken) {
+    // Dev mode fallback: set GITHUB_DEV_TOKEN in .env for local testing
+    if (import.meta.env.DEV && import.meta.env.GITHUB_DEV_TOKEN) {
+      return { token: import.meta.env.GITHUB_DEV_TOKEN };
+    }
     return { error: 'no-github-account' };
   }
 
-  if (!result.scope?.includes('repo')) {
+  // Check token expiry (relevant for GitHub Apps; OAuth App tokens don't expire)
+  if (result.accessTokenExpiresAt && result.accessTokenExpiresAt.getTime() < Date.now()) {
+    return { error: 'token-expired' };
+  }
+
+  // Check scope — split on spaces or commas per OAuth2 spec
+  const scopes = result.scope?.split(/[\s,]+/) ?? [];
+  if (!scopes.includes('repo')) {
     return { error: 'missing-scope' };
   }
 
@@ -164,6 +185,17 @@ async function githubFetch<T>(
       signal: controller.signal,
     });
 
+    // Log warning when GitHub API rate limit is running low
+    const rateLimitRemaining = response.headers?.get?.('X-RateLimit-Remaining');
+    if (rateLimitRemaining) {
+      const remaining = parseInt(rateLimitRemaining, 10);
+      if (remaining < 100) {
+        const resetAt = response.headers?.get?.('X-RateLimit-Reset');
+        const resetTime = resetAt ? new Date(parseInt(resetAt, 10) * 1000).toISOString() : 'unknown';
+        console.warn(`[github] Rate limit low: ${remaining} remaining, resets at ${resetTime}`);
+      }
+    }
+
     if (options?.handle202 && response.status === 202) {
       return { data: null, error: 'Stats are being computed. Please refresh in a moment.' };
     }
@@ -190,10 +222,26 @@ async function githubFetch<T>(
  * List the authenticated user's repos, sorted by updated_at desc.
  */
 export async function getUserRepos(token: string): Promise<GitHubResult<GitHubRepo[]>> {
-  return githubFetch<GitHubRepo[]>(
-    `${GITHUB_API}/user/repos?sort=updated&per_page=100&type=all`,
-    token,
-  );
+  const allRepos: GitHubRepo[] = [];
+  const maxPages = 3; // Cap at 300 repos
+
+  for (let page = 1; page <= maxPages; page++) {
+    const result = await githubFetch<GitHubRepo[]>(
+      `${GITHUB_API}/user/repos?sort=updated&per_page=100&type=all&page=${page}`,
+      token,
+    );
+
+    if (!result.data) {
+      return allRepos.length > 0
+        ? { data: allRepos, error: null }
+        : result;
+    }
+
+    allRepos.push(...result.data);
+    if (result.data.length < 100) break; // Last page
+  }
+
+  return { data: allRepos, error: null };
 }
 
 /**

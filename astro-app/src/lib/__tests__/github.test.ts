@@ -73,7 +73,7 @@ describe('parseGitHubRepo()', () => {
 
 describe('getGitHubToken()', () => {
   it('returns token when account exists with repo scope', async () => {
-    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: 'repo,user' });
+    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: 'repo,user', accessTokenExpiresAt: null });
     const result = await getGitHubToken(mockDb, 'test@example.com');
     expect(result).toEqual({ token: 'ghp_abc123' });
   });
@@ -85,21 +85,57 @@ describe('getGitHubToken()', () => {
   });
 
   it('returns no-github-account when accessToken is null', async () => {
-    mockGet.mockResolvedValue({ accessToken: null, scope: 'repo' });
+    mockGet.mockResolvedValue({ accessToken: null, scope: 'repo', accessTokenExpiresAt: null });
     const result = await getGitHubToken(mockDb, 'test@example.com');
     expect(result).toEqual({ error: 'no-github-account' });
   });
 
   it('returns missing-scope when scope does not include repo', async () => {
-    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: 'user' });
+    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: 'user', accessTokenExpiresAt: null });
     const result = await getGitHubToken(mockDb, 'test@example.com');
     expect(result).toEqual({ error: 'missing-scope' });
   });
 
   it('returns missing-scope when scope is null', async () => {
-    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: null });
+    mockGet.mockResolvedValue({ accessToken: 'ghp_abc123', scope: null, accessTokenExpiresAt: null });
     const result = await getGitHubToken(mockDb, 'test@example.com');
     expect(result).toEqual({ error: 'missing-scope' });
+  });
+
+  it('returns token-expired when accessTokenExpiresAt is in the past', async () => {
+    mockGet.mockResolvedValue({
+      accessToken: 'ghp_abc123',
+      scope: 'repo',
+      accessTokenExpiresAt: new Date(Date.now() - 3600000),
+    });
+    const result = await getGitHubToken(mockDb, 'test@example.com');
+    expect(result).toEqual({ error: 'token-expired' });
+  });
+
+  it('returns token when accessTokenExpiresAt is in the future', async () => {
+    mockGet.mockResolvedValue({
+      accessToken: 'ghp_abc123',
+      scope: 'repo',
+      accessTokenExpiresAt: new Date(Date.now() + 3600000),
+    });
+    const result = await getGitHubToken(mockDb, 'test@example.com');
+    expect(result).toEqual({ token: 'ghp_abc123' });
+  });
+
+  it('handles space-separated scopes (OAuth2 spec)', async () => {
+    mockGet.mockResolvedValue({
+      accessToken: 'ghp_abc123',
+      scope: 'repo read:user user:email',
+      accessTokenExpiresAt: null,
+    });
+    const result = await getGitHubToken(mockDb, 'test@example.com');
+    expect(result).toEqual({ token: 'ghp_abc123' });
+  });
+
+  it('returns no-github-account when DB query throws', async () => {
+    mockGet.mockRejectedValue(new Error('D1 not available'));
+    const result = await getGitHubToken(mockDb, 'test@example.com');
+    expect(result).toEqual({ error: 'no-github-account' });
   });
 });
 
@@ -135,6 +171,41 @@ describe('getUserRepos()', () => {
     const result = await getUserRepos('ghp_token');
     expect(result.data).toBeNull();
     expect(result.error).toBe('Network error');
+  });
+
+  it('paginates through multiple pages of repos', async () => {
+    const page1 = Array.from({ length: 100 }, (_, i) => ({
+      full_name: `org/repo-${i}`,
+      description: null,
+      private: false,
+      updated_at: '2024-01-01',
+    }));
+    const page2 = [{ full_name: 'org/repo-100', description: null, private: false, updated_at: '2024-01-01' }];
+
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(page1) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(page2) });
+
+    const result = await getUserRepos('ghp_token');
+    expect(result.data).toHaveLength(101);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns partial results when later page fails', async () => {
+    const page1 = Array.from({ length: 100 }, (_, i) => ({
+      full_name: `org/repo-${i}`,
+      description: null,
+      private: false,
+      updated_at: '2024-01-01',
+    }));
+
+    globalThis.fetch = vi.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(page1) })
+      .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Server Error' });
+
+    const result = await getUserRepos('ghp_token');
+    expect(result.data).toHaveLength(100);
+    expect(result.error).toBeNull();
   });
 });
 

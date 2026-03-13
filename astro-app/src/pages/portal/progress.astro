@@ -193,11 +193,29 @@ const serializedLinks = links.map(l => ({
           Please re-authorize to grant the required scope.
         </p>
         <button
-          id="connect-github"
+          id="reauth-github"
           type="button"
           class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90"
         >
           Re-authorize GitHub
+        </button>
+      </div>
+    )}
+
+    {/* State: GitHub token expired */}
+    {state === 'token-expired' && (
+      <div class="border bg-card p-6 flex flex-col gap-4 items-start">
+        <h2 class="text-lg font-semibold">GitHub session expired</h2>
+        <p class="text-sm text-muted-foreground">
+          Your GitHub access token has expired. Please re-authenticate to restore access
+          to your repository data.
+        </p>
+        <button
+          id="reauth-github"
+          type="button"
+          class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:bg-primary/90"
+        >
+          Re-authenticate GitHub
         </button>
       </div>
     )}
@@ -232,15 +250,24 @@ const serializedLinks = links.map(l => ({
   </div>
 </PortalLayout>
 
-{/* Client-side script for GitHub OAuth connection */}
-{(state === 'no-github-account' || state === 'missing-scope') && (
-  <script>
-    import { authClient } from '@/lib/auth-client';
-    document.getElementById('connect-github')?.addEventListener('click', () => {
-      authClient.linkSocial({
-        provider: 'github',
-        callbackURL: '/portal/progress',
-      });
+{/* Client-side scripts for GitHub OAuth connection */}
+<script>
+  import { authClient } from '@/lib/auth-client';
+
+  // Link GitHub (new connection — user has no GitHub account linked)
+  document.getElementById('connect-github')?.addEventListener('click', () => {
+    authClient.linkSocial({
+      provider: 'github',
+      callbackURL: '/portal/progress',
     });
-  </script>
-)}
+  });
+
+  // Re-authorize GitHub (existing connection — token expired or missing scope)
+  // Uses signIn.social to re-trigger OAuth flow and update stored token/scope
+  document.getElementById('reauth-github')?.addEventListener('click', () => {
+    authClient.signIn.social({
+      provider: 'github',
+      callbackURL: '/portal/progress',
+    });
+  });
+</script>
