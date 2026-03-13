@@ -8,6 +8,7 @@ import RepoLinker from '@/components/portal/RepoLinker';
 import { getDrizzle } from '@/lib/db';
 import { getGitHubToken, getAllGitHubData, parseGitHubRepo } from '@/lib/github';
 import type { RepoOverview, GitHubIssue, GitHubPullRequest, GitHubRelease } from '@/lib/github';
+import { stegaClean } from '@sanity/client/stega';
 import { projectGithubRepos } from '@/lib/drizzle-schema';
 import { eq } from 'drizzle-orm';
 import {
@@ -95,7 +96,7 @@ if (state === 'has-token') {
         });
 
         return {
-          projectTitle: project.title ?? 'Untitled',
+          projectTitle: stegaClean(project.title) ?? 'Untitled',
           githubRepo: repo,
           overview: data.overview.data,
           issues: data.issues.data,
@@ -193,16 +194,14 @@ const serializedLinks = links.map(l => ({
           <GitHubDashboard client:load projects={linkedProjectsData} />
         )}
 
-        {/* Repo linker for unlinked projects (or to change linked ones) */}
-        {unlinkedProjects.length > 0 && (
-          <RepoLinker
-            client:load
-            projects={unlinkedProjects}
-            links={serializedLinks}
-            linkEndpoint="/portal/api/github/links"
-            reposEndpoint="/portal/api/github/repos"
-          />
-        )}
+        {/* Repo linker for all projects — link unlinked, change/unlink linked */}
+        <RepoLinker
+          client:load
+          projects={projects}
+          links={serializedLinks}
+          linkEndpoint="/portal/api/github/links"
+          reposEndpoint="/portal/api/github/repos"
+        />
       </>
     )}
   </div>
@@ -211,12 +210,12 @@ const serializedLinks = links.map(l => ({
 {/* Client-side script for GitHub OAuth connection */}
 {(state === 'no-github-account' || state === 'missing-scope') && (
   <script>
-    import { createAuthClient } from 'better-auth/client';
-    const authClient = createAuthClient({
-      baseURL: window.location.origin + '/api/auth',
-    });
+    import { authClient } from '@/lib/auth-client';
     document.getElementById('connect-github')?.addEventListener('click', () => {
-      authClient.signIn.social({ provider: 'github' });
+      authClient.linkSocial({
+        provider: 'github',
+        callbackURL: '/portal/progress',
+      });
     });
   </script>
 )}
