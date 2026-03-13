@@ -7,7 +7,17 @@ import GitHubDashboard from '@/components/portal/GitHubDashboard';
 import RepoLinker from '@/components/portal/RepoLinker';
 import { getDrizzle } from '@/lib/db';
 import { getGitHubToken, getAllGitHubData, parseGitHubRepo } from '@/lib/github';
-import type { RepoOverview, GitHubIssue, GitHubPullRequest, GitHubRelease } from '@/lib/github';
+import type {
+  RepoOverview,
+  GitHubIssue,
+  GitHubPullRequest,
+  GitHubRelease,
+  GitHubCommitActivity,
+  GitHubContributor,
+  GitHubWorkflowRun,
+  GitHubCommit,
+  GitHubLanguages,
+} from '@/lib/github';
 import { stegaClean } from '@sanity/client/stega';
 import { projectGithubRepos } from '@/lib/drizzle-schema';
 import { eq } from 'drizzle-orm';
@@ -47,6 +57,11 @@ let linkedProjectsData: Array<{
   issues: GitHubIssue[] | null;
   pullRequests: { open: GitHubPullRequest[]; recentlyMerged: GitHubPullRequest[] } | null;
   releases: GitHubRelease[] | null;
+  commitActivity: GitHubCommitActivity[] | null;
+  contributors: GitHubContributor[] | null;
+  workflowRuns: GitHubWorkflowRun[] | null;
+  recentCommits: GitHubCommit[] | null;
+  languages: GitHubLanguages | null;
   errors: Record<string, string | undefined>;
 }> = [];
 let unlinkedProjects: typeof projects = [];
@@ -102,11 +117,21 @@ if (state === 'has-token') {
           issues: data.issues.data,
           pullRequests: data.pullRequests.data,
           releases: data.releases.data,
+          commitActivity: data.commitActivity.data,
+          contributors: data.contributors.data,
+          workflowRuns: data.workflowRuns.data,
+          recentCommits: data.recentCommits.data,
+          languages: data.languages.data,
           errors: {
             overview: data.overview.error ?? undefined,
             issues: data.issues.error ?? undefined,
             pullRequests: data.pullRequests.error ?? undefined,
             releases: data.releases.error ?? undefined,
+            commitActivity: data.commitActivity.error ?? undefined,
+            contributors: data.contributors.error ?? undefined,
+            workflowRuns: data.workflowRuns.error ?? undefined,
+            recentCommits: data.recentCommits.error ?? undefined,
+            languages: data.languages.error ?? undefined,
           },
         };
       }),
