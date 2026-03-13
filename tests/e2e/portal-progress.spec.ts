@@ -71,12 +71,12 @@ test.describe('Story 9.4: Portal Progress Page', () => {
 
 test.describe('Story 9.19: Extended GitHub Dashboard Insights', () => {
   test('progress page still loads after extended insights changes (regression)', async ({ page }) => {
-    const response = await page.goto('/portal/progress');
-    expect(response?.status()).toBe(200);
-
-    // Page should render without JS errors
+    // Register listener before navigation to capture errors during load/hydration
     const errors: string[] = [];
     page.on('pageerror', err => errors.push(err.message));
+
+    const response = await page.goto('/portal/progress');
+    expect(response?.status()).toBe(200);
 
     const heading = page.locator('h1');
     await expect(heading).toContainText('Project Progress');

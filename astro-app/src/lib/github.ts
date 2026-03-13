@@ -95,6 +95,7 @@ export interface GitHubApiConfig {
 
 export type GitHubResult<T> =
   | { data: T; error: null }
+  | { data: T; error: string }   // partial success (e.g., pagination cut short)
   | { data: null; error: string };
 
 export type GitHubTokenResult =
@@ -233,7 +234,7 @@ export async function getUserRepos(token: string): Promise<GitHubResult<GitHubRe
 
     if (!result.data) {
       return allRepos.length > 0
-        ? { data: allRepos, error: null }
+        ? { data: allRepos, error: `Partial results (page ${page} failed: ${result.error})` }
         : result;
     }
 

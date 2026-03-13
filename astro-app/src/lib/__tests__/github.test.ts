@@ -211,7 +211,8 @@ describe('getUserRepos()', () => {
 
     const result = await getUserRepos('ghp_token');
     expect(result.data).toHaveLength(100);
-    expect(result.error).toBeNull();
+    expect(result.error).toContain('Partial results');
+    expect(result.error).toContain('page 2');
   });
 });
 
