@@ -1,4 +1,15 @@
 import { useState } from 'react';
+import type {
+  RepoOverview,
+  GitHubIssue,
+  GitHubPullRequest,
+  GitHubRelease,
+  GitHubCommitActivity,
+  GitHubContributor,
+  GitHubWorkflowRun,
+  GitHubCommit,
+  GitHubLanguages,
+} from '../../lib/github';
 
 // ── Inline SVG icons ──
 
@@ -92,76 +103,6 @@ const MinusCircleIcon = ({ className }: { className?: string }) => (
 
 // ── Types ──
 
-interface RepoOverview {
-  full_name: string;
-  description: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-  language: string | null;
-  pushed_at: string | null;
-}
-
-interface GitHubIssue {
-  number: number;
-  title: string;
-  labels: Array<{ name: string; color: string }>;
-  assignees: Array<{ login: string; avatar_url: string }>;
-  created_at: string;
-  comments: number;
-}
-
-interface GitHubPullRequest {
-  number: number;
-  title: string;
-  user: { login: string; avatar_url: string } | null;
-  draft: boolean;
-  created_at: string;
-  merged_at: string | null;
-  requested_reviewers: Array<{ login: string; avatar_url: string }>;
-}
-
-interface GitHubRelease {
-  tag_name: string;
-  name: string | null;
-  published_at: string | null;
-  body_html?: string;
-  body?: string;
-}
-
-interface GitHubCommitActivity {
-  week: number;
-  total: number;
-  days: number[];
-}
-
-interface GitHubContributor {
-  author: { login: string; avatar_url: string };
-  total: number;
-  weeks: Array<{ w: number; a: number; d: number; c: number }>;
-}
-
-interface GitHubWorkflowRun {
-  id: number;
-  name: string;
-  status: string;
-  conclusion: string | null;
-  head_branch: string;
-  head_commit: { message: string } | null;
-  run_started_at: string;
-  updated_at: string;
-  html_url: string;
-}
-
-interface GitHubCommit {
-  sha: string;
-  commit: { message: string; author: { name: string; date: string } };
-  author: { login: string; avatar_url: string } | null;
-  html_url: string;
-}
-
-type GitHubLanguages = Record<string, number>;
-
 interface ProjectDashboardData {
   projectTitle: string;
   githubRepo: string;
@@ -251,13 +192,14 @@ function timeAgo(dateStr: string | null | undefined): string {
 
 function relativeTime(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (isNaN(seconds)) return 'N/A';
   if (seconds < 60) return 'just now';
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
   if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
-function formatDuration(startedAt: string, updatedAt: string): string {
+export function formatDuration(startedAt: string, updatedAt: string): string {
   const ms = new Date(updatedAt).getTime() - new Date(startedAt).getTime();
   const minutes = Math.floor(ms / 60000);
   const seconds = Math.floor((ms % 60000) / 1000);
@@ -271,8 +213,8 @@ function formatWeekDate(weekTimestamp: number): string {
   });
 }
 
-function getFirstLine(message: string): string {
-  return message.split('\n')[0];
+export function getFirstLine(message: string): string {
+  return message.split('\n')[0] || '(no message)';
 }
 
 function getLanguageColor(language: string): string {
@@ -303,14 +245,10 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
 
 // ── Language Breakdown (Task 3) ──
 
-function LanguageBar({ data, error }: { data: GitHubLanguages | null; error?: string }) {
-  if (error) return <ErrorSection message={error} />;
-  if (!data || Object.keys(data).length === 0) return null;
-
+export function calculateLanguageBreakdown(data: GitHubLanguages): Array<{ name: string; percentage: number }> {
   const totalBytes = Object.values(data).reduce((sum, bytes) => sum + bytes, 0);
-  if (totalBytes === 0) return null;
+  if (totalBytes === 0) return [];
 
-  // Calculate percentages and group <1% as "Other"
   const entries = Object.entries(data)
     .map(([name, bytes]) => ({ name, percentage: (bytes / totalBytes) * 100 }))
     .sort((a, b) => b.percentage - a.percentage);
@@ -329,6 +267,16 @@ function LanguageBar({ data, error }: { data: GitHubLanguages | null; error?: st
   if (otherPercentage > 0) {
     visible.push({ name: 'Other', percentage: otherPercentage });
   }
+
+  return visible;
+}
+
+function LanguageBar({ data, error }: { data: GitHubLanguages | null; error?: string }) {
+  if (error) return <ErrorSection message={error} />;
+  if (!data || Object.keys(data).length === 0) return null;
+
+  const visible = calculateLanguageBreakdown(data);
+  if (visible.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-3">
@@ -425,6 +373,7 @@ function RecentCommits({ data, error }: { data: GitHubCommit[] | null; error?: s
                         onClick={() => toggleExpand(commit.sha)}
                         className="shrink-0 text-muted-foreground hover:text-foreground"
                         title={isExpanded ? 'Collapse' : 'Expand'}
+                        aria-expanded={isExpanded}
                       >
                         <ChevronDownIcon className={`size-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                       </button>
@@ -665,6 +614,7 @@ function ReleasesTab({ data, errors }: { data: GitHubRelease[] | null; errors?: 
           )}
           <span className="text-xs text-muted-foreground">{formatDate(release.published_at)}</span>
           {release.body_html ? (
+            // body_html is pre-sanitized by GitHub's markdown processor — safe to render
             <div
               className="prose prose-sm max-w-none text-sm text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: release.body_html }}
@@ -734,7 +684,7 @@ function CommitActivityChart({ data, error }: { data: GitHubCommitActivity[] | n
             >
               <div className="w-full flex items-end justify-center" style={{ height: '128px' }}>
                 <div
-                  className="w-full bg-primary transition-all"
+                  className="w-full bg-primary transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary"
                   style={{ height: `${Math.max(heightPercent, 2)}%` }}
                   title={`${week.total} commits`}
                   tabIndex={0}
@@ -803,6 +753,7 @@ function ContributorsList({ data, error }: { data: GitHubContributor[] | null; e
           type="button"
           onClick={() => setShowAll(!showAll)}
           className="text-sm font-medium text-primary hover:underline self-start flex items-center gap-1"
+          aria-expanded={showAll}
         >
           <ChevronDownIcon className={`size-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />
           {showAll ? 'Show top 10' : `Show all ${data.length} contributors`}

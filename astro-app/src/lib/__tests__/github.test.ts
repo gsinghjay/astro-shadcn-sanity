@@ -39,6 +39,12 @@ import {
   getLanguages,
 } from '@/lib/github';
 
+import {
+  getFirstLine,
+  formatDuration,
+  calculateLanguageBreakdown,
+} from '@/components/portal/GitHubDashboard';
+
 // ── parseGitHubRepo ──
 
 describe('parseGitHubRepo()', () => {
@@ -563,94 +569,54 @@ describe('getAllGitHubData() extended fields', () => {
 
 // ── Helper function tests (for GitHubDashboard logic) ──
 
-describe('Language percentage calculation', () => {
+describe('calculateLanguageBreakdown()', () => {
   it('calculates percentages correctly', () => {
-    const languages = { TypeScript: 50000, JavaScript: 30000, CSS: 20000 };
-    const total = Object.values(languages).reduce((s, b) => s + b, 0);
-    const percentages = Object.entries(languages).map(([name, bytes]) => ({
-      name,
-      percentage: (bytes / total) * 100,
-    }));
-    expect(percentages[0]).toEqual({ name: 'TypeScript', percentage: 50 });
-    expect(percentages[1]).toEqual({ name: 'JavaScript', percentage: 30 });
-    expect(percentages[2]).toEqual({ name: 'CSS', percentage: 20 });
+    const result = calculateLanguageBreakdown({ TypeScript: 50000, JavaScript: 30000, CSS: 20000 });
+    expect(result[0]).toEqual({ name: 'TypeScript', percentage: 50 });
+    expect(result[1]).toEqual({ name: 'JavaScript', percentage: 30 });
+    expect(result[2]).toEqual({ name: 'CSS', percentage: 20 });
   });
 
   it('groups languages under 1% as "Other"', () => {
-    const languages = { TypeScript: 99000, Shell: 500, Makefile: 300, Dockerfile: 200 };
-    const total = Object.values(languages).reduce((s, b) => s + b, 0);
-    const entries = Object.entries(languages)
-      .map(([name, bytes]) => ({ name, percentage: (bytes / total) * 100 }))
-      .sort((a, b) => b.percentage - a.percentage);
+    const result = calculateLanguageBreakdown({ TypeScript: 99000, Shell: 500, Makefile: 300, Dockerfile: 200 });
+    expect(result.length).toBe(2); // TypeScript + Other
+    expect(result[0].name).toBe('TypeScript');
+    expect(result[1].name).toBe('Other');
+    expect(result[1].percentage).toBeGreaterThan(0);
+    expect(result[1].percentage).toBeLessThan(2);
+  });
 
-    const visible: Array<{ name: string; percentage: number }> = [];
-    let otherPct = 0;
-    for (const entry of entries) {
-      if (entry.percentage >= 1) {
-        visible.push(entry);
-      } else {
-        otherPct += entry.percentage;
-      }
-    }
-    if (otherPct > 0) visible.push({ name: 'Other', percentage: otherPct });
-
-    expect(visible.length).toBe(2); // TypeScript + Other
-    expect(visible[0].name).toBe('TypeScript');
-    expect(visible[1].name).toBe('Other');
-    expect(visible[1].percentage).toBeGreaterThan(0);
-    expect(visible[1].percentage).toBeLessThan(2);
+  it('returns empty array when total bytes is 0', () => {
+    const result = calculateLanguageBreakdown({});
+    expect(result).toEqual([]);
   });
 });
 
-describe('Commit message first-line extraction', () => {
+describe('getFirstLine()', () => {
   it('extracts first line from multi-line message', () => {
-    const message = 'feat: add feature\n\nDetailed description here';
-    const firstLine = message.split('\n')[0];
-    expect(firstLine).toBe('feat: add feature');
+    expect(getFirstLine('feat: add feature\n\nDetailed description here')).toBe('feat: add feature');
   });
 
   it('returns full message if single line', () => {
-    const message = 'fix: quick bug fix';
-    const firstLine = message.split('\n')[0];
-    expect(firstLine).toBe('fix: quick bug fix');
+    expect(getFirstLine('fix: quick bug fix')).toBe('fix: quick bug fix');
   });
 
-  it('handles empty message', () => {
-    const message = '';
-    const firstLine = message.split('\n')[0];
-    expect(firstLine).toBe('');
+  it('returns fallback for empty message', () => {
+    expect(getFirstLine('')).toBe('(no message)');
   });
 });
 
-describe('Workflow run duration calculation', () => {
+describe('formatDuration()', () => {
   it('calculates duration in minutes and seconds', () => {
-    const startedAt = '2024-01-01T00:00:00Z';
-    const updatedAt = '2024-01-01T00:02:34Z';
-    const ms = new Date(updatedAt).getTime() - new Date(startedAt).getTime();
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    const formatted = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-    expect(formatted).toBe('2m 34s');
+    expect(formatDuration('2024-01-01T00:00:00Z', '2024-01-01T00:02:34Z')).toBe('2m 34s');
   });
 
   it('shows seconds only when under 1 minute', () => {
-    const startedAt = '2024-01-01T00:00:00Z';
-    const updatedAt = '2024-01-01T00:00:45Z';
-    const ms = new Date(updatedAt).getTime() - new Date(startedAt).getTime();
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    const formatted = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-    expect(formatted).toBe('45s');
+    expect(formatDuration('2024-01-01T00:00:00Z', '2024-01-01T00:00:45Z')).toBe('45s');
   });
 
   it('handles exact minute boundary', () => {
-    const startedAt = '2024-01-01T00:00:00Z';
-    const updatedAt = '2024-01-01T00:05:00Z';
-    const ms = new Date(updatedAt).getTime() - new Date(startedAt).getTime();
-    const minutes = Math.floor(ms / 60000);
-    const seconds = Math.floor((ms % 60000) / 1000);
-    const formatted = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
-    expect(formatted).toBe('5m 0s');
+    expect(formatDuration('2024-01-01T00:00:00Z', '2024-01-01T00:05:00Z')).toBe('5m 0s');
   });
 });
 

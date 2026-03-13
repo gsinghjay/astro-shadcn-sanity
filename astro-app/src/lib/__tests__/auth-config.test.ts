@@ -176,8 +176,8 @@ describe('checkSponsorWhitelist()', () => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', vi.fn());
     // Stub import.meta.env values
-    import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID = 'test-project';
-    import.meta.env.PUBLIC_SANITY_STUDIO_DATASET = 'production';
+    vi.stubEnv('PUBLIC_SANITY_STUDIO_PROJECT_ID', 'test-project');
+    vi.stubEnv('PUBLIC_SANITY_STUDIO_DATASET', 'production');
   });
 
   it('returns true when email is on the sponsor whitelist', async () => {
