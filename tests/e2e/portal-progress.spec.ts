@@ -69,6 +69,32 @@ test.describe('Story 9.4: Portal Progress Page', () => {
   });
 });
 
+test.describe('Story 9.19: Extended GitHub Dashboard Insights', () => {
+  test('progress page still loads after extended insights changes (regression)', async ({ page }) => {
+    // Register listener before navigation to capture errors during load/hydration
+    const errors: string[] = [];
+    page.on('pageerror', err => errors.push(err.message));
+
+    const response = await page.goto('/portal/progress');
+    expect(response?.status()).toBe(200);
+
+    const heading = page.locator('h1');
+    await expect(heading).toContainText('Project Progress');
+
+    // No JS errors should have been thrown
+    expect(errors).toHaveLength(0);
+  });
+
+  test('progress page renders valid state without crashing (extended insights)', async ({ page }) => {
+    await page.goto('/portal/progress');
+
+    // The page should show one of the valid UI states (Connect GitHub, dashboard, etc.)
+    // without throwing errors from the new tab/component code
+    const content = page.locator('h1 ~ *').first();
+    await expect(content).toBeVisible();
+  });
+});
+
 test.describe('Story 9.4: Portal Landing Page — Progress Card', () => {
   test('landing page "Project Progress" card is enabled and links to /portal/progress', async ({ page }) => {
     await page.goto('/portal/');

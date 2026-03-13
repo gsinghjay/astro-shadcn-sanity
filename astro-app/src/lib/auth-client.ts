@@ -16,6 +16,11 @@ const baseURL = typeof window !== 'undefined'
   ? `${window.location.origin}/api/auth`
   : '/api/auth';
 
+// Note: Full type inference for custom fields (e.g., role) and social providers
+// would require `createAuthClient<typeof auth>()` but the server auth type can't
+// be used as a generic here — Better Auth's client generic expects BetterAuthClientOptions,
+// not the server auth instance type. Methods like linkSocial and signIn.social are
+// available at runtime via the core client regardless.
 export const authClient = createAuthClient({
   baseURL,
   plugins: [magicLinkClient()],
