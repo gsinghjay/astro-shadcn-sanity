@@ -124,7 +124,10 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
       },
     },
     account: {
-      accountLinking: { enabled: true },
+      accountLinking: {
+        enabled: true,
+        allowDifferentEmails: true,
+      },
     },
     plugins: [
       magicLink({
