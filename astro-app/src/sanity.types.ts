@@ -327,6 +327,7 @@ export type RichText = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "prose" | "narrow" | "wide";
   content?: PortableText;
 };
 
@@ -368,6 +369,7 @@ export type TextWithImage = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "split" | "split-asymmetric" | "reversed" | "floating";
   heading?: string;
   content?: PortableText;
   image?: {
@@ -423,6 +425,12 @@ export type FeatureGrid = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?:
+    | "grid"
+    | "grid-centered"
+    | "horizontal-cards"
+    | "sidebar-grid"
+    | "stacked";
   heading?: string;
   items?: Array<
     {
@@ -2329,7 +2337,13 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "sidebar-grid"
+          | "stacked"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2469,7 +2483,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "narrow" | "prose" | "wide" | null;
         content: Array<
           | {
               children?: Array<{
@@ -2681,7 +2695,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "floating" | "reversed" | "split-asymmetric" | "split" | null;
         heading: string | null;
         content: Array<
           | {

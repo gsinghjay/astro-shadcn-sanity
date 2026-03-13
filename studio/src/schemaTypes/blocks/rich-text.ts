@@ -6,6 +6,11 @@ export const richText = defineBlock({
   name: 'richText',
   title: 'Rich Text',
   icon: BlockContentIcon,
+  variants: [
+    {name: 'prose', title: 'Prose (Default)'},
+    {name: 'narrow', title: 'Narrow'},
+    {name: 'wide', title: 'Wide'},
+  ],
   fields: [
     defineField({
       name: 'content',

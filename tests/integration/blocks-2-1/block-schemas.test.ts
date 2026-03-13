@@ -121,12 +121,13 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(featureGrid.type).toBe('object')
     })
 
-    test('[P1] 2.1-INT-008 — featureGrid has all 3 block-specific fields', () => {
+    test('[P1] 2.1-INT-008 — featureGrid has all block-specific fields plus variant', () => {
       const fieldNames = getBlockFields(featureGrid).map((f: any) => f.name)
+      expect(fieldNames).toContain('variant')
       expect(fieldNames).toContain('heading')
       expect(fieldNames).toContain('items')
       expect(fieldNames).toContain('columns')
-      expect(fieldNames).toHaveLength(3)
+      expect(fieldNames).toHaveLength(4)
     })
 
     test('[P1] 2.1-INT-009 — featureGrid items is array of featureItem with icon, image, title, description', () => {
@@ -265,13 +266,14 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(textWithImage.type).toBe('object')
     })
 
-    test('[P1] 2.1-INT-022 — textWithImage has all 4 block-specific fields', () => {
+    test('[P1] 2.1-INT-022 — textWithImage has all block-specific fields plus variant', () => {
       const fieldNames = getBlockFields(textWithImage).map((f: any) => f.name)
+      expect(fieldNames).toContain('variant')
       expect(fieldNames).toContain('heading')
       expect(fieldNames).toContain('content')
       expect(fieldNames).toContain('image')
       expect(fieldNames).toContain('imagePosition')
-      expect(fieldNames).toHaveLength(4)
+      expect(fieldNames).toHaveLength(5)
     })
 
     test('[P1] 2.1-INT-023 — textWithImage content is portableText type', () => {
