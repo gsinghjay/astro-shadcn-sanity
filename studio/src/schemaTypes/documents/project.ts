@@ -57,6 +57,14 @@ export const project = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'featured',
+      title: 'Featured',
+      type: 'boolean',
+      group: 'main',
+      initialValue: false,
+      description: 'Show this project in "Featured" display mode blocks',
+    }),
+    defineField({
       name: 'semester',
       title: 'Semester',
       type: 'string',

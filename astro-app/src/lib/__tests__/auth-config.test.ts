@@ -73,13 +73,14 @@ describe('createAuth() — unified auth factory', () => {
     expect(config.socialProviders.github).toEqual({
       clientId: 'test-github-id',
       clientSecret: 'test-github-secret',
+      scope: ['repo'],
     });
   });
 
   it('enables account linking', () => {
     createAuth({ db: mockDb, env: mockEnv });
     const config = mockBetterAuth.mock.calls[0][0];
-    expect(config.account.accountLinking).toEqual({ enabled: true });
+    expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: true });
   });
 
   it('registers Magic Link plugin', () => {
@@ -175,8 +176,8 @@ describe('checkSponsorWhitelist()', () => {
     vi.clearAllMocks();
     vi.stubGlobal('fetch', vi.fn());
     // Stub import.meta.env values
-    import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID = 'test-project';
-    import.meta.env.PUBLIC_SANITY_STUDIO_DATASET = 'production';
+    vi.stubEnv('PUBLIC_SANITY_STUDIO_PROJECT_ID', 'test-project');
+    vi.stubEnv('PUBLIC_SANITY_STUDIO_DATASET', 'production');
   });
 
   it('returns true when email is on the sponsor whitelist', async () => {
