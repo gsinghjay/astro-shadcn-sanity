@@ -42,5 +42,8 @@
     "chromatic": "^15.1.1",
     "concurrently": "^9.1.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "wrangler": "^4.76.0"
+  }
 }
