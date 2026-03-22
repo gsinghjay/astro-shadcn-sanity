@@ -1,5 +1,4 @@
 # src/services/sanity_client.py
-import httpx
 from typing import Any
 from services.http_client import get_client, raise_for_status
 
@@ -12,14 +11,21 @@ class SanityClient:
 
     async def query(self, groq: str, dataset: str, params: dict | None = None) -> list | dict:
         url = f"{self.base_url}/query/{dataset}"
-        async with httpx.AsyncClient() as client:
+        
+        # FIX 1: Safely build headers to prevent the 400 Bad Request token error
+        headers = {}
+        if self.token and self.token.strip():
+            headers["Authorization"] = f"Bearer {self.token.strip()}"
+            
+        # FIX 2: Use get_client() wrapper to prevent Cloudflare HTTP/2 connection crashes
+        async with get_client() as client:
             resp = await client.post(
                 url,
-                headers={"Authorization": f"Bearer {self.token.strip()}"},
+                headers=headers,
                 json={"query": groq, "params": params or {}},
             )
-            print(resp.json())
-            resp.raise_for_status()
+            # This is where Sanity's errors (401, 403, etc) are forwarded!
+            raise_for_status(resp) 
             return resp.json().get("result", [])
         
     async def mutate(self, mutations: list[dict], dataset: str, write_token: str) -> dict:
