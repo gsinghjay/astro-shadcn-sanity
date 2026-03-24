@@ -40,10 +40,11 @@ Usage in route handlers::
 
 import hmac
 
-from fastapi import Request, HTTPException, Depends
+from fastapi import Request, HTTPException, Depends, Security
 
 from models.settings import WorkerSettings
-
+from services.sanity_client import SanityClient
+from fastapi.security import APIKeyHeader
 
 async def get_env(request: Request):
     """Extract the raw Cloudflare env proxy from the ASGI request scope.
@@ -187,3 +188,35 @@ async def get_db(settings: WorkerSettings = Depends(get_settings)):
     if settings.db is None:
         raise HTTPException(status_code=503, detail="D1 database not configured")
     return settings.db
+
+async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> SanityClient:
+    """
+    Injects a configured SanityClient into route handlers.
+    Uses the Cloudflare environment variables parsed by WorkerSettings.
+    """
+    # Grab the project ID from env vars (fallback to your actual ID if missing)
+    project_id = settings.env_vars.get("sanity_project_id", "49nk9b0w")
+    
+    # Grab the token from secrets (it might be None for public data)
+    token = settings.optional_secrets.get("sanity_api_read_token", "")
+    
+    return SanityClient(project_id=project_id, token=token)
+
+# Looks for 'X-Admin-API-Key' in the request headers
+admin_api_key_header = APIKeyHeader(name="X-Admin-API-Key", auto_error=False)
+
+async def verify_admin_api_key(
+    api_key_header: str = Security(admin_api_key_header),
+    settings: WorkerSettings = Depends(get_settings)
+) -> bool:
+    """Verifies that the request includes the correct Admin API Key."""
+    expected_key = settings.required_secrets.get("admin_api_key")
+    
+    if not expected_key:
+        # Failsafe: If no key is configured in Cloudflare, block all mutations
+        raise HTTPException(status_code=500, detail="admin_api_key not configured on server")
+        
+    if api_key_header != expected_key:
+        raise HTTPException(status_code=403, detail="Invalid or missing Admin API Key")
+        
+    return True
