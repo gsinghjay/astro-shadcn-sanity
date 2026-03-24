@@ -1,6 +1,6 @@
 GET_EVENTS = """
-*[_type == "event" 
-  && ($site == "" || site == $site)
+*[_type == "event"
+  && (!defined($site) || site == $site)
   && ($upcoming == false || date >= now())
 ] | order(date asc)[0...$limit] {
   _id,

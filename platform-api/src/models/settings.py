@@ -234,7 +234,7 @@ class WorkerSettings(BaseModel):
             cf_api_token=_get("CF_API_TOKEN"),
             turnstile_secret_key=_get("TURNSTILE_SECRET_KEY"),
             # Bindings
-            kv=_get_binding("KV"),
+            kv=_get_binding("API_KV"),
             db=_get_binding("DB"),
             ai=_get_binding("AI"),
         )

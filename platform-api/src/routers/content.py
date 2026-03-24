@@ -2,8 +2,7 @@
 from fastapi import APIRouter, Depends, Query, Response, HTTPException
 from typing import List
 
-# Assume verify_admin_api_key is in dependencies; adjust import if needed
-from dependencies import get_sanity, get_settings, verify_admin_api_key, verify_api_key
+from dependencies import get_sanity, get_settings, verify_admin_api_key
 from models.settings import WorkerSettings
 from services.sanity_client import SanityClient
 from utils.dataset import resolve_dataset
@@ -11,7 +10,6 @@ from models.content import (
     PageResponse, EventResponse, SponsorResponse, ProjectResponse, 
     SearchResult, SearchRequest, MutationRequest
 )
-# from queries.content import GET_PAGES, GET_EVENTS, GET_SPONSORS, GET_PROJECTS, SEARCH_QUERY
 from queries.sponsors import GET_SPONSORS
 from queries.events import GET_EVENTS
 from queries.pages import GET_PAGES

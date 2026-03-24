@@ -30,7 +30,7 @@ from routers.health import router as health_router
 from routers.content import router as content_router
 
 app = FastAPI(
-    title="FastAPI CF Worker",
+    title="Platform API",
     version="0.1.0",
     docs_url="/docs",       # Swagger UI at /docs
     redoc_url="/redoc",      # ReDoc at /redoc

@@ -190,16 +190,19 @@ async def get_db(settings: WorkerSettings = Depends(get_settings)):
     return settings.db
 
 async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> SanityClient:
-    """
-    Injects a configured SanityClient into route handlers.
+    """Inject a configured SanityClient into route handlers.
+
     Uses the Cloudflare environment variables parsed by WorkerSettings.
+
+    Raises:
+        HTTPException(503): If ``SANITY_PROJECT_ID`` is not configured.
     """
-    # Grab the project ID from env vars (fallback to your actual ID if missing)
-    project_id = settings.env_vars.get("sanity_project_id", "49nk9b0w")
-    
-    # Grab the token from secrets (it might be None for public data)
+    project_id = settings.env_vars.get("sanity_project_id")
+    if not project_id:
+        raise HTTPException(status_code=503, detail="SANITY_PROJECT_ID not configured")
+
     token = settings.optional_secrets.get("sanity_api_read_token", "")
-    
+
     return SanityClient(project_id=project_id, token=token)
 
 # Looks for 'X-Admin-API-Key' in the request headers
@@ -216,7 +219,7 @@ async def verify_admin_api_key(
         # Failsafe: If no key is configured in Cloudflare, block all mutations
         raise HTTPException(status_code=500, detail="admin_api_key not configured on server")
         
-    if api_key_header != expected_key:
+    if not api_key_header or not hmac.compare_digest(api_key_header, expected_key):
         raise HTTPException(status_code=403, detail="Invalid or missing Admin API Key")
         
     return True

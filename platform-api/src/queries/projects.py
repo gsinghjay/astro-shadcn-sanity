@@ -1,7 +1,7 @@
 GET_PROJECTS = """
-*[_type == "project" 
-  && ($site == "" || site == $site)
-  && ($sponsor == null || sponsor->slug.current == $sponsor)
+*[_type == "project"
+  && (!defined($site) || site == $site)
+  && (!defined($sponsor) || sponsor->slug.current == $sponsor)
 ] | order(title asc) {
   _id,
   title,
