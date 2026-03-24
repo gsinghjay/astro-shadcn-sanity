@@ -1,13 +1,12 @@
 # src/routers/content.py
 from fastapi import APIRouter, Depends, Query, Response, HTTPException
-from typing import List
 
 from dependencies import get_sanity, get_settings, verify_admin_api_key
 from models.settings import WorkerSettings
 from services.sanity_client import SanityClient
 from utils.dataset import resolve_dataset
 from models.content import (
-    PageResponse, EventResponse, SponsorResponse, ProjectResponse, 
+    PageResponse, EventResponse, SponsorResponse, ProjectResponse,
     SearchResult, SearchRequest, MutationRequest
 )
 from queries.sponsors import GET_SPONSORS
@@ -22,18 +21,24 @@ def set_cache_header(response: Response):
     """AC9: Set Cache-Control header for GET endpoints."""
     response.headers["Cache-Control"] = "public, max-age=60"
 
-@router.get("/pages", response_model=List[PageResponse])
+
+def _build_params(**kwargs) -> dict:
+    """Build GROQ params dict, omitting None values so $param stays undefined."""
+    return {k: v for k, v in kwargs.items() if v is not None}
+
+
+@router.get("/pages", response_model=list[PageResponse])
 async def get_pages(
     response: Response,
     site: str = Query("capstone", description="Target site/workspace"),
     sanity: SanityClient = Depends(get_sanity)
 ):
     dataset, site_filter = resolve_dataset(site)
-    result = await sanity.query(GET_PAGES, dataset, {"site": site_filter})
+    result = await sanity.query(GET_PAGES, dataset, _build_params(site=site_filter))
     set_cache_header(response)
     return result
 
-@router.get("/events", response_model=List[EventResponse])
+@router.get("/events", response_model=list[EventResponse])
 async def get_events(
     response: Response,
     site: str = Query("capstone", description="Target site/workspace"),
@@ -42,14 +47,14 @@ async def get_events(
     sanity: SanityClient = Depends(get_sanity)
 ):
     dataset, site_filter = resolve_dataset(site)
-    result = await sanity.query(
-        GET_EVENTS, dataset, 
-        {"site": site_filter, "upcoming": upcoming, "limit": limit}
-    )
+    params = _build_params(site=site_filter)
+    params["upcoming"] = upcoming
+    params["limit"] = limit
+    result = await sanity.query(GET_EVENTS, dataset, params)
     set_cache_header(response)
     return result
 
-@router.get("/sponsors", response_model=List[SponsorResponse])
+@router.get("/sponsors", response_model=list[SponsorResponse])
 async def get_sponsors(
     response: Response,
     site: str = Query("capstone", description="Target site/workspace"),
@@ -59,13 +64,13 @@ async def get_sponsors(
 ):
     dataset, site_filter = resolve_dataset(site)
     result = await sanity.query(
-        GET_SPONSORS, dataset, 
-        {"site": site_filter, "tier": tier, "featured": featured}
+        GET_SPONSORS, dataset,
+        _build_params(site=site_filter, tier=tier, featured=featured)
     )
     set_cache_header(response)
     return result
 
-@router.get("/projects", response_model=List[ProjectResponse])
+@router.get("/projects", response_model=list[ProjectResponse])
 async def get_projects(
     response: Response,
     site: str = Query("capstone", description="Target site/workspace"),
@@ -74,49 +79,47 @@ async def get_projects(
 ):
     dataset, site_filter = resolve_dataset(site)
     result = await sanity.query(
-        GET_PROJECTS, dataset, 
-        {"site": site_filter, "sponsor": sponsor}
+        GET_PROJECTS, dataset,
+        _build_params(site=site_filter, sponsor=sponsor)
     )
     set_cache_header(response)
     return result
 
-@router.post("/search", response_model=List[SearchResult])
+@router.post("/search", response_model=list[SearchResult])
 async def search_content(
     request: SearchRequest,
     sanity: SanityClient = Depends(get_sanity)
 ):
     dataset, site_filter = resolve_dataset(request.site)
-    
-    # Add an asterisk for wildcard matching in GROQ
+
     search_term = f"{request.query}*"
-    raw_results = await sanity.query(
-        SEARCH_QUERY, dataset, 
-        {"site": site_filter, "searchTerm": search_term, "types": request.types}
-    )
-    
-    # Map 'name' to 'title' if it's a sponsor, format to SearchResult
-    results = []
-    for item in raw_results:
-        results.append({
+    params = _build_params(site=site_filter)
+    params["searchTerm"] = search_term
+    params["types"] = request.types
+    raw_results = await sanity.query(SEARCH_QUERY, dataset, params)
+
+    return [
+        {
             "_id": item["_id"],
             "_type": item["_type"],
             "title": item.get("title") or item.get("name") or "Unknown",
-            "_score": item.get("_score")
-        })
-        
-    return results
+            "_score": item.get("_score"),
+        }
+        for item in raw_results
+    ]
 
 @router.post("/mutations")
 async def proxy_mutations(
     request: MutationRequest,
     sanity: SanityClient = Depends(get_sanity),
     settings: WorkerSettings = Depends(get_settings),
-    _admin: bool = Depends(verify_admin_api_key) # Protect this route!
+    _admin: bool = Depends(verify_admin_api_key)
 ):
     """Proxies mutation requests directly to Sanity API."""
-    # Write tokens should be stored in required_secrets or optional_secrets
     write_token = settings.optional_secrets.get("sanity_api_write_token")
     if not write_token:
         raise HTTPException(status_code=500, detail="Missing sanity_api_write_token")
 
-    return await sanity.mutate(request.mutations, request.dataset, write_token)
+    # Convert typed mutation models back to dicts for the Sanity API
+    raw_mutations = [m.model_dump(exclude_none=True) for m in request.mutations]
+    return await sanity.mutate(raw_mutations, request.dataset, write_token)

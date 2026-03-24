@@ -8,6 +8,6 @@ GET_SPONSORS = """
   name, 
   tier, 
   website, 
-  "projectCount": count(*[_type == "project" && references(^._id)])
+  "projectCount": count(*[_type == "project" && references(^._id) && (!defined($site) || site == $site)])
 }
 """

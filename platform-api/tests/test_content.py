@@ -16,7 +16,7 @@ class MockSanityClient:
         self.project_id = "test-project"
         self.token = "test-token"
 
-    async def query(self, groq: str, dataset: str, params: dict | None = None):
+    async def query(self, groq: str, _dataset: str, _params: dict | None = None):
         lower = groq.lower()
         if "_type == \"sponsor\"" in lower:
             return [{"_id": "sponsor-1", "name": "Acme Corp", "tier": "gold", "website": "https://acme.com", "projectCount": 2}]

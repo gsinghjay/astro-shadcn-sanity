@@ -197,7 +197,11 @@ async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> Sanity
     Raises:
         HTTPException(503): If ``SANITY_PROJECT_ID`` is not configured.
     """
-    project_id = settings.env_vars.get("sanity_project_id", "49nk9b0w")
+    project_id = settings.env_vars.get("sanity_project_id")
+    if not project_id:
+        raise ValueError(
+            "get_sanity: missing sanity_project_id — set SANITY_PROJECT_ID in wrangler.jsonc vars"
+        )
 
     token = settings.optional_secrets.get("sanity_api_read_token", "")
 

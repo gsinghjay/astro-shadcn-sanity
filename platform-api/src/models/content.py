@@ -1,32 +1,37 @@
 # src/models/content.py
-from pydantic import BaseModel, Field, ConfigDict
+from __future__ import annotations
+
+from typing import Annotated, Literal, Union
+
+from pydantic import BaseModel, Field, ConfigDict, Discriminator, Tag
+
 
 class SanityBaseModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
+
 class SponsorResponse(SanityBaseModel):
     model_config = ConfigDict(
-        populate_by_name=True,
         json_schema_extra={
             "examples": [{
-                "_id": "sponsor-123", 
-                "name": "Acme Corp", 
-                "tier": "gold", 
-                "website": "https://acme.com", 
+                "_id": "sponsor-123",
+                "name": "Acme Corp",
+                "tier": "gold",
+                "website": "https://acme.com",
                 "projectCount": 2
             }]
         }
     )
-    
+
     id: str = Field(alias="_id", description="Sanity document _id")
     name: str
     tier: str | None = Field(default=None, description="Sponsorship tier: platinum, gold, silver, bronze")
     website: str | None = None
     project_count: int = Field(default=0, alias="projectCount")
 
+
 class EventResponse(SanityBaseModel):
     model_config = ConfigDict(
-        populate_by_name=True,
         json_schema_extra={
             "examples": [{
                 "_id": "event-456",
@@ -46,9 +51,9 @@ class EventResponse(SanityBaseModel):
     location: str | None = None
     description: str | None = None
 
+
 class ProjectResponse(SanityBaseModel):
     model_config = ConfigDict(
-        populate_by_name=True,
         json_schema_extra={
             "examples": [{
                 "_id": "project-789",
@@ -68,9 +73,9 @@ class ProjectResponse(SanityBaseModel):
     sponsor: str | None = Field(default=None, description="Resolved sponsor name")
     tech_tags: list[str] = Field(default_factory=list, alias="technologyTags")
 
+
 class PageResponse(SanityBaseModel):
     model_config = ConfigDict(
-        populate_by_name=True,
         json_schema_extra={
             "examples": [{
                 "_id": "page-001",
@@ -85,9 +90,9 @@ class PageResponse(SanityBaseModel):
     slug: str
     blocks: list[dict] = Field(default_factory=list)
 
+
 class SearchResult(SanityBaseModel):
     model_config = ConfigDict(
-        populate_by_name=True,
         json_schema_extra={
             "examples": [{
                 "_id": "doc-999",
@@ -101,6 +106,7 @@ class SearchResult(SanityBaseModel):
     type: str = Field(alias="_type")
     title: str
     score: float | None = Field(default=None, alias="_score")
+
 
 class SearchRequest(BaseModel):
     model_config = ConfigDict(
@@ -116,6 +122,49 @@ class SearchRequest(BaseModel):
     site: str = "capstone"
     types: list[str] = Field(default=["event", "sponsor", "project"])
 
+
+# --- Typed Sanity mutation models ---
+
+class CreateMutation(BaseModel):
+    """Create a new document."""
+    create: dict = Field(description="Document body with _type and fields")
+
+
+class CreateOrReplaceMutation(BaseModel):
+    """Create or fully replace a document by _id."""
+    createOrReplace: dict = Field(description="Document body with _id, _type, and fields")
+
+
+class PatchMutation(BaseModel):
+    """Patch specific fields on an existing document."""
+    patch: dict = Field(description="Patch object with id, set/unset/inc/dec operations")
+
+
+class DeleteMutation(BaseModel):
+    """Delete a document by _id."""
+    delete: dict = Field(description="Object with id field")
+
+
+def _get_mutation_discriminator(v: dict | BaseModel) -> str:
+    """Discriminate mutation type by which key is present."""
+    raw = v if isinstance(v, dict) else v.model_dump()
+    for key in ("create", "createOrReplace", "patch", "delete"):
+        if key in raw:
+            return key
+    return "create"
+
+
+SanityMutation = Annotated[
+    Union[
+        Annotated[CreateMutation, Tag("create")],
+        Annotated[CreateOrReplaceMutation, Tag("createOrReplace")],
+        Annotated[PatchMutation, Tag("patch")],
+        Annotated[DeleteMutation, Tag("delete")],
+    ],
+    Discriminator(_get_mutation_discriminator),
+]
+
+
 class MutationRequest(BaseModel):
     model_config = ConfigDict(
         json_schema_extra={
@@ -125,5 +174,5 @@ class MutationRequest(BaseModel):
             }]
         }
     )
-    mutations: list[dict]
+    mutations: list[SanityMutation]
     dataset: str = "production"
