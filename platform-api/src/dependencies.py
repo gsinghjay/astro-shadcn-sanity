@@ -197,9 +197,7 @@ async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> Sanity
     Raises:
         HTTPException(503): If ``SANITY_PROJECT_ID`` is not configured.
     """
-    project_id = settings.env_vars.get("sanity_project_id")
-    if not project_id:
-        raise HTTPException(status_code=503, detail="SANITY_PROJECT_ID not configured")
+    project_id = settings.env_vars.get("sanity_project_id", "49nk9b0w")
 
     token = settings.optional_secrets.get("sanity_api_read_token", "")
 
