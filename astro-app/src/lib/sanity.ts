@@ -596,6 +596,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "logoCloud" => {
       heading,
       autoPopulate,
+      variant,
       sponsors[]->{ _id }
     },
     _type == "sponsorSteps" => {

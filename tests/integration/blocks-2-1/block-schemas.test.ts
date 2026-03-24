@@ -310,12 +310,13 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(logoCloud.type).toBe('object')
     })
 
-    test('[P1] 2.1-INT-027 — logoCloud has all 3 block-specific fields', () => {
+    test('[P1] 2.1-INT-027 — logoCloud has all 4 block-specific fields', () => {
       const fieldNames = getBlockFields(logoCloud).map((f: any) => f.name)
       expect(fieldNames).toContain('heading')
       expect(fieldNames).toContain('autoPopulate')
       expect(fieldNames).toContain('sponsors')
-      expect(fieldNames).toHaveLength(3)
+      expect(fieldNames).toContain('variant')
+      expect(fieldNames).toHaveLength(4)
     })
 
     test('[P1] 2.1-INT-028 — logoCloud autoPopulate is boolean with initialValue true', () => {

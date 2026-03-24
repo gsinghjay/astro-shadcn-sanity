@@ -36,6 +36,7 @@ export const logoCloudFull = {
   maxWidth: 'default' as const,
   heading: 'Trusted By',
   autoPopulate: false,
+  variant: null as string | null,
   sponsors: logoCloudSponsors,
 };
 
@@ -47,5 +48,18 @@ export const logoCloudMinimal = {
   maxWidth: null,
   heading: null,
   autoPopulate: null,
+  variant: null as string | null,
   sponsors: undefined as Sponsor[] | undefined,
+};
+
+export const logoCloudMarquee = {
+  ...logoCloudFull,
+  _key: 'test-lc-3',
+  variant: 'marquee',
+};
+
+export const logoCloudFlexWrap = {
+  ...logoCloudFull,
+  _key: 'test-lc-4',
+  variant: 'flex-wrap',
 };

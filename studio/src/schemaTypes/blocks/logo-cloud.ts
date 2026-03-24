@@ -7,6 +7,11 @@ export const logoCloud = defineBlock({
   title: 'Logo Cloud',
   icon: ImagesIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid'},
+    {name: 'marquee', title: 'Marquee'},
+    {name: 'flex-wrap', title: 'Flex Wrap'},
+  ],
   fields: [
     defineField({
       name: 'heading',
