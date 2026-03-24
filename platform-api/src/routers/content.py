@@ -23,8 +23,8 @@ def set_cache_header(response: Response):
 
 
 def _build_params(**kwargs) -> dict:
-    """Build GROQ params dict, omitting None values so $param stays undefined."""
-    return {k: v for k, v in kwargs.items() if v is not None}
+    """Build GROQ params dict. None values are passed through as null to Sanity."""
+    return kwargs
 
 
 @router.get("/pages", response_model=list[PageResponse])

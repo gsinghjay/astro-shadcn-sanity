@@ -11,21 +11,19 @@ class SanityClient:
 
     async def query(self, groq: str, dataset: str, params: dict | None = None) -> list | dict:
         url = f"{self.base_url}/query/{dataset}"
-        
-        # FIX 1: Safely build headers to prevent the 400 Bad Request token error
+
         headers = {}
-        if self.token and self.token.strip():
-            headers["Authorization"] = f"Bearer {self.token.strip()}"
-            
-        # FIX 2: Use get_client() wrapper to prevent Cloudflare HTTP/2 connection crashes
+        token = str(self.token).strip() if self.token else ""
+        if token and token.startswith("sk"):
+            headers["Authorization"] = f"Bearer {token}"
+
         async with get_client() as client:
             resp = await client.post(
                 url,
                 headers=headers,
                 json={"query": groq, "params": params or {}},
             )
-            # This is where Sanity's errors (401, 403, etc) are forwarded!
-            raise_for_status(resp) 
+            raise_for_status(resp)
             return resp.json().get("result", [])
         
     async def mutate(self, mutations: list[dict], dataset: str, write_token: str) -> dict:
