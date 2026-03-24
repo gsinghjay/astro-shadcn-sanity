@@ -31,7 +31,8 @@
   "homepage": "https://github.com/gsinghjay/astro-shadcn-sanity#readme",
   "workspaces": [
     "studio",
-    "astro-app"
+    "astro-app",
+    "platform-api"
   ],
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
@@ -41,5 +42,8 @@
     "chromatic": "^15.1.1",
     "concurrently": "^9.1.0"
   },
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "wrangler": "^4.76.0"
+  }
 }
