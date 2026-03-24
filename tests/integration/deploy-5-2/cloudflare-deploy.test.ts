@@ -114,22 +114,24 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(layoutContent).toContain('import.meta.env.PUBLIC_GTM_ID')
     })
 
-    test('[P0] 5.8-INT-002 — Layout.astro includes GTM container script with gtm.js', () => {
-      expect(layoutContent).toContain('https://www.googletagmanager.com/gtm.js')
+    test('[P0] 5.8-INT-002 — GTM container script is in CookieConsent component (consent-gated, Story 5.16)', () => {
+      const consentPath = path.resolve(ASTRO_APP, 'src/components/CookieConsent.astro')
+      const consentContent = readFileSync(consentPath, 'utf-8')
+      expect(consentContent).toContain('googletagmanager.com/gtm.js')
     })
 
     test('[P0] 5.8-INT-003 — GTM script is conditionally rendered (only when gtmId is set)', () => {
       expect(layoutContent).toMatch(/gtmId\s*&&/)
     })
 
-    test('[P0] 5.8-INT-004 — GTM uses define:vars to pass container ID', () => {
-      expect(layoutContent).toContain('define:vars={{ gtmId }}')
+    test('[P0] 5.8-INT-004 — CookieConsent receives gtmId prop from Layout (consent-gated, Story 5.16)', () => {
+      expect(layoutContent).toContain('<CookieConsent gtmId={gtmId}')
     })
 
-    test('[P0] 5.8-INT-005 — GTM noscript iframe present in body', () => {
-      expect(layoutContent).toContain('https://www.googletagmanager.com/ns.html')
-      expect(layoutContent).toContain('<noscript>')
-      expect(layoutContent).toContain('<iframe')
+    test('[P0] 5.8-INT-005 — GTM noscript iframe is consent-gated in CookieConsent (Story 5.16)', () => {
+      const consentPath = path.resolve(ASTRO_APP, 'src/components/CookieConsent.astro')
+      const consentContent = readFileSync(consentPath, 'utf-8')
+      expect(consentContent).toContain('googletagmanager.com/ns.html')
     })
 
     test('[P0] 5.8-INT-006 — Old GA4 gtag.js snippet is removed', () => {

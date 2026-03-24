@@ -158,6 +158,14 @@ const addressLine2 = addressLines.slice(2).join(', ');
           >{item.label}</FooterMenuLink>
         </FooterMenuItem>
       ))}
+      <FooterMenuItem>
+        <button
+          data-cookie-settings-trigger
+          class="text-background/40 hover:text-background text-xs transition-colors cursor-pointer"
+          data-gtm-category="footer"
+          data-gtm-label="cookie-settings"
+        >Cookie Settings</button>
+      </FooterMenuItem>
     </FooterMenu>
   </FooterSpread>
 </FooterUI>

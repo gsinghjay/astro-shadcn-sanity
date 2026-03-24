@@ -261,4 +261,18 @@
   [data-contact-form][data-form-state="success"] [data-form-success] {
     display: block;
   }
+
+  /* Cookie consent banner — data-state driven visibility */
+  [data-cookie-consent-banner] {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  [data-cookie-consent-banner][data-state="hidden"] {
+    transform: translateY(100%);
+    pointer-events: none;
+  }
+
+  [data-cookie-consent-banner][data-state="visible"] {
+    transform: translateY(0);
+  }
 }
