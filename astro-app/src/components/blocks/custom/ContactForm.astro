@@ -1,16 +1,18 @@
 ---
 import type { ContactFormBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
-import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
+import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
 import { AutoForm } from '@/components/ui/auto-form';
 import { Icon } from '@/components/ui/icon';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props extends ContactFormBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, successMessage, form } = Astro.props;
+const { heading, description, successMessage, form, variant: rawVariant, backgroundImages } = Astro.props;
+const variant = stegaClean(rawVariant) ?? 'stacked';
 
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 const formId = form?._id ?? '';
@@ -62,46 +64,146 @@ const mappedFields = form?.fields?.map((field) => {
 }) ?? [];
 
 const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
+const firstImage = backgroundImages?.[0];
 ---
 
-<Section data-animate>
-  <SectionSplit>
-    <SectionContent class="justify-center">
-      {heading && (
-        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
-      )}
-      {description && (
-        <p class="text-muted-foreground leading-relaxed">{description}</p>
-      )}
-    </SectionContent>
+{variant === 'split' && (
+  <Section data-animate>
+    <SectionSplit
+      class="items-start @5xl:grid-cols-[3fr_2fr] @5xl:*:sticky @5xl:*:top-[calc(var(--section-py)+var(--header-height,0px))]"
+    >
+      <SectionContent>
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground leading-relaxed">{description}</p>
+        )}
+      </SectionContent>
 
-    <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
-      <div data-form-fields>
-        <AutoForm fields={mappedFields} submit={submitText}>
-          <input type="hidden" name="form_id" value={formId} />
-          <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
-        </AutoForm>
-      </div>
-
-      <div
-        data-form-success
-        role="status"
-        aria-live="polite"
-        class="text-center py-12"
-      >
-        <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
-          <Icon name="lucide:check" class="w-8 h-8 text-primary-foreground" />
+      <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
+        <div data-form-fields>
+          <AutoForm fields={mappedFields} submit={submitText}>
+            <input type="hidden" name="form_id" value={formId} />
+            <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
+          </AutoForm>
         </div>
-        <h3 class="text-2xl font-bold mb-3">Inquiry Received</h3>
-        <p class="text-muted-foreground">{successMessage || 'Thank you for your inquiry. We will get back to you shortly.'}</p>
-      </div>
 
-      <div data-form-error role="alert" class="text-destructive text-sm font-medium mt-4">
-        Something went wrong. Please try again.
+        <div
+          data-form-success
+          role="status"
+          aria-live="polite"
+          class="text-center py-12"
+        >
+          <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
+            <Icon name="lucide:check" class="w-8 h-8 text-primary-foreground" />
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Inquiry Received</h3>
+          <p class="text-muted-foreground">{successMessage || 'Thank you for your inquiry. We will get back to you shortly.'}</p>
+        </div>
+
+        <div data-form-error role="alert" class="text-destructive text-sm font-medium mt-4">
+          Something went wrong. Please try again.
+        </div>
       </div>
-    </div>
-  </SectionSplit>
-</Section>
+    </SectionSplit>
+  </Section>
+)}
+
+{variant === 'split-image' && (
+  <Section data-animate>
+    <SectionSplit class="gap-x-32">
+      <SectionContent class="gap-16">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground leading-relaxed">{description}</p>
+        )}
+
+        <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
+          <div data-form-fields>
+            <AutoForm fields={mappedFields} submit={submitText}>
+              <input type="hidden" name="form_id" value={formId} />
+              <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
+            </AutoForm>
+          </div>
+
+          <div
+            data-form-success
+            role="status"
+            aria-live="polite"
+            class="text-center py-12"
+          >
+            <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
+              <Icon name="lucide:check" class="w-8 h-8 text-primary-foreground" />
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Inquiry Received</h3>
+            <p class="text-muted-foreground">{successMessage || 'Thank you for your inquiry. We will get back to you shortly.'}</p>
+          </div>
+
+          <div data-form-error role="alert" class="text-destructive text-sm font-medium mt-4">
+            Something went wrong. Please try again.
+          </div>
+        </div>
+      </SectionContent>
+
+      {firstImage?.asset && safeUrlFor(firstImage) && (
+        <SectionMedia class="-mr-(--section-px) p-1 @5xl:z-90 @5xl:-mt-[calc(var(--section-py)+var(--header-height,0px))]">
+          <img
+            src={safeUrlFor(firstImage)!.width(960).height(1080).fit('crop').url()}
+            alt={firstImage.alt || ''}
+            width={960}
+            height={1080}
+            loading="lazy"
+            style={firstImage.asset?.metadata?.lqip ? `background-image: url(${firstImage.asset.metadata.lqip}); background-size: cover;` : undefined}
+          />
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{variant !== 'split' && variant !== 'split-image' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionContent class="justify-center">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground leading-relaxed">{description}</p>
+        )}
+      </SectionContent>
+
+      <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
+        <div data-form-fields>
+          <AutoForm fields={mappedFields} submit={submitText}>
+            <input type="hidden" name="form_id" value={formId} />
+            <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="light"></div>
+          </AutoForm>
+        </div>
+
+        <div
+          data-form-success
+          role="status"
+          aria-live="polite"
+          class="text-center py-12"
+        >
+          <div class="w-16 h-16 bg-primary flex items-center justify-center mx-auto mb-6">
+            <Icon name="lucide:check" class="w-8 h-8 text-primary-foreground" />
+          </div>
+          <h3 class="text-2xl font-bold mb-3">Inquiry Received</h3>
+          <p class="text-muted-foreground">{successMessage || 'Thank you for your inquiry. We will get back to you shortly.'}</p>
+        </div>
+
+        <div data-form-error role="alert" class="text-destructive text-sm font-medium mt-4">
+          Something went wrong. Please try again.
+        </div>
+      </div>
+    </SectionSplit>
+  </Section>
+)}
 
 <style>
   [data-contact-form] [data-form-success] { display: none; }

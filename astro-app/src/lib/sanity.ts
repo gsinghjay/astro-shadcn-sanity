@@ -616,6 +616,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       successMessage,
+      variant,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
       form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }
     },
     _type == "sponsorCards" => {

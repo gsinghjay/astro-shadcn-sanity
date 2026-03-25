@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import ContactForm from '../blocks/custom/ContactForm.astro';
-import { contactFormFull, contactFormMinimal } from './__fixtures__/contact-form';
+import { contactFormFull, contactFormMinimal, contactFormSplit, contactFormSplitImage } from './__fixtures__/contact-form';
 
 describe('ContactForm', () => {
   test('renders heading and description', async () => {
@@ -98,5 +98,61 @@ describe('ContactForm', () => {
     expect(html).toContain('data-form-success');
     expect(html).toContain('data-form-error');
     expect(html).toContain('data-form-fields');
+  });
+
+  // Variant tests
+  test('defaults to stacked layout when no variant provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('data-contact-form');
+    expect(html).toContain('Get In Touch');
+  });
+
+  test('stacked variant renders same output as default (no variant)', async () => {
+    const container = await AstroContainer.create();
+    const [htmlDefault, htmlStacked] = await Promise.all([
+      container.renderToString(ContactForm, { props: contactFormFull }),
+      container.renderToString(ContactForm, { props: { ...contactFormFull, variant: 'stacked' } }),
+    ]);
+
+    expect(htmlStacked).toContain('data-contact-form');
+    expect(htmlStacked).toContain('Get In Touch');
+    // Both should produce the same structure
+    expect(htmlDefault).toContain('data-animate');
+    expect(htmlStacked).toContain('data-animate');
+  });
+
+  test('split variant renders SectionSplit with heading on left and form on right', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormSplit,
+    });
+
+    expect(html).toContain('Get In Touch');
+    expect(html).toContain('data-contact-form');
+    expect(html).toContain('3fr');
+  });
+
+  test('split-image variant renders image from backgroundImages', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormSplitImage,
+    });
+
+    expect(html).toContain('Contact office');
+    expect(html).toContain('data-contact-form');
+    expect(html).toContain('Get In Touch');
+  });
+
+  test('split-image variant without backgroundImages does not crash', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: { ...contactFormSplitImage, backgroundImages: null },
+    });
+
+    expect(html).toContain('data-contact-form');
   });
 });
