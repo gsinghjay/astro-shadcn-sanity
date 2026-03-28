@@ -1,6 +1,6 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
-import { Section, SectionContent, SectionSplit, SectionGrid, SectionMasonry, SectionSpread } from '@/components/ui/section';
+import { Section, SectionContent, SectionSplit, SectionGrid, SectionMasonry } from '@/components/ui/section';
 import {
   NativeCarousel,
   NativeCarouselContent,
@@ -23,7 +23,15 @@ interface Props {
 }
 
 const { heading, displayMode, testimonials = [], variant, class: className, id } = Astro.props;
-const cleanVariant = stegaClean(variant) || 'grid';
+const rawVariant = stegaClean(variant);
+const cleanVariant =
+  rawVariant === 'grid' ||
+  rawVariant === 'masonry' ||
+  rawVariant === 'split' ||
+  rawVariant === 'carousel' ||
+  rawVariant === 'marquee'
+    ? rawVariant
+    : 'grid';
 
 // For byProject mode, group testimonials by project reference
 const isByProject = stegaClean(displayMode) === 'byProject';

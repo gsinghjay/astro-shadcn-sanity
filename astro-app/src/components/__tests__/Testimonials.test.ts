@@ -100,6 +100,53 @@ describe('Testimonials', () => {
     expect(html).toBeDefined();
   });
 
+  test('masonry variant renders masonry column classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'masonry' },
+    });
+
+    expect(html).toContain('columns-2xs');
+  });
+
+  test('split variant renders single-column review stack', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'split' },
+    });
+
+    expect(html).toContain('grid-cols-1');
+  });
+
+  test('carousel variant renders native carousel markup', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'carousel' },
+    });
+
+    expect(html).toContain('data-slot="native-carousel"');
+    expect(html).toContain('var(--breakpoint-sm)');
+  });
+
+  test('marquee variant renders two marquee lanes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'marquee' },
+    });
+
+    const marqueeLaneCount = (html.match(/group\/marquee/g) ?? []).length;
+    expect(marqueeLaneCount).toBe(2);
+  });
+
+  test('unknown variant falls back to grid layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'legacy-variant' },
+    });
+
+    expect(html).toContain('md:grid-cols-2 lg:grid-cols-3');
+  });
+
   test('renders YouTube video embed with privacy-enhanced URL', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {

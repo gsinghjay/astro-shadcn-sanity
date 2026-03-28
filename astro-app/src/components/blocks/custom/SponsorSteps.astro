@@ -27,7 +27,8 @@ interface Props extends SponsorStepsBlock {
 }
 
 const { heading, subheading, items, ctaButtons, variant } = Astro.props;
-const cleanVariant = stegaClean(variant) || 'steps';
+const rawVariant = stegaClean(variant);
+const cleanVariant = rawVariant === 'steps' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'steps';
 ---
 
 {cleanVariant === 'steps' && (

@@ -11,7 +11,8 @@ interface Props extends StatsRowBlock {
 
 const { heading, stats, backgroundVariant, variant } = Astro.props;
 const isDark = stegaClean(backgroundVariant) === 'dark';
-const cleanVariant = stegaClean(variant) || 'grid';
+const rawVariant = stegaClean(variant);
+const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'grid';
 ---
 
 {cleanVariant === 'grid' && (

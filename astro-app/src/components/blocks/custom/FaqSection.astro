@@ -1,6 +1,6 @@
 ---
 import type { FaqSectionBlock } from '@/lib/types';
-import { Section, SectionSplit, SectionContent, SectionSpread, SectionProse } from '@/components/ui/section';
+import { Section, SectionSplit, SectionContent, SectionSpread } from '@/components/ui/section';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
@@ -12,7 +12,14 @@ interface Props extends FaqSectionBlock {
 }
 
 const { heading, items, variant } = Astro.props;
-const cleanVariant = stegaClean(variant) || 'split';
+const rawVariant = stegaClean(variant);
+const cleanVariant =
+  rawVariant === 'split' ||
+  rawVariant === 'stacked' ||
+  rawVariant === 'spread-header' ||
+  rawVariant === 'narrow'
+    ? rawVariant
+    : 'split';
 ---
 
 {cleanVariant === 'split' && (
