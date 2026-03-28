@@ -261,6 +261,7 @@ export type Testimonials = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "masonry" | "split" | "carousel" | "marquee";
   heading?: string;
   displayMode?: "all" | "industry" | "student" | "byProject" | "manual";
   testimonials?: Array<
@@ -314,6 +315,7 @@ export type FaqSection = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "split" | "stacked" | "spread-header" | "narrow";
   heading?: string;
   items?: Array<
     {
@@ -336,6 +338,7 @@ export type SponsorSteps = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "steps" | "split" | "spread";
   heading?: string;
   subheading?: string;
   items?: Array<
@@ -388,6 +391,7 @@ export type StatsRow = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "split" | "spread";
   heading?: string;
   stats?: Array<
     {
@@ -2244,7 +2248,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "narrow" | "split" | "spread-header" | "stacked" | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2606,7 +2610,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "split" | "spread" | "steps" | null;
         heading: string | null;
         subheading: string | null;
         items: Array<{
@@ -2628,7 +2632,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid" | "split" | "spread" | null;
         heading: string | null;
         stats: Array<{
           _key: string;
@@ -2676,7 +2680,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "carousel" | "grid" | "marquee" | "masonry" | "split" | null;
         heading: string | null;
         displayMode:
           | "all"

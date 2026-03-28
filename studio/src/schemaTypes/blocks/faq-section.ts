@@ -7,6 +7,12 @@ export const faqSection = defineBlock({
   title: 'FAQ Section',
   icon: HelpCircleIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'split', title: 'Split (sticky heading left, accordion right)'},
+    {name: 'stacked', title: 'Stacked (centered heading, full-width accordion below)'},
+    {name: 'spread-header', title: 'Spread Header (heading left, buttons right, accordion below)'},
+    {name: 'narrow', title: 'Narrow (672px centered column)'},
+  ],
   fields: [
     defineField({
       name: 'heading',

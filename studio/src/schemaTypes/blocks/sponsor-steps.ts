@@ -7,6 +7,11 @@ export const sponsorSteps = defineBlock({
   title: 'Sponsor Steps',
   icon: OlistIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'steps', title: 'Steps (vertical on mobile, horizontal on desktop with connecting line)'},
+    {name: 'split', title: 'Split (heading/buttons left, step grid right)'},
+    {name: 'spread', title: 'Spread (centered heading above, steps spread horizontally)'},
+  ],
   fields: [
     defineField({
       name: 'heading',

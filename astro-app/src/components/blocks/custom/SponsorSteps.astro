@@ -10,6 +10,8 @@ import {
   SectionContent,
   SectionProse,
   SectionSplit,
+  SectionGrid,
+  SectionSpread,
 } from '@/components/ui/section';
 import {
   Tile,
@@ -24,43 +26,146 @@ interface Props extends SponsorStepsBlock {
   id?: string;
 }
 
-const { heading, subheading, items, ctaButtons } = Astro.props;
+const { heading, subheading, items, ctaButtons, variant } = Astro.props;
+const cleanVariant = stegaClean(variant) || 'steps';
 ---
 
-<Section>
-  <SectionContent>
-    {(heading || subheading) && (
-      <SectionProse>
-        {heading && <h2>{heading}</h2>}
-        {subheading && <p>{subheading}</p>}
-      </SectionProse>
-    )}
-    <SectionActions>
-      {
-        ctaButtons?.map((btn, i) => (
-          <Button
-            variant={i === 0 ? 'default' : 'outline'}
-            href={btn.url}
-            data-gtm-category="cta"
-            data-gtm-action="click"
-            data-gtm-label={stegaClean(btn.text)}
-          >
-            {btn.text}
-          </Button>
-        ))
-      }
-    </SectionActions>
-    <SectionSplit
-      class="before:bg-border relative gap-8 before:absolute before:left-5.5 before:h-full before:w-px before:@5xl:top-5.5 before:@5xl:h-px before:@5xl:w-full"
-    >
+{cleanVariant === 'steps' && (
+  <Section>
+    <SectionContent>
+      {(heading || subheading) && (
+        <SectionProse>
+          {heading && <h2>{heading}</h2>}
+          {subheading && <p>{subheading}</p>}
+        </SectionProse>
+      )}
+      <SectionActions>
+        {
+          ctaButtons?.map((btn, i) => (
+            <Button
+              variant={i === 0 ? 'default' : 'outline'}
+              href={btn.url}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))
+        }
+      </SectionActions>
+      <SectionSplit
+        class="before:bg-border relative gap-8 before:absolute before:left-5.5 before:h-full before:w-px before:@5xl:top-5.5 before:@5xl:h-px before:@5xl:w-full"
+      >
+        {
+          (items ?? []).map(({ title, description, list }, i) => (
+            <Tile class="items-start gap-8 gap-x-4 @max-5xl:flex-row">
+              <TileMedia variant="icon">{i + 1}</TileMedia>
+              <TileContent class="p-0">
+                <TileTitle class="not-first:mt-4">{title}</TileTitle>
+                <TileDescription>{description}</TileDescription>
+                <List class="text-foreground not-first:mt-4">
+                  {list?.map((item) => (
+                    <ListItem>
+                      <CircleCheck />
+                      {item}
+                    </ListItem>
+                  ))}
+                </List>
+              </TileContent>
+            </Tile>
+          ))
+        }
+      </SectionSplit>
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section>
+    <SectionSplit>
+      <SectionContent>
+        {(heading || subheading) && (
+          <SectionProse>
+            {heading && <h2>{heading}</h2>}
+            {subheading && <p>{subheading}</p>}
+          </SectionProse>
+        )}
+        <SectionActions>
+          {
+            ctaButtons?.map((btn, i) => (
+              <Button
+                variant={i === 0 ? 'default' : 'outline'}
+                href={btn.url}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))
+          }
+        </SectionActions>
+      </SectionContent>
+      <SectionGrid>
+        {
+          (items ?? []).map(({ title, description, list }, i) => (
+            <Tile>
+              <TileMedia variant="icon">{i + 1}</TileMedia>
+              <TileContent>
+                <TileTitle>{title}</TileTitle>
+                <TileDescription>{description}</TileDescription>
+                <List class="text-foreground">
+                  {list?.map((item) => (
+                    <ListItem>
+                      <CircleCheck />
+                      {item}
+                    </ListItem>
+                  ))}
+                </List>
+              </TileContent>
+            </Tile>
+          ))
+        }
+      </SectionGrid>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'spread' && (
+  <Section>
+    <SectionContent>
+      {(heading || subheading) && (
+        <SectionProse>
+          {heading && <h2>{heading}</h2>}
+          {subheading && <p>{subheading}</p>}
+        </SectionProse>
+      )}
+      <SectionActions>
+        {
+          ctaButtons?.map((btn, i) => (
+            <Button
+              variant={i === 0 ? 'default' : 'outline'}
+              href={btn.url}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))
+        }
+      </SectionActions>
+    </SectionContent>
+    <SectionSpread>
       {
         (items ?? []).map(({ title, description, list }, i) => (
-          <Tile class="items-start gap-8 gap-x-4 @max-5xl:flex-row">
+          <Tile>
             <TileMedia variant="icon">{i + 1}</TileMedia>
-            <TileContent class="p-0">
-              <TileTitle class="not-first:mt-4">{title}</TileTitle>
+            <TileContent>
+              <TileTitle>{title}</TileTitle>
               <TileDescription>{description}</TileDescription>
-              <List class="text-foreground not-first:mt-4">
+              <List class="text-foreground">
                 {list?.map((item) => (
                   <ListItem>
                     <CircleCheck />
@@ -72,6 +177,6 @@ const { heading, subheading, items, ctaButtons } = Astro.props;
           </Tile>
         ))
       }
-    </SectionSplit>
-  </SectionContent>
-</Section>
+    </SectionSpread>
+  </Section>
+)}

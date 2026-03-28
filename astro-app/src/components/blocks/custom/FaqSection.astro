@@ -1,26 +1,59 @@
 ---
 import type { FaqSectionBlock } from '@/lib/types';
-import { Section, SectionSplit, SectionContent } from '@/components/ui/section';
+import { Section, SectionSplit, SectionContent, SectionSpread, SectionProse } from '@/components/ui/section';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props extends FaqSectionBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, items } = Astro.props;
+const { heading, items, variant } = Astro.props;
+const cleanVariant = stegaClean(variant) || 'split';
 ---
 
-<Section data-animate>
-  <SectionSplit>
+{cleanVariant === 'split' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionContent>
+        {heading && (
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{heading}</h2>
+        )}
+      </SectionContent>
+
+      <Accordion>
+        {(items ?? []).map((item, i) => (
+          <AccordionItem id={item._key}>
+            <AccordionTrigger>
+              <span class="flex items-start gap-4">
+                <span class="text-xs font-bold text-muted-foreground mt-0.5 flex-shrink-0">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span>{item.question}</span>
+              </span>
+            </AccordionTrigger>
+            <AccordionContent>
+              {Array.isArray(item.answer)
+                ? <div class="text-muted-foreground leading-relaxed pl-10 prose"><PortableText value={item.answer} components={portableTextComponents} /></div>
+                : <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>}
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'stacked' && (
+  <Section data-animate>
     <SectionContent>
       {heading && (
-        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] sticky top-24">{heading}</h2>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       )}
     </SectionContent>
-
     <Accordion>
       {(items ?? []).map((item, i) => (
         <AccordionItem id={item._key}>
@@ -40,5 +73,65 @@ const { heading, items } = Astro.props;
         </AccordionItem>
       ))}
     </Accordion>
-  </SectionSplit>
-</Section>
+  </Section>
+)}
+
+{cleanVariant === 'spread-header' && (
+  <Section data-animate>
+    <SectionSpread>
+      <div>
+        {heading && (
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+      </div>
+    </SectionSpread>
+    <Accordion>
+      {(items ?? []).map((item, i) => (
+        <AccordionItem id={item._key}>
+          <AccordionTrigger>
+            <span class="flex items-start gap-4">
+              <span class="text-xs font-bold text-muted-foreground mt-0.5 flex-shrink-0">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span>{item.question}</span>
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            {Array.isArray(item.answer)
+              ? <div class="text-muted-foreground leading-relaxed pl-10 prose"><PortableText value={item.answer} components={portableTextComponents} /></div>
+              : <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  </Section>
+)}
+
+{cleanVariant === 'narrow' && (
+  <Section data-animate style="--section-width: 672px;">
+    <SectionContent>
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+    </SectionContent>
+    <Accordion>
+      {(items ?? []).map((item, i) => (
+        <AccordionItem id={item._key}>
+          <AccordionTrigger>
+            <span class="flex items-start gap-4">
+              <span class="text-xs font-bold text-muted-foreground mt-0.5 flex-shrink-0">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <span>{item.question}</span>
+            </span>
+          </AccordionTrigger>
+          <AccordionContent>
+            {Array.isArray(item.answer)
+              ? <div class="text-muted-foreground leading-relaxed pl-10 prose"><PortableText value={item.answer} components={portableTextComponents} /></div>
+              : <p class="text-muted-foreground leading-relaxed pl-10">{item.answer}</p>}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  </Section>
+)}

@@ -1,6 +1,14 @@
 ---
 import type { Testimonial } from '@/lib/sanity';
-import { Section, SectionContent } from '@/components/ui/section';
+import { Section, SectionContent, SectionSplit, SectionGrid, SectionMasonry, SectionSpread } from '@/components/ui/section';
+import {
+  NativeCarousel,
+  NativeCarouselContent,
+  NativeCarouselItem,
+  NativeCarouselNext,
+  NativeCarouselPrevious,
+} from '@/components/ui/native-carousel';
+import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import { stegaClean } from '@sanity/client/stega';
 
@@ -8,12 +16,14 @@ interface Props {
   heading?: string | null;
   displayMode?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
   testimonials?: Testimonial[];
+  variant?: string;
   class?: string;
   id?: string;
   [key: string]: unknown;
 }
 
-const { heading, displayMode, testimonials = [] } = Astro.props;
+const { heading, displayMode, testimonials = [], variant, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(variant) || 'grid';
 
 // For byProject mode, group testimonials by project reference
 const isByProject = stegaClean(displayMode) === 'byProject';
@@ -30,41 +40,135 @@ if (isByProject) {
 }
 ---
 
-<Section data-animate>
-  {heading && (
-    <SectionContent>
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
-    </SectionContent>
-  )}
+{cleanVariant === 'grid' && (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
 
-  {isByProject ? (
-    <SectionContent>
-      {[...grouped.entries()].map(([, group]) => (
-        <div class="mb-10 last:mb-0">
-          <h3 class="text-2xl font-bold mb-4">
-            <a href={`/projects/${group.slug}`} class="hover:text-primary transition-colors">
-              {group.title}
-            </a>
-          </h3>
+    {isByProject ? (
+      <SectionContent>
+        {[...grouped.entries()].map(([, group]) => (
+          <div class="mb-10 last:mb-0">
+            <h3 class="text-2xl font-bold mb-4">
+              <a href={`/projects/${group.slug}`} class="hover:text-primary transition-colors">
+                {group.title}
+              </a>
+            </h3>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {group.testimonials.map((t) => (
+                <TestimonialCard testimonial={t} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </SectionContent>
+    ) : (
+      <SectionContent>
+        {testimonials.length > 0 ? (
           <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {group.testimonials.map((t) => (
+            {testimonials.map((t) => (
               <TestimonialCard testimonial={t} />
             ))}
           </div>
-        </div>
-      ))}
-    </SectionContent>
-  ) : (
-    <SectionContent>
+        ) : (
+          <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+        )}
+      </SectionContent>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'masonry' && (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    {testimonials.length > 0 ? (
+      <SectionMasonry>
+        {testimonials.map((t) => (
+          <TestimonialCard testimonial={t} />
+        ))}
+      </SectionMasonry>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+      </SectionContent>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section data-animate class={className} id={id}>
+    <SectionSplit>
+      <SectionContent>
+        {heading && (
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+      </SectionContent>
       {testimonials.length > 0 ? (
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <SectionGrid class="grid-cols-1">
           {testimonials.map((t) => (
             <TestimonialCard testimonial={t} />
           ))}
-        </div>
+        </SectionGrid>
       ) : (
-        <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+        <div class="text-muted-foreground text-center py-8">No testimonials to display.</div>
+      )}
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'carousel' && (
+  <Section data-animate class={className} id={id} style={{ '--section-width': 'var(--breakpoint-sm)' }}>
+    <SectionContent class="items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       )}
     </SectionContent>
-  )}
-</Section>
+    {testimonials.length > 0 ? (
+      <NativeCarousel>
+        <NativeCarouselContent>
+          {testimonials.map((t) => (
+            <NativeCarouselItem>
+              <TestimonialCard testimonial={t} />
+            </NativeCarouselItem>
+          ))}
+        </NativeCarouselContent>
+        <NativeCarouselPrevious class="top-auto -bottom-2 left-6" />
+        <NativeCarouselNext class="top-auto right-6 -bottom-2" />
+      </NativeCarousel>
+    ) : (
+      <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'marquee' && (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    {testimonials.length > 0 ? (
+      <>
+        {(['left', 'right'] as const).map((direction) => (
+          <Marquee class={direction === 'right' ? 'mask-x-from-95%' : ''}>
+            <MarqueeContent direction={direction} pauseOnHover>
+              {[...testimonials, ...testimonials].map((t) => (
+                <TestimonialCard testimonial={t} />
+              ))}
+            </MarqueeContent>
+          </Marquee>
+        ))}
+      </>
+    ) : (
+      <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+    )}
+  </Section>
+)}
