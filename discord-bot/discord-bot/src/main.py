@@ -19,12 +19,19 @@ from models import (
     MessageResponseData,
 )
 from sanity import get_project, get_upcoming_events, get_sponsor, get_all_sponsors
+
 load_dotenv()
 
 PUBLIC_KEY = os.getenv("DISCORD_PUBLIC_KEY")
 APPLICATION_ID = os.getenv("DISCORD_APPLICATION_ID")
+
+if not PUBLIC_KEY:
+    raise RuntimeError("DISCORD_PUBLIC_KEY is not set.")
+if not APPLICATION_ID:
+    raise RuntimeError("DISCORD_APPLICATION_ID is not set.")
+
 TIMESTAMP_TOLERANCE_SECONDS = 300
-_start_time = None
+_start_time = time.time()
 
 
 def verify_discord_signature(public_key_hex: str, signature_hex: str, timestamp: str, body: bytes) -> bool:
@@ -66,14 +73,11 @@ def verify_timestamp(timestamp: str) -> bool:
 
 
 def get_uptime() -> str:
-    """Calculate and format the bot uptime since server start.
+    """Calculate and format the bot uptime since process start.
 
     Returns:
         A human-readable uptime string (e.g. '2h 15m 30s').
     """
-    global _start_time
-    if _start_time is None:
-        _start_time = time.time()
     elapsed = int(time.time() - _start_time)
     hours, remainder = divmod(elapsed, 3600)
     minutes, seconds = divmod(remainder, 60)
@@ -114,7 +118,9 @@ async def send_followup(token: str, content: str = None, embeds: list = None) ->
         embeds: Optional list of embed dicts to include in the followup.
     """
     url = f"https://discord.com/api/v10/webhooks/{APPLICATION_ID}/{token}"
-    payload = {}
+    payload = {
+        "allowed_mentions": {"parse": []},  # prevent @everyone and role pings
+    }
     if content:
         payload["content"] = content
     if embeds:
@@ -170,7 +176,7 @@ async def handle_upcoming_events(token: str, limit: int = 5) -> None:
 
     Args:
         token: The interaction token for sending the followup.
-        limit: Maximum number of events to return.
+        limit: Maximum number of events to return (max 10 per Discord embed limit).
     """
     events = await get_upcoming_events(limit)
 
@@ -220,8 +226,7 @@ async def handle_sponsor_info(token: str, sponsor_name: str = None) -> None:
 
     Args:
         token: The interaction token for sending the followup.
-        sponsor_name: The sponsor name to search for in Sanity.
-        list_all: If True, list all sponsor names instead of looking up a specific one.
+        sponsor_name: The sponsor name to search for. If None, lists all sponsors.
     """
     if not sponsor_name:
         sponsors = await get_all_sponsors()
@@ -241,7 +246,7 @@ async def handle_sponsor_info(token: str, sponsor_name: str = None) -> None:
         await send_followup(token, content=f"No sponsor found matching **{sponsor_name}**.")
         return
 
-    tier = sponsor.get("tier", "unknown")
+    tier = (sponsor.get("tier") or "unknown")
     tier_colors = {
         "platinum": 0xE5E4E2,
         "gold": 0xFFD700,
@@ -266,6 +271,7 @@ async def handle_sponsor_info(token: str, sponsor_name: str = None) -> None:
     }
 
     await send_followup(token, embeds=[embed])
+
 
 app = FastAPI(
     title="Capstone Bot",
@@ -353,7 +359,7 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
                 (opt["value"] for opt in options if opt["name"] == "limit"),
                 5
             )
-            limit = max(1, min(int(limit), 15))
+            limit = max(1, min(int(limit), 10))
             background_tasks.add_task(handle_upcoming_events, interaction.token, limit)
             return JSONResponse(content={"type": 5})
 
