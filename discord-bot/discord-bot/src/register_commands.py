@@ -73,7 +73,7 @@ def main():
         "Content-Type": "application/json",
     }
 
-    response = httpx.put(url, headers=headers, json=commands)
+    response = httpx.put(url, headers=headers, json=commands, timeout=10.0)
     if response.status_code in (200, 201):
         for command in response.json():
             print(f"✓ Registered command: /{command['name']}")

@@ -4,6 +4,7 @@ Sanity CMS client for querying project and event data.
 
 import os
 import httpx
+import json
 from typing import Any
 
 SANITY_API_VERSION = "2024-01-01"
@@ -27,7 +28,7 @@ async def query_sanity(dataset: str, groq: str, params: dict = None) -> Any:
     query_params = {"query": groq}
     if params:
         for key, value in params.items():
-            query_params[f"${key}"] = f'"{value}"'
+            query_params[f"${key}"] = json.dumps(value)
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=query_params)
         response.raise_for_status()

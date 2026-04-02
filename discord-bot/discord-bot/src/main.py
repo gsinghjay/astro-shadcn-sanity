@@ -372,10 +372,6 @@ async def interactions(request: Request, background_tasks: BackgroundTasks):
             background_tasks.add_task(handle_sponsor_info, interaction.token, sponsor_name)
             return JSONResponse(content={"type": 5})
 
-        if command_name == "hello":
-            return ImmediateResponse(
-                data=MessageResponseData(content="Hello from a slash command!")
-            )
 
         raise HTTPException(status_code=400, detail=f"Unknown command: {command_name}")
 
