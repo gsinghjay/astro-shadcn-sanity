@@ -8,6 +8,10 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+# ---------------------------------------------------------------------------
+# Enums
+# ---------------------------------------------------------------------------
+
 class InteractionType(IntEnum):
     """Discord interaction types."""
     PING = 1
@@ -30,6 +34,10 @@ class ComponentType(IntEnum):
     BUTTON = 2
     STRING_SELECT = 3
 
+
+# ---------------------------------------------------------------------------
+# Shared sub-models
+# ---------------------------------------------------------------------------
 
 class User(BaseModel):
     """Represents a Discord user."""
@@ -70,6 +78,10 @@ class MessageComponentData(BaseModel):
     values: list[str] = Field(default_factory=list)
 
 
+# ---------------------------------------------------------------------------
+# Request models
+# ---------------------------------------------------------------------------
+
 class PingInteraction(BaseModel):
     """Interaction model for a PING request from Discord."""
     id: str
@@ -93,7 +105,7 @@ class ApplicationCommandInteraction(BaseModel):
     data: ApplicationCommandData
 
 
-class MessageComponentInteraction(BaseModel):
+class MessageComponentInteraction(BaseModel):   
     """Interaction model for a button or dropdown interaction."""
     id: str
     application_id: str
@@ -122,6 +134,10 @@ class Interaction(BaseModel):
     data: dict[str, Any] = Field(default_factory=dict)
     message: dict[str, Any] = Field(default_factory=dict)
 
+
+# ---------------------------------------------------------------------------
+# Response models
+# ---------------------------------------------------------------------------
 
 class EmbedFooter(BaseModel):
     """Footer section of a Discord embed."""
@@ -161,7 +177,14 @@ class MessageResponseData(BaseModel):
 
     @classmethod
     def ephemeral(cls, content: str) -> "MessageResponseData":
-        """Create an ephemeral message response visible only to the invoking user."""
+        """Create an ephemeral message response visible only to the invoking user.
+
+        Args:
+            content: The message content to display.
+
+        Returns:
+            A MessageResponseData instance with the ephemeral flag set.
+        """
         return cls(content=content, flags=64)
 
 

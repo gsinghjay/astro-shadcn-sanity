@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/discord-bot.iml" filepath="$PROJECT_DIR$/.idea/discord-bot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/astro-shadcn-sanity.iml" filepath="$PROJECT_DIR$/.idea/astro-shadcn-sanity.iml" />
     </modules>
   </component>
 </project>

@@ -1,0 +1,19 @@
+# Environment variables
+.env
+src/.env
+
+# JetBrains IDE
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+
+# Wrangler
+.wrangler/
