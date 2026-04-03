@@ -77,7 +77,7 @@ const preloadImageUrl = heroImage?.asset
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>
-      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div slot="fallback" class="mx-auto max-w-7xl px-(--gutter) py-12">
         <div class="animate-pulse space-y-8">
           <div class="h-10 bg-muted rounded w-2/5"></div>
           <div class="h-64 bg-muted rounded"></div>

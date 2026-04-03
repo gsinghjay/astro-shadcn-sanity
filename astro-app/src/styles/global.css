@@ -123,6 +123,11 @@
 }
 
 :root {
+  /* Gutter system — single source of truth for edge/container padding.
+     Responsive: 16px (mobile) → 24px (sm 640px) → 32px (lg 1024px).
+     Referenced by section, header, footer, banner via var(--gutter, 24px)
+     and by templates via px-(--gutter). */
+  --gutter: 1rem;
   --radius: 0;
   --background: #ffffff;
   --foreground: #0a0a0a;
@@ -209,6 +214,18 @@
   --primary: #059669;
   --ring: #059669;
   --destructive: #047857;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 2rem;
+  }
 }
 
 @layer base {
