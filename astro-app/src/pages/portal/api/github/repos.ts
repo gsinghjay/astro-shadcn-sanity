@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ locals }) => {
     });
   }
 
-  const db = getDrizzle(locals);
+  const db = getDrizzle();
   const tokenResult = await getGitHubToken(db, user.email);
 
   if (tokenResult.error) {

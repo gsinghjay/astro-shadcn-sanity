@@ -4,7 +4,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "fs";
 import { resolve, relative } from "path";
 
 const DIST = resolve(__dirname, "../../../dist");
-const WORKER_DIR = resolve(DIST, "_worker.js");
+const WORKER_DIR = resolve(DIST, "server");
 const ASTRO_APP = resolve(__dirname, "../../..");
 
 /**
@@ -28,10 +28,10 @@ function collectWorkerModules(): Array<{ type: "ESModule"; path: string }> {
 
   walk(WORKER_DIR);
 
-  // Entry module (index.js) must be first
+  // Entry module (entry.mjs) must be first
   modules.sort((a, b) => {
-    const aIsEntry = a.path.endsWith("index.js") ? 0 : 1;
-    const bIsEntry = b.path.endsWith("index.js") ? 0 : 1;
+    const aIsEntry = a.path.endsWith("entry.mjs") ? 0 : 1;
+    const bIsEntry = b.path.endsWith("entry.mjs") ? 0 : 1;
     return aIsEntry - bIsEntry;
   });
 

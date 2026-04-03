@@ -17,29 +17,27 @@ vi.mock('@/lib/auth-config', () => ({
   createAuth: mockCreateAuth,
 }));
 
-import { GET, POST } from '@/pages/api/auth/[...all]';
-
-const mockLocals = {
-  runtime: {
-    env: {
-      GOOGLE_CLIENT_ID: 'test-id',
-      GOOGLE_CLIENT_SECRET: 'test-secret',
-      GITHUB_CLIENT_ID: 'test-github-id',
-      GITHUB_CLIENT_SECRET: 'test-github-secret',
-      BETTER_AUTH_SECRET: 'test-auth-secret',
-      BETTER_AUTH_URL: 'http://localhost:4321',
-      RESEND_API_KEY: 'test-resend-key',
-      PORTAL_DB: {},
-    },
+// Mock cloudflare:workers env (used by auth route after Astro 6 migration)
+vi.mock('cloudflare:workers', () => ({
+  env: {
+    GOOGLE_CLIENT_ID: 'test-id',
+    GOOGLE_CLIENT_SECRET: 'test-secret',
+    GITHUB_CLIENT_ID: 'test-github-id',
+    GITHUB_CLIENT_SECRET: 'test-github-secret',
+    BETTER_AUTH_SECRET: 'test-auth-secret',
+    BETTER_AUTH_URL: 'http://localhost:4321',
+    RESEND_API_KEY: 'test-resend-key',
+    PORTAL_DB: {},
   },
-} as unknown as App.Locals;
+}));
+
+import { GET, POST } from '@/pages/api/auth/[...all]';
 
 const mockRequest = new Request('http://localhost:4321/api/auth/session');
 
 describe('[...all].ts auth route — error handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset to success defaults
     mockGetDrizzle.mockReturnValue({ __drizzle: true });
     mockCreateAuth.mockReturnValue({ handler: mockHandler });
   });
@@ -48,7 +46,7 @@ describe('[...all].ts auth route — error handling', () => {
     const mockResponse = new Response('ok', { status: 200 });
     mockHandler.mockResolvedValue(mockResponse);
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.status).toBe(200);
   });
 
@@ -57,7 +55,7 @@ describe('[...all].ts auth route — error handling', () => {
       throw new Error('Missing required auth environment variable: BETTER_AUTH_SECRET');
     });
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.status).toBe(500);
     const body = await result.json();
     expect(body.error).toBe('Auth configuration error');
@@ -68,7 +66,7 @@ describe('[...all].ts auth route — error handling', () => {
       throw new Error('PORTAL_DB binding not available');
     });
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.status).toBe(500);
     const body = await result.json();
     expect(body.error).toBe('Auth configuration error');
@@ -77,7 +75,7 @@ describe('[...all].ts auth route — error handling', () => {
   it('returns 503 for D1 runtime errors', async () => {
     mockHandler.mockRejectedValue(new Error('D1_ERROR: database unavailable'));
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.status).toBe(503);
     const body = await result.json();
     expect(body.error).toBe('Auth service unavailable');
@@ -86,7 +84,7 @@ describe('[...all].ts auth route — error handling', () => {
   it('returns 503 for non-Error exceptions', async () => {
     mockHandler.mockRejectedValue('unexpected string error');
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.status).toBe(503);
     const body = await result.json();
     expect(body.error).toBe('Auth service unavailable');
@@ -95,7 +93,7 @@ describe('[...all].ts auth route — error handling', () => {
   it('does not expose internal error details in response body', async () => {
     mockHandler.mockRejectedValue(new Error('secret internal error with DB credentials'));
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     const body = await result.json();
     expect(body.error).not.toContain('secret');
     expect(body.error).not.toContain('credentials');
@@ -104,7 +102,7 @@ describe('[...all].ts auth route — error handling', () => {
   it('sets Content-Type to application/json on error responses', async () => {
     mockHandler.mockRejectedValue(new Error('some error'));
 
-    const result = await GET({ locals: mockLocals, request: mockRequest } as any);
+    const result = await GET({ request: mockRequest } as any);
     expect(result.headers.get('Content-Type')).toBe('application/json');
   });
 

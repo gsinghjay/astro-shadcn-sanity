@@ -40,8 +40,10 @@ describe("Wrangler config — astro-app/wrangler.jsonc", () => {
     expect(app.compatibility_flags).toContain("nodejs_compat");
   });
 
-  it("pages_build_output_dir points to ./dist", () => {
+  it("assets.directory points to ./dist (Workers format)", () => {
     const app = loadAppWranglerJsonc();
-    expect(app.pages_build_output_dir).toBe("./dist");
+    const assets = app.assets as Record<string, unknown>;
+    expect(assets.directory).toBe("./dist");
+    expect(assets.binding).toBe("ASSETS");
   });
 });

@@ -1,8 +1,7 @@
 // astro-app/wrangler.jsonc
 //
-// LOCAL DEV ONLY. This file is for `wrangler pages dev` and is NOT the source
-// of truth for production. Per-project env vars and secrets are managed in the
-// CF Pages dashboard for each project:
+// Cloudflare Workers configuration (migrated from Pages in Astro 6 / @astrojs/cloudflare v13).
+// Per-project env vars and secrets are managed in the CF Workers dashboard for each project:
 //   - ywcc-capstone  (dataset: production, site: capstone, theme: red)
 //   - rwc-us         (dataset: rwc, site: rwc-us, theme: blue)
 //   - rwc-intl       (dataset: rwc, site: rwc-intl, theme: green)
@@ -10,11 +9,13 @@
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
   "name": "ywcc-capstone",
   "compatibility_date": "2025-12-01",
-  "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
-  "pages_build_output_dir": "./dist",
-  "vars": {
-    // GitHub OAuth, Resend API key, and Google OAuth secrets are set via the CF Pages dashboard.
-    // Local dev bypasses auth via the `import.meta.env.DEV` check in middleware.
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
   },
   "d1_databases": [
     {
@@ -24,14 +25,13 @@
     }
   ],
   // KV session cache for student auth (optional — middleware degrades gracefully without it).
-  // Replace "id" with your actual namespace ID from: wrangler kv namespace create SESSION_CACHE
   "kv_namespaces": [
     {
       "binding": "SESSION_CACHE",
       "id": "f78af5695075451c9d3d7887368e90dc"
     }
   ],
-  // Durable Object rate limiter — hosted in a separate worker (Pages can't export DO classes).
+  // Durable Object rate limiter — hosted in a separate worker.
   // The rate-limiter-worker must be deployed before the main app.
   "durable_objects": {
     "bindings": [

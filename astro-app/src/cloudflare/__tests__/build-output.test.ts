@@ -5,76 +5,53 @@ import { resolve } from "path";
 const DIST = resolve(__dirname, "../../../dist");
 
 /**
- * These tests validate the Cloudflare Pages build output.
+ * These tests validate the Cloudflare Workers build output (Astro 6 / @astrojs/cloudflare v13).
+ * Structure: dist/client/ (static assets), dist/server/ (worker entry).
  * They require `npm run build --workspace=astro-app` to have run first.
- * In CI, the build step runs before unit tests, so these will pass.
- * Locally, run `npm run build --workspace=astro-app` before `npm run test:unit`.
  */
 const describeIfBuilt = existsSync(DIST) ? describe : describe.skip;
 
-describeIfBuilt("Build output — Cloudflare Pages structure", () => {
+describeIfBuilt("Build output — Cloudflare Workers structure", () => {
   it("dist/ directory exists", () => {
     expect(existsSync(DIST)).toBe(true);
   });
 
-  it("_worker.js/ directory exists (Cloudflare Workers entrypoint)", () => {
-    expect(existsSync(resolve(DIST, "_worker.js"))).toBe(true);
+  it("dist/server/ directory exists (worker entrypoint)", () => {
+    expect(existsSync(resolve(DIST, "server"))).toBe(true);
   });
 
-  it("_worker.js/index.js exists (main worker script)", () => {
-    expect(existsSync(resolve(DIST, "_worker.js/index.js"))).toBe(true);
+  it("dist/server/entry.mjs exists (main worker script)", () => {
+    expect(existsSync(resolve(DIST, "server/entry.mjs"))).toBe(true);
   });
 
-  it("_routes.json exists (Cloudflare Pages routing)", () => {
-    expect(existsSync(resolve(DIST, "_routes.json"))).toBe(true);
+  it("dist/client/ directory exists (static assets)", () => {
+    expect(existsSync(resolve(DIST, "client"))).toBe(true);
   });
 
-  it("_routes.json has valid structure", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    expect(routes).toHaveProperty("version", 1);
-    expect(routes).toHaveProperty("include");
-    expect(routes).toHaveProperty("exclude");
-    expect(Array.isArray(routes.include)).toBe(true);
-    expect(Array.isArray(routes.exclude)).toBe(true);
-  });
-
-  it("_routes.json excludes static assets from worker", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    // _astro/ contains hashed JS/CSS bundles — should be served as static
-    expect(routes.exclude).toContain("/_astro/*");
-  });
-
-  it("_astro/ directory exists (client-side bundles)", () => {
-    expect(existsSync(resolve(DIST, "_astro"))).toBe(true);
-  });
-
-  it("_astro/ contains hashed JS bundles", () => {
-    const files = readdirSync(resolve(DIST, "_astro"));
+  it("dist/client/_astro/ contains hashed JS bundles", () => {
+    const files = readdirSync(resolve(DIST, "client/_astro"));
     const jsFiles = files.filter((f) => f.endsWith(".js"));
     expect(jsFiles.length).toBeGreaterThan(0);
   });
 
   it("published pages are prerendered as static HTML", () => {
-    // With output: "static" + server islands (Story 7.4),
-    // all pages are prerendered at build time. The server island
-    // handles only the dynamic content area via /_server-islands/*.
-    const indexHtml = resolve(DIST, "index.html");
+    const indexHtml = resolve(DIST, "client/index.html");
     expect(existsSync(indexHtml), "index.html should exist (prerendered)").toBe(true);
   });
 
-  it("_routes.json excludes prerendered pages from worker", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    // Root route should be excluded — served as static HTML, not by the worker
-    expect(routes.exclude).toContain("/");
+  it("server chunks include server island map", () => {
+    const chunksDir = resolve(DIST, "server/chunks");
+    const chunks = readdirSync(chunksDir).filter((f) => f.endsWith(".mjs"));
+    const allChunks = chunks.map((f) => readFileSync(resolve(chunksDir, f), "utf-8")).join("\n");
+    expect(allChunks).toContain("serverIslandMap");
+    expect(allChunks).toContain("SanityPageContent");
   });
 
-  it("worker entry includes server island map", () => {
-    const workerEntry = readFileSync(resolve(DIST, "_worker.js/index.js"), "utf-8");
-    expect(workerEntry).toContain("serverIslandMap");
-    expect(workerEntry).toContain("SanityPageContent");
+  it("_headers file exists in client dir (Cloudflare custom headers)", () => {
+    expect(existsSync(resolve(DIST, "client/_headers"))).toBe(true);
   });
 
-  it("_headers file exists (Cloudflare custom headers)", () => {
-    expect(existsSync(resolve(DIST, "_headers"))).toBe(true);
+  it("dist/server/wrangler.json exists (auto-generated worker config)", () => {
+    expect(existsSync(resolve(DIST, "server/wrangler.json"))).toBe(true);
   });
 });

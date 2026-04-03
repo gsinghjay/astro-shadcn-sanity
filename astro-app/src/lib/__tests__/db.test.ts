@@ -1,53 +1,61 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockDrizzle } = vi.hoisted(() => {
+const { mockDrizzle, mockEnv } = vi.hoisted(() => {
   const mockDrizzle = vi.fn().mockReturnValue({ __drizzle: true });
-  return { mockDrizzle };
+  const mockEnv: Record<string, unknown> = {};
+  return { mockDrizzle, mockEnv };
 });
 
 vi.mock('drizzle-orm/d1', () => ({
   drizzle: mockDrizzle,
 }));
 
+vi.mock('cloudflare:workers', () => ({
+  env: mockEnv,
+}));
+
 import { getDb, getDrizzle } from '@/lib/db';
 
+beforeEach(() => {
+  for (const key of Object.keys(mockEnv)) delete mockEnv[key];
+  mockDrizzle.mockClear();
+});
+
 describe('getDb() — D1 binding accessor', () => {
-  it('returns the PORTAL_DB binding from locals', () => {
+  it('returns the PORTAL_DB binding from env', () => {
     const mockD1 = { prepare: vi.fn() } as unknown as D1Database;
-    const locals = { runtime: { env: { PORTAL_DB: mockD1 } } } as unknown as App.Locals;
-    expect(getDb(locals)).toBe(mockD1);
+    mockEnv.PORTAL_DB = mockD1;
+    expect(getDb()).toBe(mockD1);
   });
 
   it('throws when PORTAL_DB binding is missing', () => {
-    const locals = { runtime: { env: {} } } as unknown as App.Locals;
-    expect(() => getDb(locals)).toThrow('PORTAL_DB binding not available');
+    expect(() => getDb()).toThrow('PORTAL_DB binding not available');
   });
 
-  it('throws when runtime.env is undefined', () => {
-    const locals = { runtime: { env: { PORTAL_DB: undefined } } } as unknown as App.Locals;
-    expect(() => getDb(locals)).toThrow('PORTAL_DB binding not available');
+  it('throws when PORTAL_DB is undefined', () => {
+    mockEnv.PORTAL_DB = undefined;
+    expect(() => getDb()).toThrow('PORTAL_DB binding not available');
   });
 });
 
 describe('getDrizzle() — shared Drizzle ORM instance', () => {
   it('returns a Drizzle instance wrapping PORTAL_DB', () => {
     const mockD1 = { prepare: vi.fn() } as unknown as D1Database;
-    const locals = { runtime: { env: { PORTAL_DB: mockD1 } } } as unknown as App.Locals;
-    const result = getDrizzle(locals);
+    mockEnv.PORTAL_DB = mockD1;
+    const result = getDrizzle();
     expect(result).toBeDefined();
     expect(mockDrizzle).toHaveBeenCalledWith(mockD1, expect.objectContaining({}));
   });
 
   it('passes schema to drizzle()', () => {
     const mockD1 = { prepare: vi.fn() } as unknown as D1Database;
-    const locals = { runtime: { env: { PORTAL_DB: mockD1 } } } as unknown as App.Locals;
-    getDrizzle(locals);
+    mockEnv.PORTAL_DB = mockD1;
+    getDrizzle();
     const call = mockDrizzle.mock.calls[0];
     expect(call[1]).toHaveProperty('schema');
   });
 
   it('propagates error when PORTAL_DB binding is missing', () => {
-    const locals = { runtime: { env: {} } } as unknown as App.Locals;
-    expect(() => getDrizzle(locals)).toThrow('PORTAL_DB binding not available');
+    expect(() => getDrizzle()).toThrow('PORTAL_DB binding not available');
   });
 });

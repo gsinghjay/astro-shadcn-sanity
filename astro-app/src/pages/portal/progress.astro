@@ -39,7 +39,7 @@ const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
 });
 
 // Get GitHub token from D1
-const db = getDrizzle(Astro.locals);
+const db = getDrizzle();
 const tokenResult = await getGitHubToken(db, email);
 
 // State machine: determine page state

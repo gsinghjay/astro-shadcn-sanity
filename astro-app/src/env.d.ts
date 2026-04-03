@@ -29,7 +29,8 @@ interface RateLimiterDO {
   }>;
 }
 
-type Runtime = import("@astrojs/cloudflare").Runtime<{
+/** Cloudflare Workers env bindings — used by `import { env } from 'cloudflare:workers'` */
+interface CloudflareEnv {
   TURNSTILE_SECRET_KEY: string;
   DISCORD_WEBHOOK_URL: string;
   SANITY_API_WRITE_TOKEN: string;
@@ -44,10 +45,17 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
   RESEND_FROM_EMAIL?: string;
   SESSION_CACHE?: KVNamespace;
   RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
-}>;
+  ASSETS: Fetcher;
+}
+
+declare module "cloudflare:workers" {
+  const env: CloudflareEnv;
+  export { env };
+}
 
 declare namespace App {
-  interface Locals extends Runtime {
+  interface Locals {
+    cfContext?: ExecutionContext;
     user?: { email: string; role: 'sponsor' | 'student'; name?: string };
   }
 }

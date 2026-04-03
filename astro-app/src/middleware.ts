@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { env as cfEnv } from "cloudflare:workers";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -46,14 +47,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { getDrizzle } = await import("@/lib/db");
   const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
-  const runtimeEnv = context.locals.runtime?.env;
-  if (!runtimeEnv) {
-    console.error("[middleware] Cloudflare runtime env not available");
-    return new Response("Service Unavailable", { status: 503 });
-  }
-
   // Rate limiting — per-IP sliding window via Durable Object (fail-open)
-  const rateLimiter = runtimeEnv.RATE_LIMITER;
+  const rateLimiter = cfEnv.RATE_LIMITER;
   if (rateLimiter) {
     const ip = context.request.headers.get("CF-Connecting-IP") ?? "unknown";
     try {
@@ -79,7 +74,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Unified session check — one path for both sponsors and students
   try {
-    const kvCache = runtimeEnv?.SESSION_CACHE;
+    const kvCache = cfEnv?.SESSION_CACHE;
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
     let userData: { email: string; name: string; role: string } | null = null;
@@ -94,17 +89,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // D1 fallback via Better Auth
     if (!userData && sessionToken) {
-      const db = getDrizzle(context.locals);
+      const db = getDrizzle();
       const auth = createAuth({
         db,
         env: {
-          GOOGLE_CLIENT_ID: runtimeEnv.GOOGLE_CLIENT_ID,
-          GOOGLE_CLIENT_SECRET: runtimeEnv.GOOGLE_CLIENT_SECRET,
-          GITHUB_CLIENT_ID: runtimeEnv.GITHUB_CLIENT_ID,
-          GITHUB_CLIENT_SECRET: runtimeEnv.GITHUB_CLIENT_SECRET,
-          BETTER_AUTH_SECRET: runtimeEnv.BETTER_AUTH_SECRET,
-          BETTER_AUTH_URL: runtimeEnv.BETTER_AUTH_URL,
-          RESEND_API_KEY: runtimeEnv.RESEND_API_KEY,
+          GOOGLE_CLIENT_ID: cfEnv.GOOGLE_CLIENT_ID,
+          GOOGLE_CLIENT_SECRET: cfEnv.GOOGLE_CLIENT_SECRET,
+          GITHUB_CLIENT_ID: cfEnv.GITHUB_CLIENT_ID,
+          GITHUB_CLIENT_SECRET: cfEnv.GITHUB_CLIENT_SECRET,
+          BETTER_AUTH_SECRET: cfEnv.BETTER_AUTH_SECRET,
+          BETTER_AUTH_URL: cfEnv.BETTER_AUTH_URL,
+          RESEND_API_KEY: cfEnv.RESEND_API_KEY,
         },
         requestOrigin: context.url.origin,
       });
@@ -123,7 +118,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
         // Cache session in KV (fire-and-forget, 5-min TTL)
         if (kvCache) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
       }
     }
@@ -143,11 +138,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
         userData.role = "sponsor";
         // Persist escalated role to KV cache (fire-and-forget)
         if (kvCache && sessionToken) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
         // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
-        if (runtimeEnv?.PORTAL_DB) {
-          runtimeEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE email = ?')
+        if (cfEnv?.PORTAL_DB) {
+          cfEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE email = ?')
             .bind('sponsor', userData.email)
             .run()
             .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
