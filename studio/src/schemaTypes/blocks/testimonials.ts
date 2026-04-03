@@ -7,6 +7,16 @@ export const testimonials = defineBlock({
   title: 'Testimonials',
   icon: CommentIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid (responsive grid of testimonial cards)'},
+    {name: 'masonry', title: 'Masonry (Pinterest-style flowing grid)'},
+    {name: 'split', title: 'Split (heading/buttons left, stacked reviews right)'},
+    {name: 'carousel', title: 'Carousel (horizontal slider with nav arrows)'},
+    {name: 'marquee', title: 'Marquee (auto-scrolling rows, opposite directions)'},
+  ],
+  hiddenByVariant: {
+    displayMode: ['carousel', 'marquee'],
+  },
   fields: [
     defineField({
       name: 'heading',

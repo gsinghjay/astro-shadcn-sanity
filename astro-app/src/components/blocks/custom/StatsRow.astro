@@ -1,35 +1,82 @@
 ---
 import type { StatsRowBlock } from '@/lib/types';
-import { Section } from '@/components/ui/section';
+import { Section, SectionSplit, SectionGrid, SectionSpread, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
+import { Tile, TileContent, TileDescription, TileTitle } from '@/components/ui/tile';
 
 interface Props extends StatsRowBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, stats, backgroundVariant } = Astro.props;
+const { heading, stats, backgroundVariant, variant } = Astro.props;
 const isDark = stegaClean(backgroundVariant) === 'dark';
+const rawVariant = stegaClean(variant);
+const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'grid';
 ---
 
-<Section
-  size="sm"
-  class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
-  data-animate
->
-  {heading && (
-    <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
-  )}
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-    {(stats ?? []).map((stat) => (
-      <div class="text-center">
-        <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
-          {stat.value}
+{cleanVariant === 'grid' && (
+  <Section
+    size="sm"
+    class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
+    data-animate
+  >
+    {heading && (
+      <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
+    )}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+      {(stats ?? []).map((stat) => (
+        <div class="text-center">
+          <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
+            {stat.value}
+          </div>
+          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+            {stat.label}
+          </div>
         </div>
-        <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
-          {stat.label}
-        </div>
-      </div>
-    ))}
-  </div>
-</Section>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section class={isDark ? 'bg-foreground text-background' : ''} data-animate>
+    <SectionSplit>
+      <SectionContent>
+        {heading && (
+          <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em]">{heading}</h2>
+        )}
+      </SectionContent>
+      <SectionGrid class="grid-cols-1">
+        {(stats ?? []).map((stat) => (
+          <Tile>
+            <TileContent>
+              <TileTitle>{stat.value}</TileTitle>
+              <TileDescription>{stat.label}</TileDescription>
+            </TileContent>
+          </Tile>
+        ))}
+      </SectionGrid>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'spread' && (
+  <Section class={isDark ? 'bg-foreground text-background' : ''} data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em]">{heading}</h2>
+      )}
+    </SectionContent>
+    <SectionSpread>
+      {(stats ?? []).map((stat) => (
+        <Tile>
+          <TileContent>
+            <TileTitle>{stat.value}</TileTitle>
+            <TileDescription>{stat.label}</TileDescription>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionSpread>
+  </Section>
+)}

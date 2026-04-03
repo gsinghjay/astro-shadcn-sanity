@@ -226,11 +226,12 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(statsRow.type).toBe('object')
     })
 
-    test('[P1] 2.1-INT-019 — statsRow has all 2 block-specific fields', () => {
+    test('[P1] 2.1-INT-019 — statsRow has all 3 block-specific fields', () => {
       const fieldNames = getBlockFields(statsRow).map((f: any) => f.name)
       expect(fieldNames).toContain('heading')
       expect(fieldNames).toContain('stats')
-      expect(fieldNames).toHaveLength(2)
+      expect(fieldNames).toContain('variant')
+      expect(fieldNames).toHaveLength(3)
     })
 
     test('[P1] 2.1-INT-020 — statsRow stats is array of statItem with value (required), label (required), description', () => {

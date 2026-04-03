@@ -34,4 +34,41 @@ describe('StatsRow', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('grid variant uses the existing manual 2x4 grid classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'grid' },
+    });
+
+    expect(html).toContain('grid-cols-2 md:grid-cols-4');
+  });
+
+  test('split variant renders a single-column stat stack', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'split' },
+    });
+
+    expect(html).toContain('grid-cols-1');
+    expect(html).not.toContain('grid-cols-2 md:grid-cols-4');
+  });
+
+  test('spread variant renders spread container classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'spread' },
+    });
+
+    expect(html).toContain('@5xl:justify-between');
+  });
+
+  test('unknown variant falls back to grid layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'legacy-variant' },
+    });
+
+    expect(html).toContain('grid-cols-2 md:grid-cols-4');
+  });
 });
