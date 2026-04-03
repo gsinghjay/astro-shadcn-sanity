@@ -70,4 +70,13 @@ describe('CookieConsent', () => {
 
     expect(html).toContain('data-state="hidden"');
   });
+
+  test('renders with inert attribute when hidden by default', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(CookieConsent, {
+      props: { gtmId: 'GTM-TEST123' },
+    });
+
+    expect(html).toContain('inert');
+  });
 });

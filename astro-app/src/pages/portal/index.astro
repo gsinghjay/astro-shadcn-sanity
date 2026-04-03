@@ -77,8 +77,12 @@ const cards = [
   </div>
 </PortalLayout>
 
-{/* GTM: portal landing page view */}
+{/* GTM: portal landing page view — only pushes if consent accepted */}
 <script>
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: "portal_landing_view" });
+  try {
+    if (localStorage.getItem('cookie-consent') === 'accepted') {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: "portal_landing_view" });
+    }
+  } catch { /* localStorage unavailable */ }
 </script>

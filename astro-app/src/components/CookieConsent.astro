@@ -10,6 +10,7 @@ const { gtmId } = Astro.props;
     data-cookie-consent-banner
     data-gtm-id={gtmId}
     data-state="hidden"
+    inert
     role="dialog"
     aria-label="Cookie consent"
     aria-live="polite"
@@ -45,16 +46,38 @@ const { gtmId } = Astro.props;
     const gtmId = banner.dataset.gtmId;
     const acceptBtn = banner.querySelector<HTMLButtonElement>('[data-cookie-accept]');
     const rejectBtn = banner.querySelector<HTMLButtonElement>('[data-cookie-reject]');
+    let gtmInjected = false;
+
+    function getConsent(): string | null {
+      try {
+        return localStorage.getItem('cookie-consent');
+      } catch {
+        return null;
+      }
+    }
+
+    function setConsent(value: string): void {
+      try {
+        localStorage.setItem('cookie-consent', value);
+      } catch {
+        // Storage unavailable (private browsing, disabled) — consent still works for this session
+      }
+    }
 
     function showBanner(): void {
       banner!.dataset.state = 'visible';
+      banner!.removeAttribute('inert');
     }
 
     function hideBanner(): void {
       banner!.dataset.state = 'hidden';
+      banner!.setAttribute('inert', '');
     }
 
     function injectGtm(id: string): void {
+      if (gtmInjected) return;
+      gtmInjected = true;
+
       (function (w: Window, d: Document, s: string, l: string, i: string) {
         (w as any)[l] = (w as any)[l] || [];
         (w as any)[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
@@ -79,7 +102,7 @@ const { gtmId } = Astro.props;
 
     function handleConsent(accepted: boolean): void {
       const value = accepted ? 'accepted' : 'rejected';
-      localStorage.setItem('cookie-consent', value);
+      setConsent(value);
       hideBanner();
 
       window.dataLayer = window.dataLayer || [];
@@ -94,7 +117,7 @@ const { gtmId } = Astro.props;
     }
 
     // Check existing consent
-    const consent = localStorage.getItem('cookie-consent');
+    const consent = getConsent();
     if (consent === 'accepted') {
       hideBanner();
       if (gtmId) injectGtm(gtmId);
@@ -107,6 +130,13 @@ const { gtmId } = Astro.props;
     acceptBtn?.addEventListener('click', () => handleConsent(true));
     rejectBtn?.addEventListener('click', () => handleConsent(false));
 
+    // Escape key dismisses the banner
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && banner!.dataset.state === 'visible') {
+        hideBanner();
+      }
+    });
+
     // Cookie Settings trigger from footer
     document.querySelector('[data-cookie-settings-trigger]')?.addEventListener('click', () => {
       showBanner();
@@ -114,5 +144,5 @@ const { gtmId } = Astro.props;
     });
   }
 
-  document.addEventListener('DOMContentLoaded', initCookieConsent);
+  document.addEventListener('astro:page-load', initCookieConsent);
 </script>

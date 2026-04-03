@@ -67,25 +67,32 @@ Two mechanisms feed data into GTM:
 
 ## The GTM Script and Performance
 
-The GTM container loads asynchronously in `Layout.astro` and only renders when the `PUBLIC_GTM_ID` environment variable is set:
+The GTM container is **consent-gated** via the `CookieConsent.astro` component (Story 5.16). The GTM `<script>` tag is **not** present in the initial HTML. Instead, it is dynamically injected by client-side JavaScript only after the user explicitly clicks "Accept" on the cookie consent banner.
+
+`Layout.astro` passes the `gtmId` prop to `<CookieConsent>`, which renders the banner and handles injection:
 
 ```astro
-{gtmId && (
-  <script define:vars={{ gtmId }}>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer',gtmId);
-  </script>
-)}
+<!-- Layout.astro -->
+<CookieConsent gtmId={gtmId} />
 ```
 
-**Key performance details:**
+When the user accepts, the standard GTM snippet is dynamically created and appended to `<head>`:
 
-- The `j.async=true` flag ensures the GTM script never blocks page rendering
-- The `<noscript>` iframe fallback in `<body>` handles users with JavaScript disabled
-- All `dataLayer.push()` calls use inline scripts or event listeners -- none add render-blocking resources
+```typescript
+// Inside CookieConsent.astro <script>
+function injectGtm(id: string): void {
+  // Standard GTM snippet — injected dynamically after consent
+  (function(w,d,s,l,i){ ... })(window, document, 'script', 'dataLayer', id);
+}
+```
+
+**Key performance and compliance details:**
+
+- **GDPR compliant:** No analytics scripts or cookies are loaded until the user explicitly opts in
+- The `j.async=true` flag ensures the GTM script never blocks page rendering once injected
+- Consent state is stored in `localStorage` (key: `cookie-consent`, values: `accepted` | `rejected`)
+- The `page_view` dataLayer push remains in `Layout.astro` `<head>` — it queues events that GTM processes when it loads after consent
+- All `dataLayer.push()` calls use inline scripts or event listeners — none add render-blocking resources
 - The site maintains LCP under 2 seconds and Lighthouse Performance at 89+ with GTM active
 
 ## What Gets Tracked

@@ -31,6 +31,7 @@ const {
 
 const footerLogoUrl = safeUrlFor(logoLight)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain-light.svg';
 const footerLogoAlt = logoLight?.alt || 'NJIT';
+const gtmId = import.meta.env.PUBLIC_GTM_ID;
 
 // Split siteName for footer display
 const nameParts = (siteName || 'YWCC Industry Capstone').split(' ');
@@ -158,14 +159,17 @@ const addressLine2 = addressLines.slice(2).join(', ');
           >{item.label}</FooterMenuLink>
         </FooterMenuItem>
       ))}
-      <FooterMenuItem>
-        <button
-          data-cookie-settings-trigger
-          class="text-background/40 hover:text-background text-xs transition-colors cursor-pointer"
-          data-gtm-category="footer"
-          data-gtm-label="cookie-settings"
-        >Cookie Settings</button>
-      </FooterMenuItem>
+      {gtmId && (
+        <FooterMenuItem>
+          <button
+            type="button"
+            data-cookie-settings-trigger
+            class="text-background/40 hover:text-background text-xs transition-colors cursor-pointer"
+            data-gtm-category="footer"
+            data-gtm-label="cookie-settings"
+          >Cookie Settings</button>
+        </FooterMenuItem>
+      )}
     </FooterMenu>
   </FooterSpread>
 </FooterUI>
