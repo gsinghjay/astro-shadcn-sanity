@@ -7,6 +7,16 @@ export const featureGrid = defineBlock({
   title: 'Feature Grid',
   icon: ThLargeIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid (Default)'},
+    {name: 'grid-centered', title: 'Grid Centered'},
+    {name: 'horizontal-cards', title: 'Horizontal Cards'},
+    {name: 'sidebar-grid', title: 'Sidebar Grid'},
+    {name: 'stacked', title: 'Stacked'},
+  ],
+  hiddenByVariant: {
+    columns: ['stacked', 'sidebar-grid'],
+  },
   fields: [
     defineField({
       name: 'heading',

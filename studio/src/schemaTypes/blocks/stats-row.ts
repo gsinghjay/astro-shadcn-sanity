@@ -7,6 +7,11 @@ export const statsRow = defineBlock({
   title: 'Stats Row',
   icon: BarChartIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid (responsive grid of stat tiles)'},
+    {name: 'split', title: 'Split (heading/buttons left, vertical stat stack right)'},
+    {name: 'spread', title: 'Spread (centered heading above, icon-based stats spread)'},
+  ],
   fields: [
     defineField({
       name: 'heading',

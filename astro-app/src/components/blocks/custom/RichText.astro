@@ -3,17 +3,34 @@ import type { RichTextBlock } from '@/lib/types';
 import { Section, SectionProse } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props extends RichTextBlock {
   class?: string;
   id?: string;
 }
 
-const { content } = Astro.props;
+const { content, variant } = Astro.props;
+
+// Clean variant value and default to 'prose'
+const cleanVariant = stegaClean(variant ?? 'prose');
 ---
 
 <Section data-animate>
-  <SectionProse>
-    {content && <PortableText value={content} components={portableTextComponents} />}
-  </SectionProse>
+  {cleanVariant === 'wide' ? (
+    // Wide variant keeps prose typography but removes max-width cap
+    <SectionProse size="lg" class="max-w-none">
+      {content && <PortableText value={content} components={portableTextComponents} />}
+    </SectionProse>
+  ) : cleanVariant === 'narrow' ? (
+    // Narrow variant uses explicit section width custom property
+    <SectionProse style="--section-width: 672px; max-width: var(--section-width);" class="w-full">
+      {content && <PortableText value={content} components={portableTextComponents} />}
+    </SectionProse>
+  ) : (
+    // Prose default variant
+    <SectionProse>
+      {content && <PortableText value={content} components={portableTextComponents} />}
+    </SectionProse>
+  )}
 </Section>

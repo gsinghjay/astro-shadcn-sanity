@@ -7,6 +7,15 @@ export const textWithImage = defineBlock({
   title: 'Text with Image',
   icon: ImageIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'split', title: 'Split (Default)'},
+    {name: 'split-asymmetric', title: 'Split Asymmetric'},
+    {name: 'reversed', title: 'Reversed'},
+    {name: 'floating', title: 'Floating'},
+  ],
+  hiddenByVariant: {
+    imagePosition: ['reversed', 'floating'],
+  },
   fields: [
     defineField({
       name: 'heading',
