@@ -1,3 +1,53 @@
+## [1.12.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.11.0...v1.12.0) (2026-04-03)
+
+### Features
+
+* **blocks:** add projectCards page builder block (Story 2.16) ([e417566](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e417566f842a3c4acb95803438af269f0a78adc3))
+* **blocks:** add sponsorshipTiers page builder block (Story 2.17) ([264a5d1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/264a5d1c02410330dc6b85b3c919ce8a4b9c87ea))
+* **events:** add event reminder notifications via CF Workers cron (Story 2.13) ([a2fdb25](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a2fdb25588fb33500d83089a5c31512a1abae552))
+* **events:** add iCal export and Add to Calendar buttons (Story 2.18) ([128ba16](https://github.com/gsinghjay/astro-shadcn-sanity/commit/128ba16440da2363ccc329747653caf7bcc36f81))
+* **gdpr:** add cookie consent banner gating GTM behind user opt-in ([7cf2017](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7cf201705fd679826c83d47b0c88864070f2936c))
+* **portal:** add extended GitHub dashboard insights ([5b59168](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5b591685778bea5d63e2d191bef1e861a04f876c))
+* **portal:** add GitHub dev dashboard with self-serve repo linking (Story 9.4) ([8d78b5c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8d78b5cc0ca118220907d79c51e676eea43f737a))
+* replace PyNaCl with Web Crypto API via Node.js FFI for Ed25519 signature verification ([e8ecf84](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e8ecf84bbd4d1ce20395da8e1dde2efa54f76dec))
+* **testimonials:** add YouTube video embed support (Story 2.19) ([8483b41](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8483b411f8a5a0ccfcad64fbc905d4f9594a7290))
+* **video:** add reusable video embed component with code review fixes (Story 2.21) ([0198c4a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0198c4ad42f32ee1cc9a0425c4b04603ee420322))
+
+### Bug Fixes
+
+* address CodeRabbit review comments ([b1af408](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b1af4088ed51431d9c965102272eb30280b74f16))
+* address CodeRabbit review comments ([41e12b1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/41e12b1bbdd3904356deb867f69a9d8775175cd3))
+* **auth:** allow linking GitHub accounts with different emails ([93f8d5d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/93f8d5d45797b9f6777cbee7481c5cd7ff8c2746))
+* **blocks:** add stegaClean to SponsorshipTiers button variant prop ([8f7b139](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8f7b1393b79fd692ca1ba3318c46fe0362444b23))
+* **blocks:** improve SponsorshipTiers preview subtitle and SVG accessibility ([45b4329](https://github.com/gsinghjay/astro-shadcn-sanity/commit/45b43295c5d1f40d4e8ce1bc0b8b08cb51c1214c))
+* **csp:** allow GitHub avatars and Cloudflare Web Analytics ([c3282fc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c3282fc120c6fd62da23f3b6caa6799520ce59b7))
+* **docker:** remove workspace node_modules named volumes to fix EACCES errors ([81449c4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/81449c4a51bfefe8dd1ffa370c40d0b1d24f7bcb))
+* **gdpr:** address code review findings for cookie consent banner ([44e177b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/44e177bc00a3d756e8786a392876d10e66d019d8))
+* **header:** stegaClean nav labels so Presentation Tool links navigate directly ([b1a198a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b1a198a9820acf8914819a4f89637aeff44d0ee4))
+* **platform-api:** address PR [#562](https://github.com/gsinghjay/astro-shadcn-sanity/issues/562) review findings ([a93d597](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a93d597f6e4e3d9c77965cb98f2d03aeb7c3b7b9))
+* **platform-api:** code review fixes for Stories 12.1 and 12.2 ([4e2bb61](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4e2bb6181e43daf4dc7b661a295eb4f2567f84d1))
+* **platform-api:** pass null params to Sanity and validate token prefix ([b8516cb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b8516cb8633b075ab694a240471c2bae6773c8b7))
+* **platform-api:** restore hardcoded Sanity project ID fallback ([bd578b1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bd578b1b5b69f22058613eef5f3a43ad32704ece))
+* **portal:** additional code review fixes for Story 9.19 ([8428b9d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8428b9dcd70e726a2f49534fdaedc9a8ec120164))
+* **portal:** code review fixes for Story 9.19 GitHub extended insights ([3ab35af](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3ab35af23c23346b32fb119566b19d0b37e54a3e))
+* **portal:** code review fixes for Story 9.4 GitHub dev dashboard ([7610041](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7610041b5d2f0a5b62b804ee281d8d6cf61c9c5e))
+* **portal:** harden Better Auth GitHub integration ([d3ac11f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d3ac11fcf5bee76bdfcba6bef263bd1f9ea18d45))
+* **portal:** use linkSocial instead of signIn.social for GitHub account linking ([c762112](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c7621128ec16810b20f693b34474b143bc4328cd))
+* **testimonials:** add stegaClean to video embed and expand test coverage (Story 2.19) ([11c2d7a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/11c2d7a1c810f0996084093f1cf38db26184524a))
+* **testimonials:** code review fixes for Story 2.19 ([6e970cf](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6e970cff5d9aebf652b510f4d5c46aec175ba260))
+* **tests:** add missing test coverage for SponsorshipTiers code review findings ([8227519](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8227519dfb04c9142568d2127ff0000b0bc48d6d))
+* **video:** code review fixes for Story 2.21 ([d1f0a60](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d1f0a60f2a4c6b9b7f4a945d7cffd49bc5b6f8af))
+
+### Documentation
+
+* add docstrings to meet 80% coverage threshold ([c04c6ed](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c04c6edeb96d964d787f2380e9a3e6be8632fbe7))
+* rescan and update project documentation (deep scan v1.11.0) ([8c37d04](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8c37d04fb38b9395b0be244ac28e0f873a0fa6d1))
+
+### Miscellaneous
+
+* resolve merge conflicts ([f73ed89](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f73ed893d8348973bcf656b6ba01bb0beb542351))
+* update package-lock.json after wrangler upgrade ([d6247ff](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d6247ff09247fec867e615e2c93bfbdbc08ab9a9))
+
 ## [1.11.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.10.0...v1.11.0) (2026-03-10)
 
 ### Features
