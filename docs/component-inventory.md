@@ -1,253 +1,248 @@
 # Component Inventory
 
-Complete inventory of the 508 component files in `astro-app/src/components/`.
+*Generated: 2026-03-11 | Scan Level: deep*
 
-## Overview and Counts
+## Summary
 
-| Category | Location | Count | Description |
-|----------|----------|------:|-------------|
-| Custom Sanity Blocks | `blocks/custom/` | 13 | Page builder blocks mapped to Sanity schema types |
-| UI Blocks | `blocks/` | 101 | Generic presentation blocks from fulldev/ui registry |
-| UI Primitives | `ui/` | 39 families | shadcn-astro style composable primitives |
-| Top-level Components | `components/` | 14 | Layout, routing, and entity card components |
-| Portal Components | `portal/` | 5 | React-based authenticated portal UI |
-| Storybook Stories | across all dirs | 153 | Visual regression and documentation stories |
-| Container API Tests | `__tests__/` | 18 | Vitest component tests using Astro Container API |
+| Category | Count | Location |
+|----------|-------|----------|
+| Custom Sanity Blocks | 23 | src/components/blocks/custom/ |
+| Generic UI Blocks | 115+ | src/components/blocks/ |
+| UI Primitive Families | 39 | src/components/ui/ |
+| Top-Level Components | 15 | src/components/ |
+| Portal Components (React) | 8 | src/components/portal/ |
+| Storybook Stories | 120+ | *.stories.ts files |
+| **Total Component Files** | **508+** | |
 
-## Block System Architecture
+---
 
-The page builder uses a three-layer architecture that maps Sanity document types to rendered Astro components.
+## Custom Sanity Block Components
 
-```mermaid
-flowchart TD
-    A[Sanity Page Document] -->|blocks array| B[SanityPageContent.astro]
-    B -->|selects template| C[Template Layout]
-    C --> D[BlockRenderer.astro]
-    D -->|looks up _type| E[block-registry.ts]
-    E -->|import.meta.glob| F[Custom Blocks\nblocks/custom/*.astro]
-    E -->|import.meta.glob| G[UI Blocks\nblocks/*.astro]
-    D -->|wraps each block| H[BlockWrapper.astro]
-    H -->|backgroundVariant\nspacing, maxWidth| I[Rendered Block]
-    D -->|resolves external data| J[Sponsors / Testimonials / Events]
-    J --> I
+These components render page builder blocks from Sanity content. Each maps to a schema block type.
+
+| Component | Schema Type | Variants | Story | Test |
+|-----------|------------|----------|-------|------|
+| HeroBanner.astro | heroBanner | centered, split, split-asymmetric, overlay, spread | 2.1 | Yes |
+| FeatureGrid.astro | featureGrid | - | 2.1 | Yes |
+| CtaBanner.astro | ctaBanner | centered, split, spread, overlay | 2.1 | Yes |
+| StatsRow.astro | statsRow | - | 2.1 | Yes |
+| TextWithImage.astro | textWithImage | - | 2.1 | Yes |
+| LogoCloud.astro | logoCloud | - | 2.1 | Yes |
+| SponsorSteps.astro | sponsorSteps | - | 2.1 | Yes |
+| RichText.astro | richText | - | 2.1b | Yes |
+| FaqSection.astro | faqSection | - | 2.1b | Yes |
+| ContactForm.astro | contactForm | - | 2.1b | Yes |
+| SponsorCards.astro | sponsorCards | - | 2.14 | Yes |
+| Testimonials.astro | testimonials | - | 2.1b | Yes |
+| EventList.astro | eventList | - | 2.1b | Yes |
+| ProjectCards.astro | projectCards | - | 2.16 | Yes |
+| TeamGrid.astro | teamGrid | grid, grid-compact, split | 2.9 | Yes |
+| ImageGallery.astro | imageGallery | grid, masonry, single | 2.9 | Yes |
+| ArticleList.astro | articleList | grid, split-featured, list | 2.9 | Yes |
+| ComparisonTable.astro | comparisonTable | table, stacked | 2.10 | Yes |
+| Timeline.astro | timeline | vertical, split, horizontal | 2.10 | Yes |
+| Pullquote.astro | pullquote | centered, split, sidebar | 2.10 | Yes |
+| Divider.astro | divider | line, short, labeled | 2.11 | Yes |
+| AnnouncementBar.astro | announcementBar | inline, floating | 2.11 | Yes |
+| SponsorshipTiers.astro | sponsorshipTiers | - | 2.17 | Yes |
+
+### Block Dispatch Flow
+
+```
+Page data (Sanity) → BlockRenderer.astro → block-registry.ts → CustomBlock.astro
+                           │                      │
+                           ▼                      ▼
+                     BlockWrapper.astro    import.meta.glob()
+                     (spacing, bg,        auto-discovers all
+                      maxWidth)           blocks/custom/*.astro
 ```
 
-**block-registry.ts** auto-discovers components via `import.meta.glob`:
-- Custom blocks: PascalCase filename converts to camelCase `_type` (e.g., `HeroBanner.astro` registers as `heroBanner`)
-- UI blocks: kebab-case filename used directly as `_type` (e.g., `hero-1.astro` registers as `hero-1`)
+---
 
-**BlockRenderer.astro** receives a `blocks` array from a Sanity page document, resolves each `_type` to a component, and injects external data (sponsors, testimonials, events) where needed.
+## Generic UI Block Variants
 
-**BlockWrapper.astro** wraps every block and applies shared `blockBaseFields`:
-
-| Field | Options | Default |
-|-------|---------|---------|
-| `backgroundVariant` | `white`, `light`, `dark`, `primary` | `white` |
-| `spacing` | `none`, `small`, `default`, `large` | `default` |
-| `maxWidth` | `narrow`, `default`, `full` | `default` |
-
-## Custom Sanity Blocks
-
-Each custom block lives in `blocks/custom/`, has a matching `.stories.ts` file and a Container API test in `__tests__/`. All receive typed props from Sanity via `BlockRenderer`.
-
-| Component | `_type` | Key Props | External Data |
-|-----------|---------|-----------|---------------|
-| HeroBanner | `heroBanner` | `heading`, `subheading`, `ctaButtons`, `backgroundImages`, `alignment` | -- |
-| FeatureGrid | `featureGrid` | `heading`, `columns`, `items` | -- |
-| CtaBanner | `ctaBanner` | `heading`, `description`, `ctaButtons`, `backgroundVariant` | -- |
-| StatsRow | `statsRow` | `heading`, `stats`, `backgroundVariant` | -- |
-| TextWithImage | `textWithImage` | `heading`, `content` (Portable Text), `image`, `imagePosition` | -- |
-| LogoCloud | `logoCloud` | `heading`, `autoPopulate` | `sponsors` |
-| SponsorSteps | `sponsorSteps` | `heading`, `steps`, `ctaButtons` | -- |
-| RichText | `richText` | `content` (Portable Text) | -- |
-| FaqSection | `faqSection` | `heading`, `items` (Portable Text bodies) | -- |
-| ContactForm | `contactForm` | `heading`, `description`, form field config | -- |
-| SponsorCards | `sponsorCards` | `heading`, `displayMode` | `sponsors` |
-| Testimonials | `testimonials` | `heading`, `displayMode` | `testimonials` |
-| EventList | `eventList` | `heading`, `filterBy`, `limit` | `events` |
-
-### External Data Resolution
-
-`BlockRenderer` resolves external data for blocks that reference shared collections:
-
-| Block | Resolver Function | Data Source |
-|-------|-------------------|-------------|
-| LogoCloud, SponsorCards | `resolveBlockSponsors()` | `getAllSponsors()` |
-| Testimonials | `resolveBlockTestimonials()` | `getAllTestimonials()` |
-| EventList | `resolveBlockEvents()` | `getAllEvents()` |
-
-## UI Block Library
-
-101 generic presentation blocks from the fulldev/ui registry. Each has a matching `.stories.ts` file. These use kebab-case filenames and register directly by filename in the block registry.
+Pre-built layout variants from fulldev-ui registry. Used as visual templates that custom blocks can reference.
 
 | Category | Count | Files |
-|----------|------:|-------|
-| hero | 14 | `hero-1` through `hero-14` |
-| cta | 8 | `cta-1` through `cta-8` |
-| services | 7 | `services-1` through `services-7` |
-| features | 6 | `features-1` through `features-6` |
-| content | 6 | `content-1` through `content-6` |
-| reviews | 5 | `reviews-1` through `reviews-5` |
-| products | 5 | `products-1` through `products-5` |
-| videos | 4 | `videos-1` through `videos-4` |
-| faqs | 4 | `faqs-1` through `faqs-4` |
-| blocks | 4 | `blocks-1` through `blocks-4` |
-| articles | 4 | `articles-1` through `articles-4` |
-| video | 3 | `video-1` through `video-3` |
-| steps | 3 | `steps-1` through `steps-3` |
-| stats | 3 | `stats-1` through `stats-3` |
-| pricings | 3 | `pricings-1` through `pricings-3` |
-| logos | 3 | `logos-1` through `logos-3` |
-| header | 3 | `header-1` through `header-3` |
-| footer | 3 | `footer-1` through `footer-3` |
-| contact | 3 | `contact-1` through `contact-3` |
-| links | 2 | `links-1`, `links-2` |
-| images | 2 | `images-1`, `images-2` |
-| banner | 2 | `banner-1`, `banner-2` |
-| article | 2 | `article-1`, `article-2` |
-| table | 1 | `table-1` |
-| product | 1 | `product-1` |
+|----------|-------|-------|
+| Hero sections | 14 | hero-1.astro through hero-14.astro |
+| CTA sections | 8 | cta-1.astro through cta-8.astro |
+| Services | 7 | services-1.astro through services-7.astro |
+| Features | 6 | features-1.astro through features-6.astro |
+| Content | 6 | content-1.astro through content-6.astro |
+| Reviews | 5 | reviews-1.astro through reviews-5.astro |
+| Products | 5 | products-1.astro through products-5.astro |
+| FAQs | 4 | faqs-1.astro through faqs-4.astro |
+| Videos | 4 | videos-1.astro through videos-4.astro |
+| Articles | 4+2 | articles-1..4.astro + article-1..2.astro |
+| Stats | 3 | stats-1.astro through stats-3.astro |
+| Steps | 3 | steps-1.astro through steps-3.astro |
+| Footers | 3 | footer-1.astro through footer-3.astro |
+| Headers | 3 | header-1.astro through header-3.astro |
+| Logos | 3 | logos-1.astro through logos-3.astro |
+| Pricing | 3 | pricings-1.astro through pricings-3.astro |
+| Video (single) | 3 | video-1.astro through video-3.astro |
+| Contact | 3 | contact-1.astro through contact-3.astro |
+| Images | 2 | images-1.astro, images-2.astro |
+| Banners | 2 | banner-1.astro, banner-2.astro |
+| Links | 2 | links-1.astro, links-2.astro |
+| Table | 1 | table-1.astro |
+| Block utilities | 4 | blocks-1..4.astro |
+| Product (single) | 1 | product-1.astro |
+| **Total** | **115+** | |
 
-## UI Primitives
+---
 
-39 primitive families in `ui/`, following shadcn-astro conventions. Each family uses slot-based composition with a root component and sub-components.
+## UI Primitive Families (39)
 
-| Family | Sub-components | Key Exports |
-|--------|---------------:|-------------|
-| accordion | 5 | Accordion, AccordionItem, AccordionTrigger, AccordionContent |
-| alert | 4 | Alert, AlertTitle, AlertDescription |
-| auto-form | 1 | AutoForm |
-| avatar | 4 | Avatar, AvatarImage, AvatarFallback |
-| badge | 2 | Badge |
-| banner | 6 | Banner and variants |
-| button | 2 | Button |
-| checkbox | 1 | Checkbox |
-| collapsible | 4 | Collapsible, CollapsibleTrigger, CollapsibleContent |
-| empty | 7 | Empty state compositions |
-| field | 11 | Field, FieldLabel, FieldContent, FieldMessage |
-| footer | 14 | Footer, FooterSection, FooterLink, FooterBottom |
-| header | 4 | Header components |
-| icon | 1 | Icon |
-| image | 2 | Image |
-| input | 1 | Input |
-| item | 8 | Item, ItemContent, ItemTitle, ItemDescription |
-| label | 2 | Label |
-| list | 3 | List, ListItem |
-| logo | 4 | Logo components |
-| marquee | 3 | Marquee |
-| native-carousel | 6 | NativeCarousel, NativeCarouselItem |
-| native-select | 4 | NativeSelect, NativeSelectOption |
-| navigation-menu | 10 | NavigationMenu, NavigationMenuItem, NavigationMenuLink |
-| price | 4 | Price display components |
-| radio-group | 3 | RadioGroup, RadioGroupItem |
-| rating | 1 | Rating |
-| section | 11 | Section, SectionContent, SectionSplit, SectionGrid, SectionProse, SectionActions, SectionMedia |
-| separator | 1 | Separator |
-| sheet | 9 | Sheet, SheetTrigger, SheetContent, SheetHeader, SheetFooter |
-| sidebar | 7 | Sidebar, SidebarItem, SidebarGroup |
-| skeleton | 1 | Skeleton |
-| spinner | 1 | Spinner |
-| table | 9 | Table, TableHeader, TableBody, TableRow, TableCell |
-| tabs | 5 | Tabs, TabsList, TabsTrigger, TabsContent |
-| textarea | 1 | Textarea |
-| theme-toggle | 2 | ThemeToggle |
-| tile | 9 | Tile, TileContent, TileTitle, TileDescription, TileIcon |
-| video | 1 | Video |
+shadcn-style composable primitives. Each family has an index.ts barrel export and optional sub-components.
 
-## Top-level Components
+| Family | Key Sub-Components | Purpose |
+|--------|-------------------|---------|
+| accordion | accordion, accordion-item, accordion-content | Expandable sections |
+| alert | alert-title, alert-description | Status messages |
+| auto-form | auto-form | Dynamic form generation |
+| avatar | avatar-image | Profile pictures |
+| badge | badge | Labels and tags |
+| banner | banner-close, banner-content, banner-title, banner-description | Dismissible banners |
+| button | button | CTAs (default, secondary, outline, ghost) |
+| checkbox | checkbox | Form checkbox input |
+| collapsible | collapsible, collapsible-trigger, collapsible-content | Toggle panels |
+| empty | empty-header, empty-title, empty-description, empty-content | Empty/zero states |
+| field | field, field-set, field-group, field-label, field-title, field-legend, field-description, field-content, field-error, field-separator | Form field layouts |
+| footer | footer-content, footer-copyright, footer-menu, footer-group, footer-group-label, footer-menu-item, footer-menu-link, footer-actions, footer-split, footer-grid, footer-spread, footer-description | Footer structure |
+| header | header-content, header-actions | Header structure |
+| icon | icon | Lucide SVG icon system |
+| image | image | Responsive images |
+| input | input | Text input |
+| item | item, item-group, item-content, item-media, item-title, item-description, item-actions | List/grid items |
+| label | label | Form labels |
+| list | list, list-item | Ordered/unordered lists |
+| logo | logo, logo-image, logo-text | Brand logos |
+| marquee | marquee, marquee-content | Scrolling content |
+| native-carousel | native-carousel, native-carousel-content, native-carousel-previous | Image carousel |
+| native-select | native-select, native-select-option, native-select-optgroup | Dropdown |
+| navigation-menu | navigation structure | Primary nav |
+| price | price | Pricing display |
+| radio-group | radio-group | Radio inputs |
+| rating | rating | Star ratings |
+| section | section-provider, section-content, section-split, section-spread, section-grid, section-masonry, section-actions | **Core layout container** |
+| separator | separator | Visual dividers |
+| sheet | sheet-header, sheet-footer, sheet-title, sheet-description, sheet-trigger | Modal/drawer |
+| sidebar | sidebar | Navigation sidebar |
+| skeleton | skeleton | Loading placeholders |
+| spinner | spinner | Loading indicator |
+| table | table | Data tables |
+| tabs | tabs | Tab navigation |
+| textarea | textarea | Multi-line text input |
+| theme-toggle | theme-toggle | Dark/light mode switch |
+| tile | tile, tile-content, tile-split, tile-spread, tile-title, tile-description, tile-actions | Grid tiles |
+| video | video | Video player |
 
-Components at the root of `components/` handle layout structure, navigation, and entity rendering.
+### Section Primitive (Critical)
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| BlockRenderer | `BlockRenderer.astro` | Maps page block arrays to components, resolves external data |
-| BlockWrapper | `BlockWrapper.astro` | Applies background, spacing, and max-width to each block |
-| block | `block.astro` | Generic block wrapper |
-| block-registry | `block-registry.ts` | Auto-discovers custom and UI blocks via `import.meta.glob` |
-| Breadcrumb | `Breadcrumb.astro` | Breadcrumb navigation container |
-| BreadcrumbItem | `BreadcrumbItem.astro` | Individual breadcrumb link |
-| EventCard | `EventCard.astro` | Renders event listing cards |
-| Footer | `Footer.astro` | Site-wide footer |
-| Header | `Header.astro` | Site-wide header with navigation |
-| ProjectCard | `ProjectCard.astro` | Renders project listing cards |
-| SanityPageContent | `SanityPageContent.astro` | Server Island for draft-aware page rendering |
-| SponsorCard | `SponsorCard.astro` | Renders sponsor listing cards |
-| TestimonialCard | `TestimonialCard.astro` | Renders testimonial cards |
-| VisualEditingMPA | `VisualEditingMPA.tsx` | React component enabling Sanity visual editing overlay |
-
-### SanityPageContent
-
-`SanityPageContent.astro` serves as a Server Island (`server:defer`) for preview mode. It fetches fresh Sanity data per-request, selects a page template (default, fullWidth, landing, sidebar, twoColumn), and passes blocks to `BlockRenderer`.
-
-## Portal Components
-
-React components for the authenticated portal area (`/portal/*`). These are separate from Astro UI components because `.astro` files cannot be imported into `.tsx` files.
-
-| Component | File | Purpose |
-|-----------|------|---------|
-| PortalCard | `PortalCard.tsx` | Card with icon, title, badge, and children slot |
-| PortalIcon | `PortalIcon.tsx` | Renders Lucide icons as inline SVG (SSR only, do not hydrate) |
-| PortalSkeleton | `PortalSkeleton.tsx` | Animated placeholder bars (CSS animation only) |
-| types | `types.ts` | Shared types: `PortalUser`, `PortalNavItem` |
-| CLAUDE | `CLAUDE.md` | Development guide for portal component conventions |
-
-Portal components follow the React Islands pattern: Astro pages handle auth and data fetching, then pass serializable props to React components hydrated with `client:load` or `client:visible`.
-
-## Storybook Coverage
-
-153 story files provide visual regression testing and documentation.
-
-| Location | Stories | Coverage |
-|----------|--------:|----------|
-| `blocks/custom/*.stories.ts` | 13 | All 13 custom blocks (100%) |
-| `blocks/*.stories.ts` | 101 | All 101 UI blocks (100%) |
-| `ui/**/*.stories.ts` | 38 | Select UI primitive families |
-| `components/*.stories.ts` | 1 | ProjectCard |
-
-## Component Patterns
-
-### Props and Types
-
-Custom blocks extend typed interfaces from `@/lib/types`:
-
-```typescript
-interface Props extends HeroBannerBlock {
-  class?: string;
-  id?: string;
-}
-```
-
-UI primitives use slot-based composition:
+The `section` family is the core layout primitive. All page content is wrapped in Section components:
 
 ```astro
-<Section size="lg">
+<Section>
   <SectionContent>
-    <SectionGrid size="default">
-      <!-- grid items -->
-    </SectionGrid>
+    <!-- Content here -->
   </SectionContent>
 </Section>
 ```
 
-### Stega-Clean Pattern
+**Important:** Each `<Section>` adds 48-64px vertical padding. Do NOT stack multiple Sections for content that should appear together — use a single Section with natural gap spacing.
 
-Sanity visual editing injects invisible stega strings into content. Components call `stegaClean()` before using values in logic:
+---
 
-```typescript
-import { stegaClean } from '@sanity/client/stega';
-const bg = stegaClean(backgroundVariant) ?? 'white';
-```
+## Top-Level Application Components (15)
 
-### Container API Testing
+| Component | Type | Purpose | Test |
+|-----------|------|---------|------|
+| BlockRenderer.astro | Astro | Block type dispatcher (page builder core) | Yes |
+| BlockWrapper.astro | Astro | Block spacing/styling wrapper | Yes |
+| block.astro | Astro | Block utilities | No |
+| Breadcrumb.astro | Astro | Navigation breadcrumbs | Yes |
+| BreadcrumbItem.astro | Astro | Individual breadcrumb | No |
+| EventCard.astro | Astro | Event card display | Yes |
+| Footer.astro | Astro | Site-wide footer | No |
+| Header.astro | Astro | Site-wide header (GTM tests only) | Partial |
+| ProjectCard.astro | Astro | Project card display | Yes |
+| SanityImage.astro | Astro | Optimized Sanity image (urlFor + LQIP) | Yes |
+| SanityLiveUpdater.astro | Astro | Live content subscription | No |
+| SanityPageContent.astro | Astro | Dynamic page renderer | No |
+| SponsorCard.astro | Astro | Sponsor card display | Yes |
+| TestimonialCard.astro | Astro | Testimonial display | No |
+| VariantLayout.astro | Astro | Layout variant dispatcher | Yes |
 
-Component tests use Astro Container API with mocked Sanity data:
+---
 
-```typescript
-const container = await AstroContainer.create();
-const html = await container.renderToString(HeroBanner, {
-  props: { ...heroBannerFixture }
-});
-expect(html).toContain('expected content');
-```
+## Portal Components (React)
 
-18 test files in `__tests__/` cover all custom blocks, BlockRenderer, BlockWrapper, Header, Breadcrumb, and ProjectCard.
+Hydrated React islands for the authenticated sponsor/student portal.
+
+| Component | Hydration | Purpose |
+|-----------|-----------|---------|
+| PortalCard.tsx | client:load | Card with icon, title, badge |
+| PortalIcon.tsx | (child) | Lucide icon renderer |
+| PortalSkeleton.tsx | (child) | Animated loading placeholders |
+| SponsorProjects.tsx | client:load | Projects list panel |
+| PortalCalendar.tsx | client:visible | Schedule-X event calendar |
+| EventDetailPopover.tsx | client:load | Event details overlay |
+| types.ts | - | PortalUser, PortalNavItem types |
+
+**Architecture Rule:** No direct Sanity fetching in React components. Fetch in `.astro` frontmatter or API endpoints, pass as props.
+
+---
+
+## Design System
+
+### Theme Tokens
+
+| Token | Light | Dark |
+|-------|-------|------|
+| Primary | Swiss red #e30613 | Same |
+| Background | white | neutral-950 |
+| Foreground | neutral-950 | neutral-50 |
+| Card | white | neutral-900 |
+| Muted | neutral-100 | neutral-800 |
+| Border | neutral-200 | neutral-800 |
+
+### Multi-Site Themes
+
+| Theme | Primary Color | Data Attribute |
+|-------|---------------|----------------|
+| Red (Capstone) | #e30613 | default |
+| Blue (RWC US) | #2563eb | [data-site-theme="blue"] |
+| Green (RWC Intl) | #059669 | [data-site-theme="green"] |
+
+### Typography
+
+- Sans: Helvetica Neue
+- Mono: Courier New
+- Headings: letter-spacing -0.03em, line-height 1.05
+- Body: letter-spacing -0.01em, line-height 1.5
+
+---
+
+## Test Coverage
+
+### Components With Tests (42)
+
+All 23 custom Sanity blocks have dedicated test files plus 19 additional component tests covering BlockRenderer, BlockWrapper, Breadcrumb, Header, SanityImage, EventCard, ProjectCard, SponsorCard, VariantLayout, and events page.
+
+### Components Without Tests
+
+- Footer.astro
+- SanityPageContent.astro
+- SanityLiveUpdater.astro
+- BreadcrumbItem.astro
+- block.astro
+- TestimonialCard.astro
+
+### Test Fixtures (16+)
+
+Pre-built Sanity content fixtures for each block type, used across component tests.
+
+---
+*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*

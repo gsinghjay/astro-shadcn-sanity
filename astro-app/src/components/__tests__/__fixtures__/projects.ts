@@ -36,6 +36,7 @@ export const projectFull: Project = {
   semester: 'Fall 2025',
   status: 'completed',
   outcome: 'Reduced campus navigation time by 40% for new students.',
+  featured: true,
 };
 
 export const projectHiddenSponsor: Project = {
@@ -55,6 +56,7 @@ export const projectHiddenSponsor: Project = {
   semester: null,
   status: null,
   outcome: null,
+  featured: null,
 };
 
 export const projectMinimal: Project = {
@@ -67,4 +69,5 @@ export const projectMinimal: Project = {
   semester: null,
   status: null,
   outcome: null,
+  featured: null,
 };

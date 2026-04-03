@@ -1,6 +1,13 @@
 import { test, expect } from '../support/fixtures';
 
 test.describe('GTM DataLayer', () => {
+  test.beforeEach(async ({ context }) => {
+    // Pre-set cookie consent to accepted so GTM loads
+    await context.addInitScript(() => {
+      localStorage.setItem('cookie-consent', 'accepted');
+    });
+  });
+
   test('dataLayer contains page_view event on homepage', async ({ page }) => {
     await page.goto('/');
 

@@ -34,6 +34,7 @@ import {contactForm} from './blocks/contact-form'
 import {sponsorCards} from './blocks/sponsor-cards'
 import {testimonials} from './blocks/testimonials'
 import {eventList} from './blocks/event-list'
+import {projectCards} from './blocks/project-cards'
 // Block schemas — content display (Story 2.9)
 import {teamGrid} from './blocks/team-grid'
 import {imageGallery} from './blocks/image-gallery'
@@ -52,6 +53,9 @@ import {pullquote} from './blocks/pullquote'
 // Block schemas — utility (Story 2.11)
 import {divider} from './blocks/divider'
 import {announcementBar} from './blocks/announcement-bar'
+import {sponsorshipTiers} from './blocks/sponsorship-tiers'
+// Block schemas — media (Story 2.21)
+import {videoEmbed} from './blocks/video-embed'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -89,6 +93,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   sponsorCards,
   testimonials,
   eventList,
+  projectCards,
   // Blocks — content display
   teamGrid,
   imageGallery,
@@ -104,4 +109,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Blocks — utility
   divider,
   announcementBar,
+  // Blocks — social proof (Story 2.17)
+  sponsorshipTiers,
+  // Blocks — media (Story 2.21)
+  videoEmbed,
 ]

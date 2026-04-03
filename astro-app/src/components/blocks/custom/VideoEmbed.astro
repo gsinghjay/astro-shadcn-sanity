@@ -1,0 +1,17 @@
+---
+import type { VideoEmbedBlock } from '@/lib/types';
+import VideoEmbedComponent from '@/components/VideoEmbed.astro';
+import { stegaClean } from '@sanity/client/stega';
+
+type Props = VideoEmbedBlock;
+
+const { videoUrl: rawVideoUrl, title, caption } = Astro.props;
+const videoUrl = stegaClean(rawVideoUrl);
+---
+
+{videoUrl && (
+  <VideoEmbedComponent url={videoUrl} title={title ?? undefined} />
+)}
+{caption && (
+  <p class="mt-2 text-sm text-muted-foreground text-center">{caption}</p>
+)}
