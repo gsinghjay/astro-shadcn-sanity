@@ -32,7 +32,8 @@ const {
   class: className,
   id,
 } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'inline';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' ? rawCleaned : 'inline';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 

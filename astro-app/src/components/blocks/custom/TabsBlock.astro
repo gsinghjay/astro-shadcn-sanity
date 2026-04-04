@@ -20,9 +20,10 @@ interface Props {
 }
 
 const { heading, tabs = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'default';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'pills' || rawCleaned === 'underline' ? rawCleaned : 'default';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
-const firstTab = tabs[0]?._key;
+const firstTab = tabs[0]?._key || 'tab-0';
 ---
 
 {cleanVariant === 'default' && (

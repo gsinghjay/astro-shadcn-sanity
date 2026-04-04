@@ -32,7 +32,8 @@ const {
   class: className,
   id,
 } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'default';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'split' || rawCleaned === 'full-width' ? rawCleaned : 'default';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
@@ -49,7 +50,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
         <div class="text-center space-y-2">
           <span class="text-4xl">📍</span>
           {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
-          {coordinates && (
+          {coordinates?.lat != null && coordinates?.lng != null && (
             <p class="text-xs text-muted-foreground">
               {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)} (zoom: {zoom})
             </p>

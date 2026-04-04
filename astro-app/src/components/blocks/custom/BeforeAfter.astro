@@ -33,7 +33,8 @@ const {
   class: className,
   id,
 } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'side-by-side';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' || rawCleaned === 'toggle' ? rawCleaned : 'side-by-side';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
@@ -114,7 +115,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'toggle' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={cn(baseClasses, className)} id={id} data-animate data-variant="toggle">
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>

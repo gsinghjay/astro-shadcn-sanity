@@ -29,7 +29,8 @@ interface Props {
 }
 
 const { heading, description, tiers = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'simple';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' ? rawCleaned : 'simple';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
@@ -55,7 +56,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
             </div>
             {tier.description && <TileDescription>{tier.description}</TileDescription>}
             <ul class="space-y-2 text-sm">
-              {tier.features.map((feature) => (
+              {(tier.features ?? []).map((feature) => (
                 <li class="flex items-start gap-2">
                   <span class="text-primary mt-0.5">&#10003;</span>
                   <span>{feature}</span>
@@ -100,7 +101,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
             </div>
             {tier.description && <TileDescription class="text-center">{tier.description}</TileDescription>}
             <ul class="space-y-2 text-sm w-full">
-              {tier.features.map((feature) => (
+              {(tier.features ?? []).map((feature) => (
                 <li class="flex items-center gap-2 justify-center">
                   <span class="text-primary">&#10003;</span>
                   <span>{feature}</span>
@@ -145,20 +146,23 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
           </tr>
         </thead>
         <tbody>
-          {(tiers[0]?.features ?? []).map((_, featureIndex) => (
-            <tr class="border-b">
-              <td class="p-4 text-sm">{tiers[0]?.features[featureIndex]}</td>
-              {tiers.map((tier) => (
-                <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
-                  {featureIndex < tier.features.length ? (
-                    <span class="text-primary">&#10003;</span>
-                  ) : (
-                    <span class="text-muted-foreground">&#8212;</span>
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {(() => {
+            const allFeatures = [...new Set(tiers.flatMap((t) => t.features ?? []))];
+            return allFeatures.map((feature) => (
+              <tr class="border-b">
+                <td class="p-4 text-sm">{feature}</td>
+                {tiers.map((tier) => (
+                  <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+                    {(tier.features ?? []).includes(feature) ? (
+                      <span class="text-primary">&#10003;</span>
+                    ) : (
+                      <span class="text-muted-foreground">&#8212;</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ));
+          })()}
         </tbody>
         <tfoot>
           <tr>

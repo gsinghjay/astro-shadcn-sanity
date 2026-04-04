@@ -23,7 +23,8 @@ interface Props {
 }
 
 const { heading, description, links = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'grid';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleaned === 'icon-list' ? rawCleaned : 'grid';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 

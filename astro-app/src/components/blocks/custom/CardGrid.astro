@@ -25,7 +25,8 @@ interface Props {
 }
 
 const { heading, description, cards = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
-const cleanVariant = stegaClean(rawVariant) ?? 'grid-3';
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'grid-2' || rawCleaned === 'grid-3' || rawCleaned === 'grid-4' || rawCleaned === 'masonry' ? rawCleaned : 'grid-3';
 const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 
 const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
