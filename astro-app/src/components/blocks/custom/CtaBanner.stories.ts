@@ -20,10 +20,27 @@ const sharedButtons = [
 ]
 
 export default {
-  title: 'Blocks/CtaBanner',
+  title: 'Components/CtaBanner',
   component: CtaBanner,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Call-to-action banner with heading, body text, and action buttons. Supports centered, split, spread, overlay, and minimal layouts. Typically placed mid-page or before footer.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['centered', 'split', 'spread', 'overlay', 'minimal'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    description: { control: 'text', description: 'Body text' },
+  },
 }
 
 export const Centered = {

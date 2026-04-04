@@ -10,9 +10,25 @@ const authorImage = {
 }
 
 export default {
-  title: 'Blocks/Pullquote',
+  title: 'Components/Pullquote',
   component: Pullquote,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Decorative blockquote with large serif quotation mark. Supports centered, split, and sidebar variants.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['centered', 'split', 'sidebar'],
+      description: 'Layout variant',
+    },
+    quote: { control: 'text', description: 'Quote text' },
+  },
 }
 
 export const Centered = {

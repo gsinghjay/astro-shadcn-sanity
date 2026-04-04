@@ -19,9 +19,25 @@ const teamMembers = [
 ]
 
 export default {
-  title: 'Blocks/TeamGrid',
+  title: 'Components/TeamGrid',
   component: TeamGrid,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Team member grid with photos, names, and roles. Supports grid, compact, and split variants.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'grid-compact', 'split'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const Grid = {

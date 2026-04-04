@@ -1,9 +1,24 @@
 import RichText from './RichText.astro'
 
 export default {
-  title: 'Blocks/RichText',
+  title: 'Components/RichText',
   component: RichText,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Portable Text renderer for long-form content. Supports default and narrow (672px) widths.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['prose', 'narrow', 'wide'],
+      description: 'Width variant',
+    },
+  },
 }
 
 export const Default = {
@@ -43,6 +58,38 @@ export const Default = {
         _type: 'block',
         _key: 'b6',
         children: [{ _type: 'span', text: 'Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est omnis dolor repellendus.' }],
+      },
+    ],
+  },
+}
+
+export const Narrow = {
+  args: {
+    _type: 'richText',
+    _key: 'story-rt-narrow',
+    variant: 'narrow',
+    content: [
+      {
+        _type: 'block',
+        _key: 'b1',
+        style: 'h2',
+        children: [{ _type: 'span', text: 'Narrow Width Content' }],
+      },
+      {
+        _type: 'block',
+        _key: 'b2',
+        children: [{ _type: 'span', text: 'This content is constrained to 672px maximum width, ideal for focused reading experiences. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.' }],
+      },
+      {
+        _type: 'block',
+        _key: 'b3',
+        style: 'h3',
+        children: [{ _type: 'span', text: 'Improved Readability' }],
+      },
+      {
+        _type: 'block',
+        _key: 'b4',
+        children: [{ _type: 'span', text: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.' }],
       },
     ],
   },

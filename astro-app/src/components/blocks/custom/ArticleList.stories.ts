@@ -5,9 +5,25 @@ const sharedButtons = [
 ]
 
 export default {
-  title: 'Blocks/ArticleList',
+  title: 'Components/ArticleList',
   component: ArticleList,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Article listing in grid, split-featured, or list layouts with placeholder cards.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'split-featured', 'list'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const Grid = {

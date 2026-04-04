@@ -1,9 +1,26 @@
 import AnnouncementBar from './AnnouncementBar.astro'
 
 export default {
-  title: 'Blocks/AnnouncementBar',
+  title: 'Components/AnnouncementBar',
   component: AnnouncementBar,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Dismissible announcement banner. Supports inline (top-of-page) and floating (overlay) variants.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['inline', 'floating'],
+      description: 'Layout variant',
+    },
+    text: { control: 'text', description: 'Announcement text' },
+    dismissible: { control: 'boolean', description: 'Show dismiss button' },
+  },
 }
 
 export const Inline = {

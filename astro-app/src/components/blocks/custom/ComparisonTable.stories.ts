@@ -23,9 +23,25 @@ const ctaButtons = [
 ]
 
 export default {
-  title: 'Blocks/ComparisonTable',
+  title: 'Components/ComparisonTable',
   component: ComparisonTable,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Side-by-side comparison of features or plans in table or stacked card layout.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['table', 'stacked'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const Table = {

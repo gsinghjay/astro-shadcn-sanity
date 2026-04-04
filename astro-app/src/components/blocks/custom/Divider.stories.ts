@@ -1,9 +1,25 @@
 import Divider from './Divider.astro'
 
 export default {
-  title: 'Blocks/Divider',
+  title: 'Components/Divider',
   component: Divider,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Visual separator between content sections. Supports line, short, labeled, and space-only variants.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['line', 'short', 'labeled', 'space'],
+      description: 'Layout variant',
+    },
+    label: { control: 'text', description: 'Label text (labeled variant only)' },
+  },
 }
 
 export const Line = {

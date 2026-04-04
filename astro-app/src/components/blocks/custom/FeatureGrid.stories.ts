@@ -1,9 +1,26 @@
 import FeatureGrid from './FeatureGrid.astro'
 
 export default {
-  title: 'Blocks/FeatureGrid',
+  title: 'Components/FeatureGrid',
   component: FeatureGrid,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Grid of feature tiles with numbered icons, headings, and descriptions. Supports grid, centered, horizontal-cards, sidebar-grid, and stacked variants.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'grid-centered', 'horizontal-cards', 'sidebar-grid', 'stacked'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    columns: { control: { type: 'number', min: 1, max: 4 }, description: 'Number of grid columns' },
+  },
 }
 
 export const TwoColumn = {

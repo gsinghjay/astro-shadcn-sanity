@@ -1,9 +1,21 @@
 import ContactForm from './ContactForm.astro'
 
 export default {
-  title: 'Blocks/ContactForm',
+  title: 'Components/ContactForm',
   component: ContactForm,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Split-layout contact form with heading, description, and Turnstile CAPTCHA. Renders AutoForm fields from schema.',
+      },
+    },
+  },
+  argTypes: {
+    heading: { control: 'text', description: 'Section heading' },
+    description: { control: 'text', description: 'Description text' },
+  },
 }
 
 export const Default = {

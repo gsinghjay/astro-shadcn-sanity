@@ -1,10 +1,21 @@
 import LogoCloud from './LogoCloud.astro'
 
 export default {
-  title: 'Blocks/LogoCloud',
+  title: 'Components/LogoCloud',
   component: LogoCloud,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Responsive grid of partner/media logos with subtle opacity treatment. Bordered section with up to 8 columns.',
+      },
+    },
+  },
+  argTypes: {
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const WithLogos = {

@@ -1,10 +1,30 @@
 import StatsRow from './StatsRow.astro'
 
 export default {
-  title: 'Blocks/StatsRow',
+  title: 'Components/StatsRow',
   component: StatsRow,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Horizontal row of numeric statistics with labels. Supports grid, split, and spread layouts with optional dark theme.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'split', 'spread'],
+      description: 'Layout variant',
+    },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['light', 'dark'],
+      description: 'Background theme',
+    },
+  },
 }
 
 export const Light = {

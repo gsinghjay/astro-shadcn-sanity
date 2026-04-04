@@ -32,9 +32,26 @@ const galleryImages = [
 ]
 
 export default {
-  title: 'Blocks/ImageGallery',
+  title: 'Components/ImageGallery',
   component: ImageGallery,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Image gallery with grid, masonry, and single-image layouts. Configurable column count.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'masonry', 'single'],
+      description: 'Layout variant',
+    },
+    columns: { control: { type: 'select' }, options: ['2', '3', '4'], description: 'Number of grid columns' },
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const GridThreeColumns = {

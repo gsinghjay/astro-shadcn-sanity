@@ -13,9 +13,25 @@ const ctaButtons = [
 ]
 
 export default {
-  title: 'Blocks/Timeline',
+  title: 'Components/Timeline',
   component: Timeline,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Chronological timeline of events or milestones. Supports vertical, split (alternating), and horizontal layouts.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['vertical', 'split', 'horizontal'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+  },
 }
 
 export const Vertical = {
