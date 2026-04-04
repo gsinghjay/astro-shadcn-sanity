@@ -16,6 +16,9 @@ export const wideBlockWarnings: Record<string, string[]> = {
   imageGallery: ['sidebar'],
   comparisonTable: ['sidebar', 'twoColumn'],
   videoEmbed: ['sidebar'],
+  pricingTable: ['sidebar', 'twoColumn'],
+  cardGrid: ['sidebar'],
+  metricsDashboard: ['sidebar'],
 }
 
 /**
@@ -123,6 +126,20 @@ export const page = defineType({
         defineArrayMember({type: 'announcementBar'}),
         defineArrayMember({type: 'sponsorshipTiers'}),
         defineArrayMember({type: 'videoEmbed'}),
+        // Essential blocks (Story 17.20)
+        defineArrayMember({type: 'pricingTable'}),
+        defineArrayMember({type: 'serviceCards'}),
+        defineArrayMember({type: 'productShowcase'}),
+        defineArrayMember({type: 'linkCards'}),
+        defineArrayMember({type: 'newsletter'}),
+        defineArrayMember({type: 'accordion'}),
+        defineArrayMember({type: 'tabsBlock'}),
+        defineArrayMember({type: 'embedBlock'}),
+        defineArrayMember({type: 'mapBlock'}),
+        defineArrayMember({type: 'countdownTimer'}),
+        defineArrayMember({type: 'metricsDashboard'}),
+        defineArrayMember({type: 'cardGrid'}),
+        defineArrayMember({type: 'beforeAfter'}),
       ],
       validation: (Rule) =>
         Rule.custom((blocks, context) => {
@@ -140,22 +157,22 @@ export const page = defineType({
             {
               name: 'content',
               title: 'Content',
-              of: ['richText', 'textWithImage', 'faqSection', 'articleList', 'timeline', 'pullquote'],
+              of: ['richText', 'textWithImage', 'faqSection', 'articleList', 'timeline', 'pullquote', 'serviceCards', 'linkCards', 'accordion', 'tabsBlock'],
             },
             {
               name: 'display',
               title: 'Display',
-              of: ['teamGrid', 'imageGallery'],
+              of: ['teamGrid', 'imageGallery', 'productShowcase', 'mapBlock', 'cardGrid', 'beforeAfter'],
             },
             {
               name: 'media',
               title: 'Media & Stats',
-              of: ['statsRow', 'featureGrid', 'videoEmbed'],
+              of: ['statsRow', 'featureGrid', 'videoEmbed', 'embedBlock', 'metricsDashboard'],
             },
             {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList', 'sponsorshipTiers']},
-            {name: 'data', title: 'Data', of: ['comparisonTable']},
-            {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm']},
-            {name: 'utility', title: 'Utility', of: ['divider', 'announcementBar']},
+            {name: 'data', title: 'Data', of: ['comparisonTable', 'pricingTable']},
+            {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm', 'newsletter']},
+            {name: 'utility', title: 'Utility', of: ['divider', 'announcementBar', 'countdownTimer']},
           ],
           views: [
             {name: 'list'},

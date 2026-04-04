@@ -1,17 +1,10 @@
 ---
 import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { CountdownTimerBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  targetDate?: string;
-  completedMessage?: string;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends CountdownTimerBlock {
   class?: string;
   id?: string;
 }
@@ -22,15 +15,11 @@ const {
   targetDate,
   completedMessage = 'Event has started!',
   variant: rawVariant,
-  backgroundVariant,
-  spacing,
-  maxWidth,
   class: className,
   id,
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'hero' || rawCleaned === 'banner' ? rawCleaned : 'inline';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 
 // Static placeholder digits for Storybook rendering
 const placeholderUnits = [
@@ -42,7 +31,7 @@ const placeholderUnits = [
 ---
 
 {cleanVariant === 'inline' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl mx-auto items-center text-center">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -66,7 +55,7 @@ const placeholderUnits = [
 )}
 
 {cleanVariant === 'hero' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-4xl mx-auto items-center text-center py-12">
       {heading && (
         <h2 class="text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -90,7 +79,7 @@ const placeholderUnits = [
 )}
 
 {cleanVariant === 'banner' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="flex-row flex-wrap items-center justify-center gap-6">
       {heading && (
         <h2 class="text-xl md:text-2xl font-bold">{heading}</h2>

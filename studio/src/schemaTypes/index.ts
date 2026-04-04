@@ -9,6 +9,15 @@ import {faqItem} from './objects/faq-item'
 import {featureItem} from './objects/feature-item'
 import {statItem} from './objects/stat-item'
 import {stepItem} from './objects/step-item'
+// Object schemas — essential blocks (Story 17.20)
+import {pricingTier} from './objects/pricing-tier'
+import {serviceItem} from './objects/service-item'
+import {productItem} from './objects/product-item'
+import {linkCardItem} from './objects/link-card-item'
+import {accordionItem} from './objects/accordion-item'
+import {tabItem} from './objects/tab-item'
+import {metricItem} from './objects/metric-item'
+import {cardGridItem} from './objects/card-grid-item'
 
 // Document schemas
 import {page} from './documents/page'
@@ -56,6 +65,20 @@ import {announcementBar} from './blocks/announcement-bar'
 import {sponsorshipTiers} from './blocks/sponsorship-tiers'
 // Block schemas — media (Story 2.21)
 import {videoEmbed} from './blocks/video-embed'
+// Block schemas — essential blocks (Story 17.20)
+import {pricingTable} from './blocks/pricing-table'
+import {serviceCards} from './blocks/service-cards'
+import {productShowcase} from './blocks/product-showcase'
+import {linkCards} from './blocks/link-cards'
+import {newsletter} from './blocks/newsletter'
+import {accordion} from './blocks/accordion'
+import {tabsBlock} from './blocks/tabs-block'
+import {embedBlock} from './blocks/embed-block'
+import {mapBlock} from './blocks/map-block'
+import {countdownTimer} from './blocks/countdown-timer'
+import {metricsDashboard} from './blocks/metrics-dashboard'
+import {cardGrid} from './blocks/card-grid'
+import {beforeAfter} from './blocks/before-after'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -113,4 +136,27 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   sponsorshipTiers,
   // Blocks — media (Story 2.21)
   videoEmbed,
+  // Objects — essential blocks (Story 17.20)
+  pricingTier,
+  serviceItem,
+  productItem,
+  linkCardItem,
+  accordionItem,
+  tabItem,
+  metricItem,
+  cardGridItem,
+  // Blocks — essential blocks (Story 17.20)
+  pricingTable,
+  serviceCards,
+  productShowcase,
+  linkCards,
+  newsletter,
+  accordion,
+  tabsBlock,
+  embedBlock,
+  mapBlock,
+  countdownTimer,
+  metricsDashboard,
+  cardGrid,
+  beforeAfter,
 ]
