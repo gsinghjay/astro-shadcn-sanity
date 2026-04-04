@@ -701,12 +701,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "serviceCards" => {
       heading,
       description,
-      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href } }
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
     },
     _type == "productShowcase" => {
       heading,
       description,
-      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, price, badge, link{ label, href } }
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
     },
     _type == "linkCards" => {
       heading,
@@ -757,12 +757,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "cardGrid" => {
       heading,
       description,
-      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href }, badge }
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
     },
     _type == "beforeAfter" => {
       heading,
-      beforeImage{ ${IMAGE_PROJECTION}, alt },
-      afterImage{ ${IMAGE_PROJECTION}, alt },
+      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
       beforeLabel,
       afterLabel,
       caption

@@ -39,7 +39,12 @@ export const serviceItem = defineType({
       type: 'object',
       fields: [
         defineField({name: 'label', title: 'Label', type: 'string'}),
-        defineField({name: 'href', title: 'URL', type: 'string'}),
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'url',
+          validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
+        }),
       ],
     }),
   ],

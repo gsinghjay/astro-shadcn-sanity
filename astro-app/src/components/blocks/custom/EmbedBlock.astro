@@ -11,8 +11,8 @@ interface Props extends EmbedBlockBlock {
 
 const {
   heading,
-  embedUrl = '',
-  aspectRatio = '16/9',
+  embedUrl: rawEmbedUrl = '',
+  aspectRatio: rawAspectRatio = '16/9',
   caption,
   variant: rawVariant,
   class: className,
@@ -20,7 +20,9 @@ const {
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'contained' || rawCleaned === 'full-width' ? rawCleaned : 'default';
-const cleanAspectRatio = stegaClean(aspectRatio) ?? '16/9';
+const embedUrl = stegaClean(rawEmbedUrl) ?? '';
+const validAspectRatios = ['16/9', '4/3', '1/1', '21/9'];
+const cleanAspectRatio = validAspectRatios.includes(stegaClean(rawAspectRatio) ?? '') ? stegaClean(rawAspectRatio) : '16/9';
 ---
 
 {cleanVariant === 'default' && (

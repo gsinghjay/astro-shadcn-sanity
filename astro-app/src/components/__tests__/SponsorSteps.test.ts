@@ -61,8 +61,8 @@ describe('SponsorSteps', () => {
       props: { ...sponsorStepsFull, variant: 'steps' },
     });
 
-    expect(html).toContain('before:left-5.5');
-    expect(html).toContain('before:@5xl:w-full');
+    expect(html).toContain('bg-border');
+    expect(html).toContain('h-px flex-1');
   });
 
   test('split variant renders grid and omits connecting-line classes', async () => {
@@ -72,7 +72,7 @@ describe('SponsorSteps', () => {
     });
 
     expect(html).toContain('sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]');
-    expect(html).not.toContain('before:left-5.5');
+    expect(html).not.toContain('h-px flex-1');
   });
 
   test('spread variant renders spread container classes', async () => {
@@ -90,6 +90,6 @@ describe('SponsorSteps', () => {
       props: { ...sponsorStepsFull, variant: 'legacy-variant' },
     });
 
-    expect(html).toContain('before:left-5.5');
+    expect(html).toContain('bg-border');
   });
 });

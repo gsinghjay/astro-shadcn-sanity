@@ -119,7 +119,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
 
     <SectionGrid size="sm">
       {services.map((service) => (
-        <Tile variant="floating" href={service.link} class="items-center text-center">
+        <Tile variant="floating" href={service.link?.href} class="items-center text-center">
           <TileContent class="items-center text-center">
             {service.icon && (
               <span class="text-4xl">{service.icon}</span>

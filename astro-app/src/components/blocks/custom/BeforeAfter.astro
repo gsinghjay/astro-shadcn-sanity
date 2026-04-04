@@ -24,6 +24,8 @@ const {
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' || rawCleaned === 'toggle' ? rawCleaned : 'side-by-side';
+const beforeImgUrl = safeUrlFor(beforeImage)?.width(800).height(600).fit('crop').url();
+const afterImgUrl = safeUrlFor(afterImage)?.width(800).height(600).fit('crop').url();
 ---
 
 {cleanVariant === 'side-by-side' && (
@@ -38,8 +40,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(beforeImage) ? (
-            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          {beforeImgUrl ? (
+            <img src={beforeImgUrl} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
           )}
@@ -49,8 +51,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(afterImage) ? (
-            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          {afterImgUrl ? (
+            <img src={afterImgUrl} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
           )}
@@ -76,8 +78,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(beforeImage) ? (
-            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          {beforeImgUrl ? (
+            <img src={beforeImgUrl} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
           )}
@@ -87,8 +89,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(afterImage) ? (
-            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          {afterImgUrl ? (
+            <img src={afterImgUrl} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
           )}
@@ -114,8 +116,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(beforeImage) ? (
-            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          {beforeImgUrl ? (
+            <img src={beforeImgUrl} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
           )}
@@ -125,8 +127,8 @@ const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' |
       <div class="relative">
         <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
         <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-          {safeUrlFor(afterImage) ? (
-            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          {afterImgUrl ? (
+            <img src={afterImgUrl} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
           ) : (
             <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
           )}

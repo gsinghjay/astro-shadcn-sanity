@@ -1,4 +1,4 @@
-import {defineType, defineField} from 'sanity'
+import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon} from '@sanity/icons'
 
 export const pricingTier = defineType({
@@ -35,7 +35,7 @@ export const pricingTier = defineType({
       name: 'features',
       title: 'Features',
       type: 'array',
-      of: [{type: 'string'}],
+      of: [defineArrayMember({type: 'string'})],
     }),
     defineField({
       name: 'highlighted',
