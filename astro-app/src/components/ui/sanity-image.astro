@@ -22,6 +22,7 @@ interface Props {
   fetchpriority?: 'high' | 'low' | 'auto';
   decoding?: 'async' | 'sync' | 'auto';
   sizes?: string;
+  srcsetWidths?: number[];
 }
 
 const {
@@ -33,6 +34,7 @@ const {
   fetchpriority,
   decoding = 'async',
   sizes,
+  srcsetWidths = [640, 960, 1280, 1920],
 } = Astro.props;
 
 const lqip = image.asset?.metadata?.lqip;
@@ -41,32 +43,43 @@ const alt = image.alt || '';
 const optimizedUrl = image.asset
   ? urlFor(image).width(width).height(height).fit('crop').url()
   : '';
+
+const srcset = image.asset
+  ? srcsetWidths
+      .map(w => {
+        const h = Math.round(w * height / width);
+        return `${urlFor(image).width(w).height(h).fit('crop').url()} ${w}w`;
+      })
+      .join(', ')
+  : undefined;
 ---
 
 {lqip ? (
   <div style={`background-image: url(${lqip}); background-size: cover;`}>
     <img
       src={optimizedUrl}
+      srcset={srcset}
       alt={alt}
       width={width}
       height={height}
       loading={loading}
       fetchpriority={fetchpriority}
       decoding={decoding}
-      sizes={sizes}
+      sizes={sizes || '100vw'}
       class={className}
     />
   </div>
 ) : (
   <img
     src={optimizedUrl}
+    srcset={srcset}
     alt={alt}
     width={width}
     height={height}
     loading={loading}
     fetchpriority={fetchpriority}
     decoding={decoding}
-    sizes={sizes}
+    sizes={sizes || '100vw'}
     class={className}
   />
 )}

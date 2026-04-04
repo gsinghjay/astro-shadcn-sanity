@@ -21,6 +21,15 @@ const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
 const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
 const isDarkHero = ['dark', 'hatched'].includes(bgVariant);
 const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
+
+function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
+  return widths
+    .map(w => {
+      const h = Math.round(w * baseHeight / baseWidth);
+      return `${urlFor(image).width(w).height(h).fit('crop').url()} ${w}w`;
+    })
+    .join(', ');
+}
 ---
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
@@ -34,6 +43,7 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -43,6 +53,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
             >
               <img
                 src={optimizedUrl}
+                srcset={srcset}
+                sizes="100vw"
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
@@ -111,6 +123,7 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -120,6 +133,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
             >
               <img
                 src={optimizedUrl}
+                srcset={srcset}
+                sizes="100vw"
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
@@ -214,6 +229,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
         <SectionMedia>
           <img
             src={urlFor(firstImage).width(960).height(1080).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 960, 1080, [480, 640, 960])}
+            sizes="(max-width: 1024px) 100vw, 50vw"
             alt={firstImage.alt || ''}
             width={960}
             height={1080}
@@ -265,6 +282,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
         <SectionMedia>
           <img
             src={urlFor(firstImage).width(1200).height(1080).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 1200, 1080, [640, 960, 1200])}
+            sizes="(max-width: 1024px) 100vw, 60vw"
             alt={firstImage.alt || ''}
             width={1200}
             height={1080}
@@ -317,6 +336,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
         <SectionMedia class="rounded-r-none @5xl:-my-(--section-py)">
           <img
             src={urlFor(firstImage).width(1440).height(960).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 1440, 960, [640, 960, 1440])}
+            sizes="(max-width: 1024px) 100vw, 75vw"
             alt={firstImage.alt || ''}
             width={1440}
             height={960}
@@ -338,6 +359,8 @@ const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
       <div class="absolute inset-0">
         <img
           src={urlFor(firstImage).width(1920).height(1080).fit('crop').url()}
+          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1440, 1920])}
+          sizes="100vw"
           alt={firstImage.alt || ''}
           width={1920}
           height={1080}

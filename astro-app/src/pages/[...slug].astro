@@ -66,6 +66,9 @@ const heroImage = firstBlock?._type === 'heroBanner'
 const preloadImageUrl = heroImage?.asset
   ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
+const preloadSrcset = heroImage?.asset
+  ? [640, 1024, 1440, 1920].map(w => `${urlFor(heroImage).width(w).height(Math.round(w * 1080 / 1920)).fit('crop').url()} ${w}w`).join(', ')
+  : undefined;
 ---
 
 <Layout
@@ -74,6 +77,8 @@ const preloadImageUrl = heroImage?.asset
   hideNav={!visualEditingEnabled && template === 'landing'}
   template={template}
   preloadImage={preloadImageUrl}
+  preloadImageSrcset={preloadSrcset}
+  preloadImageSizes="100vw"
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>

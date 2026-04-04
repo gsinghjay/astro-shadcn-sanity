@@ -292,6 +292,60 @@ describe('HeroBanner', () => {
     });
   });
 
+  // ─── Responsive srcset ──────────────────────────────────────────────
+  describe('responsive srcset', () => {
+    test('centered variant includes srcset with 4 widths', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroFull,
+      });
+
+      expect(html).toContain('srcset="');
+      expect(html).toContain('640w');
+      expect(html).toContain('1024w');
+      expect(html).toContain('1440w');
+      expect(html).toContain('1920w');
+      expect(html).toContain('sizes="100vw"');
+    });
+
+    test('split variant uses smaller widths (480, 640, 960)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSplit,
+      });
+
+      expect(html).toContain('480w');
+      expect(html).toContain('640w');
+      expect(html).toContain('960w');
+      expect(html).not.toContain('1920w');
+    });
+
+    test('split-asymmetric variant uses widths (640, 960, 1200)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSplitAsymmetric,
+      });
+
+      expect(html).toContain('640w');
+      expect(html).toContain('960w');
+      expect(html).toContain('1200w');
+      expect(html).not.toContain('1920w');
+    });
+
+    test('spread variant includes srcset with full widths', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSpread,
+      });
+
+      expect(html).toContain('srcset="');
+      expect(html).toContain('640w');
+      expect(html).toContain('1024w');
+      expect(html).toContain('1920w');
+      expect(html).toContain('sizes="100vw"');
+    });
+  });
+
   // ─── Background variant handling ────────────────────────────────────
   describe('background variants', () => {
     test('hatched variant applies bg-hatched on Section', async () => {
