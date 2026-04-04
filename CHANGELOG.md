@@ -1,3 +1,38 @@
+## [1.13.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.12.0...v1.13.0) (2026-04-04)
+
+### Features
+
+* **2-6:** Add layout variants to content blocks ([cf89f22](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cf89f22c18d59b636b7fdb2fd522535b95886a23))
+* **2-7:** update custom block schemas, components, and tests ([1c4105f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1c4105f38cd0db933167a9c4d3e7d664d8730243))
+* add /ping slash command with bot status and uptime ([a5296b2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a5296b27d62baededa365ffa7a351b3e98930352))
+* add project-status, upcoming-events, sponsor-info, and ping slash commands ([4896df3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4896df357b7982c719f4c14d11535e18b374b618))
+* **blocks:** add 13 essential CMS block components with Storybook stories ([8dd97fd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8dd97fd3ff2e76da8d22aa3aa892bd40849aa4d0))
+* **blocks:** add hatched background pattern variants for Swiss Brutalist style ([3eb509d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3eb509d93ce37ff5a30182cbf250981772891dbf))
+* **blocks:** add Sanity schema integration for 13 essential CMS blocks ([3d77d5c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3d77d5c01aba667671ff1d2b097ba833b4dbb059))
+* **perf:** add responsive images, YouTube facade & cache headers ([74d5e4d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/74d5e4d9ec59bc717a75de0893c87ad751809908))
+
+### Bug Fixes
+
+* **2-7:** add variant fallback handling and focused schema/component tests ([8d30f17](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8d30f17e2c1db46db82bb288dc3c96b31bebaab0))
+* address CodeRabbit review comments ([3cc221c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3cc221cfbd513bc11962a49857fd6418b57cd18a))
+* address CodeRabbit review comments - json.dumps, timeout, remove hello handler ([eedbe1b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/eedbe1bca480fd1017ec7e6def63d9b82998bebf))
+* **blocks:** apply code review patches to 13 essential CMS block components ([d6326a0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d6326a0e85cbd1a9822cddcc68108162198d28bc))
+* **blocks:** apply code review patches to hatched background variants ([8295f51](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8295f51ea010180f83f1f565e86cdf5618b5d833))
+* **feature-grid:** fully center grid-centered heading and cards ([cbf4dc1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cbf4dc14c946829e74672ced03ca6f0f0f856456))
+* **story-2.6:** resolve variant findings and pass typegen+vitest ([84a8334](https://github.com/gsinghjay/astro-shadcn-sanity/commit/84a83347014163a065def1d8021a0eb14c318c12))
+* **storybook:** correct argTypes, prop names, and descriptions from code review ([8dec72d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8dec72d0fac45e8252c718aa2418ef684bfae59a))
+* **test:** add missing positive assertions to HeroBanner heading cap tests ([82c03e9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/82c03e940c57caa2adcce448ef80fdb4e43ae866))
+* use POST for single command registration, remove verify.mjs ([cfa5304](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cfa5304a03ca25df6dcfbc74156360de5677018e))
+
+### Documentation
+
+* **storybook:** add block-base argTypes (backgroundVariant, spacing, maxWidth) to all stories ([27080a7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/27080a7d244b0d57da98993f4efe9aa9a4b48874))
+* **storybook:** add descriptions, argTypes, and expanded variants to all 21 block stories ([3e17329](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3e173292ab015e412a8de34bf69cc503989c34ea))
+
+### Miscellaneous
+
+* remove out-of-scope files from /ping PR ([917599b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/917599b45bfe4bf5aa8eac54341430c9383b02a6))
+
 ## [1.12.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.11.0...v1.12.0) (2026-04-03)
 
 ### Features
