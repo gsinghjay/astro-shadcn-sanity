@@ -31,10 +31,42 @@ const sharedButtons = [
 ]
 
 export default {
-  title: 'Blocks/HeroBanner',
+  title: 'Components/HeroBanner',
   component: HeroBanner,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Full-width hero section with headline, subtext, CTA buttons, and optional background image. Supports 6 layout variants (centered, overlay, split, split-asymmetric, spread, split-bleed). Used as the first block on landing and index pages.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['centered', 'overlay', 'split', 'split-asymmetric', 'spread', 'split-bleed'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Main headline' },
+    subheading: { control: 'text', description: 'Supporting text below headline' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const Default = {
@@ -120,6 +152,32 @@ export const SplitBleed = {
     subheading: 'Compact text left, edge-to-edge image right (1fr:3fr)',
     ctaButtons: sharedButtons,
     backgroundImages: sharedImages,
+  },
+}
+
+export const HatchedDark = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-hatched',
+    variant: 'centered',
+    heading: 'Engineering the Future',
+    subheading: 'Swiss Brutalist diagonal-line texture over a dark background',
+    alignment: 'center',
+    backgroundVariant: 'hatched',
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedLight = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-hatched-light',
+    variant: 'centered',
+    heading: 'Technical Innovation',
+    subheading: 'Light hatched pattern for a softer engineering aesthetic',
+    alignment: 'center',
+    backgroundVariant: 'hatched-light',
+    ctaButtons: sharedButtons,
   },
 }
 

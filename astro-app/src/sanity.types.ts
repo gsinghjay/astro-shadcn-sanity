@@ -23,6 +23,327 @@ export type AnnouncementBarLink = {
   href?: string;
 };
 
+export type ServiceItemLink = {
+  label?: string;
+  href?: string;
+};
+
+export type ProductItemLink = {
+  label?: string;
+  href?: string;
+};
+
+export type Coordinates = {
+  lat?: number;
+  lng?: number;
+};
+
+export type ContactInfo = {
+  phone?: string;
+  email?: string;
+  hours?: string;
+};
+
+export type CardGridItemLink = {
+  label?: string;
+  href?: string;
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type BeforeAfter = {
+  _type: "beforeAfter";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "side-by-side" | "stacked" | "toggle";
+  heading?: string;
+  beforeImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  afterImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  beforeLabel?: string;
+  afterLabel?: string;
+  caption?: string;
+};
+
+export type CardGrid = {
+  _type: "cardGrid";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry";
+  heading?: string;
+  description?: string;
+  cards?: Array<
+    {
+      _key: string;
+    } & CardGridItem
+  >;
+};
+
+export type MetricsDashboard = {
+  _type: "metricsDashboard";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "row" | "card";
+  heading?: string;
+  description?: string;
+  metrics?: Array<
+    {
+      _key: string;
+    } & MetricItem
+  >;
+};
+
+export type CountdownTimer = {
+  _type: "countdownTimer";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "inline" | "hero" | "banner";
+  heading?: string;
+  description?: string;
+  targetDate?: string;
+  completedMessage?: string;
+};
+
+export type MapBlock = {
+  _type: "mapBlock";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "split" | "full-width";
+  heading?: string;
+  address?: string;
+  coordinates?: Coordinates;
+  zoom?: number;
+  caption?: string;
+  contactInfo?: ContactInfo;
+};
+
+export type EmbedBlock = {
+  _type: "embedBlock";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "contained" | "full-width";
+  heading?: string;
+  embedUrl?: string;
+  aspectRatio?: string;
+  caption?: string;
+};
+
+export type TabsBlock = {
+  _type: "tabsBlock";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "pills" | "underline";
+  heading?: string;
+  tabs?: Array<
+    {
+      _key: string;
+    } & TabItem
+  >;
+};
+
+export type Accordion = {
+  _type: "accordion";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "bordered" | "separated";
+  heading?: string;
+  description?: string;
+  items?: Array<
+    {
+      _key: string;
+    } & AccordionItem
+  >;
+};
+
+export type Newsletter = {
+  _type: "newsletter";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "inline" | "banner" | "split";
+  heading?: string;
+  description?: string;
+  placeholderText?: string;
+  buttonText?: string;
+  disclaimer?: string;
+};
+
+export type LinkCards = {
+  _type: "linkCards";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "list" | "icon-list";
+  heading?: string;
+  description?: string;
+  links?: Array<
+    {
+      _key: string;
+    } & LinkCardItem
+  >;
+};
+
+export type ProductShowcase = {
+  _type: "productShowcase";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "featured" | "detail";
+  heading?: string;
+  description?: string;
+  products?: Array<
+    {
+      _key: string;
+    } & ProductItem
+  >;
+};
+
+export type ServiceCards = {
+  _type: "serviceCards";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "list" | "alternating" | "icon-grid";
+  heading?: string;
+  description?: string;
+  services?: Array<
+    {
+      _key: string;
+    } & ServiceItem
+  >;
+};
+
+export type PricingTable = {
+  _type: "pricingTable";
+  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "simple" | "featured" | "comparison";
+  heading?: string;
+  description?: string;
+  tiers?: Array<
+    {
+      _key: string;
+    } & PricingTier
+  >;
+};
+
+export type CardGridItem = {
+  _type: "cardGridItem";
+  title?: string;
+  description?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  link?: CardGridItemLink;
+  badge?: string;
+};
+
+export type MetricItem = {
+  _type: "metricItem";
+  label?: string;
+  value?: string;
+  change?: string;
+  trend?: "up" | "down" | "neutral";
+  icon?: string;
+};
+
+export type TabItem = {
+  _type: "tabItem";
+  label?: string;
+  content?: string;
+};
+
+export type AccordionItem = {
+  _type: "accordionItem";
+  title?: string;
+  content?: string;
+};
+
+export type LinkCardItem = {
+  _type: "linkCardItem";
+  title?: string;
+  description?: string;
+  icon?: string;
+  url?: string;
+};
+
+export type ProductItem = {
+  _type: "productItem";
+  title?: string;
+  description?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  price?: string;
+  badge?: string;
+  link?: ProductItemLink;
+};
+
+export type ServiceItem = {
+  _type: "serviceItem";
+  title?: string;
+  description?: string;
+  icon?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  link?: ServiceItemLink;
+};
+
+export type PricingTier = {
+  _type: "pricingTier";
+  name?: string;
+  price?: string;
+  interval?: string;
+  description?: string;
+  features?: Array<string>;
+  highlighted?: boolean;
+  ctaText?: string;
+  ctaUrl?: string;
+};
+
 export type VideoEmbed = {
   _type: "videoEmbed";
   backgroundVariant?: "white" | "light" | "dark" | "primary";
@@ -69,13 +390,6 @@ export type Divider = {
   maxWidth?: "narrow" | "default" | "full";
   variant?: "line" | "short" | "labeled";
   label?: string;
-};
-
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
 export type Pullquote = {
@@ -261,6 +575,7 @@ export type Testimonials = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "masonry" | "split" | "carousel" | "marquee";
   heading?: string;
   displayMode?: "all" | "industry" | "student" | "byProject" | "manual";
   testimonials?: Array<
@@ -314,6 +629,7 @@ export type FaqSection = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "split" | "stacked" | "spread-header" | "narrow";
   heading?: string;
   items?: Array<
     {
@@ -327,6 +643,7 @@ export type RichText = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "prose" | "narrow" | "wide";
   content?: PortableText;
 };
 
@@ -335,6 +652,7 @@ export type SponsorSteps = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "steps" | "split" | "spread";
   heading?: string;
   subheading?: string;
   items?: Array<
@@ -368,6 +686,7 @@ export type TextWithImage = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "split" | "split-asymmetric" | "reversed" | "floating";
   heading?: string;
   content?: PortableText;
   image?: {
@@ -386,6 +705,7 @@ export type StatsRow = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "split" | "spread";
   heading?: string;
   stats?: Array<
     {
@@ -423,6 +743,12 @@ export type FeatureGrid = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?:
+    | "grid"
+    | "grid-centered"
+    | "horizontal-cards"
+    | "sidebar-grid"
+    | "stacked";
   heading?: string;
   items?: Array<
     {
@@ -804,6 +1130,45 @@ export type Page = {
     | ({
         _key: string;
       } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
   >;
 };
 
@@ -1141,11 +1506,37 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | Options
   | AnnouncementBarLink
+  | ServiceItemLink
+  | ProductItemLink
+  | Coordinates
+  | ContactInfo
+  | CardGridItemLink
+  | SanityImageAssetReference
+  | BeforeAfter
+  | CardGrid
+  | MetricsDashboard
+  | CountdownTimer
+  | MapBlock
+  | EmbedBlock
+  | TabsBlock
+  | Accordion
+  | Newsletter
+  | LinkCards
+  | ProductShowcase
+  | ServiceCards
+  | PricingTable
+  | CardGridItem
+  | MetricItem
+  | TabItem
+  | AccordionItem
+  | LinkCardItem
+  | ProductItem
+  | ServiceItem
+  | PricingTier
   | VideoEmbed
   | SponsorshipTiers
   | AnnouncementBar
   | Divider
-  | SanityImageAssetReference
   | Pullquote
   | Timeline
   | ComparisonTable
@@ -2043,7 +2434,7 @@ export type SPONSOR_PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      videoUrl,      title,      caption    }  }}
+// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      videoUrl,      title,      caption    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      placeholderText,      buttonText,      disclaimer    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      aspectRatio,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      zoom,      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      beforeLabel,      afterLabel,      caption    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -2071,6 +2462,21 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     } | null;
   } | null;
   blocks: Array<
+    | {
+        _type: "accordion";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "bordered" | "default" | "separated" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          content: string | null;
+        }> | null;
+      }
     | {
         _type: "announcementBar";
         _key: string;
@@ -2102,6 +2508,71 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           text: string | null;
           url: string | null;
           variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "beforeAfter";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "side-by-side" | "stacked" | "toggle" | null;
+        heading: string | null;
+        beforeImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+        afterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+        beforeLabel: string | null;
+        afterLabel: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "cardGrid";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid-2" | "grid-3" | "grid-4" | "masonry" | null;
+        heading: string | null;
+        description: string | null;
+        cards: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+          badge: string | null;
         }> | null;
       }
     | {
@@ -2183,6 +2654,18 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         } | null;
       }
     | {
+        _type: "countdownTimer";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "hero" | "inline" | null;
+        heading: string | null;
+        description: string | null;
+        targetDate: string | null;
+        completedMessage: string | null;
+      }
+    | {
         _type: "ctaBanner";
         _key: string;
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
@@ -2220,6 +2703,18 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         label: string | null;
       }
     | {
+        _type: "embedBlock";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "contained" | "default" | "full-width" | null;
+        heading: string | null;
+        embedUrl: string | null;
+        aspectRatio: string | null;
+        caption: string | null;
+      }
+    | {
         _type: "eventList";
         _key: string;
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
@@ -2236,7 +2731,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "narrow" | "split" | "spread-header" | "stacked" | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2329,7 +2824,13 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "sidebar-grid"
+          | "stacked"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2414,6 +2915,23 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         columns: "2" | "3" | "4" | null;
       }
     | {
+        _type: "linkCards";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "icon-list" | "list" | null;
+        heading: string | null;
+        description: string | null;
+        links: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon: string | null;
+          url: string | null;
+        }> | null;
+      }
+    | {
         _type: "logoCloud";
         _key: string;
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
@@ -2424,6 +2942,111 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         autoPopulate: boolean | null;
         sponsors: Array<{
           _id: string;
+        }> | null;
+      }
+    | {
+        _type: "mapBlock";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "default" | "full-width" | "split" | null;
+        heading: string | null;
+        address: string | null;
+        coordinates: {
+          lat: number | null;
+          lng: number | null;
+        } | null;
+        zoom: number | null;
+        caption: string | null;
+        contactInfo: {
+          phone: string | null;
+          email: string | null;
+          hours: string | null;
+        } | null;
+      }
+    | {
+        _type: "metricsDashboard";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "card" | "grid" | "row" | null;
+        heading: string | null;
+        description: string | null;
+        metrics: Array<{
+          _key: string;
+          label: string | null;
+          value: string | null;
+          change: string | null;
+          trend: "down" | "neutral" | "up" | null;
+          icon: string | null;
+        }> | null;
+      }
+    | {
+        _type: "newsletter";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "inline" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        placeholderText: string | null;
+        buttonText: string | null;
+        disclaimer: string | null;
+      }
+    | {
+        _type: "pricingTable";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "comparison" | "featured" | "simple" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          interval: string | null;
+          description: string | null;
+          features: Array<string> | null;
+          highlighted: boolean | null;
+          ctaText: string | null;
+          ctaUrl: string | null;
+        }> | null;
+      }
+    | {
+        _type: "productShowcase";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "detail" | "featured" | "grid" | null;
+        heading: string | null;
+        description: string | null;
+        products: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+          } | null;
+          price: string | null;
+          badge: string | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
         }> | null;
       }
     | {
@@ -2469,7 +3092,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "narrow" | "prose" | "wide" | null;
         content: Array<
           | {
               children?: Array<{
@@ -2552,6 +3175,37 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         > | null;
       }
     | {
+        _type: "serviceCards";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "alternating" | "grid" | "icon-grid" | "list" | null;
+        heading: string | null;
+        description: string | null;
+        services: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
         _type: "sponsorCards";
         _key: string;
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
@@ -2592,7 +3246,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "split" | "spread" | "steps" | null;
         heading: string | null;
         subheading: string | null;
         items: Array<{
@@ -2614,13 +3268,27 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid" | "split" | "spread" | null;
         heading: string | null;
         stats: Array<{
           _key: string;
           value: string | null;
           label: string | null;
           description: string | null;
+        }> | null;
+      }
+    | {
+        _type: "tabsBlock";
+        _key: string;
+        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "default" | "pills" | "underline" | null;
+        heading: string | null;
+        tabs: Array<{
+          _key: string;
+          label: string | null;
+          content: string | null;
         }> | null;
       }
     | {
@@ -2662,7 +3330,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "carousel" | "grid" | "marquee" | "masonry" | "split" | null;
         heading: string | null;
         displayMode:
           | "all"
@@ -2681,7 +3349,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "floating" | "reversed" | "split-asymmetric" | "split" | null;
         heading: string | null;
         content: Array<
           | {
@@ -2846,6 +3514,6 @@ declare module "@sanity/client" {
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref in\n  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id\n  && ($site == "" || site == $site)\n] | order(title asc) {\n  _id, title, "slug": slug.current, status\n}': SPONSOR_PROJECTS_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      videoUrl,\n      title,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      videoUrl,\n      title,\n      caption\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      placeholderText,\n      buttonText,\n      disclaimer\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      aspectRatio,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      zoom,\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      beforeLabel,\n      afterLabel,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

@@ -2,9 +2,35 @@ import EventList from './EventList.astro'
 import { eventsData } from '../../__tests__/__fixtures__/events'
 
 export default {
-  title: 'Blocks/EventList',
+  title: 'Components/EventList',
   component: EventList,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Renders a list of program events with status badges, dates, and descriptions. Supports filtering by event status (upcoming, past, all).',
+      },
+    },
+  },
+  argTypes: {
+    heading: { control: 'text', description: 'Section heading' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 const upcomingEvents = eventsData.filter(e => e.status === 'upcoming')

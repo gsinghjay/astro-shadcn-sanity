@@ -5,9 +5,40 @@ const sharedButtons = [
 ]
 
 export default {
-  title: 'Blocks/ArticleList',
+  title: 'Components/ArticleList',
   component: ArticleList,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Article listing in grid, split-featured, or list layouts with placeholder cards.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'split-featured', 'list'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const Grid = {

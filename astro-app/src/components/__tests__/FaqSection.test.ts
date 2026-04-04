@@ -50,4 +50,50 @@ describe('FaqSection', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('split variant keeps sticky heading layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'split' },
+    });
+
+    expect(html).toContain('sticky top-24');
+  });
+
+  test('stacked variant does not apply sticky heading layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'stacked' },
+    });
+
+    expect(html).not.toContain('sticky top-24');
+    expect(html).not.toContain('--section-width: 672px;');
+  });
+
+  test('spread-header variant renders spread container classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'spread-header' },
+    });
+
+    expect(html).toContain('@5xl:justify-between');
+  });
+
+  test('narrow variant applies constrained section width', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'narrow' },
+    });
+
+    expect(html).toContain('--section-width: 672px;');
+  });
+
+  test('unknown variant falls back to split layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'legacy-variant' },
+    });
+
+    expect(html).toContain('sticky top-24');
+  });
 });
