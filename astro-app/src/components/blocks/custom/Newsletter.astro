@@ -3,18 +3,10 @@ import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { NewsletterBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  placeholderText?: string;
-  buttonText?: string;
-  disclaimer?: string;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends NewsletterBlock {
   class?: string;
   id?: string;
 }
@@ -26,19 +18,15 @@ const {
   buttonText = 'Subscribe',
   disclaimer,
   variant: rawVariant,
-  backgroundVariant,
-  spacing,
-  maxWidth,
   class: className,
   id,
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' ? rawCleaned : 'inline';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
 {cleanVariant === 'inline' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-2xl mx-auto items-center text-center">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -58,7 +46,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'banner' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="flex-row flex-wrap items-center justify-between gap-6">
       <div class="flex-1 min-w-0">
         {heading && (
@@ -82,7 +70,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'split' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionSplit>
       <SectionContent>
         {heading && (

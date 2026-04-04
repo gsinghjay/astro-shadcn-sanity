@@ -4,38 +4,21 @@ import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/t
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { PricingTableBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  tiers?: Array<{
-    _key: string;
-    name: string;
-    price: string;
-    interval?: string;
-    description?: string;
-    features: string[];
-    highlighted?: boolean;
-    ctaText?: string;
-    ctaUrl?: string;
-  }>;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends PricingTableBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, tiers = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const { heading, description, tiers = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' ? rawCleaned : 'simple';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
 {cleanVariant === 'simple' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -76,7 +59,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'featured' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl mx-auto items-center text-center">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -121,7 +104,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'comparison' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>

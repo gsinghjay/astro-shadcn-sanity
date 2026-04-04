@@ -1,32 +1,21 @@
 ---
 import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { AccordionBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  items?: Array<{
-    _key: string;
-    title: string;
-    content: string;
-  }>;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends AccordionBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, items = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const { heading, description, items = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || rawCleaned === 'separated' ? rawCleaned : 'default';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
 {cleanVariant === 'default' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -53,7 +42,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'bordered' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -80,7 +69,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'separated' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>

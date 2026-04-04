@@ -2,31 +2,17 @@
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent } from '@/components/ui/tile';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { MetricsDashboardBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  metrics?: Array<{
-    _key: string;
-    label: string;
-    value: string;
-    change?: string;
-    trend?: 'up' | 'down' | 'neutral';
-    icon?: string;
-  }>;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends MetricsDashboardBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, metrics = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const { heading, description, metrics = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'row' || rawCleaned === 'card' ? rawCleaned : 'grid';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 
 const trendColor = (trend?: string) => {
   const t = stegaClean(trend);
@@ -44,7 +30,7 @@ const trendArrow = (trend?: string) => {
 ---
 
 {cleanVariant === 'grid' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -75,7 +61,7 @@ const trendArrow = (trend?: string) => {
 )}
 
 {cleanVariant === 'row' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -104,7 +90,7 @@ const trendArrow = (trend?: string) => {
 )}
 
 {cleanVariant === 'card' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
