@@ -4,23 +4,37 @@ import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, S
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
-import { cn } from '@/lib/utils';
+import { cn, bgClasses } from '@/lib/utils';
 
 interface Props extends HeroBannerBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, subheading, ctaButtons, backgroundImages, alignment, variant: rawVariant, class: className, id } = Astro.props;
+const { heading, subheading, ctaButtons, backgroundImages, backgroundVariant, alignment, variant: rawVariant, class: className, id } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'centered';
 const isCentered = stegaClean(alignment) === 'center';
 const hasCarousel = backgroundImages && backgroundImages.length > 0;
 const firstImage = backgroundImages?.[0];
+
+const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
+const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
+const isDarkHero = ['dark', 'hatched'].includes(bgVariant);
+const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
+
+function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
+  return widths
+    .map(w => {
+      const h = Math.round(w * baseHeight / baseWidth);
+      return `${urlFor(image).width(w).height(h).fit('crop').url()} ${w}w`;
+    })
+    .join(', ');
+}
 ---
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
 {variant === 'centered' && (
-  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative group", className)} id={id} data-animate>
+  <Section size="lg" class={cn(heroBg, "overflow-hidden relative group", className)} id={id} data-animate>
     {hasCarousel && (
       <div class="hero-carousel absolute inset-0" data-slot="hero-carousel" data-carousel>
         {backgroundImages?.map((image, index) => {
@@ -29,6 +43,7 @@ const firstImage = backgroundImages?.[0];
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -38,6 +53,8 @@ const firstImage = backgroundImages?.[0];
             >
               <img
                 src={optimizedUrl}
+                srcset={srcset}
+                sizes="100vw"
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
@@ -63,7 +80,7 @@ const firstImage = backgroundImages?.[0];
       </div>
     )}
 
-    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} bg-foreground p-8 md:p-12`}>
+    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} ${cardBg} p-8 md:p-12`}>
       <h1 class="text-5xl md:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
         {heading}
       </h1>
@@ -97,7 +114,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* OVERLAY variant — carousel + text directly over dark overlay (no glass card) */}
 {variant === 'overlay' && (
-  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative group", className)} id={id} data-animate>
+  <Section size="lg" class={cn(heroBg, "overflow-hidden relative group", className)} id={id} data-animate>
     {hasCarousel && (
       <div class="hero-carousel absolute inset-0" data-slot="hero-carousel" data-carousel>
         {backgroundImages?.map((image, index) => {
@@ -106,6 +123,7 @@ const firstImage = backgroundImages?.[0];
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -115,6 +133,8 @@ const firstImage = backgroundImages?.[0];
             >
               <img
                 src={optimizedUrl}
+                srcset={srcset}
+                sizes="100vw"
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
@@ -174,7 +194,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT variant — text + buttons left, first image right */}
 {variant === 'split' && (
-  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate>
+  <Section size="lg" class={cn(heroBg, className)} id={id} data-animate>
     <SectionSplit>
       <SectionContent>
         <h1 class="text-4xl md:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
@@ -209,6 +229,8 @@ const firstImage = backgroundImages?.[0];
         <SectionMedia>
           <img
             src={urlFor(firstImage).width(960).height(1080).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 960, 1080, [480, 640, 960])}
+            sizes="(max-width: 1024px) 100vw, 50vw"
             alt={firstImage.alt || ''}
             width={960}
             height={1080}
@@ -225,7 +247,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT-ASYMMETRIC variant — small text left, large image right (2fr:3fr) */}
 {variant === 'split-asymmetric' && (
-  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate>
+  <Section size="lg" class={cn(heroBg, className)} id={id} data-animate>
     <SectionSplit class="@5xl:grid-cols-[2fr_3fr]">
       <SectionContent>
         <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
@@ -260,6 +282,8 @@ const firstImage = backgroundImages?.[0];
         <SectionMedia>
           <img
             src={urlFor(firstImage).width(1200).height(1080).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 1200, 1080, [640, 960, 1200])}
+            sizes="(max-width: 1024px) 100vw, 60vw"
             alt={firstImage.alt || ''}
             width={1200}
             height={1080}
@@ -276,7 +300,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT-BLEED variant — compact text left (1fr), edge-bleed image right (3fr) */}
 {variant === 'split-bleed' && (
-  <Section size="lg" class={cn("bg-foreground text-background", className)} id={id} data-animate style="padding-inline-end: 0">
+  <Section size="lg" class={cn(heroBg, className)} id={id} data-animate style="padding-inline-end: 0">
     <SectionSplit class="@5xl:grid-cols-[1fr_3fr] @5xl:items-center">
       <SectionContent>
         <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold leading-[0.95] tracking-[-0.04em] text-balance">
@@ -312,6 +336,8 @@ const firstImage = backgroundImages?.[0];
         <SectionMedia class="rounded-r-none @5xl:-my-(--section-py)">
           <img
             src={urlFor(firstImage).width(1440).height(960).fit('crop').url()}
+            srcset={buildSrcset(firstImage, 1440, 960, [640, 960, 1440])}
+            sizes="(max-width: 1024px) 100vw, 75vw"
             alt={firstImage.alt || ''}
             width={1440}
             height={960}
@@ -328,11 +354,13 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPREAD variant — text left, buttons right, first image as background */}
 {variant === 'spread' && (
-  <Section size="lg" class={cn("bg-foreground text-background overflow-hidden relative", className)} id={id} data-animate>
+  <Section size="lg" class={cn(heroBg, "overflow-hidden relative", className)} id={id} data-animate>
     {firstImage?.asset && (
       <div class="absolute inset-0">
         <img
           src={urlFor(firstImage).width(1920).height(1080).fit('crop').url()}
+          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1440, 1920])}
+          sizes="100vw"
           alt={firstImage.alt || ''}
           width={1920}
           height={1080}

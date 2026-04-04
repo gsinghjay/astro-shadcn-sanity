@@ -73,6 +73,35 @@ describe('StatsRow', () => {
     expect(html).not.toContain('border-y-2');
   });
 
+  test('hatched variant applies bg-hatched on grid Section', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, backgroundVariant: 'hatched' },
+    });
+
+    expect(html).toContain('bg-hatched');
+    expect(html).toContain('text-background');
+  });
+
+  test('hatched-light variant applies bg-hatched-light on grid Section', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, backgroundVariant: 'hatched-light' },
+    });
+
+    expect(html).toContain('bg-hatched-light');
+  });
+
+  test('primary variant applies bg-primary on grid Section', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, backgroundVariant: 'primary' },
+    });
+
+    expect(html).toContain('bg-primary');
+    expect(html).toContain('text-primary-foreground');
+  });
+
   test('unknown variant falls back to grid layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {

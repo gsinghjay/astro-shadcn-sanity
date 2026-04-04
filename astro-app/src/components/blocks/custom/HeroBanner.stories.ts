@@ -53,7 +53,7 @@ export default {
     subheading: { control: 'text', description: 'Supporting text below headline' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
       description: 'Background color theme',
     },
     spacing: {
@@ -152,6 +152,32 @@ export const SplitBleed = {
     subheading: 'Compact text left, edge-to-edge image right (1fr:3fr)',
     ctaButtons: sharedButtons,
     backgroundImages: sharedImages,
+  },
+}
+
+export const HatchedDark = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-hatched',
+    variant: 'centered',
+    heading: 'Engineering the Future',
+    subheading: 'Swiss Brutalist diagonal-line texture over a dark background',
+    alignment: 'center',
+    backgroundVariant: 'hatched',
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedLight = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-hatched-light',
+    variant: 'centered',
+    heading: 'Technical Innovation',
+    subheading: 'Light hatched pattern for a softer engineering aesthetic',
+    alignment: 'center',
+    backgroundVariant: 'hatched-light',
+    ctaButtons: sharedButtons,
   },
 }
 

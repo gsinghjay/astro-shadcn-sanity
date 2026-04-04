@@ -86,13 +86,12 @@ describe('HeroBanner', () => {
       expect(html).toContain('loading="lazy"');
     });
 
-    test('renders solid dark card (no glass-morphism)', async () => {
+    test('renders solid card (no glass-morphism)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroFull,
       });
 
-      expect(html).toContain('bg-foreground');
       expect(html).not.toContain('backdrop-blur');
       expect(html).not.toContain('bg-foreground/80');
     });
@@ -290,6 +289,94 @@ describe('HeroBanner', () => {
 
       expect(html).toContain('Get Started');
       expect(html).toContain('Learn More');
+    });
+  });
+
+  // ─── Responsive srcset ──────────────────────────────────────────────
+  describe('responsive srcset', () => {
+    test('centered variant includes srcset with 4 widths', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroFull,
+      });
+
+      expect(html).toContain('srcset="');
+      expect(html).toContain('640w');
+      expect(html).toContain('1024w');
+      expect(html).toContain('1440w');
+      expect(html).toContain('1920w');
+      expect(html).toContain('sizes="100vw"');
+    });
+
+    test('split variant uses smaller widths (480, 640, 960)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSplit,
+      });
+
+      expect(html).toContain('480w');
+      expect(html).toContain('640w');
+      expect(html).toContain('960w');
+      expect(html).not.toContain('1920w');
+    });
+
+    test('split-asymmetric variant uses widths (640, 960, 1200)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSplitAsymmetric,
+      });
+
+      expect(html).toContain('640w');
+      expect(html).toContain('960w');
+      expect(html).toContain('1200w');
+      expect(html).not.toContain('1920w');
+    });
+
+    test('spread variant includes srcset with full widths', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSpread,
+      });
+
+      expect(html).toContain('srcset="');
+      expect(html).toContain('640w');
+      expect(html).toContain('1024w');
+      expect(html).toContain('1920w');
+      expect(html).toContain('sizes="100vw"');
+    });
+  });
+
+  // ─── Background variant handling ────────────────────────────────────
+  describe('background variants', () => {
+    test('hatched variant applies bg-hatched on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroFull, backgroundVariant: 'hatched' },
+      });
+
+      expect(html).toContain('bg-hatched');
+      expect(html).toContain('text-background');
+    });
+
+    test('hatched-light variant applies bg-hatched-light on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroFull, backgroundVariant: 'hatched-light' },
+      });
+
+      expect(html).toContain('bg-hatched-light');
+      expect(html).toContain('text-foreground');
+    });
+
+    test('white variant does not apply dark background on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroMinimal, backgroundVariant: 'white' },
+      });
+
+      const sectionMatch = html.match(/<section[^>]*class="([^"]*)"/);
+      expect(sectionMatch).toBeTruthy();
+      expect(sectionMatch![1]).not.toContain('bg-foreground');
     });
   });
 

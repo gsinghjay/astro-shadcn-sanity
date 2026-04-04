@@ -1,17 +1,10 @@
 ---
 import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import type { EmbedBlockBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  embedUrl?: string;
-  aspectRatio?: string;
-  caption?: string;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends EmbedBlockBlock {
   class?: string;
   id?: string;
 }
@@ -22,20 +15,16 @@ const {
   aspectRatio = '16/9',
   caption,
   variant: rawVariant,
-  backgroundVariant,
-  spacing,
-  maxWidth,
   class: className,
   id,
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'contained' || rawCleaned === 'full-width' ? rawCleaned : 'default';
 const cleanAspectRatio = stegaClean(aspectRatio) ?? '16/9';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
 {cleanVariant === 'default' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -65,7 +54,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'contained' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -95,7 +84,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'full-width' && (
-  <Section class={cn(baseClasses, 'max-w-none', className)} id={id} data-animate>
+  <Section class={cn('max-w-none', className)} id={id} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>

@@ -4,36 +4,22 @@ import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/t
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
-import { cn, blockBaseClasses } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { safeUrlFor } from '@/lib/image';
+import type { ProductShowcaseBlock } from '@/lib/types';
 
-interface Props {
-  heading?: string;
-  description?: string;
-  products?: Array<{
-    _key: string;
-    title: string;
-    description?: string;
-    image?: { url: string; alt?: string };
-    price?: string;
-    badge?: string;
-    link?: string;
-  }>;
-  variant?: string;
-  backgroundVariant?: string;
-  spacing?: string;
-  maxWidth?: string;
+interface Props extends ProductShowcaseBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, products = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const { heading, description, products = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'featured' || rawCleaned === 'detail' ? rawCleaned : 'grid';
-const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
 ---
 
 {cleanVariant === 'grid' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -45,11 +31,11 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 
     <SectionGrid>
       {products.map((product) => (
-        <Tile variant="floating" href={product.link}>
+        <Tile variant="floating" href={product.link?.href}>
           <TileContent>
             <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-              {product.image ? (
-                <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              {safeUrlFor(product.image) ? (
+                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={product.image?.alt || ''} class="w-full h-full object-cover" loading="lazy" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
               )}
@@ -70,7 +56,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'featured' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -93,8 +79,8 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
           {product.price && (
             <span class="text-2xl font-bold">{product.price}</span>
           )}
-          {product.link && (
-            <Button href={product.link} variant="outline">Learn More</Button>
+          {product.link?.href && (
+            <Button href={product.link.href} variant="outline">{product.link.label || 'Learn More'}</Button>
           )}
         </SectionContent>
         <SectionMedia>
@@ -112,7 +98,7 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 )}
 
 {cleanVariant === 'detail' && (
-  <Section class={cn(baseClasses, className)} id={id} data-animate>
+  <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -124,11 +110,11 @@ const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(s
 
     <div class="w-full space-y-8">
       {products.map((product) => (
-        <Tile variant="floating" href={product.link}>
+        <Tile variant="floating" href={product.link?.href}>
           <TileContent class="flex-row gap-8">
             <div class="w-48 h-48 flex-shrink-0 bg-muted rounded-sm overflow-hidden">
-              {product.image ? (
-                <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              {safeUrlFor(product.image) ? (
+                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={product.image?.alt || ''} class="w-full h-full object-cover" loading="lazy" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
               )}
