@@ -8,7 +8,7 @@ export default {
     docs: {
       description: {
         component:
-          'Portable Text renderer for long-form content. Supports default and narrow (672px) widths.',
+          'Portable Text renderer for long-form content. Supports prose (default), narrow (672px), and wide width variants.',
       },
     },
   },

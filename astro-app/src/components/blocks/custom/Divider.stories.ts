@@ -8,14 +8,14 @@ export default {
     docs: {
       description: {
         component:
-          'Visual separator between content sections. Supports line, short, labeled, and space-only variants.',
+          'Visual separator between content sections. Supports line, short, and labeled variants.',
       },
     },
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['line', 'short', 'labeled', 'space'],
+      options: ['line', 'short', 'labeled'],
       description: 'Layout variant',
     },
     label: { control: 'text', description: 'Label text (labeled variant only)' },

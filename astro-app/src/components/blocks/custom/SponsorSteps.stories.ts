@@ -71,8 +71,8 @@ export const Default = {
   args: {
     _type: 'sponsorSteps',
     _key: 'story-steps-1',
-    headline: 'How to Become a Sponsor',
-    subtitle: 'Follow these steps to begin your sponsorship journey.',
+    heading: 'How to Become a Sponsor',
+    subheading: 'Follow these steps to begin your sponsorship journey.',
     items: sharedItems,
   },
 }

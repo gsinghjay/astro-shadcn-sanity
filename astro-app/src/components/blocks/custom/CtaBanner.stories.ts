@@ -28,14 +28,14 @@ export default {
     docs: {
       description: {
         component:
-          'Call-to-action banner with heading, body text, and action buttons. Supports centered, split, spread, overlay, and minimal layouts. Typically placed mid-page or before footer.',
+          'Call-to-action banner with heading, body text, and action buttons. Supports centered, split, spread, and overlay layouts. Typically placed mid-page or before footer.',
       },
     },
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['centered', 'split', 'spread', 'overlay', 'minimal'],
+      options: ['centered', 'split', 'spread', 'overlay'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },

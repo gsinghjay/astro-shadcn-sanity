@@ -19,6 +19,7 @@ export default {
       options: ['grid', 'split', 'spread'],
       description: 'Layout variant',
     },
+    heading: { control: 'text', description: 'Section heading' },
     backgroundVariant: {
       control: { type: 'select' },
       options: ['white', 'light', 'dark', 'primary'],

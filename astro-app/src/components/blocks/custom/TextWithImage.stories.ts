@@ -19,6 +19,11 @@ export default {
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
+    imagePosition: {
+      control: { type: 'select' },
+      options: ['left', 'right'],
+      description: 'Image placement relative to text',
+    },
     backgroundVariant: {
       control: { type: 'select' },
       options: ['white', 'light', 'dark', 'primary'],

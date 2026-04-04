@@ -20,6 +20,11 @@ export default {
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
+    displayMode: {
+      control: { type: 'select' },
+      options: ['all', 'industry', 'student', 'byProject', 'manual'],
+      description: 'Testimonial filtering mode',
+    },
     backgroundVariant: {
       control: { type: 'select' },
       options: ['white', 'light', 'dark', 'primary'],

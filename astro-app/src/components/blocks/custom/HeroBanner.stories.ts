@@ -39,14 +39,14 @@ export default {
     docs: {
       description: {
         component:
-          'Full-width hero section with headline, subtext, CTA buttons, and optional background image. Supports 7 layout variants (centered, overlay, split, asymmetric, spread, bleed, minimal). Used as the first block on landing and index pages.',
+          'Full-width hero section with headline, subtext, CTA buttons, and optional background image. Supports 6 layout variants (centered, overlay, split, split-asymmetric, spread, split-bleed). Used as the first block on landing and index pages.',
       },
     },
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['centered', 'overlay', 'split', 'split-asymmetric', 'spread', 'split-bleed', 'minimal'],
+      options: ['centered', 'overlay', 'split', 'split-asymmetric', 'spread', 'split-bleed'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Main headline' },

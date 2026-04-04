@@ -8,7 +8,7 @@ export default {
     docs: {
       description: {
         component:
-          'Accordion-based FAQ with numbered questions. Supports split (sticky heading) and stacked layouts.',
+          'Accordion-based FAQ with numbered questions. Supports split (sticky heading), stacked, spread-header, and narrow layouts.',
       },
     },
   },
