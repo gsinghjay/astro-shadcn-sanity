@@ -27,8 +27,8 @@ export const linkCardItem = defineType({
     defineField({
       name: 'url',
       title: 'URL',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
+      type: 'url',
+      validation: (Rule) => Rule.required().uri({allowRelative: true, scheme: ['http', 'https']}),
     }),
   ],
   preview: {

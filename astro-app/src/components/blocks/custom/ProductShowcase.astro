@@ -85,8 +85,8 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'featured' || rawCl
         </SectionContent>
         <SectionMedia>
           <div class="aspect-video bg-muted rounded-sm overflow-hidden">
-            {product.image ? (
-              <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+            {safeUrlFor(product.image) ? (
+              <img src={safeUrlFor(product.image)!.width(800).height(450).fit('crop').url()} alt={product.image?.alt || ''} class="w-full h-full object-cover" loading="lazy" />
             ) : (
               <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
             )}

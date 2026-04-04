@@ -51,7 +51,8 @@ export const pricingTier = defineType({
     defineField({
       name: 'ctaUrl',
       title: 'CTA URL',
-      type: 'string',
+      type: 'url',
+      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
     }),
   ],
   preview: {

@@ -70,9 +70,9 @@ const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
       {cards.map((card) => (
         <Tile variant="floating" href={card.link?.href}>
           <TileContent>
-            {card.image && (
+            {safeUrlFor(card.image) && (
               <div class="bg-muted rounded-sm overflow-hidden -mx-6 -mt-6 mb-2">
-                <img src={card.image.url} alt={card.image.alt || ''} class="w-full object-cover" loading="lazy" />
+                <img src={safeUrlFor(card.image)!.width(600).url()} alt={card.image?.alt || ''} class="w-full object-cover" loading="lazy" />
               </div>
             )}
             <div class="flex items-start justify-between gap-2">
