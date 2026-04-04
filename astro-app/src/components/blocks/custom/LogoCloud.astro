@@ -27,7 +27,7 @@ const { heading, sponsors } = Astro.props;
     {sponsors?.map((sponsor) => {
       const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
       const content = (
-        <div class="bg-muted p-6 flex items-center justify-center h-24 hover:bg-background transition-colors duration-200">
+        <div class="bg-muted p-6 flex items-center justify-center h-24">
           {logoUrl ? (
             <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
           ) : (

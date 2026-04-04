@@ -42,7 +42,7 @@ export default {
     description: { control: 'text', description: 'Body text' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
       description: 'Background color theme',
     },
     spacing: {
@@ -104,6 +104,30 @@ export const Overlay = {
     description: 'Everything you need to build, launch, and grow your project.',
     backgroundVariant: 'dark',
     backgroundImages: [sharedImage],
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedDark = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-hatched',
+    variant: 'centered',
+    heading: 'Engineering Excellence Starts Here',
+    description: 'Join a community of innovators pushing the boundaries of technology and design.',
+    backgroundVariant: 'hatched',
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedLight = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-hatched-light',
+    variant: 'centered',
+    heading: 'Build With Confidence',
+    description: 'Light hatched pattern for a softer technical aesthetic.',
+    backgroundVariant: 'hatched-light',
     ctaButtons: sharedButtons,
   },
 }

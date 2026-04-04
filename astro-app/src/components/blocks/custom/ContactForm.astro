@@ -75,7 +75,7 @@ const submitText = stegaClean(form?.submitButton?.text) || 'Submit Inquiry';
       )}
     </SectionContent>
 
-    <div data-contact-form data-gtm-form="contact" class="border-2 border-foreground p-8 md:p-12">
+    <div data-contact-form data-gtm-form="contact" class="border border-foreground p-8 md:p-12">
       <div data-form-fields>
         <AutoForm fields={mappedFields} submit={submitText}>
           <input type="hidden" name="form_id" value={formId} />

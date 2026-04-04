@@ -1,18 +1,22 @@
 /**
- * Extracts a YouTube video ID from common URL patterns and returns
- * a privacy-enhanced embed URL. Returns null for unrecognized URLs.
+ * Extracts a YouTube video ID from common URL patterns.
+ * Returns null for unrecognized URLs.
+ */
+export function getVideoId(videoUrl: string): string | null {
+  const watchMatch = videoUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
+  if (watchMatch) return watchMatch[1];
+  const shortMatch = videoUrl.match(/youtu\.be\/([^?&]+)/);
+  if (shortMatch) return shortMatch[1];
+  const embedMatch = videoUrl.match(/youtube\.com\/embed\/([^?&]+)/);
+  if (embedMatch) return embedMatch[1];
+  return null;
+}
+
+/**
+ * Returns a privacy-enhanced embed URL for a YouTube video.
+ * Returns null for unrecognized URLs.
  */
 export function getEmbedUrl(videoUrl: string): string | null {
-  let videoId: string | null = null;
-  const watchMatch = videoUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
-  if (watchMatch) videoId = watchMatch[1];
-  if (!videoId) {
-    const shortMatch = videoUrl.match(/youtu\.be\/([^?&]+)/);
-    if (shortMatch) videoId = shortMatch[1];
-  }
-  if (!videoId) {
-    const embedMatch = videoUrl.match(/youtube\.com\/embed\/([^?&]+)/);
-    if (embedMatch) videoId = embedMatch[1];
-  }
+  const videoId = getVideoId(videoUrl);
   return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : null;
 }
