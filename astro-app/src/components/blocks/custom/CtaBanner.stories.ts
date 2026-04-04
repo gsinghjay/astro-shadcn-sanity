@@ -35,14 +35,14 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['centered', 'split', 'spread', 'overlay'],
+      options: ['centered', 'split', 'spread', 'overlay', 'brutalist', 'data-cta'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
     description: { control: 'text', description: 'Body text' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light', 'blueprint', 'mono', 'stripe'],
       description: 'Background color theme',
     },
     spacing: {
@@ -132,6 +132,30 @@ export const HatchedLight = {
   },
 }
 
+export const MonoDark = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-mono',
+    variant: 'centered',
+    heading: 'Terminal-Grade Infrastructure',
+    description: 'Near-black mono background for a terminal aesthetic.',
+    backgroundVariant: 'mono',
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const StripePaper = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-stripe',
+    variant: 'centered',
+    heading: 'Document Your Progress',
+    description: 'Ruled engineering paper background for a technical notebook feel.',
+    backgroundVariant: 'stripe',
+    ctaButtons: sharedButtons,
+  },
+}
+
 export const Minimal = {
   args: {
     _type: 'ctaBanner',
@@ -141,6 +165,38 @@ export const Minimal = {
     backgroundVariant: 'light',
     ctaButtons: [
       { _key: 'btn-1', text: 'Contact Us', url: '/contact' },
+    ],
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-brutalist',
+    variant: 'brutalist',
+    heading: 'Partner with Top Engineering Talent',
+    backgroundVariant: 'hatched',
+    ctaButtons: [
+      { _key: 'btn-1', text: 'Start a Partnership', url: '/contact' },
+    ],
+  },
+}
+
+export const DataCta = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-data',
+    variant: 'data-cta',
+    heading: 'The Numbers Speak',
+    description: 'Real impact, measurable outcomes.',
+    backgroundVariant: 'dark',
+    stats: [
+      { _key: 'ds1', value: '94%', label: 'Placement Rate' },
+      { _key: 'ds2', value: '$2.4M', label: 'Research Funding' },
+      { _key: 'ds3', value: '10+', label: 'Fortune 500 Partners' },
+    ],
+    ctaButtons: [
+      { _key: 'btn-1', text: 'Become a Sponsor', url: '/sponsors' },
     ],
   },
 }

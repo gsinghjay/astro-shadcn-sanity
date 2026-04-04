@@ -12,7 +12,7 @@ interface Props extends StatsRowBlock {
 
 const { heading, stats, backgroundVariant, variant } = Astro.props;
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
-const isDark = ['dark', 'hatched'].includes(bgVariant);
+const isDark = ['dark', 'hatched', 'blueprint', 'mono'].includes(bgVariant);
 const sectionBg = bgClasses[bgVariant] ?? '';
 const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 

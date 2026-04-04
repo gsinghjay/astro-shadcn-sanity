@@ -12,5 +12,8 @@ export const bgClasses: Record<string, string> = {
   primary: 'bg-primary text-primary-foreground',
   hatched: 'bg-hatched text-background',
   'hatched-light': 'bg-hatched-light text-foreground',
+  blueprint: 'bg-blueprint text-white',
+  mono: 'bg-mono text-white',
+  stripe: 'bg-stripe text-foreground',
 };
 

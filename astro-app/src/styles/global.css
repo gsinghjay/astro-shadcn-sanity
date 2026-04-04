@@ -110,6 +110,33 @@
   );
 }
 
+@utility bg-blueprint {
+  background-color: #003366;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 7px, rgba(255, 255, 255, 0.06) 7px, rgba(255, 255, 255, 0.06) 8px),
+    repeating-linear-gradient(90deg, transparent, transparent 7px, rgba(255, 255, 255, 0.06) 7px, rgba(255, 255, 255, 0.06) 8px);
+}
+
+@utility bg-mono {
+  background-color: #0A0A0A;
+}
+
+@utility bg-stripe {
+  background-color: #FFFFFF;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.04) 3px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+}
+
+@utility border-brutal {
+  border-width: 2px;
+  border-style: solid;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

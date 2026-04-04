@@ -18,7 +18,7 @@ const cleanVariant = stegaClean(variant ?? 'grid');
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const sectionBg = bgClasses[bgVariant] ?? '';
-const isDarkBg = ['dark', 'hatched', 'primary'].includes(bgVariant);
+const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;

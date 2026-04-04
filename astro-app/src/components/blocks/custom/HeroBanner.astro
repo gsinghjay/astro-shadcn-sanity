@@ -19,7 +19,7 @@ const firstImage = backgroundImages?.[0];
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
 const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
-const isDarkHero = ['dark', 'hatched'].includes(bgVariant);
+const isDarkHero = ['dark', 'hatched', 'blueprint', 'mono'].includes(bgVariant);
 const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
 
 function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
