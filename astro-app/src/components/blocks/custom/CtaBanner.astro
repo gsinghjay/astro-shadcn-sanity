@@ -20,23 +20,36 @@ const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
   dark: '',
+  hatched: '',
   light: '',
   white: '',
+  'hatched-light': '',
 };
 
 const secondaryBtnMap: Record<string, string> = {
   primary: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
   dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  hatched: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
   light: '',
   white: '',
+  'hatched-light': '',
 };
+
+const sectionBgMap: Record<string, string> = {
+  dark: 'bg-foreground text-background',
+  primary: 'bg-primary text-primary-foreground',
+  light: 'bg-muted',
+  hatched: 'bg-hatched text-background',
+  'hatched-light': 'bg-hatched-light',
+};
+const sectionBg = sectionBgMap[bgVariant] ?? '';
 
 const firstImage = backgroundImages?.[0];
 ---
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
 {layoutVariant === 'centered' && (
-  <Section class={className} id={id} data-animate>
+  <Section class={cn(sectionBg, className)} id={id} data-animate>
     <SectionContent class="items-center text-center max-w-3xl mx-auto">
       <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
         {heading}
@@ -68,7 +81,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPLIT variant — text + buttons left, first image right */}
 {layoutVariant === 'split' && (
-  <Section class={className} id={id} data-animate>
+  <Section class={cn(sectionBg, className)} id={id} data-animate>
     <SectionSplit>
       <SectionContent>
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
@@ -116,7 +129,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* SPREAD variant — heading + description left, buttons right (no image) */}
 {layoutVariant === 'spread' && (
-  <Section class={className} id={id} data-animate>
+  <Section class={cn(sectionBg, className)} id={id} data-animate>
     <SectionSpread>
       <SectionContent>
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">

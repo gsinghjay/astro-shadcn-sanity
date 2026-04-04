@@ -88,6 +88,28 @@
   border-bottom: 1px solid var(--primary);
 }
 
+@utility bg-hatched {
+  background-color: #222222;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 7px,
+    rgba(229, 229, 229, 0.1) 7px,
+    rgba(229, 229, 229, 0.1) 8px
+  );
+}
+
+@utility bg-hatched-light {
+  background-color: #F7F7F7;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 7px,
+    rgba(67, 67, 67, 0.08) 7px,
+    rgba(67, 67, 67, 0.08) 8px
+  );
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

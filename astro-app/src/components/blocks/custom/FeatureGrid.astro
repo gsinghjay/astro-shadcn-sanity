@@ -10,10 +10,20 @@ interface Props extends FeatureGridBlock {
   id?: string;
 }
 
-const { heading, columns, items, variant } = Astro.props;
+const { heading, columns, items, variant, backgroundVariant } = Astro.props;
 
 // Clean variant value and default to 'grid'
 const cleanVariant = stegaClean(variant ?? 'grid');
+
+const bgVariant = stegaClean(backgroundVariant) ?? 'white';
+const sectionBgMap: Record<string, string> = {
+  dark: 'bg-foreground text-background',
+  primary: 'bg-primary text-primary-foreground',
+  light: 'bg-muted',
+  hatched: 'bg-hatched text-background',
+  'hatched-light': 'bg-hatched-light',
+};
+const sectionBg = sectionBgMap[bgVariant] ?? '';
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
@@ -28,7 +38,7 @@ const gridClass =
 
 {cleanVariant === 'grid' ? (
   // Default grid variant - matches current behavior exactly
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -55,7 +65,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'grid-centered' ? (
   // Grid-centered variant - centered alignment
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl mx-auto items-center text-center">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -82,7 +92,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'horizontal-cards' ? (
   // Horizontal-cards variant - image left, text right
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -121,7 +131,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'sidebar-grid' ? (
   // Sidebar-grid variant - sticky sidebar with grid
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     <SectionSplit class="@5xl:grid-cols-[1fr_2fr]">
       <SectionContent class="@5xl:sticky @5xl:top-[calc(var(--section-py)+var(--header-height,0px))]">
         <SectionProse>
@@ -152,7 +162,7 @@ const gridClass =
   </Section>
 ) : (
   // Stacked variant - single column with horizontal split
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
