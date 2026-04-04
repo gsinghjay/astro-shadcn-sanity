@@ -46,7 +46,7 @@ const gridClass = getGridClasses(cleanVariant);
 <Section data-animate>
   {cleanVariant === 'floating' ? (
     // Floating variant with card styling
-    <div class="border rounded-lg shadow-lg p-8 bg-card">
+    <div class="border shadow-sm p-8 bg-card">
       <SectionSplit class={gridClass}>
         <SectionContent class="justify-center">
           {heading && (
@@ -67,7 +67,7 @@ const gridClass = getGridClasses(cleanVariant);
                 alt={image?.alt || heading || ''}
                 width={800}
                 height={600}
-                class="w-full h-full object-cover rounded"
+                class="w-full h-full object-cover"
                 loading="lazy"
                 decoding="async"
               />
@@ -78,7 +78,7 @@ const gridClass = getGridClasses(cleanVariant);
               alt={image?.alt || heading || ''}
               width={800}
               height={600}
-              class="w-full h-full object-cover rounded"
+              class="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
             />

@@ -1,0 +1,141 @@
+---
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import { safeUrlFor } from '@/lib/image';
+import type { BeforeAfterBlock } from '@/lib/types';
+
+interface Props extends BeforeAfterBlock {
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  beforeImage,
+  afterImage,
+  beforeLabel = 'Before',
+  afterLabel = 'After',
+  caption,
+  variant: rawVariant,
+  class: className,
+  id,
+} = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' || rawCleaned === 'toggle' ? rawCleaned : 'side-by-side';
+---
+
+{cleanVariant === 'side-by-side' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionSplit>
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(beforeImage) ? (
+            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
+          )}
+        </div>
+      </div>
+
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(afterImage) ? (
+            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
+          )}
+        </div>
+      </div>
+    </SectionSplit>
+
+    {caption && (
+      <p class="text-sm text-muted-foreground text-center w-full">{caption}</p>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'stacked' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl mx-auto space-y-6">
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(beforeImage) ? (
+            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
+          )}
+        </div>
+      </div>
+
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(afterImage) ? (
+            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    {caption && (
+      <p class="text-sm text-muted-foreground text-center w-full">{caption}</p>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'toggle' && (
+  <Section class={className} id={id} data-animate data-variant="toggle">
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionSplit>
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{beforeLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(beforeImage) ? (
+            <img src={safeUrlFor(beforeImage)!.width(800).height(600).fit('crop').url()} alt={beforeImage?.alt || beforeLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{beforeLabel}</div>
+          )}
+        </div>
+      </div>
+
+      <div class="relative">
+        <Badge class="absolute top-3 left-3 z-10">{afterLabel}</Badge>
+        <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+          {safeUrlFor(afterImage) ? (
+            <img src={safeUrlFor(afterImage)!.width(800).height(600).fit('crop').url()} alt={afterImage?.alt || afterLabel} class="w-full h-full object-cover" loading="lazy" />
+          ) : (
+            <div class="w-full h-full flex items-center justify-center text-muted-foreground">{afterLabel}</div>
+          )}
+        </div>
+      </div>
+    </SectionSplit>
+
+    {caption && (
+      <p class="text-sm text-muted-foreground text-center w-full">{caption}</p>
+    )}
+  </Section>
+)}

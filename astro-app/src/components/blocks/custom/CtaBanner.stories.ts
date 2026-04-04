@@ -20,10 +20,42 @@ const sharedButtons = [
 ]
 
 export default {
-  title: 'Blocks/CtaBanner',
+  title: 'Components/CtaBanner',
   component: CtaBanner,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Call-to-action banner with heading, body text, and action buttons. Supports centered, split, spread, and overlay layouts. Typically placed mid-page or before footer.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['centered', 'split', 'spread', 'overlay'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    description: { control: 'text', description: 'Body text' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const Centered = {
@@ -72,6 +104,30 @@ export const Overlay = {
     description: 'Everything you need to build, launch, and grow your project.',
     backgroundVariant: 'dark',
     backgroundImages: [sharedImage],
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedDark = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-hatched',
+    variant: 'centered',
+    heading: 'Engineering Excellence Starts Here',
+    description: 'Join a community of innovators pushing the boundaries of technology and design.',
+    backgroundVariant: 'hatched',
+    ctaButtons: sharedButtons,
+  },
+}
+
+export const HatchedLight = {
+  args: {
+    _type: 'ctaBanner',
+    _key: 'story-cta-hatched-light',
+    variant: 'centered',
+    heading: 'Build With Confidence',
+    description: 'Light hatched pattern for a softer technical aesthetic.',
+    backgroundVariant: 'hatched-light',
     ctaButtons: sharedButtons,
   },
 }

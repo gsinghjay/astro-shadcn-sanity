@@ -692,6 +692,80 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       videoUrl,
       title,
       caption
+    },
+    _type == "pricingTable" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
+    },
+    _type == "serviceCards" => {
+      heading,
+      description,
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href } }
+    },
+    _type == "productShowcase" => {
+      heading,
+      description,
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, price, badge, link{ label, href } }
+    },
+    _type == "linkCards" => {
+      heading,
+      description,
+      links[]{ _key, title, description, icon, url }
+    },
+    _type == "newsletter" => {
+      heading,
+      description,
+      placeholderText,
+      buttonText,
+      disclaimer
+    },
+    _type == "accordion" => {
+      heading,
+      description,
+      items[]{ _key, title, content }
+    },
+    _type == "tabsBlock" => {
+      heading,
+      tabs[]{ _key, label, content }
+    },
+    _type == "embedBlock" => {
+      heading,
+      embedUrl,
+      aspectRatio,
+      caption
+    },
+    _type == "mapBlock" => {
+      heading,
+      address,
+      coordinates{ lat, lng },
+      zoom,
+      caption,
+      contactInfo{ phone, email, hours }
+    },
+    _type == "countdownTimer" => {
+      heading,
+      description,
+      targetDate,
+      completedMessage
+    },
+    _type == "metricsDashboard" => {
+      heading,
+      description,
+      metrics[]{ _key, label, value, change, trend, icon }
+    },
+    _type == "cardGrid" => {
+      heading,
+      description,
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href }, badge }
+    },
+    _type == "beforeAfter" => {
+      heading,
+      beforeImage{ ${IMAGE_PROJECTION}, alt },
+      afterImage{ ${IMAGE_PROJECTION}, alt },
+      beforeLabel,
+      afterLabel,
+      caption
     }
   }
 }`);

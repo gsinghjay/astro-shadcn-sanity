@@ -4,16 +4,21 @@ import { Section, SectionContent, SectionGrid, SectionSplit, SectionProse } from
 import { Tile, TileContent, TileTitle, TileDescription, TileSplit, TileMedia } from '@/components/ui/tile';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { bgClasses } from '@/lib/utils';
 
 interface Props extends FeatureGridBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, columns, items, variant } = Astro.props;
+const { heading, columns, items, variant, backgroundVariant } = Astro.props;
 
 // Clean variant value and default to 'grid'
 const cleanVariant = stegaClean(variant ?? 'grid');
+
+const bgVariant = stegaClean(backgroundVariant) ?? 'white';
+const sectionBg = bgClasses[bgVariant] ?? '';
+const isDarkBg = ['dark', 'hatched', 'primary'].includes(bgVariant);
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
@@ -28,7 +33,7 @@ const gridClass =
 
 {cleanVariant === 'grid' ? (
   // Default grid variant - matches current behavior exactly
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -40,7 +45,7 @@ const gridClass =
         <Tile variant="floating">
           <TileContent>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
                 <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -55,7 +60,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'grid-centered' ? (
   // Grid-centered variant - centered alignment
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl mx-auto items-center text-center">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -67,7 +72,7 @@ const gridClass =
         <Tile variant="floating" class="items-center text-center">
           <TileContent class="items-center text-center">
             <div class="flex flex-col items-center gap-3 w-full">
-              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
                 <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -82,7 +87,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'horizontal-cards' ? (
   // Horizontal-cards variant - image left, text right
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -121,7 +126,7 @@ const gridClass =
   </Section>
 ) : cleanVariant === 'sidebar-grid' ? (
   // Sidebar-grid variant - sticky sidebar with grid
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     <SectionSplit class="@5xl:grid-cols-[1fr_2fr]">
       <SectionContent class="@5xl:sticky @5xl:top-[calc(var(--section-py)+var(--header-height,0px))]">
         <SectionProse>
@@ -136,7 +141,7 @@ const gridClass =
           <Tile variant="floating">
             <TileContent>
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+                <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
                   <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
                     {String(i + 1).padStart(2, '0')}
                   </span>
@@ -152,7 +157,7 @@ const gridClass =
   </Section>
 ) : (
   // Stacked variant - single column with horizontal split
-  <Section data-animate>
+  <Section class={sectionBg} data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
@@ -168,7 +173,7 @@ const gridClass =
                 <TileTitle class="text-lg">{feature.title}</TileTitle>
               </div>
               <div class="flex flex-col items-start justify-center">
-                <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+                <TileDescription class={`whitespace-pre-line ${isDarkBg ? 'text-background/70' : ''}`}>{feature.description}</TileDescription>
               </div>
             </TileSplit>
           </Tile>
