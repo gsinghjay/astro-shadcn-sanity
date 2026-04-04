@@ -58,7 +58,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
-                loading={isFirst ? 'eager' : 'lazy'}
+                loading="eager"
                 fetchpriority={isFirst ? 'high' : undefined}
                 decoding="async"
                 class="w-full h-full object-cover"
@@ -138,7 +138,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
                 alt={image.alt || `Slide ${index + 1}`}
                 width={1920}
                 height={1080}
-                loading={isFirst ? 'eager' : 'lazy'}
+                loading="eager"
                 fetchpriority={isFirst ? 'high' : undefined}
                 decoding="async"
                 class="w-full h-full object-cover"
