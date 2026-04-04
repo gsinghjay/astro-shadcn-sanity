@@ -185,13 +185,15 @@ describe('HeroBanner', () => {
       expect(html).not.toContain('Second slide');
     });
 
-    test('heading caps at text-6xl (no text-7xl)', async () => {
+    test('heading caps at text-6xl (no text-7xl or text-8xl)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroSplit,
       });
 
+      expect(html).toContain('text-6xl');
       expect(html).not.toContain('text-7xl');
+      expect(html).not.toContain('text-8xl');
     });
 
     test('renders CTA buttons', async () => {
@@ -275,6 +277,7 @@ describe('HeroBanner', () => {
         props: heroOverlay,
       });
 
+      expect(html).toContain('text-6xl');
       expect(html).not.toContain('text-7xl');
       expect(html).not.toContain('text-8xl');
     });
@@ -321,13 +324,15 @@ describe('HeroBanner', () => {
       expect(html).toContain('bg-foreground/60');
     });
 
-    test('heading caps at text-6xl (no text-7xl)', async () => {
+    test('heading caps at text-6xl (no text-7xl or text-8xl)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroSpread,
       });
 
+      expect(html).toContain('text-6xl');
       expect(html).not.toContain('text-7xl');
+      expect(html).not.toContain('text-8xl');
     });
 
     test('renders CTA buttons', async () => {
