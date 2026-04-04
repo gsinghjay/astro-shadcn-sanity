@@ -89,6 +89,16 @@ describe('ContactForm', () => {
     expect(html).toContain('cf-turnstile');
   });
 
+  test('form container uses 1px border (border, not border-2)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ContactForm, {
+      props: contactFormFull,
+    });
+
+    expect(html).toContain('border border-foreground');
+    expect(html).not.toContain('border-2');
+  });
+
   test('renders state-toggle CSS', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ContactForm, {

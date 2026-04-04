@@ -6,7 +6,7 @@ The design language draws directly from **NJIT's institutional identity** layere
 
 Corners are **sharp everywhere** (`--radius: 0`) -- buttons, inputs, cards, and containers all use squared-off edges, matching njit.edu exactly. There is zero decorative rounding in the system.
 
-Depth is **completely flat**. No box-shadows on primary UI elements. Shadows appear only on "floating" layout variants (headers, sections) as a subtle structural cue, never as decoration. The interface trusts color contrast, weight, and whitespace to establish hierarchy.
+Depth is **completely flat**. No box-shadows on primary UI elements. Shadows appear only on "floating" layout variants (headers, sections) as a subtle structural cue, never as decoration. No `backdrop-blur` or glass-morphism effects -- transparency is not used for depth. The interface trusts color contrast, weight, and whitespace to establish hierarchy.
 
 The overall mood: **institutional confidence** -- the visual equivalent of a well-designed research paper or engineering specification.
 
@@ -98,6 +98,10 @@ Dark mode inverts the canvas to near-black (`#0A0A0A`) with soft-white text (`#F
 | H5 | text-base | text-lg | text-xl |
 | H6 | text-sm | text-base | text-lg |
 
+### Display Heading Cap
+
+Component display headings (hero banners, feature sections) cap at `text-6xl` (60px). No component heading exceeds this size. Decorative typographic elements (e.g., Pullquote quotation marks) are exempt.
+
 ## 4. Component Stylings
 
 ### Buttons
@@ -133,6 +137,10 @@ Compact (`rounded-md`, `px-2 py-0.5`) at 12px with medium weight. Variants: defa
 ### Accent Dividers
 
 A signature NJIT pattern: thin 1px red bottom-borders used as decorative separators. Available via the `accent-divider` utility class. Used under stat numbers, between content sections, and as visual anchors.
+
+### Borders
+
+Structural borders use 1px weight (`border`, `border-y`, `border-b`). No 2px borders in the component system. The only exception is focus rings (`ring-2`) for accessibility.
 
 ### Navigation Items
 

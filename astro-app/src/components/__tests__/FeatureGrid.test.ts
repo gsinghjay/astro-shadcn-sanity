@@ -26,6 +26,16 @@ describe('FeatureGrid', () => {
     expect(html).toContain('02');
   });
 
+  test('numbered icon boxes use 1px border (border, not border-2)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FeatureGrid, {
+      props: featureGridFull,
+    });
+
+    expect(html).toContain('border border-foreground');
+    expect(html).not.toContain('border-2');
+  });
+
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FeatureGrid, {

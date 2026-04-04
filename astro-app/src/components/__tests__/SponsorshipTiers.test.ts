@@ -127,6 +127,24 @@ describe('SponsorshipTiers', () => {
     expect(html).not.toContain('<h3');
   });
 
+  test('tier cards have no rounded-lg class', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).not.toContain('rounded-lg');
+  });
+
+  test('highlighted tier uses shadow-sm not shadow-lg', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).not.toContain('shadow-lg');
+  });
+
   test('root section has data-animate attribute', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorshipTiers, {

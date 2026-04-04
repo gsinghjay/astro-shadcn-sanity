@@ -86,14 +86,26 @@ describe('HeroBanner', () => {
       expect(html).toContain('loading="lazy"');
     });
 
-    test('renders glass card overlay (backdrop-blur)', async () => {
+    test('renders solid dark card (no glass-morphism)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroFull,
       });
 
-      expect(html).toContain('backdrop-blur-sm');
-      expect(html).toContain('bg-foreground/80');
+      expect(html).toContain('bg-foreground');
+      expect(html).not.toContain('backdrop-blur');
+      expect(html).not.toContain('bg-foreground/80');
+    });
+
+    test('heading caps at text-6xl (no text-7xl or text-8xl)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroFull,
+      });
+
+      expect(html).not.toContain('text-7xl');
+      expect(html).not.toContain('text-8xl');
+      expect(html).toContain('text-6xl');
     });
 
     test('renders GTM tracking attributes on CTA buttons', async () => {
@@ -173,6 +185,15 @@ describe('HeroBanner', () => {
       expect(html).not.toContain('Second slide');
     });
 
+    test('heading caps at text-6xl (no text-7xl)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSplit,
+      });
+
+      expect(html).not.toContain('text-7xl');
+    });
+
     test('renders CTA buttons', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
@@ -248,6 +269,16 @@ describe('HeroBanner', () => {
       expect(html).not.toContain('bg-foreground/80');
     });
 
+    test('heading caps at text-6xl (no text-7xl or text-8xl)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroOverlay,
+      });
+
+      expect(html).not.toContain('text-7xl');
+      expect(html).not.toContain('text-8xl');
+    });
+
     test('renders CTA buttons', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
@@ -288,6 +319,15 @@ describe('HeroBanner', () => {
 
       expect(html).toContain('w-full h-full object-cover');
       expect(html).toContain('bg-foreground/60');
+    });
+
+    test('heading caps at text-6xl (no text-7xl)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: heroSpread,
+      });
+
+      expect(html).not.toContain('text-7xl');
     });
 
     test('renders CTA buttons', async () => {

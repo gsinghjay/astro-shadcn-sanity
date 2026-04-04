@@ -63,6 +63,16 @@ describe('StatsRow', () => {
     expect(html).toContain('@5xl:justify-between');
   });
 
+  test('grid variant uses 1px border (border-y, not border-y-2)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'grid' },
+    });
+
+    expect(html).toContain('border-y');
+    expect(html).not.toContain('border-y-2');
+  });
+
   test('unknown variant falls back to grid layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {

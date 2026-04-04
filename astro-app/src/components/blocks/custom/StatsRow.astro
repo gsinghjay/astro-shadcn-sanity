@@ -18,7 +18,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'grid' && (
   <Section
     size="sm"
-    class={`border-y-2 ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
+    class={`border-y ${isDark ? 'bg-foreground text-background border-foreground' : 'bg-muted border-border'}`}
     data-animate
   >
     {heading && (
