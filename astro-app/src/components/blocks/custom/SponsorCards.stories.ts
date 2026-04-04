@@ -1,9 +1,35 @@
 import SponsorCards from './SponsorCards.astro'
 
 export default {
-  title: 'Blocks/SponsorCards',
+  title: 'Components/SponsorCards',
   component: SponsorCards,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Grid display of sponsor organization cards with logos, tiers, and metadata.',
+      },
+    },
+  },
+  argTypes: {
+    heading: { control: 'text', description: 'Section heading' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const Default = {

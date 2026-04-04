@@ -66,6 +66,9 @@ const heroImage = firstBlock?._type === 'heroBanner'
 const preloadImageUrl = heroImage?.asset
   ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
+const preloadSrcset = heroImage?.asset
+  ? [640, 1024, 1440, 1920].map(w => `${urlFor(heroImage).width(w).height(Math.round(w * 1080 / 1920)).fit('crop').url()} ${w}w`).join(', ')
+  : undefined;
 ---
 
 <Layout
@@ -74,10 +77,12 @@ const preloadImageUrl = heroImage?.asset
   hideNav={!visualEditingEnabled && template === 'landing'}
   template={template}
   preloadImage={preloadImageUrl}
+  preloadImageSrcset={preloadSrcset}
+  preloadImageSizes="100vw"
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>
-      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div slot="fallback" class="mx-auto max-w-7xl px-(--gutter) py-12">
         <div class="animate-pulse space-y-8">
           <div class="h-10 bg-muted rounded w-2/5"></div>
           <div class="h-64 bg-muted rounded"></div>

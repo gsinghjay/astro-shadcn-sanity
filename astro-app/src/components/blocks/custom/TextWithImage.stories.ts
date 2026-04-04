@@ -1,9 +1,45 @@
 import TextWithImage from './TextWithImage.astro'
 
 export default {
-  title: 'Blocks/TextWithImage',
+  title: 'Components/TextWithImage',
   component: TextWithImage,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Split-layout block pairing prose content with an image. Supports left/right positioning and asymmetric ratios.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['split', 'reversed', 'floating', 'split-asymmetric'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    imagePosition: {
+      control: { type: 'select' },
+      options: ['left', 'right'],
+      description: 'Image placement relative to text',
+    },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const ImageRight = {
