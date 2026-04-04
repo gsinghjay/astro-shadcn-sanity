@@ -30,6 +30,37 @@ export const textWithImageFull: TextWithImageBlock = {
   imagePosition: 'right',
 };
 
+export const textWithImageFloating: TextWithImageBlock = {
+  _type: 'textWithImage',
+  _key: 'test-twi-3',
+  backgroundVariant: null,
+  spacing: 'default',
+  maxWidth: 'default',
+  heading: 'Floating Card',
+  content: [
+    {
+      _type: 'block',
+      _key: 'b1',
+      style: 'normal',
+      children: [{ _type: 'span', _key: 'sp1', text: 'Content in a floating card.', marks: [] }],
+      markDefs: [],
+    },
+  ],
+  image: {
+    asset: {
+      _id: 'image-float123-1200x900-jpg',
+      url: 'https://cdn.sanity.io/images/test/test/float123-1200x900.jpg',
+      metadata: {
+        lqip: 'data:image/jpeg;base64,/9j/2wBDAAkGBw',
+        dimensions: { width: 1200, height: 900, aspectRatio: 1.3333 },
+      },
+    },
+    alt: 'Floating image',
+  },
+  imagePosition: null,
+  variant: 'floating',
+};
+
 export const textWithImageMinimal: TextWithImageBlock = {
   _type: 'textWithImage',
   _key: 'test-twi-2',

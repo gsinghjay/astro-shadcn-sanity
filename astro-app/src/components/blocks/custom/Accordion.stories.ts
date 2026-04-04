@@ -1,0 +1,100 @@
+import Accordion from './Accordion.astro'
+
+const sharedItems = [
+  {
+    _key: 'acc-1',
+    title: 'What is included in the free plan?',
+    content: 'The free plan includes up to 5 projects, 10 GB of storage, and access to community support. No credit card required to get started.',
+  },
+  {
+    _key: 'acc-2',
+    title: 'Can I upgrade or downgrade at any time?',
+    content: 'Yes, you can change your plan at any time. Upgrades take effect immediately, and downgrades apply at the end of the current billing cycle.',
+  },
+  {
+    _key: 'acc-3',
+    title: 'How does billing work?',
+    content: 'We offer monthly and annual billing options. Annual plans save you 20% compared to monthly pricing. All prices are in USD.',
+  },
+  {
+    _key: 'acc-4',
+    title: 'Is there a refund policy?',
+    content: 'We offer a 30-day money-back guarantee for all paid plans. If you are not satisfied, contact support for a full refund.',
+  },
+  {
+    _key: 'acc-5',
+    title: 'Do you offer custom enterprise plans?',
+    content: 'Absolutely. Contact our sales team for custom pricing, dedicated support, and tailored features for your organization.',
+  },
+]
+
+export default {
+  title: 'Components/Accordion',
+  component: Accordion,
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component: 'General-purpose collapsible content block using native details/summary elements for zero-JS accordion behavior.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['default', 'bordered', 'separated'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    description: { control: 'text', description: 'Section description' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
+}
+
+export const Default = {
+  args: {
+    _type: 'accordion',
+    _key: 'story-accordion-default',
+    variant: 'default',
+    heading: 'Frequently Asked Questions',
+    description: 'Find answers to the most common questions about our platform.',
+    items: sharedItems,
+  },
+}
+
+export const Bordered = {
+  args: {
+    _type: 'accordion',
+    _key: 'story-accordion-bordered',
+    variant: 'bordered',
+    heading: 'Knowledge Base',
+    description: 'Browse topics below to learn more.',
+    items: sharedItems,
+  },
+}
+
+export const Separated = {
+  args: {
+    _type: 'accordion',
+    _key: 'story-accordion-separated',
+    variant: 'separated',
+    heading: 'Help Center',
+    description: 'Click a topic to expand.',
+    items: sharedItems,
+  },
+}

@@ -42,6 +42,16 @@ describe('LogoCloud', () => {
     expect(html).toContain('https://techcorp.example.com');
   });
 
+  test('logo cells use opacity-only hover (no hover:bg-background)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LogoCloud, {
+      props: logoCloudFull,
+    });
+
+    expect(html).not.toContain('hover:bg-background');
+    expect(html).not.toContain('transition-colors');
+  });
+
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {

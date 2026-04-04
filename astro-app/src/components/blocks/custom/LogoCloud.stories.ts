@@ -1,10 +1,36 @@
 import LogoCloud from './LogoCloud.astro'
 
 export default {
-  title: 'Blocks/LogoCloud',
+  title: 'Components/LogoCloud',
   component: LogoCloud,
   tags: ['autodocs'],
-  parameters: { layout: 'fullscreen' },
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        component:
+          'Responsive grid of partner/media logos with subtle opacity treatment. Bordered section with up to 8 columns.',
+      },
+    },
+  },
+  argTypes: {
+    heading: { control: 'text', description: 'Section heading' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const WithLogos = {
