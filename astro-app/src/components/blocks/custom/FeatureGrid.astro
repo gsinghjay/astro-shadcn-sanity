@@ -4,6 +4,7 @@ import { Section, SectionContent, SectionGrid, SectionSplit, SectionProse } from
 import { Tile, TileContent, TileTitle, TileDescription, TileSplit, TileMedia } from '@/components/ui/tile';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { bgClasses } from '@/lib/utils';
 
 interface Props extends FeatureGridBlock {
   class?: string;
@@ -16,14 +17,8 @@ const { heading, columns, items, variant, backgroundVariant } = Astro.props;
 const cleanVariant = stegaClean(variant ?? 'grid');
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
-const sectionBgMap: Record<string, string> = {
-  dark: 'bg-foreground text-background',
-  primary: 'bg-primary text-primary-foreground',
-  light: 'bg-muted',
-  hatched: 'bg-hatched text-background',
-  'hatched-light': 'bg-hatched-light',
-};
-const sectionBg = sectionBgMap[bgVariant] ?? '';
+const sectionBg = bgClasses[bgVariant] ?? '';
+const isDarkBg = ['dark', 'hatched', 'primary'].includes(bgVariant);
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
@@ -178,7 +173,7 @@ const gridClass =
                 <TileTitle class="text-lg">{feature.title}</TileTitle>
               </div>
               <div class="flex flex-col items-start justify-center">
-                <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+                <TileDescription class={`whitespace-pre-line ${isDarkBg ? 'text-background/70' : ''}`}>{feature.description}</TileDescription>
               </div>
             </TileSplit>
           </Tile>

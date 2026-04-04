@@ -1,4 +1,4 @@
-import { getEmbedUrl } from '@/lib/video';
+import { getEmbedUrl, getVideoId } from '@/lib/video';
 
 /**
  * Mirrors extractYouTubeId() from studio/src/schemaTypes/blocks/YouTubePreview.tsx.
@@ -40,6 +40,28 @@ describe('getEmbedUrl / extractYouTubeId parity', () => {
       }
     },
   );
+});
+
+describe('getVideoId', () => {
+  it('extracts ID from youtube.com/watch?v= URL', () => {
+    expect(getVideoId('https://www.youtube.com/watch?v=dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
+  });
+
+  it('extracts ID from youtu.be/ short URL', () => {
+    expect(getVideoId('https://youtu.be/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
+  });
+
+  it('extracts ID from youtube.com/embed/ URL', () => {
+    expect(getVideoId('https://www.youtube.com/embed/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ');
+  });
+
+  it('returns null for non-YouTube URL', () => {
+    expect(getVideoId('https://vimeo.com/123456')).toBeNull();
+  });
+
+  it('returns null for empty string', () => {
+    expect(getVideoId('')).toBeNull();
+  });
 });
 
 describe('getEmbedUrl', () => {

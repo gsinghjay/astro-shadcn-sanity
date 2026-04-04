@@ -182,11 +182,13 @@ describe('CtaBanner', () => {
       expect(html).toContain('z-10');
     });
 
-    test('uses text-background for centered text on dark overlay', async () => {
+    test('applies backgroundVariant classes on overlay Section', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(CtaBanner, { props: ctaOverlay });
 
-      expect(html).toContain('text-background');
+      const sectionMatch = html.match(/<section[^>]*class="([^"]*)"/);
+      expect(sectionMatch).toBeTruthy();
+      expect(sectionMatch![1]).toContain('bg-primary');
     });
 
     test('renders GTM attributes in overlay variant', async () => {
