@@ -4,7 +4,7 @@ import { Section, SectionContent, SectionActions, SectionSplit, SectionSpread, S
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
-import { cn } from '@/lib/utils';
+import { cn, bgClasses } from '@/lib/utils';
 
 interface Props extends CtaBannerBlock {
   class?: string;
@@ -16,6 +16,9 @@ const { heading, description, ctaButtons, backgroundVariant, backgroundImages, v
 const layoutVariant = stegaClean(rawVariant) ?? 'centered';
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
+const sectionBg = bgClasses[bgVariant] ?? '';
+const isDarkBg = ['dark', 'hatched', 'primary'].includes(bgVariant);
+const descColor = isDarkBg ? 'text-background/70' : 'text-muted-foreground';
 
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
@@ -35,15 +38,6 @@ const secondaryBtnMap: Record<string, string> = {
   'hatched-light': '',
 };
 
-const sectionBgMap: Record<string, string> = {
-  dark: 'bg-foreground text-background',
-  primary: 'bg-primary text-primary-foreground',
-  light: 'bg-muted',
-  hatched: 'bg-hatched text-background',
-  'hatched-light': 'bg-hatched-light',
-};
-const sectionBg = sectionBgMap[bgVariant] ?? '';
-
 const firstImage = backgroundImages?.[0];
 ---
 
@@ -56,7 +50,7 @@ const firstImage = backgroundImages?.[0];
       </h2>
 
       {description && (
-        <p class="text-lg leading-relaxed max-w-2xl text-muted-foreground">{description}</p>
+        <p class="text-lg leading-relaxed max-w-2xl ${descColor}">{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (
@@ -89,7 +83,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl text-muted-foreground">{description}</p>
+          <p class="text-lg leading-relaxed max-w-xl ${descColor}">{description}</p>
         )}
 
         {ctaButtons && ctaButtons.length > 0 && (
@@ -137,7 +131,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl text-muted-foreground">{description}</p>
+          <p class="text-lg leading-relaxed max-w-xl ${descColor}">{description}</p>
         )}
       </SectionContent>
 
@@ -163,7 +157,7 @@ const firstImage = backgroundImages?.[0];
 
 {/* OVERLAY variant — first image as full-width background, centered text + buttons on top */}
 {layoutVariant === 'overlay' && (
-  <Section class={cn("bg-foreground text-background overflow-hidden relative", className)} id={id} data-animate>
+  <Section class={cn(sectionBg || "bg-foreground text-background", "overflow-hidden relative", className)} id={id} data-animate>
     {firstImage?.asset && (
       <div class="absolute inset-0">
         <img
@@ -195,7 +189,7 @@ const firstImage = backgroundImages?.[0];
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i === 0 ? primaryBtnMap['dark'] : secondaryBtnMap['dark']}
+              class={i === 0 ? primaryBtnMap[bgVariant] ?? primaryBtnMap['dark'] : secondaryBtnMap[bgVariant] ?? secondaryBtnMap['dark']}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}

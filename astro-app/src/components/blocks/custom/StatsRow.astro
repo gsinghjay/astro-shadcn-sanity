@@ -3,6 +3,7 @@ import type { StatsRowBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionGrid, SectionSpread, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { Tile, TileContent, TileDescription, TileTitle } from '@/components/ui/tile';
+import { bgClasses } from '@/lib/utils';
 
 interface Props extends StatsRowBlock {
   class?: string;
@@ -12,13 +13,7 @@ interface Props extends StatsRowBlock {
 const { heading, stats, backgroundVariant, variant } = Astro.props;
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
 const isDark = ['dark', 'hatched'].includes(bgVariant);
-
-const bgMap: Record<string, string> = {
-  dark: 'bg-foreground text-background',
-  hatched: 'bg-hatched text-background',
-  'hatched-light': 'bg-hatched-light',
-};
-const sectionBg = bgMap[bgVariant] ?? '';
+const sectionBg = bgClasses[bgVariant] ?? '';
 const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 
 const rawVariant = stegaClean(variant);

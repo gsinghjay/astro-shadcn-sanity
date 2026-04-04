@@ -86,13 +86,12 @@ describe('HeroBanner', () => {
       expect(html).toContain('loading="lazy"');
     });
 
-    test('renders solid dark card (no glass-morphism)', async () => {
+    test('renders solid card (no glass-morphism)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroFull,
       });
 
-      expect(html).toContain('bg-foreground');
       expect(html).not.toContain('backdrop-blur');
       expect(html).not.toContain('bg-foreground/80');
     });
@@ -290,6 +289,40 @@ describe('HeroBanner', () => {
 
       expect(html).toContain('Get Started');
       expect(html).toContain('Learn More');
+    });
+  });
+
+  // ─── Background variant handling ────────────────────────────────────
+  describe('background variants', () => {
+    test('hatched variant applies bg-hatched on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroFull, backgroundVariant: 'hatched' },
+      });
+
+      expect(html).toContain('bg-hatched');
+      expect(html).toContain('text-background');
+    });
+
+    test('hatched-light variant applies bg-hatched-light on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroFull, backgroundVariant: 'hatched-light' },
+      });
+
+      expect(html).toContain('bg-hatched-light');
+      expect(html).toContain('text-foreground');
+    });
+
+    test('white variant does not apply dark background on Section', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(HeroBanner, {
+        props: { ...heroMinimal, backgroundVariant: 'white' },
+      });
+
+      const sectionMatch = html.match(/<section[^>]*class="([^"]*)"/);
+      expect(sectionMatch).toBeTruthy();
+      expect(sectionMatch![1]).not.toContain('bg-foreground');
     });
   });
 

@@ -43,4 +43,24 @@ describe('FeatureGrid', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('hatched variant applies bg-hatched on Section', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FeatureGrid, {
+      props: { ...featureGridFull, backgroundVariant: 'hatched' },
+    });
+
+    expect(html).toContain('bg-hatched');
+    expect(html).toContain('text-background');
+  });
+
+  test('hatched-light variant applies bg-hatched-light on Section', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FeatureGrid, {
+      props: { ...featureGridFull, backgroundVariant: 'hatched-light' },
+    });
+
+    expect(html).toContain('bg-hatched-light');
+    expect(html).toContain('text-foreground');
+  });
 });

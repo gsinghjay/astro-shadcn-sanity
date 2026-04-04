@@ -5,13 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-const bgClasses: Record<string, string> = {
+export const bgClasses: Record<string, string> = {
   white: '',
   light: 'bg-muted',
   dark: 'bg-foreground text-background',
   primary: 'bg-primary text-primary-foreground',
-  hatched: 'bg-foreground text-background',
-  'hatched-light': 'bg-muted',
+  hatched: 'bg-hatched text-background',
+  'hatched-light': 'bg-hatched-light text-foreground',
 };
 
 const spacingClasses: Record<string, string> = {
