@@ -1,0 +1,167 @@
+---
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import type { PricingTableBlock } from '@/lib/types';
+
+interface Props extends PricingTableBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, tiers = [], variant: rawVariant, class: className, id } = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' ? rawCleaned : 'simple';
+---
+
+{cleanVariant === 'simple' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {tiers.map((tier) => (
+        <Tile variant="floating" class={cn(tier.highlighted && 'border-primary ring-1 ring-primary')}>
+          <TileContent>
+            <TileTitle>{tier.name}</TileTitle>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-bold">{tier.price}</span>
+              {tier.interval && <span class="text-muted-foreground">/{tier.interval}</span>}
+            </div>
+            {tier.description && <TileDescription>{tier.description}</TileDescription>}
+            <ul class="space-y-2 text-sm">
+              {(tier.features ?? []).map((feature) => (
+                <li class="flex items-start gap-2">
+                  <span class="text-primary mt-0.5">&#10003;</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            {tier.ctaText && (
+              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto">
+                {tier.ctaText}
+              </Button>
+            )}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'featured' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {tiers.map((tier) => (
+        <Tile variant="floating" class={cn(
+          'items-center text-center',
+          tier.highlighted && 'border-primary ring-1 ring-primary scale-105 shadow-lg'
+        )}>
+          <TileContent class="items-center text-center">
+            {tier.highlighted && <Badge>Most Popular</Badge>}
+            <TileTitle class="text-2xl">{tier.name}</TileTitle>
+            <div class="flex items-baseline gap-1">
+              <span class="text-5xl font-bold">{tier.price}</span>
+              {tier.interval && <span class="text-muted-foreground">/{tier.interval}</span>}
+            </div>
+            {tier.description && <TileDescription class="text-center">{tier.description}</TileDescription>}
+            <ul class="space-y-2 text-sm w-full">
+              {(tier.features ?? []).map((feature) => (
+                <li class="flex items-center gap-2 justify-center">
+                  <span class="text-primary">&#10003;</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+            {tier.ctaText && (
+              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto">
+                {tier.ctaText}
+              </Button>
+            )}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'comparison' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b">
+            <th class="p-4 text-sm font-medium text-muted-foreground">Features</th>
+            {tiers.map((tier) => (
+              <th class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+                <div class="font-bold text-lg">{tier.name}</div>
+                <div class="text-2xl font-bold mt-1">{tier.price}</div>
+                {tier.interval && <div class="text-sm text-muted-foreground">/{tier.interval}</div>}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {(() => {
+            const allFeatures = [...new Set(tiers.flatMap((t) => t.features ?? []))];
+            return allFeatures.map((feature) => (
+              <tr class="border-b">
+                <td class="p-4 text-sm">{feature}</td>
+                {tiers.map((tier) => (
+                  <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+                    {(tier.features ?? []).includes(feature) ? (
+                      <span class="text-primary">&#10003;</span>
+                    ) : (
+                      <span class="text-muted-foreground">&#8212;</span>
+                    )}
+                  </td>
+                ))}
+              </tr>
+            ));
+          })()}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="p-4"></td>
+            {tiers.map((tier) => (
+              <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+                {tier.ctaText && (
+                  <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'}>
+                    {tier.ctaText}
+                  </Button>
+                )}
+              </td>
+            ))}
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </Section>
+)}

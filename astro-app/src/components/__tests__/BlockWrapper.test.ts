@@ -137,4 +137,23 @@ describe('BlockWrapper', () => {
     });
     expect(html).not.toContain('data-gtm-section');
   });
+
+  test('maps backgroundVariant "hatched" to bg-hatched text-background', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { backgroundVariant: 'hatched' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).toContain('bg-hatched');
+    expect(html).toContain('text-background');
+  });
+
+  test('maps backgroundVariant "hatched-light" to bg-hatched-light', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { backgroundVariant: 'hatched-light' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).toContain('bg-hatched-light');
+  });
 });
