@@ -1,0 +1,150 @@
+---
+import { Section, SectionContent, SectionGrid, SectionSplit, SectionMedia } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  products?: Array<{
+    _key: string;
+    title: string;
+    description?: string;
+    image?: { url: string; alt?: string };
+    price?: string;
+    badge?: string;
+    link?: string;
+  }>;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, products = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'grid';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+---
+
+{cleanVariant === 'grid' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {products.map((product) => (
+        <Tile variant="floating" href={product.link}>
+          <TileContent>
+            <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+              {product.image ? (
+                <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
+              )}
+            </div>
+            <div class="flex items-start justify-between gap-2">
+              <TileTitle>{product.title}</TileTitle>
+              {product.badge && <Badge>{product.badge}</Badge>}
+            </div>
+            {product.description && <TileDescription>{product.description}</TileDescription>}
+            {product.price && (
+              <span class="text-lg font-bold">{product.price}</span>
+            )}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'featured' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    {products.map((product, i) => (
+      <SectionSplit class={i % 2 !== 0 ? '@lg:direction-rtl' : ''}>
+        <SectionContent>
+          <div class="flex items-center gap-3">
+            <h3 class="text-2xl font-bold">{product.title}</h3>
+            {product.badge && <Badge>{product.badge}</Badge>}
+          </div>
+          {product.description && (
+            <p class="text-muted-foreground leading-relaxed">{product.description}</p>
+          )}
+          {product.price && (
+            <span class="text-2xl font-bold">{product.price}</span>
+          )}
+          {product.link && (
+            <Button href={product.link} variant="outline">Learn More</Button>
+          )}
+        </SectionContent>
+        <SectionMedia>
+          <div class="aspect-video bg-muted rounded-sm overflow-hidden">
+            {product.image ? (
+              <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+            ) : (
+              <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
+            )}
+          </div>
+        </SectionMedia>
+      </SectionSplit>
+    ))}
+  </Section>
+)}
+
+{cleanVariant === 'detail' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full space-y-8">
+      {products.map((product) => (
+        <Tile variant="floating" href={product.link}>
+          <TileContent class="flex-row gap-8">
+            <div class="w-48 h-48 flex-shrink-0 bg-muted rounded-sm overflow-hidden">
+              {product.image ? (
+                <img src={product.image.url} alt={product.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
+              )}
+            </div>
+            <div class="flex-1 min-w-0 flex flex-col gap-2">
+              <div class="flex items-start justify-between gap-2">
+                <TileTitle class="text-xl">{product.title}</TileTitle>
+                {product.badge && <Badge>{product.badge}</Badge>}
+              </div>
+              {product.description && <TileDescription>{product.description}</TileDescription>}
+              {product.price && (
+                <span class="text-lg font-bold mt-auto">{product.price}</span>
+              )}
+            </div>
+          </TileContent>
+        </Tile>
+      ))}
+    </div>
+  </Section>
+)}

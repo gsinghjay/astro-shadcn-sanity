@@ -1,0 +1,100 @@
+---
+import { Section, SectionContent, SectionGrid, SectionMasonry } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  cards?: Array<{
+    _key: string;
+    title: string;
+    description?: string;
+    image?: { url: string; alt?: string };
+    link?: string;
+    badge?: string;
+  }>;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, cards = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'grid-3';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+
+const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
+  'grid-2': 'lg',
+  'grid-3': 'default',
+  'grid-4': 'sm',
+};
+---
+
+{cleanVariant !== 'masonry' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid size={gridSizeMap[cleanVariant] ?? 'default'}>
+      {cards.map((card) => (
+        <Tile variant="floating" href={card.link}>
+          <TileContent>
+            {card.image && (
+              <div class="aspect-video bg-muted rounded-sm overflow-hidden -mx-6 -mt-6 mb-2">
+                <img src={card.image.url} alt={card.image.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              </div>
+            )}
+            <div class="flex items-start justify-between gap-2">
+              <TileTitle>{card.title}</TileTitle>
+              {card.badge && <Badge>{card.badge}</Badge>}
+            </div>
+            {card.description && <TileDescription>{card.description}</TileDescription>}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'masonry' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionMasonry>
+      {cards.map((card) => (
+        <Tile variant="floating" href={card.link}>
+          <TileContent>
+            {card.image && (
+              <div class="bg-muted rounded-sm overflow-hidden -mx-6 -mt-6 mb-2">
+                <img src={card.image.url} alt={card.image.alt || ''} class="w-full object-cover" loading="lazy" />
+              </div>
+            )}
+            <div class="flex items-start justify-between gap-2">
+              <TileTitle>{card.title}</TileTitle>
+              {card.badge && <Badge>{card.badge}</Badge>}
+            </div>
+            {card.description && <TileDescription>{card.description}</TileDescription>}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionMasonry>
+  </Section>
+)}

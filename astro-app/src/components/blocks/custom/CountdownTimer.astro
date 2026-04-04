@@ -1,0 +1,110 @@
+---
+import { Section, SectionContent } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  targetDate?: string;
+  completedMessage?: string;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  description,
+  targetDate,
+  completedMessage = 'Event has started!',
+  variant: rawVariant,
+  backgroundVariant,
+  spacing,
+  maxWidth,
+  class: className,
+  id,
+} = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'inline';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+
+// Static placeholder digits for Storybook rendering
+const placeholderUnits = [
+  { value: '42', label: 'Days' },
+  { value: '08', label: 'Hours' },
+  { value: '15', label: 'Min' },
+  { value: '30', label: 'Sec' },
+];
+---
+
+{cleanVariant === 'inline' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <div class="flex items-center gap-4 justify-center" data-countdown={targetDate}>
+        {placeholderUnits.map((unit, i) => (
+          <Fragment>
+            {i > 0 && <span class="text-2xl font-bold text-muted-foreground">:</span>}
+            <div class="flex flex-col items-center">
+              <span class="text-4xl md:text-5xl font-bold tabular-nums">{unit.value}</span>
+              <span class="text-xs uppercase tracking-wide text-muted-foreground mt-1">{unit.label}</span>
+            </div>
+          </Fragment>
+        ))}
+      </div>
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'hero' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-4xl mx-auto items-center text-center py-12">
+      {heading && (
+        <h2 class="text-5xl md:text-7xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-xl leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <div class="flex items-center gap-6 md:gap-8 justify-center" data-countdown={targetDate}>
+        {placeholderUnits.map((unit, i) => (
+          <Fragment>
+            {i > 0 && <span class="text-4xl font-bold text-muted-foreground">:</span>}
+            <div class="flex flex-col items-center">
+              <span class="text-6xl md:text-8xl font-bold tabular-nums">{unit.value}</span>
+              <span class="text-sm uppercase tracking-wide text-muted-foreground mt-2">{unit.label}</span>
+            </div>
+          </Fragment>
+        ))}
+      </div>
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'banner' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="flex-row flex-wrap items-center justify-center gap-6">
+      {heading && (
+        <h2 class="text-xl md:text-2xl font-bold">{heading}</h2>
+      )}
+      <div class="flex items-center gap-3" data-countdown={targetDate}>
+        {placeholderUnits.map((unit, i) => (
+          <Fragment>
+            {i > 0 && <span class="text-lg font-bold text-muted-foreground">:</span>}
+            <div class="flex items-baseline gap-1">
+              <span class="text-2xl md:text-3xl font-bold tabular-nums">{unit.value}</span>
+              <span class="text-xs uppercase text-muted-foreground">{unit.label}</span>
+            </div>
+          </Fragment>
+        ))}
+      </div>
+    </SectionContent>
+  </Section>
+)}

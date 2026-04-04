@@ -1,0 +1,105 @@
+---
+import { Section, SectionContent } from '@/components/ui/section';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  tabs?: Array<{
+    _key: string;
+    label: string;
+    content: string;
+  }>;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const { heading, tabs = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'default';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+const firstTab = tabs[0]?._key;
+---
+
+{cleanVariant === 'default' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key}>{tab.label}</TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'pills' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList class="bg-transparent gap-2 p-0">
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key} class="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'underline' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList class="bg-transparent border-b rounded-none p-0 gap-0">
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key} class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}

@@ -1,0 +1,142 @@
+---
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Tile, TileContent } from '@/components/ui/tile';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  metrics?: Array<{
+    _key: string;
+    label: string;
+    value: string;
+    change?: string;
+    trend?: 'up' | 'down' | 'neutral';
+    icon?: string;
+  }>;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, metrics = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'grid';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+
+const trendColor = (trend?: string) => {
+  const t = stegaClean(trend);
+  if (t === 'up') return 'text-green-600';
+  if (t === 'down') return 'text-red-600';
+  return 'text-muted-foreground';
+};
+
+const trendArrow = (trend?: string) => {
+  const t = stegaClean(trend);
+  if (t === 'up') return '↑';
+  if (t === 'down') return '↓';
+  return '→';
+};
+---
+
+{cleanVariant === 'grid' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid size="sm">
+      {metrics.map((metric) => (
+        <Tile variant="floating">
+          <TileContent>
+            {metric.icon && <span class="text-2xl">{metric.icon}</span>}
+            <span class="text-sm text-muted-foreground">{metric.label}</span>
+            <span class="text-3xl font-bold">{metric.value}</span>
+            {metric.change && (
+              <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
+                <span>{trendArrow(metric.trend)}</span>
+                {metric.change}
+              </span>
+            )}
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'row' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full flex flex-wrap items-center justify-center gap-8 md:gap-16">
+      {metrics.map((metric) => (
+        <div class="flex flex-col items-center text-center gap-1">
+          {metric.icon && <span class="text-2xl">{metric.icon}</span>}
+          <span class="text-4xl font-bold">{metric.value}</span>
+          <span class="text-sm text-muted-foreground">{metric.label}</span>
+          {metric.change && (
+            <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
+              <span>{trendArrow(metric.trend)}</span>
+              {metric.change}
+            </span>
+          )}
+        </div>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'card' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {metrics.map((metric) => (
+        <Tile variant="floating">
+          <TileContent class="flex-row items-center gap-4">
+            {metric.icon && (
+              <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
+                <span class="text-2xl">{metric.icon}</span>
+              </div>
+            )}
+            <div class="flex-1 min-w-0">
+              <span class="text-sm text-muted-foreground">{metric.label}</span>
+              <div class="flex items-baseline gap-2">
+                <span class="text-2xl font-bold">{metric.value}</span>
+                {metric.change && (
+                  <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
+                    <span>{trendArrow(metric.trend)}</span>
+                    {metric.change}
+                  </span>
+                )}
+              </div>
+            </div>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}

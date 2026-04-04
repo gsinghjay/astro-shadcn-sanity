@@ -1,0 +1,132 @@
+---
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  address?: string;
+  coordinates?: { lat: number; lng: number };
+  zoom?: number;
+  caption?: string;
+  contactInfo?: { phone?: string; email?: string; hours?: string };
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  address,
+  coordinates,
+  zoom = 15,
+  caption,
+  contactInfo,
+  variant: rawVariant,
+  backgroundVariant,
+  spacing,
+  maxWidth,
+  class: className,
+  id,
+} = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'default';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+---
+
+{cleanVariant === 'default' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="w-full aspect-video bg-muted rounded-sm flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-4xl">📍</span>
+          {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
+          {coordinates && (
+            <p class="text-xs text-muted-foreground">
+              {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)} (zoom: {zoom})
+            </p>
+          )}
+        </div>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionSplit>
+      <div class="w-full aspect-video bg-muted rounded-sm flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-4xl">📍</span>
+          {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
+        </div>
+      </div>
+
+      <SectionContent class="justify-center">
+        {address && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Address</h3>
+            <p>{address}</p>
+          </div>
+        )}
+        {contactInfo?.phone && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Phone</h3>
+            <p>{contactInfo.phone}</p>
+          </div>
+        )}
+        {contactInfo?.email && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Email</h3>
+            <p>{contactInfo.email}</p>
+          </div>
+        )}
+        {contactInfo?.hours && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Hours</h3>
+            <p class="whitespace-pre-line">{contactInfo.hours}</p>
+          </div>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'full-width' && (
+  <Section class={cn(baseClasses, 'max-w-none', className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="w-full aspect-[21/9] bg-muted flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-5xl">📍</span>
+          {address && <p class="text-muted-foreground">{address}</p>}
+        </div>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}

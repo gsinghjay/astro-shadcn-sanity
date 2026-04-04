@@ -1,0 +1,108 @@
+---
+import { Section, SectionContent } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  embedUrl?: string;
+  aspectRatio?: string;
+  caption?: string;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  embedUrl = '',
+  aspectRatio = '16/9',
+  caption,
+  variant: rawVariant,
+  backgroundVariant,
+  spacing,
+  maxWidth,
+  class: className,
+  id,
+} = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'default';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+---
+
+{cleanVariant === 'default' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="relative w-full overflow-hidden rounded-sm" style={`aspect-ratio: ${aspectRatio}`}>
+        <iframe
+          src={embedUrl}
+          class="absolute inset-0 w-full h-full border-0"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'contained' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl mx-auto">
+      <div class="relative w-full overflow-hidden rounded-sm" style={`aspect-ratio: ${aspectRatio}`}>
+        <iframe
+          src={embedUrl}
+          class="absolute inset-0 w-full h-full border-0"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'full-width' && (
+  <Section class={cn(baseClasses, 'max-w-none', className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="relative w-full overflow-hidden" style={`aspect-ratio: ${aspectRatio}`}>
+        <iframe
+          src={embedUrl}
+          class="absolute inset-0 w-full h-full border-0"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}

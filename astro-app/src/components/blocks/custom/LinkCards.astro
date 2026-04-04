@@ -1,0 +1,115 @@
+---
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  links?: Array<{
+    _key: string;
+    title: string;
+    description?: string;
+    icon?: string;
+    url: string;
+  }>;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, links = [], variant: rawVariant, backgroundVariant, spacing, maxWidth, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'grid';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+---
+
+{cleanVariant === 'grid' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {links.map((link) => (
+        <Tile variant="floating" href={link.url}>
+          <TileContent>
+            {link.icon && <span class="text-3xl">{link.icon}</span>}
+            <TileTitle>{link.title}</TileTitle>
+            {link.description && <TileDescription>{link.description}</TileDescription>}
+            <span class="text-sm text-primary font-medium mt-auto">Learn more &rarr;</span>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'list' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full space-y-2">
+      {links.map((link) => (
+        <Tile variant="floating" href={link.url}>
+          <TileContent class="flex-row items-center gap-4">
+            {link.icon && <span class="text-2xl flex-shrink-0">{link.icon}</span>}
+            <div class="flex-1 min-w-0">
+              <TileTitle>{link.title}</TileTitle>
+              {link.description && <TileDescription>{link.description}</TileDescription>}
+            </div>
+            <span class="text-primary flex-shrink-0">&rarr;</span>
+          </TileContent>
+        </Tile>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'icon-list' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid size="sm">
+      {links.map((link) => (
+        <Tile href={link.url}>
+          <TileContent class="flex-row items-center gap-4">
+            <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
+              {link.icon ? (
+                <span class="text-2xl">{link.icon}</span>
+              ) : (
+                <span class="text-primary text-lg font-bold">{link.title.charAt(0)}</span>
+              )}
+            </div>
+            <div class="flex-1 min-w-0">
+              <TileTitle class="text-sm">{link.title}</TileTitle>
+              {link.description && <TileDescription class="text-xs">{link.description}</TileDescription>}
+            </div>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+)}

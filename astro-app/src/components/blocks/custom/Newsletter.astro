@@ -1,0 +1,106 @@
+---
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { stegaClean } from '@sanity/client/stega';
+import { cn, blockBaseClasses } from '@/lib/utils';
+
+interface Props {
+  heading?: string;
+  description?: string;
+  placeholderText?: string;
+  buttonText?: string;
+  disclaimer?: string;
+  variant?: string;
+  backgroundVariant?: string;
+  spacing?: string;
+  maxWidth?: string;
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  description,
+  placeholderText = 'Enter your email',
+  buttonText = 'Subscribe',
+  disclaimer,
+  variant: rawVariant,
+  backgroundVariant,
+  spacing,
+  maxWidth,
+  class: className,
+  id,
+} = Astro.props;
+const cleanVariant = stegaClean(rawVariant) ?? 'inline';
+const baseClasses = blockBaseClasses(stegaClean(backgroundVariant), stegaClean(spacing), stegaClean(maxWidth));
+---
+
+{cleanVariant === 'inline' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="max-w-2xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
+        <Input type="email" placeholder={placeholderText} class="flex-1" />
+        <Button type="submit">{buttonText}</Button>
+      </form>
+      {disclaimer && (
+        <p class="text-xs text-muted-foreground">{disclaimer}</p>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'banner' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionContent class="flex-row flex-wrap items-center justify-between gap-6">
+      <div class="flex-1 min-w-0">
+        {heading && (
+          <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground mt-2">{description}</p>
+        )}
+      </div>
+      <form class="flex gap-2 flex-shrink-0" onsubmit="return false;">
+        <Input type="email" placeholder={placeholderText} class="w-64" />
+        <Button type="submit">{buttonText}</Button>
+      </form>
+    </SectionContent>
+    {disclaimer && (
+      <SectionContent>
+        <p class="text-xs text-muted-foreground">{disclaimer}</p>
+      </SectionContent>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section class={cn(baseClasses, className)} id={id} data-animate>
+    <SectionSplit>
+      <SectionContent>
+        {heading && (
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
+      </SectionContent>
+
+      <SectionContent class="justify-center">
+        <form class="flex flex-col gap-4 w-full" onsubmit="return false;">
+          <Input type="email" placeholder={placeholderText} />
+          <Button type="submit" class="w-full">{buttonText}</Button>
+        </form>
+        {disclaimer && (
+          <p class="text-xs text-muted-foreground">{disclaimer}</p>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
