@@ -227,7 +227,7 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
 }`);
 
@@ -331,7 +331,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   team[]{ _key, name, role },
   mentor{ name, title, department },
   outcome,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
@@ -465,7 +465,7 @@ export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defi
 export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   date, endDate, location, description, eventType, status, isAllDay, category,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } }
 }`);
 
 /**
@@ -556,6 +556,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   seo {
     metaTitle,
     metaDescription,
+    noIndex,
     ogImage { ${IMAGE_PROJECTION}, alt }
   },
   blocks[]{
