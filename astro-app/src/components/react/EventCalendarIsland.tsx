@@ -182,15 +182,15 @@ export default function EventCalendarIsland({ events }: { events: string }) {
     <div className="sx-calendar-wrapper" style={{ minHeight: '600px' }}>
       <div className="mb-2 flex flex-wrap items-center gap-4 text-xs">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-red-600" />
+          <span className="inline-block h-4 w-4 bg-red-600 dark:bg-red-300" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Showcase</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-blue-600" />
+          <span className="inline-block h-4 w-4 bg-blue-600 dark:bg-blue-300" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Networking</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-green-600" />
+          <span className="inline-block h-4 w-4 bg-green-600 dark:bg-green-300" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Workshop</span>
         </span>
       </div>
