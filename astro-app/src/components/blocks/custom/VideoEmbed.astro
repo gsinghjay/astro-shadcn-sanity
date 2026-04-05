@@ -34,45 +34,49 @@ const posterUrl = safeUrlFor(posterImage)?.width(1280).height(720).url() ?? unde
 )}
 
 {variant === 'split' && videoUrl && (
-  <SectionSplit data-animate>
-    <SectionContent class="justify-center">
-      {heading && (
-        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
-      )}
-      {description && (
-        <p class="text-muted-foreground leading-relaxed">{description}</p>
-      )}
-    </SectionContent>
-    <div>
-      <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
-    </div>
-  </SectionSplit>
+  <Section data-animate>
+    <SectionSplit>
+      <SectionContent class="justify-center">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground leading-relaxed">{description}</p>
+        )}
+      </SectionContent>
+      <div>
+        <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
+      </div>
+    </SectionSplit>
+  </Section>
 )}
 
 {variant === 'split-asymmetric' && videoUrl && (
-  <SectionSplit class="@5xl:grid-cols-[1fr_3fr] @5xl:items-start" data-animate>
-    <SectionContent class="@5xl:sticky @5xl:top-[calc(24px+var(--header-height,0px))]">
-      {heading && (
-        <SectionProse size="sm">
-          <h2>{heading}</h2>
-          {description && <p>{description}</p>}
-        </SectionProse>
-      )}
-    </SectionContent>
-    <SectionGrid class="grid-cols-1 gap-1 @5xl:grid-cols-2">
-      <div class="@5xl:col-span-2">
-        <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
-      </div>
-      {posterImage && posterUrl && (
-        <img
-          src={posterUrl}
-          alt={posterImage.alt ?? ''}
-          width="640"
-          height="360"
-          loading="lazy"
-          class="w-full h-auto object-cover"
-        />
-      )}
-    </SectionGrid>
-  </SectionSplit>
+  <Section data-animate>
+    <SectionSplit class="@5xl:grid-cols-[1fr_3fr] @5xl:items-start">
+      <SectionContent class="@5xl:sticky @5xl:top-[calc(24px+var(--header-height,0px))]">
+        {heading && (
+          <SectionProse size="sm">
+            <h2>{heading}</h2>
+            {description && <p>{description}</p>}
+          </SectionProse>
+        )}
+      </SectionContent>
+      <SectionGrid class="grid-cols-1 gap-1 @5xl:grid-cols-2">
+        <div class="@5xl:col-span-2">
+          <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
+        </div>
+        {posterImage && posterUrl && (
+          <img
+            src={posterUrl}
+            alt={posterImage.alt ?? ''}
+            width="640"
+            height="360"
+            loading="lazy"
+            class="w-full h-auto object-cover"
+          />
+        )}
+      </SectionGrid>
+    </SectionSplit>
+  </Section>
 )}
