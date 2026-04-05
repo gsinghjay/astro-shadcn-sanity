@@ -18,7 +18,7 @@ interface Props {
 const { heading, sponsors, variant: rawVariant, class: className, id } = Astro.props;
 const cleanVariant = (() => {
   const v = stegaClean(rawVariant);
-  return v === 'marquee' || v === 'tiered' || v === 'grid-prominent' ? v : 'default';
+  return v === 'marquee' || v === 'flex-wrap' || v === 'tiered' || v === 'grid-prominent' ? v : 'grid';
 })();
 
 const tierOrder = ['platinum', 'gold', 'silver', 'bronze'];
@@ -40,7 +40,7 @@ function groupByTier(list: Sponsor[]) {
 }
 ---
 
-{cleanVariant === 'default' && (
+{cleanVariant === 'grid' && (
   <Section size="sm" class:list={["bg-muted border-y border-border", className]} id={id} data-animate>
     {heading && (
       <div class="text-center">
@@ -145,6 +145,33 @@ function groupByTier(list: Sponsor[]) {
         </>
       ))}
     </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'flex-wrap' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <div class="flex flex-wrap justify-center gap-8 px-8">
+      {sponsors?.map((sponsor) => {
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+        const content = (
+          <div class="flex items-center justify-center h-20 px-4">
+            {logoUrl ? (
+              <img src={logoUrl} alt={sponsor.name} class="max-h-12 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
+            ) : (
+              <span class="text-sm font-bold text-muted-foreground whitespace-nowrap">{sponsor.name}</span>
+            )}
+          </div>
+        );
+        return sponsor.website ? (
+          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{content}</a>
+        ) : content;
+      })}
+    </div>
   </Section>
 )}
 

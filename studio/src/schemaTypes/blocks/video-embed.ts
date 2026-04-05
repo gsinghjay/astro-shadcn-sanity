@@ -9,9 +9,24 @@ export const videoEmbed = defineBlock({
   icon: PlayIcon,
   components: {preview: YouTubePreview},
   preview: {
-    select: {title: 'title', subtitle: 'videoUrl'},
+    select: {title: 'heading', subtitle: 'videoUrl'},
   },
+  variants: [
+    {name: 'full-width', title: 'Full Width'},
+    {name: 'split', title: 'Split'},
+    {name: 'split-asymmetric', title: 'Split Asymmetric'},
+  ],
   fields: [
+    defineField({
+      name: 'heading',
+      title: 'Heading',
+      type: 'string',
+    }),
+    defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+    }),
     defineField({
       name: 'videoUrl',
       title: 'Video URL',
@@ -24,21 +39,24 @@ export const videoEmbed = defineBlock({
             const isYouTube =
               /youtube\.com\/watch\?v=/.test(url) ||
               /youtu\.be\//.test(url) ||
-              /youtube\.com\/embed\//.test(url)
+              /youtube\.com\/embed\//.test(url) ||
+              /youtube\.com\/shorts\//.test(url)
             return isYouTube || 'Only YouTube URLs are supported'
           }),
     }),
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      description: 'Accessible title for the video player',
-    }),
-    defineField({
-      name: 'caption',
-      title: 'Caption',
-      type: 'text',
-      description: 'Optional caption displayed below the video',
+      name: 'posterImage',
+      title: 'Poster Image',
+      type: 'image',
+      description: 'Custom thumbnail (optional — falls back to YouTube thumbnail)',
+      options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt Text',
+          type: 'string',
+        }),
+      ],
     }),
   ],
 })

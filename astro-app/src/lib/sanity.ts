@@ -615,7 +615,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       successMessage,
-      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }
+      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
     },
     _type == "sponsorCards" => {
       heading,
@@ -689,9 +690,10 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
     },
     _type == "videoEmbed" => {
+      heading,
+      description,
       videoUrl,
-      title,
-      caption
+      posterImage{ ${IMAGE_PROJECTION}, alt }
     },
     _type == "pricingTable" => {
       heading,
