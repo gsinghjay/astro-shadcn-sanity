@@ -18,7 +18,7 @@ const posterUrl = safeUrlFor(posterImage)?.width(1280).height(720).url() ?? unde
 ---
 
 {variant === 'full-width' && videoUrl && (
-  <div data-animate>
+  <Section data-animate>
     {(heading || description) && (
       <SectionContent class="items-center text-center mb-8">
         {heading && (
@@ -30,7 +30,7 @@ const posterUrl = safeUrlFor(posterImage)?.width(1280).height(720).url() ?? unde
       </SectionContent>
     )}
     <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
-  </div>
+  </Section>
 )}
 
 {variant === 'split' && videoUrl && (

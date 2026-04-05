@@ -1,18 +1,15 @@
 ---
+import type { LogoCloudBlock } from '@/lib/types';
 import type { Sponsor } from '@/lib/sanity';
 import { Section, SectionContent } from '@/components/ui/section';
 import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 
-interface Props {
-  heading?: string | null;
-  autoPopulate?: boolean | null;
+interface Props extends Omit<LogoCloudBlock, 'sponsors'> {
   sponsors?: Sponsor[];
-  variant?: string;
   class?: string;
   id?: string;
-  [key: string]: unknown;
 }
 
 const { heading, sponsors, variant: rawVariant, class: className, id } = Astro.props;
@@ -85,7 +82,7 @@ function groupByTier(list: Sponsor[]) {
         {(['left', 'right'] as const).map((direction) => (
           <Marquee>
             <MarqueeContent direction={direction} pauseOnHover>
-              {[...sponsors, ...sponsors].map((sponsor) => {
+              {sponsors.map((sponsor) => {
                 const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
                 const item = (
                   <div class="flex items-center justify-center px-8 h-20">

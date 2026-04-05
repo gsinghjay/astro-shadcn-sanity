@@ -1,6 +1,8 @@
 /**
  * Extracts a YouTube video ID from common URL patterns.
  * Returns null for unrecognized URLs.
+ *
+ * Keep in sync with studio/src/schemaTypes/blocks/YouTubePreview.tsx (extractYouTubeId).
  */
 export function getVideoId(videoUrl: string): string | null {
   const watchMatch = videoUrl.match(/youtube\.com\/watch\?v=([^&]+)/);
