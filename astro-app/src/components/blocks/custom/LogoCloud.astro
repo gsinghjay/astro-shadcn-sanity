@@ -1,6 +1,7 @@
 ---
 import type { Sponsor } from '@/lib/sanity';
-import { Section } from '@/components/ui/section';
+import { Section, SectionContent } from '@/components/ui/section';
+import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 
@@ -8,41 +9,185 @@ interface Props {
   heading?: string | null;
   autoPopulate?: boolean | null;
   sponsors?: Sponsor[];
+  variant?: string;
   class?: string;
   id?: string;
   [key: string]: unknown;
 }
 
-const { heading, sponsors } = Astro.props;
+const { heading, sponsors, variant: rawVariant, class: className, id } = Astro.props;
+const cleanVariant = (() => {
+  const v = stegaClean(rawVariant);
+  return v === 'marquee' || v === 'tiered' || v === 'grid-prominent' ? v : 'default';
+})();
+
+const tierOrder = ['platinum', 'gold', 'silver', 'bronze'];
+const tierLabels: Record<string, string> = {
+  platinum: 'PLATINUM PARTNERS',
+  gold: 'GOLD PARTNERS',
+  silver: 'SILVER PARTNERS',
+  bronze: 'BRONZE PARTNERS',
+};
+
+function groupByTier(list: Sponsor[]) {
+  const groups = new Map<string, Sponsor[]>();
+  for (const s of list) {
+    const t = stegaClean(s.tier) || 'silver';
+    if (!groups.has(t)) groups.set(t, []);
+    groups.get(t)!.push(s);
+  }
+  return tierOrder.filter(t => groups.has(t)).map(t => ({ tier: t, sponsors: groups.get(t)! }));
+}
 ---
 
-<Section size="sm" class="bg-muted border-y border-border" data-animate>
-  {heading && (
-    <div class="text-center">
-      <span class="label-caps text-muted-foreground">{heading}</span>
+{cleanVariant === 'default' && (
+  <Section size="sm" class:list={["bg-muted border-y border-border", className]} id={id} data-animate>
+    {heading && (
+      <div class="text-center">
+        <span class="label-caps text-muted-foreground">{heading}</span>
+      </div>
+    )}
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
+      {sponsors?.map((sponsor) => {
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
+        const content = (
+          <div class="bg-muted p-6 flex items-center justify-center h-24">
+            {logoUrl ? (
+              <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
+            ) : (
+              <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
+            )}
+          </div>
+        );
+
+        return sponsor.website ? (
+          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">
+            {content}
+          </a>
+        ) : (
+          content
+        );
+      })}
     </div>
-  )}
+  </Section>
+)}
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
-    {sponsors?.map((sponsor) => {
-      const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
-      const content = (
-        <div class="bg-muted p-6 flex items-center justify-center h-24">
-          {logoUrl ? (
-            <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
-          ) : (
-            <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
-          )}
-        </div>
-      );
+{cleanVariant === 'marquee' && (
+  <Section class:list={["bg-foreground text-background", className]} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <span class="label-caps text-background/60">{heading}</span>
+      </SectionContent>
+    )}
+    {sponsors && sponsors.length > 0 && (
+      <>
+        {(['left', 'right'] as const).map((direction) => (
+          <Marquee>
+            <MarqueeContent direction={direction} pauseOnHover>
+              {[...sponsors, ...sponsors].map((sponsor) => {
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+                const item = (
+                  <div class="flex items-center justify-center px-8 h-20">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={sponsor.name} class="max-h-14 max-w-[160px] opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
+                    ) : (
+                      <span class="text-base font-bold text-background/70 whitespace-nowrap">{sponsor.name}</span>
+                    )}
+                  </div>
+                );
+                return sponsor.website ? (
+                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{item}</a>
+                ) : item;
+              })}
+            </MarqueeContent>
+          </Marquee>
+        ))}
+      </>
+    )}
+  </Section>
+)}
 
-      return sponsor.website ? (
-        <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">
-          {content}
-        </a>
-      ) : (
-        content
-      );
-    })}
-  </div>
-</Section>
+{cleanVariant === 'tiered' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <SectionContent>
+      {groupByTier(sponsors ?? []).map((group, i) => (
+        <>
+          {i > 0 && <hr class="border-border" />}
+          <div class="space-y-4">
+            <span class="label-caps text-muted-foreground">{tierLabels[group.tier] ?? group.tier.toUpperCase()}</span>
+            <div class="flex flex-wrap items-center gap-8">
+              {group.sponsors.map((sponsor) => {
+                const isPlatinum = stegaClean(sponsor.tier) === 'platinum';
+                const w = isPlatinum ? 160 : 120;
+                const h = isPlatinum ? 60 : 40;
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+                const item = (
+                  <div class:list={["flex items-center justify-center", isPlatinum ? 'h-20' : 'h-14']}>
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={sponsor.name} class:list={["opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-14 max-w-[160px]' : 'max-h-10 max-w-[120px]']} width={w} height={h} loading="lazy" />
+                    ) : (
+                      <span class:list={["font-bold text-muted-foreground", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
+                    )}
+                  </div>
+                );
+                return sponsor.website ? (
+                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{item}</a>
+                ) : item;
+              })}
+            </div>
+          </div>
+        </>
+      ))}
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'grid-prominent' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl">
+      {(sponsors ?? []).map((sponsor) => {
+        const tier = stegaClean(sponsor.tier) || 'silver';
+        const isPlatinum = tier === 'platinum';
+        const isGold = tier === 'gold';
+        const w = isPlatinum ? 200 : isGold ? 160 : 120;
+        const h = isPlatinum ? 80 : isGold ? 60 : 40;
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+        const content = (
+          <div class:list={[
+            "bg-background p-6 flex items-center justify-center",
+            isPlatinum && 'col-span-2 h-32',
+            isGold && 'h-24',
+            !isPlatinum && !isGold && 'h-20',
+          ]}>
+            {logoUrl ? (
+              <img src={logoUrl} alt={sponsor.name} class:list={["opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-16 max-w-[200px]' : isGold ? 'max-h-12 max-w-[160px]' : 'max-h-8 max-w-[120px]']} width={w} height={h} loading="lazy" />
+            ) : (
+              <span class:list={["font-bold text-muted-foreground text-center leading-tight", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
+            )}
+          </div>
+        );
+
+        return sponsor.website ? (
+          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" class:list={[isPlatinum && 'col-span-2']}>
+            {content}
+          </a>
+        ) : (
+          <div class:list={[isPlatinum && 'col-span-2']}>
+            {content}
+          </div>
+        );
+      })}
+    </div>
+  </Section>
+)}

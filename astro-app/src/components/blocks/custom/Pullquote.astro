@@ -11,7 +11,10 @@ interface Props extends PullquoteBlock {
 }
 
 const { quote, attribution, role, image, variant: rawVariant } = Astro.props;
-const variant = stegaClean(rawVariant) ?? 'centered';
+const variant = (() => {
+  const v = stegaClean(rawVariant);
+  return v === 'centered' || v === 'split' || v === 'sidebar' || v === 'brutalist' ? v : 'centered';
+})();
 const imgSrc = safeUrlFor(image)?.width(120).height(120).fit('crop').url() ?? null;
 const lqip = image?.asset?.metadata?.lqip;
 const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '';
@@ -89,6 +92,24 @@ const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? 
           <div class="text-muted-foreground mt-4">
             <span class="font-medium text-foreground">{attribution}</span>
             {role && <span class="block text-sm">{role}</span>}
+          </div>
+        )}
+      </blockquote>
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'brutalist' && (
+  <Section data-animate>
+    <SectionContent class="max-w-5xl mx-auto">
+      <blockquote class="border-l-[8px] border-primary pl-8 py-4">
+        <div class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.1]">
+          {quote}
+        </div>
+        {attribution && (
+          <div class="mt-8 font-mono">
+            <span class="font-bold text-foreground">{attribution}</span>
+            {role && <span class="block text-sm text-muted-foreground mt-1">{role}</span>}
           </div>
         )}
       </blockquote>

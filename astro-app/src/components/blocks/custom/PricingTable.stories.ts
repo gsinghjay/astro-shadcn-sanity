@@ -49,7 +49,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['simple', 'featured', 'comparison'],
+      options: ['simple', 'featured', 'comparison', 'brutalist'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -102,5 +102,51 @@ export const Comparison = {
     heading: 'Compare Plans',
     description: 'See which plan is right for your team.',
     tiers: sharedTiers,
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'pricingTable',
+    _key: 'story-pricing-brutalist',
+    variant: 'brutalist',
+    heading: 'Sponsorship Investment',
+    description: 'Choose the partnership level that aligns with your goals.',
+    backgroundVariant: 'hatched-light',
+    tiers: [
+      {
+        _key: 'tier-1',
+        name: 'Silver',
+        price: '$5,000',
+        interval: 'per semester',
+        description: 'Project mentorship and brand visibility.',
+        features: ['1 capstone project', 'Logo on website', 'Student resume access', 'Showcase attendance'],
+        highlighted: false,
+        ctaText: 'Get Started',
+        ctaUrl: '/contact',
+      },
+      {
+        _key: 'tier-2',
+        name: 'Gold',
+        price: '$15,000',
+        interval: 'per semester',
+        description: 'Dedicated team and strategic partnership.',
+        features: ['2 capstone projects', 'Priority project selection', 'Dedicated liaison', 'Recruitment events', 'Logo prominence'],
+        highlighted: true,
+        ctaText: 'Partner Now',
+        ctaUrl: '/contact',
+      },
+      {
+        _key: 'tier-3',
+        name: 'Platinum',
+        price: '$30,000',
+        interval: 'per year',
+        description: 'Enterprise-grade collaboration and talent pipeline.',
+        features: ['Unlimited projects', 'Advisory board seat', 'Custom curriculum input', 'Exclusive recruitment', 'Annual showcase keynote', 'Research collaboration'],
+        highlighted: false,
+        ctaText: 'Contact Us',
+        ctaUrl: '/contact',
+      },
+    ],
   },
 }

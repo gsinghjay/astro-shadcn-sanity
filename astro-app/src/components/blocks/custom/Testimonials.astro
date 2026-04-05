@@ -11,6 +11,7 @@ import {
 import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props {
   heading?: string | null;
@@ -29,7 +30,9 @@ const cleanVariant =
   rawVariant === 'masonry' ||
   rawVariant === 'split' ||
   rawVariant === 'carousel' ||
-  rawVariant === 'marquee'
+  rawVariant === 'marquee' ||
+  rawVariant === 'brutalist-quote' ||
+  rawVariant === 'spotlight'
     ? rawVariant
     : 'grid';
 
@@ -175,6 +178,104 @@ if (isByProject) {
           </Marquee>
         ))}
       </>
+    ) : (
+      <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'brutalist-quote' && (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    {testimonials.length > 0 ? (
+      <NativeCarousel>
+        <NativeCarouselContent>
+          {testimonials.map((t) => {
+            const photoUrl = t.photo
+              ? safeUrlFor(t.photo)?.width(80).height(80).fit('crop').url() ?? null
+              : null;
+            return (
+              <NativeCarouselItem>
+                <div class="relative p-8 md:p-12 max-w-4xl mx-auto">
+                  <div class="text-[8rem] leading-none text-primary/20 font-serif absolute top-0 left-4 select-none" aria-hidden="true">&ldquo;</div>
+                  <blockquote class="relative z-10 text-2xl md:text-3xl lg:text-4xl font-bold tracking-[-0.03em] leading-[1.1] mb-8">
+                    {t.quote}
+                  </blockquote>
+                  <div class="flex items-center gap-3 font-mono">
+                    {photoUrl ? (
+                      <img src={photoUrl} alt={t.photo?.alt ?? ''} width="48" height="48" loading="lazy" class="w-12 h-12 object-cover" />
+                    ) : (
+                      <div class="w-12 h-12 bg-muted flex items-center justify-center">
+                        <span class="text-sm font-bold text-muted-foreground">
+                          {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <span class="font-bold text-sm">{t.name}</span>
+                      {t.role && <span class="block text-xs text-muted-foreground">{t.role}</span>}
+                      {t.organization && <span class="block text-xs text-muted-foreground">{t.organization}</span>}
+                    </div>
+                  </div>
+                </div>
+              </NativeCarouselItem>
+            );
+          })}
+        </NativeCarouselContent>
+        <NativeCarouselPrevious class="top-auto -bottom-2 left-6" />
+        <NativeCarouselNext class="top-auto right-6 -bottom-2" />
+      </NativeCarousel>
+    ) : (
+      <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'spotlight' && (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    {testimonials.length > 0 ? (
+      <SectionContent>
+        {(() => {
+          const t = testimonials[0];
+          const photoUrl = t.photo
+            ? safeUrlFor(t.photo)?.width(200).height(200).fit('crop').url() ?? null
+            : null;
+          return (
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+              <div class="flex-shrink-0">
+                {photoUrl ? (
+                  <img src={photoUrl} alt={t.photo?.alt ?? ''} width="200" height="200" loading="lazy" class="w-48 h-48 object-cover border-2 border-border" />
+                ) : (
+                  <div class="w-48 h-48 bg-muted flex items-center justify-center border-2 border-border">
+                    <span class="text-4xl font-bold text-muted-foreground">
+                      {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div class="flex-1 space-y-4">
+                <blockquote class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.1]">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <div>
+                  <span class="text-lg font-bold">{t.name}</span>
+                  {t.role && <span class="block text-muted-foreground">{t.role}</span>}
+                  {t.organization && <span class="block text-lg font-semibold text-primary">{t.organization}</span>}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+      </SectionContent>
     ) : (
       <p class="text-muted-foreground text-center py-8">No testimonials to display.</p>
     )}

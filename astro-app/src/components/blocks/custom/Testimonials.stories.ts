@@ -16,7 +16,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['grid', 'masonry', 'split', 'carousel', 'marquee'],
+      options: ['grid', 'masonry', 'split', 'carousel', 'marquee', 'brutalist-quote', 'spotlight'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -27,7 +27,7 @@ export default {
     },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
       description: 'Background color theme',
     },
     spacing: {
@@ -103,5 +103,28 @@ export const Empty = {
     heading: 'Testimonials',
     displayMode: 'all',
     testimonials: [],
+  },
+}
+
+export const BrutalistQuote = {
+  args: {
+    _type: 'testimonials',
+    _key: 'story-test-brutalist',
+    variant: 'brutalist-quote',
+    heading: 'What Partners Say',
+    backgroundVariant: 'hatched',
+    displayMode: 'industry',
+    testimonials: testimonialsData.filter((t) => t.type === 'industry'),
+  },
+}
+
+export const Spotlight = {
+  args: {
+    _type: 'testimonials',
+    _key: 'story-test-spotlight',
+    variant: 'spotlight',
+    heading: 'Partner Spotlight',
+    displayMode: 'manual',
+    testimonials: [testimonialsData[0]],
   },
 }
