@@ -1,8 +1,9 @@
 ---
 import type { ImageGalleryBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
+import { urlFor, safeUrlFor } from '@/lib/image';
 import { Section, SectionContent, SectionMasonry } from '@/components/ui/section';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends ImageGalleryBlock {
   class?: string;
@@ -13,12 +14,27 @@ const { heading, description, images, columns: rawColumns, variant: rawVariant }
 const variant = stegaClean(rawVariant) ?? 'grid';
 const columns = stegaClean(rawColumns) ?? '3';
 
+const galleryImages = (images ?? []).filter(img => img.image?.asset).map(img => ({
+  "@type": "ImageObject" as const,
+  "contentUrl": safeUrlFor(img.image)?.width(1200).url(),
+  ...(img.caption && { "name": stegaClean(img.caption) }),
+  ...(img.image?.alt && { "description": stegaClean(img.image.alt) }),
+}));
+const galleryJsonLd = galleryImages.length > 0 ? {
+  "@type": "ImageGallery",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(description && { "description": stegaClean(description) }),
+  "image": galleryImages,
+} : null;
+
 const gridColsClass: Record<string, string> = {
   '2': 'grid-cols-1 sm:grid-cols-2',
   '3': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
   '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
 };
 ---
+
+{galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
 
 {variant === 'grid' && (
   <Section data-animate>

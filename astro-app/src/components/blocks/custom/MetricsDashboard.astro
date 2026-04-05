@@ -4,6 +4,8 @@ import { Tile, TileContent } from '@/components/ui/tile';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { MetricsDashboardBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericValue, extractUnitText } from '@/lib/structured-data';
 
 interface Props extends MetricsDashboardBlock {
   class?: string;
@@ -11,6 +13,18 @@ interface Props extends MetricsDashboardBlock {
 }
 
 const { heading, description, metrics = [], variant: rawVariant, class: className, id } = Astro.props;
+
+const metricsJsonLd = metrics.filter(m => m.value && m.label).map(metric => {
+  const cleanValue = stegaClean(metric.value) || '';
+  const unit = extractUnitText(cleanValue);
+  return {
+    "@type": "QuantitativeValue",
+    "name": stegaClean(metric.label),
+    "value": extractNumericValue(cleanValue),
+    ...(unit && { "unitText": unit }),
+    ...(metric.change && { "description": `Change: ${stegaClean(metric.change)}` }),
+  };
+});
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'row' || rawCleaned === 'card' || rawCleaned === 'terminal' || rawCleaned === 'brutalist-grid' ? rawCleaned : 'grid';
 
@@ -28,6 +42,8 @@ const trendArrow = (trend?: string) => {
   return '→';
 };
 ---
+
+{metricsJsonLd.length > 0 && metricsJsonLd.map(m => <JsonLd schema={m} />)}
 
 {cleanVariant === 'grid' && (
   <Section class={className} id={id} data-animate>

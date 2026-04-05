@@ -5,6 +5,8 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 import { stegaClean } from '@sanity/client/stega';
+import { JsonLd } from '@/components/ui/json-ld';
+import { portableTextToPlainText } from '@/lib/portable-text-utils';
 
 interface Props extends FaqSectionBlock {
   class?: string;
@@ -13,6 +15,18 @@ interface Props extends FaqSectionBlock {
 
 const { heading, items, variant } = Astro.props;
 const rawVariant = stegaClean(variant);
+
+const faqJsonLd = (items ?? []).length > 0 ? {
+  "@type": "FAQPage",
+  "mainEntity": (items ?? []).filter(item => item.question).map(item => ({
+    "@type": "Question",
+    "name": stegaClean(item.question),
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": Array.isArray(item.answer) ? portableTextToPlainText(item.answer) : stegaClean(item.answer),
+    },
+  })),
+} : null;
 const cleanVariant =
   rawVariant === 'split' ||
   rawVariant === 'stacked' ||
@@ -22,6 +36,8 @@ const cleanVariant =
     ? rawVariant
     : 'split';
 ---
+
+{faqJsonLd && <JsonLd schema={faqJsonLd} />}
 
 {cleanVariant === 'split' && (
   <Section data-animate>

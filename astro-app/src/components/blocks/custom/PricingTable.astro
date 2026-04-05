@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { PricingTableBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericPrice } from '@/lib/structured-data';
 
 interface Props extends PricingTableBlock {
   class?: string;
@@ -15,7 +17,19 @@ interface Props extends PricingTableBlock {
 const { heading, description, tiers = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' || rawCleaned === 'brutalist' ? rawCleaned : 'simple';
+
+const offersJsonLd = tiers.filter(t => t.name && t.price).map(tier => ({
+  "@type": "Offer",
+  "name": stegaClean(tier.name),
+  "price": extractNumericPrice(stegaClean(tier.price) || ''),
+  "priceCurrency": "USD",
+  ...(tier.description && { "description": stegaClean(tier.description) }),
+  ...(tier.ctaUrl && { "url": stegaClean(tier.ctaUrl) }),
+  "availability": "https://schema.org/InStock",
+}));
 ---
+
+{offersJsonLd.length > 0 && offersJsonLd.map(o => <JsonLd schema={o} />)}
 
 {cleanVariant === 'simple' && (
   <Section class={className} id={id} data-animate>

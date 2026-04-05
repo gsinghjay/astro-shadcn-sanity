@@ -3,6 +3,7 @@ import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { AccordionBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends AccordionBlock {
   class?: string;
@@ -12,7 +13,21 @@ interface Props extends AccordionBlock {
 const { heading, description, items = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || rawCleaned === 'separated' || rawCleaned === 'technical' ? rawCleaned : 'default';
+
+const faqJsonLd = items.length > 0 ? {
+  "@type": "FAQPage",
+  "mainEntity": items.filter(item => item.title && item.content).map(item => ({
+    "@type": "Question",
+    "name": stegaClean(item.title),
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": stegaClean(item.content),
+    },
+  })),
+} : null;
 ---
+
+{faqJsonLd && <JsonLd schema={faqJsonLd} />}
 
 {cleanVariant === 'default' && (
   <Section class={className} id={id} data-animate>
