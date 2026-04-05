@@ -60,12 +60,12 @@ const trendArrow = (trend?: string) => {
       {metrics.map((metric) => (
         <Tile variant="floating">
           <TileContent>
-            {metric.icon && <span class="text-2xl">{metric.icon}</span>}
+            {metric.icon && <span class="text-2xl" aria-hidden="true">{metric.icon}</span>}
             <span class="text-sm text-muted-foreground">{metric.label}</span>
             <span class="text-3xl font-bold">{metric.value}</span>
             {metric.change && (
               <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
-                <span>{trendArrow(metric.trend)}</span>
+                <span aria-label={stegaClean(metric.trend) === 'up' ? 'Increased' : stegaClean(metric.trend) === 'down' ? 'Decreased' : 'No change'}>{trendArrow(metric.trend)}</span>
                 {metric.change}
               </span>
             )}
@@ -90,12 +90,12 @@ const trendArrow = (trend?: string) => {
     <div class="w-full flex flex-wrap items-center justify-center gap-8 md:gap-16">
       {metrics.map((metric) => (
         <div class="flex flex-col items-center text-center gap-1">
-          {metric.icon && <span class="text-2xl">{metric.icon}</span>}
+          {metric.icon && <span class="text-2xl" aria-hidden="true">{metric.icon}</span>}
           <span class="text-4xl font-bold">{metric.value}</span>
           <span class="text-sm text-muted-foreground">{metric.label}</span>
           {metric.change && (
             <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
-              <span>{trendArrow(metric.trend)}</span>
+              <span aria-label={stegaClean(metric.trend) === 'up' ? 'Increased' : stegaClean(metric.trend) === 'down' ? 'Decreased' : 'No change'}>{trendArrow(metric.trend)}</span>
               {metric.change}
             </span>
           )}
@@ -122,7 +122,7 @@ const trendArrow = (trend?: string) => {
           <TileContent class="flex-row items-center gap-4">
             {metric.icon && (
               <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
-                <span class="text-2xl">{metric.icon}</span>
+                <span class="text-2xl" aria-hidden="true">{metric.icon}</span>
               </div>
             )}
             <div class="flex-1 min-w-0">
@@ -131,7 +131,7 @@ const trendArrow = (trend?: string) => {
                 <span class="text-2xl font-bold">{metric.value}</span>
                 {metric.change && (
                   <span class={cn('text-sm font-medium flex items-center gap-1', trendColor(metric.trend))}>
-                    <span>{trendArrow(metric.trend)}</span>
+                    <span aria-label={stegaClean(metric.trend) === 'up' ? 'Increased' : stegaClean(metric.trend) === 'down' ? 'Decreased' : 'No change'}>{trendArrow(metric.trend)}</span>
                     {metric.change}
                   </span>
                 )}
@@ -167,7 +167,7 @@ const trendArrow = (trend?: string) => {
             </div>
             {metric.change && (
               <span class={cn('text-sm font-mono flex items-center gap-1 mt-1', t === 'up' ? 'text-green-500' : t === 'down' ? 'text-red-500' : 'text-gray-500')}>
-                <span>{trendArrow(metric.trend)}</span>
+                <span aria-label={stegaClean(metric.trend) === 'up' ? 'Increased' : stegaClean(metric.trend) === 'down' ? 'Decreased' : 'No change'}>{trendArrow(metric.trend)}</span>
                 {metric.change}
               </span>
             )}
@@ -196,7 +196,7 @@ const trendArrow = (trend?: string) => {
             <span class="label-caps text-muted-foreground text-[10px] mt-1 block">{metric.label}</span>
             {metric.change && (
               <span class={cn('text-xs font-medium mt-2 block', t === 'up' ? 'text-green-600' : t === 'down' ? 'text-red-600' : 'text-muted-foreground')}>
-                {trendArrow(metric.trend)} {metric.change}
+                <span aria-label={stegaClean(metric.trend) === 'up' ? 'Increased' : stegaClean(metric.trend) === 'down' ? 'Decreased' : 'No change'}>{trendArrow(metric.trend)}</span> {metric.change}
               </span>
             )}
           </div>

@@ -41,11 +41,11 @@ function groupByTier(list: Sponsor[]) {
   <Section size="sm" class:list={["bg-muted border-y border-border", className]} id={id} data-animate>
     {heading && (
       <div class="text-center">
-        <span class="label-caps text-muted-foreground">{heading}</span>
+        <h2 class="label-caps text-muted-foreground">{heading}</h2>
       </div>
     )}
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
+    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border list-none">
       {sponsors?.map((sponsor) => {
         const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
         const content = (
@@ -58,15 +58,19 @@ function groupByTier(list: Sponsor[]) {
           </div>
         );
 
-        return sponsor.website ? (
-          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">
-            {content}
-          </a>
-        ) : (
-          content
+        return (
+          <li>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>
+                {content}
+              </a>
+            ) : (
+              content
+            )}
+          </li>
         );
       })}
-    </div>
+    </ul>
   </Section>
 )}
 
@@ -94,7 +98,7 @@ function groupByTier(list: Sponsor[]) {
                   </div>
                 );
                 return sponsor.website ? (
-                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{item}</a>
+                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{item}</a>
                 ) : item;
               })}
             </MarqueeContent>
@@ -118,7 +122,7 @@ function groupByTier(list: Sponsor[]) {
           {i > 0 && <hr class="border-border" />}
           <div class="space-y-4">
             <span class="label-caps text-muted-foreground">{tierLabels[group.tier] ?? group.tier.toUpperCase()}</span>
-            <div class="flex flex-wrap items-center gap-8">
+            <ul class="flex flex-wrap items-center gap-8 list-none">
               {group.sponsors.map((sponsor) => {
                 const isPlatinum = stegaClean(sponsor.tier) === 'platinum';
                 const w = isPlatinum ? 160 : 120;
@@ -133,11 +137,15 @@ function groupByTier(list: Sponsor[]) {
                     )}
                   </div>
                 );
-                return sponsor.website ? (
-                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{item}</a>
-                ) : item;
+                return (
+                  <li>
+                    {sponsor.website ? (
+                      <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{item}</a>
+                    ) : item}
+                  </li>
+                );
               })}
-            </div>
+            </ul>
           </div>
         </>
       ))}
@@ -152,7 +160,7 @@ function groupByTier(list: Sponsor[]) {
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       </SectionContent>
     )}
-    <div class="flex flex-wrap justify-center gap-8 px-8">
+    <ul class="flex flex-wrap justify-center gap-8 px-8 list-none">
       {sponsors?.map((sponsor) => {
         const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
         const content = (
@@ -164,11 +172,15 @@ function groupByTier(list: Sponsor[]) {
             )}
           </div>
         );
-        return sponsor.website ? (
-          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">{content}</a>
-        ) : content;
+        return (
+          <li>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{content}</a>
+            ) : content}
+          </li>
+        );
       })}
-    </div>
+    </ul>
   </Section>
 )}
 
@@ -179,7 +191,7 @@ function groupByTier(list: Sponsor[]) {
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       </SectionContent>
     )}
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl">
+    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl list-none">
       {(sponsors ?? []).map((sponsor) => {
         const tier = stegaClean(sponsor.tier) || 'silver';
         const isPlatinum = tier === 'platinum';
@@ -190,7 +202,7 @@ function groupByTier(list: Sponsor[]) {
         const content = (
           <div class:list={[
             "bg-background p-6 flex items-center justify-center",
-            isPlatinum && 'col-span-2 h-32',
+            isPlatinum && 'h-32',
             isGold && 'h-24',
             !isPlatinum && !isGold && 'h-20',
           ]}>
@@ -202,16 +214,18 @@ function groupByTier(list: Sponsor[]) {
           </div>
         );
 
-        return sponsor.website ? (
-          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" class:list={[isPlatinum && 'col-span-2']}>
-            {content}
-          </a>
-        ) : (
-          <div class:list={[isPlatinum && 'col-span-2']}>
-            {content}
-          </div>
+        return (
+          <li class:list={[isPlatinum && 'col-span-2']}>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>
+                {content}
+              </a>
+            ) : (
+              content
+            )}
+          </li>
         );
       })}
-    </div>
+    </ul>
   </Section>
 )}

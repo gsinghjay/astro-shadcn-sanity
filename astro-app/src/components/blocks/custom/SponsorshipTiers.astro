@@ -88,6 +88,7 @@ const tierBarColors: Record<string, string> = {
                   data-gtm-category="sponsorship"
                   data-gtm-action="click"
                   data-gtm-label={stegaClean(tier.name)}
+                  aria-label={`${stegaClean(tier.ctaButton.text)} for ${stegaClean(tier.name)}`}
                 >
                   {tier.ctaButton.text}
                 </Button>
@@ -143,6 +144,7 @@ const tierBarColors: Record<string, string> = {
                     data-gtm-category="sponsorship"
                     data-gtm-action="click"
                     data-gtm-label={stegaClean(tier.name)}
+                    aria-label={`${stegaClean(tier.ctaButton.text)} for ${stegaClean(tier.name)}`}
                   >
                     {tier.ctaButton.text}
                   </Button>

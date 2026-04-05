@@ -32,9 +32,9 @@ const dataRows = rows ?? [];
         {heading && <TableCaption class="sr-only">{heading}</TableCaption>}
         <TableHeader>
           <TableRow>
-            <TableHead class="font-bold">Feature</TableHead>
+            <TableHead class="font-bold" scope="col">Feature</TableHead>
             {cols.map((col) => (
-              <TableHead class={col.highlighted ? 'bg-muted font-bold' : 'font-bold'}>{col.title}</TableHead>
+              <TableHead class={col.highlighted ? 'bg-muted font-bold' : 'font-bold'} scope="col">{col.title}</TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -142,9 +142,9 @@ const dataRows = rows ?? [];
         <table class="w-full border-collapse font-mono text-sm">
           <thead>
             <tr class="border-b-[3px] border-foreground">
-              <th class="text-left py-3 px-4 font-bold uppercase tracking-wider text-xs">Feature</th>
+              <th class="text-left py-3 px-4 font-bold uppercase tracking-wider text-xs" scope="col">Feature</th>
               {cols.map((col) => (
-                <th class={`text-left py-3 px-4 font-bold uppercase tracking-wider text-xs ${col.highlighted ? 'border-t-4 border-t-primary' : ''}`}>
+                <th class={`text-left py-3 px-4 font-bold uppercase tracking-wider text-xs ${col.highlighted ? 'border-t-4 border-t-primary' : ''}`} scope="col">
                   {col.title}
                 </th>
               ))}

@@ -32,7 +32,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
         <Tile variant="floating" href={service.link?.href}>
           <TileContent>
             {service.icon && (
-              <span class="text-3xl">{service.icon}</span>
+              <span class="text-3xl" aria-hidden="true">{service.icon}</span>
             )}
             <TileTitle>{service.title}</TileTitle>
             {service.description && <TileDescription>{service.description}</TileDescription>}
@@ -54,21 +54,23 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
       )}
     </SectionContent>
 
-    <div class="w-full space-y-4">
+    <ul class="w-full space-y-4 list-none">
       {services.map((service) => (
-        <Tile variant="floating" href={service.link?.href}>
-          <TileContent class="flex-row items-center gap-6">
-            {service.icon && (
-              <span class="text-3xl flex-shrink-0">{service.icon}</span>
-            )}
-            <div class="flex-1 min-w-0">
-              <TileTitle>{service.title}</TileTitle>
-              {service.description && <TileDescription>{service.description}</TileDescription>}
-            </div>
-          </TileContent>
-        </Tile>
+        <li>
+          <Tile variant="floating" href={service.link?.href}>
+            <TileContent class="flex-row items-center gap-6">
+              {service.icon && (
+                <span class="text-3xl flex-shrink-0" aria-hidden="true">{service.icon}</span>
+              )}
+              <div class="flex-1 min-w-0">
+                <TileTitle>{service.title}</TileTitle>
+                {service.description && <TileDescription>{service.description}</TileDescription>}
+              </div>
+            </TileContent>
+          </Tile>
+        </li>
       ))}
-    </div>
+    </ul>
   </Section>
 )}
 
@@ -87,7 +89,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
       {services.map((service, i) => (
         <SectionSplit class={i % 2 !== 0 ? '@lg:direction-rtl' : ''}>
           <SectionContent>
-            {service.icon && <span class="text-4xl">{service.icon}</span>}
+            {service.icon && <span class="text-4xl" aria-hidden="true">{service.icon}</span>}
             <h3 class="text-2xl font-bold">{service.title}</h3>
             {service.description && (
               <p class="text-muted-foreground leading-relaxed">{service.description}</p>
@@ -95,9 +97,9 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
           </SectionContent>
           <div class="bg-muted rounded-sm aspect-video flex items-center justify-center">
             {safeUrlFor(service.image) ? (
-              <img src={safeUrlFor(service.image)!.width(800).height(450).fit('crop').url()} alt={service.image?.alt || ''} class="w-full h-full object-cover rounded-sm" loading="lazy" />
+              <img src={safeUrlFor(service.image)!.width(800).height(450).fit('crop').url()} alt={service.image?.alt || stegaClean(service.title) || 'Service image'} class="w-full h-full object-cover rounded-sm" loading="lazy" />
             ) : (
-              <span class="text-6xl">{service.icon || '📋'}</span>
+              <span class="text-6xl" aria-hidden="true">{service.icon || '📋'}</span>
             )}
           </div>
         </SectionSplit>
@@ -122,7 +124,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
         <Tile variant="floating" href={service.link?.href} class="items-center text-center">
           <TileContent class="items-center text-center">
             {service.icon && (
-              <span class="text-4xl">{service.icon}</span>
+              <span class="text-4xl" aria-hidden="true">{service.icon}</span>
             )}
             <TileTitle>{service.title}</TileTitle>
             {service.description && <TileDescription class="text-center">{service.description}</TileDescription>}
@@ -152,7 +154,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
           </span>
           {service.icon && (
             <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center border-brutal border-foreground/20">
-              <span class="text-2xl">{service.icon}</span>
+              <span class="text-2xl" aria-hidden="true">{service.icon}</span>
             </div>
           )}
           <div class="flex-1 min-w-0">
