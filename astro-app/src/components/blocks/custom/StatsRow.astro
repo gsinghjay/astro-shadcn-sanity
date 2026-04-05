@@ -1,6 +1,7 @@
 ---
 import type { StatsRowBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionGrid, SectionSpread, SectionContent } from '@/components/ui/section';
+import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import { stegaClean } from '@sanity/client/stega';
 import { Tile, TileContent, TileDescription, TileTitle } from '@/components/ui/tile';
 import { bgClasses } from '@/lib/utils';
@@ -12,12 +13,12 @@ interface Props extends StatsRowBlock {
 
 const { heading, stats, backgroundVariant, variant } = Astro.props;
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
-const isDark = ['dark', 'hatched', 'blueprint', 'mono'].includes(bgVariant);
+const isDark = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 const sectionBg = bgClasses[bgVariant] ?? '';
 const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 
 const rawVariant = stegaClean(variant);
-const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'grid';
+const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' || rawVariant === 'brutalist' || rawVariant === 'ticker' ? rawVariant : 'grid';
 ---
 
 {cleanVariant === 'grid' && (
@@ -83,5 +84,52 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
         </Tile>
       ))}
     </SectionSpread>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section
+    size="sm"
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass}`}
+    data-animate
+  >
+    {heading && (
+      <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
+    )}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+      {(stats ?? []).map((stat) => (
+        <div class="border-t-4 border-primary pt-4">
+          <div class="font-mono tabular-nums text-5xl md:text-6xl lg:text-7xl font-bold tracking-[-0.04em] leading-none mb-3">
+            {stat.value}
+          </div>
+          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+            {stat.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'ticker' && (
+  <Section
+    size="sm"
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass} overflow-hidden`}
+    data-animate
+  >
+    <Marquee>
+      <MarqueeContent pauseOnHover>
+        {(stats ?? []).map((stat) => (
+          <div class="flex items-baseline gap-3 px-8 md:px-12 shrink-0">
+            <span class="font-mono tabular-nums text-4xl md:text-5xl font-bold tracking-[-0.04em] leading-none">
+              {stat.value}
+            </span>
+            <span class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+              {stat.label}
+            </span>
+          </div>
+        ))}
+      </MarqueeContent>
+    </Marquee>
   </Section>
 )}
