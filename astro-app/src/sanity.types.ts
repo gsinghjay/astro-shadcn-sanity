@@ -494,7 +494,7 @@ export type SponsorshipTiers = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "brutalist";
+  variant?: "default" | "brutalist";
   heading?: string;
   description?: string;
   tiers?: Array<{
@@ -849,7 +849,7 @@ export type SponsorCards = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "showcase" | "brutalist-tier";
+  variant?: "default" | "showcase" | "brutalist-tier";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   sponsors?: Array<
@@ -970,7 +970,7 @@ export type LogoCloud = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "marquee" | "tiered" | "grid-prominent";
+  variant?: "default" | "marquee" | "tiered" | "grid-prominent";
   heading?: string;
   autoPopulate?: boolean;
   sponsors?: Array<
@@ -3524,7 +3524,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid-prominent" | "marquee" | "tiered" | null;
+        variant: "default" | "grid-prominent" | "marquee" | "tiered" | null;
         heading: string | null;
         autoPopulate: boolean | null;
         sponsors: Array<{
@@ -3917,7 +3917,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "brutalist-tier" | "showcase" | null;
+        variant: "brutalist-tier" | "default" | "showcase" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         sponsors: Array<{
@@ -3940,7 +3940,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "brutalist" | null;
+        variant: "brutalist" | "default" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{

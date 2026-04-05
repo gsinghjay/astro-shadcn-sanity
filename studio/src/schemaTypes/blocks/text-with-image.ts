@@ -15,7 +15,7 @@ export const textWithImage = defineBlock({
     {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
-    imagePosition: ['reversed', 'floating'],
+    imagePosition: ['reversed', 'floating', 'brutalist'],
   },
   fields: [
     defineField({

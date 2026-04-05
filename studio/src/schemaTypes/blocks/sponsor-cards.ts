@@ -8,6 +8,7 @@ export const sponsorCards = defineBlock({
   icon: StarIcon,
   preview: {select: {title: 'heading'}},
   variants: [
+    {name: 'default', title: 'Default'},
     {name: 'showcase', title: 'Showcase'},
     {name: 'brutalist-tier', title: 'Brutalist Tier'},
   ],

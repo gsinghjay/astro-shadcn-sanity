@@ -8,6 +8,7 @@ export const logoCloud = defineBlock({
   icon: ImagesIcon,
   preview: {select: {title: 'heading'}},
   variants: [
+    {name: 'default', title: 'Default'},
     {name: 'marquee', title: 'Marquee'},
     {name: 'tiered', title: 'Tiered'},
     {name: 'grid-prominent', title: 'Grid Prominent'},

@@ -17,6 +17,7 @@ export const heroBanner = defineBlock({
   ],
   hiddenByVariant: {
     alignment: ['split', 'split-asymmetric', 'spread'],
+    backgroundImages: ['brutalist'],
   },
   fields: [
     defineField({
