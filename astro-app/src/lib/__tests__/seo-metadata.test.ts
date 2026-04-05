@@ -34,28 +34,38 @@ describe('SEO Metadata & Sitemap — Configuration', () => {
     });
   });
 
-  describe('Task 2: robots.txt', () => {
-    const robotsPath = resolve(ROOT, 'public/robots.txt');
+  describe('Task 2: robots.txt endpoint', () => {
+    const endpointPath = resolve(ROOT, 'src/pages/robots.txt.ts');
 
-    it('robots.txt exists in public/', () => {
-      expect(existsSync(robotsPath)).toBe(true);
+    it('robots.txt endpoint exists', () => {
+      expect(existsSync(endpointPath)).toBe(true);
     });
 
-    it('contains User-agent directive', () => {
-      const content = readFileSync(robotsPath, 'utf-8');
+    it('uses import.meta.env.SITE for dynamic Sitemap URL', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toContain('import.meta.env.SITE');
+      expect(content).toContain('sitemap-index.xml');
+    });
+
+    it('contains User-agent and Allow directives', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
       expect(content).toContain('User-agent: *');
-    });
-
-    it('contains Allow directive', () => {
-      const content = readFileSync(robotsPath, 'utf-8');
       expect(content).toContain('Allow: /');
     });
 
-    it('contains Sitemap directive with production URL', () => {
-      const content = readFileSync(robotsPath, 'utf-8');
-      expect(content).toContain('Sitemap:');
-      expect(content).toContain('sitemap-index.xml');
-      expect(content).not.toContain('localhost');
+    it('disallows /portal/ routes', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toContain('Disallow: /portal/');
+    });
+
+    it('disallows /auth/ routes', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toContain('Disallow: /auth/');
+    });
+
+    it('disallows /student/ routes', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toContain('Disallow: /student/');
     });
   });
 

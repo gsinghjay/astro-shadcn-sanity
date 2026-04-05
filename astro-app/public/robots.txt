@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://ywcc-capstone.pages.dev/sitemap-index.xml
