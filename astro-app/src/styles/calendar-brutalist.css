@@ -1,0 +1,168 @@
+/**
+ * Swiss Brutalist theme overrides for Schedule-X calendar.
+ * Imported AFTER @schedule-x/theme-default/dist/index.css (base layout required).
+ *
+ * Design: no rounded corners, no shadows, no gradients.
+ * Hard 1px borders, uppercase headers, monospace time column, Swiss red accent.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════
+   Light mode — CSS custom property overrides
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  --sx-color-primary: #E30613;
+  --sx-color-on-primary: #FFFFFF;
+  --sx-color-surface: #FFFFFF;
+  --sx-color-on-surface: #0A0A0A;
+  --sx-color-background: #FFFFFF;
+  --sx-color-on-background: #0A0A0A;
+  --sx-color-outline: #0A0A0A;
+  --sx-color-outline-variant: #0A0A0A;
+  --sx-color-surface-container: #F7F7F7;
+  --sx-color-surface-container-low: #FAFAFA;
+  --sx-color-surface-container-high: #F0F0F0;
+  --sx-color-surface-dim: #E5E5E5;
+  --sx-color-shadow: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Dark mode — inverted Swiss Brutalist palette
+   ═══════════════════════════════════════════════════════════════════ */
+.dark {
+  --sx-color-primary: #F87171;
+  --sx-color-on-primary: #0A0A0A;
+  --sx-color-surface: #0A0A0A;
+  --sx-color-on-surface: #E5E5E5;
+  --sx-color-background: #0A0A0A;
+  --sx-color-on-background: #E5E5E5;
+  --sx-color-outline: #404040;
+  --sx-color-outline-variant: #404040;
+  --sx-color-surface-container: #171717;
+  --sx-color-surface-container-low: #0F0F0F;
+  --sx-color-surface-container-high: #1F1F1F;
+  --sx-color-surface-dim: #171717;
+  --sx-color-shadow: transparent;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Structural overrides — border-radius, borders, shadows
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Kill all border-radius globally — Schedule-X sets it inline in places */
+[class*="sx-"],
+[class*="sx__"] {
+  border-radius: 0 !important;
+}
+
+/* Grid borders — hard 1px lines */
+.sx__time-grid-day,
+.sx__month-grid-day,
+.sx__week-grid__day {
+  border-color: var(--sx-color-outline);
+  border-width: 1px;
+}
+
+/* Today indicator — thick red top border, not a colored circle */
+.sx__month-grid-day--is-today,
+.sx__date-grid-day--is-today {
+  border-top: 2px solid var(--sx-color-primary);
+}
+
+/* Remove today circle indicator if present */
+.sx__month-grid-day--is-today .sx__month-grid-day__header-date,
+.sx__date-grid-day--is-today .sx__date-grid-day__header-date {
+  background: transparent;
+  color: var(--sx-color-primary);
+  font-weight: 700;
+}
+
+/* Event chips — flat, no shadow, hard border */
+.sx__event,
+.sx__month-grid-event,
+.sx__month-agenda-event {
+  box-shadow: none !important;
+  border: 1px solid currentColor;
+  border-radius: 0 !important;
+}
+
+/* Short event text — uppercase */
+.sx__event .sx__event-title,
+.sx__month-grid-event .sx__month-grid-event__title {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Day headers — uppercase, tight tracking
+   ═══════════════════════════════════════════════════════════════════ */
+.sx__week-grid__header-day-name,
+.sx__month-grid-day__header-day-name,
+.sx__date-grid-day__header-day-name {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+/* Time column — monospace numerals */
+.sx__time-grid__hour,
+.sx__time-grid__hour-text {
+  font-family: 'Courier New', Courier, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   View switcher — uppercase tabs with bottom-border active state
+   ═══════════════════════════════════════════════════════════════════ */
+.sx__view-selection__item {
+  border-radius: 0 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-bottom: 2px solid transparent;
+  background: transparent !important;
+}
+
+.sx__view-selection__item--is-selected {
+  border-bottom-color: var(--sx-color-primary);
+  font-weight: 700;
+  background: transparent !important;
+}
+
+.sx__view-selection__item:hover:not(.sx__view-selection__item--is-selected) {
+  border-bottom-color: var(--sx-color-outline-variant);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Additional structural cleanup
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Remove any remaining box-shadows from containers */
+.sx__calendar,
+.sx__calendar-wrapper,
+.sx-react-calendar-wrapper {
+  box-shadow: none !important;
+}
+
+/* Month agenda — clean borders */
+.sx__month-agenda-day {
+  border-bottom: 1px solid var(--sx-color-outline);
+}
+
+/* Navigation buttons — flat, no background */
+.sx__date-input__chevron-wrapper {
+  border-radius: 0 !important;
+}
+
+/* Calendar height — fill parent container */
+.sx-calendar-height .sx-react-calendar-wrapper,
+.sx-calendar-height .sx__calendar-wrapper {
+  height: 100%;
+}
+
+.sx-calendar-height {
+  width: 100%;
+}
