@@ -55,7 +55,7 @@ const productsJsonLd = products.filter(p => p.title).map(product => ({
           <TileContent>
             <div class="aspect-video bg-muted rounded-sm overflow-hidden">
               {safeUrlFor(product.image) ? (
-                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={product.image?.alt || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
+                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={stegaClean(product.image?.alt) || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
               )}
@@ -106,7 +106,7 @@ const productsJsonLd = products.filter(p => p.title).map(product => ({
         <SectionMedia>
           <div class="aspect-video bg-muted rounded-sm overflow-hidden">
             {safeUrlFor(product.image) ? (
-              <img src={safeUrlFor(product.image)!.width(800).height(450).fit('crop').url()} alt={product.image?.alt || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
+              <img src={safeUrlFor(product.image)!.width(800).height(450).fit('crop').url()} alt={stegaClean(product.image?.alt) || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
             ) : (
               <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
             )}
@@ -134,7 +134,7 @@ const productsJsonLd = products.filter(p => p.title).map(product => ({
           <TileContent class="flex-row gap-8">
             <div class="w-48 h-48 flex-shrink-0 bg-muted rounded-sm overflow-hidden">
               {safeUrlFor(product.image) ? (
-                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={product.image?.alt || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
+                <img src={safeUrlFor(product.image)!.width(600).height(338).fit('crop').url()} alt={stegaClean(product.image?.alt) || stegaClean(product.title) || 'Product image'} class="w-full h-full object-cover" loading="lazy" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center text-muted-foreground text-sm">No image</div>
               )}

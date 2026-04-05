@@ -102,7 +102,7 @@ const gridClass =
               {feature.image ? (
                 <img
                   src={safeUrlFor(feature.image)?.width(460).height(260).fit('crop').url() ?? ''}
-                  alt={feature.image.alt || feature.title || ''}
+                  alt={stegaClean(feature.image.alt) || stegaClean(feature.title) || 'Feature image'}
                   width={460}
                   height={260}
                   class="w-full h-full object-cover"

@@ -16,6 +16,16 @@ const rawCleaned = stegaClean(rawVariant) ?? 'table';
 const variant = rawCleaned === 'table' || rawCleaned === 'stacked' || rawCleaned === 'specification' ? rawCleaned : 'table';
 const cols = columns ?? [];
 const dataRows = rows ?? [];
+const colCountClass: Record<number, string> = { 1: '@5xl:grid-cols-1', 2: '@5xl:grid-cols-2', 3: '@5xl:grid-cols-3', 4: '@5xl:grid-cols-4', 5: '@5xl:grid-cols-5', 6: '@5xl:grid-cols-6' };
+
+// Pre-compute zebra striping for specification variant (skips header rows)
+let specDataIdx = 0;
+const specStripeClasses = dataRows.map(row => {
+  if (row.isHeader) return '';
+  const cls = specDataIdx % 2 !== 0 ? 'bg-hatched-light' : '';
+  specDataIdx++;
+  return cls;
+});
 ---
 
 {variant === 'table' && (
@@ -48,7 +58,7 @@ const dataRows = rows ?? [];
               </TableRow>
             ) : (
               <TableRow>
-                <TableCell class="font-medium">{row.feature}</TableCell>
+                <th scope="row" class="p-4 font-medium text-left">{row.feature}</th>
                 {cols.map((col, i) => (
                   <TableCell class={col.highlighted ? 'bg-muted' : ''}>
                     {row.values?.[i] ?? ''}
@@ -90,7 +100,7 @@ const dataRows = rows ?? [];
       )}
     </SectionContent>
 
-    <SectionGrid class={`grid-cols-1 @5xl:grid-cols-${cols.length}`}>
+    <SectionGrid class={`grid-cols-1 ${colCountClass[cols.length] ?? ''}`}>
       {cols.map((col, colIndex) => (
         <Tile variant={col.highlighted ? 'floating' : undefined} class={col.highlighted ? 'bg-muted' : ''}>
           <TileContent>
@@ -159,8 +169,8 @@ const dataRows = rows ?? [];
                   </td>
                 </tr>
               ) : (
-                <tr class={rowIdx % 2 !== 0 ? 'bg-hatched-light' : ''}>
-                  <td class="py-2 px-4 font-medium">{row.feature}</td>
+                <tr class={specStripeClasses[rowIdx]}>
+                  <th scope="row" class="py-2 px-4 font-medium text-left">{row.feature}</th>
                   {cols.map((col, i) => (
                     <td class={`py-2 px-4 ${col.highlighted ? 'border-x border-primary/20' : ''}`}>
                       {row.values?.[i] ?? ''}

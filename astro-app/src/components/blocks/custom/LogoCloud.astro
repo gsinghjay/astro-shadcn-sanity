@@ -51,7 +51,7 @@ function groupByTier(list: Sponsor[]) {
         const content = (
           <div class="bg-muted p-6 flex items-center justify-center h-24">
             {logoUrl ? (
-              <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
             )}
@@ -91,7 +91,7 @@ function groupByTier(list: Sponsor[]) {
                 const item = (
                   <div class="flex items-center justify-center px-8 h-20">
                     {logoUrl ? (
-                      <img src={logoUrl} alt={sponsor.name} class="max-h-14 max-w-[160px] opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-14 max-w-[160px] opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
                     ) : (
                       <span class="text-base font-bold text-background/70 whitespace-nowrap">{sponsor.name}</span>
                     )}
@@ -131,7 +131,7 @@ function groupByTier(list: Sponsor[]) {
                 const item = (
                   <div class:list={["flex items-center justify-center", isPlatinum ? 'h-20' : 'h-14']}>
                     {logoUrl ? (
-                      <img src={logoUrl} alt={sponsor.name} class:list={["opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-14 max-w-[160px]' : 'max-h-10 max-w-[120px]']} width={w} height={h} loading="lazy" />
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-14 max-w-[160px]' : 'max-h-10 max-w-[120px]']} width={w} height={h} loading="lazy" />
                     ) : (
                       <span class:list={["font-bold text-muted-foreground", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
                     )}
@@ -166,7 +166,7 @@ function groupByTier(list: Sponsor[]) {
         const content = (
           <div class="flex items-center justify-center h-20 px-4">
             {logoUrl ? (
-              <img src={logoUrl} alt={sponsor.name} class="max-h-12 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-12 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground whitespace-nowrap">{sponsor.name}</span>
             )}
@@ -207,7 +207,7 @@ function groupByTier(list: Sponsor[]) {
             !isPlatinum && !isGold && 'h-20',
           ]}>
             {logoUrl ? (
-              <img src={logoUrl} alt={sponsor.name} class:list={["opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-16 max-w-[200px]' : isGold ? 'max-h-12 max-w-[160px]' : 'max-h-8 max-w-[120px]']} width={w} height={h} loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-16 max-w-[200px]' : isGold ? 'max-h-12 max-w-[160px]' : 'max-h-8 max-w-[120px]']} width={w} height={h} loading="lazy" />
             ) : (
               <span class:list={["font-bold text-muted-foreground text-center leading-tight", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
             )}

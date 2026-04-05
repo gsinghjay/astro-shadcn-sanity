@@ -25,7 +25,7 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
       {photoUrl ? (
         <img
           src={photoUrl}
-          alt={t.photo?.alt || stegaClean(t.name) || 'Testimonial author'}
+          alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'}
           width="48"
           height="48"
           loading="lazy"
@@ -34,7 +34,7 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
       ) : (
         <div class="w-12 h-12 bg-muted flex items-center justify-center flex-shrink-0">
           <span class="text-sm font-bold text-muted-foreground">
-            {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+            {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
           </span>
         </div>
       )}

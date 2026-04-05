@@ -90,7 +90,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
               {link.icon ? (
                 <span class="text-2xl" aria-hidden="true">{link.icon}</span>
               ) : (
-                <span class="text-primary text-lg font-bold">{(link.title ?? '').charAt(0)}</span>
+                <span class="text-primary text-lg font-bold" aria-hidden="true">{(link.title ?? '').charAt(0)}</span>
               )}
             </div>
             <div class="flex-1 min-w-0">

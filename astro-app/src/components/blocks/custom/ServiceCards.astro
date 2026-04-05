@@ -97,7 +97,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
           </SectionContent>
           <div class="bg-muted rounded-sm aspect-video flex items-center justify-center">
             {safeUrlFor(service.image) ? (
-              <img src={safeUrlFor(service.image)!.width(800).height(450).fit('crop').url()} alt={service.image?.alt || stegaClean(service.title) || 'Service image'} class="w-full h-full object-cover rounded-sm" loading="lazy" />
+              <img src={safeUrlFor(service.image)!.width(800).height(450).fit('crop').url()} alt={stegaClean(service.image?.alt) || stegaClean(service.title) || 'Service image'} class="w-full h-full object-cover rounded-sm" loading="lazy" />
             ) : (
               <span class="text-6xl" aria-hidden="true">{service.icon || '📋'}</span>
             )}
@@ -149,7 +149,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
     <div class="w-full space-y-0">
       {services.map((service, i) => (
         <div class="flex items-start gap-6 border-l-4 border-primary pl-6 py-6 border-b border-border last:border-b-0">
-          <span class="font-mono text-2xl font-bold text-primary/30 flex-shrink-0 leading-none mt-1">
+          <span class="font-mono text-2xl font-bold text-primary/30 flex-shrink-0 leading-none mt-1" aria-hidden="true">
             {String(i + 1).padStart(2, '0')}
           </span>
           {service.icon && (

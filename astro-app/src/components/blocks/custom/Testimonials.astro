@@ -220,11 +220,11 @@ if (isByProject) {
                     <p>{t.quote}</p>
                     <footer class="flex items-center gap-3 font-mono mt-8 text-base font-normal tracking-normal leading-normal">
                       {photoUrl ? (
-                        <img src={photoUrl} alt={t.photo?.alt || stegaClean(t.name) || 'Testimonial author'} width="48" height="48" loading="lazy" class="w-12 h-12 object-cover" />
+                        <img src={photoUrl} alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'} width="48" height="48" loading="lazy" class="w-12 h-12 object-cover" />
                       ) : (
                         <div class="w-12 h-12 bg-muted flex items-center justify-center">
                           <span class="text-sm font-bold text-muted-foreground">
-                            {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                            {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
                           </span>
                         </div>
                       )}
@@ -267,11 +267,11 @@ if (isByProject) {
             <div class="flex flex-col md:flex-row gap-8 items-center">
               <div class="flex-shrink-0">
                 {photoUrl ? (
-                  <img src={photoUrl} alt={t.photo?.alt || stegaClean(t.name) || 'Testimonial author'} width="200" height="200" loading="lazy" class="w-48 h-48 object-cover border-2 border-border" />
+                  <img src={photoUrl} alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'} width="200" height="200" loading="lazy" class="w-48 h-48 object-cover border-2 border-border" />
                 ) : (
                   <div class="w-48 h-48 bg-muted flex items-center justify-center border-2 border-border">
                     <span class="text-4xl font-bold text-muted-foreground">
-                      {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                      {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
                     </span>
                   </div>
                 )}
