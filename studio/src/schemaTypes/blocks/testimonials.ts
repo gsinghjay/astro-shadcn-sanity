@@ -13,6 +13,8 @@ export const testimonials = defineBlock({
     {name: 'split', title: 'Split (heading/buttons left, stacked reviews right)'},
     {name: 'carousel', title: 'Carousel (horizontal slider with nav arrows)'},
     {name: 'marquee', title: 'Marquee (auto-scrolling rows, opposite directions)'},
+    {name: 'brutalist-quote', title: 'Brutalist Quote'},
+    {name: 'spotlight', title: 'Spotlight'},
   ],
   hiddenByVariant: {
     displayMode: ['carousel', 'marquee'],

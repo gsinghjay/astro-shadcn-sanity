@@ -11,6 +11,7 @@ export const accordion = defineBlock({
     {name: 'default', title: 'Default'},
     {name: 'bordered', title: 'Bordered'},
     {name: 'separated', title: 'Separated'},
+    {name: 'technical', title: 'Technical'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

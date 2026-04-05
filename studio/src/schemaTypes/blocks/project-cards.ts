@@ -7,6 +7,11 @@ export const projectCards = defineBlock({
   title: 'Project Cards',
   icon: ProjectsIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'default', title: 'Default'},
+    {name: 'case-study', title: 'Case Study'},
+    {name: 'blueprint', title: 'Blueprint'},
+  ],
   fields: [
     defineField({
       name: 'heading',

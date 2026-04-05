@@ -13,6 +13,7 @@ export const heroBanner = defineBlock({
     {name: 'split-asymmetric', title: 'Split Asymmetric'},
     {name: 'overlay', title: 'Overlay'},
     {name: 'spread', title: 'Spread'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
     alignment: ['split', 'split-asymmetric', 'spread'],

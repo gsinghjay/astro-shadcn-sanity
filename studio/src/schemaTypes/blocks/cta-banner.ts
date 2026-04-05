@@ -12,6 +12,8 @@ export const ctaBanner = defineBlock({
     {name: 'split', title: 'Split'},
     {name: 'spread', title: 'Spread'},
     {name: 'overlay', title: 'Overlay'},
+    {name: 'brutalist', title: 'Brutalist'},
+    {name: 'data-cta', title: 'Data CTA'},
   ],
   hiddenByVariant: {
     backgroundImages: ['centered', 'spread'],

@@ -11,6 +11,7 @@ export const pricingTable = defineBlock({
     {name: 'simple', title: 'Simple'},
     {name: 'featured', title: 'Featured'},
     {name: 'comparison', title: 'Comparison'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

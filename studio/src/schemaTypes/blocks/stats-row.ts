@@ -11,6 +11,8 @@ export const statsRow = defineBlock({
     {name: 'grid', title: 'Grid (responsive grid of stat tiles)'},
     {name: 'split', title: 'Split (heading/buttons left, vertical stat stack right)'},
     {name: 'spread', title: 'Spread (centered heading above, icon-based stats spread)'},
+    {name: 'brutalist', title: 'Brutalist'},
+    {name: 'ticker', title: 'Ticker'},
   ],
   fields: [
     defineField({

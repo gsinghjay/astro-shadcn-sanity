@@ -12,6 +12,7 @@ export const cardGrid = defineBlock({
     {name: 'grid-3', title: '3 Columns'},
     {name: 'grid-4', title: '4 Columns'},
     {name: 'masonry', title: 'Masonry'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

@@ -58,7 +58,16 @@ export type SanityImageAssetReference = {
 
 export type BeforeAfter = {
   _type: "beforeAfter";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "side-by-side" | "stacked" | "toggle";
@@ -86,10 +95,19 @@ export type BeforeAfter = {
 
 export type CardGrid = {
   _type: "cardGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry";
+  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry" | "brutalist";
   heading?: string;
   description?: string;
   cards?: Array<
@@ -101,7 +119,16 @@ export type CardGrid = {
 
 export type MetricsDashboard = {
   _type: "metricsDashboard";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "row" | "card" | "terminal" | "brutalist-grid";
@@ -116,7 +143,16 @@ export type MetricsDashboard = {
 
 export type CountdownTimer = {
   _type: "countdownTimer";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "inline" | "hero" | "banner" | "brutalist";
@@ -128,7 +164,16 @@ export type CountdownTimer = {
 
 export type MapBlock = {
   _type: "mapBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "default" | "split" | "full-width";
@@ -142,7 +187,16 @@ export type MapBlock = {
 
 export type EmbedBlock = {
   _type: "embedBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "default" | "contained" | "full-width";
@@ -154,10 +208,19 @@ export type EmbedBlock = {
 
 export type TabsBlock = {
   _type: "tabsBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "default" | "pills" | "underline";
+  variant?: "default" | "pills" | "underline" | "brutalist";
   heading?: string;
   tabs?: Array<
     {
@@ -168,10 +231,19 @@ export type TabsBlock = {
 
 export type Accordion = {
   _type: "accordion";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "default" | "bordered" | "separated";
+  variant?: "default" | "bordered" | "separated" | "technical";
   heading?: string;
   description?: string;
   items?: Array<
@@ -183,10 +255,19 @@ export type Accordion = {
 
 export type Newsletter = {
   _type: "newsletter";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "inline" | "banner" | "split";
+  variant?: "inline" | "banner" | "split" | "brutalist";
   heading?: string;
   description?: string;
   placeholderText?: string;
@@ -196,7 +277,16 @@ export type Newsletter = {
 
 export type LinkCards = {
   _type: "linkCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "list" | "icon-list";
@@ -211,7 +301,16 @@ export type LinkCards = {
 
 export type ProductShowcase = {
   _type: "productShowcase";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "featured" | "detail";
@@ -226,7 +325,16 @@ export type ProductShowcase = {
 
 export type ServiceCards = {
   _type: "serviceCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "list" | "alternating" | "icon-grid" | "specification";
@@ -241,10 +349,19 @@ export type ServiceCards = {
 
 export type PricingTable = {
   _type: "pricingTable";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "simple" | "featured" | "comparison";
+  variant?: "simple" | "featured" | "comparison" | "brutalist";
   heading?: string;
   description?: string;
   tiers?: Array<
@@ -346,7 +463,16 @@ export type PricingTier = {
 
 export type VideoEmbed = {
   _type: "videoEmbed";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   videoUrl?: string;
@@ -356,9 +482,19 @@ export type VideoEmbed = {
 
 export type SponsorshipTiers = {
   _type: "sponsorshipTiers";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "brutalist";
   heading?: string;
   description?: string;
   tiers?: Array<{
@@ -373,7 +509,16 @@ export type SponsorshipTiers = {
 
 export type AnnouncementBar = {
   _type: "announcementBar";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "inline" | "floating";
@@ -385,7 +530,16 @@ export type AnnouncementBar = {
 
 export type Divider = {
   _type: "divider";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "line" | "short" | "labeled";
@@ -394,10 +548,19 @@ export type Divider = {
 
 export type Pullquote = {
   _type: "pullquote";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "sidebar";
+  variant?: "centered" | "split" | "sidebar" | "brutalist";
   quote?: string;
   attribution?: string;
   role?: string;
@@ -413,7 +576,16 @@ export type Pullquote = {
 
 export type Timeline = {
   _type: "timeline";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "vertical" | "split" | "horizontal" | "engineering";
@@ -433,7 +605,16 @@ export type Timeline = {
 
 export type ComparisonTable = {
   _type: "comparisonTable";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "table" | "stacked" | "specification";
@@ -486,7 +667,16 @@ export type ComparisonColumn = {
 
 export type ArticleList = {
   _type: "articleList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "split-featured" | "list";
@@ -503,7 +693,16 @@ export type ArticleList = {
 
 export type ImageGallery = {
   _type: "imageGallery";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "masonry" | "single";
@@ -519,7 +718,16 @@ export type ImageGallery = {
 
 export type TeamGrid = {
   _type: "teamGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "grid-compact" | "split";
@@ -541,9 +749,19 @@ export type ProjectReference = {
 
 export type ProjectCards = {
   _type: "projectCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "case-study" | "blueprint";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   projects?: Array<
@@ -555,7 +773,16 @@ export type ProjectCards = {
 
 export type EventList = {
   _type: "eventList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
@@ -572,10 +799,26 @@ export type TestimonialReference = {
 
 export type Testimonials = {
   _type: "testimonials";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "masonry" | "split" | "carousel" | "marquee";
+  variant?:
+    | "grid"
+    | "masonry"
+    | "split"
+    | "carousel"
+    | "marquee"
+    | "brutalist-quote"
+    | "spotlight";
   heading?: string;
   displayMode?: "all" | "industry" | "student" | "byProject" | "manual";
   testimonials?: Array<
@@ -594,9 +837,19 @@ export type SponsorReference = {
 
 export type SponsorCards = {
   _type: "sponsorCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "showcase" | "brutalist-tier";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   sponsors?: Array<
@@ -615,7 +868,16 @@ export type FormReference = {
 
 export type ContactForm = {
   _type: "contactForm";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
@@ -626,10 +888,19 @@ export type ContactForm = {
 
 export type FaqSection = {
   _type: "faqSection";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "split" | "stacked" | "spread-header" | "narrow";
+  variant?: "split" | "stacked" | "spread-header" | "narrow" | "technical";
   heading?: string;
   items?: Array<
     {
@@ -640,7 +911,16 @@ export type FaqSection = {
 
 export type RichText = {
   _type: "richText";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "prose" | "narrow" | "wide";
@@ -649,7 +929,16 @@ export type RichText = {
 
 export type SponsorSteps = {
   _type: "sponsorSteps";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "steps" | "split" | "spread";
@@ -669,9 +958,19 @@ export type SponsorSteps = {
 
 export type LogoCloud = {
   _type: "logoCloud";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "marquee" | "tiered" | "grid-prominent";
   heading?: string;
   autoPopulate?: boolean;
   sponsors?: Array<
@@ -683,10 +982,24 @@ export type LogoCloud = {
 
 export type TextWithImage = {
   _type: "textWithImage";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "split" | "split-asymmetric" | "reversed" | "floating";
+  variant?:
+    | "split"
+    | "split-asymmetric"
+    | "reversed"
+    | "floating"
+    | "brutalist";
   heading?: string;
   content?: PortableText;
   image?: {
@@ -702,10 +1015,19 @@ export type TextWithImage = {
 
 export type StatsRow = {
   _type: "statsRow";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "split" | "spread";
+  variant?: "grid" | "split" | "spread" | "brutalist" | "ticker";
   heading?: string;
   stats?: Array<
     {
@@ -716,10 +1038,25 @@ export type StatsRow = {
 
 export type CtaBanner = {
   _type: "ctaBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "spread" | "overlay";
+  variant?:
+    | "centered"
+    | "split"
+    | "spread"
+    | "overlay"
+    | "brutalist"
+    | "data-cta";
   heading?: string;
   description?: string;
   backgroundImages?: Array<{
@@ -740,7 +1077,16 @@ export type CtaBanner = {
 
 export type FeatureGrid = {
   _type: "featureGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?:
@@ -761,10 +1107,25 @@ export type FeatureGrid = {
 
 export type HeroBanner = {
   _type: "heroBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "split-asymmetric" | "overlay" | "spread";
+  variant?:
+    | "centered"
+    | "split"
+    | "split-asymmetric"
+    | "overlay"
+    | "spread"
+    | "brutalist";
   heading?: string;
   subheading?: string;
   backgroundImages?: Array<{
@@ -1957,7 +2318,16 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     | {
         _key: string;
         _type: "videoEmbed";
-        backgroundVariant?: "dark" | "light" | "primary" | "white";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
         spacing?: "default" | "large" | "none" | "small";
         maxWidth?: "default" | "full" | "narrow";
         videoUrl?: string;
@@ -2466,10 +2836,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "accordion";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "bordered" | "default" | "separated" | null;
+        variant: "bordered" | "default" | "separated" | "technical" | null;
         heading: string | null;
         description: string | null;
         items: Array<{
@@ -2481,7 +2861,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "announcementBar";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
@@ -2496,7 +2886,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "articleList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "list" | "split-featured" | null;
@@ -2514,7 +2914,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "beforeAfter";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "side-by-side" | "stacked" | "toggle" | null;
@@ -2552,10 +2962,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "cardGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid-2" | "grid-3" | "grid-4" | "masonry" | null;
+        variant:
+          | "brutalist"
+          | "grid-2"
+          | "grid-3"
+          | "grid-4"
+          | "masonry"
+          | null;
         heading: string | null;
         description: string | null;
         cards: Array<{
@@ -2585,7 +3011,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "comparisonTable";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "specification" | "stacked" | "table" | null;
@@ -2612,7 +3048,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "contactForm";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: null;
@@ -2663,7 +3109,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "countdownTimer";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "banner" | "brutalist" | "hero" | "inline" | null;
@@ -2675,10 +3131,27 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "ctaBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "overlay" | "split" | "spread" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread"
+          | null;
         heading: string | null;
         description: string | null;
         backgroundImages: Array<{
@@ -2703,7 +3176,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "divider";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "labeled" | "line" | "short" | null;
@@ -2712,7 +3195,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "embedBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "contained" | "default" | "full-width" | null;
@@ -2724,7 +3217,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "eventList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: null;
@@ -2735,10 +3238,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "faqSection";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "narrow" | "split" | "spread-header" | "stacked" | null;
+        variant:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2814,7 +3333,16 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | {
                 _key: string;
                 _type: "videoEmbed";
-                backgroundVariant?: "dark" | "light" | "primary" | "white";
+                backgroundVariant?:
+                  | "blueprint"
+                  | "dark"
+                  | "hatched-light"
+                  | "hatched"
+                  | "light"
+                  | "mono"
+                  | "primary"
+                  | "stripe"
+                  | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
                 videoUrl?: string;
@@ -2828,7 +3356,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "featureGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
@@ -2862,10 +3400,21 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "heroBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
+          | "brutalist"
           | "centered"
           | "overlay"
           | "split-asymmetric"
@@ -2897,7 +3446,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "imageGallery";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "masonry" | "single" | null;
@@ -2925,7 +3484,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "linkCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "icon-list" | "list" | null;
@@ -2942,10 +3511,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "logoCloud";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid-prominent" | "marquee" | "tiered" | null;
         heading: string | null;
         autoPopulate: boolean | null;
         sponsors: Array<{
@@ -2955,7 +3534,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "mapBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "default" | "full-width" | "split" | null;
@@ -2976,7 +3565,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "metricsDashboard";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
@@ -2994,10 +3593,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "newsletter";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "banner" | "inline" | "split" | null;
+        variant: "banner" | "brutalist" | "inline" | "split" | null;
         heading: string | null;
         description: string | null;
         placeholderText: string | null;
@@ -3007,10 +3616,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "pricingTable";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "comparison" | "featured" | "simple" | null;
+        variant: "brutalist" | "comparison" | "featured" | "simple" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{
@@ -3028,7 +3647,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "productShowcase";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "detail" | "featured" | "grid" | null;
@@ -3062,10 +3691,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "projectCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "blueprint" | "case-study" | "default" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         projects: Array<{
@@ -3075,10 +3714,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "pullquote";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "sidebar" | "split" | null;
+        variant: "brutalist" | "centered" | "sidebar" | "split" | null;
         quote: string | null;
         attribution: string | null;
         role: string | null;
@@ -3099,7 +3748,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "richText";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "narrow" | "prose" | "wide" | null;
@@ -3174,7 +3833,16 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
               videoUrl?: string;
@@ -3187,7 +3855,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "serviceCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
@@ -3226,10 +3904,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist-tier" | "showcase" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         sponsors: Array<{
@@ -3239,10 +3927,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorshipTiers";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{
@@ -3261,7 +3959,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorSteps";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "split" | "spread" | "steps" | null;
@@ -3283,10 +3991,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "statsRow";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid" | "split" | "spread" | null;
+        variant: "brutalist" | "grid" | "split" | "spread" | "ticker" | null;
         heading: string | null;
         stats: Array<{
           _key: string;
@@ -3298,10 +4016,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "tabsBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "default" | "pills" | "underline" | null;
+        variant: "brutalist" | "default" | "pills" | "underline" | null;
         heading: string | null;
         tabs: Array<{
           _key: string;
@@ -3312,7 +4040,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "teamGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid-compact" | "grid" | "split" | null;
@@ -3345,10 +4083,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "testimonials";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "carousel" | "grid" | "marquee" | "masonry" | "split" | null;
+        variant:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight"
+          | null;
         heading: string | null;
         displayMode:
           | "all"
@@ -3364,10 +4120,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "textWithImage";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "floating" | "reversed" | "split-asymmetric" | "split" | null;
+        variant:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split"
+          | null;
         heading: string | null;
         content: Array<
           | {
@@ -3440,7 +4212,16 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
               videoUrl?: string;
@@ -3465,7 +4246,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "timeline";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "engineering" | "horizontal" | "split" | "vertical" | null;
@@ -3500,7 +4291,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "videoEmbed";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: null;

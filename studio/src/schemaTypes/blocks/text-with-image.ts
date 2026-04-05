@@ -12,6 +12,7 @@ export const textWithImage = defineBlock({
     {name: 'split-asymmetric', title: 'Split Asymmetric'},
     {name: 'reversed', title: 'Reversed'},
     {name: 'floating', title: 'Floating'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
     imagePosition: ['reversed', 'floating'],

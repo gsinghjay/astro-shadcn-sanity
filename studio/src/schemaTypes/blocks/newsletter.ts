@@ -11,6 +11,7 @@ export const newsletter = defineBlock({
     {name: 'inline', title: 'Inline'},
     {name: 'banner', title: 'Banner'},
     {name: 'split', title: 'Split'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

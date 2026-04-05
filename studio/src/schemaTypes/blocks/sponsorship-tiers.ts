@@ -6,6 +6,9 @@ export const sponsorshipTiers = defineBlock({
   name: 'sponsorshipTiers',
   title: 'Sponsorship Tiers',
   icon: CreditCardIcon,
+  variants: [
+    {name: 'brutalist', title: 'Brutalist'},
+  ],
   preview: {
     select: {title: 'heading', tiers: 'tiers'},
     prepare({title, tiers}) {

@@ -10,6 +10,7 @@ export const pullquote = defineBlock({
     {name: 'centered', title: 'Centered'},
     {name: 'split', title: 'Split'},
     {name: 'sidebar', title: 'Sidebar'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
     image: ['sidebar'],

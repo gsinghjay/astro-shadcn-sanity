@@ -11,6 +11,7 @@ export const tabsBlock = defineBlock({
     {name: 'default', title: 'Default'},
     {name: 'pills', title: 'Pills'},
     {name: 'underline', title: 'Underline'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

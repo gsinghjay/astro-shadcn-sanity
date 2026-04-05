@@ -12,6 +12,7 @@ export const faqSection = defineBlock({
     {name: 'stacked', title: 'Stacked (centered heading, full-width accordion below)'},
     {name: 'spread-header', title: 'Spread Header (heading left, buttons right, accordion below)'},
     {name: 'narrow', title: 'Narrow (672px centered column)'},
+    {name: 'technical', title: 'Technical'},
   ],
   fields: [
     defineField({
