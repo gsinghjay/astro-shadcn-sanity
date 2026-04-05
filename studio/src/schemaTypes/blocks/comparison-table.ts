@@ -9,6 +9,7 @@ export const comparisonTable = defineBlock({
   variants: [
     {name: 'table', title: 'Table'},
     {name: 'stacked', title: 'Stacked'},
+    {name: 'specification', title: 'Specification'},
   ],
   preview: {select: {title: 'heading'}},
   fields: [

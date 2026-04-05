@@ -12,7 +12,7 @@ interface Props extends MetricsDashboardBlock {
 
 const { heading, description, metrics = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'row' || rawCleaned === 'card' ? rawCleaned : 'grid';
+const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'row' || rawCleaned === 'card' || rawCleaned === 'terminal' || rawCleaned === 'brutalist-grid' ? rawCleaned : 'grid';
 
 const trendColor = (trend?: string) => {
   const t = stegaClean(trend);
@@ -125,5 +125,67 @@ const trendArrow = (trend?: string) => {
         </Tile>
       ))}
     </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'terminal' && (
+  <Section class={cn('bg-mono text-white', className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-mono font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-gray-400 font-mono">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid size="sm">
+      {metrics.map((metric) => {
+        const t = stegaClean(metric.trend);
+        const valueColor = t === 'up' ? 'text-green-500' : t === 'down' ? 'text-red-500' : 'text-white';
+        return (
+          <div class="p-4">
+            <span class="font-mono text-xs text-gray-500 uppercase tracking-wider">{metric.label}</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span class={cn('text-3xl font-bold font-mono', valueColor)}>{metric.value}</span>
+            </div>
+            {metric.change && (
+              <span class={cn('text-sm font-mono flex items-center gap-1 mt-1', t === 'up' ? 'text-green-500' : t === 'down' ? 'text-red-500' : 'text-gray-500')}>
+                <span>{trendArrow(metric.trend)}</span>
+                {metric.change}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist-grid' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+    </SectionContent>
+
+    <div class="grid grid-cols-2 @3xl:grid-cols-4 w-full">
+      {metrics.map((metric) => {
+        const t = stegaClean(metric.trend);
+        const topBorderColor = t === 'up' ? 'border-t-green-600' : t === 'down' ? 'border-t-red-600' : 'border-t-gray-400';
+        return (
+          <div class={cn('border-brutal border-foreground/20 border-t-4 p-4', topBorderColor)}>
+            <span class="text-3xl md:text-4xl font-bold block">{metric.value}</span>
+            <span class="label-caps text-muted-foreground text-[10px] mt-1 block">{metric.label}</span>
+            {metric.change && (
+              <span class={cn('text-xs font-medium mt-2 block', t === 'up' ? 'text-green-600' : t === 'down' ? 'text-red-600' : 'text-muted-foreground')}>
+                {trendArrow(metric.trend)} {metric.change}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
   </Section>
 )}

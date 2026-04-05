@@ -13,6 +13,7 @@ export const featureGrid = defineBlock({
     {name: 'horizontal-cards', title: 'Horizontal Cards'},
     {name: 'sidebar-grid', title: 'Sidebar Grid'},
     {name: 'stacked', title: 'Stacked'},
+    {name: 'numbered-brutalist', title: 'Numbered Brutalist'},
   ],
   hiddenByVariant: {
     columns: ['stacked', 'sidebar-grid'],

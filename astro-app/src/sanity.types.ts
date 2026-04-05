@@ -104,7 +104,7 @@ export type MetricsDashboard = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "row" | "card";
+  variant?: "grid" | "row" | "card" | "terminal" | "brutalist-grid";
   heading?: string;
   description?: string;
   metrics?: Array<
@@ -119,7 +119,7 @@ export type CountdownTimer = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "inline" | "hero" | "banner";
+  variant?: "inline" | "hero" | "banner" | "brutalist";
   heading?: string;
   description?: string;
   targetDate?: string;
@@ -229,7 +229,7 @@ export type ServiceCards = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "list" | "alternating" | "icon-grid";
+  variant?: "grid" | "list" | "alternating" | "icon-grid" | "specification";
   heading?: string;
   description?: string;
   services?: Array<
@@ -416,7 +416,7 @@ export type Timeline = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "vertical" | "split" | "horizontal";
+  variant?: "vertical" | "split" | "horizontal" | "engineering";
   heading?: string;
   description?: string;
   items?: Array<
@@ -436,7 +436,7 @@ export type ComparisonTable = {
   backgroundVariant?: "white" | "light" | "dark" | "primary";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "table" | "stacked";
+  variant?: "table" | "stacked" | "specification";
   heading?: string;
   description?: string;
   columns?: Array<
@@ -748,7 +748,8 @@ export type FeatureGrid = {
     | "grid-centered"
     | "horizontal-cards"
     | "sidebar-grid"
-    | "stacked";
+    | "stacked"
+    | "numbered-brutalist";
   heading?: string;
   items?: Array<
     {
@@ -2587,7 +2588,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "stacked" | "table" | null;
+        variant: "specification" | "stacked" | "table" | null;
         heading: string | null;
         description: string | null;
         columns: Array<{
@@ -2665,7 +2666,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "banner" | "hero" | "inline" | null;
+        variant: "banner" | "brutalist" | "hero" | "inline" | null;
         heading: string | null;
         description: string | null;
         targetDate: string | null;
@@ -2834,6 +2835,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | "grid-centered"
           | "grid"
           | "horizontal-cards"
+          | "numbered-brutalist"
           | "sidebar-grid"
           | "stacked"
           | null;
@@ -2977,7 +2979,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "card" | "grid" | "row" | null;
+        variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
         heading: string | null;
         description: string | null;
         metrics: Array<{
@@ -3188,7 +3190,13 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "alternating" | "grid" | "icon-grid" | "list" | null;
+        variant:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification"
+          | null;
         heading: string | null;
         description: string | null;
         services: Array<{
@@ -3460,7 +3468,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         backgroundVariant: "dark" | "light" | "primary" | "white" | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "horizontal" | "split" | "vertical" | null;
+        variant: "engineering" | "horizontal" | "split" | "vertical" | null;
         heading: string | null;
         description: string | null;
         items: Array<{

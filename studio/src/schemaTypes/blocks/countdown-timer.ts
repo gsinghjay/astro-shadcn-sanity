@@ -11,6 +11,7 @@ export const countdownTimer = defineBlock({
     {name: 'inline', title: 'Inline'},
     {name: 'hero', title: 'Hero'},
     {name: 'banner', title: 'Banner'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

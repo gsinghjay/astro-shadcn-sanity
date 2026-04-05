@@ -90,11 +90,11 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       expect(variantField, 'featureGrid missing variant field').toBeDefined()
     })
 
-    test('2.6-INT-010 — featureGrid variant field has 5 options', () => {
+    test('2.6-INT-010 — featureGrid variant field has 6 options', () => {
       const schema = featureGrid as BlockSchema
       const variantField = schema.fields.find((f) => f.name === 'variant')
       const values = variantField.options.list.map((o: any) => o.value)
-      expect(values).toEqual(['grid', 'grid-centered', 'horizontal-cards', 'sidebar-grid', 'stacked'])
+      expect(values).toEqual(['grid', 'grid-centered', 'horizontal-cards', 'sidebar-grid', 'stacked', 'numbered-brutalist'])
     })
 
     test('2.6-INT-011 — featureGrid variant field initialValue is grid (default)', () => {

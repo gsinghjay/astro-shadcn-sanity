@@ -12,6 +12,7 @@ export const serviceCards = defineBlock({
     {name: 'list', title: 'List'},
     {name: 'alternating', title: 'Alternating'},
     {name: 'icon-grid', title: 'Icon Grid'},
+    {name: 'specification', title: 'Specification'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

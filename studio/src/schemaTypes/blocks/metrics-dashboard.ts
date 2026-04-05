@@ -11,6 +11,8 @@ export const metricsDashboard = defineBlock({
     {name: 'grid', title: 'Grid'},
     {name: 'row', title: 'Row'},
     {name: 'card', title: 'Card'},
+    {name: 'terminal', title: 'Terminal'},
+    {name: 'brutalist-grid', title: 'Brutalist Grid'},
   ],
   fields: [
     defineField({name: 'heading', title: 'Heading', type: 'string'}),

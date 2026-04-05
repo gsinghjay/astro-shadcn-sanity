@@ -10,6 +10,7 @@ export const timeline = defineBlock({
     {name: 'vertical', title: 'Vertical'},
     {name: 'split', title: 'Split'},
     {name: 'horizontal', title: 'Horizontal'},
+    {name: 'engineering', title: 'Engineering'},
   ],
   hiddenByVariant: {
     description: ['horizontal'],

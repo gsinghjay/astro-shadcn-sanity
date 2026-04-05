@@ -12,7 +12,8 @@ interface Props extends ComparisonTableBlock {
 }
 
 const { heading, description, columns, rows, links, variant: rawVariant } = Astro.props;
-const variant = stegaClean(rawVariant) ?? 'table';
+const rawCleaned = stegaClean(rawVariant) ?? 'table';
+const variant = rawCleaned === 'table' || rawCleaned === 'stacked' || rawCleaned === 'specification' ? rawCleaned : 'table';
 const cols = columns ?? [];
 const dataRows = rows ?? [];
 ---
@@ -124,5 +125,69 @@ const dataRows = rows ?? [];
         </SectionActions>
       </SectionContent>
     )}
+  </Section>
+)}
+
+{variant === 'specification' && (
+  <Section data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+
+      <div class="w-full overflow-x-auto">
+        <table class="w-full border-collapse font-mono text-sm">
+          <thead>
+            <tr class="border-b-[3px] border-foreground">
+              <th class="text-left py-3 px-4 font-bold uppercase tracking-wider text-xs">Feature</th>
+              {cols.map((col) => (
+                <th class={`text-left py-3 px-4 font-bold uppercase tracking-wider text-xs ${col.highlighted ? 'border-t-4 border-t-primary' : ''}`}>
+                  {col.title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {dataRows.map((row, rowIdx) => (
+              row.isHeader ? (
+                <tr>
+                  <td class="font-bold border-t-2 border-foreground/30 pt-4 pb-2 px-4 uppercase tracking-wider text-xs" colspan={cols.length + 1}>
+                    {row.feature}
+                  </td>
+                </tr>
+              ) : (
+                <tr class={rowIdx % 2 !== 0 ? 'bg-hatched-light' : ''}>
+                  <td class="py-2 px-4 font-medium">{row.feature}</td>
+                  {cols.map((col, i) => (
+                    <td class={`py-2 px-4 ${col.highlighted ? 'border-x border-primary/20' : ''}`}>
+                      {row.values?.[i] ?? ''}
+                    </td>
+                  ))}
+                </tr>
+              )
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {links && links.length > 0 && (
+        <SectionActions>
+          {links.map((link, i) => (
+            <Button
+              href={link.url}
+              variant={link.variant || (i === 0 ? 'default' : 'outline')}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(link.text)}
+            >
+              {link.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
   </Section>
 )}
