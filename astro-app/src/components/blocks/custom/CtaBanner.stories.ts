@@ -195,8 +195,18 @@ export const DataCta = {
       { _key: 'ds2', value: '$2.4M', label: 'Research Funding' },
       { _key: 'ds3', value: '10+', label: 'Fortune 500 Partners' },
     ],
-    ctaButtons: [
-      { _key: 'btn-1', text: 'Become a Sponsor', url: '/sponsors' },
-    ],
+    ctaButtons: [{
+      "_key": "btn-1",
+      "text": "Become a Sponsor",
+      "url": "/sponsors"
+    }, {
+      "_key": "btn-2",
+      "text": "Become a Sponsor",
+      "url": "/sponsors"
+    }, {
+      "_key": "btn-3",
+      "text": "Become a Sponsor",
+      "url": "/sponsors"
+    }],
   },
 }
