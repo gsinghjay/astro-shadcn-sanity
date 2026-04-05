@@ -15,7 +15,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['inline', 'banner', 'split'],
+      options: ['inline', 'banner', 'split', 'brutalist'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -77,6 +77,20 @@ export const Split = {
     placeholderText: 'Enter your email address',
     buttonText: 'Get Started',
     disclaimer: 'By subscribing, you agree to our Privacy Policy.',
+    backgroundVariant: 'dark',
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'newsletter',
+    _key: 'story-newsletter-brutalist',
+    variant: 'brutalist',
+    heading: 'Stay Connected',
+    description: 'Program updates, showcase dates, and partnership opportunities.',
+    placeholderText: 'you@company.com',
+    buttonText: 'Subscribe',
+    disclaimer: 'No spam. Unsubscribe anytime.',
     backgroundVariant: 'dark',
   },
 }

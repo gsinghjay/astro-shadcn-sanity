@@ -60,7 +60,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['grid-2', 'grid-3', 'grid-4', 'masonry'],
+      options: ['grid-2', 'grid-3', 'grid-4', 'masonry', 'brutalist'],
       description: 'Grid layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -123,5 +123,24 @@ export const Masonry = {
     heading: 'Explore',
     description: 'A curated collection of guides and resources.',
     cards: sharedCards,
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'cardGrid',
+    _key: 'story-cardgrid-brutalist',
+    variant: 'brutalist',
+    heading: 'Research Domains',
+    description: 'Active capstone project categories.',
+    backgroundVariant: 'hatched-light',
+    cards: [
+      { _key: 'cb1', title: 'Cybersecurity', description: 'Zero trust, microsegmentation, blockchain-secured DNS infrastructure.', badge: '3 Projects', link: { text: 'View Projects', url: '/projects' } },
+      { _key: 'cb2', title: 'Machine Learning', description: 'Predictive models, NLP, sentiment analysis, and resource optimization.', badge: '4 Projects', link: { text: 'View Projects', url: '/projects' } },
+      { _key: 'cb3', title: 'Cloud & DevOps', description: 'Azure ML pipelines, CI/CD automation, and scalable infrastructure.', badge: '2 Projects', link: { text: 'View Projects', url: '/projects' } },
+      { _key: 'cb4', title: '5G & Healthcare', description: 'Alzheimer\'s care applications and telemedicine over 5G networks.', badge: '1 Project', link: { text: 'View Projects', url: '/projects' } },
+      { _key: 'cb5', title: 'Web Platforms', description: 'Full-stack applications, CMS systems, and client portals.', badge: '3 Projects', link: { text: 'View Projects', url: '/projects' } },
+      { _key: 'cb6', title: 'Sustainability', description: 'Green technology portals and environmental impact dashboards.', badge: '1 Project', link: { text: 'View Projects', url: '/projects' } },
+    ],
   },
 }

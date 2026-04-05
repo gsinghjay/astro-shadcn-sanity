@@ -22,7 +22,7 @@ const {
   id,
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' ? rawCleaned : 'inline';
+const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' || rawCleaned === 'brutalist' ? rawCleaned : 'inline';
 ---
 
 {cleanVariant === 'inline' && (
@@ -91,5 +91,29 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
         )}
       </SectionContent>
     </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-2xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6 text-left">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
+        <input
+          type="email"
+          placeholder={placeholderText}
+          class="flex-1 h-10 border-2 border-background bg-transparent px-3 font-mono text-sm placeholder:font-mono focus:outline-none focus:border-primary"
+        />
+        <Button type="submit" variant="outline" class="uppercase tracking-wider font-bold border-2">{buttonText}</Button>
+      </form>
+      {disclaimer && (
+        <p class="text-xs text-muted-foreground">{disclaimer}</p>
+      )}
+    </SectionContent>
   </Section>
 )}

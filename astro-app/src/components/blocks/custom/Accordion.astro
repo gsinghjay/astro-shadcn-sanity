@@ -11,7 +11,7 @@ interface Props extends AccordionBlock {
 
 const { heading, description, items = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || rawCleaned === 'separated' ? rawCleaned : 'default';
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || rawCleaned === 'separated' || rawCleaned === 'technical' ? rawCleaned : 'default';
 ---
 
 {cleanVariant === 'default' && (
@@ -87,6 +87,35 @@ const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || ra
             <span class="ml-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-45">+</span>
           </summary>
           <div class="px-4 pb-4 text-muted-foreground leading-relaxed">
+            {item.content}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'technical' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full max-w-3xl space-y-0">
+      {items.map((item, i) => (
+        <details class="group border-l-4 border-border open:border-primary transition-colors">
+          <summary class="flex cursor-pointer items-center gap-4 py-4 pl-6 text-left font-medium transition-colors hover:text-primary">
+            <span class="font-mono text-xs font-bold text-muted-foreground flex-shrink-0">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {item.title}
+          </summary>
+          <div class="pl-6 pb-4 ml-6 border-l border-border text-muted-foreground leading-relaxed">
             {item.content}
           </div>
         </details>

@@ -14,7 +14,7 @@ interface Props extends CardGridBlock {
 
 const { heading, description, cards = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'grid-2' || rawCleaned === 'grid-3' || rawCleaned === 'grid-4' || rawCleaned === 'masonry' ? rawCleaned : 'grid-3';
+const cleanVariant = rawCleaned === 'grid-2' || rawCleaned === 'grid-3' || rawCleaned === 'grid-4' || rawCleaned === 'masonry' || rawCleaned === 'brutalist' ? rawCleaned : 'grid-3';
 
 const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
   'grid-2': 'lg',
@@ -23,7 +23,7 @@ const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
 };
 ---
 
-{cleanVariant !== 'masonry' && (
+{cleanVariant !== 'masonry' && cleanVariant !== 'brutalist' && (
   <Section class={className} id={id} data-animate>
     <SectionContent class="max-w-3xl">
       {heading && (
@@ -84,5 +84,38 @@ const gridSizeMap: Record<string, 'sm' | 'default' | 'lg'> = {
         </Tile>
       ))}
     </SectionMasonry>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid size="default">
+      {cards.map((card) => (
+        <div class="border-2 border-border hover:border-primary transition-colors">
+          <div class="h-1 bg-primary"></div>
+          <div class="p-6 flex flex-col gap-3">
+            {safeUrlFor(card.image) && (
+              <div class="aspect-video bg-muted overflow-hidden -mx-6 -mt-6 mb-2">
+                <img src={safeUrlFor(card.image)!.width(600).height(338).fit('crop').url()} alt={card.image?.alt || ''} class="w-full h-full object-cover" loading="lazy" />
+              </div>
+            )}
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-bold text-lg">{card.title}</h3>
+              {card.badge && <Badge>{card.badge}</Badge>}
+            </div>
+            {card.description && <p class="text-sm text-muted-foreground">{card.description}</p>}
+          </div>
+        </div>
+      ))}
+    </SectionGrid>
   </Section>
 )}
