@@ -99,7 +99,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
       {(stats ?? []).map((stat) => (
         <div class="border-t-4 border-primary pt-4">
-          <div class="font-mono tabular-nums text-5xl md:text-6xl lg:text-7xl font-bold tracking-[-0.04em] leading-none mb-3">
+          <div class="font-mono tabular-nums text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
           <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
@@ -111,7 +111,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
   </Section>
 )}
 
-{cleanVariant === 'ticker' && (
+{cleanVariant === 'ticker' && stats && stats.length > 0 && (
   <Section
     size="sm"
     class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass} overflow-hidden`}
@@ -119,7 +119,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
   >
     <Marquee>
       <MarqueeContent pauseOnHover>
-        {(stats ?? []).map((stat) => (
+        {stats.map((stat) => (
           <div class="flex items-baseline gap-3 px-8 md:px-12 shrink-0">
             <span class="font-mono tabular-nums text-4xl md:text-5xl font-bold tracking-[-0.04em] leading-none">
               {stat.value}

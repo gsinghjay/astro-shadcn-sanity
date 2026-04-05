@@ -232,7 +232,7 @@ const firstImage = backgroundImages?.[0];
             <Button
               href={btn.url}
               variant={i === 0 ? 'outline' : (btn.variant || 'outline')}
-              class={i === 0 ? primaryBtnMap[bgVariant] ?? primaryBtnMap['brutalist'] : secondaryBtnMap[bgVariant] ?? secondaryBtnMap['brutalist']}
+              class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['brutalist'] : secondaryBtnMap[bgVariant] || secondaryBtnMap['brutalist']}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -282,7 +282,7 @@ const firstImage = backgroundImages?.[0];
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i === 0 ? primaryBtnMap[bgVariant] : secondaryBtnMap[bgVariant]}
+                class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['data-cta'] : secondaryBtnMap[bgVariant] || secondaryBtnMap['data-cta']}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
