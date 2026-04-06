@@ -19,18 +19,21 @@ export const imageGallery = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'images',
       title: 'Images',
       type: 'array',
+      description: 'Gallery images with optional captions',
       of: [defineArrayMember({type: 'galleryImage'})],
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).max(30),
     }),
     defineField({
       name: 'columns',

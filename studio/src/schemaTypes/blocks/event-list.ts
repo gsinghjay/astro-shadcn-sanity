@@ -12,11 +12,13 @@ export const eventList = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'filterBy',
       title: 'Filter By',
       type: 'string',
+      description: 'Filter events by status (upcoming, past, all)',
       options: {
         list: [
           {title: 'All', value: 'all'},
@@ -31,7 +33,7 @@ export const eventList = defineBlock({
       title: 'Max Events to Display',
       type: 'number',
       initialValue: 10,
-      validation: (Rule) => Rule.min(1).max(50),
+      validation: (Rule) => Rule.required().min(1).max(50),
     }),
   ],
 })

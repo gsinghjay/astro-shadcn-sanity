@@ -19,18 +19,20 @@ export const teamGrid = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'items',
       title: 'Team Members',
       type: 'array',
       of: [defineArrayMember({type: 'teamMember'})],
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).max(30),
     }),
   ],
 })

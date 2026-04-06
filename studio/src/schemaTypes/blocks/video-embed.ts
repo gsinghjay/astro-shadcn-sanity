@@ -21,16 +21,19 @@ export const videoEmbed = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'videoUrl',
       title: 'Video URL',
       type: 'url',
+      description: 'YouTube video URL (e.g., https://www.youtube.com/watch?v=...)',
       validation: (Rule) =>
         Rule.required()
           .uri({scheme: ['https']})
@@ -55,6 +58,7 @@ export const videoEmbed = defineBlock({
           name: 'alt',
           title: 'Alt Text',
           type: 'string',
+          description: 'Describe the thumbnail for screen readers',
         }),
       ],
     }),

@@ -21,11 +21,13 @@ export const timeline = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'items',
@@ -33,13 +35,14 @@ export const timeline = defineBlock({
       type: 'array',
       of: [defineArrayMember({type: 'timelineEntry'})],
       validation: (Rule) =>
-        Rule.required().min(1).error('Add at least one timeline entry'),
+        Rule.required().min(1).max(20).error('Add at least one timeline entry'),
     }),
     defineField({
       name: 'links',
       title: 'Links',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

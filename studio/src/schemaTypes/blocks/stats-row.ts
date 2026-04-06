@@ -19,13 +19,14 @@ export const statsRow = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'stats',
       title: 'Stats',
       type: 'array',
       of: [defineArrayMember({type: 'statItem'})],
-      validation: (Rule) => Rule.min(1).error('Add at least one stat'),
+      validation: (Rule) => Rule.min(1).max(10).error('Add at least one stat'),
     }),
   ],
 })

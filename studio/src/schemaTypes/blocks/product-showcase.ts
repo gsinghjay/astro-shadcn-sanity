@@ -13,14 +13,14 @@ export const productShowcase = defineBlock({
     {name: 'detail', title: 'Detail'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'description', title: 'Description', type: 'text', validation: (Rule) => Rule.max(500)}),
     defineField({
       name: 'products',
       title: 'Products',
       type: 'array',
       of: [defineArrayMember({type: 'productItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(20),
     }),
   ],
 })

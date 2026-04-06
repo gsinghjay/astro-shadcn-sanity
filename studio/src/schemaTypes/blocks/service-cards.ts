@@ -15,14 +15,14 @@ export const serviceCards = defineBlock({
     {name: 'specification', title: 'Specification'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'description', title: 'Description', type: 'text', description: 'Supporting text below the heading (max 500 characters)', validation: (Rule) => Rule.max(500)}),
     defineField({
       name: 'services',
       title: 'Services',
       type: 'array',
       of: [defineArrayMember({type: 'serviceItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(20),
     }),
   ],
 })

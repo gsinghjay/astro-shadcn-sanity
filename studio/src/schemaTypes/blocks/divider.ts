@@ -20,6 +20,8 @@ export const divider = defineBlock({
       name: 'label',
       title: 'Label',
       type: 'string',
+      description: 'Optional text label displayed on the divider',
+      validation: (Rule) => Rule.max(100),
     }),
   ],
 })

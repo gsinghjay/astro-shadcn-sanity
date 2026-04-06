@@ -24,16 +24,19 @@ export const sponsorshipTiers = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'tiers',
       title: 'Tiers',
       type: 'array',
+      description: 'Sponsorship tier definitions with pricing and benefits',
       of: [
         defineArrayMember({
           type: 'object',

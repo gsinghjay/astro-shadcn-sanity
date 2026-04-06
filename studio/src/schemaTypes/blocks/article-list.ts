@@ -19,16 +19,19 @@ export const articleList = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'source',
       title: 'Source',
       type: 'string',
+      description: 'Content type to display (blog posts, news, etc.)',
       options: {
         list: [
           {title: 'All', value: 'all'},
@@ -51,6 +54,7 @@ export const articleList = defineBlock({
       title: 'CTA Buttons',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

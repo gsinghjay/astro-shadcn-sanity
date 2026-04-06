@@ -11,18 +11,20 @@ export const stepItem = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'list',
       title: 'Bullet Points',
       type: 'array',
       of: [defineArrayMember({type: 'string'})],
+      validation: (Rule) => Rule.max(10),
     }),
   ],
   preview: {
