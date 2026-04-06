@@ -58,7 +58,7 @@ export const ctaBanner = defineBlock({
       type: 'array',
       description: 'Call-to-action buttons (max 5)',
       of: [defineArrayMember({type: 'button'})],
-      validation: (Rule) => Rule.min(1).max(5).error('Add at least one button'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one button'), Rule.max(5)],
     }),
   ],
 })

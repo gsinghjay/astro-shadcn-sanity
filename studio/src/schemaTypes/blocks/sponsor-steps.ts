@@ -31,7 +31,7 @@ export const sponsorSteps = defineBlock({
       title: 'Steps',
       type: 'array',
       of: [defineArrayMember({type: 'stepItem'})],
-      validation: (Rule) => Rule.min(1).max(10).error('Add at least one step'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one step'), Rule.max(10)],
     }),
     defineField({
       name: 'ctaButtons',

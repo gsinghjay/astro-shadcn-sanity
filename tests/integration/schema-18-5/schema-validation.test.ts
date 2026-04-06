@@ -9,9 +9,6 @@
  */
 import {describe, test, expect} from 'vitest'
 
-// Block base imports
-import {blockBaseFields} from '../../../studio/src/schemaTypes/objects/block-base'
-
 // Block schema imports
 import {accordion} from '../../../studio/src/schemaTypes/blocks/accordion'
 import {announcementBar} from '../../../studio/src/schemaTypes/blocks/announcement-bar'
@@ -29,18 +26,23 @@ import {featureGrid} from '../../../studio/src/schemaTypes/blocks/feature-grid'
 import {heroBanner} from '../../../studio/src/schemaTypes/blocks/hero-banner'
 import {imageGallery} from '../../../studio/src/schemaTypes/blocks/image-gallery'
 import {linkCards} from '../../../studio/src/schemaTypes/blocks/link-cards'
+import {logoCloud} from '../../../studio/src/schemaTypes/blocks/logo-cloud'
 import {mapBlock} from '../../../studio/src/schemaTypes/blocks/map-block'
 import {metricsDashboard} from '../../../studio/src/schemaTypes/blocks/metrics-dashboard'
 import {newsletter} from '../../../studio/src/schemaTypes/blocks/newsletter'
 import {pricingTable} from '../../../studio/src/schemaTypes/blocks/pricing-table'
+import {productShowcase} from '../../../studio/src/schemaTypes/blocks/product-showcase'
+import {projectCards} from '../../../studio/src/schemaTypes/blocks/project-cards'
 import {pullquote} from '../../../studio/src/schemaTypes/blocks/pullquote'
 import {serviceCards} from '../../../studio/src/schemaTypes/blocks/service-cards'
+import {sponsorCards} from '../../../studio/src/schemaTypes/blocks/sponsor-cards'
 import {sponsorSteps} from '../../../studio/src/schemaTypes/blocks/sponsor-steps'
 import {sponsorshipTiers} from '../../../studio/src/schemaTypes/blocks/sponsorship-tiers'
 import {statsRow} from '../../../studio/src/schemaTypes/blocks/stats-row'
 import {tabsBlock} from '../../../studio/src/schemaTypes/blocks/tabs-block'
 import {teamGrid} from '../../../studio/src/schemaTypes/blocks/team-grid'
 import {testimonials} from '../../../studio/src/schemaTypes/blocks/testimonials'
+import {textWithImage} from '../../../studio/src/schemaTypes/blocks/text-with-image'
 import {timeline} from '../../../studio/src/schemaTypes/blocks/timeline'
 import {videoEmbed} from '../../../studio/src/schemaTypes/blocks/video-embed'
 
@@ -90,17 +92,22 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       {name: 'heroBanner', schema: heroBanner},
       {name: 'imageGallery', schema: imageGallery},
       {name: 'linkCards', schema: linkCards},
+      {name: 'logoCloud', schema: logoCloud},
       {name: 'mapBlock', schema: mapBlock},
       {name: 'metricsDashboard', schema: metricsDashboard},
       {name: 'newsletter', schema: newsletter},
       {name: 'pricingTable', schema: pricingTable},
+      {name: 'productShowcase', schema: productShowcase},
+      {name: 'projectCards', schema: projectCards},
       {name: 'serviceCards', schema: serviceCards},
+      {name: 'sponsorCards', schema: sponsorCards},
       {name: 'sponsorSteps', schema: sponsorSteps},
       {name: 'sponsorshipTiers', schema: sponsorshipTiers},
       {name: 'statsRow', schema: statsRow},
       {name: 'tabsBlock', schema: tabsBlock},
       {name: 'teamGrid', schema: teamGrid},
       {name: 'testimonials', schema: testimonials},
+      {name: 'textWithImage', schema: textWithImage},
       {name: 'timeline', schema: timeline},
       {name: 'videoEmbed', schema: videoEmbed},
     ]
@@ -383,14 +390,16 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       }
     })
 
-    test('map-block lat calls min(-90) and max(90)', () => {
+    test('map-block lat calls required(), min(-90) and max(90)', () => {
       const calls = getNestedCalls(mapBlock, 'coordinates', 'lat')
+      expect(calls.some((c) => c.method === 'required')).toBe(true)
       expect(calls.some((c) => c.method === 'min' && c.args[0] === -90)).toBe(true)
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 90)).toBe(true)
     })
 
-    test('map-block lng calls min(-180) and max(180)', () => {
+    test('map-block lng calls required(), min(-180) and max(180)', () => {
       const calls = getNestedCalls(mapBlock, 'coordinates', 'lng')
+      expect(calls.some((c) => c.method === 'required')).toBe(true)
       expect(calls.some((c) => c.method === 'min' && c.args[0] === -180)).toBe(true)
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 180)).toBe(true)
     })
@@ -412,22 +421,10 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(getCalls(tabsBlock, 'tabs').some((c) => c.method === 'max' && c.args[0] === 8)).toBe(true)
     })
 
-    test('event-list limit calls required(), min(1), max(50)', () => {
+    test('event-list limit calls min(1), max(50)', () => {
       const calls = getCalls(eventList, 'limit')
-      expect(calls.some((c) => c.method === 'required')).toBe(true)
       expect(calls.some((c) => c.method === 'min' && c.args[0] === 1)).toBe(true)
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 50)).toBe(true)
-    })
-
-    test('block-base fields have required() validation', () => {
-      for (const field of blockBaseFields as any[]) {
-        if (['backgroundVariant', 'spacing', 'maxWidth'].includes(field.name)) {
-          expect(field.validation).toBeDefined()
-          const rule = createMockRule()
-          field.validation(rule)
-          expect(rule._calls.some((c: any) => c.method === 'required')).toBe(true)
-        }
-      }
     })
   })
 

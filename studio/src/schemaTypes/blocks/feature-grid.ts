@@ -30,7 +30,7 @@ export const featureGrid = defineBlock({
       title: 'Items',
       type: 'array',
       of: [defineArrayMember({type: 'featureItem'})],
-      validation: (Rule) => Rule.min(1).max(20).error('Add at least one feature'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one feature'), Rule.max(20)],
     }),
     defineField({
       name: 'columns',

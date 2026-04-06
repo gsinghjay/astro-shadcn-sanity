@@ -33,7 +33,7 @@ export const eventList = defineBlock({
       title: 'Max Events to Display',
       type: 'number',
       initialValue: 10,
-      validation: (Rule) => Rule.required().min(1).max(50),
+      validation: (Rule) => Rule.min(1).max(50),
     }),
   ],
 })

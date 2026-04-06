@@ -21,7 +21,6 @@ export const blockBaseFields = [
       layout: 'radio',
     },
     initialValue: 'white',
-    validation: (Rule) => Rule.required(),
   }),
   defineField({
     name: 'spacing',
@@ -38,7 +37,6 @@ export const blockBaseFields = [
       layout: 'radio',
     },
     initialValue: 'default',
-    validation: (Rule) => Rule.required(),
   }),
   defineField({
     name: 'maxWidth',
@@ -54,6 +52,5 @@ export const blockBaseFields = [
       layout: 'radio',
     },
     initialValue: 'default',
-    validation: (Rule) => Rule.required(),
   }),
 ]

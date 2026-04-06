@@ -59,7 +59,7 @@ export const sponsorshipTiers = defineBlock({
               title: 'Benefits',
               type: 'array',
               of: [defineArrayMember({type: 'string'})],
-              validation: (Rule) => Rule.min(1).error('Add at least one benefit'),
+              validation: (Rule) => [Rule.min(1).error('Add at least one benefit'), Rule.max(15)],
             }),
             defineField({
               name: 'highlighted',

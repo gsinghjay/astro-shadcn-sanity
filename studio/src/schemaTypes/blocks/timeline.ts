@@ -34,8 +34,10 @@ export const timeline = defineBlock({
       title: 'Timeline Entries',
       type: 'array',
       of: [defineArrayMember({type: 'timelineEntry'})],
-      validation: (Rule) =>
-        Rule.required().min(1).max(20).error('Add at least one timeline entry'),
+      validation: (Rule) => [
+        Rule.required().min(1).error('Add at least one timeline entry'),
+        Rule.max(20),
+      ],
     }),
     defineField({
       name: 'links',

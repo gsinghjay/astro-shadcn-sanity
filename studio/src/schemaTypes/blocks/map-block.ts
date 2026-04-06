@@ -23,8 +23,8 @@ export const mapBlock = defineBlock({
       title: 'Coordinates',
       type: 'object',
       fields: [
-        defineField({name: 'lat', title: 'Latitude', type: 'number', description: 'Latitude (-90 to 90)', validation: (Rule) => Rule.min(-90).max(90)}),
-        defineField({name: 'lng', title: 'Longitude', type: 'number', description: 'Longitude (-180 to 180)', validation: (Rule) => Rule.min(-180).max(180)}),
+        defineField({name: 'lat', title: 'Latitude', type: 'number', description: 'Latitude (-90 to 90)', validation: (Rule) => Rule.required().min(-90).max(90)}),
+        defineField({name: 'lng', title: 'Longitude', type: 'number', description: 'Longitude (-180 to 180)', validation: (Rule) => Rule.required().min(-180).max(180)}),
       ],
     }),
     defineField({

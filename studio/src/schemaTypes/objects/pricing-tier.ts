@@ -50,24 +50,14 @@ export const pricingTier = defineType({
       name: 'ctaText',
       title: 'CTA Text',
       type: 'string',
-      description: 'Text for the call-to-action button (requires CTA URL)',
-      validation: (Rule) =>
-        Rule.max(100).custom((value, context) => {
-          const parent = context.parent as {ctaUrl?: string} | undefined
-          if (value && !parent?.ctaUrl) return 'CTA URL is required when CTA Text is set'
-          return true
-        }),
+      description: 'Text for the call-to-action button',
+      validation: (Rule) => Rule.max(100),
     }),
     defineField({
       name: 'ctaUrl',
       title: 'CTA URL',
       type: 'url',
-      validation: (Rule) =>
-        Rule.uri({allowRelative: true, scheme: ['http', 'https']}).custom((value, context) => {
-          const parent = context.parent as {ctaText?: string} | undefined
-          if (value && !parent?.ctaText) return 'CTA Text is required when CTA URL is set'
-          return true
-        }),
+      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
     }),
   ],
   preview: {
