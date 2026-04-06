@@ -1,6 +1,7 @@
 import {defineField} from 'sanity'
 import {PlayIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields, validateYouTubeUrl} from '../helpers/commonFields'
 import {YouTubePreview} from './YouTubePreview'
 
 export const videoEmbed = defineBlock({
@@ -9,7 +10,7 @@ export const videoEmbed = defineBlock({
   icon: PlayIcon,
   components: {preview: YouTubePreview},
   preview: {
-    select: {title: 'heading', subtitle: 'videoUrl'},
+    select: {title: 'heading', subtitle: 'youtubeUrl'},
   },
   variants: [
     {name: 'full-width', title: 'Full Width'},
@@ -17,35 +18,16 @@ export const videoEmbed = defineBlock({
     {name: 'split-asymmetric', title: 'Split Asymmetric'},
   ],
   fields: [
+    ...headerFields(),
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (Rule) => Rule.required().max(150),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      validation: (Rule) => Rule.max(500),
-    }),
-    defineField({
-      name: 'videoUrl',
-      title: 'Video URL',
+      name: 'youtubeUrl',
+      title: 'YouTube URL',
       type: 'url',
       description: 'YouTube video URL (e.g., https://www.youtube.com/watch?v=...)',
       validation: (Rule) =>
         Rule.required()
           .uri({scheme: ['https']})
-          .custom((url) => {
-            if (!url) return true
-            const isYouTube =
-              /youtube\.com\/watch\?v=/.test(url) ||
-              /youtu\.be\//.test(url) ||
-              /youtube\.com\/embed\//.test(url) ||
-              /youtube\.com\/shorts\//.test(url)
-            return isYouTube || 'Only YouTube URLs are supported'
-          }),
+          .custom(validateYouTubeUrl),
     }),
     defineField({
       name: 'posterImage',

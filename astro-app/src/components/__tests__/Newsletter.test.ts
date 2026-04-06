@@ -10,9 +10,9 @@ const baseProps = {
   maxWidth: 'default' as const,
   heading: 'Stay Connected',
   description: 'Get updates delivered to your inbox.',
-  placeholderText: 'you@company.com',
-  buttonText: 'Subscribe',
-  disclaimer: 'No spam ever.',
+  inputPlaceholder: 'you@company.com',
+  submitButtonLabel: 'Subscribe',
+  privacyDisclaimerText: 'No spam ever.',
 };
 
 describe('Newsletter', () => {

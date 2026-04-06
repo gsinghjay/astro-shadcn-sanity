@@ -15,8 +15,8 @@ export const eventList = defineBlock({
       validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
-      name: 'filterBy',
-      title: 'Filter By',
+      name: 'eventStatus',
+      title: 'Event Status',
       type: 'string',
       description: 'Filter events by status (upcoming, past, all)',
       options: {

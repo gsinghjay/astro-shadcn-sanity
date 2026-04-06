@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ThLargeIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const comparisonTable = defineBlock({
   name: 'comparisonTable',
@@ -13,35 +14,24 @@ export const comparisonTable = defineBlock({
   ],
   preview: {select: {title: 'heading'}},
   fields: [
+    ...headerFields(),
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (Rule) => Rule.required().max(150),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      validation: (Rule) => Rule.max(500),
-    }),
-    defineField({
-      name: 'columns',
-      title: 'Columns',
+      name: 'options',
+      title: 'Options',
       type: 'array',
-      description: 'Column headers for comparison features',
+      description: 'Column headers for comparison options',
       of: [defineArrayMember({type: 'comparisonColumn'})],
       validation: (Rule) =>
-        Rule.required().min(2).max(5).error('Add between 2 and 5 columns'),
+        Rule.required().min(2).max(5).error('Add between 2 and 5 options'),
     }),
     defineField({
-      name: 'rows',
-      title: 'Rows',
+      name: 'criteria',
+      title: 'Criteria',
       type: 'array',
-      description: 'Feature rows comparing the columns',
+      description: 'Criteria rows comparing the options',
       of: [defineArrayMember({type: 'comparisonRow'})],
       validation: (Rule) =>
-        Rule.required().min(1).error('Add at least one row'),
+        Rule.required().min(1).error('Add at least one criterion'),
     }),
     defineField({
       name: 'links',

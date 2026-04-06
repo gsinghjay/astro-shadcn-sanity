@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {PackageIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const productShowcase = defineBlock({
   name: 'productShowcase',
@@ -13,8 +14,7 @@ export const productShowcase = defineBlock({
     {name: 'detail', title: 'Detail'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
-    defineField({name: 'description', title: 'Description', type: 'text', validation: (Rule) => Rule.max(500)}),
+    ...headerFields(),
     defineField({
       name: 'products',
       title: 'Products',
