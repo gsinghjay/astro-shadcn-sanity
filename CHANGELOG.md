@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.14.1...v1.15.0) (2026-04-09)
+
+### Features
+
+* **ai-search:** add Cloudflare AI Search chat bubble widget ([21b9696](https://github.com/gsinghjay/astro-shadcn-sanity/commit/21b969673eaea967b2899e670017b9a8a5abda16))
+
 ## [1.14.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.14.0...v1.14.1) (2026-04-09)
 
 ### Bug Fixes
