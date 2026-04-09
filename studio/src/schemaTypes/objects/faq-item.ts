@@ -11,7 +11,7 @@ export const faqItem = defineType({
       name: 'question',
       title: 'Question',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(200),
     }),
     defineField({
       name: 'answer',

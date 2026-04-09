@@ -20,17 +20,20 @@ export const contactForm = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'successMessage',
       title: 'Success Message',
       type: 'string',
       description: 'Shown after successful form submission',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'form',
@@ -44,7 +47,7 @@ export const contactForm = defineBlock({
       name: 'backgroundImages',
       title: 'Background Images',
       type: 'array',
-      description: 'Image displayed alongside the form (used in split-image variant)',
+      description: 'Background images for the form section',
       of: [
         defineArrayMember({
           type: 'image',
@@ -58,6 +61,7 @@ export const contactForm = defineBlock({
           ],
         }),
       ],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

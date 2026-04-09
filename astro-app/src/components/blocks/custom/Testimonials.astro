@@ -16,7 +16,7 @@ import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props {
   heading?: string | null;
-  displayMode?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
+  testimonialSource?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
   testimonials?: Testimonial[];
   variant?: string;
   class?: string;
@@ -24,7 +24,7 @@ interface Props {
   [key: string]: unknown;
 }
 
-const { heading, displayMode, testimonials = [], variant, class: className, id } = Astro.props;
+const { heading, testimonialSource, testimonials = [], variant, class: className, id } = Astro.props;
 
 const reviewsJsonLd = testimonials.filter(t => t.name && t.quote).map(t => ({
   "@type": "Review",
@@ -49,7 +49,7 @@ const cleanVariant =
     : 'grid';
 
 // For byProject mode, group testimonials by project reference
-const isByProject = stegaClean(displayMode) === 'byProject';
+const isByProject = stegaClean(testimonialSource) === 'byProject';
 const grouped = new Map<string, { title: string; slug: string; testimonials: Testimonial[] }>();
 if (isByProject) {
   for (const t of testimonials) {

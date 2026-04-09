@@ -19,13 +19,14 @@ export const faqSection = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'items',
       title: 'Items',
       type: 'array',
       of: [defineArrayMember({type: 'faqItem'})],
-      validation: (Rule) => Rule.min(1).error('Add at least one FAQ'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one FAQ'), Rule.max(20)],
     }),
   ],
 })

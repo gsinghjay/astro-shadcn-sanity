@@ -12,6 +12,7 @@ export const featureItem = defineType({
       title: 'Icon',
       type: 'string',
       description: 'Icon name from icon set',
+      validation: (Rule) => Rule.max(50),
     }),
     defineField({
       name: 'image',
@@ -32,12 +33,13 @@ export const featureItem = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
   ],
   preview: {

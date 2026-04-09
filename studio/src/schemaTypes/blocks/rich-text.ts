@@ -16,6 +16,7 @@ export const richText = defineBlock({
       name: 'content',
       title: 'Content',
       type: 'portableText',
+      description: 'Rich text content using Portable Text',
     }),
   ],
 })
