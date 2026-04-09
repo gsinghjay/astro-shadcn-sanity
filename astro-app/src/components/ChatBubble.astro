@@ -1,0 +1,118 @@
+---
+import { stegaClean } from "@sanity/client/stega";
+
+interface Props {
+  apiUrl: string;
+  placeholder?: string;
+  theme?: string;
+  hideBranding?: boolean;
+  openByDefault?: boolean;
+}
+
+const { apiUrl, placeholder, theme, hideBranding, openByDefault } = Astro.props;
+
+const cleanApiUrl = stegaClean(apiUrl);
+const cleanPlaceholder = stegaClean(placeholder ?? "Ask a question...");
+const cleanTheme = stegaClean(theme ?? "auto");
+const siteId = import.meta.env.PUBLIC_SITE_ID || "default";
+---
+
+{cleanApiUrl && (
+  <div
+    data-chat-bubble-wrapper
+    data-api-url={cleanApiUrl}
+    data-placeholder={cleanPlaceholder}
+    data-theme={cleanTheme}
+    data-hide-branding={hideBranding ? "true" : "false"}
+    data-open-by-default={openByDefault ? "true" : "false"}
+    data-site-id={siteId}
+  >
+    <chat-bubble-snippet
+      api-url={cleanApiUrl}
+      placeholder={cleanPlaceholder}
+      theme={cleanTheme}
+      hide-branding={hideBranding ? "" : undefined}
+    ></chat-bubble-snippet>
+  </div>
+)}
+
+<script>
+  // Static import — Vite bundles this as a deferred module, no render blocking.
+  // Dynamic import() inside requestIdleCallback breaks bare specifier resolution.
+  import "@cloudflare/ai-search-snippet";
+
+  let chatBubbleInitialized = false;
+
+  function initChatBubble(): void {
+    const wrapper = document.querySelector<HTMLElement>("[data-chat-bubble-wrapper]");
+    if (!wrapper) return;
+
+    // Guard against duplicate initialization on SPA-style navigations
+    if (chatBubbleInitialized) return;
+    chatBubbleInitialized = true;
+
+    const openByDefault = wrapper.dataset.openByDefault === "true";
+    const siteId = wrapper.dataset.siteId || "default";
+
+    if (openByDefault) {
+      handleAutoOpen(siteId);
+    }
+  }
+
+  function handleAutoOpen(siteId: string): void {
+    const STORAGE_KEY = `chatBubbleSeen-${siteId}`;
+
+    try {
+      if (localStorage.getItem(STORAGE_KEY)) return;
+    } catch {
+      // localStorage unavailable — skip auto-open
+      return;
+    }
+
+    // First visit: auto-open after 1.5s delay
+    setTimeout(() => {
+      const bubble = document.querySelector("chat-bubble-snippet");
+      if (!bubble) return;
+
+      tryOpenBubble(bubble, () => {
+        try {
+          localStorage.setItem(STORAGE_KEY, "true");
+        } catch {
+          // Storage unavailable — auto-open still works for this session
+        }
+      });
+    }, 1500);
+  }
+
+  function tryOpenBubble(bubble: Element, onOpen: () => void): void {
+    const shadowRoot = bubble.shadowRoot;
+    if (shadowRoot) {
+      const trigger = shadowRoot.querySelector("button");
+      if (trigger) {
+        trigger.click();
+        onOpen();
+        return;
+      }
+    }
+
+    // Shadow DOM may not be ready yet — observe for changes and retry once
+    const observer = new MutationObserver(() => {
+      const sr = bubble.shadowRoot;
+      if (sr) {
+        const trigger = sr.querySelector("button");
+        if (trigger) {
+          observer.disconnect();
+          trigger.click();
+          onOpen();
+        }
+      }
+    });
+
+    observer.observe(bubble, { childList: true, subtree: true });
+
+    // Safety timeout: stop observing after 5s to avoid leaks
+    setTimeout(() => observer.disconnect(), 5000);
+  }
+
+  document.addEventListener("astro:page-load", initChatBubble);
+</script>

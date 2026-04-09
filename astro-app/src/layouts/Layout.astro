@@ -3,6 +3,7 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import CookieConsent from "../components/CookieConsent.astro";
+import ChatBubble from "../components/ChatBubble.astro";
 import VisualEditingMPA from "../components/VisualEditingMPA";
 import SanityLiveUpdater from "../components/SanityLiveUpdater.astro";
 import { getSiteSettings, getSyncTags } from "../lib/sanity";
@@ -66,6 +67,26 @@ const liveContentEnabled =
 
 const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
 
+// Extract AI Search worker origin for CSP connect-src (scoped, not wildcard)
+const aiSearchApiUrl = siteSettings?.aiSearch?.enabled
+  ? stegaClean(siteSettings.aiSearch.apiUrl ?? "")
+  : "";
+const aiSearchWorkerOrigin = aiSearchApiUrl
+  ? new URL(aiSearchApiUrl).origin
+  : "";
+
+const cspConnectSrc = [
+  "'self'",
+  "https://www.google-analytics.com",
+  "https://www.googletagmanager.com",
+  "https://*.sanity.io",
+  "wss://*.sanity.io",
+  "https://cloudflareinsights.com",
+  ...(aiSearchWorkerOrigin ? [aiSearchWorkerOrigin] : []),
+].join(" ");
+
+const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com";
+
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
@@ -98,7 +119,7 @@ const orgJsonLd = {
     {seo?.noIndex && <meta name="robots" content="noindex" />}
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com https://*.sanity.io wss://*.sanity.io https://cloudflareinsights.com; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com"
+      content={cspContent}
     />
     <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     {preloadImage && !preloadImageSrcset && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
@@ -133,5 +154,14 @@ const orgJsonLd = {
     {visualEditingEnabled && <VisualEditingMPA client:only="react" />}
     {(liveContentEnabled || visualEditingEnabled) && <SanityLiveUpdater />}
     <CookieConsent gtmId={gtmId} />
+    {siteSettings?.aiSearch?.enabled && siteSettings.aiSearch.apiUrl && (
+      <ChatBubble
+        apiUrl={siteSettings.aiSearch.apiUrl}
+        placeholder={siteSettings.aiSearch.placeholder}
+        theme={siteSettings.aiSearch.theme}
+        hideBranding={siteSettings.aiSearch.hideBranding}
+        openByDefault={siteSettings.aiSearch.openByDefault}
+      />
+    )}
   </body>
 </html>

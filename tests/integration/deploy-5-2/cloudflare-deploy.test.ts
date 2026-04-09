@@ -153,31 +153,18 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
     })
 
     test('[P0] 5.8-INT-008 — CSP allows googletagmanager in img-src (noscript pixel)', () => {
-      const cspMatch = layoutContent.match(/content="([^"]*Content-Security-Policy[^"]*)"/)
-        || layoutContent.match(/content="(default-src[^"]*)"/)
-      expect(cspMatch).not.toBeNull()
-      const csp = cspMatch![1]
-      const imgSrc = csp.match(/img-src\s+([^;]+)/)
-      expect(imgSrc).not.toBeNull()
-      expect(imgSrc![1]).toContain('https://www.googletagmanager.com')
+      // img-src directive appears in CSP string with googletagmanager domain
+      expect(layoutContent).toMatch(/img-src[^;]*https:\/\/www\.googletagmanager\.com/)
     })
 
     test('[P0] 5.8-INT-009a — CSP allows googletagmanager in connect-src (GTM container fetch)', () => {
-      const cspMatch = layoutContent.match(/content="(default-src[^"]*)"/)
-      expect(cspMatch).not.toBeNull()
-      const csp = cspMatch![1]
-      const connectSrc = csp.match(/connect-src\s+([^;]+)/)
-      expect(connectSrc).not.toBeNull()
-      expect(connectSrc![1]).toContain('https://www.googletagmanager.com')
+      // connect-src is built dynamically via cspConnectSrc array; verify GTM is included
+      expect(layoutContent).toMatch(/cspConnectSrc[\s\S]*?googletagmanager\.com/)
     })
 
     test('[P0] 5.8-INT-009 — CSP allows googletagmanager in frame-src (noscript iframe)', () => {
-      const cspMatch = layoutContent.match(/content="(default-src[^"]*)"/)
-      expect(cspMatch).not.toBeNull()
-      const csp = cspMatch![1]
-      const frameSrc = csp.match(/frame-src\s+([^;]+)/)
-      expect(frameSrc).not.toBeNull()
-      expect(frameSrc![1]).toContain('https://www.googletagmanager.com')
+      // frame-src directive appears in CSP string with googletagmanager domain
+      expect(layoutContent).toMatch(/frame-src[^;]*https:\/\/www\.googletagmanager\.com/)
     })
 
     test('[P0] 5.2-INT-019 — CSP allows cdn.sanity.io in img-src', () => {
