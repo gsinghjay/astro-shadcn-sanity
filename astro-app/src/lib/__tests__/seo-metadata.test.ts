@@ -53,6 +53,16 @@ describe('SEO Metadata & Sitemap — Configuration', () => {
       expect(content).toContain('Allow: /');
     });
 
+    it('contains Cloudflare-AI-Search user-agent block', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toContain('User-agent: Cloudflare-AI-Search');
+    });
+
+    it('normalizes trailing slash on SITE url before building Sitemap directive', () => {
+      const content = readFileSync(endpointPath, 'utf-8');
+      expect(content).toMatch(/replace\(\/\\\/\$\/, ['"]['"]?\)/);
+    });
+
     it('disallows /portal/ routes', () => {
       const content = readFileSync(endpointPath, 'utf-8');
       expect(content).toContain('Disallow: /portal/');
