@@ -73,4 +73,26 @@ describe('Pullquote', () => {
     expect(html).toBeDefined();
     expect(html).toContain('Less is more');
   });
+
+  test('brutalist variant renders 8px left border and large text', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Pullquote, {
+      props: { ...pullquoteFull, variant: 'brutalist' },
+    });
+
+    expect(html).toContain('border-l-[8px]');
+    expect(html).toContain('text-4xl');
+    expect(html).toContain('font-mono');
+    expect(html).toContain('Design is not just what it looks like');
+  });
+
+  test('brutalist variant does not render decorative quotation mark', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Pullquote, {
+      props: { ...pullquoteFull, variant: 'brutalist' },
+    });
+
+    expect(html).not.toContain('text-8xl');
+    expect(html).not.toContain('font-serif');
+  });
 });

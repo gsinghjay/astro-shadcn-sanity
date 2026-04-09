@@ -13,7 +13,7 @@ export const embedBlock = defineBlock({
     {name: 'full-width', title: 'Full Width'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
     defineField({
       name: 'embedUrl',
       title: 'Embed URL',
@@ -34,6 +34,6 @@ export const embedBlock = defineBlock({
         ],
       },
     }),
-    defineField({name: 'caption', title: 'Caption', type: 'string'}),
+    defineField({name: 'caption', title: 'Caption', type: 'string', description: 'Caption displayed below the embed', validation: (Rule) => Rule.max(200)}),
   ],
 })

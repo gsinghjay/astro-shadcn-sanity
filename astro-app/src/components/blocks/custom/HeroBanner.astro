@@ -19,7 +19,7 @@ const firstImage = backgroundImages?.[0];
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
 const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
-const isDarkHero = ['dark', 'hatched'].includes(bgVariant);
+const isDarkHero = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
 
 function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
@@ -405,5 +405,44 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
       )}
     </SectionSpread>
     <div class="absolute bottom-0 left-0 right-0 h-px bg-primary z-10"></div>
+  </Section>
+)}
+
+{/* BRUTALIST variant — asymmetric left-aligned layout, oversized heading, monospace subheading, thick bottom border */}
+{variant === 'brutalist' && (
+  <Section size="lg" class={cn(heroBg, className)} id={id} data-animate>
+    <SectionSplit class="@5xl:grid-cols-[3fr_2fr]">
+      <SectionContent>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold leading-[0.9] tracking-[-0.04em] whitespace-pre-line">
+          {heading}
+        </h1>
+
+        {subheading && (
+          <p class="font-mono label-caps tracking-[0.15em] max-w-xl">
+            {subheading}
+          </p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i > 0 ? (isDarkHero ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : '') : ''}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+
+      <div class="hidden @5xl:block" />
+    </SectionSplit>
+    <div class="absolute bottom-0 left-0 right-0 h-1 bg-primary z-10"></div>
   </Section>
 )}

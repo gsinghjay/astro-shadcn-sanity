@@ -11,7 +11,7 @@ export const tabItem = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(100),
     }),
     defineField({
       name: 'content',

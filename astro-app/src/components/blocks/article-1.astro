@@ -40,7 +40,7 @@ const { class: className, id, title, description, image, item } = Astro.props
 <Section class={className} id={id} style={{ "--container": "672px" }}>
   <SectionContent>
     <SectionProse>
-      {title && <h1>{title}</h1>}
+      {title && <h2>{title}</h2>}
       {description && <p>{description}</p>}
     </SectionProse>
     <Item class="p-0">

@@ -4,6 +4,7 @@ import sanity from "@sanity/astro";
 import tailwindcss from "@tailwindcss/vite";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
+import sitemap from "@astrojs/sitemap";
 
 const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
@@ -58,5 +59,11 @@ export default defineConfig({
       },
     }),
     react(),
+    sitemap({
+      filter: (page) =>
+        !page.includes('/portal/') &&
+        !page.includes('/auth/') &&
+        !page.includes('/student/'),
+    }),
   ],
 });

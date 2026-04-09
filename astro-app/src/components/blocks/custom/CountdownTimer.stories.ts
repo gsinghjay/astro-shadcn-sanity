@@ -15,7 +15,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['inline', 'hero', 'banner'],
+      options: ['inline', 'hero', 'banner', 'brutalist'],
       description: 'Display variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -71,5 +71,18 @@ export const Banner = {
     heading: 'Sale ends in:',
     targetDate: '2026-05-01T23:59:59Z',
     backgroundVariant: 'primary',
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'countdownTimer',
+    _key: 'story-countdown-brutalist',
+    variant: 'brutalist',
+    heading: 'Spring 2026 Capstone Showcase',
+    description: 'Mark your calendar.',
+    targetDate: '2026-05-07T14:00:00.000Z',
+    completedMessage: 'The showcase has concluded. View recordings.',
+    backgroundVariant: 'dark',
   },
 }

@@ -1,10 +1,14 @@
 ---
 import type { Project } from '@/lib/sanity';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { Badge } from '@/components/ui/badge';
 import ProjectCard from '@/components/ProjectCard.astro';
+import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props {
   heading?: string | null;
+  variant?: 'default' | 'case-study' | 'blueprint' | null;
   displayMode?: 'all' | 'featured' | 'manual' | null;
   projects?: Project[];
   class?: string;
@@ -12,19 +16,144 @@ interface Props {
   [key: string]: unknown;
 }
 
-const { heading, projects } = Astro.props;
+const { heading, variant: rawVariant, projects, class: className, id } = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'case-study' || rawCleaned === 'blueprint' ? rawCleaned : 'default';
+
+const statusStyles: Record<string, string> = {
+  active: 'bg-green-100 text-green-800 border-green-300',
+  completed: 'bg-blue-100 text-blue-800 border-blue-300',
+  archived: 'bg-muted text-muted-foreground border-border',
+};
 ---
 
-<Section data-animate>
-  {heading && (
-    <SectionContent>
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
-    </SectionContent>
-  )}
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
 
-  <SectionGrid size="lg">
-    {(projects ?? []).map((project) => (
-      <ProjectCard project={project} />
-    ))}
-  </SectionGrid>
-</Section>
+    <SectionGrid size="lg">
+      {(projects ?? []).map((project) => (
+        <ProjectCard project={project} />
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'case-study' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full flex flex-col gap-6">
+      {(projects ?? []).map((project) => {
+        const status = stegaClean(project.status) || 'active';
+        const techs = project.technologyTags ?? [];
+        const slug = stegaClean(project.slug);
+        return (
+          <div class="border-2 border-border hover:border-primary transition-colors flex flex-col @3xl:flex-row">
+            <div class="@3xl:w-2/5 bg-muted flex-shrink-0">
+              {safeUrlFor(project.sponsor?.logo) ? (
+                <div class="aspect-video @3xl:aspect-auto @3xl:h-full flex items-center justify-center p-8 bg-muted">
+                  <img
+                    src={safeUrlFor(project.sponsor!.logo)!.width(200).height(200).url()}
+                    alt={project.sponsor?.logo?.alt || `${project.sponsor?.name} logo`}
+                    class="max-h-24 object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              ) : (
+                <div class="aspect-video @3xl:aspect-auto @3xl:h-full flex items-center justify-center bg-muted">
+                  <span class="text-4xl font-bold text-muted-foreground/20">
+                    {(project.title || '').slice(0, 2).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div class="flex-1 p-6 flex flex-col gap-3">
+              <div class="flex items-start justify-between gap-3">
+                <a href={`/projects/${slug}`} class="no-underline text-inherit">
+                  <h3 class="text-xl font-bold">{project.title}</h3>
+                </a>
+                {status && (
+                  <Badge class={statusStyles[status] || statusStyles.active}>{status}</Badge>
+                )}
+              </div>
+
+              {project.sponsor?.name && (
+                <p class="text-sm text-muted-foreground">Sponsor: <span class="font-medium text-foreground">{project.sponsor.name}</span></p>
+              )}
+
+              {project.outcome && (
+                <p class="text-sm text-muted-foreground">{project.outcome}</p>
+              )}
+
+              {techs.length > 0 && (
+                <div class="flex flex-wrap gap-1.5 mt-auto pt-2">
+                  {techs.map((tag) => (
+                    <span class="label-caps px-2 py-0.5 border border-border text-xs">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'blueprint' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="font-mono text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionGrid size="lg">
+      {(projects ?? []).map((project) => {
+        const status = stegaClean(project.status) || 'active';
+        const techs = project.technologyTags ?? [];
+        const slug = stegaClean(project.slug);
+        return (
+          <div class="border border-background/30 bg-background/5 p-6 flex flex-col gap-3 relative overflow-hidden">
+            <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+            <div class="relative flex items-start justify-between gap-3">
+              <a href={`/projects/${slug}`} class="no-underline text-inherit">
+                <h3 class="font-mono text-lg font-bold">{project.title}</h3>
+              </a>
+              {status && (
+                <Badge class={statusStyles[status] || statusStyles.active}>{status}</Badge>
+              )}
+            </div>
+
+            {project.sponsor?.name && (
+              <p class="relative text-sm opacity-70">{project.sponsor.name}</p>
+            )}
+
+            {project.outcome && (
+              <p class="relative text-sm opacity-60">{project.outcome}</p>
+            )}
+
+            {techs.length > 0 && (
+              <div class="relative flex flex-wrap gap-1.5 mt-auto pt-2">
+                {techs.map((tag) => (
+                  <span class="label-caps px-2 py-0.5 border border-current/30 text-xs font-mono">{tag}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </SectionGrid>
+  </Section>
+)}

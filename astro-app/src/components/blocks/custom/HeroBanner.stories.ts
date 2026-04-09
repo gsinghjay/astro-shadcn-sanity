@@ -46,14 +46,14 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['centered', 'overlay', 'split', 'split-asymmetric', 'spread', 'split-bleed'],
+      options: ['centered', 'overlay', 'split', 'split-asymmetric', 'spread', 'split-bleed', 'brutalist'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Main headline' },
     subheading: { control: 'text', description: 'Supporting text below headline' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light', 'blueprint', 'mono', 'stripe'],
       description: 'Background color theme',
     },
     spacing: {
@@ -181,11 +181,40 @@ export const HatchedLight = {
   },
 }
 
+export const Blueprint = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-blueprint',
+    variant: 'centered',
+    heading: 'Blueprint Engineering',
+    subheading: 'Navy grid pattern evoking technical drafting and precision design',
+    alignment: 'center',
+    backgroundVariant: 'blueprint',
+    ctaButtons: sharedButtons,
+  },
+}
+
 export const Minimal = {
   args: {
     _type: 'heroBanner',
     _key: 'story-hero-3',
     heading: 'Amet Consectetur',
     alignment: 'full',
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'heroBanner',
+    _key: 'story-hero-brutalist',
+    variant: 'brutalist',
+    heading: 'Engineering\nthe Future',
+    subheading: 'NJIT YING WU COLLEGE OF COMPUTING — CAPSTONE PROGRAM',
+    alignment: 'left',
+    backgroundVariant: 'hatched',
+    ctaButtons: [
+      { _key: 'btn-1', text: 'Become a Sponsor', url: '/sponsors' },
+      { _key: 'btn-2', text: 'View Projects', url: '/projects', variant: 'outline' },
+    ],
   },
 }
