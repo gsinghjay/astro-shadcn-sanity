@@ -96,4 +96,47 @@ describe('FaqSection', () => {
 
     expect(html).toContain('sticky top-24');
   });
+
+  test('technical variant renders thick left-border on heading', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'technical' },
+    });
+
+    expect(html).toContain('border-l-4');
+    expect(html).toContain('border-primary');
+    expect(html).toContain('pl-6');
+  });
+
+  test('technical variant renders monospace numbered questions', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'technical' },
+    });
+
+    expect(html).toContain('font-mono');
+    expect(html).toContain('01');
+    expect(html).toContain('02');
+  });
+
+  test('technical variant renders red border on open and vertical rule', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'technical' },
+    });
+
+    expect(html).toContain('open:border-primary');
+    expect(html).toContain('border-l');
+  });
+
+  test('technical variant does not use Accordion UI component', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FaqSection, {
+      props: { ...faqFull, variant: 'technical' },
+    });
+
+    // Uses native details/summary instead of Accordion component
+    expect(html).not.toContain('sticky top-24');
+    expect(html).not.toContain('--section-width: 672px;');
+  });
 });

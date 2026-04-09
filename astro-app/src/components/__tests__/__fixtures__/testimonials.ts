@@ -83,7 +83,7 @@ export const testimonialsFull = {
   spacing: 'default' as const,
   maxWidth: 'default' as const,
   heading: 'What People Say',
-  displayMode: 'all' as const,
+  testimonialSource: 'all' as const,
   testimonials: testimonialsData,
 };
 
@@ -94,7 +94,7 @@ export const testimonialsMinimal = {
   spacing: null,
   maxWidth: null,
   heading: null,
-  displayMode: null,
+  testimonialSource: null,
   testimonials: undefined as Testimonial[] | undefined,
 };
 
@@ -105,6 +105,6 @@ export const testimonialsByProject = {
   spacing: 'default' as const,
   maxWidth: 'default' as const,
   heading: 'Impact Case Studies',
-  displayMode: 'byProject' as const,
+  testimonialSource: 'byProject' as const,
   testimonials: testimonialsData.filter(t => t.project != null),
 };

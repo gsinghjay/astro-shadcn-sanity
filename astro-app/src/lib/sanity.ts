@@ -227,7 +227,7 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
 }`);
 
@@ -331,7 +331,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   team[]{ _key, name, role },
   mentor{ name, title, department },
   outcome,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
@@ -372,13 +372,13 @@ export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESUL
 
 /**
  * Resolve testimonials for a testimonials block from the pre-fetched cache.
- * Filters based on displayMode config (all/industry/student/byProject/manual).
+ * Filters based on testimonialSource config (all/industry/student/byProject/manual).
  */
 export function resolveBlockTestimonials(
-  block: { _type: string; displayMode?: string | null; testimonials?: Array<{ _id: string }> | null },
+  block: { _type: string; testimonialSource?: string | null; testimonials?: Array<{ _id: string }> | null },
   allTestimonials: Testimonial[],
 ): Testimonial[] {
-  const mode = stegaClean(block.displayMode) ?? 'all';
+  const mode = stegaClean(block.testimonialSource) ?? 'all';
   if (mode === 'all') return allTestimonials;
   if (mode === 'industry') return allTestimonials.filter(t => stegaClean(t.type) === 'industry');
   if (mode === 'student') return allTestimonials.filter(t => stegaClean(t.type) === 'student');
@@ -413,14 +413,14 @@ export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
 
 /**
  * Resolve events for an eventList block from the pre-fetched cache.
- * Filters based on filterBy config (all/upcoming/past) and applies limit.
+ * Filters based on eventStatus config (all/upcoming/past) and applies limit.
  * Status field takes priority; date comparison is fallback when status is unset.
  */
 export function resolveBlockEvents(
-  block: { _type: string; filterBy?: string | null; limit?: number | null },
+  block: { _type: string; eventStatus?: string | null; limit?: number | null },
   allEvents: SanityEvent[],
 ): SanityEvent[] {
-  const filter = stegaClean(block.filterBy) ?? 'upcoming';
+  const filter = stegaClean(block.eventStatus) ?? 'upcoming';
   const limit = block.limit ?? 10;
   const now = new Date().toISOString();
 
@@ -465,7 +465,7 @@ export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defi
 export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   date, endDate, location, description, eventType, status, isAllDay, category,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } }
 }`);
 
 /**
@@ -556,6 +556,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   seo {
     metaTitle,
     metaDescription,
+    noIndex,
     ogImage { ${IMAGE_PROJECTION}, alt }
   },
   blocks[]{
@@ -615,7 +616,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       successMessage,
-      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }
+      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
     },
     _type == "sponsorCards" => {
       heading,
@@ -629,12 +631,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "testimonials" => {
       heading,
-      displayMode,
+      testimonialSource,
       testimonials[]->{ _id }
     },
     _type == "eventList" => {
       heading,
-      filterBy,
+      eventStatus,
       limit
     },
     _type == "teamGrid" => {
@@ -651,15 +653,15 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "articleList" => {
       heading,
       description,
-      source,
+      contentType,
       limit,
-      links[]{ _key, text, url, variant }
+      ctaButtons[]{ _key, text, url, variant }
     },
     _type == "comparisonTable" => {
       heading,
       description,
-      columns[]{ _key, title, highlighted },
-      rows[]{ _key, feature, values, isHeader },
+      options[]{ _key, title, highlighted },
+      criteria[]{ _key, feature, values, isHeader },
       links[]{ _key, text, url, variant }
     },
     _type == "timeline" => {
@@ -689,9 +691,10 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
     },
     _type == "videoEmbed" => {
-      videoUrl,
-      title,
-      caption
+      heading,
+      description,
+      youtubeUrl,
+      posterImage{ ${IMAGE_PROJECTION}, alt }
     },
     _type == "pricingTable" => {
       heading,
@@ -701,12 +704,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "serviceCards" => {
       heading,
       description,
-      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href } }
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
     },
     _type == "productShowcase" => {
       heading,
       description,
-      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, price, badge, link{ label, href } }
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
     },
     _type == "linkCards" => {
       heading,
@@ -716,9 +719,9 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "newsletter" => {
       heading,
       description,
-      placeholderText,
-      buttonText,
-      disclaimer
+      inputPlaceholder,
+      submitButtonLabel,
+      privacyDisclaimerText
     },
     _type == "accordion" => {
       heading,
@@ -757,12 +760,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "cardGrid" => {
       heading,
       description,
-      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt }, link{ label, href }, badge }
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
     },
     _type == "beforeAfter" => {
       heading,
-      beforeImage{ ${IMAGE_PROJECTION}, alt },
-      afterImage{ ${IMAGE_PROJECTION}, alt },
+      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
       beforeLabel,
       afterLabel,
       caption

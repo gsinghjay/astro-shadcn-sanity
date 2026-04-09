@@ -54,7 +54,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['grid', 'list', 'alternating', 'icon-grid'],
+      options: ['grid', 'list', 'alternating', 'icon-grid', 'specification'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -118,5 +118,24 @@ export const IconGrid = {
     heading: 'Capabilities',
     description: 'Everything you need under one roof.',
     services: sharedServices,
+  },
+}
+
+export const Specification = {
+  args: {
+    _type: 'serviceCards',
+    _key: 'story-services-spec',
+    variant: 'specification',
+    heading: 'Capabilities',
+    description: 'What our capstone teams deliver.',
+    backgroundVariant: 'hatched-light',
+    services: [
+      { _key: 'spec1', title: 'Full-Stack Development', description: 'React, Next.js, Astro, Node.js — modern frameworks, production deployments.', icon: '⚡' },
+      { _key: 'spec2', title: 'Machine Learning', description: 'Predictive models, NLP pipelines, computer vision — from prototype to production.', icon: '🧠' },
+      { _key: 'spec3', title: 'Cloud Architecture', description: 'AWS, Azure, GCP — scalable infrastructure with CI/CD and monitoring.', icon: '☁️' },
+      { _key: 'spec4', title: 'Cybersecurity', description: 'Zero trust, microsegmentation, blockchain DNS — enterprise security solutions.', icon: '🔒' },
+      { _key: 'spec5', title: 'Data Engineering', description: 'ETL pipelines, real-time analytics, data lake architecture.', icon: '📊' },
+      { _key: 'spec6', title: 'Mobile & IoT', description: '5G-enabled applications, cross-platform mobile, embedded systems.', icon: '📱' },
+    ],
   },
 }

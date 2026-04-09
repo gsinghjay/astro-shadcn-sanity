@@ -25,6 +25,7 @@ export const galleryImage = defineType({
       name: 'caption',
       title: 'Caption',
       type: 'string',
+      validation: (Rule) => Rule.max(200),
     }),
   ],
   preview: {

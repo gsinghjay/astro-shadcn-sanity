@@ -43,7 +43,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'bordered', 'separated'],
+      options: ['default', 'bordered', 'separated', 'technical'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -96,5 +96,23 @@ export const Separated = {
     heading: 'Help Center',
     description: 'Click a topic to expand.',
     items: sharedItems,
+  },
+}
+
+export const Technical = {
+  args: {
+    _type: 'accordion',
+    _key: 'story-accordion-technical',
+    variant: 'technical',
+    heading: 'Technical Specifications',
+    description: 'Detailed program and project requirements.',
+    backgroundVariant: 'hatched-light',
+    items: [
+      { _key: 'at1', title: 'Technology Stack Requirements', content: 'Teams must use production-grade frameworks: React/Next.js, Astro, or SvelteKit for frontend. Node.js, Python, or Go for backend. AWS, Azure, or GCP for cloud infrastructure. All code must pass CI/CD pipeline checks.' },
+      { _key: 'at2', title: 'Deliverable Standards', content: 'All projects must include: documented API endpoints, unit test coverage above 80%, deployment runbook, architecture decision records (ADRs), and a 15-minute technical demo.' },
+      { _key: 'at3', title: 'Timeline & Milestones', content: 'Week 1–2: Requirements and architecture. Week 3–8: Sprint cycles with bi-weekly demos. Week 9–10: Integration testing and documentation. Week 11–12: Final showcase preparation.' },
+      { _key: 'at4', title: 'Team Composition', content: '4–6 students per team, cross-functional: at least one frontend specialist, one backend specialist, one DevOps/infrastructure lead, and one QA/testing lead.' },
+      { _key: 'at5', title: 'Evaluation Criteria', content: 'Code quality (30%), functionality completeness (25%), documentation (20%), presentation (15%), sponsor satisfaction (10%).' },
+    ],
   },
 }
