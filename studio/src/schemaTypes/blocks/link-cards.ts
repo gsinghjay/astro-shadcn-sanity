@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const linkCards = defineBlock({
   name: 'linkCards',
@@ -13,14 +14,13 @@ export const linkCards = defineBlock({
     {name: 'icon-list', title: 'Icon List'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text'}),
+    ...headerFields(),
     defineField({
       name: 'links',
       title: 'Links',
       type: 'array',
       of: [defineArrayMember({type: 'linkCardItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(20),
     }),
   ],
 })

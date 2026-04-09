@@ -1,9 +1,12 @@
 ---
 import type { StatsRowBlock } from '@/lib/types';
 import { Section, SectionSplit, SectionGrid, SectionSpread, SectionContent } from '@/components/ui/section';
+import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import { stegaClean } from '@sanity/client/stega';
 import { Tile, TileContent, TileDescription, TileTitle } from '@/components/ui/tile';
 import { bgClasses } from '@/lib/utils';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericValue, extractUnitText } from '@/lib/structured-data';
 
 interface Props extends StatsRowBlock {
   class?: string;
@@ -11,14 +14,28 @@ interface Props extends StatsRowBlock {
 }
 
 const { heading, stats, backgroundVariant, variant } = Astro.props;
+
+const statsJsonLd = (stats ?? []).filter(s => s.value && s.label).map(stat => {
+  const cleanValue = stegaClean(stat.value) || '';
+  const unit = extractUnitText(cleanValue);
+  return {
+    "@type": "QuantitativeValue",
+    "name": stegaClean(stat.label),
+    "value": extractNumericValue(cleanValue),
+    ...(unit && { "unitText": unit }),
+    ...(stat.description && { "description": stegaClean(stat.description) }),
+  };
+});
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
-const isDark = ['dark', 'hatched'].includes(bgVariant);
+const isDark = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 const sectionBg = bgClasses[bgVariant] ?? '';
 const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 
 const rawVariant = stegaClean(variant);
-const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'grid';
+const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' || rawVariant === 'brutalist' || rawVariant === 'ticker' ? rawVariant : 'grid';
 ---
+
+{statsJsonLd.length > 0 && statsJsonLd.map(s => <JsonLd schema={s} />)}
 
 {cleanVariant === 'grid' && (
   <Section
@@ -83,5 +100,52 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
         </Tile>
       ))}
     </SectionSpread>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section
+    size="sm"
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass}`}
+    data-animate
+  >
+    {heading && (
+      <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
+    )}
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+      {(stats ?? []).map((stat) => (
+        <div class="border-t-4 border-primary pt-4">
+          <div class="font-mono tabular-nums text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
+            {stat.value}
+          </div>
+          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+            {stat.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'ticker' && stats && stats.length > 0 && (
+  <Section
+    size="sm"
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass} overflow-hidden`}
+    data-animate
+  >
+    <Marquee>
+      <MarqueeContent pauseOnHover>
+        {stats.map((stat) => (
+          <div class="flex items-baseline gap-3 px-8 md:px-12 shrink-0">
+            <span class="font-mono tabular-nums text-4xl md:text-5xl font-bold tracking-[-0.04em] leading-none">
+              {stat.value}
+            </span>
+            <span class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+              {stat.label}
+            </span>
+          </div>
+        ))}
+      </MarqueeContent>
+    </Marquee>
   </Section>
 )}

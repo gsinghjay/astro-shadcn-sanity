@@ -7,11 +7,19 @@ export const logoCloud = defineBlock({
   title: 'Logo Cloud',
   icon: ImagesIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid'},
+    {name: 'marquee', title: 'Marquee'},
+    {name: 'flex-wrap', title: 'Flex Wrap'},
+    {name: 'tiered', title: 'Tiered'},
+    {name: 'grid-prominent', title: 'Grid Prominent'},
+  ],
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'autoPopulate',

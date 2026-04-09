@@ -77,13 +77,15 @@ describe('HeroBanner', () => {
       expect(html).toContain('background-size: cover');
     });
 
-    test('subsequent slides have loading="lazy"', async () => {
+    test('all carousel slides use loading="eager" to prevent ERR_ABORTED', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(HeroBanner, {
         props: heroFull,
       });
 
-      expect(html).toContain('loading="lazy"');
+      expect(html).not.toContain('loading="lazy"');
+      const eagerMatches = html.match(/loading="eager"/g);
+      expect(eagerMatches?.length).toBeGreaterThanOrEqual(2);
     });
 
     test('renders solid card (no glass-morphism)', async () => {

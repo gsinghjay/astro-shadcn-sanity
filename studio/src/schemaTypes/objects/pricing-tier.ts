@@ -1,4 +1,4 @@
-import {defineType, defineField} from 'sanity'
+import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon} from '@sanity/icons'
 
 export const pricingTier = defineType({
@@ -11,31 +11,34 @@ export const pricingTier = defineType({
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(100),
     }),
     defineField({
       name: 'price',
       title: 'Price',
       type: 'string',
       description: 'Display price, e.g. "$29", "Free"',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(50),
     }),
     defineField({
       name: 'interval',
       title: 'Interval',
       type: 'string',
       description: 'Billing interval, e.g. "month", "year"',
+      validation: (Rule) => Rule.max(50),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'string',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'features',
       title: 'Features',
       type: 'array',
-      of: [{type: 'string'}],
+      of: [defineArrayMember({type: 'string'})],
+      validation: (Rule) => Rule.max(15),
     }),
     defineField({
       name: 'highlighted',
@@ -47,11 +50,14 @@ export const pricingTier = defineType({
       name: 'ctaText',
       title: 'CTA Text',
       type: 'string',
+      description: 'Text for the call-to-action button',
+      validation: (Rule) => Rule.max(100),
     }),
     defineField({
       name: 'ctaUrl',
       title: 'CTA URL',
-      type: 'string',
+      type: 'url',
+      validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
     }),
   ],
   preview: {

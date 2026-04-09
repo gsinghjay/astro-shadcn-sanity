@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ThLargeIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const cardGrid = defineBlock({
   name: 'cardGrid',
@@ -12,16 +13,17 @@ export const cardGrid = defineBlock({
     {name: 'grid-3', title: '3 Columns'},
     {name: 'grid-4', title: '4 Columns'},
     {name: 'masonry', title: 'Masonry'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text'}),
+    ...headerFields(),
     defineField({
       name: 'cards',
       title: 'Cards',
       type: 'array',
+      description: 'Content cards to display in the grid',
       of: [defineArrayMember({type: 'cardGridItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(20),
     }),
   ],
 })

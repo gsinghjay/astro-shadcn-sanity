@@ -11,12 +11,13 @@ export const cardGridItem = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'image',
@@ -24,7 +25,7 @@ export const cardGridItem = defineType({
       type: 'image',
       options: {hotspot: true},
       fields: [
-        defineField({name: 'alt', title: 'Alt text', type: 'string'}),
+        defineField({name: 'alt', title: 'Alt text', type: 'string', description: 'Describe the image for screen readers'}),
       ],
     }),
     defineField({
@@ -32,14 +33,21 @@ export const cardGridItem = defineType({
       title: 'Link',
       type: 'object',
       fields: [
-        defineField({name: 'label', title: 'Label', type: 'string'}),
-        defineField({name: 'href', title: 'URL', type: 'string'}),
+        defineField({name: 'label', title: 'Label', type: 'string', validation: (Rule) => Rule.max(100)}),
+        defineField({
+          name: 'href',
+          title: 'URL',
+          type: 'url',
+          validation: (Rule) => Rule.uri({allowRelative: true, scheme: ['http', 'https']}),
+        }),
       ],
     }),
     defineField({
       name: 'badge',
       title: 'Badge',
       type: 'string',
+      description: 'Optional badge label (e.g., "New", "Featured")',
+      validation: (Rule) => Rule.max(50),
     }),
   ],
   preview: {

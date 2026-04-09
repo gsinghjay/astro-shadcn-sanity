@@ -6,6 +6,7 @@ import { createEventsServicePlugin } from '@schedule-x/events-service';
 import { isCalendarView } from '@/stores/calendarStore';
 import 'temporal-polyfill/global';
 import '@schedule-x/theme-default/dist/index.css';
+import '@/styles/calendar-brutalist.css';
 
 interface SanityEventData {
   _id: string;
@@ -178,22 +179,24 @@ export default function EventCalendarIsland({ events }: { events: string }) {
   if (!showCalendar) return null;
 
   return (
-    <div className="sx-calendar-wrapper">
-      <div className="mb-4 flex flex-wrap items-center gap-4 text-sm">
+    <div className="sx-calendar-wrapper" style={{ minHeight: '600px' }}>
+      <div className="mb-2 flex flex-wrap items-center gap-4 text-xs">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-red-600" />
-          Showcase
+          <span className="inline-block h-4 w-4 bg-red-600 dark:bg-red-300" />
+          <span className="uppercase tracking-[0.1em] font-mono font-medium">Showcase</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-blue-600" />
-          Networking
+          <span className="inline-block h-4 w-4 bg-blue-600 dark:bg-blue-300" />
+          <span className="uppercase tracking-[0.1em] font-mono font-medium">Networking</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-4 w-4 bg-green-600" />
-          Workshop
+          <span className="inline-block h-4 w-4 bg-green-600 dark:bg-green-300" />
+          <span className="uppercase tracking-[0.1em] font-mono font-medium">Workshop</span>
         </span>
       </div>
-      <ScheduleXCalendar calendarApp={calendar} />
+      <div className="sx-calendar-height" style={{ height: '560px' }}>
+        <ScheduleXCalendar calendarApp={calendar} />
+      </div>
     </div>
   );
 }

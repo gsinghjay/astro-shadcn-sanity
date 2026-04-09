@@ -16,13 +16,13 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['grid', 'split', 'spread'],
+      options: ['grid', 'split', 'spread', 'brutalist', 'ticker'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light', 'blueprint', 'mono', 'stripe'],
       description: 'Background color theme',
     },
     spacing: {
@@ -105,6 +105,53 @@ export const TwoStats = {
     stats: [
       { _key: 's1', value: '10', label: 'Lorem Ipsum' },
       { _key: 's2', value: '15', label: 'Dolor Sit' },
+    ],
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'statsRow',
+    _key: 'story-stats-brutalist',
+    variant: 'brutalist',
+    backgroundVariant: 'dark',
+    stats: [
+      { _key: 'sb1', value: '94%', label: 'Placement Rate' },
+      { _key: 'sb2', value: '500+', label: 'Students Graduated' },
+      { _key: 'sb3', value: '$2.4M', label: 'Research Funding' },
+      { _key: 'sb4', value: '10', label: 'Fortune 500 Partners' },
+    ],
+  },
+}
+
+export const Blueprint = {
+  args: {
+    _type: 'statsRow',
+    _key: 'story-stats-blueprint',
+    heading: 'Engineering Blueprint',
+    backgroundVariant: 'blueprint',
+    stats: [
+      { _key: 's1', value: '100+', label: 'Lorem Ipsum' },
+      { _key: 's2', value: '200+', label: 'Dolor Sit' },
+      { _key: 's3', value: '50+', label: 'Amet Consectetur' },
+      { _key: 's4', value: '99%', label: 'Adipiscing Elit' },
+    ],
+  },
+}
+
+export const Ticker = {
+  args: {
+    _type: 'statsRow',
+    _key: 'story-stats-ticker',
+    variant: 'ticker',
+    backgroundVariant: 'dark',
+    stats: [
+      { _key: 'st1', value: '94%', label: 'Placement Rate' },
+      { _key: 'st2', value: '500+', label: 'Graduates' },
+      { _key: 'st3', value: '$2.4M', label: 'Funding' },
+      { _key: 'st4', value: '10', label: 'Fortune 500 Partners' },
+      { _key: 'st5', value: '40+', label: 'Projects Completed' },
+      { _key: 'st6', value: 'Top 40', label: 'Public University' },
     ],
   },
 }

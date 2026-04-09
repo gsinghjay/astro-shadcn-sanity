@@ -90,33 +90,34 @@ describe('VideoEmbed (shared component) — facade pattern', () => {
 });
 
 describe('VideoEmbed (block component)', () => {
-  test('renders caption when provided', async () => {
+  test('renders heading and description when provided', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockVideoEmbed, {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
-        caption: 'This is a test caption',
+        youtubeUrl: 'https://youtu.be/abc123',
+        heading: 'Test Video Heading',
+        description: 'This is a test description',
       },
     });
 
-    expect(html).toContain('This is a test caption');
+    expect(html).toContain('Test Video Heading');
+    expect(html).toContain('This is a test description');
     expect(html).toContain('text-muted-foreground');
   });
 
-  test('does not render caption when not provided', async () => {
+  test('renders video without heading or description', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockVideoEmbed, {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
+        youtubeUrl: 'https://youtu.be/abc123',
       },
     });
 
     expect(html).toContain('data-youtube-facade');
-    expect(html).not.toContain('text-muted-foreground');
   });
 
   test('renders facade via shared VideoEmbed component', async () => {
@@ -125,12 +126,44 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        title: 'My Video Title',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        heading: 'My Video Title',
       },
     });
 
     expect(html).toContain('data-youtube-facade="dQw4w9WgXcQ"');
     expect(html).not.toContain('<iframe');
+  });
+
+  test('renders split variant with SectionSplit layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockVideoEmbed, {
+      props: {
+        _type: 'videoEmbed' as const,
+        _key: 'test-key',
+        youtubeUrl: 'https://youtu.be/abc123',
+        heading: 'Split Video',
+        variant: 'split',
+      },
+    });
+
+    expect(html).toContain('Split Video');
+    expect(html).toContain('data-youtube-facade');
+  });
+
+  test('defaults to full-width variant for unknown values', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockVideoEmbed, {
+      props: {
+        _type: 'videoEmbed' as const,
+        _key: 'test-key',
+        youtubeUrl: 'https://youtu.be/abc123',
+        heading: 'Default Variant',
+        variant: 'unknown-value',
+      },
+    });
+
+    expect(html).toContain('Default Variant');
+    expect(html).toContain('data-youtube-facade');
   });
 });

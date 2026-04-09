@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
-import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '../lib/sanity';
+import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents } from '../lib/sanity';
 import { urlFor } from '../lib/image';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
@@ -11,6 +11,7 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 // In VE mode: skip fetch — server island handles its own data fetching
 let page = null;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
+let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
 let events: Awaited<ReturnType<typeof getAllEvents>> = [];
 if (!visualEditingEnabled) {
@@ -19,6 +20,7 @@ if (!visualEditingEnabled) {
     return Astro.redirect('/404');
   }
   sponsors = await getAllSponsors();
+  projects = await getAllProjects();
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
 }
@@ -51,6 +53,6 @@ const preloadSrcset = heroImage?.asset
       </div>
     </SanityPageContent>
   ) : (
-    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
+    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
   )}
 </Layout>
