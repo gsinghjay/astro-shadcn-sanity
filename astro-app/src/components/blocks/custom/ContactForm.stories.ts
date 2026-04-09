@@ -13,6 +13,11 @@ export default {
     },
   },
   argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['stacked', 'split', 'split-image'],
+      description: 'Layout variant',
+    },
     heading: { control: 'text', description: 'Section heading' },
     description: { control: 'text', description: 'Description text' },
     backgroundVariant: {
@@ -70,5 +75,45 @@ export const WithSuccessMessage = {
       ],
       submitButton: { text: 'Send Message' },
     },
+  },
+}
+
+const sharedForm = {
+  _id: 'form-story-shared',
+  title: 'Contact Form',
+  fields: [
+    { _key: 'f1', name: 'name', label: 'Full Name', type: 'text', required: true, choices: null, options: { placeholder: 'Your name', defaultValue: null } },
+    { _key: 'f2', name: 'email', label: 'Email', type: 'email', required: true, choices: null, options: { placeholder: 'you@example.com', defaultValue: null } },
+    { _key: 'f3', name: 'message', label: 'Message', type: 'textarea', required: true, choices: null, options: { placeholder: 'Tell us about your project', defaultValue: null } },
+  ],
+  submitButton: { text: 'Submit Inquiry' },
+}
+
+export const Split = {
+  args: {
+    _type: 'contactForm',
+    _key: 'story-contact-split',
+    variant: 'split',
+    heading: 'Get in Touch',
+    description: 'Have a question or want to work together? Fill out the form and we will get back to you within 24 hours.',
+    form: sharedForm,
+  },
+}
+
+export const SplitImage = {
+  args: {
+    _type: 'contactForm',
+    _key: 'story-contact-split-image',
+    variant: 'split-image',
+    heading: 'Start a Conversation',
+    description: 'We would love to hear from you. Reach out and let us know how we can help.',
+    form: sharedForm,
+    backgroundImages: [
+      {
+        _key: 'bg-1',
+        asset: { url: 'https://placehold.co/800x1000/1a1a2e/e2e8f0?text=Contact+Us' },
+        alt: 'Contact background image',
+      },
+    ],
   },
 }

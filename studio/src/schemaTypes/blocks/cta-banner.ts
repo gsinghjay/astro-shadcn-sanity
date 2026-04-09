@@ -12,26 +12,30 @@ export const ctaBanner = defineBlock({
     {name: 'split', title: 'Split'},
     {name: 'spread', title: 'Spread'},
     {name: 'overlay', title: 'Overlay'},
+    {name: 'brutalist', title: 'Brutalist'},
+    {name: 'data-cta', title: 'Data CTA'},
   ],
   hiddenByVariant: {
-    backgroundImages: ['centered', 'spread'],
+    backgroundImages: ['centered', 'spread', 'brutalist', 'data-cta'],
   },
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'backgroundImages',
       title: 'Background Images',
       type: 'array',
+      description: 'Background images for the banner',
       of: [
         defineArrayMember({
           type: 'image',
@@ -46,13 +50,15 @@ export const ctaBanner = defineBlock({
           ],
         }),
       ],
+      validation: (Rule) => Rule.max(5),
     }),
     defineField({
       name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
+      description: 'Call-to-action buttons (max 5)',
       of: [defineArrayMember({type: 'button'})],
-      validation: (Rule) => Rule.min(1).error('Add at least one button'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one button'), Rule.max(5)],
     }),
   ],
 })

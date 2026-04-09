@@ -17,7 +17,7 @@ const variant = (() => {
 })();
 const imgSrc = safeUrlFor(image)?.width(120).height(120).fit('crop').url() ?? null;
 const lqip = image?.asset?.metadata?.lqip;
-const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? '';
+const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('').slice(0, 2) ?? '';
 ---
 
 {variant === 'centered' && (
@@ -25,59 +25,61 @@ const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? 
     <SectionContent class="items-center text-center max-w-4xl mx-auto">
       <div class="text-8xl text-primary font-serif leading-none select-none" aria-hidden="true">&ldquo;</div>
       <blockquote class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">
-        {quote}
+        <p>{quote}</p>
+        {attribution && (
+          <footer class="flex items-center gap-3 mt-6 text-base font-normal tracking-normal leading-normal">
+            {imgSrc && (
+              <Avatar>
+                <AvatarImage
+                  src={imgSrc}
+                  alt={stegaClean(image?.alt) || stegaClean(attribution) || 'Quote author'}
+                  style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                />
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            )}
+            <div class="text-muted-foreground">
+              <cite class="not-italic font-medium text-foreground">{attribution}</cite>
+              {role && <span class="block text-sm">{role}</span>}
+            </div>
+          </footer>
+        )}
       </blockquote>
-      {attribution && (
-        <div class="flex items-center gap-3 mt-6">
-          {imgSrc && (
-            <Avatar>
-              <AvatarImage
-                src={imgSrc}
-                alt={image?.alt || attribution}
-                style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
-              />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          )}
-          <div class="text-muted-foreground">
-            <span class="font-medium text-foreground">{attribution}</span>
-            {role && <span class="block text-sm">{role}</span>}
-          </div>
-        </div>
-      )}
     </SectionContent>
   </Section>
 )}
 
 {variant === 'split' && (
   <Section data-animate>
-    <SectionSplit>
-      <SectionContent class="justify-center">
-        <div class="text-8xl text-primary font-serif leading-none select-none" aria-hidden="true">&ldquo;</div>
-        <blockquote class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.1]">
-          {quote}
-        </blockquote>
-      </SectionContent>
+    <blockquote>
+      <SectionSplit>
+        <SectionContent class="justify-center">
+          <div class="text-8xl text-primary font-serif leading-none select-none" aria-hidden="true">&ldquo;</div>
+          <p class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.1]">{quote}</p>
+        </SectionContent>
 
-      <SectionContent class="justify-center">
-        {imgSrc && (
-          <Avatar class="w-16 h-16">
-            <AvatarImage
-              src={imgSrc}
-              alt={image?.alt || attribution || ''}
-              style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
-            />
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-        )}
-        {attribution && (
-          <div class="text-muted-foreground">
-            <span class="font-medium text-foreground text-lg">{attribution}</span>
-            {role && <span class="block text-sm">{role}</span>}
-          </div>
-        )}
-      </SectionContent>
-    </SectionSplit>
+        <SectionContent class="justify-center">
+          {attribution && (
+            <>
+              {imgSrc && (
+                <Avatar class="w-16 h-16">
+                  <AvatarImage
+                    src={imgSrc}
+                    alt={stegaClean(image?.alt) || stegaClean(attribution) || 'Quote author'}
+                    style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                  />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+              )}
+              <footer class="text-muted-foreground">
+                <cite class="not-italic font-medium text-foreground text-lg">{attribution}</cite>
+                {role && <span class="block text-sm">{role}</span>}
+              </footer>
+            </>
+          )}
+        </SectionContent>
+      </SectionSplit>
+    </blockquote>
   </Section>
 )}
 
@@ -85,14 +87,14 @@ const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? 
   <Section data-animate>
     <SectionContent class="max-w-2xl">
       <blockquote class="border-l-4 border-primary pl-6">
-        <div class="text-xl font-bold tracking-[-0.03em] leading-[1.2]">
+        <p class="text-xl font-bold tracking-[-0.03em] leading-[1.2]">
           {quote}
-        </div>
+        </p>
         {attribution && (
-          <div class="text-muted-foreground mt-4">
-            <span class="font-medium text-foreground">{attribution}</span>
+          <footer class="text-muted-foreground mt-4">
+            <cite class="not-italic font-medium text-foreground">{attribution}</cite>
             {role && <span class="block text-sm">{role}</span>}
-          </div>
+          </footer>
         )}
       </blockquote>
     </SectionContent>
@@ -103,14 +105,14 @@ const initials = attribution?.split(' ').map(n => n[0]).join('').slice(0, 2) ?? 
   <Section data-animate>
     <SectionContent class="max-w-5xl mx-auto">
       <blockquote class="border-l-[8px] border-primary pl-8 py-4">
-        <div class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.1]">
+        <p class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.1]">
           {quote}
-        </div>
+        </p>
         {attribution && (
-          <div class="mt-8 font-mono">
-            <span class="font-bold text-foreground">{attribution}</span>
+          <footer class="mt-8 font-mono">
+            <cite class="not-italic font-bold text-foreground">{attribution}</cite>
             {role && <span class="block text-sm text-muted-foreground mt-1">{role}</span>}
-          </div>
+          </footer>
         )}
       </blockquote>
     </SectionContent>

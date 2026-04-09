@@ -1,0 +1,129 @@
+---
+/**
+ * Storybook-only wrapper that renders mock Schedule-X calendar elements
+ * to showcase the Swiss Brutalist theme CSS overrides.
+ * Does NOT depend on Schedule-X JS — just applies the class names.
+ */
+import '@schedule-x/theme-default/dist/index.css'
+import '@/styles/calendar-brutalist.css'
+
+interface Props {
+  dark?: boolean
+}
+
+const { dark = false } = Astro.props
+---
+
+<div class:list={[{ dark }]}>
+  <div class="sx-react-calendar-wrapper" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 960px;">
+
+    {/* ── Legend ── */}
+    <div class="mb-2 flex flex-wrap items-center gap-4 text-xs" style="padding: 0 0 8px;">
+      <span class="flex items-center gap-1.5">
+        <span class="inline-block h-4 w-4 bg-red-600"></span>
+        <span class="uppercase tracking-[0.1em] font-mono font-medium">Showcase</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="inline-block h-4 w-4 bg-blue-600"></span>
+        <span class="uppercase tracking-[0.1em] font-mono font-medium">Networking</span>
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="inline-block h-4 w-4 bg-green-600"></span>
+        <span class="uppercase tracking-[0.1em] font-mono font-medium">Workshop</span>
+      </span>
+    </div>
+
+    {/* ── View Switcher ── */}
+    <div class="sx__view-selection" style="display: flex; gap: 4px; padding: 8px 0 12px; border-bottom: 1px solid var(--sx-color-outline);">
+      <button class="sx__view-selection__item" style="padding: 6px 12px; cursor: pointer; border: none; color: var(--sx-color-on-surface);">DAY</button>
+      <button class="sx__view-selection__item" style="padding: 6px 12px; cursor: pointer; border: none; color: var(--sx-color-on-surface);">WEEK</button>
+      <button class="sx__view-selection__item sx__view-selection__item--is-selected" style="padding: 6px 12px; cursor: pointer; border: none; color: var(--sx-color-on-surface);">MONTH</button>
+      <button class="sx__view-selection__item" style="padding: 6px 12px; cursor: pointer; border: none; color: var(--sx-color-on-surface);">AGENDA</button>
+    </div>
+
+    {/* ── Month Grid ── */}
+    <div style={`background: var(--sx-color-surface); color: var(--sx-color-on-surface); border: 1px solid var(--sx-color-outline);`}>
+
+      {/* Day Headers */}
+      <div style="display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--sx-color-outline);">
+        {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((day) => (
+          <div
+            class="sx__month-grid-day__header-day-name"
+            style="padding: 8px 4px; text-align: center; border-right: 1px solid var(--sx-color-outline);"
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+
+      {/* Week Rows */}
+      {[
+        [{ d: '30', prev: true }, { d: '31', prev: true }, { d: '1' }, { d: '2' }, { d: '3' }, { d: '4' }, { d: '5', today: true }],
+        [{ d: '6' }, { d: '7', event: { title: 'SPONSOR MEETING', color: '#dc2626' } }, { d: '8' }, { d: '9' }, { d: '10', event: { title: 'TECH WORKSHOP', color: '#16a34a' } }, { d: '11' }, { d: '12' }],
+        [{ d: '13' }, { d: '14' }, { d: '15', event: { title: 'NETWORKING MIXER', color: '#2563eb' } }, { d: '16' }, { d: '17' }, { d: '18' }, { d: '19' }],
+        [{ d: '20' }, { d: '21' }, { d: '22' }, { d: '23', event: { title: 'CAPSTONE DEMO', color: '#dc2626' } }, { d: '24' }, { d: '25' }, { d: '26' }],
+        [{ d: '27' }, { d: '28' }, { d: '29' }, { d: '30' }, { d: '1', next: true }, { d: '2', next: true }, { d: '3', next: true }],
+      ].map((week) => (
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); min-height: 80px;">
+          {week.map((cell: any) => (
+            <div
+              class:list={[
+                'sx__month-grid-day',
+                { 'sx__month-grid-day--is-today': cell.today },
+              ]}
+              style={`padding: 4px 6px; border-right: 1px solid var(--sx-color-outline); border-bottom: 1px solid var(--sx-color-outline); background: ${cell.prev || cell.next ? 'var(--sx-color-surface-container-low)' : 'var(--sx-color-surface)'};`}
+            >
+              <div style={`font-size: 0.8125rem; font-weight: ${cell.today ? '700' : '400'}; color: ${cell.today ? 'var(--sx-color-primary)' : cell.prev || cell.next ? 'var(--sx-color-surface-dim)' : 'inherit'};`}>
+                {cell.d}
+              </div>
+              {cell.event && (
+                <div
+                  class="sx__month-grid-event"
+                  style={`margin-top: 4px; padding: 2px 4px; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: ${cell.event.color}20; color: ${cell.event.color}; border: 1px solid ${cell.event.color};`}
+                >
+                  {cell.event.title}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    {/* ── Time Grid Sample (Day/Week view excerpt) ── */}
+    <div style="margin-top: 24px; border: 1px solid var(--sx-color-outline); background: var(--sx-color-surface);">
+      <div style="padding: 8px 0 4px 8px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--sx-color-on-surface); border-bottom: 1px solid var(--sx-color-outline);">
+        Time Grid (Day/Week view excerpt)
+      </div>
+      {['09:00', '10:00', '11:00', '12:00'].map((hour, i) => (
+        <div class="sx__time-grid-day" style="display: flex; min-height: 48px; border-bottom: 1px solid var(--sx-color-outline);">
+          <div
+            class="sx__time-grid__hour"
+            style="width: 60px; padding: 4px 8px; font-size: 0.75rem; color: var(--sx-color-on-surface); border-right: 1px solid var(--sx-color-outline); flex-shrink: 0;"
+          >
+            {hour}
+          </div>
+          <div style="flex: 1; position: relative;">
+            {i === 1 && (
+              <div
+                class="sx__event"
+                style={`position: absolute; top: 2px; left: 4px; right: 4px; padding: 4px 6px; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: #dc262620; color: #dc2626; border: 1px solid #dc2626;`}
+              >
+                Capstone Showcase
+              </div>
+            )}
+            {i === 3 && (
+              <div
+                class="sx__event"
+                style={`position: absolute; top: 2px; left: 4px; right: 4px; padding: 4px 6px; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; background: #2563eb20; color: #2563eb; border: 1px solid #2563eb;`}
+              >
+                Networking Lunch
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+
+  </div>
+</div>

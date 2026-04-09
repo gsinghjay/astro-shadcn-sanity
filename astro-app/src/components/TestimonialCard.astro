@@ -19,30 +19,32 @@ const projectSlug = t.project ? stegaClean(t.project.slug) : null;
   {t.videoUrl && (
     <VideoEmbed url={stegaClean(t.videoUrl)} title={`${stegaClean(t.name)} video testimonial`} />
   )}
-  <blockquote class="text-base italic text-card-foreground leading-relaxed">"{t.quote}"</blockquote>
-  <div class="flex items-center gap-3">
-    {photoUrl ? (
-      <img
-        src={photoUrl}
-        alt={t.photo?.alt ?? ''}
-        width="48"
-        height="48"
-        loading="lazy"
-        class="object-cover w-12 h-12 flex-shrink-0"
-      />
-    ) : (
-      <div class="w-12 h-12 bg-muted flex items-center justify-center flex-shrink-0">
-        <span class="text-sm font-bold text-muted-foreground">
-          {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
-        </span>
-      </div>
-    )}
-    <div class="flex flex-col">
-      <span class="font-semibold text-sm">{t.name}</span>
-      {t.role && <span class="text-xs text-muted-foreground">{t.role}</span>}
-      {t.organization && <span class="text-xs text-muted-foreground">{t.organization}</span>}
-    </div>
-  </div>
+  <blockquote class="text-base italic text-card-foreground leading-relaxed">
+    <p>"{t.quote}"</p>
+    <footer class="flex items-center gap-3 mt-4 not-italic">
+      {photoUrl ? (
+        <img
+          src={photoUrl}
+          alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'}
+          width="48"
+          height="48"
+          loading="lazy"
+          class="object-cover w-12 h-12 flex-shrink-0"
+        />
+      ) : (
+        <div class="w-12 h-12 bg-muted flex items-center justify-center flex-shrink-0">
+          <span class="text-sm font-bold text-muted-foreground">
+            {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
+          </span>
+        </div>
+      )}
+      <cite class="not-italic flex flex-col">
+        <span class="font-semibold text-sm">{t.name}</span>
+        {t.role && <span class="text-xs text-muted-foreground">{t.role}</span>}
+        {t.organization && <span class="text-xs text-muted-foreground">{t.organization}</span>}
+      </cite>
+    </footer>
+  </blockquote>
   {t.project && projectSlug && (
     <a href={`/projects/${projectSlug}`} class="text-xs font-medium text-primary hover:text-primary/80 inline-flex items-center gap-1" data-gtm-category="testimonial" data-gtm-label={stegaClean(t.name)}>
       {t.project.title}

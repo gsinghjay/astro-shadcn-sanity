@@ -57,8 +57,10 @@ describe('EventList', () => {
 
     // event-5 has description > 150 chars — should be truncated with '...'
     expect(html).toContain('...');
-    // Should NOT contain the full long description
-    expect(html).not.toContain('and more practical techniques.');
+    // Strip JSON-LD scripts before checking visible content truncation
+    const visibleHtml = html.replace(/<script type="application\/ld\+json">.*?<\/script>/gs, '');
+    // Should NOT contain the full long description in visible content
+    expect(visibleHtml).not.toContain('and more practical techniques.');
   });
 
   test('renders past events', async () => {

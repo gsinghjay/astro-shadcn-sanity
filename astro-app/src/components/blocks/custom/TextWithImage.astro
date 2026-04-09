@@ -43,6 +43,55 @@ const getGridClasses = (variant: string): string => {
 const gridClass = getGridClasses(cleanVariant);
 ---
 
+{cleanVariant === 'brutalist' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionMedia class="aspect-[4/3]">
+        <div class="border-2 border-border h-full">
+          {imgSrc && lqip ? (
+            <div style={`background-image: url(${lqip}); background-size: cover;`} class="h-full">
+              <img
+                src={imgSrc}
+                alt={image?.alt || heading || ''}
+                width={800}
+                height={600}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={image?.alt || heading || ''}
+              width={800}
+              height={600}
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+        </div>
+        {image?.alt && (
+          <p class="font-mono text-xs text-muted-foreground mt-2 tracking-wide">{image.alt}</p>
+        )}
+      </SectionMedia>
+
+      <SectionContent class="justify-center pl-8 border-l-4 border-border">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {content && (
+          <div class="text-muted-foreground leading-relaxed prose">
+            <PortableText value={content} components={portableTextComponents} />
+          </div>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant !== 'brutalist' && (
 <Section data-animate>
   {cleanVariant === 'floating' ? (
     // Floating variant with card styling
@@ -158,3 +207,4 @@ const gridClass = getGridClasses(cleanVariant);
     </SectionSplit>
   )}
 </Section>
+)}

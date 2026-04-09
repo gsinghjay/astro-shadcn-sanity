@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ClockIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const timeline = defineBlock({
   name: 'timeline',
@@ -10,35 +11,30 @@ export const timeline = defineBlock({
     {name: 'vertical', title: 'Vertical'},
     {name: 'split', title: 'Split'},
     {name: 'horizontal', title: 'Horizontal'},
+    {name: 'engineering', title: 'Engineering'},
   ],
   hiddenByVariant: {
     description: ['horizontal'],
   },
   preview: {select: {title: 'heading'}},
   fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-    }),
+    ...headerFields(),
     defineField({
       name: 'items',
       title: 'Timeline Entries',
       type: 'array',
       of: [defineArrayMember({type: 'timelineEntry'})],
-      validation: (Rule) =>
+      validation: (Rule) => [
         Rule.required().min(1).error('Add at least one timeline entry'),
+        Rule.max(20),
+      ],
     }),
     defineField({
       name: 'links',
       title: 'Links',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

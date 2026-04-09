@@ -14,15 +14,15 @@ interface Props extends NewsletterBlock {
 const {
   heading,
   description,
-  placeholderText = 'Enter your email',
-  buttonText = 'Subscribe',
-  disclaimer,
+  inputPlaceholder = 'Enter your email',
+  submitButtonLabel = 'Subscribe',
+  privacyDisclaimerText,
   variant: rawVariant,
   class: className,
   id,
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' ? rawCleaned : 'inline';
+const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' || rawCleaned === 'brutalist' ? rawCleaned : 'inline';
 ---
 
 {cleanVariant === 'inline' && (
@@ -35,11 +35,11 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
         <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
       )}
       <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
-        <Input type="email" placeholder={placeholderText} class="flex-1" />
-        <Button type="submit">{buttonText}</Button>
+        <Input type="email" placeholder={inputPlaceholder} class="flex-1" />
+        <Button type="submit">{submitButtonLabel}</Button>
       </form>
-      {disclaimer && (
-        <p class="text-xs text-muted-foreground">{disclaimer}</p>
+      {privacyDisclaimerText && (
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
       )}
     </SectionContent>
   </Section>
@@ -57,8 +57,8 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
         )}
       </div>
       <form class="flex gap-2 flex-shrink-0" onsubmit="return false;">
-        <Input type="email" placeholder={placeholderText} class="w-64" />
-        <Button type="submit">{buttonText}</Button>
+        <Input type="email" placeholder={inputPlaceholder} class="w-64" />
+        <Button type="submit">{submitButtonLabel}</Button>
       </form>
     </SectionContent>
     {disclaimer && (
@@ -83,13 +83,37 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
 
       <SectionContent class="justify-center">
         <form class="flex flex-col gap-4 w-full" onsubmit="return false;">
-          <Input type="email" placeholder={placeholderText} />
-          <Button type="submit" class="w-full">{buttonText}</Button>
+          <Input type="email" placeholder={inputPlaceholder} />
+          <Button type="submit" class="w-full">{submitButtonLabel}</Button>
         </form>
         {disclaimer && (
           <p class="text-xs text-muted-foreground">{disclaimer}</p>
         )}
       </SectionContent>
     </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-2xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6 text-left">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
+        <input
+          type="email"
+          placeholder={inputPlaceholder}
+          class="flex-1 h-10 border-2 border-background bg-transparent px-3 font-mono text-sm placeholder:font-mono focus:outline-none focus:border-primary"
+        />
+        <Button type="submit" variant="outline" class="uppercase tracking-wider font-bold border-2">{submitButtonLabel}</Button>
+      </form>
+      {privacyDisclaimerText && (
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+      )}
+    </SectionContent>
   </Section>
 )}

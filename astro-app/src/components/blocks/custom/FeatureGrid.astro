@@ -46,7 +46,7 @@ const gridClass =
           <TileContent>
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
+                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>
@@ -73,7 +73,7 @@ const gridClass =
           <TileContent class="items-center text-center">
             <div class="flex flex-col items-center gap-3 w-full">
               <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
+                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
                   {String(i + 1).padStart(2, '0')}
                 </span>
               </div>
@@ -102,7 +102,7 @@ const gridClass =
               {feature.image ? (
                 <img
                   src={safeUrlFor(feature.image)?.width(460).height(260).fit('crop').url() ?? ''}
-                  alt={feature.image.alt || feature.title || ''}
+                  alt={stegaClean(feature.image.alt) || stegaClean(feature.title) || 'Feature image'}
                   width={460}
                   height={260}
                   class="w-full h-full object-cover"
@@ -142,7 +142,7 @@ const gridClass =
             <TileContent>
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-                  <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
+                  <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                 </div>
@@ -154,6 +154,29 @@ const gridClass =
         ))}
       </SectionGrid>
     </SectionSplit>
+  </Section>
+) : cleanVariant === 'numbered-brutalist' ? (
+  // Numbered-brutalist variant - oversized monospace numbers, thick left red border, hover transition
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionGrid>
+      {(items ?? []).map((feature, i) => (
+        <div class="border-l-4 border-primary pl-6 py-4 hover:border-l-8 transition-all duration-200 group">
+          <span class="font-mono text-6xl font-bold text-primary/20 leading-none block" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="font-bold text-lg mt-2">{feature.title}</h3>
+          {feature.description && (
+            <p class={`text-sm mt-1 ${isDarkBg ? 'text-background/70' : 'text-muted-foreground'}`}>{feature.description}</p>
+          )}
+        </div>
+      ))}
+    </SectionGrid>
   </Section>
 ) : (
   // Stacked variant - single column with horizontal split

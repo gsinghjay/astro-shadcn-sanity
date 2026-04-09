@@ -16,7 +16,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'marquee', 'tiered', 'grid-prominent'],
+      options: ['grid', 'marquee', 'flex-wrap', 'tiered', 'grid-prominent'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -110,6 +110,22 @@ export const Tiered = {
       { _id: 'lt5', name: 'Forbes', tier: 'gold', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Forbes' }, alt: 'Forbes logo' }, website: 'https://forbes.com' },
       { _id: 'lt6', name: 'Eco-Enterprise', tier: 'silver', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Eco' }, alt: 'Eco-Enterprise logo' }, website: 'https://eco-enterprise.com' },
       { _id: 'lt7', name: 'Angeles Foundation', tier: 'bronze', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Angeles' }, alt: 'Angeles Foundation logo' } },
+    ],
+  },
+}
+
+export const FlexWrap = {
+  args: {
+    _type: 'logoCloud',
+    _key: 'story-logos-flexwrap',
+    variant: 'flex-wrap',
+    heading: 'Featured In',
+    sponsors: [
+      { _id: 'lf1', name: 'Acme Corp', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Acme' }, alt: 'Acme Corp logo' }, website: 'https://example.com' },
+      { _id: 'lf2', name: 'Ipsum Solutions', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Ipsum' }, alt: 'Ipsum Solutions logo' } },
+      { _id: 'lf3', name: 'Dolor Tech', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Dolor' }, alt: 'Dolor Tech logo' } },
+      { _id: 'lf4', name: 'Sit Amet Inc', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Sit+Amet' }, alt: 'Sit Amet Inc logo' } },
+      { _id: 'lf5', name: 'Magna Global', logo: { asset: { url: 'https://placehold.co/160x60/e2e8f0/475569?text=Magna' }, alt: 'Magna Global logo' } },
     ],
   },
 }
