@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const sponsorshipTiers = defineBlock({
   name: 'sponsorshipTiers',
@@ -20,62 +21,13 @@ export const sponsorshipTiers = defineBlock({
     },
   },
   fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-    }),
+    ...headerFields(),
     defineField({
       name: 'tiers',
       title: 'Tiers',
       type: 'array',
-      of: [
-        defineArrayMember({
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'name',
-              title: 'Tier Name',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'price',
-              title: 'Price',
-              type: 'string',
-              description: 'e.g. "$0", "$5,000/year", "Custom"',
-              validation: (Rule) => Rule.required(),
-            }),
-            defineField({
-              name: 'benefits',
-              title: 'Benefits',
-              type: 'array',
-              of: [defineArrayMember({type: 'string'})],
-              validation: (Rule) => Rule.min(1).error('Add at least one benefit'),
-            }),
-            defineField({
-              name: 'highlighted',
-              title: 'Highlighted (Recommended)',
-              type: 'boolean',
-              description: 'Mark this tier as the recommended option',
-              initialValue: false,
-            }),
-            defineField({
-              name: 'ctaButton',
-              title: 'CTA Button',
-              type: 'button',
-            }),
-          ],
-          preview: {
-            select: {title: 'name', subtitle: 'price'},
-          },
-        }),
-      ],
+      description: 'Sponsorship tier definitions with pricing and benefits',
+      of: [defineArrayMember({type: 'sponsorshipTierItem'})],
       validation: (Rule) =>
         Rule.min(1)
           .error('Add at least one tier')

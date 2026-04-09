@@ -5,6 +5,8 @@ import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import { stegaClean } from '@sanity/client/stega';
 import { Tile, TileContent, TileDescription, TileTitle } from '@/components/ui/tile';
 import { bgClasses } from '@/lib/utils';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericValue, extractUnitText } from '@/lib/structured-data';
 
 interface Props extends StatsRowBlock {
   class?: string;
@@ -12,6 +14,18 @@ interface Props extends StatsRowBlock {
 }
 
 const { heading, stats, backgroundVariant, variant } = Astro.props;
+
+const statsJsonLd = (stats ?? []).filter(s => s.value && s.label).map(stat => {
+  const cleanValue = stegaClean(stat.value) || '';
+  const unit = extractUnitText(cleanValue);
+  return {
+    "@type": "QuantitativeValue",
+    "name": stegaClean(stat.label),
+    "value": extractNumericValue(cleanValue),
+    ...(unit && { "unitText": unit }),
+    ...(stat.description && { "description": stegaClean(stat.description) }),
+  };
+});
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
 const isDark = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 const sectionBg = bgClasses[bgVariant] ?? '';
@@ -20,6 +34,8 @@ const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 const rawVariant = stegaClean(variant);
 const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' || rawVariant === 'brutalist' || rawVariant === 'ticker' ? rawVariant : 'grid';
 ---
+
+{statsJsonLd.length > 0 && statsJsonLd.map(s => <JsonLd schema={s} />)}
 
 {cleanVariant === 'grid' && (
   <Section

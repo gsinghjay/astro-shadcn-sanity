@@ -3,6 +3,7 @@ import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { MapBlockBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends MapBlockBlock {
   class?: string;
@@ -22,7 +23,26 @@ const {
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'split' || rawCleaned === 'full-width' ? rawCleaned : 'default';
+
+const hasContact = contactInfo?.phone || contactInfo?.email;
+const mapJsonLd = (heading || coordinates) ? {
+  "@type": hasContact ? "LocalBusiness" : "Place",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(address && { "address": stegaClean(address) }),
+  ...(coordinates?.lat != null && coordinates?.lng != null && {
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": coordinates.lat,
+      "longitude": coordinates.lng,
+    },
+  }),
+  ...(caption && { "description": stegaClean(caption) }),
+  ...(contactInfo?.phone && { "telephone": stegaClean(contactInfo.phone) }),
+  ...(contactInfo?.email && { "email": stegaClean(contactInfo.email) }),
+} : null;
 ---
+
+{mapJsonLd && <JsonLd schema={mapJsonLd} />}
 
 {cleanVariant === 'default' && (
   <Section class={className} id={id} data-animate>

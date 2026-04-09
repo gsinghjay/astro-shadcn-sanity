@@ -3,6 +3,7 @@ import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { CountdownTimerBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends CountdownTimerBlock {
   class?: string;
@@ -21,6 +22,14 @@ const {
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'hero' || rawCleaned === 'banner' || rawCleaned === 'brutalist' ? rawCleaned : 'inline';
 
+const countdownJsonLd = targetDate ? {
+  "@type": "Event",
+  ...(heading && { "name": stegaClean(heading) }),
+  "startDate": targetDate,
+  ...(description && { "description": stegaClean(description) }),
+  "eventStatus": "https://schema.org/EventScheduled",
+} : null;
+
 // Static placeholder digits for Storybook rendering
 const placeholderUnits = [
   { value: '42', label: 'Days' },
@@ -29,6 +38,8 @@ const placeholderUnits = [
   { value: '30', label: 'Sec' },
 ];
 ---
+
+{countdownJsonLd && <JsonLd schema={countdownJsonLd} />}
 
 {cleanVariant === 'inline' && (
   <Section class={className} id={id} data-animate>

@@ -13,7 +13,7 @@ export const beforeAfter = defineBlock({
     {name: 'toggle', title: 'Toggle'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
     defineField({
       name: 'beforeImage',
       title: 'Before Image',
@@ -38,14 +38,18 @@ export const beforeAfter = defineBlock({
       name: 'beforeLabel',
       title: 'Before Label',
       type: 'string',
+      description: 'Label shown on the before image overlay',
       initialValue: 'Before',
+      validation: (Rule) => Rule.max(100),
     }),
     defineField({
       name: 'afterLabel',
       title: 'After Label',
       type: 'string',
+      description: 'Label shown on the after image overlay',
       initialValue: 'After',
+      validation: (Rule) => Rule.max(100),
     }),
-    defineField({name: 'caption', title: 'Caption', type: 'string'}),
+    defineField({name: 'caption', title: 'Caption', type: 'string', validation: (Rule) => Rule.max(200)}),
   ],
 })
