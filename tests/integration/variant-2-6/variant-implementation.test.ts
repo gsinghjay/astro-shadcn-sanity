@@ -36,11 +36,11 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       expect(variantField, 'textWithImage missing variant field').toBeDefined()
     })
 
-    test('2.6-INT-002 — textWithImage variant field has 4 options', () => {
+    test('2.6-INT-002 — textWithImage variant field has 5 options', () => {
       const schema = textWithImage as BlockSchema
       const variantField = schema.fields.find((f) => f.name === 'variant')
       const values = variantField.options.list.map((o: any) => o.value)
-      expect(values).toEqual(['split', 'split-asymmetric', 'reversed', 'floating'])
+      expect(values).toEqual(['split', 'split-asymmetric', 'reversed', 'floating', 'brutalist'])
     })
 
     test('2.6-INT-003 — textWithImage variant field initialValue is split (default)', () => {

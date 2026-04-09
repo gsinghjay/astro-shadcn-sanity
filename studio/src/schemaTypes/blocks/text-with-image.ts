@@ -12,15 +12,17 @@ export const textWithImage = defineBlock({
     {name: 'split-asymmetric', title: 'Split Asymmetric'},
     {name: 'reversed', title: 'Reversed'},
     {name: 'floating', title: 'Floating'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
-    imagePosition: ['reversed', 'floating'],
+    imagePosition: ['reversed', 'floating', 'brutalist'],
   },
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'content',

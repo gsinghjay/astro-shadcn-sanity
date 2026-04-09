@@ -4,6 +4,7 @@ import { Section, SectionContent, SectionActions } from '@/components/ui/section
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends TimelineBlock {
   class?: string;
@@ -13,7 +14,22 @@ interface Props extends TimelineBlock {
 const { heading, description, items, links, variant: rawVariant } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'vertical';
 const entries = items ?? [];
+
+const timelineJsonLd = entries.length > 0 ? {
+  "@type": "ItemList",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(description && { "description": stegaClean(description) }),
+  "itemListElement": entries.filter(item => item.title).map((item, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": stegaClean(item.title),
+    ...(item.description && { "description": stegaClean(item.description) }),
+    ...(item.date && { "temporal": stegaClean(item.date) }),
+  })),
+} : null;
 ---
+
+{timelineJsonLd && <JsonLd schema={timelineJsonLd} />}
 
 {variant === 'vertical' && (
   <Section data-animate>

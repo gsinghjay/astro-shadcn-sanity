@@ -5,7 +5,7 @@ import { stegaClean } from '@sanity/client/stega';
 
 interface VideoEmbedNode {
   _type: 'videoEmbed';
-  videoUrl?: string;
+  youtubeUrl?: string;
   title?: string;
   caption?: string;
 }
@@ -13,7 +13,7 @@ interface VideoEmbedNode {
 type Props = PTProps<VideoEmbedNode>;
 
 const { node } = Astro.props;
-const videoUrl = stegaClean(node.videoUrl ?? '');
+const videoUrl = stegaClean(node.youtubeUrl ?? '');
 ---
 
 <div class="my-6">

@@ -58,7 +58,16 @@ export type SanityImageAssetReference = {
 
 export type BeforeAfter = {
   _type: "beforeAfter";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "side-by-side" | "stacked" | "toggle";
@@ -86,10 +95,19 @@ export type BeforeAfter = {
 
 export type CardGrid = {
   _type: "cardGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry";
+  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry" | "brutalist";
   heading?: string;
   description?: string;
   cards?: Array<
@@ -101,7 +119,16 @@ export type CardGrid = {
 
 export type MetricsDashboard = {
   _type: "metricsDashboard";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "row" | "card" | "terminal" | "brutalist-grid";
@@ -116,7 +143,16 @@ export type MetricsDashboard = {
 
 export type CountdownTimer = {
   _type: "countdownTimer";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "inline" | "hero" | "banner" | "brutalist";
@@ -128,7 +164,16 @@ export type CountdownTimer = {
 
 export type MapBlock = {
   _type: "mapBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "default" | "split" | "full-width";
@@ -142,7 +187,16 @@ export type MapBlock = {
 
 export type EmbedBlock = {
   _type: "embedBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "default" | "contained" | "full-width";
@@ -154,10 +208,19 @@ export type EmbedBlock = {
 
 export type TabsBlock = {
   _type: "tabsBlock";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "default" | "pills" | "underline";
+  variant?: "default" | "pills" | "underline" | "brutalist";
   heading?: string;
   tabs?: Array<
     {
@@ -168,10 +231,19 @@ export type TabsBlock = {
 
 export type Accordion = {
   _type: "accordion";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "default" | "bordered" | "separated";
+  variant?: "default" | "bordered" | "separated" | "technical";
   heading?: string;
   description?: string;
   items?: Array<
@@ -183,20 +255,38 @@ export type Accordion = {
 
 export type Newsletter = {
   _type: "newsletter";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "inline" | "banner" | "split";
+  variant?: "inline" | "banner" | "split" | "brutalist";
   heading?: string;
   description?: string;
-  placeholderText?: string;
-  buttonText?: string;
-  disclaimer?: string;
+  inputPlaceholder?: string;
+  submitButtonLabel?: string;
+  privacyDisclaimerText?: string;
 };
 
 export type LinkCards = {
   _type: "linkCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "list" | "icon-list";
@@ -211,7 +301,16 @@ export type LinkCards = {
 
 export type ProductShowcase = {
   _type: "productShowcase";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "featured" | "detail";
@@ -226,7 +325,16 @@ export type ProductShowcase = {
 
 export type ServiceCards = {
   _type: "serviceCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "list" | "alternating" | "icon-grid" | "specification";
@@ -241,10 +349,19 @@ export type ServiceCards = {
 
 export type PricingTable = {
   _type: "pricingTable";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "simple" | "featured" | "comparison";
+  variant?: "simple" | "featured" | "comparison" | "brutalist";
   heading?: string;
   description?: string;
   tiers?: Array<
@@ -252,6 +369,15 @@ export type PricingTable = {
       _key: string;
     } & PricingTier
   >;
+};
+
+export type SponsorshipTierItem = {
+  _type: "sponsorshipTierItem";
+  name?: string;
+  price?: string;
+  benefits?: Array<string>;
+  highlighted?: boolean;
+  ctaButton?: Button;
 };
 
 export type CardGridItem = {
@@ -346,34 +472,68 @@ export type PricingTier = {
 
 export type VideoEmbed = {
   _type: "videoEmbed";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  videoUrl?: string;
-  title?: string;
-  caption?: string;
+  variant?: "full-width" | "split" | "split-asymmetric";
+  heading?: string;
+  description?: string;
+  youtubeUrl?: string;
+  posterImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
 };
 
 export type SponsorshipTiers = {
   _type: "sponsorshipTiers";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "brutalist";
   heading?: string;
   description?: string;
-  tiers?: Array<{
-    name?: string;
-    price?: string;
-    benefits?: Array<string>;
-    highlighted?: boolean;
-    ctaButton?: Button;
-    _key: string;
-  }>;
+  tiers?: Array<
+    {
+      _key: string;
+    } & SponsorshipTierItem
+  >;
 };
 
 export type AnnouncementBar = {
   _type: "announcementBar";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "inline" | "floating";
@@ -385,7 +545,16 @@ export type AnnouncementBar = {
 
 export type Divider = {
   _type: "divider";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "line" | "short" | "labeled";
@@ -394,10 +563,19 @@ export type Divider = {
 
 export type Pullquote = {
   _type: "pullquote";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "sidebar";
+  variant?: "centered" | "split" | "sidebar" | "brutalist";
   quote?: string;
   attribution?: string;
   role?: string;
@@ -413,7 +591,16 @@ export type Pullquote = {
 
 export type Timeline = {
   _type: "timeline";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "vertical" | "split" | "horizontal" | "engineering";
@@ -433,18 +620,27 @@ export type Timeline = {
 
 export type ComparisonTable = {
   _type: "comparisonTable";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "table" | "stacked" | "specification";
   heading?: string;
   description?: string;
-  columns?: Array<
+  options?: Array<
     {
       _key: string;
     } & ComparisonColumn
   >;
-  rows?: Array<
+  criteria?: Array<
     {
       _key: string;
     } & ComparisonRow
@@ -486,15 +682,24 @@ export type ComparisonColumn = {
 
 export type ArticleList = {
   _type: "articleList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "split-featured" | "list";
   heading?: string;
   description?: string;
-  source?: "all" | "blog" | "news";
+  contentType?: "all" | "blog" | "news";
   limit?: number;
-  links?: Array<
+  ctaButtons?: Array<
     {
       _key: string;
     } & Button
@@ -503,7 +708,16 @@ export type ArticleList = {
 
 export type ImageGallery = {
   _type: "imageGallery";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "masonry" | "single";
@@ -519,7 +733,16 @@ export type ImageGallery = {
 
 export type TeamGrid = {
   _type: "teamGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "grid-compact" | "split";
@@ -541,9 +764,19 @@ export type ProjectReference = {
 
 export type ProjectCards = {
   _type: "projectCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "case-study" | "blueprint";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   projects?: Array<
@@ -555,11 +788,20 @@ export type ProjectCards = {
 
 export type EventList = {
   _type: "eventList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  filterBy?: "all" | "upcoming" | "past";
+  eventStatus?: "all" | "upcoming" | "past";
   limit?: number;
 };
 
@@ -572,12 +814,28 @@ export type TestimonialReference = {
 
 export type Testimonials = {
   _type: "testimonials";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "masonry" | "split" | "carousel" | "marquee";
+  variant?:
+    | "grid"
+    | "masonry"
+    | "split"
+    | "carousel"
+    | "marquee"
+    | "brutalist-quote"
+    | "spotlight";
   heading?: string;
-  displayMode?: "all" | "industry" | "student" | "byProject" | "manual";
+  testimonialSource?: "all" | "industry" | "student" | "byProject" | "manual";
   testimonials?: Array<
     {
       _key: string;
@@ -594,9 +852,19 @@ export type SponsorReference = {
 
 export type SponsorCards = {
   _type: "sponsorCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "showcase" | "brutalist-tier";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   sponsors?: Array<
@@ -615,21 +883,49 @@ export type FormReference = {
 
 export type ContactForm = {
   _type: "contactForm";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "stacked" | "split" | "split-image";
   heading?: string;
   description?: string;
   successMessage?: string;
   form?: FormReference;
+  backgroundImages?: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
 };
 
 export type FaqSection = {
   _type: "faqSection";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "split" | "stacked" | "spread-header" | "narrow";
+  variant?: "split" | "stacked" | "spread-header" | "narrow" | "technical";
   heading?: string;
   items?: Array<
     {
@@ -640,7 +936,16 @@ export type FaqSection = {
 
 export type RichText = {
   _type: "richText";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "prose" | "narrow" | "wide";
@@ -649,7 +954,16 @@ export type RichText = {
 
 export type SponsorSteps = {
   _type: "sponsorSteps";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "steps" | "split" | "spread";
@@ -669,9 +983,19 @@ export type SponsorSteps = {
 
 export type LogoCloud = {
   _type: "logoCloud";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "marquee" | "flex-wrap" | "tiered" | "grid-prominent";
   heading?: string;
   autoPopulate?: boolean;
   sponsors?: Array<
@@ -683,10 +1007,24 @@ export type LogoCloud = {
 
 export type TextWithImage = {
   _type: "textWithImage";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "split" | "split-asymmetric" | "reversed" | "floating";
+  variant?:
+    | "split"
+    | "split-asymmetric"
+    | "reversed"
+    | "floating"
+    | "brutalist";
   heading?: string;
   content?: PortableText;
   image?: {
@@ -702,10 +1040,19 @@ export type TextWithImage = {
 
 export type StatsRow = {
   _type: "statsRow";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "split" | "spread";
+  variant?: "grid" | "split" | "spread" | "brutalist" | "ticker";
   heading?: string;
   stats?: Array<
     {
@@ -716,10 +1063,25 @@ export type StatsRow = {
 
 export type CtaBanner = {
   _type: "ctaBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "spread" | "overlay";
+  variant?:
+    | "centered"
+    | "split"
+    | "spread"
+    | "overlay"
+    | "brutalist"
+    | "data-cta";
   heading?: string;
   description?: string;
   backgroundImages?: Array<{
@@ -740,7 +1102,16 @@ export type CtaBanner = {
 
 export type FeatureGrid = {
   _type: "featureGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?:
@@ -761,10 +1132,25 @@ export type FeatureGrid = {
 
 export type HeroBanner = {
   _type: "heroBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "split-asymmetric" | "overlay" | "spread";
+  variant?:
+    | "centered"
+    | "split"
+    | "split-asymmetric"
+    | "overlay"
+    | "spread"
+    | "brutalist";
   heading?: string;
   subheading?: string;
   backgroundImages?: Array<{
@@ -1282,6 +1668,7 @@ export type Seo = {
   _type: "seo";
   metaTitle?: string;
   metaDescription?: string;
+  noIndex?: boolean;
   ogImage?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -1526,6 +1913,7 @@ export type AllSanitySchemaTypes =
   | ProductShowcase
   | ServiceCards
   | PricingTable
+  | SponsorshipTierItem
   | CardGridItem
   | MetricItem
   | TabItem
@@ -1723,7 +2111,7 @@ export type ALL_SPONSOR_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SPONSOR_BY_SLUG_QUERY
-// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }}
+// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }}
 export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   _id: string;
   name: string | null;
@@ -1749,6 +2137,7 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -1881,7 +2270,7 @@ export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1957,12 +2346,30 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
     | {
         _key: string;
         _type: "videoEmbed";
-        backgroundVariant?: "dark" | "light" | "primary" | "white";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
         spacing?: "default" | "large" | "none" | "small";
         maxWidth?: "default" | "full" | "narrow";
-        videoUrl?: string;
-        title?: string;
-        caption?: string;
+        variant?: "full-width" | "split-asymmetric" | "split";
+        heading?: string;
+        description?: string;
+        youtubeUrl?: string;
+        posterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
         markDefs: null;
       }
   > | null;
@@ -2075,6 +2482,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -2185,7 +2593,7 @@ export type ALL_EVENT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENT_BY_SLUG_QUERY
-// Query: *[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status, isAllDay, category,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
+// Query: *[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status, isAllDay, category,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
 export type EVENT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -2201,6 +2609,7 @@ export type EVENT_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -2435,7 +2844,7 @@ export type SPONSOR_PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      videoUrl,      title,      caption    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      placeholderText,      buttonText,      disclaimer    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      aspectRatio,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      zoom,      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }  }}
+// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    noIndex,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      contentType,      limit,      ctaButtons[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      aspectRatio,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      zoom,      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -2450,6 +2859,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -2466,10 +2876,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "accordion";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "bordered" | "default" | "separated" | null;
+        variant: "bordered" | "default" | "separated" | "technical" | null;
         heading: string | null;
         description: string | null;
         items: Array<{
@@ -2481,7 +2901,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "announcementBar";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
@@ -2496,15 +2926,25 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "articleList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "list" | "split-featured" | null;
         heading: string | null;
         description: string | null;
-        source: "all" | "blog" | "news" | null;
+        contentType: "all" | "blog" | "news" | null;
         limit: number | null;
-        links: Array<{
+        ctaButtons: Array<{
           _key: string;
           text: string | null;
           url: string | null;
@@ -2514,7 +2954,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "beforeAfter";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "side-by-side" | "stacked" | "toggle" | null;
@@ -2552,10 +3002,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "cardGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid-2" | "grid-3" | "grid-4" | "masonry" | null;
+        variant:
+          | "brutalist"
+          | "grid-2"
+          | "grid-3"
+          | "grid-4"
+          | "masonry"
+          | null;
         heading: string | null;
         description: string | null;
         cards: Array<{
@@ -2585,18 +3051,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "comparisonTable";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "specification" | "stacked" | "table" | null;
         heading: string | null;
         description: string | null;
-        columns: Array<{
+        options: Array<{
           _key: string;
           title: string | null;
           highlighted: boolean | null;
         }> | null;
-        rows: Array<{
+        criteria: Array<{
           _key: string;
           feature: string | null;
           values: Array<string> | null;
@@ -2612,10 +3088,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "contactForm";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "split-image" | "split" | "stacked" | null;
         heading: string | null;
         description: string | null;
         successMessage: string | null;
@@ -2659,11 +3145,33 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             text: string | null;
           } | null;
         } | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
       }
     | {
         _type: "countdownTimer";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "banner" | "brutalist" | "hero" | "inline" | null;
@@ -2675,10 +3183,27 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "ctaBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "overlay" | "split" | "spread" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread"
+          | null;
         heading: string | null;
         description: string | null;
         backgroundImages: Array<{
@@ -2703,7 +3228,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "divider";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "labeled" | "line" | "short" | null;
@@ -2712,7 +3247,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "embedBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "contained" | "default" | "full-width" | null;
@@ -2724,21 +3269,47 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "eventList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: null;
         heading: string | null;
-        filterBy: "all" | "past" | "upcoming" | null;
+        eventStatus: "all" | "past" | "upcoming" | null;
         limit: number | null;
       }
     | {
         _type: "faqSection";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "narrow" | "split" | "spread-header" | "stacked" | null;
+        variant:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2814,12 +3385,30 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | {
                 _key: string;
                 _type: "videoEmbed";
-                backgroundVariant?: "dark" | "light" | "primary" | "white";
+                backgroundVariant?:
+                  | "blueprint"
+                  | "dark"
+                  | "hatched-light"
+                  | "hatched"
+                  | "light"
+                  | "mono"
+                  | "primary"
+                  | "stripe"
+                  | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
-                videoUrl?: string;
-                title?: string;
-                caption?: string;
+                variant?: "full-width" | "split-asymmetric" | "split";
+                heading?: string;
+                description?: string;
+                youtubeUrl?: string;
+                posterImage?: {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot?: SanityImageHotspot;
+                  crop?: SanityImageCrop;
+                  alt?: string;
+                  _type: "image";
+                };
                 markDefs: null;
               }
           > | null;
@@ -2828,7 +3417,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "featureGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
@@ -2862,10 +3461,21 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "heroBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
+          | "brutalist"
           | "centered"
           | "overlay"
           | "split-asymmetric"
@@ -2897,7 +3507,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "imageGallery";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "masonry" | "single" | null;
@@ -2925,7 +3545,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "linkCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "icon-list" | "list" | null;
@@ -2942,10 +3572,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "logoCloud";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered"
+          | null;
         heading: string | null;
         autoPopulate: boolean | null;
         sponsors: Array<{
@@ -2955,7 +3601,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "mapBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "default" | "full-width" | "split" | null;
@@ -2976,7 +3632,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "metricsDashboard";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
@@ -2994,23 +3660,43 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "newsletter";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "banner" | "inline" | "split" | null;
+        variant: "banner" | "brutalist" | "inline" | "split" | null;
         heading: string | null;
         description: string | null;
-        placeholderText: string | null;
-        buttonText: string | null;
-        disclaimer: string | null;
+        inputPlaceholder: string | null;
+        submitButtonLabel: string | null;
+        privacyDisclaimerText: string | null;
       }
     | {
         _type: "pricingTable";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "comparison" | "featured" | "simple" | null;
+        variant: "brutalist" | "comparison" | "featured" | "simple" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{
@@ -3028,7 +3714,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "productShowcase";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "detail" | "featured" | "grid" | null;
@@ -3062,10 +3758,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "projectCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "blueprint" | "case-study" | "default" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         projects: Array<{
@@ -3075,10 +3781,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "pullquote";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "sidebar" | "split" | null;
+        variant: "brutalist" | "centered" | "sidebar" | "split" | null;
         quote: string | null;
         attribution: string | null;
         role: string | null;
@@ -3099,7 +3815,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "richText";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "narrow" | "prose" | "wide" | null;
@@ -3174,12 +3900,30 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
-              videoUrl?: string;
-              title?: string;
-              caption?: string;
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
               markDefs: null;
             }
         > | null;
@@ -3187,7 +3931,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "serviceCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
@@ -3226,10 +3980,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist-tier" | "default" | "showcase" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         sponsors: Array<{
@@ -3239,10 +4003,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorshipTiers";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist" | "default" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{
@@ -3261,7 +4035,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorSteps";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "split" | "spread" | "steps" | null;
@@ -3283,10 +4067,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "statsRow";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid" | "split" | "spread" | null;
+        variant: "brutalist" | "grid" | "split" | "spread" | "ticker" | null;
         heading: string | null;
         stats: Array<{
           _key: string;
@@ -3298,10 +4092,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "tabsBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "default" | "pills" | "underline" | null;
+        variant: "brutalist" | "default" | "pills" | "underline" | null;
         heading: string | null;
         tabs: Array<{
           _key: string;
@@ -3312,7 +4116,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "teamGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid-compact" | "grid" | "split" | null;
@@ -3345,12 +4159,30 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "testimonials";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "carousel" | "grid" | "marquee" | "masonry" | "split" | null;
+        variant:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight"
+          | null;
         heading: string | null;
-        displayMode:
+        testimonialSource:
           | "all"
           | "byProject"
           | "industry"
@@ -3364,10 +4196,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "textWithImage";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "floating" | "reversed" | "split-asymmetric" | "split" | null;
+        variant:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split"
+          | null;
         heading: string | null;
         content: Array<
           | {
@@ -3440,12 +4288,30 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
-              videoUrl?: string;
-              title?: string;
-              caption?: string;
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
               markDefs: null;
             }
         > | null;
@@ -3465,7 +4331,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "timeline";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "engineering" | "horizontal" | "split" | "vertical" | null;
@@ -3500,13 +4376,34 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "videoEmbed";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
-        videoUrl: string | null;
-        title: string | null;
-        caption: string | null;
+        variant: "full-width" | "split-asymmetric" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        youtubeUrl: string | null;
+        posterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
       }
   > | null;
 } | null;
@@ -3519,19 +4416,19 @@ declare module "@sanity/client" {
     '*[_type == "page" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "project" && ($site == "" || site == $site)] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry, hidden },\n  technologyTags,\n  semester,\n  status,\n  outcome,\n  featured\n}': ALL_PROJECTS_QUERY_RESULT;
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
-    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type, videoUrl,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, category\n}': ALL_EVENTS_QUERY_RESULT;
     '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, category\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
-    '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status, isAllDay, category,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status, isAllDay, category,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref in\n  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id\n  && ($site == "" || site == $site)\n] | order(title asc) {\n  _id, title, "slug": slug.current, status\n}': SPONSOR_PROJECTS_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      videoUrl,\n      title,\n      caption\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      placeholderText,\n      buttonText,\n      disclaimer\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      aspectRatio,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      zoom,\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    noIndex,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      limit,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      aspectRatio,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      zoom,\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

@@ -9,9 +9,9 @@ export const articleListFull: ArticleListBlock = {
   variant: 'grid',
   heading: 'Latest Articles',
   description: 'Stay up to date with our news',
-  source: 'all',
+  contentType: 'all',
   limit: 6,
-  links: [
+  ctaButtons: [
     { _key: 'btn-1', text: 'View All Articles', url: '/articles', variant: 'default' },
   ],
 };
@@ -25,9 +25,9 @@ export const articleListSplitFeatured: ArticleListBlock = {
   variant: 'split-featured',
   heading: 'Featured Articles',
   description: 'Our top picks',
-  source: 'blog',
+  contentType: 'blog',
   limit: 4,
-  links: null,
+  ctaButtons: null,
 };
 
 export const articleListVariantList: ArticleListBlock = {
@@ -39,9 +39,9 @@ export const articleListVariantList: ArticleListBlock = {
   variant: 'list',
   heading: 'News',
   description: 'This should be hidden in list variant',
-  source: 'news',
+  contentType: 'news',
   limit: 10,
-  links: [
+  ctaButtons: [
     { _key: 'btn-2', text: 'More News', url: '/news', variant: 'outline' },
   ],
 };
@@ -55,7 +55,7 @@ export const articleListMinimal: ArticleListBlock = {
   variant: null,
   heading: null,
   description: null,
-  source: null,
+  contentType: null,
   limit: null,
-  links: null,
+  ctaButtons: null,
 };
