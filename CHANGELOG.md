@@ -1,3 +1,9 @@
+## [1.14.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.14.0...v1.14.1) (2026-04-09)
+
+### Bug Fixes
+
+* **seo:** add Cloudflare AI Search user-agent to robots.txt and fix trailing slash ([84f4f7e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/84f4f7efdf2fc52810b98bfee7a3b76232f2538b))
+
 ## [1.14.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.13.0...v1.14.0) (2026-04-09)
 
 ### Features
