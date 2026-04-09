@@ -11,18 +11,20 @@ export const linkCardItem = defineType({
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'string',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'icon',
       title: 'Icon',
       type: 'string',
       description: 'Lucide icon name',
+      validation: (Rule) => Rule.max(50),
     }),
     defineField({
       name: 'url',

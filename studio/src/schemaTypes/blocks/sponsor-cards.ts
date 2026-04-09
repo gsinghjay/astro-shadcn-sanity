@@ -1,6 +1,7 @@
-import {defineField, defineArrayMember} from 'sanity'
+import {defineField} from 'sanity'
 import {StarIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {displayModeBlock} from '../helpers/commonFields'
 
 export const sponsorCards = defineBlock({
   name: 'sponsorCards',
@@ -17,39 +18,12 @@ export const sponsorCards = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
-    defineField({
-      name: 'displayMode',
-      title: 'Display Mode',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'All', value: 'all'},
-          {title: 'Featured', value: 'featured'},
-          {title: 'Manual', value: 'manual'},
-        ],
-      },
-      initialValue: 'all',
-    }),
-    defineField({
-      name: 'sponsors',
-      title: 'Sponsors',
-      type: 'array',
-      hidden: ({parent}) => parent?.displayMode !== 'manual',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{type: 'sponsor'}],
-        }),
-      ],
-      validation: (Rule) =>
-        Rule.custom((sponsors, context) => {
-          const parent = context.parent as {displayMode?: string}
-          if (parent?.displayMode === 'manual' && (!sponsors || sponsors.length === 0)) {
-            return 'Add at least one sponsor in manual mode'
-          }
-          return true
-        }),
+    ...displayModeBlock({
+      referenceType: 'sponsor',
+      arrayFieldName: 'sponsors',
+      arrayFieldTitle: 'Sponsors',
     }),
   ],
 })

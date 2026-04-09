@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {TrendUpwardIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const metricsDashboard = defineBlock({
   name: 'metricsDashboard',
@@ -15,14 +16,14 @@ export const metricsDashboard = defineBlock({
     {name: 'brutalist-grid', title: 'Brutalist Grid'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
-    defineField({name: 'description', title: 'Description', type: 'text'}),
+    ...headerFields(),
     defineField({
       name: 'metrics',
       title: 'Metrics',
       type: 'array',
+      description: 'Key metrics to display in the dashboard',
       of: [defineArrayMember({type: 'metricItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(20),
     }),
   ],
 })

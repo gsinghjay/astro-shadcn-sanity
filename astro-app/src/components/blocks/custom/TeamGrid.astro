@@ -1,9 +1,10 @@
 ---
 import type { TeamGridBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor } from '@/lib/image';
+import { urlFor, safeUrlFor } from '@/lib/image';
 import { Section, SectionContent, SectionGrid, SectionSplit } from '@/components/ui/section';
 import { Tile, TileContent, TileMedia } from '@/components/ui/tile';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends TeamGridBlock {
   class?: string;
@@ -12,7 +13,19 @@ interface Props extends TeamGridBlock {
 
 const { heading, description, items, variant: rawVariant } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
+
+const personsJsonLd = (items ?? []).filter(m => m.name).map(member => ({
+  "@type": "Person",
+  "name": stegaClean(member.name),
+  ...(member.role && { "jobTitle": stegaClean(member.role) }),
+  ...(member.image?.asset && { "image": safeUrlFor(member.image)?.width(400).url() }),
+  ...(member.links?.length && {
+    "sameAs": member.links.filter(l => l.href).map(l => stegaClean(l.href)),
+  }),
+}));
 ---
+
+{personsJsonLd.length > 0 && personsJsonLd.map(p => <JsonLd schema={p} />)}
 
 {variant === 'grid' && (
   <Section data-animate>
