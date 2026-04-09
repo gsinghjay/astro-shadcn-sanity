@@ -1,5 +1,5 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
-import {CogIcon, ImageIcon, MenuIcon, BlockContentIcon, UsersIcon} from '@sanity/icons'
+import {CogIcon, ImageIcon, MenuIcon, BlockContentIcon, UsersIcon, SearchIcon} from '@sanity/icons'
 import {linkFields} from '../objects/link'
 import {buttonFields} from '../objects/button'
 import {siteField} from '../fields/site-field'
@@ -15,6 +15,7 @@ export const siteSettings = defineType({
     {name: 'navigation', title: 'Navigation', icon: MenuIcon, default: true},
     {name: 'footer', title: 'Footer', icon: BlockContentIcon},
     {name: 'social', title: 'Social & Contact', icon: UsersIcon},
+    {name: 'aiSearch', title: 'AI Search', icon: SearchIcon},
   ],
   fields: [
     defineField({
@@ -220,6 +221,70 @@ export const siteSettings = defineType({
       type: 'string',
       group: 'social',
       description: 'e.g., "Fall 2026"',
+    }),
+    defineField({
+      name: 'aiSearch',
+      title: 'AI Search Chat Bubble',
+      type: 'object',
+      group: 'aiSearch',
+      description: 'Configure the Cloudflare AI Search chat bubble widget',
+      fields: [
+        defineField({
+          name: 'enabled',
+          title: 'Enable Chat Bubble',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Show the floating AI search chat bubble on the site',
+        }),
+        defineField({
+          name: 'apiUrl',
+          title: 'API URL',
+          type: 'url',
+          description: 'NLWeb Worker URL (e.g., https://your-worker.workers.dev)',
+          validation: (Rule) =>
+            Rule.uri({scheme: ['https']}).custom((value, context) => {
+              const parent = context.parent as {enabled?: boolean}
+              if (parent?.enabled && !value) {
+                return 'API URL is required when chat bubble is enabled'
+              }
+              return true
+            }),
+        }),
+        defineField({
+          name: 'placeholder',
+          title: 'Placeholder Text',
+          type: 'string',
+          initialValue: 'Ask a question...',
+          description: 'Hint text shown in the chat input field',
+        }),
+        defineField({
+          name: 'theme',
+          title: 'Theme',
+          type: 'string',
+          initialValue: 'auto',
+          options: {
+            list: [
+              {title: 'Auto (follows system)', value: 'auto'},
+              {title: 'Light', value: 'light'},
+              {title: 'Dark', value: 'dark'},
+            ],
+          },
+        }),
+        defineField({
+          name: 'hideBranding',
+          title: 'Hide Branding',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Remove "Powered by Cloudflare" text from the widget',
+        }),
+        defineField({
+          name: 'openByDefault',
+          title: 'Open on First Visit',
+          type: 'boolean',
+          initialValue: true,
+          description: 'Auto-open the chat panel on a visitor\'s first page load (with a short delay)',
+        }),
+      ],
     }),
   ],
 })

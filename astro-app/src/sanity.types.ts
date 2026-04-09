@@ -1299,6 +1299,14 @@ export type SiteSettings = {
     _key: string;
   }>;
   currentSemester?: string;
+  aiSearch?: {
+    enabled?: boolean;
+    apiUrl?: string;
+    placeholder?: string;
+    theme?: "auto" | "light" | "dark";
+    hideBranding?: boolean;
+    openByDefault?: boolean;
+  };
 };
 
 export type GalleryImage = {
@@ -1990,7 +1998,7 @@ export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type == "siteSettings" && _id == $siteSettingsId][0]{  siteName,  siteDescription,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },  ctaButton{ text, url },  footerContent{ text, copyrightText },  socialLinks[]{ _key, platform, url },  contactInfo{ address, email, phone },  footerLinks[]{ _key, label, href },  resourceLinks[]{ _key, label, href, external },  programLinks[]{ _key, label, href },  currentSemester}
+// Query: *[_type == "siteSettings" && _id == $siteSettingsId][0]{  siteName,  siteDescription,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },  ctaButton{ text, url },  footerContent{ text, copyrightText },  socialLinks[]{ _key, platform, url },  contactInfo{ address, email, phone },  footerLinks[]{ _key, label, href },  resourceLinks[]{ _key, label, href, external },  programLinks[]{ _key, label, href },  currentSemester,  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }}
 export type SITE_SETTINGS_QUERY_RESULT = {
   siteName: string | null;
   siteDescription: string | null;
@@ -2067,6 +2075,14 @@ export type SITE_SETTINGS_QUERY_RESULT = {
     href: string | null;
   }> | null;
   currentSemester: string | null;
+  aiSearch: {
+    enabled: boolean | null;
+    apiUrl: string | null;
+    placeholder: string | null;
+    theme: "auto" | "dark" | "light" | null;
+    hideBranding: boolean | null;
+    openByDefault: boolean | null;
+  } | null;
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -4412,7 +4428,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "siteSettings" && _id == $siteSettingsId][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester\n}': SITE_SETTINGS_QUERY_RESULT;
+    '*[_type == "siteSettings" && _id == $siteSettingsId][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester,\n  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
