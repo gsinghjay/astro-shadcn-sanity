@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ImagesIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const imageGallery = defineBlock({
   name: 'imageGallery',
@@ -15,18 +16,7 @@ export const imageGallery = defineBlock({
     columns: ['masonry', 'single'],
   },
   fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (Rule) => Rule.required().max(150),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      validation: (Rule) => Rule.max(500),
-    }),
+    ...headerFields(),
     defineField({
       name: 'images',
       title: 'Images',

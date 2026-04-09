@@ -96,7 +96,7 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
+        youtubeUrl: 'https://youtu.be/abc123',
         heading: 'Test Video Heading',
         description: 'This is a test description',
       },
@@ -113,7 +113,7 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
+        youtubeUrl: 'https://youtu.be/abc123',
       },
     });
 
@@ -126,7 +126,7 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         heading: 'My Video Title',
       },
     });
@@ -141,7 +141,7 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
+        youtubeUrl: 'https://youtu.be/abc123',
         heading: 'Split Video',
         variant: 'split',
       },
@@ -157,7 +157,7 @@ describe('VideoEmbed (block component)', () => {
       props: {
         _type: 'videoEmbed' as const,
         _key: 'test-key',
-        videoUrl: 'https://youtu.be/abc123',
+        youtubeUrl: 'https://youtu.be/abc123',
         heading: 'Default Variant',
         variant: 'unknown-value',
       },

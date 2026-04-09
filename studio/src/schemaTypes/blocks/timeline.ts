@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ClockIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const timeline = defineBlock({
   name: 'timeline',
@@ -17,18 +18,7 @@ export const timeline = defineBlock({
   },
   preview: {select: {title: 'heading'}},
   fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (Rule) => Rule.required().max(150),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      validation: (Rule) => Rule.max(500),
-    }),
+    ...headerFields(),
     defineField({
       name: 'items',
       title: 'Timeline Entries',

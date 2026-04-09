@@ -11,11 +11,11 @@ interface Props extends ComparisonTableBlock {
   id?: string;
 }
 
-const { heading, description, columns, rows, links, variant: rawVariant } = Astro.props;
+const { heading, description, options, criteria, links, variant: rawVariant } = Astro.props;
 const rawCleaned = stegaClean(rawVariant) ?? 'table';
 const variant = rawCleaned === 'table' || rawCleaned === 'stacked' || rawCleaned === 'specification' ? rawCleaned : 'table';
-const cols = columns ?? [];
-const dataRows = rows ?? [];
+const cols = options ?? [];
+const dataRows = criteria ?? [];
 const colCountClass: Record<number, string> = { 1: '@5xl:grid-cols-1', 2: '@5xl:grid-cols-2', 3: '@5xl:grid-cols-3', 4: '@5xl:grid-cols-4', 5: '@5xl:grid-cols-5', 6: '@5xl:grid-cols-6' };
 
 // Pre-compute zebra striping for specification variant (skips header rows)

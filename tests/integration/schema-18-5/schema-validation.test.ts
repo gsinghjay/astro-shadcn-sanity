@@ -196,14 +196,14 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(field.validation).toBeDefined()
     })
 
-    test('placeholderText has validation', () => {
-      const field = findField(newsletter, 'placeholderText')
+    test('inputPlaceholder has validation', () => {
+      const field = findField(newsletter, 'inputPlaceholder')
       expect(field).toBeDefined()
       expect(field.validation).toBeDefined()
     })
 
-    test('buttonText has validation', () => {
-      const field = findField(newsletter, 'buttonText')
+    test('submitButtonLabel has validation', () => {
+      const field = findField(newsletter, 'submitButtonLabel')
       expect(field).toBeDefined()
       expect(field.validation).toBeDefined()
     })
@@ -268,20 +268,20 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(typeof field.description).toBe('string')
     })
 
-    test('newsletter placeholderText has description', () => {
-      const field = findField(newsletter, 'placeholderText')
+    test('newsletter inputPlaceholder has description', () => {
+      const field = findField(newsletter, 'inputPlaceholder')
       expect(field).toBeDefined()
       expect(field.description).toBeDefined()
     })
 
-    test('newsletter buttonText has description', () => {
-      const field = findField(newsletter, 'buttonText')
+    test('newsletter submitButtonLabel has description', () => {
+      const field = findField(newsletter, 'submitButtonLabel')
       expect(field).toBeDefined()
       expect(field.description).toBeDefined()
     })
 
-    test('video-embed videoUrl has description', () => {
-      const field = findField(videoEmbed, 'videoUrl')
+    test('video-embed youtubeUrl has description', () => {
+      const field = findField(videoEmbed, 'youtubeUrl')
       expect(field).toBeDefined()
       expect(field.description).toBeDefined()
       expect(typeof field.description).toBe('string')
@@ -369,8 +369,8 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 150)).toBe(true)
     })
 
-    test('newsletter placeholderText and buttonText call required()', () => {
-      for (const fieldName of ['placeholderText', 'buttonText']) {
+    test('newsletter inputPlaceholder and submitButtonLabel call required()', () => {
+      for (const fieldName of ['inputPlaceholder', 'submitButtonLabel']) {
         const calls = getCalls(newsletter, fieldName)
         expect(calls.some((c) => c.method === 'required')).toBe(true)
       }

@@ -129,7 +129,7 @@ describe('VideoEmbed JSON-LD', () => {
         maxWidth: null,
         heading: 'Demo Video',
         description: 'Watch our demo',
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
         variant: 'full-width',
       },
     });
@@ -153,7 +153,7 @@ describe('VideoEmbed JSON-LD', () => {
         spacing: null,
         maxWidth: null,
         heading: 'Bad Video',
-        videoUrl: 'https://example.com/not-a-video',
+        youtubeUrl: 'https://example.com/not-a-video',
         variant: 'full-width',
       },
     });

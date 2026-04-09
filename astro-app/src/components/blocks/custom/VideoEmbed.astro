@@ -9,8 +9,8 @@ import { getVideoId } from '@/lib/video';
 
 type Props = VideoEmbedBlock;
 
-const { heading, description, videoUrl: rawVideoUrl, posterImage, variant: rawVariant } = Astro.props;
-const videoUrl = stegaClean(rawVideoUrl);
+const { heading, description, youtubeUrl: rawYoutubeUrl, posterImage, variant: rawVariant } = Astro.props;
+const videoUrl = stegaClean(rawYoutubeUrl);
 const variant = (() => {
   const v = stegaClean(rawVariant);
   return v === 'split' || v === 'split-asymmetric' ? v : 'full-width';

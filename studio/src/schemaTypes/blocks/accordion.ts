@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {ChevronDownIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const accordion = defineBlock({
   name: 'accordion',
@@ -14,8 +15,7 @@ export const accordion = defineBlock({
     {name: 'technical', title: 'Technical'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
-    defineField({name: 'description', title: 'Description', type: 'text', description: 'Supporting text below the heading (max 500 characters)', validation: (Rule) => Rule.max(500)}),
+    ...headerFields(),
     defineField({
       name: 'items',
       title: 'Items',

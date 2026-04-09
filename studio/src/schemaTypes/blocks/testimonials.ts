@@ -17,7 +17,7 @@ export const testimonials = defineBlock({
     {name: 'spotlight', title: 'Spotlight'},
   ],
   hiddenByVariant: {
-    displayMode: ['carousel', 'marquee'],
+    testimonialSource: ['carousel', 'marquee'],
   },
   fields: [
     defineField({
@@ -27,8 +27,8 @@ export const testimonials = defineBlock({
       validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
-      name: 'displayMode',
-      title: 'Display Mode',
+      name: 'testimonialSource',
+      title: 'Testimonial Source',
       type: 'string',
       options: {
         list: [
@@ -45,7 +45,7 @@ export const testimonials = defineBlock({
       name: 'testimonials',
       title: 'Testimonials',
       type: 'array',
-      hidden: ({parent}) => parent?.displayMode !== 'manual',
+      hidden: ({parent}) => parent?.testimonialSource !== 'manual',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -54,8 +54,8 @@ export const testimonials = defineBlock({
       ],
       validation: (Rule) =>
         Rule.custom((testimonials, context) => {
-          const parent = context.parent as {displayMode?: string}
-          if (parent?.displayMode === 'manual' && (!testimonials || testimonials.length === 0)) {
+          const parent = context.parent as {testimonialSource?: string}
+          if (parent?.testimonialSource === 'manual' && (!testimonials || testimonials.length === 0)) {
             return 'Add at least one testimonial in manual mode'
           }
           return true

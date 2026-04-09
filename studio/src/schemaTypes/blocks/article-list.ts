@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {DocumentTextIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const articleList = defineBlock({
   name: 'articleList',
@@ -15,21 +16,10 @@ export const articleList = defineBlock({
     description: ['list'],
   },
   fields: [
+    ...headerFields(),
     defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-      validation: (Rule) => Rule.required().max(150),
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-      validation: (Rule) => Rule.max(500),
-    }),
-    defineField({
-      name: 'source',
-      title: 'Source',
+      name: 'contentType',
+      title: 'Content Type',
       type: 'string',
       description: 'Content type to display (blog posts, news, etc.)',
       options: {
@@ -50,7 +40,7 @@ export const articleList = defineBlock({
       validation: (Rule) => Rule.min(1).max(20),
     }),
     defineField({
-      name: 'links',
+      name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
