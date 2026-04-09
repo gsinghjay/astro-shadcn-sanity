@@ -88,6 +88,7 @@ const tierBarColors: Record<string, string> = {
                   data-gtm-category="sponsorship"
                   data-gtm-action="click"
                   data-gtm-label={stegaClean(tier.name)}
+                  aria-label={`${stegaClean(tier.ctaButton.text) || 'Learn more'} for ${stegaClean(tier.name) || 'this tier'}`}
                 >
                   {tier.ctaButton.text}
                 </Button>
@@ -129,7 +130,7 @@ const tierBarColors: Record<string, string> = {
                 <ul class="flex-1 space-y-3 mb-6">
                   {(tier.benefits ?? []).map((benefit) => (
                     <li class="flex items-start gap-2">
-                      <span class="text-primary mt-0.5 font-mono font-bold">&#9632;</span>
+                      <span class="text-primary mt-0.5 font-mono font-bold" aria-hidden="true">&#9632;</span>
                       <span class="text-sm">{benefit}</span>
                     </li>
                   ))}
@@ -143,6 +144,7 @@ const tierBarColors: Record<string, string> = {
                     data-gtm-category="sponsorship"
                     data-gtm-action="click"
                     data-gtm-label={stegaClean(tier.name)}
+                    aria-label={`${stegaClean(tier.ctaButton.text) || 'Learn more'} for ${stegaClean(tier.name) || 'this tier'}`}
                   >
                     {tier.ctaButton.text}
                   </Button>

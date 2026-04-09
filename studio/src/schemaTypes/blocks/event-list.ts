@@ -12,11 +12,13 @@ export const eventList = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
-      name: 'filterBy',
-      title: 'Filter By',
+      name: 'eventStatus',
+      title: 'Event Status',
       type: 'string',
+      description: 'Filter events by status (upcoming, past, all)',
       options: {
         list: [
           {title: 'All', value: 'all'},
