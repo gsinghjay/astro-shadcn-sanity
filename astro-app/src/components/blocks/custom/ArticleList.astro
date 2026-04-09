@@ -10,7 +10,7 @@ interface Props extends ArticleListBlock {
   id?: string;
 }
 
-const { heading, description, links, variant: rawVariant } = Astro.props;
+const { heading, description, ctaButtons, variant: rawVariant } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
 const placeholderCards = [1, 2, 3];
@@ -41,9 +41,9 @@ const placeholderRows = [1, 2, 3, 4];
     <SectionContent>
       <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
     </SectionContent>
-    {links && links.length > 0 && (
+    {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
-        {links.map((link, i) => (
+        {ctaButtons.map((link, i) => (
           <Button
             href={link.url}
             variant={link.variant || (i === 0 ? 'default' : 'outline')}
@@ -90,9 +90,9 @@ const placeholderRows = [1, 2, 3, 4];
     <SectionContent>
       <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
     </SectionContent>
-    {links && links.length > 0 && (
+    {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
-        {links.map((link, i) => (
+        {ctaButtons.map((link, i) => (
           <Button
             href={link.url}
             variant={link.variant || (i === 0 ? 'default' : 'outline')}
@@ -129,9 +129,9 @@ const placeholderRows = [1, 2, 3, 4];
       </div>
       <p class="mt-4 text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
     </SectionContent>
-    {links && links.length > 0 && (
+    {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
-        {links.map((link, i) => (
+        {ctaButtons.map((link, i) => (
           <Button
             href={link.url}
             variant={link.variant || (i === 0 ? 'default' : 'outline')}

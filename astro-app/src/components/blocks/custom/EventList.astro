@@ -2,10 +2,12 @@
 import type { SanityEvent } from '@/lib/sanity';
 import { Section, SectionContent } from '@/components/ui/section';
 import EventCard from '@/components/EventCard.astro';
+import { JsonLd } from '@/components/ui/json-ld';
+import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   heading?: string | null;
-  filterBy?: 'all' | 'upcoming' | 'past' | null;
+  eventStatus?: 'all' | 'upcoming' | 'past' | null;
   limit?: number | null;
   events?: SanityEvent[];
   class?: string;
@@ -14,7 +16,21 @@ interface Props {
 }
 
 const { heading, events = [] } = Astro.props;
+
+const eventsJsonLd = events.filter(e => e.title).map(e => ({
+  "@type": "Event",
+  "name": stegaClean(e.title),
+  "startDate": e.date,
+  ...(e.endDate && { "endDate": e.endDate }),
+  ...(e.location && { "location": { "@type": "Place", "name": stegaClean(e.location) } }),
+  ...(e.description && { "description": stegaClean(e.description) }),
+  "eventStatus": "https://schema.org/EventScheduled",
+  "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+  ...(e.slug?.current && { "url": `${Astro.url.origin}/events/${e.slug.current}` }),
+}));
 ---
+
+{eventsJsonLd.length > 0 && eventsJsonLd.map(e => <JsonLd schema={e} />)}
 
 <Section data-animate>
   {heading && (

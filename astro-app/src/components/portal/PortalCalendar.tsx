@@ -155,17 +155,17 @@ export default function PortalCalendar({ events }: PortalCalendarProps) {
   return (
     <div ref={calendarRef} className="sx-react-calendar-wrapper relative">
       {/* Event type legend */}
-      <div className="mb-4 flex flex-wrap items-center gap-4 text-xs">
+      <div className="mb-2 flex flex-wrap items-center gap-4 text-xs">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 bg-red-600" />
+          <span className="inline-block h-4 w-4 bg-red-600 dark:bg-red-400" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Showcase</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 bg-blue-600" />
+          <span className="inline-block h-4 w-4 bg-blue-600 dark:bg-blue-400" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Networking</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 bg-green-600" />
+          <span className="inline-block h-4 w-4 bg-green-600 dark:bg-green-400" />
           <span className="uppercase tracking-[0.1em] font-mono font-medium">Workshop</span>
         </span>
       </div>

@@ -9,12 +9,12 @@ export const comparisonTableFull: ComparisonTableBlock = {
   variant: 'table',
   heading: 'Plan Comparison',
   description: 'Compare our plans side by side.',
-  columns: [
+  options: [
     { _key: 'c1', title: 'Free', highlighted: null },
     { _key: 'c2', title: 'Pro', highlighted: true },
     { _key: 'c3', title: 'Enterprise', highlighted: null },
   ],
-  rows: [
+  criteria: [
     { _key: 'r0', feature: 'Storage', values: ['5 GB', '50 GB', 'Unlimited'], isHeader: null },
     { _key: 'r1', feature: 'Advanced Features', values: null, isHeader: true },
     { _key: 'r2', feature: 'API Calls', values: ['1,000', '100,000', 'Unlimited'], isHeader: null },
@@ -39,11 +39,11 @@ export const comparisonTableMinimal: ComparisonTableBlock = {
   variant: null,
   heading: null,
   description: null,
-  columns: [
+  options: [
     { _key: 'c1', title: 'A', highlighted: null },
     { _key: 'c2', title: 'B', highlighted: null },
   ],
-  rows: [
+  criteria: [
     { _key: 'r1', feature: 'Item', values: ['Yes', 'No'], isHeader: null },
   ],
   links: null,

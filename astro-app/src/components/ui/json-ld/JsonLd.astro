@@ -1,0 +1,15 @@
+---
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  schema: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { schema } = Astro.props;
+const cleaned = stegaClean(schema);
+const withContext = Array.isArray(cleaned)
+  ? cleaned.map(s => ({ '@context': 'https://schema.org', ...s }))
+  : { '@context': 'https://schema.org', ...cleaned };
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(withContext)} />

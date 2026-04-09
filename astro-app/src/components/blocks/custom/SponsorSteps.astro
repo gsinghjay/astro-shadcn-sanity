@@ -20,6 +20,7 @@ import {
   TileMedia,
   TileTitle,
 } from '@/components/ui/tile';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends SponsorStepsBlock {
   class?: string;
@@ -29,7 +30,22 @@ interface Props extends SponsorStepsBlock {
 const { heading, subheading, items, ctaButtons, variant } = Astro.props;
 const rawVariant = stegaClean(variant);
 const cleanVariant = rawVariant === 'steps' || rawVariant === 'split' || rawVariant === 'spread' ? rawVariant : 'steps';
+
+const howToJsonLd = (items ?? []).length > 0 ? {
+  "@type": "HowTo",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(subheading && { "description": stegaClean(subheading) }),
+  "step": (items ?? []).filter(item => item.title).map((item, i) => ({
+    "@type": "HowToStep",
+    "position": i + 1,
+    "name": stegaClean(item.title),
+    ...(item.description && { "text": stegaClean(item.description) }),
+    ...(ctaButtons?.[0]?.url && i === (items?.length ?? 0) - 1 && { "url": stegaClean(ctaButtons[0].url) }),
+  })),
+} : null;
 ---
+
+{howToJsonLd && <JsonLd schema={howToJsonLd} />}
 
 {cleanVariant === 'steps' && (
   <Section>

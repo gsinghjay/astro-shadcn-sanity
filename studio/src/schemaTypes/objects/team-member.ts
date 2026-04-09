@@ -9,12 +9,14 @@ export const teamMember = defineType({
       name: 'name',
       title: 'Name',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(100),
     }),
     defineField({
       name: 'role',
       title: 'Role',
       type: 'string',
+      description: 'Job title or role',
+      validation: (Rule) => Rule.max(100),
     }),
     defineField({
       name: 'image',
@@ -35,7 +37,9 @@ export const teamMember = defineType({
       name: 'links',
       title: 'Links',
       type: 'array',
+      description: 'Social media or portfolio links',
       of: [defineArrayMember({type: 'link'})],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
   preview: {

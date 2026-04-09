@@ -23,25 +23,28 @@
   --sx-color-surface-container-high: #F0F0F0;
   --sx-color-surface-dim: #E5E5E5;
   --sx-color-shadow: transparent;
+  --sx-box-shadow-level3: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Dark mode — inverted Swiss Brutalist palette
+   Schedule-X uses .is-dark on its calendar wrapper, not .dark on <html>
    ═══════════════════════════════════════════════════════════════════ */
-.dark {
+.is-dark {
   --sx-color-primary: #F87171;
   --sx-color-on-primary: #0A0A0A;
   --sx-color-surface: #0A0A0A;
   --sx-color-on-surface: #E5E5E5;
   --sx-color-background: #0A0A0A;
   --sx-color-on-background: #E5E5E5;
-  --sx-color-outline: #404040;
-  --sx-color-outline-variant: #404040;
+  --sx-color-outline: #E5E5E5;
+  --sx-color-outline-variant: #E5E5E5;
   --sx-color-surface-container: #171717;
   --sx-color-surface-container-low: #0F0F0F;
   --sx-color-surface-container-high: #1F1F1F;
   --sx-color-surface-dim: #171717;
   --sx-color-shadow: transparent;
+  --sx-box-shadow-level3: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -62,32 +65,42 @@
   border-width: 1px;
 }
 
-/* Today indicator — thick red top border, not a colored circle */
-.sx__month-grid-day--is-today,
-.sx__date-grid-day--is-today {
+/* Today indicator — thick red top border on cell, not a colored circle */
+.sx__month-grid-day:has(.sx__is-today) {
+  border-top: 2px solid var(--sx-color-primary);
+}
+.sx__week-grid__date--is-today {
   border-top: 2px solid var(--sx-color-primary);
 }
 
-/* Remove today circle indicator if present */
-.sx__month-grid-day--is-today .sx__month-grid-day__header-date,
-.sx__date-grid-day--is-today .sx__date-grid-day__header-date {
+/* Remove today circle indicator — flat date number with color accent */
+.sx__month-grid-day__header-date.sx__is-today {
+  background: transparent;
+  color: var(--sx-color-primary);
+  font-weight: 700;
+}
+.sx__week-grid__date--is-today .sx__week-grid__date-number {
   background: transparent;
   color: var(--sx-color-primary);
   font-weight: 700;
 }
 
 /* Event chips — flat, no shadow, hard border */
-.sx__event,
+.sx__time-grid-event,
 .sx__month-grid-event,
 .sx__month-agenda-event {
-  box-shadow: none !important;
+  box-shadow: none;
   border: 1px solid currentColor;
-  border-radius: 0 !important;
 }
 
-/* Short event text — uppercase */
-.sx__event .sx__event-title,
-.sx__month-grid-event .sx__month-grid-event__title {
+/* Event text — uppercase, tight */
+.sx__time-grid-event-title {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.sx__month-grid-event {
   text-transform: uppercase;
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
@@ -97,9 +110,8 @@
 /* ═══════════════════════════════════════════════════════════════════
    Day headers — uppercase, tight tracking
    ═══════════════════════════════════════════════════════════════════ */
-.sx__week-grid__header-day-name,
-.sx__month-grid-day__header-day-name,
-.sx__date-grid-day__header-day-name {
+.sx__week-grid__day-name,
+.sx__month-grid-day__header-day-name {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
@@ -107,8 +119,8 @@
 }
 
 /* Time column — monospace numerals */
-.sx__time-grid__hour,
-.sx__time-grid__hour-text {
+.sx__week-grid__hour,
+.sx__week-grid__hour-text {
   font-family: 'Courier New', Courier, monospace;
   font-variant-numeric: tabular-nums;
 }
@@ -116,35 +128,45 @@
 /* ═══════════════════════════════════════════════════════════════════
    View switcher — uppercase tabs with bottom-border active state
    ═══════════════════════════════════════════════════════════════════ */
-.sx__view-selection__item {
-  border-radius: 0 !important;
+.sx__view-selection-item {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 500;
   font-size: 0.75rem;
+  font-family: 'Courier New', Courier, monospace;
   border-bottom: 2px solid transparent;
-  background: transparent !important;
+  background-color: transparent;
 }
 
-.sx__view-selection__item--is-selected {
+.sx__view-selection-item.is-selected {
   border-bottom-color: var(--sx-color-primary);
   font-weight: 700;
-  background: transparent !important;
+  background-color: transparent;
 }
 
-.sx__view-selection__item:hover:not(.sx__view-selection__item--is-selected) {
+.sx__view-selection-item:hover,
+.sx__view-selection-item:focus {
+  background-color: transparent;
+  color: var(--sx-color-on-surface);
   border-bottom-color: var(--sx-color-outline-variant);
+}
+
+.sx__view-selection-item.is-selected:hover,
+.sx__view-selection-item.is-selected:focus {
+  background-color: transparent;
+  color: var(--sx-color-on-surface);
+  border-bottom-color: var(--sx-color-primary);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    Additional structural cleanup
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Remove any remaining box-shadows from containers */
+/* Remove box-shadows from containers via variable override + direct */
 .sx__calendar,
 .sx__calendar-wrapper,
 .sx-react-calendar-wrapper {
-  box-shadow: none !important;
+  box-shadow: none;
 }
 
 /* Month agenda — clean borders */
@@ -152,9 +174,9 @@
   border-bottom: 1px solid var(--sx-color-outline);
 }
 
-/* Navigation buttons — flat, no background */
-.sx__date-input__chevron-wrapper {
-  border-radius: 0 !important;
+/* Navigation buttons — flat */
+.sx__date-input-chevron-wrapper {
+  border-radius: 0;
 }
 
 /* Calendar height — fill parent container */

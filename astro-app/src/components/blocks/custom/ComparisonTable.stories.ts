@@ -69,8 +69,8 @@ export const Table = {
     variant: 'table',
     heading: 'Choose Your Plan',
     description: 'Simple, transparent pricing for teams of every size.',
-    columns: pricingColumns,
-    rows: pricingRows,
+    options: pricingColumns,
+    criteria: pricingRows,
     links: ctaButtons,
   },
 }
@@ -85,8 +85,8 @@ export const Stacked = {
     variant: 'stacked',
     heading: 'Plan Comparison',
     description: 'Card view for easy mobile comparison.',
-    columns: pricingColumns,
-    rows: pricingRows,
+    options: pricingColumns,
+    criteria: pricingRows,
     links: ctaButtons,
   },
 }
@@ -100,11 +100,11 @@ export const TwoColumn = {
     maxWidth: 'default',
     variant: 'table',
     heading: 'Before & After',
-    columns: [
+    options: [
       { _key: 'col-a', title: 'Traditional', highlighted: false },
       { _key: 'col-b', title: 'Modern', highlighted: true },
     ],
-    rows: [
+    criteria: [
       { _key: 'r1', feature: 'Deployment', values: ['Manual FTP', 'CI/CD Pipeline'], isHeader: false },
       { _key: 'r2', feature: 'Testing', values: ['Manual QA', 'Automated Tests'], isHeader: false },
       { _key: 'r3', feature: 'Monitoring', values: ['Server logs', 'Real-time dashboard'], isHeader: false },
@@ -119,12 +119,12 @@ export const Specification = {
     variant: 'specification',
     heading: 'Sponsorship Tier Specifications',
     backgroundVariant: 'hatched-light',
-    columns: [
+    options: [
       { _key: 'col-s', title: 'Silver', highlighted: false },
       { _key: 'col-g', title: 'Gold', highlighted: true },
       { _key: 'col-p', title: 'Platinum', highlighted: false },
     ],
-    rows: [
+    criteria: [
       { _key: 'row-h1', feature: 'PROJECT ACCESS', values: [], isHeader: true },
       { _key: 'row-1', feature: 'Capstone projects', values: ['1', '2', 'Unlimited'], isHeader: false },
       { _key: 'row-2', feature: 'Project selection priority', values: ['Standard', 'Priority', 'First choice'], isHeader: false },
