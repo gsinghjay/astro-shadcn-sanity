@@ -12,19 +12,21 @@ export const faqSection = defineBlock({
     {name: 'stacked', title: 'Stacked (centered heading, full-width accordion below)'},
     {name: 'spread-header', title: 'Spread Header (heading left, buttons right, accordion below)'},
     {name: 'narrow', title: 'Narrow (672px centered column)'},
+    {name: 'technical', title: 'Technical'},
   ],
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'items',
       title: 'Items',
       type: 'array',
       of: [defineArrayMember({type: 'faqItem'})],
-      validation: (Rule) => Rule.min(1).error('Add at least one FAQ'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one FAQ'), Rule.max(20)],
     }),
   ],
 })

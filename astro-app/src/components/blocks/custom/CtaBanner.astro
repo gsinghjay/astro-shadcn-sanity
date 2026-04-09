@@ -9,9 +9,10 @@ import { cn, bgClasses } from '@/lib/utils';
 interface Props extends CtaBannerBlock {
   class?: string;
   id?: string;
+  stats?: Array<{ _key: string; value?: string; label?: string }>;
 }
 
-const { heading, description, ctaButtons, backgroundVariant, backgroundImages, variant: rawVariant, class: className, id } = Astro.props;
+const { heading, description, ctaButtons, backgroundVariant, backgroundImages, variant: rawVariant, stats, class: className, id } = Astro.props;
 
 const layoutVariant = stegaClean(rawVariant) ?? 'centered';
 
@@ -24,18 +25,28 @@ const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
   dark: '',
   hatched: '',
+  blueprint: '',
+  mono: '',
   light: '',
   white: '',
   'hatched-light': '',
+  stripe: '',
+  brutalist: 'border-2 border-background bg-transparent text-background hover:bg-background hover:text-foreground',
+  'data-cta': '',
 };
 
 const secondaryBtnMap: Record<string, string> = {
   primary: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
   dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
   hatched: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  blueprint: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  mono: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
   light: '',
   white: '',
   'hatched-light': '',
+  stripe: '',
+  brutalist: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  'data-cta': 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
 };
 
 const firstImage = backgroundImages?.[0];
@@ -50,7 +61,7 @@ const firstImage = backgroundImages?.[0];
       </h2>
 
       {description && (
-        <p class="text-lg leading-relaxed max-w-2xl ${descColor}">{description}</p>
+        <p class={`text-lg leading-relaxed max-w-2xl ${descColor}`}>{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (
@@ -83,7 +94,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl ${descColor}">{description}</p>
+          <p class={`text-lg leading-relaxed max-w-xl ${descColor}`}>{description}</p>
         )}
 
         {ctaButtons && ctaButtons.length > 0 && (
@@ -131,7 +142,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class="text-lg leading-relaxed max-w-xl ${descColor}">{description}</p>
+          <p class={`text-lg leading-relaxed max-w-xl ${descColor}`}>{description}</p>
         )}
       </SectionContent>
 
@@ -200,5 +211,88 @@ const firstImage = backgroundImages?.[0];
         </SectionActions>
       )}
     </SectionContent>
+  </Section>
+)}
+
+{/* BRUTALIST variant — full-bleed hatched bg, thick left red border on heading, outlined CTA */}
+{layoutVariant === 'brutalist' && (
+  <Section class={cn(sectionBg, className)} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">
+        {heading}
+      </h2>
+
+      {description && (
+        <p class={`text-lg leading-relaxed max-w-2xl ${descColor}`}>{description}</p>
+      )}
+
+      {ctaButtons && ctaButtons.length > 0 && (
+        <SectionActions>
+          {ctaButtons.map((btn, i) => (
+            <Button
+              href={btn.url}
+              variant={i === 0 ? 'outline' : (btn.variant || 'outline')}
+              class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['brutalist'] : secondaryBtnMap[bgVariant] || secondaryBtnMap['brutalist']}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(btn.text)}
+            >
+              {btn.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{/* DATA-CTA variant — split layout: stats left, CTA right */}
+{layoutVariant === 'data-cta' && (
+  <Section class={cn(sectionBg, className)} id={id} data-animate>
+    <SectionSplit class="@5xl:items-center">
+      <SectionContent>
+        {stats && stats.length > 0 && (
+          <div class="flex flex-col gap-6">
+            {stats.map((stat) => (
+              <div class="accent-divider pb-4">
+                <div class="font-mono tabular-nums text-5xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-1">
+                  {stat.value}
+                </div>
+                <div class={`label-caps ${isDarkBg ? 'text-background/40' : 'text-muted-foreground'}`}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </SectionContent>
+
+      <SectionContent>
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.05]">
+          {heading}
+        </h2>
+
+        {description && (
+          <p class={`text-lg leading-relaxed ${descColor}`}>{description}</p>
+        )}
+
+        {ctaButtons && ctaButtons.length > 0 && (
+          <SectionActions>
+            {ctaButtons.map((btn, i) => (
+              <Button
+                href={btn.url}
+                variant={i === 0 ? 'default' : (btn.variant || 'outline')}
+                class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['data-cta'] : secondaryBtnMap[bgVariant] || secondaryBtnMap['data-cta']}
+                data-gtm-category="cta"
+                data-gtm-action="click"
+                data-gtm-label={stegaClean(btn.text)}
+              >
+                {btn.text}
+              </Button>
+            ))}
+          </SectionActions>
+        )}
+      </SectionContent>
+    </SectionSplit>
   </Section>
 )}

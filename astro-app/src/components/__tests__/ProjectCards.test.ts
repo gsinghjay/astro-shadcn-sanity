@@ -54,4 +54,84 @@ describe('ProjectCards', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('case-study variant renders horizontal layout with sponsor name', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'case-study' },
+    });
+
+    expect(html).toContain('Our Projects');
+    expect(html).toContain('Smart Campus Navigation');
+    expect(html).toContain('Acme Corp');
+    expect(html).toContain('border-2');
+    expect(html).toContain('@3xl:flex-row');
+  });
+
+  test('case-study variant renders tech stack badges', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'case-study' },
+    });
+
+    expect(html).toContain('React');
+    expect(html).toContain('TypeScript');
+    expect(html).toContain('label-caps');
+  });
+
+  test('case-study variant renders status indicator', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'case-study' },
+    });
+
+    expect(html).toContain('completed');
+  });
+
+  test('case-study variant renders heading with left border accent', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'case-study' },
+    });
+
+    expect(html).toContain('border-l-4');
+    expect(html).toContain('border-primary');
+  });
+
+  test('blueprint variant renders monospace title', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'blueprint' },
+    });
+
+    expect(html).toContain('font-mono');
+  });
+
+  test('blueprint variant renders grid overlay effect', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'blueprint' },
+    });
+
+    expect(html).toContain('background-size: 20px 20px');
+  });
+
+  test('blueprint variant renders lighter border cards', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'blueprint' },
+    });
+
+    expect(html).toContain('border');
+    expect(html).toContain('background/30');
+  });
+
+  test('unknown variant falls back to default', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ProjectCards, {
+      props: { ...projectCardsFull, variant: 'unknown' },
+    });
+
+    expect(html).toContain('Smart Campus Navigation');
+  });
 });

@@ -213,4 +213,26 @@ describe('Testimonials', () => {
     expect(html).not.toContain('data-youtube-facade');
     expect(html).toContain('Great experience overall');
   });
+
+  test('brutalist-quote variant renders carousel with oversized quotation mark', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'brutalist-quote' },
+    });
+
+    expect(html).toContain('data-slot="native-carousel"');
+    expect(html).toContain('text-[8rem]');
+    expect(html).toContain('font-mono');
+  });
+
+  test('spotlight variant renders single full-width testimonial', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'spotlight' },
+    });
+
+    expect(html).toContain('w-48 h-48');
+    expect(html).toContain('Jane Smith');
+    expect(html).toContain('Acme Corp');
+  });
 });

@@ -20,6 +20,13 @@ export const seo = defineType({
       validation: (Rule) => Rule.max(160),
     }),
     defineField({
+      name: 'noIndex',
+      title: 'No Index',
+      type: 'boolean',
+      description: 'Hide this page from search engines',
+      initialValue: false,
+    }),
+    defineField({
       name: 'ogImage',
       title: 'Open Graph Image',
       type: 'image',

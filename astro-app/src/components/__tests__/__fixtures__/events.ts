@@ -65,7 +65,7 @@ export const eventsFull = {
   spacing: 'default' as const,
   maxWidth: 'default' as const,
   heading: 'Upcoming Events',
-  filterBy: 'upcoming' as const,
+  eventStatus: 'upcoming' as const,
   limit: 10,
   events: eventsData.filter(e => e.status === 'upcoming'),
 };
@@ -77,7 +77,7 @@ export const eventsMinimal = {
   spacing: null,
   maxWidth: null,
   heading: null,
-  filterBy: null,
+  eventStatus: null,
   limit: null,
   events: undefined as SanityEvent[] | undefined,
 };
@@ -89,7 +89,7 @@ export const eventsAll = {
   spacing: 'default' as const,
   maxWidth: 'default' as const,
   heading: 'All Events',
-  filterBy: 'all' as const,
+  eventStatus: 'all' as const,
   limit: 10,
   events: eventsData,
 };
@@ -101,7 +101,7 @@ export const eventsPast = {
   spacing: 'default' as const,
   maxWidth: 'default' as const,
   heading: 'Past Events',
-  filterBy: 'past' as const,
+  eventStatus: 'past' as const,
   limit: 10,
   events: eventsData.filter(e => e.status === 'past'),
 };

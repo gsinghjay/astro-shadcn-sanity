@@ -2,29 +2,124 @@
 import type { Sponsor } from '@/lib/sanity';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import SponsorCard from '@/components/SponsorCard.astro';
+import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
 
 interface Props {
   heading?: string | null;
   displayMode?: 'all' | 'featured' | 'manual' | null;
   sponsors?: Sponsor[];
+  variant?: string;
   class?: string;
   id?: string;
   [key: string]: unknown;
 }
 
-const { heading, sponsors } = Astro.props;
+const { heading, sponsors, variant: rawVariant, class: className, id } = Astro.props;
+const cleanVariant = (() => {
+  const v = stegaClean(rawVariant);
+  return v === 'showcase' || v === 'brutalist-tier' ? v : 'default';
+})();
+
+const tierBarColors: Record<string, string> = {
+  platinum: 'bg-primary',
+  gold: 'bg-[#E89B32]',
+  silver: 'bg-[#D4D4D4]',
+  bronze: 'bg-[#A3A3A3]',
+};
 ---
 
-<Section data-animate>
-  {heading && (
-    <SectionContent>
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
-    </SectionContent>
-  )}
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
 
-  <SectionGrid size="lg">
-    {(sponsors ?? []).map((sponsor) => (
-      <SponsorCard sponsor={sponsor} />
-    ))}
-  </SectionGrid>
-</Section>
+    <SectionGrid size="lg">
+      {(sponsors ?? []).map((sponsor) => (
+        <SponsorCard sponsor={sponsor} />
+      ))}
+    </SectionGrid>
+  </Section>
+)}
+
+{cleanVariant === 'showcase' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <SectionContent>
+      <div class="space-y-6">
+        {(sponsors ?? []).map((sponsor) => {
+          const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(80).fit('max').url() ?? null;
+          return (
+            <div class="flex flex-col md:flex-row gap-6 border-2 border-border p-6 items-center">
+              <div class="flex-shrink-0 w-40 h-20 flex items-center justify-center bg-muted">
+                {logoUrl ? (
+                  <img src={logoUrl} alt={sponsor.logo?.alt || `${sponsor.name} logo`} class="max-h-16 max-w-[140px] object-contain" width="160" height="80" loading="lazy" />
+                ) : (
+                  <span class="text-xl font-bold text-muted-foreground">
+                    {(sponsor.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                  </span>
+                )}
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="flex items-center gap-3">
+                  <h3 class="text-xl font-bold">{sponsor.name}</h3>
+                  {sponsor.tier && (
+                    <span class="label-caps text-muted-foreground">{sponsor.tier}</span>
+                  )}
+                </div>
+                {sponsor.description && (
+                  <p class="text-muted-foreground leading-relaxed">{sponsor.description}</p>
+                )}
+                {sponsor.website && (
+                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener noreferrer" class="text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 inline-flex items-center gap-1">
+                    Visit Website &rarr;
+                  </a>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist-tier' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <SectionGrid size="lg">
+      {(sponsors ?? []).map((sponsor) => {
+        const tier = stegaClean(sponsor.tier) || 'silver';
+        const barColor = tierBarColors[tier] ?? 'bg-[#A3A3A3]';
+        return (
+          <div class="border-2 border-foreground">
+            <div class:list={[barColor, "h-2"]} />
+            <div class="p-6 space-y-3">
+              <span class="font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">{tier}</span>
+              <h3 class="text-xl font-bold">{sponsor.name}</h3>
+              {sponsor.description && (
+                <p class="text-sm text-muted-foreground leading-relaxed">{sponsor.description}</p>
+              )}
+              {sponsor.website && (
+                <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener noreferrer" class="text-xs font-bold uppercase tracking-wider text-primary hover:text-primary/80 inline-flex items-center gap-1">
+                  Visit Website &rarr;
+                </a>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </SectionGrid>
+  </Section>
+)}

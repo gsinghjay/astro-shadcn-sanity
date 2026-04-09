@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { PricingTableBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericPrice } from '@/lib/structured-data';
 
 interface Props extends PricingTableBlock {
   class?: string;
@@ -14,8 +16,33 @@ interface Props extends PricingTableBlock {
 
 const { heading, description, tiers = [], variant: rawVariant, class: className, id } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
-const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' ? rawCleaned : 'simple';
+const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || rawCleaned === 'comparison' || rawCleaned === 'brutalist' ? rawCleaned : 'simple';
+
+// Pre-compute deduplicated features for comparison variant (stega-safe)
+const comparisonFeatures: { raw: string; clean: string }[] = [];
+const seenFeatures = new Set<string>();
+for (const t of tiers) {
+  for (const f of t.features ?? []) {
+    const clean = stegaClean(f) || '';
+    if (clean && !seenFeatures.has(clean)) {
+      seenFeatures.add(clean);
+      comparisonFeatures.push({ raw: f, clean });
+    }
+  }
+}
+
+const offersJsonLd = tiers.filter(t => t.name && t.price).map(tier => ({
+  "@type": "Offer",
+  "name": stegaClean(tier.name),
+  "price": extractNumericPrice(stegaClean(tier.price) || ''),
+  "priceCurrency": "USD",
+  ...(tier.description && { "description": stegaClean(tier.description) }),
+  ...(tier.ctaUrl && { "url": stegaClean(tier.ctaUrl) }),
+  "availability": "https://schema.org/InStock",
+}));
 ---
+
+{offersJsonLd.length > 0 && offersJsonLd.map(o => <JsonLd schema={o} />)}
 
 {cleanVariant === 'simple' && (
   <Section class={className} id={id} data-animate>
@@ -41,13 +68,13 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
             <ul class="space-y-2 text-sm">
               {(tier.features ?? []).map((feature) => (
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-0.5">&#10003;</span>
+                  <span class="text-primary mt-0.5" aria-hidden="true">&#10003;</span>
                   <span>{feature}</span>
                 </li>
               ))}
             </ul>
             {tier.ctaText && (
-              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto">
+              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto" aria-label={`Subscribe to ${stegaClean(tier.name) || 'this'} plan`}>
                 {tier.ctaText}
               </Button>
             )}
@@ -86,13 +113,13 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
             <ul class="space-y-2 text-sm w-full">
               {(tier.features ?? []).map((feature) => (
                 <li class="flex items-center gap-2 justify-center">
-                  <span class="text-primary">&#10003;</span>
+                  <span class="text-primary" aria-hidden="true">&#10003;</span>
                   <span>{feature}</span>
                 </li>
               ))}
             </ul>
             {tier.ctaText && (
-              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto">
+              <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto" aria-label={`Subscribe to ${stegaClean(tier.name) || 'this'} plan`}>
                 {tier.ctaText}
               </Button>
             )}
@@ -118,9 +145,9 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="border-b">
-            <th class="p-4 text-sm font-medium text-muted-foreground">Features</th>
+            <th class="p-4 text-sm font-medium text-muted-foreground" scope="col">Features</th>
             {tiers.map((tier) => (
-              <th class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+              <th class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')} scope="col">
                 <div class="font-bold text-lg">{tier.name}</div>
                 <div class="text-2xl font-bold mt-1">{tier.price}</div>
                 {tier.interval && <div class="text-sm text-muted-foreground">/{tier.interval}</div>}
@@ -129,23 +156,20 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
           </tr>
         </thead>
         <tbody>
-          {(() => {
-            const allFeatures = [...new Set(tiers.flatMap((t) => t.features ?? []))];
-            return allFeatures.map((feature) => (
-              <tr class="border-b">
-                <td class="p-4 text-sm">{feature}</td>
-                {tiers.map((tier) => (
-                  <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
-                    {(tier.features ?? []).includes(feature) ? (
-                      <span class="text-primary">&#10003;</span>
-                    ) : (
-                      <span class="text-muted-foreground">&#8212;</span>
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ));
-          })()}
+          {comparisonFeatures.map(({ raw, clean }) => (
+            <tr class="border-b">
+              <th scope="row" class="p-4 text-sm text-left font-normal">{raw}</th>
+              {tiers.map((tier) => (
+                <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
+                  {(tier.features ?? []).some(f => stegaClean(f) === clean) ? (
+                    <span class="text-primary" aria-hidden="true">&#10003;</span>
+                  ) : (
+                    <span class="text-muted-foreground" aria-hidden="true">&#8212;</span>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
         </tbody>
         <tfoot>
           <tr>
@@ -153,7 +177,7 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
             {tiers.map((tier) => (
               <td class={cn('p-4 text-center', tier.highlighted && 'bg-primary/5')}>
                 {tier.ctaText && (
-                  <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'}>
+                  <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} aria-label={`Subscribe to ${stegaClean(tier.name) || 'this'} plan`}>
                     {tier.ctaText}
                   </Button>
                 )}
@@ -163,5 +187,49 @@ const cleanVariant = rawCleaned === 'simple' || rawCleaned === 'featured' || raw
         </tfoot>
       </table>
     </div>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <SectionGrid>
+      {tiers.map((tier) => (
+        <div class={cn(
+          'flex flex-col p-6 border-2 border-foreground',
+          tier.highlighted && 'border-primary ring-2 ring-primary'
+        )}>
+          <div class="space-y-2 mb-6">
+            <h3 class="text-xl font-bold">{tier.name}</h3>
+            <div class="flex items-baseline gap-1 font-mono">
+              <span class="text-4xl font-bold">{tier.price}</span>
+              {tier.interval && <span class="text-muted-foreground">/{tier.interval}</span>}
+            </div>
+            {tier.description && <p class="text-sm text-muted-foreground">{tier.description}</p>}
+          </div>
+          <ul class="space-y-2 text-sm flex-1 mb-6">
+            {(tier.features ?? []).map((feature) => (
+              <li class="flex items-start gap-2">
+                <span class="text-primary mt-0.5 font-mono font-bold" aria-hidden="true">&#9632;</span>
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+          {tier.ctaText && (
+            <Button href={tier.ctaUrl} variant={tier.highlighted ? 'default' : 'outline'} class="w-full mt-auto" aria-label={`Subscribe to ${stegaClean(tier.name) || 'this'} plan`}>
+              {tier.ctaText}
+            </Button>
+          )}
+        </div>
+      ))}
+    </SectionGrid>
   </Section>
 )}

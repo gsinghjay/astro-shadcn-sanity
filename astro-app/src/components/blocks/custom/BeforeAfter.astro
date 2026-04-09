@@ -5,6 +5,7 @@ import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import { safeUrlFor } from '@/lib/image';
 import type { BeforeAfterBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends BeforeAfterBlock {
   class?: string;
@@ -26,7 +27,33 @@ const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'side-by-side' || rawCleaned === 'stacked' || rawCleaned === 'toggle' ? rawCleaned : 'side-by-side';
 const beforeImgUrl = safeUrlFor(beforeImage)?.width(800).height(600).fit('crop').url();
 const afterImgUrl = safeUrlFor(afterImage)?.width(800).height(600).fit('crop').url();
+
+const imageObjects: Record<string, unknown>[] = [];
+if (beforeImage?.asset) {
+  imageObjects.push({
+    "@type": "ImageObject",
+    "name": stegaClean(beforeLabel) || "Before",
+    "contentUrl": safeUrlFor(beforeImage)?.width(1200).url(),
+    ...(beforeImage.alt && { "description": stegaClean(beforeImage.alt) }),
+  });
+}
+if (afterImage?.asset) {
+  imageObjects.push({
+    "@type": "ImageObject",
+    "name": stegaClean(afterLabel) || "After",
+    "contentUrl": safeUrlFor(afterImage)?.width(1200).url(),
+    ...(afterImage.alt && { "description": stegaClean(afterImage.alt) }),
+  });
+}
+const beforeAfterJsonLd = imageObjects.length > 0 ? {
+  "@type": "ImageGallery",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(caption && { "description": stegaClean(caption) }),
+  "image": imageObjects,
+} : null;
 ---
+
+{beforeAfterJsonLd && <JsonLd schema={beforeAfterJsonLd} />}
 
 {cleanVariant === 'side-by-side' && (
   <Section class={className} id={id} data-animate>
