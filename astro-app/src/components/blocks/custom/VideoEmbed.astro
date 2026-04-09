@@ -4,21 +4,35 @@ import VideoEmbedComponent from '@/components/VideoEmbed.astro';
 import { Section, SectionContent, SectionSplit, SectionGrid, SectionProse } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { JsonLd } from '@/components/ui/json-ld';
+import { getVideoId } from '@/lib/video';
 
 type Props = VideoEmbedBlock;
 
-const { heading, description, videoUrl: rawVideoUrl, posterImage, variant: rawVariant } = Astro.props;
-const videoUrl = stegaClean(rawVideoUrl);
+const { heading, description, youtubeUrl: rawYoutubeUrl, posterImage, variant: rawVariant } = Astro.props;
+const videoUrl = stegaClean(rawYoutubeUrl);
 const variant = (() => {
   const v = stegaClean(rawVariant);
   return v === 'split' || v === 'split-asymmetric' ? v : 'full-width';
 })();
 
 const posterUrl = safeUrlFor(posterImage)?.width(1280).height(720).url() ?? undefined;
+
+const videoId = videoUrl ? getVideoId(videoUrl) : null;
+const videoJsonLd = videoUrl && videoId ? {
+  "@type": "VideoObject",
+  "name": stegaClean(heading) || "Video",
+  ...(description && { "description": stegaClean(description) }),
+  "thumbnailUrl": `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+  "embedUrl": `https://www.youtube-nocookie.com/embed/${videoId}`,
+  "contentUrl": videoUrl,
+} : null;
 ---
 
+{videoJsonLd && <JsonLd schema={videoJsonLd} />}
+
 {variant === 'full-width' && videoUrl && (
-  <div data-animate>
+  <Section data-animate>
     {(heading || description) && (
       <SectionContent class="items-center text-center mb-8">
         {heading && (
@@ -30,7 +44,7 @@ const posterUrl = safeUrlFor(posterImage)?.width(1280).height(720).url() ?? unde
       </SectionContent>
     )}
     <VideoEmbedComponent url={videoUrl} title={heading ?? undefined} />
-  </div>
+  </Section>
 )}
 
 {variant === 'split' && videoUrl && (

@@ -11,20 +11,21 @@ export const metricItem = defineType({
       name: 'label',
       title: 'Label',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(100),
     }),
     defineField({
       name: 'value',
       title: 'Value',
       type: 'string',
       description: 'Display value',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(50),
     }),
     defineField({
       name: 'change',
       title: 'Change',
       type: 'string',
       description: 'e.g. "+12%", "-3%"',
+      validation: (Rule) => Rule.max(50),
     }),
     defineField({
       name: 'trend',
@@ -44,6 +45,7 @@ export const metricItem = defineType({
       title: 'Icon',
       type: 'string',
       description: 'Lucide icon name',
+      validation: (Rule) => Rule.max(50),
     }),
   ],
   preview: {

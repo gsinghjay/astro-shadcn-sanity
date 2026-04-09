@@ -21,7 +21,7 @@ export default {
     },
     heading: { control: 'text', description: 'Heading above the video' },
     description: { control: 'text', description: 'Description text' },
-    videoUrl: { control: 'text', description: 'YouTube video URL' },
+    youtubeUrl: { control: 'text', description: 'YouTube video URL' },
     backgroundVariant: {
       control: { type: 'select' },
       options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
@@ -47,7 +47,7 @@ export const FullWidth = {
     variant: 'full-width',
     heading: 'Watch Our Latest Presentation',
     description: 'Learn about our capstone program and how students collaborate with industry sponsors on real-world projects.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },
 }
 
@@ -56,7 +56,7 @@ export const FullWidthNoText = {
     _type: 'videoEmbed',
     _key: 'story-video-2',
     variant: 'full-width',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },
 }
 
@@ -67,7 +67,7 @@ export const Split = {
     variant: 'split',
     heading: 'Project Showcase',
     description: 'See how our teams delivered innovative solutions for their sponsors in the Spring 2026 semester.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },
 }
 
@@ -78,6 +78,6 @@ export const SplitAsymmetric = {
     variant: 'split-asymmetric',
     heading: 'Behind the Scenes',
     description: 'A day in the life of a capstone team — from stand-ups to sponsor demos.',
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    youtubeUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   },
 }
