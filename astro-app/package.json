@@ -21,6 +21,7 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.2",
+    "@cloudflare/ai-search-snippet": "0.0.30",
     "@iconify-json/lucide": "^1.2.89",
     "@iconify-json/simple-icons": "^1.2.69",
     "@iconify/utils": "^3.1.0",
