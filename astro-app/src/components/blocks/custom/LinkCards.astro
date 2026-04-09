@@ -30,7 +30,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
       {links.map((link) => (
         <Tile variant="floating" href={link.url}>
           <TileContent>
-            {link.icon && <span class="text-3xl">{link.icon}</span>}
+            {link.icon && <span class="text-3xl" aria-hidden="true">{link.icon}</span>}
             <TileTitle>{link.title}</TileTitle>
             {link.description && <TileDescription>{link.description}</TileDescription>}
             <span class="text-sm text-primary font-medium mt-auto">Learn more &rarr;</span>
@@ -52,20 +52,22 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
       )}
     </SectionContent>
 
-    <div class="w-full space-y-2">
+    <ul class="w-full space-y-2 list-none">
       {links.map((link) => (
-        <Tile variant="floating" href={link.url}>
-          <TileContent class="flex-row items-center gap-4">
-            {link.icon && <span class="text-2xl flex-shrink-0">{link.icon}</span>}
-            <div class="flex-1 min-w-0">
-              <TileTitle>{link.title}</TileTitle>
-              {link.description && <TileDescription>{link.description}</TileDescription>}
-            </div>
-            <span class="text-primary flex-shrink-0">&rarr;</span>
-          </TileContent>
-        </Tile>
+        <li>
+          <Tile variant="floating" href={link.url}>
+            <TileContent class="flex-row items-center gap-4">
+              {link.icon && <span class="text-2xl flex-shrink-0" aria-hidden="true">{link.icon}</span>}
+              <div class="flex-1 min-w-0">
+                <TileTitle>{link.title}</TileTitle>
+                {link.description && <TileDescription>{link.description}</TileDescription>}
+              </div>
+              <span class="text-primary flex-shrink-0">&rarr;</span>
+            </TileContent>
+          </Tile>
+        </li>
       ))}
-    </div>
+    </ul>
   </Section>
 )}
 
@@ -86,9 +88,9 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
           <TileContent class="flex-row items-center gap-4">
             <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
               {link.icon ? (
-                <span class="text-2xl">{link.icon}</span>
+                <span class="text-2xl" aria-hidden="true">{link.icon}</span>
               ) : (
-                <span class="text-primary text-lg font-bold">{(link.title ?? '').charAt(0)}</span>
+                <span class="text-primary text-lg font-bold" aria-hidden="true">{(link.title ?? '').charAt(0)}</span>
               )}
             </div>
             <div class="flex-1 min-w-0">

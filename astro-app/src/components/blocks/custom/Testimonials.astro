@@ -12,10 +12,11 @@ import { Marquee, MarqueeContent } from '@/components/ui/marquee';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props {
   heading?: string | null;
-  displayMode?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
+  testimonialSource?: 'all' | 'industry' | 'student' | 'byProject' | 'manual' | null;
   testimonials?: Testimonial[];
   variant?: string;
   class?: string;
@@ -23,7 +24,18 @@ interface Props {
   [key: string]: unknown;
 }
 
-const { heading, displayMode, testimonials = [], variant, class: className, id } = Astro.props;
+const { heading, testimonialSource, testimonials = [], variant, class: className, id } = Astro.props;
+
+const reviewsJsonLd = testimonials.filter(t => t.name && t.quote).map(t => ({
+  "@type": "Review",
+  "reviewBody": stegaClean(t.quote),
+  "author": {
+    "@type": "Person",
+    "name": stegaClean(t.name),
+    ...(t.role && { "jobTitle": stegaClean(t.role) }),
+    ...(t.organization && { "worksFor": { "@type": "Organization", "name": stegaClean(t.organization) } }),
+  },
+}));
 const rawVariant = stegaClean(variant);
 const cleanVariant =
   rawVariant === 'grid' ||
@@ -37,7 +49,7 @@ const cleanVariant =
     : 'grid';
 
 // For byProject mode, group testimonials by project reference
-const isByProject = stegaClean(displayMode) === 'byProject';
+const isByProject = stegaClean(testimonialSource) === 'byProject';
 const grouped = new Map<string, { title: string; slug: string; testimonials: Testimonial[] }>();
 if (isByProject) {
   for (const t of testimonials) {
@@ -50,6 +62,8 @@ if (isByProject) {
   }
 }
 ---
+
+{reviewsJsonLd.length > 0 && reviewsJsonLd.map(r => <JsonLd schema={r} />)}
 
 {cleanVariant === 'grid' && (
   <Section data-animate class={className} id={id}>
@@ -203,24 +217,24 @@ if (isByProject) {
                 <div class="relative p-8 md:p-12 max-w-4xl mx-auto">
                   <div class="text-[8rem] leading-none text-primary/20 font-serif absolute top-0 left-4 select-none" aria-hidden="true">&ldquo;</div>
                   <blockquote class="relative z-10 text-2xl md:text-3xl lg:text-4xl font-bold tracking-[-0.03em] leading-[1.1] mb-8">
-                    {t.quote}
+                    <p>{t.quote}</p>
+                    <footer class="flex items-center gap-3 font-mono mt-8 text-base font-normal tracking-normal leading-normal">
+                      {photoUrl ? (
+                        <img src={photoUrl} alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'} width="48" height="48" loading="lazy" class="w-12 h-12 object-cover" />
+                      ) : (
+                        <div class="w-12 h-12 bg-muted flex items-center justify-center">
+                          <span class="text-sm font-bold text-muted-foreground">
+                            {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
+                          </span>
+                        </div>
+                      )}
+                      <cite class="not-italic">
+                        <span class="font-bold text-sm">{t.name}</span>
+                        {t.role && <span class="block text-xs text-muted-foreground">{t.role}</span>}
+                        {t.organization && <span class="block text-xs text-muted-foreground">{t.organization}</span>}
+                      </cite>
+                    </footer>
                   </blockquote>
-                  <div class="flex items-center gap-3 font-mono">
-                    {photoUrl ? (
-                      <img src={photoUrl} alt={t.photo?.alt ?? ''} width="48" height="48" loading="lazy" class="w-12 h-12 object-cover" />
-                    ) : (
-                      <div class="w-12 h-12 bg-muted flex items-center justify-center">
-                        <span class="text-sm font-bold text-muted-foreground">
-                          {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <span class="font-bold text-sm">{t.name}</span>
-                      {t.role && <span class="block text-xs text-muted-foreground">{t.role}</span>}
-                      {t.organization && <span class="block text-xs text-muted-foreground">{t.organization}</span>}
-                    </div>
-                  </div>
                 </div>
               </NativeCarouselItem>
             );
@@ -253,24 +267,26 @@ if (isByProject) {
             <div class="flex flex-col md:flex-row gap-8 items-center">
               <div class="flex-shrink-0">
                 {photoUrl ? (
-                  <img src={photoUrl} alt={t.photo?.alt ?? ''} width="200" height="200" loading="lazy" class="w-48 h-48 object-cover border-2 border-border" />
+                  <img src={photoUrl} alt={stegaClean(t.photo?.alt) || stegaClean(t.name) || 'Testimonial author'} width="200" height="200" loading="lazy" class="w-48 h-48 object-cover border-2 border-border" />
                 ) : (
                   <div class="w-48 h-48 bg-muted flex items-center justify-center border-2 border-border">
                     <span class="text-4xl font-bold text-muted-foreground">
-                      {(t.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+                      {(t.name || '').split(' ').filter(Boolean).map((w: string) => w[0]).join('').slice(0, 2)}
                     </span>
                   </div>
                 )}
               </div>
               <div class="flex-1 space-y-4">
                 <blockquote class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.1]">
-                  &ldquo;{t.quote}&rdquo;
+                  <p>&ldquo;{t.quote}&rdquo;</p>
+                  <footer class="mt-4 font-normal tracking-normal leading-normal">
+                    <cite class="not-italic">
+                      <span class="text-lg font-bold">{t.name}</span>
+                      {t.role && <span class="block text-muted-foreground text-base">{t.role}</span>}
+                    </cite>
+                    {t.organization && <span class="block text-lg font-semibold text-primary">{t.organization}</span>}
+                  </footer>
                 </blockquote>
-                <div>
-                  <span class="text-lg font-bold">{t.name}</span>
-                  {t.role && <span class="block text-muted-foreground">{t.role}</span>}
-                  {t.organization && <span class="block text-lg font-semibold text-primary">{t.organization}</span>}
-                </div>
               </div>
             </div>
           );

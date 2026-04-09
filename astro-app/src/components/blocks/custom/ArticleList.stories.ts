@@ -48,9 +48,9 @@ export const Grid = {
     variant: 'grid',
     heading: 'Latest Articles',
     description: 'News and insights from our team on technology, design, and community.',
-    source: 'all',
+    contentType: 'all',
     limit: 6,
-    links: sharedButtons,
+    ctaButtons: sharedButtons,
   },
 }
 
@@ -61,9 +61,9 @@ export const SplitFeatured = {
     variant: 'split-featured',
     heading: 'From the Blog',
     description: 'Featured stories and recent posts.',
-    source: 'blog',
+    contentType: 'blog',
     limit: 4,
-    links: sharedButtons,
+    ctaButtons: sharedButtons,
   },
 }
 
@@ -73,9 +73,9 @@ export const List = {
     _key: 'story-al-list',
     variant: 'list',
     heading: 'Archive',
-    source: 'all',
+    contentType: 'all',
     limit: 10,
-    links: sharedButtons,
+    ctaButtons: sharedButtons,
   },
 }
 

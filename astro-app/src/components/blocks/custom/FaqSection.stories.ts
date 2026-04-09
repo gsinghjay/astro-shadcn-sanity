@@ -15,13 +15,13 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['split', 'stacked', 'spread-header', 'narrow'],
+      options: ['split', 'stacked', 'spread-header', 'narrow', 'technical'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
       description: 'Background color theme',
     },
     spacing: {
@@ -108,6 +108,23 @@ export const Minimal = {
         question: 'Ut enim ad minim veniam?',
         answer: 'Quis nostrud exercitation ullamco laboris nisi ut aliquip.',
       },
+    ],
+  },
+}
+
+export const Technical = {
+  args: {
+    _type: 'faqSection',
+    _key: 'story-faq-technical',
+    variant: 'technical',
+    heading: 'Sponsor FAQ',
+    backgroundVariant: 'hatched-light',
+    items: [
+      { _key: 'ft1', question: 'What is the minimum commitment for sponsors?', answer: 'Silver-tier sponsorship starts at $5,000 per semester and includes one capstone project with a dedicated student team of 4–6 members.' },
+      { _key: 'ft2', question: 'Who owns the intellectual property?', answer: 'IP arrangements are flexible. Standard projects use an open-source license. Custom IP agreements can be negotiated for Gold and Platinum sponsors.' },
+      { _key: 'ft3', question: 'How are student teams selected?', answer: 'Teams are assembled based on skill match to project requirements. Platinum sponsors get first-choice team selection; Gold sponsors get priority matching.' },
+      { _key: 'ft4', question: 'What technologies do students work with?', answer: 'Our program covers full-stack development, ML/AI, cloud architecture, cybersecurity, mobile/IoT, and data engineering. Technology selection is driven by project requirements.' },
+      { _key: 'ft5', question: 'Can we hire students after the project?', answer: 'Absolutely. All sponsors receive student resume access. Gold and Platinum sponsors get exclusive recruitment events and early access to top performers.' },
     ],
   },
 }

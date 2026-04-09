@@ -18,6 +18,8 @@ import {accordionItem} from './objects/accordion-item'
 import {tabItem} from './objects/tab-item'
 import {metricItem} from './objects/metric-item'
 import {cardGridItem} from './objects/card-grid-item'
+// Object schemas — sponsorship (Story 18.6)
+import {sponsorshipTierItem} from './objects/sponsorship-tier-item'
 
 // Document schemas
 import {page} from './documents/page'
@@ -145,6 +147,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   tabItem,
   metricItem,
   cardGridItem,
+  sponsorshipTierItem,
   // Blocks — essential blocks (Story 17.20)
   pricingTable,
   serviceCards,
