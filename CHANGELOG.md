@@ -1,3 +1,45 @@
+## [1.14.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.13.0...v1.14.0) (2026-04-09)
+
+### Features
+
+* **a11y:** add semantic HTML and accessibility fixes to block components ([d35baf4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d35baf4cad92a723d5c1a2dbd2e8d92209eec0d3))
+* **blocks:** add brutalist variants for data and content components ([f673c81](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f673c815f6a22c9a4c31f1adcf55fa8d2d654485))
+* **blocks:** add brutalist variants for HeroBanner, CtaBanner, and StatsRow ([12dc59f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/12dc59fb3046aa7f81417204258aeffefbaf8bae))
+* **blocks:** add brutalist variants for sponsor and social proof components ([ed6d585](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ed6d58511b612c5d0cc47862af9e91dfb1e72275))
+* **blocks:** add brutalist variants for UI and engagement components ([bf3e6a2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bf3e6a2de22b585c0702de14c70f119b956085d1))
+* **blocks:** add variants to videoEmbed, logoCloud, and contactForm ([aafefc7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/aafefc74cd9331782cf99a6d08958a1d5165a54d))
+* **calendar:** add Swiss Brutalist theme for Schedule-X calendars ([8ddd3bb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8ddd3bbe7122b5942ff3d8ed04ffc5e05ef4e82b)), closes [#E30613](https://github.com/gsinghjay/astro-shadcn-sanity/issues/E30613)
+* **css:** add brutalist foundation CSS utilities and background variants ([1bd4fcd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1bd4fcdeec09f9d922b3295e60f5c766a4f1e6fe))
+* **seo:** add JSON-LD structured data to 17 block components ([4d7de6f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4d7de6fad1480c3bc33970cfd84b421ac540af15))
+* **seo:** add sitemap, robots.txt, canonical URLs, and noIndex support ([15e4d83](https://github.com/gsinghjay/astro-shadcn-sanity/commit/15e4d83837a2ba8ac3bc8bb8498e50f463cc7da9))
+* **studio:** add schema validation rules and editor descriptions ([5e4afd3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5e4afd339bb9aaa6a4e6f57278e375ac3aedb780))
+* **studio:** extract shared schema helpers and standardize field naming ([a91505f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a91505fb72d61f543082e84bf6fd5ff7ed609792))
+* **studio:** register brutalist variants in Sanity block schemas ([a56cdc8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a56cdc8da245c8f0da33ae8f2f23a465d5221795))
+
+### Bug Fixes
+
+* **a11y:** address code review findings for Story 18.4 ([77bd53b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/77bd53b87294328afcdb40f1ccc3b08f83efc2e1))
+* **blocks:** add missing button map entries for new background variants ([7f6db2e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7f6db2ee12f7a011d2e2c35d69bf7f90a8c933b1))
+* **blocks:** address review findings for Story 2.8 ([a64dfe6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a64dfe65ac0b0c1b37c8df817914ef11e947d8b3))
+* **blocks:** apply code review fixes for image handling and URL validation ([b616257](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b616257e03db36d2662384d8c2fc1760a90b2fa2))
+* **blocks:** apply code review patches for brutalist variant bugs ([215b1b1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/215b1b1e7b1689f2b5718ead5dd11a0ef67448af)), closes [#4](https://github.com/gsinghjay/astro-shadcn-sanity/issues/4)
+* **blocks:** apply code review patches for security, bugs and schema consistency ([bf6123c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bf6123c463d67516987410935d09725f0cc28fd1))
+* **blocks:** wrap VideoEmbed split variants in Section for container queries ([cdc77a3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cdc77a3b5f8ac385d4e967033f267b0932b5eb8d))
+* **calendar:** correct Schedule-X CSS selectors and review findings for Story 17.27 ([f1694d5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f1694d538423d6880b00f597d6fe3a16a2a0b448))
+* **home:** add missing getAllProjects fetch so projectCards block renders ([c30f3e7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c30f3e7032025fd31631969cee28787bc79baedb))
+* **home:** resolve CSP, CLS, and carousel loading issues from production audit ([fee4aaf](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fee4aaf944b3a5769c0d51907bc07e23502ddf4c))
+* **seo:** address code review findings for Story 5.1 ([eb7c7dc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/eb7c7dc23bf36770ac4821bae9509d40284d030a))
+* **studio:** add default variants and hiddenByVariant for brutalist schemas ([e6a48b3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e6a48b3125ba94850ee0fde6e838d636afec19f9))
+* **studio:** address code review findings for Story 18.5 ([698ba89](https://github.com/gsinghjay/astro-shadcn-sanity/commit/698ba8942b3a7d214dc8d09ad1373dc0f6909a5a)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1)
+
+### Documentation
+
+* **storybook:** add stories for new block variants ([aefe18a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/aefe18a57973e8718d388cad4b7f3e26a73d67cb))
+
+### Miscellaneous
+
+* lingering ([2bfe688](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2bfe6880cf3b790691f1425ebb9c0086c6cb1c72))
+
 ## [1.13.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.12.0...v1.13.0) (2026-04-04)
 
 ### Features
