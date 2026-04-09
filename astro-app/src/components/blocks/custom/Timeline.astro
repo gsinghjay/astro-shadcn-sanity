@@ -4,6 +4,7 @@ import { Section, SectionContent, SectionActions } from '@/components/ui/section
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
+import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends TimelineBlock {
   class?: string;
@@ -13,7 +14,22 @@ interface Props extends TimelineBlock {
 const { heading, description, items, links, variant: rawVariant } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'vertical';
 const entries = items ?? [];
+
+const timelineJsonLd = entries.length > 0 ? {
+  "@type": "ItemList",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(description && { "description": stegaClean(description) }),
+  "itemListElement": entries.filter(item => item.title).map((item, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "name": stegaClean(item.title),
+    ...(item.description && { "description": stegaClean(item.description) }),
+    ...(item.date && { "temporal": stegaClean(item.date) }),
+  })),
+} : null;
 ---
+
+{timelineJsonLd && <JsonLd schema={timelineJsonLd} />}
 
 {variant === 'vertical' && (
   <Section data-animate>
@@ -201,6 +217,54 @@ const entries = items ?? [];
             );
           })}
         </div>
+      </div>
+
+      {links && links.length > 0 && (
+        <SectionActions>
+          {links.map((link, i) => (
+            <Button
+              href={link.url}
+              variant={link.variant || (i === 0 ? 'default' : 'outline')}
+              data-gtm-category="cta"
+              data-gtm-action="click"
+              data-gtm-label={stegaClean(link.text)}
+            >
+              {link.text}
+            </Button>
+          ))}
+        </SectionActions>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'engineering' && (
+  <Section data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+
+      <div class="relative before:absolute before:left-[11px] before:top-0 before:h-full before:w-[2px] before:border-l-2 before:border-dashed before:border-primary/40">
+        {entries.map((entry) => (
+          <div class="relative flex gap-6 pb-8 last:pb-0">
+            <div class="relative flex-shrink-0 mt-1">
+              <div class="w-[24px] h-[24px] bg-primary border-brutal border-primary"></div>
+            </div>
+            <div class="flex-1">
+              <span class="font-mono label-caps text-muted-foreground tracking-wider">{entry.date}</span>
+              <div class="border-l-4 border-primary pl-4 mt-2">
+                <h3 class="font-semibold">{entry.title}</h3>
+                {entry.description && (
+                  <p class="text-muted-foreground mt-1 text-sm">{entry.description}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {links && links.length > 0 && (

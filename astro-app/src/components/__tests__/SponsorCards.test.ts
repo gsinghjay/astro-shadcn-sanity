@@ -86,4 +86,36 @@ describe('SponsorCards', () => {
     expect(html).toContain('data-gtm-action="external"');
     expect(html).toContain('data-gtm-action="detail"');
   });
+
+  test('showcase variant renders horizontal card layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorCards, {
+      props: { ...sponsorCardsFull, variant: 'showcase' },
+    });
+
+    expect(html).toContain('md:flex-row');
+    expect(html).toContain('Acme Corp');
+    expect(html).toContain('Leading technology partner');
+  });
+
+  test('brutalist-tier variant renders tier color bar and monospace label', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorCards, {
+      props: { ...sponsorCardsFull, variant: 'brutalist-tier' },
+    });
+
+    expect(html).toContain('border-2 border-foreground');
+    expect(html).toContain('font-mono');
+    expect(html).toContain('h-2');
+  });
+
+  test('unknown variant falls back to default card grid', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorCards, {
+      props: { ...sponsorCardsFull, variant: 'nonexistent' },
+    });
+
+    expect(html).toContain('data-gtm-category="sponsor"');
+    expect(html).toContain('data-gtm-action="detail"');
+  });
 });

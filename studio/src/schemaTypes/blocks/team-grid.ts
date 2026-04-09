@@ -1,6 +1,7 @@
 import {defineField, defineArrayMember} from 'sanity'
 import {UsersIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields} from '../helpers/commonFields'
 
 export const teamGrid = defineBlock({
   name: 'teamGrid',
@@ -15,22 +16,13 @@ export const teamGrid = defineBlock({
     description: ['grid-compact'],
   },
   fields: [
-    defineField({
-      name: 'heading',
-      title: 'Heading',
-      type: 'string',
-    }),
-    defineField({
-      name: 'description',
-      title: 'Description',
-      type: 'text',
-    }),
+    ...headerFields(),
     defineField({
       name: 'items',
       title: 'Team Members',
       type: 'array',
       of: [defineArrayMember({type: 'teamMember'})],
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).max(30),
     }),
   ],
 })

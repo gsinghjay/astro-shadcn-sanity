@@ -38,7 +38,7 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'pills', 'underline'],
+      options: ['default', 'pills', 'underline', 'brutalist'],
       description: 'Tab style variant',
     },
     heading: { control: 'text', description: 'Section heading' },
@@ -87,5 +87,21 @@ export const Underline = {
     variant: 'underline',
     heading: 'Product Details',
     tabs: sharedTabs,
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'tabsBlock',
+    _key: 'story-tabs-brutalist',
+    variant: 'brutalist',
+    heading: 'Program Overview',
+    backgroundVariant: 'hatched-light',
+    tabs: [
+      { _key: 'tb1', label: 'For Sponsors', content: 'Access top STEM talent, prototype solutions to real business challenges, and build your brand on campus. From Silver to Platinum, every tier delivers measurable ROI.' },
+      { _key: 'tb2', label: 'For Students', content: 'Work on real-world projects with Fortune 500 companies. Build your portfolio, gain industry mentorship, and graduate with production deployment experience.' },
+      { _key: 'tb3', label: 'For Faculty', content: 'Bridge academic theory and industry practice. Guide student teams on cutting-edge projects while building research partnerships with corporate sponsors.' },
+      { _key: 'tb4', label: 'Impact', content: '94% placement rate. $2.4M in research funding. 40+ completed projects. 10 Fortune 500 partners. Top 40 public university nationally.' },
+    ],
   },
 }

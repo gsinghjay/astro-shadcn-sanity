@@ -37,13 +37,13 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['table', 'stacked'],
+      options: ['table', 'stacked', 'specification'],
       description: 'Layout variant',
     },
     heading: { control: 'text', description: 'Section heading' },
     backgroundVariant: {
       control: { type: 'select' },
-      options: ['white', 'light', 'dark', 'primary'],
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
       description: 'Background color theme',
     },
     spacing: {
@@ -69,8 +69,8 @@ export const Table = {
     variant: 'table',
     heading: 'Choose Your Plan',
     description: 'Simple, transparent pricing for teams of every size.',
-    columns: pricingColumns,
-    rows: pricingRows,
+    options: pricingColumns,
+    criteria: pricingRows,
     links: ctaButtons,
   },
 }
@@ -85,8 +85,8 @@ export const Stacked = {
     variant: 'stacked',
     heading: 'Plan Comparison',
     description: 'Card view for easy mobile comparison.',
-    columns: pricingColumns,
-    rows: pricingRows,
+    options: pricingColumns,
+    criteria: pricingRows,
     links: ctaButtons,
   },
 }
@@ -100,14 +100,46 @@ export const TwoColumn = {
     maxWidth: 'default',
     variant: 'table',
     heading: 'Before & After',
-    columns: [
+    options: [
       { _key: 'col-a', title: 'Traditional', highlighted: false },
       { _key: 'col-b', title: 'Modern', highlighted: true },
     ],
-    rows: [
+    criteria: [
       { _key: 'r1', feature: 'Deployment', values: ['Manual FTP', 'CI/CD Pipeline'], isHeader: false },
       { _key: 'r2', feature: 'Testing', values: ['Manual QA', 'Automated Tests'], isHeader: false },
       { _key: 'r3', feature: 'Monitoring', values: ['Server logs', 'Real-time dashboard'], isHeader: false },
+    ],
+  },
+}
+
+export const Specification = {
+  args: {
+    _type: 'comparisonTable',
+    _key: 'story-comparison-spec',
+    variant: 'specification',
+    heading: 'Sponsorship Tier Specifications',
+    backgroundVariant: 'hatched-light',
+    options: [
+      { _key: 'col-s', title: 'Silver', highlighted: false },
+      { _key: 'col-g', title: 'Gold', highlighted: true },
+      { _key: 'col-p', title: 'Platinum', highlighted: false },
+    ],
+    criteria: [
+      { _key: 'row-h1', feature: 'PROJECT ACCESS', values: [], isHeader: true },
+      { _key: 'row-1', feature: 'Capstone projects', values: ['1', '2', 'Unlimited'], isHeader: false },
+      { _key: 'row-2', feature: 'Project selection priority', values: ['Standard', 'Priority', 'First choice'], isHeader: false },
+      { _key: 'row-3', feature: 'Custom project scoping', values: ['—', '✓', '✓'], isHeader: false },
+      { _key: 'row-h2', feature: 'TALENT & RECRUITMENT', values: [], isHeader: true },
+      { _key: 'row-4', feature: 'Student resume access', values: ['✓', '✓', '✓'], isHeader: false },
+      { _key: 'row-5', feature: 'Dedicated liaison', values: ['—', '✓', '✓'], isHeader: false },
+      { _key: 'row-6', feature: 'Exclusive recruitment events', values: ['—', '—', '✓'], isHeader: false },
+      { _key: 'row-h3', feature: 'VISIBILITY & GOVERNANCE', values: [], isHeader: true },
+      { _key: 'row-7', feature: 'Logo on website', values: ['✓', '✓', '✓'], isHeader: false },
+      { _key: 'row-8', feature: 'Showcase keynote', values: ['—', '—', '✓'], isHeader: false },
+      { _key: 'row-9', feature: 'Advisory board seat', values: ['—', '—', '✓'], isHeader: false },
+    ],
+    links: [
+      { _key: 'link-1', text: 'Compare All Features', url: '/sponsorship-opportunities' },
     ],
   },
 }

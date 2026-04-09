@@ -67,6 +67,7 @@ export type BeforeAfterBlock = Extract<PageBlock, { _type: 'beforeAfter' }>;
 export interface SeoProps {
   metaTitle?: string | null;
   metaDescription?: string | null;
+  noIndex?: boolean | null;
   ogImage?: {
     asset?: {
       _id: string;

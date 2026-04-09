@@ -11,15 +11,16 @@ export const tabsBlock = defineBlock({
     {name: 'default', title: 'Default'},
     {name: 'pills', title: 'Pills'},
     {name: 'underline', title: 'Underline'},
+    {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string'}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
     defineField({
       name: 'tabs',
       title: 'Tabs',
       type: 'array',
       of: [defineArrayMember({type: 'tabItem'})],
-      validation: (Rule) => Rule.min(1),
+      validation: (Rule) => Rule.min(1).max(8),
     }),
   ],
 })

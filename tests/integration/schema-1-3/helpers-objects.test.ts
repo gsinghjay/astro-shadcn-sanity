@@ -71,8 +71,8 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
 
       const options = (bgField as any).options?.list
       const values = options.map((o: any) => typeof o === 'object' ? o.value : o)
-      expect(values).toEqual(expect.arrayContaining(['white', 'light', 'dark', 'primary']))
-      expect(values).toHaveLength(4)
+      expect(values).toEqual(expect.arrayContaining(['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light', 'blueprint', 'mono', 'stripe']))
+      expect(values).toHaveLength(9)
     })
 
     test('[P0] 1.3-INT-005 — blockBaseFields contains spacing with constrained presets', () => {
