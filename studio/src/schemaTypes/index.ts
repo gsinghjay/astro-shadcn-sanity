@@ -29,6 +29,8 @@ import {project} from './documents/project'
 import {testimonial} from './documents/testimonial'
 import {event} from './documents/event'
 import {submission} from './documents/submission'
+// Document schemas — articles (Story 19.1)
+import {articleCategory} from './documents/article-category'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -103,6 +105,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   event,
   submission,
+  // Documents — articles (Story 19.1)
+  articleCategory,
   // Blocks — homepage
   heroBanner,
   featureGrid,

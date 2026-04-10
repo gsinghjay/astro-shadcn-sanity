@@ -1449,6 +1449,24 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
+export type ArticleCategory = {
+  _id: string;
+  _type: "articleCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  site?: "rwc-us" | "rwc-intl";
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type Submission = {
   _id: string;
   _type: "submission";
@@ -2055,12 +2073,6 @@ export type Event = {
   seo?: Seo;
 };
 
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type Sponsor = {
   _id: string;
   _type: "sponsor";
@@ -2309,6 +2321,8 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
+  | ArticleCategory
+  | Slug
   | Submission
   | Testimonial
   | SanityImageCrop
@@ -2328,7 +2342,6 @@ export type AllSanitySchemaTypes =
   | Project
   | Seo
   | Event
-  | Slug
   | Sponsor
   | Link
   | FormField
