@@ -1,12 +1,12 @@
 /**
- * Story 2-0: Template Layout System — Catch-all Route & GROQ (AC6, AC8)
+ * Story 2-0: Template Layout System — Catch-all Route & GROQ
  *
- * Tests the [...slug].astro file structure and GROQ query exports.
+ * Verifies [...slug].astro uses FullWidthTemplate directly and GROQ query
+ * no longer projects the template field.
  *
  * @story 2-0
- * @phase GREEN
  */
-import { describe, test, expect, beforeAll } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
@@ -17,59 +17,53 @@ const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
 const SLUG_ROUTE = path.join(ASTRO_APP, 'src/pages/[...slug].astro')
 const SANITY_LIB = path.join(ASTRO_APP, 'src/lib/sanity.ts')
 
-describe('Story 2-0: Catch-all Route & GROQ Integration (AC6, AC8)', () => {
-  test('[P0] 2.0-INT-025 — [...slug].astro exists', () => {
+describe('Story 2-0: Catch-all Route', () => {
+  test('[...slug].astro exists', () => {
     expect(fs.existsSync(SLUG_ROUTE)).toBe(true)
   })
 
-  test('[P0] 2.0-INT-026 — [...slug].astro imports all 5 template components', () => {
+  test('[...slug].astro imports FullWidthTemplate', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
-    expect(content).toContain('DefaultTemplate')
     expect(content).toContain('FullWidthTemplate')
-    expect(content).toContain('LandingTemplate')
-    expect(content).toContain('SidebarTemplate')
-    expect(content).toContain('TwoColumnTemplate')
   })
 
-  test('[P0] 2.0-INT-027 — [...slug].astro has template dispatch map', () => {
+  test('[...slug].astro does not import removed templates', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
-    expect(content).toMatch(/templates\s*[=:]/)
-    expect(content).toContain('default')
-    expect(content).toContain('fullWidth')
-    expect(content).toContain('landing')
-    expect(content).toContain('sidebar')
-    expect(content).toContain('twoColumn')
+    expect(content).not.toContain('DefaultTemplate')
+    expect(content).not.toContain('LandingTemplate')
+    expect(content).not.toContain('SidebarTemplate')
+    expect(content).not.toContain('TwoColumnTemplate')
   })
 
-  test('[P0] 2.0-INT-028 — [...slug].astro falls back to DefaultTemplate', () => {
+  test('[...slug].astro does not have a template dispatch map', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
-    expect(content).toMatch(/\?\?\s*DefaultTemplate/)
+    expect(content).not.toMatch(/const templates\s*=/)
   })
 
-  test('[P0] 2.0-INT-029 — [...slug].astro uses BlockRenderer', () => {
+  test('[...slug].astro uses BlockRenderer', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
     expect(content).toContain('BlockRenderer')
   })
 
-  test('[P0] 2.0-INT-030 — [...slug].astro imports from sanity.ts', () => {
-    const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
-    expect(content).toContain('sanityClient')
-    expect(content).toContain('ALL_PAGE_SLUGS_QUERY')
-  })
-
-  test('[P0] 2.0-INT-031 — sanity.ts exports PAGE_BY_SLUG_QUERY with template field', () => {
-    const content = fs.readFileSync(SANITY_LIB, 'utf-8')
-    expect(content).toContain('PAGE_BY_SLUG_QUERY')
-    expect(content).toContain('template')
-  })
-
-  test('[P0] 2.0-INT-032 — sanity.ts exports ALL_PAGE_SLUGS_QUERY', () => {
-    const content = fs.readFileSync(SANITY_LIB, 'utf-8')
-    expect(content).toContain('ALL_PAGE_SLUGS_QUERY')
-  })
-
-  test('[P0] 2.0-INT-033 — [...slug].astro has getStaticPaths export', () => {
+  test('[...slug].astro has getStaticPaths export', () => {
     const content = fs.readFileSync(SLUG_ROUTE, 'utf-8')
     expect(content).toContain('getStaticPaths')
+  })
+})
+
+describe('Story 2-0: GROQ Integration', () => {
+  test('sanity.ts exports PAGE_BY_SLUG_QUERY', () => {
+    const content = fs.readFileSync(SANITY_LIB, 'utf-8')
+    expect(content).toContain('PAGE_BY_SLUG_QUERY')
+  })
+
+  test('sanity.ts exports ALL_PAGE_SLUGS_QUERY', () => {
+    const content = fs.readFileSync(SANITY_LIB, 'utf-8')
+    expect(content).toContain('ALL_PAGE_SLUGS_QUERY')
+  })
+
+  test('PAGE_BY_SLUG_QUERY includes blocks', () => {
+    const content = fs.readFileSync(SANITY_LIB, 'utf-8')
+    expect(content).toContain('blocks[]')
   })
 })

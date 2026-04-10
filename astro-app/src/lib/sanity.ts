@@ -544,7 +544,7 @@ export async function getSponsorProjects(email: string) {
 }
 
 /**
- * GROQ query: fetch a single page by slug with template and blocks.
+ * GROQ query: fetch a single page by slug with blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
  * and resolved per-block via resolveBlockSponsors().
@@ -553,7 +553,6 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   _id,
   title,
   "slug": slug.current,
-  template,
   seo {
     metaTitle,
     metaDescription,
