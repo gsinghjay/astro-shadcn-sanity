@@ -1449,6 +1449,56 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
+export type Author = {
+  _id: string;
+  _type: "author";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  role?: string;
+  bio?: string;
+  credentials?: Array<string>;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  sameAs?: Array<string>;
+  socialLinks?: Array<{
+    platform?: "linkedin" | "github" | "twitter" | "website" | "other";
+    url?: string;
+    _key: string;
+  }>;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type ArticleCategory = {
   _id: string;
   _type: "articleCategory";
@@ -1459,12 +1509,6 @@ export type ArticleCategory = {
   slug?: Slug;
   description?: string;
   site?: "rwc-us" | "rwc-intl";
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type Submission = {
@@ -1503,22 +1547,6 @@ export type Testimonial = {
   };
   videoUrl?: string;
   project?: ProjectReference;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type SiteSettings = {
@@ -2321,12 +2349,13 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
-  | ArticleCategory
-  | Slug
-  | Submission
-  | Testimonial
+  | Author
   | SanityImageCrop
   | SanityImageHotspot
+  | Slug
+  | ArticleCategory
+  | Submission
+  | Testimonial
   | SiteSettings
   | GalleryImage
   | TeamMember

@@ -31,6 +31,8 @@ import {event} from './documents/event'
 import {submission} from './documents/submission'
 // Document schemas — articles (Story 19.1)
 import {articleCategory} from './documents/article-category'
+// Document schemas — authors (Story 20.1)
+import {author} from './documents/author'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -107,6 +109,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   submission,
   // Documents — articles (Story 19.1)
   articleCategory,
+  // Documents — authors (Story 20.1)
+  author,
   // Blocks — homepage
   heroBanner,
   featureGrid,
