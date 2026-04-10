@@ -288,12 +288,6 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(typeof field.description).toBe('string')
     })
 
-    test('map-block zoom has description', () => {
-      const field = findField(mapBlock, 'zoom')
-      expect(field).toBeDefined()
-      expect(field.description).toBeDefined()
-    })
-
     test('comparison-column highlighted has description', () => {
       const field = findField(comparisonColumn, 'highlighted')
       expect(field).toBeDefined()
@@ -402,12 +396,6 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(calls.some((c) => c.method === 'required')).toBe(true)
       expect(calls.some((c) => c.method === 'min' && c.args[0] === -180)).toBe(true)
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 180)).toBe(true)
-    })
-
-    test('map-block zoom calls min(1) and max(20)', () => {
-      const calls = getCalls(mapBlock, 'zoom')
-      expect(calls.some((c) => c.method === 'min' && c.args[0] === 1)).toBe(true)
-      expect(calls.some((c) => c.method === 'max' && c.args[0] === 20)).toBe(true)
     })
 
     test('map-block address calls max(500)', () => {

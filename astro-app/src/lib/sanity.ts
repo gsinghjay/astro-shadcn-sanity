@@ -647,8 +647,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "imageGallery" => {
       heading,
       description,
-      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption },
-      columns
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
     },
     _type == "articleList" => {
       heading,
@@ -735,14 +734,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "embedBlock" => {
       heading,
       embedUrl,
-      aspectRatio,
       caption
     },
     _type == "mapBlock" => {
       heading,
       address,
       coordinates{ lat, lng },
-      zoom,
       caption,
       contactInfo{ phone, email, hours }
     },

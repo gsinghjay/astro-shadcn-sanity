@@ -8,8 +8,9 @@ export const richText = defineBlock({
   icon: BlockContentIcon,
   variants: [
     {name: 'prose', title: 'Prose (Default)'},
-    {name: 'narrow', title: 'Narrow'},
-    {name: 'wide', title: 'Wide'},
+    {name: 'standard', title: 'Standard'},
+    {name: 'highlighted', title: 'Highlighted'},
+    {name: 'sidebar', title: 'Sidebar'},
   ],
   fields: [
     defineField({

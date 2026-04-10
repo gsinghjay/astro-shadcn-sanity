@@ -39,7 +39,7 @@ export default {
     docs: {
       description: {
         component:
-          'Image gallery with grid, masonry, and single-image layouts. Configurable column count.',
+          'Image gallery with grid, masonry, and single-image layouts.',
       },
     },
   },
@@ -49,7 +49,6 @@ export default {
       options: ['grid', 'masonry', 'single'],
       description: 'Layout variant',
     },
-    columns: { control: { type: 'select' }, options: ['2', '3', '4'], description: 'Number of grid columns' },
     heading: { control: 'text', description: 'Section heading' },
     backgroundVariant: {
       control: { type: 'select' },
@@ -69,37 +68,14 @@ export default {
   },
 }
 
-export const GridThreeColumns = {
+export const Grid = {
   args: {
     _type: 'imageGallery',
-    _key: 'story-ig-grid3',
+    _key: 'story-ig-grid',
     variant: 'grid',
     heading: 'Photography',
     description: 'A curated selection of images exploring Swiss design principles in the built environment.',
     images: galleryImages,
-    columns: '3',
-  },
-}
-
-export const GridTwoColumns = {
-  args: {
-    _type: 'imageGallery',
-    _key: 'story-ig-grid2',
-    variant: 'grid',
-    heading: 'Selected Works',
-    images: galleryImages.slice(0, 4),
-    columns: '2',
-  },
-}
-
-export const GridFourColumns = {
-  args: {
-    _type: 'imageGallery',
-    _key: 'story-ig-grid4',
-    variant: 'grid',
-    heading: 'Archive',
-    images: galleryImages,
-    columns: '4',
   },
 }
 

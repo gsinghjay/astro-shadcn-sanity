@@ -27,14 +27,6 @@ export const mapBlock = defineBlock({
         defineField({name: 'lng', title: 'Longitude', type: 'number', description: 'Longitude (-180 to 180)', validation: (Rule) => Rule.required().min(-180).max(180)}),
       ],
     }),
-    defineField({
-      name: 'zoom',
-      title: 'Zoom',
-      type: 'number',
-      description: 'Map zoom level (1-20, default 15)',
-      initialValue: 15,
-      validation: (Rule) => Rule.min(1).max(20),
-    }),
     defineField({name: 'caption', title: 'Caption', type: 'string', validation: (Rule) => Rule.max(200)}),
     defineField({
       name: 'contactInfo',

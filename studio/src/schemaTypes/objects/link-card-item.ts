@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {LinkIcon} from '@sanity/icons'
+import {LUCIDE_ICON_OPTIONS} from '../helpers/commonFields'
 
 export const linkCardItem = defineType({
   name: 'linkCardItem',
@@ -23,8 +24,11 @@ export const linkCardItem = defineType({
       name: 'icon',
       title: 'Icon',
       type: 'string',
-      description: 'Lucide icon name',
-      validation: (Rule) => Rule.max(50),
+      description: 'Optional icon from the Lucide icon set',
+      options: {
+        list: LUCIDE_ICON_OPTIONS,
+        layout: 'dropdown',
+      },
     }),
     defineField({
       name: 'url',

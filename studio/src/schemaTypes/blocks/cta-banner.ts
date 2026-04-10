@@ -15,9 +15,6 @@ export const ctaBanner = defineBlock({
     {name: 'brutalist', title: 'Brutalist'},
     {name: 'data-cta', title: 'Data CTA'},
   ],
-  hiddenByVariant: {
-    backgroundImages: ['centered', 'spread', 'brutalist', 'data-cta'],
-  },
   fields: [
     defineField({
       name: 'heading',
