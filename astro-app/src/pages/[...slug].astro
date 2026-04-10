@@ -4,22 +4,9 @@ import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
 import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
-import { stegaClean } from '@sanity/client/stega';
 import { urlFor } from '@/lib/image';
 
-import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
-import LandingTemplate from '@/layouts/templates/LandingTemplate.astro';
-import SidebarTemplate from '@/layouts/templates/SidebarTemplate.astro';
-import TwoColumnTemplate from '@/layouts/templates/TwoColumnTemplate.astro';
-
-const templates = {
-  default: DefaultTemplate,
-  fullWidth: FullWidthTemplate,
-  landing: LandingTemplate,
-  sidebar: SidebarTemplate,
-  twoColumn: TwoColumnTemplate,
-};
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
@@ -38,8 +25,6 @@ const { slug } = Astro.params;
 // In static mode: fetch page data and render inline
 // In VE mode: skip fetch — server island handles its own data fetching
 let page = null;
-let template: keyof typeof templates = 'default';
-let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
@@ -50,8 +35,6 @@ if (!visualEditingEnabled) {
   if (!page) {
     return Astro.redirect('/404');
   }
-  template = stegaClean(page.template) as keyof typeof templates;
-  TemplateComponent = templates[template] ?? DefaultTemplate;
   sponsors = await getAllSponsors();
   projects = await getAllProjects();
   testimonials = await getAllTestimonials();
@@ -74,8 +57,6 @@ const preloadSrcset = heroImage?.asset
 <Layout
   title={page?.title ?? undefined}
   seo={page?.seo}
-  hideNav={!visualEditingEnabled && template === 'landing'}
-  template={template}
   preloadImage={preloadImageUrl}
   preloadImageSrcset={preloadSrcset}
   preloadImageSizes="100vw"
@@ -94,8 +75,8 @@ const preloadSrcset = heroImage?.asset
       </div>
     </SanityPageContent>
   ) : (
-    <TemplateComponent>
+    <FullWidthTemplate>
       <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
-    </TemplateComponent>
+    </FullWidthTemplate>
   )}
 </Layout>

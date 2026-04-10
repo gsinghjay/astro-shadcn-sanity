@@ -1,68 +1,38 @@
 /**
- * Story 2-0: Template Layout System — Template Shell Components (AC7)
+ * Story 2-0: Template Layout System — Template Shell Component
  *
- * Tests that all 5 template shell components exist and contain a <slot />.
+ * Verifies only FullWidthTemplate exists after template simplification.
  *
  * @story 2-0
- * @phase GREEN
  */
-import { describe, test, expect, beforeAll } from 'vitest'
+import { describe, test, expect } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const ASTRO_APP = path.resolve(__dirname, '../../../astro-app')
-const TEMPLATES_DIR = path.join(ASTRO_APP, 'src/layouts/templates')
+const TEMPLATES_DIR = path.resolve(__dirname, '../../../astro-app/src/layouts/templates')
 
-const TEMPLATE_FILES = [
-  'DefaultTemplate.astro',
-  'FullWidthTemplate.astro',
-  'LandingTemplate.astro',
-  'SidebarTemplate.astro',
-  'TwoColumnTemplate.astro',
-]
-
-describe('Story 2-0: Template Shell Components (AC7)', () => {
-  test('[P0] 2.0-INT-018 — all 5 template files exist', () => {
-    for (const file of TEMPLATE_FILES) {
-      const filePath = path.join(TEMPLATES_DIR, file)
-      expect(fs.existsSync(filePath), `Missing: ${file}`).toBe(true)
-    }
+describe('Story 2-0: Template Shell Components', () => {
+  test('FullWidthTemplate.astro exists', () => {
+    expect(fs.existsSync(path.join(TEMPLATES_DIR, 'FullWidthTemplate.astro'))).toBe(true)
   })
 
-  test('[P0] 2.0-INT-019 — each template contains a <slot /> element', () => {
-    for (const file of TEMPLATE_FILES) {
-      const filePath = path.join(TEMPLATES_DIR, file)
-      const content = fs.readFileSync(filePath, 'utf-8')
-      expect(content, `${file} missing <slot`).toMatch(/<slot\s*\/?>/)
-    }
+  test('FullWidthTemplate contains a <slot /> element', () => {
+    const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'FullWidthTemplate.astro'), 'utf-8')
+    expect(content).toMatch(/<slot\s*\/?>/)
   })
 
-  test('[P0] 2.0-INT-020 — DefaultTemplate uses max-width container', () => {
-    const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'DefaultTemplate.astro'), 'utf-8')
-    expect(content).toContain('max-w-')
-  })
-
-  test('[P0] 2.0-INT-021 — FullWidthTemplate uses full width', () => {
+  test('FullWidthTemplate uses full width', () => {
     const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'FullWidthTemplate.astro'), 'utf-8')
     expect(content).toContain('w-full')
   })
 
-  test('[P0] 2.0-INT-022 — SidebarTemplate uses grid with sidebar column', () => {
-    const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'SidebarTemplate.astro'), 'utf-8')
-    expect(content).toContain('grid')
-    expect(content).toMatch(/<aside/)
-  })
-
-  test('[P0] 2.0-INT-023 — TwoColumnTemplate uses two-column grid', () => {
-    const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'TwoColumnTemplate.astro'), 'utf-8')
-    expect(content).toContain('grid-cols-2')
-  })
-
-  test('[P1] 2.0-INT-024 — LandingTemplate has data-template attribute', () => {
-    const content = fs.readFileSync(path.join(TEMPLATES_DIR, 'LandingTemplate.astro'), 'utf-8')
-    expect(content).toContain('data-template="landing"')
+  test('removed templates no longer exist', () => {
+    const removed = ['DefaultTemplate.astro', 'LandingTemplate.astro', 'SidebarTemplate.astro', 'TwoColumnTemplate.astro']
+    for (const file of removed) {
+      expect(fs.existsSync(path.join(TEMPLATES_DIR, file)), `${file} should be deleted`).toBe(false)
+    }
   })
 })
