@@ -45,7 +45,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         },
       }),
       visionTool(),
-      formSchema(),
+      formSchema({}),
     ],
     schema: {
       types: createSchemaTypesForWorkspace('rwc'),
@@ -108,7 +108,7 @@ export default defineConfig([
         },
       }),
       visionTool(),
-      formSchema(),
+      formSchema({}),
     ],
     schema: {
       types: createSchemaTypesForWorkspace('production'),
