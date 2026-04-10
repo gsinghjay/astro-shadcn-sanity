@@ -61,6 +61,7 @@ import {stepItem} from '../../../studio/src/schemaTypes/objects/step-item'
 import {tabItem} from '../../../studio/src/schemaTypes/objects/tab-item'
 import {teamMember} from '../../../studio/src/schemaTypes/objects/team-member'
 import {timelineEntry} from '../../../studio/src/schemaTypes/objects/timeline-entry'
+import {sponsorshipTierItem} from '../../../studio/src/schemaTypes/objects/sponsorship-tier-item'
 
 // Helper to find a field in a schema (works with defineBlock output which wraps in defineType)
 function findField(schema: any, fieldName: string): any | undefined {
@@ -487,6 +488,35 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       const field = findField(comparisonRow, 'feature')
       expect(field).toBeDefined()
       expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem name has validation', () => {
+      const field = findField(sponsorshipTierItem, 'name')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem price has validation', () => {
+      const field = findField(sponsorshipTierItem, 'price')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem benefits array has validation', () => {
+      const field = findField(sponsorshipTierItem, 'benefits')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem highlighted has description', () => {
+      const field = findField(sponsorshipTierItem, 'highlighted')
+      expect(field).toBeDefined()
+      expect(field.description).toBeDefined()
+      expect(typeof field.description).toBe('string')
+    })
+
+    test('sponsorshipTierItem has icon', () => {
+      expect(sponsorshipTierItem.icon).toBeDefined()
     })
   })
 })

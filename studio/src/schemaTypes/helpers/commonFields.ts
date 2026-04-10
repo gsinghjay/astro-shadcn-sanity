@@ -42,6 +42,7 @@ export function displayModeBlock(config: {
       name: 'displayMode',
       title: 'Display Mode',
       type: 'string',
+      description: 'Choose how to select items: all, featured only, or manual pick',
       options: {
         list: [
           {title: 'All', value: 'all'},

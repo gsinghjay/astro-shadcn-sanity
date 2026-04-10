@@ -631,12 +631,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "testimonials" => {
       heading,
-      testimonialSource,
+      "testimonialSource": coalesce(testimonialSource, displayMode),
       testimonials[]->{ _id }
     },
     _type == "eventList" => {
       heading,
-      eventStatus,
+      "eventStatus": coalesce(eventStatus, filterBy),
       limit
     },
     _type == "teamGrid" => {
@@ -653,15 +653,15 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "articleList" => {
       heading,
       description,
-      contentType,
+      "contentType": coalesce(contentType, source),
       limit,
-      ctaButtons[]{ _key, text, url, variant }
+      "ctaButtons": coalesce(ctaButtons, links)[]{ _key, text, url, variant }
     },
     _type == "comparisonTable" => {
       heading,
       description,
-      options[]{ _key, title, highlighted },
-      criteria[]{ _key, feature, values, isHeader },
+      "options": coalesce(options, columns)[]{ _key, title, highlighted },
+      "criteria": coalesce(criteria, rows)[]{ _key, feature, values, isHeader },
       links[]{ _key, text, url, variant }
     },
     _type == "timeline" => {
@@ -693,7 +693,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "videoEmbed" => {
       heading,
       description,
-      youtubeUrl,
+      "youtubeUrl": coalesce(youtubeUrl, videoUrl),
       posterImage{ ${IMAGE_PROJECTION}, alt }
     },
     _type == "pricingTable" => {
@@ -719,9 +719,9 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "newsletter" => {
       heading,
       description,
-      inputPlaceholder,
-      submitButtonLabel,
-      privacyDisclaimerText
+      "inputPlaceholder": coalesce(inputPlaceholder, placeholderText),
+      "submitButtonLabel": coalesce(submitButtonLabel, buttonText),
+      "privacyDisclaimerText": coalesce(privacyDisclaimerText, disclaimer)
     },
     _type == "accordion" => {
       heading,
