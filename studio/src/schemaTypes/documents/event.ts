@@ -1,6 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {CalendarIcon, SearchIcon} from '@sanity/icons'
-import {siteField} from '../fields/site-field'
+import {siteField, siteScopedIsUnique} from '../fields/site-field'
 
 export const event = defineType({
   name: 'event',
@@ -32,7 +32,7 @@ export const event = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'main',
-      options: {source: 'title', maxLength: 96},
+      options: {source: 'title', maxLength: 96, isUnique: siteScopedIsUnique},
       validation: (Rule) => Rule.required(),
     }),
     {...siteField, group: 'main'},

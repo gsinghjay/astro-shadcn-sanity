@@ -1,22 +1,91 @@
-import {defineConfig} from 'sanity'
+import {defineConfig, type WorkspaceOptions} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
-import {RocketIcon, UsersIcon} from '@sanity/icons'
+import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
 import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
-import {rwcDeskStructure} from './src/structure/rwc-desk-structure'
+import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
 import {resolve} from './src/presentation/resolve'
 import {
   CAPSTONE_SINGLETON_TYPES,
   SITE_AWARE_TYPES,
-  RWC_SITES,
-  RWC_SINGLETON_IDS,
 } from './src/constants'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '<your project ID>'
+
+interface RwcWorkspaceOptions {
+  name: string
+  title: string
+  basePath: string
+  icon: typeof EarthAmericasIcon
+  siteId: string
+  projectId: string
+  originEnv: string | undefined
+  defaultOrigin: string
+}
+
+function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
+  return {
+    name: opts.name,
+    title: opts.title,
+    basePath: opts.basePath,
+    icon: opts.icon,
+    projectId: opts.projectId,
+    dataset: 'rwc',
+    plugins: [
+      structureTool({structure: createRwcDeskStructure(opts.siteId, opts.title)}),
+      presentationTool({
+        resolve,
+        previewUrl: {
+          origin: opts.originEnv || opts.defaultOrigin,
+          preview: '/',
+        },
+      }),
+      visionTool(),
+      formSchema({}),
+    ],
+    schema: {
+      types: createSchemaTypesForWorkspace('rwc'),
+      templates: (prev) => {
+        const filtered = prev.filter(
+          (t) =>
+            !SITE_AWARE_TYPES.includes(t.schemaType) &&
+            t.schemaType !== 'siteSettings',
+        )
+        const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
+          id: `${type}-${opts.siteId}`,
+          title: `${type.charAt(0).toUpperCase() + type.slice(1)} (${opts.title})`,
+          schemaType: type,
+          value: {site: opts.siteId},
+        }))
+        return [...filtered, ...siteTemplates]
+      },
+    },
+    document: {
+      actions: (input, context) => {
+        if (
+          context.schemaType === 'siteSettings' ||
+          context.documentId === `siteSettings-${opts.siteId}`
+        ) {
+          return input.filter(
+            ({action}) =>
+              action &&
+              ['publish', 'discardChanges', 'restore'].includes(action),
+          )
+        }
+        return input
+      },
+      newDocumentOptions: (prev) =>
+        prev.filter(
+          (t) =>
+            t.templateId !== 'siteSettings' && t.templateId !== 'submission',
+        ),
+    },
+  }
+}
 
 export default defineConfig([
   // ─── Capstone Workspace ───────────────────────────────────
@@ -39,7 +108,7 @@ export default defineConfig([
         },
       }),
       visionTool(),
-      formSchema(),
+      formSchema({}),
     ],
     schema: {
       types: createSchemaTypesForWorkspace('production'),
@@ -61,69 +130,27 @@ export default defineConfig([
     },
   },
 
-  // ─── RWC Workspace ────────────────────────────────────────
-  {
-    name: 'rwc',
-    title: 'RWC Programs',
-    basePath: '/rwc',
-    icon: UsersIcon,
+  // ─── RWC US Workspace ──────────────────────────────────────
+  createRwcWorkspace({
+    name: 'rwc-us',
+    title: 'RWC US',
+    basePath: '/rwc-us',
+    icon: EarthAmericasIcon,
+    siteId: 'rwc-us',
     projectId,
-    dataset: 'rwc',
-    plugins: [
-      structureTool({structure: rwcDeskStructure}),
-      presentationTool({
-        resolve,
-        previewUrl: {
-          origin:
-            process.env.SANITY_STUDIO_RWC_PREVIEW_ORIGIN ||
-            'http://localhost:4322',
-          preview: '/',
-        },
-      }),
-      visionTool(),
-      formSchema(),
-    ],
-    schema: {
-      types: createSchemaTypesForWorkspace('rwc'),
-      templates: (prev) => {
-        // Remove default templates for site-aware types + siteSettings
-        const filtered = prev.filter(
-          (t) =>
-            !SITE_AWARE_TYPES.includes(t.schemaType) &&
-            t.schemaType !== 'siteSettings',
-        )
-        // Add site-specific templates (page-rwc-us, page-rwc-intl, etc.)
-        const siteTemplates = RWC_SITES.flatMap(({id: siteId, title: siteTitle}) =>
-          SITE_AWARE_TYPES.map((type) => ({
-            id: `${type}-${siteId}`,
-            title: `${type.charAt(0).toUpperCase() + type.slice(1)} (${siteTitle})`,
-            schemaType: type,
-            value: {site: siteId},
-          })),
-        )
-        return [...filtered, ...siteTemplates]
-      },
-    },
-    document: {
-      actions: (input, context) => {
-        // Guard RWC siteSettings singletons by schemaType + fixed document ID
-        if (
-          context.schemaType === 'siteSettings' ||
-          RWC_SINGLETON_IDS.includes(context.documentId || '')
-        ) {
-          return input.filter(
-            ({action}) =>
-              action &&
-              ['publish', 'discardChanges', 'restore'].includes(action),
-          )
-        }
-        return input
-      },
-      newDocumentOptions: (prev) =>
-        prev.filter(
-          (t) =>
-            t.templateId !== 'siteSettings' && t.templateId !== 'submission',
-        ),
-    },
-  },
+    originEnv: process.env.SANITY_STUDIO_RWC_US_PREVIEW_ORIGIN,
+    defaultOrigin: 'http://localhost:4322',
+  }),
+
+  // ─── RWC International Workspace ─────────────────────────
+  createRwcWorkspace({
+    name: 'rwc-intl',
+    title: 'RWC International',
+    basePath: '/rwc-intl',
+    icon: EarthGlobeIcon,
+    siteId: 'rwc-intl',
+    projectId,
+    originEnv: process.env.SANITY_STUDIO_RWC_INTL_PREVIEW_ORIGIN,
+    defaultOrigin: 'http://localhost:4323',
+  }),
 ])

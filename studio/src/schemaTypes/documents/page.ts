@@ -1,6 +1,6 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
-import {siteField} from '../fields/site-field'
+import {siteField, siteScopedIsUnique} from '../fields/site-field'
 
 export const page = defineType({
   name: 'page',
@@ -28,7 +28,7 @@ export const page = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'layout',
-      options: {source: 'title', maxLength: 96},
+      options: {source: 'title', maxLength: 96, isUnique: siteScopedIsUnique},
       validation: (Rule) => Rule.required(),
     }),
     {...siteField, group: 'layout'},
