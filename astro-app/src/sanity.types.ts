@@ -1449,68 +1449,6 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
-export type Author = {
-  _id: string;
-  _type: "author";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  name?: string;
-  slug?: Slug;
-  site?: "rwc-us" | "rwc-intl";
-  role?: string;
-  bio?: string;
-  credentials?: Array<string>;
-  image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  sameAs?: Array<string>;
-  socialLinks?: Array<{
-    platform?: "linkedin" | "github" | "twitter" | "website" | "other";
-    url?: string;
-    _key: string;
-  }>;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
-export type ArticleCategory = {
-  _id: string;
-  _type: "articleCategory";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  slug?: Slug;
-  description?: string;
-  site?: "rwc-us" | "rwc-intl";
-};
-
 export type Submission = {
   _id: string;
   _type: "submission";
@@ -1547,6 +1485,22 @@ export type Testimonial = {
   };
   videoUrl?: string;
   project?: ProjectReference;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SiteSettings = {
@@ -1785,6 +1739,13 @@ export type EventReference = {
   [internalGroqTypeReferenceTo]?: "event";
 };
 
+export type ArticleReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "article";
+};
+
 export type PortableText = Array<
   | {
       children?: Array<{
@@ -1806,7 +1767,8 @@ export type PortableText = Array<
               | PageReference
               | SponsorReference
               | ProjectReference
-              | EventReference;
+              | EventReference
+              | ArticleReference;
             _type: "internalLink";
             _key: string;
           }
@@ -2081,6 +2043,98 @@ export type Seo = {
   };
 };
 
+export type AuthorReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "author";
+};
+
+export type ArticleCategoryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "articleCategory";
+};
+
+export type Article = {
+  _id: string;
+  _type: "article";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  excerpt?: string;
+  featuredImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  body?: PortableText;
+  author?: AuthorReference;
+  publishedAt?: string;
+  updatedAt?: string;
+  category?: ArticleCategoryReference;
+  tags?: Array<string>;
+  relatedArticles?: Array<
+    {
+      _key: string;
+    } & ArticleReference
+  >;
+  seo?: Seo;
+};
+
+export type ArticleCategory = {
+  _id: string;
+  _type: "articleCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  site?: "rwc-us" | "rwc-intl";
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Author = {
+  _id: string;
+  _type: "author";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  role?: string;
+  bio?: string;
+  credentials?: Array<string>;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  sameAs?: Array<string>;
+  socialLinks?: Array<{
+    platform?: "linkedin" | "github" | "twitter" | "website" | "other";
+    url?: string;
+    _key: string;
+  }>;
+};
+
 export type Event = {
   _id: string;
   _type: "event";
@@ -2349,13 +2403,10 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
-  | Author
-  | SanityImageCrop
-  | SanityImageHotspot
-  | Slug
-  | ArticleCategory
   | Submission
   | Testimonial
+  | SanityImageCrop
+  | SanityImageHotspot
   | SiteSettings
   | GalleryImage
   | TeamMember
@@ -2365,11 +2416,18 @@ export type AllSanitySchemaTypes =
   | FaqItem
   | PageReference
   | EventReference
+  | ArticleReference
   | PortableText
   | Page
   | Button
   | Project
   | Seo
+  | AuthorReference
+  | ArticleCategoryReference
+  | Article
+  | ArticleCategory
+  | Slug
+  | Author
   | Event
   | Sponsor
   | Link
@@ -2692,6 +2750,10 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
         markDefs: Array<
           | {
               reference:
+                | {
+                    _type: "article";
+                    slug: string | null;
+                  }
                 | {
                     _type: "event";
                     slug: string | null;
@@ -3795,6 +3857,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | {
                       reference:
                         | {
+                            _type: "article";
+                            slug: string | null;
+                          }
+                        | {
                             _type: "event";
                             slug: string | null;
                           }
@@ -4521,6 +4587,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 | {
                     reference:
                       | {
+                          _type: "article";
+                          slug: string | null;
+                        }
+                      | {
                           _type: "event";
                           slug: string | null;
                         }
@@ -4979,6 +5049,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               markDefs: Array<
                 | {
                     reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
                       | {
                           _type: "event";
                           slug: string | null;

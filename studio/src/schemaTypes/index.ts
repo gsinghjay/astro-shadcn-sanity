@@ -29,8 +29,9 @@ import {project} from './documents/project'
 import {testimonial} from './documents/testimonial'
 import {event} from './documents/event'
 import {submission} from './documents/submission'
-// Document schemas — articles (Story 19.1)
+// Document schemas — articles (Story 19.1, 19.2)
 import {articleCategory} from './documents/article-category'
+import {article} from './documents/article'
 // Document schemas — authors (Story 20.1)
 import {author} from './documents/author'
 
@@ -107,8 +108,9 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   testimonial,
   event,
   submission,
-  // Documents — articles (Story 19.1)
+  // Documents — articles (Story 19.1, 19.2)
   articleCategory,
+  article,
   // Documents — authors (Story 20.1)
   author,
   // Blocks — homepage
