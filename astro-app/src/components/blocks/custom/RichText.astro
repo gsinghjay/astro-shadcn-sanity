@@ -12,8 +12,10 @@ interface Props extends RichTextBlock {
 
 const { content, variant } = Astro.props;
 
-// Clean variant value and default to 'prose'
-const cleanVariant = stegaClean(variant ?? 'prose');
+// Clean variant value, remap legacy names, and default to 'prose'
+const LEGACY_VARIANT_MAP: Record<string, string> = { narrow: 'standard', wide: 'highlighted' };
+const raw = stegaClean(variant ?? 'prose');
+const cleanVariant = LEGACY_VARIANT_MAP[raw] ?? raw;
 ---
 
 <Section data-animate>

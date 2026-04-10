@@ -50,6 +50,35 @@ describe('RichText', () => {
     expect(html).toMatch(/<a[^>]*href="https:\/\/example\.com"[^>]*>our site<\/a>/);
   });
 
+  test('renders sidebar variant with left border treatment', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(RichText, {
+      props: {
+        ...richTextFull,
+        _key: 'test-rt-sidebar',
+        variant: 'sidebar',
+      },
+    });
+
+    expect(html).toContain('border-l-2');
+    expect(html).toContain('border-muted');
+    expect(html).toContain('pl-6');
+  });
+
+  test('renders legacy "narrow" variant as standard via fallback map', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(RichText, {
+      props: {
+        ...richTextFull,
+        _key: 'test-rt-legacy-narrow',
+        variant: 'narrow' as any,
+      },
+    });
+
+    // Should render as 'standard' (672px constrained), not default prose
+    expect(html).toContain('672px');
+  });
+
   test('handles null content without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(RichText, {
