@@ -631,12 +631,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "testimonials" => {
       heading,
-      "testimonialSource": coalesce(testimonialSource, displayMode),
+      testimonialSource,
       testimonials[]->{ _id }
     },
     _type == "eventList" => {
       heading,
-      "eventStatus": coalesce(eventStatus, filterBy),
+      eventStatus,
       limit
     },
     _type == "teamGrid" => {
@@ -653,15 +653,15 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "articleList" => {
       heading,
       description,
-      "contentType": coalesce(contentType, source),
+      contentType,
       limit,
-      "ctaButtons": coalesce(ctaButtons, links)[]{ _key, text, url, variant }
+      ctaButtons[]{ _key, text, url, variant }
     },
     _type == "comparisonTable" => {
       heading,
       description,
-      "options": coalesce(options, columns)[]{ _key, title, highlighted },
-      "criteria": coalesce(criteria, rows)[]{ _key, feature, values, isHeader },
+      options[]{ _key, title, highlighted },
+      criteria[]{ _key, feature, values, isHeader },
       links[]{ _key, text, url, variant }
     },
     _type == "timeline" => {
@@ -693,7 +693,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "videoEmbed" => {
       heading,
       description,
-      "youtubeUrl": coalesce(youtubeUrl, videoUrl),
+      youtubeUrl,
       posterImage{ ${IMAGE_PROJECTION}, alt }
     },
     _type == "pricingTable" => {
@@ -719,9 +719,9 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "newsletter" => {
       heading,
       description,
-      "inputPlaceholder": coalesce(inputPlaceholder, placeholderText),
-      "submitButtonLabel": coalesce(submitButtonLabel, buttonText),
-      "privacyDisclaimerText": coalesce(privacyDisclaimerText, disclaimer)
+      inputPlaceholder,
+      submitButtonLabel,
+      privacyDisclaimerText
     },
     _type == "accordion" => {
       heading,
