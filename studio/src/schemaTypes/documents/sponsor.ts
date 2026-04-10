@@ -1,6 +1,6 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon, SearchIcon} from '@sanity/icons'
-import {siteField} from '../fields/site-field'
+import {siteField, siteScopedIsUnique} from '../fields/site-field'
 
 export const sponsor = defineType({
   name: 'sponsor',
@@ -27,7 +27,7 @@ export const sponsor = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'main',
-      options: {source: 'name'},
+      options: {source: 'name', isUnique: siteScopedIsUnique},
       validation: (Rule) => Rule.required(),
     }),
     {...siteField, group: 'main'},
