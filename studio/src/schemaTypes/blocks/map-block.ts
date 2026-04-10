@@ -16,7 +16,7 @@ export const mapBlock = defineBlock({
     contactInfo: ['default', 'full-width'],
   },
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.max(150)}),
     defineField({name: 'address', title: 'Address', type: 'text', validation: (Rule) => Rule.max(500)}),
     defineField({
       name: 'coordinates',

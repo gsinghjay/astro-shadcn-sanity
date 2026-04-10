@@ -355,11 +355,10 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       return rule._calls
     }
 
-    test('heading fields call required() and max(150)', () => {
+    test('heading fields call max(150)', () => {
       const samples = [accordion, cardGrid, newsletter, timeline, videoEmbed]
       for (const schema of samples) {
         const calls = getCalls(schema, 'heading')
-        expect(calls.some((c) => c.method === 'required')).toBe(true)
         expect(calls.some((c) => c.method === 'max' && c.args[0] === 150)).toBe(true)
       }
     })

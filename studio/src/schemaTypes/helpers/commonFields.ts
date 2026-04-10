@@ -8,7 +8,7 @@ export function headerFields(opts?: {
   headingRequired?: boolean
   descriptionMax?: number
 }): ReturnType<typeof defineField>[] {
-  const headingRequired = opts?.headingRequired ?? true
+  const headingRequired = opts?.headingRequired ?? false
   const descriptionMax = opts?.descriptionMax ?? 500
 
   return [

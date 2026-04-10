@@ -13,7 +13,7 @@ export const beforeAfter = defineBlock({
     {name: 'toggle', title: 'Toggle'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.max(150)}),
     defineField({
       name: 'beforeImage',
       title: 'Before Image',

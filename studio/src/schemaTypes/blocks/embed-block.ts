@@ -13,7 +13,7 @@ export const embedBlock = defineBlock({
     {name: 'full-width', title: 'Full Width'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.max(150)}),
     defineField({
       name: 'embedUrl',
       title: 'Embed URL',

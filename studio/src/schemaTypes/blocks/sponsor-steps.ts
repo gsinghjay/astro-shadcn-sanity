@@ -17,7 +17,7 @@ export const sponsorSteps = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      validation: (Rule) => Rule.required().max(150),
+      validation: (Rule) => Rule.max(150),
     }),
     defineField({
       name: 'subheading',
