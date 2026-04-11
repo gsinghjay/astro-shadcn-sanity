@@ -981,7 +981,7 @@ export type ArticleList = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "split-featured" | "list";
+  variant?: "grid" | "split-featured" | "list" | "brutalist" | "magazine";
   heading?: string;
   description?: string;
   contentType?: "all" | "by-category";
@@ -3730,7 +3730,13 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid" | "list" | "split-featured" | null;
+        variant:
+          | "brutalist"
+          | "grid"
+          | "list"
+          | "magazine"
+          | "split-featured"
+          | null;
         heading: string | null;
         description: string | null;
         contentType: "all" | "by-category" | null;
