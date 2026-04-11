@@ -1,0 +1,89 @@
+---
+import type { Article, RelatedArticle } from '@/lib/sanity';
+import { safeUrlFor } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
+import { Badge } from '@/components/ui/badge';
+
+interface Props {
+  article: Article | RelatedArticle;
+}
+
+const { article } = Astro.props;
+
+const imageBuilder = safeUrlFor(article.featuredImage);
+const imageUrl = imageBuilder?.width(1280).height(720).fit('crop').url() ?? null;
+const srcset = imageBuilder
+  ? [480, 640, 960, 1280, 1600, 1920]
+      .map((w) => `${imageBuilder.width(w).height(Math.round((w * 9) / 16)).fit('crop').url()} ${w}w`)
+      .join(', ')
+  : undefined;
+const lqip = article.featuredImage?.asset?.metadata?.lqip ?? null;
+
+const formattedDate = article.publishedAt
+  ? new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
+
+const authorSlug = article.author?.slug ? stegaClean(article.author.slug) : null;
+const articleSlug = stegaClean(article.slug);
+---
+
+<article class="flex flex-col gap-4 border border-border bg-card overflow-hidden">
+  {imageUrl && (
+    <a href={`/articles/${articleSlug}`} class="block aspect-video overflow-hidden">
+      <img
+        src={imageUrl}
+        srcset={srcset}
+        sizes="(min-width: 1280px) 1280px, 100vw"
+        alt={stegaClean(article.featuredImage?.alt) || stegaClean(article.title) || 'Article image'}
+        class="w-full h-full object-cover"
+        width="1280"
+        height="720"
+        loading="lazy"
+        style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+      />
+    </a>
+  )}
+  <div class={`flex flex-col gap-3 p-6 ${imageUrl ? 'pt-0' : ''}`}>
+    <div class="flex items-center gap-3 flex-wrap">
+      {article.category?.title && (
+        <Badge variant="outline">{article.category.title}</Badge>
+      )}
+      {formattedDate && (
+        <time datetime={article.publishedAt ? stegaClean(article.publishedAt) : undefined} class="text-sm text-muted-foreground">
+          {formattedDate}
+        </time>
+      )}
+    </div>
+    <h3 class="text-lg font-semibold">
+      <a
+        href={`/articles/${articleSlug}`}
+        class="hover:text-primary hover:underline"
+        data-gtm-category="article"
+        data-gtm-action="detail"
+        data-gtm-label={stegaClean(article.title)}
+      >
+        {article.title}
+      </a>
+    </h3>
+    {article.excerpt && (
+      <p class="text-sm text-card-foreground leading-relaxed line-clamp-3">{article.excerpt}</p>
+    )}
+    {article.author?.name && (
+      <p class="text-sm text-muted-foreground">
+        {authorSlug ? (
+          <a
+            href={`/authors/${authorSlug}`}
+            class="hover:text-primary hover:underline"
+            data-gtm-category="author"
+            data-gtm-action="detail"
+            data-gtm-label={stegaClean(article.author.name)}
+          >
+            {article.author.name}
+          </a>
+        ) : (
+          <span>{article.author.name}</span>
+        )}
+      </p>
+    )}
+  </div>
+</article>

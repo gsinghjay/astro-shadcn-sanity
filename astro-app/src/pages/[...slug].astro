@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getAllArticles, prefetchPages, getSiteParams } from '@/lib/sanity';
 import { urlFor } from '@/lib/image';
 
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
@@ -29,6 +29,7 @@ let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
 let events: Awaited<ReturnType<typeof getAllEvents>> = [];
+let articles: Awaited<ReturnType<typeof getAllArticles>> = [];
 
 if (!visualEditingEnabled) {
   page = await getPage(slug as string);
@@ -39,6 +40,7 @@ if (!visualEditingEnabled) {
   projects = await getAllProjects();
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
+  articles = await getAllArticles();
 }
 
 // Extract first hero image for <link rel="preload"> (LCP optimization)
@@ -76,7 +78,7 @@ const preloadSrcset = heroImage?.asset
     </SanityPageContent>
   ) : (
     <FullWidthTemplate>
-      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
+      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} articles={articles} />
     </FullWidthTemplate>
   )}
 </Layout>

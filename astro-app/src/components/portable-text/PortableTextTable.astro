@@ -1,0 +1,70 @@
+---
+import type { Type, Props as PTProps } from 'astro-portabletext/types';
+import { stegaClean } from '@sanity/client/stega';
+
+type TableRow = {
+  _key: string;
+  isHeader?: boolean;
+  cells?: string[];
+};
+
+type TableBlock = {
+  _type: 'table';
+  _key: string;
+  caption?: string;
+  rows?: TableRow[];
+};
+
+type Props = PTProps<Type<TableBlock>>;
+
+const { node } = Astro.props;
+const caption = node.caption;
+const rows = node.rows ?? [];
+
+// Partition rows: leading header rows go in <thead>, the rest go in <tbody>.
+const headerRows: TableRow[] = [];
+const bodyRows: TableRow[] = [];
+let seenBodyRow = false;
+for (const row of rows) {
+  if (!seenBodyRow && row.isHeader) {
+    headerRows.push(row);
+  } else {
+    seenBodyRow = true;
+    bodyRows.push(row);
+  }
+}
+---
+
+<div class="overflow-x-auto my-6 not-prose">
+  <table class="w-full border-collapse text-sm text-left">
+    {caption && (
+      <caption class="caption-bottom pt-3 text-xs text-muted-foreground">
+        {caption}
+      </caption>
+    )}
+    {headerRows.length > 0 && (
+      <thead class="bg-muted/50">
+        {headerRows.map((row) => (
+          <tr>
+            {(row.cells ?? []).map((cell) => (
+              <th class="border border-border px-4 py-2 font-semibold">{cell}</th>
+            ))}
+          </tr>
+        ))}
+      </thead>
+    )}
+    <tbody>
+      {bodyRows.map((row) => (
+        <tr class="odd:bg-background even:bg-muted/20">
+          {(row.cells ?? []).map((cell) =>
+            row.isHeader ? (
+              <th class="border border-border px-4 py-2 font-semibold text-left">{cell}</th>
+            ) : (
+              <td class="border border-border px-4 py-2 align-top">{cell}</td>
+            ),
+          )}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
