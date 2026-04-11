@@ -199,6 +199,27 @@ export const MagazineTwoArticles = {
   },
 } satisfies Story;
 
+export const MagazineThreeArticles = {
+  args: {
+    _type: 'articleList',
+    _key: 'story-al-mag-3',
+    variant: 'magazine',
+    heading: 'The Long Read',
+    description: 'Hero + 2-card companion row.',
+    contentType: 'all',
+    limit: 3,
+    articles: storyArticles.slice(0, 3),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Magazine boundary case — 3 articles total. Hero renders first; the remaining 2 cards fill a `grid-cols-1 md:grid-cols-2` grid (the middle tier of the tiered remaining-articles layout, between the single-centered-card tier at 1 remaining and the 3-column tier at ≥3 remaining). Added in Story 19.9 code review to close the 2-remaining tier visual coverage gap.',
+      },
+    },
+  },
+} satisfies Story;
+
 export const MagazineFourArticles = {
   args: {
     _type: 'articleList',

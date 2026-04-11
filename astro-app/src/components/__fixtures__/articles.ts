@@ -192,3 +192,22 @@ export const storyArticles: StoryArticle[] = [
     category: CATEGORY_TUTORIALS,
   },
 ];
+
+/**
+ * Named fixture aliases — one per ArticleCard rendering branch.
+ *
+ * Story files should reference these directly instead of using `.find()`
+ * predicates on `storyArticles`, so that:
+ *   - TypeScript catches fixture-index drift at compile time,
+ *   - story files self-document which branch they demonstrate,
+ *   - reordering the `storyArticles` array can't silently break Canvas rendering.
+ *
+ * The role labels below mirror the fixture coverage matrix in the JSDoc at
+ * the top of this file.
+ */
+export const storyArticleFull = storyArticles[0]; // image + author + tags
+export const storyArticleLongTitle = storyArticles[1]; // ≥80 char headline
+export const storyArticleLongExcerpt = storyArticles[2]; // ≥250 char excerpt
+export const storyArticleNoImage = storyArticles[3]; // featuredImage: null
+export const storyArticleNoAuthor = storyArticles[4]; // author: null
+export const storyArticleUnlinkedByline = storyArticles[5]; // author.name set, author.slug null

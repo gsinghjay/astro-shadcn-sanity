@@ -6,7 +6,14 @@
  */
 import type { Meta, StoryObj } from '@/lib/storybook-types';
 import ArticleCard from './ArticleCard.astro';
-import { storyArticles } from './__fixtures__/articles';
+import {
+  storyArticleFull,
+  storyArticleNoImage,
+  storyArticleNoAuthor,
+  storyArticleLongTitle,
+  storyArticleLongExcerpt,
+  storyArticleUnlinkedByline,
+} from './__fixtures__/articles';
 
 const meta = {
   title: 'Components/ArticleCard',
@@ -32,7 +39,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default = {
-  args: { article: storyArticles[0] },
+  args: { article: storyArticleFull },
   parameters: {
     docs: {
       description: {
@@ -44,7 +51,7 @@ export const Default = {
 } satisfies Story;
 
 export const NoImage = {
-  args: { article: storyArticles.find((a) => !a.featuredImage) },
+  args: { article: storyArticleNoImage },
   parameters: {
     docs: {
       description: {
@@ -56,7 +63,7 @@ export const NoImage = {
 } satisfies Story;
 
 export const NoAuthor = {
-  args: { article: storyArticles.find((a) => !a.author) },
+  args: { article: storyArticleNoAuthor },
   parameters: {
     docs: {
       description: {
@@ -68,9 +75,7 @@ export const NoAuthor = {
 } satisfies Story;
 
 export const LongTitle = {
-  args: {
-    article: storyArticles.find((a) => (a.title?.length ?? 0) >= 80),
-  },
+  args: { article: storyArticleLongTitle },
   parameters: {
     docs: {
       description: {
@@ -82,14 +87,24 @@ export const LongTitle = {
 } satisfies Story;
 
 export const LongExcerpt = {
-  args: {
-    article: storyArticles.find((a) => (a.excerpt?.length ?? 0) >= 250),
-  },
+  args: { article: storyArticleLongExcerpt },
   parameters: {
     docs: {
       description: {
         story:
           'Excerpt ≥250 characters — exercises the `line-clamp-3` truncation applied to the card body paragraph.',
+      },
+    },
+  },
+} satisfies Story;
+
+export const UnlinkedByline = {
+  args: { article: storyArticleUnlinkedByline },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Author name is set but `author.slug` is `null` — exercises the unlinked-byline branch where the name renders as a plain `<span>` instead of a `<a href="/authors/{slug}">`. Mirrors the `articleNoAuthorSlug` pattern from the existing `__tests__/__fixtures__/articles.ts`.',
       },
     },
   },
