@@ -21,16 +21,31 @@ export const articleList = defineBlock({
       name: 'contentType',
       title: 'Content Type',
       type: 'string',
-      description: 'Content type to display (blog posts, news, etc.)',
+      description: 'Show all articles or filter by specific categories',
       options: {
         list: [
           {title: 'All', value: 'all'},
-          {title: 'Blog', value: 'blog'},
-          {title: 'News', value: 'news'},
+          {title: 'By Category', value: 'by-category'},
         ],
         layout: 'radio',
       },
       initialValue: 'all',
+    }),
+    defineField({
+      name: 'categories',
+      title: 'Categories',
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'articleCategory'}]})],
+      hidden: ({parent}) => parent?.contentType !== 'by-category',
+      description: 'Select one or more categories to filter articles',
+      validation: (Rule) =>
+        Rule.custom((categories, context) => {
+          const parent = context.parent as {contentType?: string} | undefined
+          if (parent?.contentType === 'by-category' && (!categories || categories.length === 0)) {
+            return 'Select at least one category when filtering by category'
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'limit',

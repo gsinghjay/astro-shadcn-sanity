@@ -1,20 +1,65 @@
 ---
 import type { ArticleListBlock } from '@/lib/types';
+import type { Article } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
 import { Section, SectionContent, SectionActions, SectionGrid, SectionSplit } from '@/components/ui/section';
 import { Tile, TileContent, TileMedia } from '@/components/ui/tile';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 interface Props extends ArticleListBlock {
+  articles?: Article[];
   class?: string;
   id?: string;
 }
 
-const { heading, description, ctaButtons, variant: rawVariant } = Astro.props;
+const { heading, description, ctaButtons, variant: rawVariant, articles: rawArticles = [] } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
-const placeholderCards = [1, 2, 3];
-const placeholderRows = [1, 2, 3, 4];
+// Drop articles without a valid slug — they have no detail page to link to.
+// The GROQ query applies `defined(slug.current)`, but typegen widens slug to
+// `string | null` and drafts can still surface null at runtime.
+const articles = rawArticles.filter((a): a is Article => !!stegaClean(a.slug));
+
+function formatDate(dateStr: string | null | undefined): string | null {
+  if (!dateStr) return null;
+  const cleaned = stegaClean(dateStr);
+  if (!cleaned) return null;
+  const d = new Date(cleaned);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function articleHref(article: Article): string {
+  // Safe because `articles` has already been filtered to articles with valid slugs.
+  return `/articles/${stegaClean(article.slug)}`;
+}
+
+function articleImageUrl(article: Article, w: number, h: number): string | null {
+  const builder = safeUrlFor(article.featuredImage);
+  return builder ? builder.width(w).height(h).fit('crop').url() : null;
+}
+
+function articleLqip(article: Article): string | null {
+  return article.featuredImage?.asset?.metadata?.lqip ?? null;
+}
+
+function articleAlt(article: Article): string {
+  return stegaClean(article.featuredImage?.alt) || stegaClean(article.title) || '';
+}
+
+const featuredArticle = articles[0];
+const remainingArticles = articles.slice(1);
+const featuredImg = featuredArticle ? articleImageUrl(featuredArticle, 800, 450) : null;
+const featuredLqip = featuredArticle ? articleLqip(featuredArticle) : null;
+const featuredHref = featuredArticle ? articleHref(featuredArticle) : '';
+const featuredAlt = featuredArticle ? articleAlt(featuredArticle) : '';
+const featuredDate = featuredArticle ? formatDate(featuredArticle.publishedAt) : null;
 ---
 
 {variant === 'grid' && (
@@ -25,22 +70,68 @@ const placeholderRows = [1, 2, 3, 4];
         {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
       </SectionContent>
     )}
-    <SectionGrid>
-      {placeholderCards.map(() => (
-        <Tile>
-          <TileMedia>
-            <div class="aspect-video w-full bg-muted" />
-          </TileMedia>
-          <TileContent>
-            <div class="h-5 w-3/4 bg-muted" />
-            <div class="mt-2 h-3 w-full bg-muted/60" />
-          </TileContent>
-        </Tile>
-      ))}
-    </SectionGrid>
-    <SectionContent>
-      <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
-    </SectionContent>
+    {articles.length > 0 ? (
+      <SectionGrid>
+        {articles.map((article) => {
+          const img = articleImageUrl(article, 640, 360);
+          const lqip = articleLqip(article);
+          const href = articleHref(article);
+          const formattedDate = formatDate(article.publishedAt);
+          return (
+            <Tile>
+              {img && (
+                <TileMedia>
+                  <a href={href} class="block aspect-video overflow-hidden">
+                    <img
+                      src={img}
+                      alt={articleAlt(article)}
+                      width={640}
+                      height={360}
+                      loading="lazy"
+                      class="w-full h-full object-cover"
+                      style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                    />
+                  </a>
+                </TileMedia>
+              )}
+              <TileContent>
+                <div class="flex items-center gap-3 flex-wrap">
+                  {article.category?.title && (
+                    <Badge variant="outline">{article.category.title}</Badge>
+                  )}
+                  {formattedDate && (
+                    <time
+                      datetime={article.publishedAt ? stegaClean(article.publishedAt) ?? undefined : undefined}
+                      class="text-sm text-muted-foreground"
+                    >
+                      {formattedDate}
+                    </time>
+                  )}
+                </div>
+                <h3 class="mt-2 text-lg font-semibold">
+                  <a
+                    href={href}
+                    class="hover:text-primary hover:underline"
+                    data-gtm-category="article"
+                    data-gtm-action="detail"
+                    data-gtm-label={stegaClean(article.title) ?? undefined}
+                  >
+                    {article.title}
+                  </a>
+                </h3>
+                {article.excerpt && (
+                  <p class="mt-2 text-sm text-muted-foreground line-clamp-3">{article.excerpt}</p>
+                )}
+              </TileContent>
+            </Tile>
+          );
+        })}
+      </SectionGrid>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No articles to display.</p>
+      </SectionContent>
+    )}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -67,29 +158,109 @@ const placeholderRows = [1, 2, 3, 4];
         {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
       </SectionContent>
     )}
-    <SectionSplit>
-      <div>
-        <div class="aspect-video w-full bg-muted" />
-        <div class="mt-4 space-y-2">
-          <div class="h-6 w-3/4 bg-muted" />
-          <div class="h-3 w-full bg-muted/60" />
-        </div>
-      </div>
-      <div class="grid gap-6">
-        {[1, 2].map(() => (
-          <div class="flex gap-4">
-            <div class="aspect-video w-32 flex-shrink-0 bg-muted" />
-            <div class="flex-1 space-y-2">
-              <div class="h-4 w-3/4 bg-muted" />
-              <div class="h-3 w-full bg-muted/60" />
+    {articles.length > 0 ? (
+      <SectionSplit>
+        {featuredArticle && (
+          <article class="flex flex-col gap-4 border border-border bg-card overflow-hidden">
+            {featuredImg && (
+              <a href={featuredHref} class="block aspect-video overflow-hidden">
+                <img
+                  src={featuredImg}
+                  alt={featuredAlt}
+                  width={800}
+                  height={450}
+                  loading="lazy"
+                  class="w-full h-full object-cover"
+                  style={featuredLqip ? `background-image: url(${featuredLqip}); background-size: cover;` : undefined}
+                />
+              </a>
+            )}
+            <div class={`flex flex-col gap-3 p-6 ${featuredImg ? 'pt-0' : ''}`}>
+              <div class="flex items-center gap-3 flex-wrap">
+                {featuredArticle.category?.title && (
+                  <Badge variant="outline">{featuredArticle.category.title}</Badge>
+                )}
+                {featuredDate && (
+                  <time
+                    datetime={featuredArticle.publishedAt ? stegaClean(featuredArticle.publishedAt) ?? undefined : undefined}
+                    class="text-sm text-muted-foreground"
+                  >
+                    {featuredDate}
+                  </time>
+                )}
+              </div>
+              <h3 class="text-2xl font-semibold">
+                <a
+                  href={featuredHref}
+                  class="hover:text-primary hover:underline"
+                  data-gtm-category="article"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(featuredArticle.title) ?? undefined}
+                >
+                  {featuredArticle.title}
+                </a>
+              </h3>
+              {featuredArticle.excerpt && (
+                <p class="text-sm text-muted-foreground leading-relaxed line-clamp-4">{featuredArticle.excerpt}</p>
+              )}
             </div>
-          </div>
-        ))}
-      </div>
-    </SectionSplit>
-    <SectionContent>
-      <p class="text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
-    </SectionContent>
+          </article>
+        )}
+        <div class="grid gap-6">
+          {remainingArticles.map((article) => {
+            const img = articleImageUrl(article, 320, 180);
+            const lqip = articleLqip(article);
+            const href = articleHref(article);
+            const formattedDate = formatDate(article.publishedAt);
+            return (
+              <article class="flex gap-4">
+                {img && (
+                  <a href={href} class="aspect-video w-32 flex-shrink-0 overflow-hidden">
+                    <img
+                      src={img}
+                      alt={articleAlt(article)}
+                      width={320}
+                      height={180}
+                      loading="lazy"
+                      class="w-full h-full object-cover"
+                      style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                    />
+                  </a>
+                )}
+                <div class="flex-1 flex flex-col gap-1">
+                  {formattedDate && (
+                    <time
+                      datetime={article.publishedAt ? stegaClean(article.publishedAt) ?? undefined : undefined}
+                      class="text-xs text-muted-foreground"
+                    >
+                      {formattedDate}
+                    </time>
+                  )}
+                  <h4 class="text-base font-semibold leading-snug">
+                    <a
+                      href={href}
+                      class="hover:text-primary hover:underline"
+                      data-gtm-category="article"
+                      data-gtm-action="detail"
+                      data-gtm-label={stegaClean(article.title) ?? undefined}
+                    >
+                      {article.title}
+                    </a>
+                  </h4>
+                  {article.excerpt && (
+                    <p class="text-sm text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </SectionSplit>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No articles to display.</p>
+      </SectionContent>
+    )}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -116,18 +287,42 @@ const placeholderRows = [1, 2, 3, 4];
       </SectionContent>
     )}
     <SectionContent>
-      <div class="divide-y">
-        {placeholderRows.map(() => (
-          <div class="flex gap-6 py-4">
-            <span class="w-20 flex-shrink-0 text-sm text-muted-foreground">—</span>
-            <div class="flex-1 space-y-1">
-              <div class="h-4 w-48 bg-muted" />
-              <div class="h-3 w-full bg-muted/60" />
-            </div>
-          </div>
-        ))}
-      </div>
-      <p class="mt-4 text-sm text-muted-foreground">No articles to display. Article data source will be connected when the article document type is created.</p>
+      {articles.length > 0 ? (
+        <div class="divide-y divide-border">
+          {articles.map((article) => {
+            const href = articleHref(article);
+            const formattedDate = formatDate(article.publishedAt);
+            return (
+              <article class="flex gap-6 py-4">
+                <time
+                  datetime={article.publishedAt ? stegaClean(article.publishedAt) ?? undefined : undefined}
+                  class="w-28 flex-shrink-0 text-sm text-muted-foreground"
+                >
+                  {formattedDate ?? '—'}
+                </time>
+                <div class="flex-1 space-y-1">
+                  <h3 class="text-base font-semibold">
+                    <a
+                      href={href}
+                      class="hover:text-primary hover:underline"
+                      data-gtm-category="article"
+                      data-gtm-action="detail"
+                      data-gtm-label={stegaClean(article.title) ?? undefined}
+                    >
+                      {article.title}
+                    </a>
+                  </h3>
+                  {article.excerpt && (
+                    <p class="text-sm text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p class="text-muted-foreground text-center py-8">No articles to display.</p>
+      )}
     </SectionContent>
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>

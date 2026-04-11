@@ -36,6 +36,7 @@ const {
   ARTICLE_BY_SLUG_QUERY,
   getAllArticles,
   getArticleBySlug,
+  resolveBlockArticles,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -698,6 +699,134 @@ describe("resolveBlockSponsors()", () => {
       const block = { _type: "sponsorCards", displayMode: "manual", sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual([]);
     });
+  });
+});
+
+describe("resolveBlockArticles()", () => {
+  const allArticles = [
+    {
+      _id: "art-1",
+      title: "First",
+      slug: "first",
+      publishedAt: "2026-01-05T00:00:00Z",
+      category: { _id: "cat-news", title: "News", slug: "news" },
+    },
+    {
+      _id: "art-2",
+      title: "Second",
+      slug: "second",
+      publishedAt: "2026-01-04T00:00:00Z",
+      category: { _id: "cat-blog", title: "Blog", slug: "blog" },
+    },
+    {
+      _id: "art-3",
+      title: "Third",
+      slug: "third",
+      publishedAt: "2026-01-03T00:00:00Z",
+      category: { _id: "cat-news", title: "News", slug: "news" },
+    },
+    {
+      _id: "art-4",
+      title: "Fourth",
+      slug: "fourth",
+      publishedAt: "2026-01-02T00:00:00Z",
+      category: null,
+    },
+  ] as any[];
+
+  it("returns all articles when contentType is 'all'", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("returns all articles when contentType is null (defaults to all)", () => {
+    const block = { _type: "articleList", contentType: null, categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("applies limit by slicing from the top (pre-sorted newest first)", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 2 };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(2);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-2"]);
+  });
+
+  it("uses default limit of 6 when limit is null", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: null };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(4);
+  });
+
+  it("filters by category when contentType is 'by-category'", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(2);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-3"]);
+  });
+
+  it("filters by multiple categories", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }, { _id: "cat-blog" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(3);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-2", "art-3"]);
+  });
+
+  it("excludes articles with null category when filtering by category", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result.find((a: any) => a._id === "art-4")).toBeUndefined();
+  });
+
+  it("returns all articles when contentType is 'by-category' but categories is empty", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [],
+      limit: 10,
+    };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("returns all articles when contentType is 'by-category' but categories is null", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: null,
+      limit: 10,
+    };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("applies limit after category filtering", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 1,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(1);
+    expect(result[0]._id).toBe("art-1");
+  });
+
+  it("returns empty array when input is empty", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, [])).toEqual([]);
   });
 });
 
