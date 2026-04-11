@@ -1,5 +1,6 @@
 import {defineType, defineField} from 'sanity'
 import {SparklesIcon} from '@sanity/icons'
+import {LUCIDE_ICON_OPTIONS} from '../helpers/commonFields'
 
 export const featureItem = defineType({
   name: 'featureItem',
@@ -11,8 +12,11 @@ export const featureItem = defineType({
       name: 'icon',
       title: 'Icon',
       type: 'string',
-      description: 'Icon name from icon set',
-      validation: (Rule) => Rule.max(50),
+      description: 'Optional icon from the Lucide icon set',
+      options: {
+        list: LUCIDE_ICON_OPTIONS,
+        layout: 'dropdown',
+      },
     }),
     defineField({
       name: 'image',

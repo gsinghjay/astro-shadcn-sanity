@@ -45,7 +45,7 @@ export const portableText = defineType({
                 name: 'reference',
                 type: 'reference',
                 title: 'Reference',
-                to: [{type: 'page'}, {type: 'sponsor'}, {type: 'project'}, {type: 'event'}],
+                to: [{type: 'page'}, {type: 'sponsor'}, {type: 'project'}, {type: 'event'}, {type: 'article'}],
               }),
             ],
           }),
@@ -94,6 +94,65 @@ export const portableText = defineType({
           validation: (Rule) => Rule.required(),
         }),
       ],
+    }),
+    defineArrayMember({
+      name: 'table',
+      type: 'object',
+      title: 'Table',
+      fields: [
+        defineField({
+          name: 'caption',
+          type: 'string',
+          title: 'Caption (optional)',
+          description: 'Short description rendered above the table',
+        }),
+        defineField({
+          name: 'rows',
+          type: 'array',
+          title: 'Rows',
+          of: [
+            defineArrayMember({
+              name: 'tableRow',
+              type: 'object',
+              fields: [
+                defineField({
+                  name: 'isHeader',
+                  type: 'boolean',
+                  title: 'Header row',
+                  description: 'Toggle on for column headers',
+                  initialValue: false,
+                }),
+                defineField({
+                  name: 'cells',
+                  type: 'array',
+                  title: 'Cells',
+                  of: [{type: 'string'}],
+                  validation: (Rule) => Rule.min(1),
+                }),
+              ],
+              preview: {
+                select: {cells: 'cells', isHeader: 'isHeader'},
+                prepare({cells, isHeader}) {
+                  return {
+                    title: (cells || []).join(' | ') || '(empty row)',
+                    subtitle: isHeader ? 'Header row' : undefined,
+                  }
+                },
+              },
+            }),
+          ],
+          validation: (Rule) => Rule.min(1),
+        }),
+      ],
+      preview: {
+        select: {rows: 'rows', caption: 'caption'},
+        prepare({rows, caption}) {
+          return {
+            title: caption || 'Table',
+            subtitle: `${(rows || []).length} rows`,
+          }
+        },
+      },
     }),
   ],
 })

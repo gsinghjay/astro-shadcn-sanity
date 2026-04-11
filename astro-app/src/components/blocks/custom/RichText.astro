@@ -12,23 +12,26 @@ interface Props extends RichTextBlock {
 
 const { content, variant } = Astro.props;
 
-// Clean variant value and default to 'prose'
-const cleanVariant = stegaClean(variant ?? 'prose');
+// Clean variant value, remap legacy names, and default to 'prose'
+const LEGACY_VARIANT_MAP: Record<string, string> = { narrow: 'standard', wide: 'highlighted' };
+const raw = stegaClean(variant ?? 'prose');
+const cleanVariant = LEGACY_VARIANT_MAP[raw] ?? raw;
 ---
 
 <Section data-animate>
-  {cleanVariant === 'wide' ? (
-    // Wide variant keeps prose typography but removes max-width cap
+  {cleanVariant === 'highlighted' ? (
     <SectionProse size="lg" class="max-w-none">
       {content && <PortableText value={content} components={portableTextComponents} />}
     </SectionProse>
-  ) : cleanVariant === 'narrow' ? (
-    // Narrow variant uses explicit section width custom property
+  ) : cleanVariant === 'standard' ? (
     <SectionProse style="--section-width: 672px; max-width: var(--section-width);" class="w-full">
       {content && <PortableText value={content} components={portableTextComponents} />}
     </SectionProse>
+  ) : cleanVariant === 'sidebar' ? (
+    <SectionProse size="sm" class="border-l-2 border-muted pl-6">
+      {content && <PortableText value={content} components={portableTextComponents} />}
+    </SectionProse>
   ) : (
-    // Prose default variant
     <SectionProse>
       {content && <PortableText value={content} components={portableTextComponents} />}
     </SectionProse>

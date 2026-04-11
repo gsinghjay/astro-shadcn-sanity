@@ -26,7 +26,6 @@ export default {
     },
     heading: { control: 'text', description: 'Section heading' },
     address: { control: 'text', description: 'Physical address' },
-    zoom: { control: { type: 'number', min: 1, max: 20 }, description: 'Map zoom level' },
     caption: { control: 'text', description: 'Caption text below map' },
     backgroundVariant: {
       control: { type: 'select' },
@@ -54,7 +53,6 @@ export const Default = {
     heading: 'Find Us',
     address: '123 Innovation Drive, Suite 400, San Francisco, CA 94105',
     coordinates: { lat: 37.7749, lng: -122.4194 },
-    zoom: 15,
     caption: 'Located in the heart of downtown San Francisco.',
   },
 }
