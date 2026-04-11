@@ -246,6 +246,22 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toMatch(/\b512w\b/);
     });
 
+    test('split-featured sidebar row uses items-start to prevent thumbnail stretch', async () => {
+      // Regression guard: without `items-start` on the <article> flex row, the
+      // sidebar's default `align-items: stretch` overrode the thumbnail anchor's
+      // aspect-video intrinsic height, stretching the thumbnail vertically to
+      // match the text column (which itself was stretched by SectionSplit's
+      // grid-default align-items: stretch on the sidebar column). The chain of
+      // three stretches made the 128x72 thumbnail render many times taller.
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListSplitFeatured, articles: sampleArticlesWithImages },
+      });
+      // The `items-start` class must appear on the sidebar article row's flex
+      // container so the thumbnail stays at its intrinsic aspect-video size.
+      expect(html).toContain('flex items-start gap-4');
+    });
+
     test('list variant does not render article images', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(ArticleList, {

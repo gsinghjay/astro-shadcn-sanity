@@ -124,7 +124,7 @@ const remainingArticles = articles.slice(1);
             const href = articleHref(article);
             const formattedDate = formatDate(article.publishedAt);
             return (
-              <article class="flex gap-4">
+              <article class="flex items-start gap-4">
                 {img && (
                   <a href={href} class="aspect-video w-32 flex-shrink-0 overflow-hidden">
                     <img
