@@ -232,6 +232,20 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toContain('background-image: url(data:image/jpeg;base64,/9j/4AAQSide');
     });
 
+    test('split-featured sidebar thumbnails emit retina srcset with sizes="128px"', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListSplitFeatured, articles: sampleArticlesWithImages },
+      });
+      // Sidebar thumbs are fixed at w-32 (128px CSS) across breakpoints — srcset
+      // widths [128, 256, 384, 512] target DPR variants, not layout widths.
+      expect(html).toContain('sizes="128px"');
+      // The 512w descriptor is unique to the sidebar srcset (not emitted by
+      // ArticleCard's [480, 640, 960, 1280, 1600, 1920] widths), so it proves
+      // the sidebar's own srcset was wired up.
+      expect(html).toMatch(/\b512w\b/);
+    });
+
     test('list variant does not render article images', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(ArticleList, {
@@ -315,6 +329,22 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toContain('border-brutal');
     });
 
+    test('brutalist cards emit responsive srcset + sizes (mobile perf)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListBrutalist, articles: sampleArticlesWithImages },
+      });
+      // Brutalist variant uses widths [320, 480, 640, 960, 1280]. The `sizes` hint
+      // is calibrated to SectionGrid size="default" auto-fit behavior (2 cols at
+      // 640-900px, 3 cols at 900-1180px, 4 cols at 1180-1440px, 5 cols at 1440+px)
+      // — patched after the initial 19.8 review caught a 1024/768 hint mismatch.
+      expect(html).toContain('srcset=');
+      expect(html).toContain(
+        'sizes="(min-width: 1440px) 20vw, (min-width: 1180px) 25vw, (min-width: 900px) 33vw, (min-width: 640px) 50vw, 100vw"',
+      );
+      expect(html).toMatch(/\b320w\b/);
+    });
+
     test('shows empty state when articles is empty', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(ArticleList, {
@@ -366,27 +396,86 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toContain('fetchpriority="high"');
     });
 
+    test('hero image emits a responsive srcset + sizes for LCP budget', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListMagazine, articles: sampleArticlesWithImages },
+      });
+      // LCP fix: hero must ship a responsive srcset so mobile viewports don't
+      // download the full 1600x900 asset. widths array: [640, 960, 1280, 1600, 1920].
+      expect(html).toContain('srcset=');
+      expect(html).toContain('sizes="100vw"');
+      expect(html).toMatch(/\bw=640\b/);
+      expect(html).toMatch(/\bw=1920\b/);
+    });
+
     test('renders remaining articles in a grid when there are >= 2 articles', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(ArticleList, {
         props: { ...articleListMagazine, articles: sampleArticles },
       });
-      // AC #20: remaining articles in responsive grid after hero
-      expect(html).toContain('grid-cols-1 md:grid-cols-2 lg:grid-cols-3');
+      // AC #20: remaining articles in responsive grid after hero. With 3 articles
+      // total (2 remaining), the post-review tier logic now uses md:grid-cols-2
+      // without lg:grid-cols-3 — the 3-col class only activates with ≥3 remaining.
+      expect(html).toContain('md:grid-cols-2');
       // Both non-hero articles rendered
       expect(html).toContain('Sanity Visual Editing Tips');
       expect(html).toContain('Why CSS Container Queries Matter');
     });
 
-    test('with exactly 1 article renders only the hero (no remaining-articles grid)', async () => {
+    test('with exactly 2 articles renders hero + contained single-card layout for 1 remaining', async () => {
+      // Post-review patch: a lone remaining card no longer orphans inside a
+      // 3-col grid. It renders in a centered max-w-3xl container instead.
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListMagazine, articles: sampleArticles.slice(0, 2) },
+      });
+      // Hero (article[0]) renders
+      expect(html).toContain('Astro 5 Released');
+      // Remaining single article (article[1]) renders in the contained layout
+      expect(html).toContain('Sanity Visual Editing Tips');
+      expect(html).toContain('max-w-3xl mx-auto');
+      // Neither grid tier class is emitted for a single remaining item
+      expect(html).not.toContain('md:grid-cols-2');
+      expect(html).not.toContain('lg:grid-cols-3');
+    });
+
+    test('with >=4 articles uses lg:grid-cols-3 for the remaining-articles grid', async () => {
+      // Post-review patch: the 3-col class only activates when ≥3 articles remain
+      // (i.e., ≥4 total articles once the hero is extracted).
+      const fourArticles = [
+        ...sampleArticles,
+        {
+          _id: 'article-4',
+          title: 'Fourth Article for Grid Coverage',
+          slug: 'fourth-article',
+          excerpt: 'A fourth article to exercise the lg:grid-cols-3 tier.',
+          featuredImage: null,
+          author: { name: 'Sam Taylor', slug: 'sam-taylor' },
+          publishedAt: '2026-02-15T09:00:00Z',
+          category: { _id: 'cat-blog', title: 'Blog', slug: 'blog' },
+        },
+      ] as typeof sampleArticles;
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListMagazine, articles: fourArticles },
+      });
+      // 4 total → 3 remaining → full 3-col tier activated
+      expect(html).toContain('grid-cols-1 md:grid-cols-2 lg:grid-cols-3');
+      expect(html).toContain('Fourth Article for Grid Coverage');
+    });
+
+    test('with exactly 1 article renders only the hero (no remaining-articles layout)', async () => {
       const container = await AstroContainer.create();
       const html = await container.renderToString(ArticleList, {
         props: { ...articleListMagazine, articles: [sampleArticles[0]] },
       });
       // Hero still renders
       expect(html).toContain('Astro 5 Released');
-      // AC #21: no remaining-grid marker when there is only 1 article
+      // AC #21: no remaining-grid marker when there is only 1 article.
+      // Neither the 3-col tier NOR the single-card contained layout renders.
       expect(html).not.toContain('grid-cols-1 md:grid-cols-2 lg:grid-cols-3');
+      expect(html).not.toContain('max-w-3xl mx-auto');
     });
 
     test('shows empty state when articles is empty', async () => {

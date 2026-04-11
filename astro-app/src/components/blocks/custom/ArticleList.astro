@@ -45,6 +45,17 @@ function articleImageUrl(article: Article, w: number, h: number): string | null 
   return builder ? builder.width(w).height(h).fit('crop').url() : null;
 }
 
+// Builds a 16:9 responsive srcset for an article's featured image.
+// Mirrors the ArticleCard.astro pattern so brutalist cards and the magazine
+// hero serve appropriately-sized images to mobile viewports (LCP budget).
+function articleSrcset(article: Article, widths: number[]): string | undefined {
+  const builder = safeUrlFor(article.featuredImage);
+  if (!builder) return undefined;
+  return widths
+    .map((w) => `${builder.width(w).height(Math.round((w * 9) / 16)).fit('crop').url()} ${w}w`)
+    .join(', ');
+}
+
 function articleLqip(article: Article): string | null {
   return article.featuredImage?.asset?.metadata?.lqip ?? null;
 }
@@ -106,6 +117,9 @@ const remainingArticles = articles.slice(1);
         <div class="grid gap-6">
           {remainingArticles.map((article) => {
             const img = articleImageUrl(article, 320, 180);
+            // Sidebar thumb is fixed at w-32 (128px CSS) across breakpoints —
+            // srcset widths target 1x/2x/3x/4x DPR variants, not layout widths.
+            const srcset = articleSrcset(article, [128, 256, 384, 512]);
             const lqip = articleLqip(article);
             const href = articleHref(article);
             const formattedDate = formatDate(article.publishedAt);
@@ -115,6 +129,8 @@ const remainingArticles = articles.slice(1);
                   <a href={href} class="aspect-video w-32 flex-shrink-0 overflow-hidden">
                     <img
                       src={img}
+                      srcset={srcset}
+                      sizes="128px"
                       alt={articleAlt(article)}
                       width={320}
                       height={180}
@@ -251,6 +267,7 @@ const remainingArticles = articles.slice(1);
       <SectionGrid size="default">
         {articles.map((article) => {
           const img = articleImageUrl(article, 640, 360);
+          const srcset = articleSrcset(article, [320, 480, 640, 960, 1280]);
           const lqip = articleLqip(article);
           const href = articleHref(article);
           const formattedDate = formatDate(article.publishedAt);
@@ -261,6 +278,8 @@ const remainingArticles = articles.slice(1);
                 <a href={href} class="block aspect-video overflow-hidden">
                   <img
                     src={img}
+                    srcset={srcset}
+                    sizes="(min-width: 1440px) 20vw, (min-width: 1180px) 25vw, (min-width: 900px) 33vw, (min-width: 640px) 50vw, 100vw"
                     alt={articleAlt(article)}
                     width={640}
                     height={360}
@@ -341,6 +360,7 @@ const remainingArticles = articles.slice(1);
       <>
         {featuredArticle && (() => {
           const heroImg = articleImageUrl(featuredArticle, 1600, 900);
+          const heroSrcset = articleSrcset(featuredArticle, [640, 960, 1280, 1600, 1920]);
           const heroLqip = articleLqip(featuredArticle);
           const heroHref = articleHref(featuredArticle);
           const heroAlt = articleAlt(featuredArticle);
@@ -352,6 +372,8 @@ const remainingArticles = articles.slice(1);
                 <a href={heroHref} class="block aspect-[16/9] overflow-hidden">
                   <img
                     src={heroImg}
+                    srcset={heroSrcset}
+                    sizes="100vw"
                     alt={heroAlt}
                     width={1600}
                     height={900}
@@ -412,8 +434,21 @@ const remainingArticles = articles.slice(1);
             </article>
           );
         })()}
-        {remainingArticles.length > 0 && (
-          <SectionGrid class="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {/* Tier the remaining-articles layout by count so a single orphan
+            doesn't occupy 1/3 width next to 66vw of whitespace. */}
+        {remainingArticles.length === 1 && (
+          <div class="max-w-3xl mx-auto">
+            <ArticleCard article={remainingArticles[0]} />
+          </div>
+        )}
+        {remainingArticles.length >= 2 && (
+          <SectionGrid
+            class={
+              remainingArticles.length === 2
+                ? 'grid-cols-1 md:grid-cols-2'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }
+          >
             {remainingArticles.map((article) => <ArticleCard article={article} />)}
           </SectionGrid>
         )}
