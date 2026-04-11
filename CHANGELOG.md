@@ -1,3 +1,41 @@
+## [1.16.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.15.0...v1.16.0) (2026-04-11)
+
+### Features
+
+* **articleList:** add brutalist and magazine variants, refactor to reuse ArticleCard ([f85210e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f85210e6ebefed4e86c1c7c58947aa4c5e0e6975))
+* **articleList:** wire block to real article documents (Story 19.4) ([7052c7e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7052c7e6aaff38f3fdac1f6cf269c7eadd8795cc))
+* **astro:** add article listing and detail pages (Story 19.3) ([a9e1e62](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a9e1e62a805cfab63f1eeff91b288ccc152e2b4c))
+* **portable-text:** add table block to portable text schema ([7ef1b4a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7ef1b4a62517bbcc234f472052ff714d520f9388))
+* **rss:** add site-wide RSS feed endpoint for articles (Story 19.5) ([c84aeef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c84aeefb8cf1ec18f9946eb5d998fcd40b603294))
+* **storybook:** add ArticleCard stories and strict CSF3 template (Story 19.9) ([ed31dce](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ed31dcee5cf96c485af06cba81551e7498d53788)), closes [#26](https://github.com/gsinghjay/astro-shadcn-sanity/issues/26)
+* **studio:** add article document schema (Story 19.2) ([1373ab2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1373ab225dccc646c1bfb41e30d60a08076d68cd))
+* **studio:** add articleCategory document schema (Story 19.1) ([ca52732](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ca52732543f7e44dbb5acbd6fdbaa4516dee9a96))
+* **studio:** add author document schema (Story 20.1) ([3232989](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3232989c01e28fd4d84f05c08e87fb6356794ba6))
+
+### Bug Fixes
+
+* **articleList:** prevent split-featured sidebar thumbnail stretch ([4f13ba2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4f13ba2be4aabc495d511c0536dced0aca06df09))
+* **astro:** responsive srcset on ArticleCard and article link handler ([8f67e34](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8f67e349184ce6b879735cf6ba078672f8a3be27))
+* **review:** address code review findings for Story 18.7 ([b3eb5d9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b3eb5d995837c28e4bdaa368199ed5387570cc3a))
+* **review:** address code review findings for Story 19.3 ([5167ff2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5167ff2246b9bc455166cdb36b0cd0531b8c797c))
+* **review:** address Story 19.8 code review findings ([80ccd10](https://github.com/gsinghjay/astro-shadcn-sanity/commit/80ccd101851d2a727b2b6a4dcd7c4ea5b74a564d))
+* **review:** address Story 19.9 code review findings ([50647cb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/50647cbe02eb90bc9fc3c868c08b8dca5cd9bbc6))
+* **studio:** address code review findings for Story 18.6 ([5af2989](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5af2989bf1690f6cf0288d28d459adf5fdf0bfa7))
+* **studio:** clean up RWC workspace config, add site-scoped slug uniqueness ([c87120a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c87120aaa6fc1cd091878a9df31a794763f692fb))
+* **studio:** harden migration script with PT support, optimistic locking, error handling ([8cfeaff](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8cfeaffbac8b5bebd3a9e4294ad30017c406dbd0))
+
+### Miscellaneous
+
+* **studio:** update sanity to 5.20.0 and @sanity/vision to 5.20.0 ([154d60e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/154d60efd29bfd6668f296ac275a3bedd86b6dc2))
+
+### Refactoring
+
+* **groq:** remove coalesce() fallbacks after successful migration ([43a0f22](https://github.com/gsinghjay/astro-shadcn-sanity/commit/43a0f226cf403a89db08a17e3ac3f9575ef0c8eb))
+* remove page template system, use full-width for all pages ([066a4f0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/066a4f0c6478136649601656733e35968f3766e5))
+* **studio:** make heading field optional across all block schemas ([a304648](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a304648cf2b071b1a1c9f9ecee6794c8b2aa3bc6))
+* **studio:** remove presentation leakage from schemas (Story 18.7) ([f823be6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f823be6e644514b619365badf3906e04fea08f3f))
+* **studio:** split RWC workspace into separate US and International workspaces ([9a15ccc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9a15ccc6df6cbf1cafb1fc14e1ea4e8877cdc361))
+
 ## [1.15.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.14.1...v1.15.0) (2026-04-09)
 
 ### Features
