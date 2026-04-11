@@ -24,6 +24,8 @@ if (ref?.slug) {
     href = `/projects/${slug}`;
   } else if (refType === 'event') {
     href = `/events/${slug}`;
+  } else if (refType === 'article') {
+    href = `/articles/${slug}`;
   } else {
     href = `/${slug}`;
   }

@@ -11,7 +11,12 @@ interface Props {
 const { article } = Astro.props;
 
 const imageBuilder = safeUrlFor(article.featuredImage);
-const imageUrl = imageBuilder?.width(640).height(360).url() ?? null;
+const imageUrl = imageBuilder?.width(1280).height(720).fit('crop').url() ?? null;
+const srcset = imageBuilder
+  ? [480, 640, 960, 1280, 1600, 1920]
+      .map((w) => `${imageBuilder.width(w).height(Math.round((w * 9) / 16)).fit('crop').url()} ${w}w`)
+      .join(', ')
+  : undefined;
 const lqip = article.featuredImage?.asset?.metadata?.lqip ?? null;
 
 const formattedDate = article.publishedAt
@@ -27,10 +32,12 @@ const articleSlug = stegaClean(article.slug);
     <a href={`/articles/${articleSlug}`} class="block aspect-video overflow-hidden">
       <img
         src={imageUrl}
+        srcset={srcset}
+        sizes="(min-width: 1280px) 1280px, 100vw"
         alt={stegaClean(article.featuredImage?.alt) || stegaClean(article.title) || 'Article image'}
         class="w-full h-full object-cover"
-        width="640"
-        height="360"
+        width="1280"
+        height="720"
         loading="lazy"
         style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
       />
