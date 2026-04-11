@@ -16,6 +16,7 @@ export const articleListFull: ArticleListBlock = {
   ctaButtons: [
     { _key: 'btn-1', text: 'View All Articles', url: '/articles', variant: 'default' },
   ],
+  showNewsletterCta: false,
 };
 
 export const articleListSplitFeatured: ArticleListBlock = {
@@ -31,6 +32,7 @@ export const articleListSplitFeatured: ArticleListBlock = {
   categories: [{ _id: 'cat-featured' }],
   limit: 4,
   ctaButtons: null,
+  showNewsletterCta: false,
 };
 
 export const articleListVariantList: ArticleListBlock = {
@@ -48,6 +50,7 @@ export const articleListVariantList: ArticleListBlock = {
   ctaButtons: [
     { _key: 'btn-2', text: 'More News', url: '/news', variant: 'outline' },
   ],
+  showNewsletterCta: false,
 };
 
 export const articleListMinimal: ArticleListBlock = {
@@ -63,6 +66,7 @@ export const articleListMinimal: ArticleListBlock = {
   categories: null,
   limit: null,
   ctaButtons: null,
+  showNewsletterCta: null,
 };
 
 export const articleListBrutalist: ArticleListBlock = {
@@ -80,6 +84,7 @@ export const articleListBrutalist: ArticleListBlock = {
   ctaButtons: [
     { _key: 'btn-brutal', text: 'Read the archive', url: '/articles', variant: 'default' },
   ],
+  showNewsletterCta: false,
 };
 
 export const articleListMagazine: ArticleListBlock = {
@@ -97,6 +102,28 @@ export const articleListMagazine: ArticleListBlock = {
   ctaButtons: [
     { _key: 'btn-mag', text: 'Browse all issues', url: '/articles', variant: 'outline' },
   ],
+  showNewsletterCta: false,
+};
+
+/**
+ * Story 19.7 — opts in to the compact ArticleNewsletterCta below the
+ * article cards. Spreads `articleListFull` and overrides `showNewsletterCta`.
+ */
+export const articleListWithNewsletterCta: ArticleListBlock = {
+  ...articleListFull,
+  _key: 'test-al-newsletter',
+  showNewsletterCta: true,
+};
+
+/**
+ * Story 19.7 — same as `articleListFull` but with the `brutalist` variant,
+ * used to assert the CTA renders across multiple variants (proving the
+ * template insertion is shared, not grid-specific).
+ */
+export const articleListBrutalistWithNewsletterCta: ArticleListBlock = {
+  ...articleListBrutalist,
+  _key: 'test-al-brutalist-newsletter',
+  showNewsletterCta: true,
 };
 
 /**

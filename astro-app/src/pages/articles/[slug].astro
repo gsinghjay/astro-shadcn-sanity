@@ -18,6 +18,7 @@ import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 import { JsonLd } from '@/components/ui/json-ld';
 import { buildArticleJsonLd } from '@/lib/article-jsonld';
+import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const articles = await sanityClient.fetch<Array<{ slug: string }>>(ALL_ARTICLE_SLUGS_QUERY, getSiteParams());
@@ -141,6 +142,8 @@ const cleanAuthorSlug = authorSlug;
           <PortableText value={article.body} components={portableTextComponents} />
         </div>
       )}
+
+      <ArticleNewsletterCta variant="article-body" />
 
       {relatedArticles.length > 0 && (
         <div>
