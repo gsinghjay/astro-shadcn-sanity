@@ -1,7 +1,7 @@
 ---
 import type { PageBlock } from '@/lib/types';
-import type { Sponsor, Project, Testimonial, SanityEvent } from '@/lib/sanity';
-import { resolveBlockSponsors, resolveBlockProjects, resolveBlockTestimonials, resolveBlockEvents } from '@/lib/sanity';
+import type { Sponsor, Project, Testimonial, SanityEvent, Article } from '@/lib/sanity';
+import { resolveBlockSponsors, resolveBlockProjects, resolveBlockTestimonials, resolveBlockEvents, resolveBlockArticles } from '@/lib/sanity';
 import { allBlocks } from './block-registry';
 import BlockWrapper from './BlockWrapper.astro';
 
@@ -11,9 +11,10 @@ interface Props {
   projects?: Project[];
   testimonials?: Testimonial[];
   events?: SanityEvent[];
+  articles?: Article[];
 }
 
-const { blocks, sponsors = [], projects = [], testimonials = [], events = [] } = Astro.props;
+const { blocks, sponsors = [], projects = [], testimonials = [], events = [], articles = [] } = Astro.props;
 
 function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
   switch (block._type) {
@@ -26,6 +27,8 @@ function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
       return { testimonials: resolveBlockTestimonials(block, testimonials) };
     case 'eventList':
       return { events: resolveBlockEvents(block, events) };
+    case 'articleList':
+      return { articles: resolveBlockArticles(block, articles) };
     default:
       return {};
   }

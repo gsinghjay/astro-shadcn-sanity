@@ -8,7 +8,7 @@
  * The component fetches its own data, selects the template, and renders blocks.
  */
 import BlockRenderer from '@/components/BlockRenderer.astro';
-import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getSyncTags, resetSyncTags } from '@/lib/sanity';
+import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getAllArticles, getSyncTags, resetSyncTags } from '@/lib/sanity';
 
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
 
@@ -29,6 +29,7 @@ const sponsors = await getAllSponsors();
 const projects = await getAllProjects();
 const testimonials = await getAllTestimonials();
 const events = await getAllEvents();
+const articles = await getAllArticles();
 
 // Collect sync tags from all queries run during this island's render
 const islandSyncTags = getSyncTags();
@@ -38,7 +39,7 @@ const islandSyncTags = getSyncTags();
 {page ? (
   <>
     <FullWidthTemplate>
-      <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
+      <BlockRenderer blocks={page.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} articles={articles} />
     </FullWidthTemplate>
     {islandSyncTags.length > 0 && (
       <script define:vars={{ syncTags: islandSyncTags }}>
