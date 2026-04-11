@@ -25,10 +25,19 @@ test.describe('Articles smoke — Story 19.7 CTA integration', () => {
       if (msg.type() === 'error') errors.push(msg.text())
     })
 
-    // One of the article slugs the static build emits. If the slug list changes
-    // this test can be updated or switched to a fetch-then-pick pattern, but
-    // AC #14 only requires "one article detail page".
-    await page.goto('/articles/building-ywcc-capstone-rwc-platform')
+    // Fetch the first article href from the listing page rather than hard-coding
+    // a slug — keeps the test resilient to dataset changes (slug renames,
+    // unpublished articles, multi-site filtering). AC #14 only requires "one
+    // article detail page", and "the first one we find" is good enough.
+    await page.goto('/articles')
+    await page.waitForLoadState('domcontentloaded')
+    const firstArticleHref = await page
+      .locator('a[href^="/articles/"]')
+      .first()
+      .getAttribute('href')
+    expect(firstArticleHref, 'no /articles/<slug> link found on /articles listing').toBeTruthy()
+
+    await page.goto(firstArticleHref!)
     await page.waitForLoadState('domcontentloaded')
 
     await expect(page).toHaveTitle(/.+/)
@@ -41,8 +50,11 @@ test.describe('Articles smoke — Story 19.7 CTA integration', () => {
     await expect(cta.locator('input[type="email"]')).toBeVisible()
     await expect(cta.locator('button[type="submit"]')).toBeVisible()
 
-    // Default heading text from the component ("Stay updated") should be on the page.
-    await expect(page.getByText('Stay updated').first()).toBeVisible()
+    // Assert the heading via role + exact text — `getByText` is a substring
+    // match and could match unrelated content elsewhere on the page (false
+    // positive). `getByRole('heading', ...)` requires an actual <h1-h6>, and
+    // `exact: true` rules out substring collisions.
+    await expect(page.getByRole('heading', { name: 'Stay updated', exact: true })).toBeVisible()
 
     expect(errors, `Console errors found:\n${errors.join('\n')}`).toHaveLength(0)
   })

@@ -46,7 +46,12 @@ const {
 // which makes the second {variant === 'compact'} JSX branch appear unreachable
 // (ts7027). Binding the fallback to a separately-typed const keeps the
 // variant type as the full union for both JSX checks.
-const variant: 'article-body' | 'compact' = rawVariant ?? 'article-body';
+//
+// Use an explicit allow-list (not `?? 'article-body'`): nullish coalescing only
+// catches null/undefined, so an unexpected runtime value like '' or 'compac'
+// would slip through and BOTH JSX branches would evaluate false, rendering
+// nothing. The explicit check guarantees one branch always wins.
+const variant: 'article-body' | 'compact' = rawVariant === 'compact' ? 'compact' : 'article-body';
 ---
 
 {variant === 'article-body' && (
@@ -62,7 +67,7 @@ const variant: 'article-body' | 'compact' = rawVariant ?? 'article-body';
       data-gtm-action="subscribe"
       data-gtm-label="article-body"
     >
-      <Input type="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
+      <Input type="email" name="email" autocomplete="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
       <Button type="submit">{submitButtonLabel}</Button>
     </form>
     {privacyDisclaimerText && (
@@ -84,7 +89,7 @@ const variant: 'article-body' | 'compact' = rawVariant ?? 'article-body';
       data-gtm-action="subscribe"
       data-gtm-label="article-list-block"
     >
-      <Input type="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
+      <Input type="email" name="email" autocomplete="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
       <Button type="submit">{submitButtonLabel}</Button>
     </form>
     {privacyDisclaimerText && (

@@ -51,6 +51,9 @@ describe('articles/[slug].astro — ArticleNewsletterCta integration (Story 19.7
     const between = content.slice(ptIdx, relatedIdx);
 
     expect(between).toContain('<ArticleNewsletterCta');
-    expect(between).not.toContain('<Section');
+    // Match only standalone <Section> openings — `<Section ` or `<Section>` —
+    // NOT `<SectionContent`/`<SectionGrid`/etc., which are legitimate child
+    // wrappers and would otherwise trigger a false positive on a benign refactor.
+    expect(between).not.toMatch(/<Section[\s>]/);
   });
 });
