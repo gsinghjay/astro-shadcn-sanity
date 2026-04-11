@@ -10,9 +10,8 @@ interface Props extends ImageGalleryBlock {
   id?: string;
 }
 
-const { heading, description, images, columns: rawColumns, variant: rawVariant } = Astro.props;
+const { heading, description, images, variant: rawVariant } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
-const columns = stegaClean(rawColumns) ?? '3';
 
 const galleryImages = (images ?? []).filter(img => img.image?.asset).map(img => ({
   "@type": "ImageObject" as const,
@@ -26,12 +25,6 @@ const galleryJsonLd = galleryImages.length > 0 ? {
   ...(description && { "description": stegaClean(description) }),
   "image": galleryImages,
 } : null;
-
-const gridColsClass: Record<string, string> = {
-  '2': 'grid-cols-1 sm:grid-cols-2',
-  '3': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-  '4': 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-};
 ---
 
 {galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
@@ -45,7 +38,7 @@ const gridColsClass: Record<string, string> = {
       </SectionContent>
     )}
     <SectionContent>
-      <div class={`grid gap-6 ${gridColsClass[columns] || gridColsClass['3']}`}>
+      <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {(images ?? []).map((item) => (
           <figure>
             {item.image?.asset && (

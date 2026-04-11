@@ -14,7 +14,6 @@ const {
   heading,
   address,
   coordinates,
-  zoom = 15,
   caption,
   contactInfo,
   variant: rawVariant,
@@ -59,7 +58,7 @@ const mapJsonLd = (heading || coordinates) ? {
           {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
           {coordinates?.lat != null && coordinates?.lng != null && (
             <p class="text-xs text-muted-foreground">
-              {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)} (zoom: {zoom})
+              {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
             </p>
           )}
         </div>

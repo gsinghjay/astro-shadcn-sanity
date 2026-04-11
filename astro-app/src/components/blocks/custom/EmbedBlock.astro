@@ -12,7 +12,6 @@ interface Props extends EmbedBlockBlock {
 const {
   heading,
   embedUrl: rawEmbedUrl = '',
-  aspectRatio: rawAspectRatio = '16/9',
   caption,
   variant: rawVariant,
   class: className,
@@ -21,8 +20,6 @@ const {
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'contained' || rawCleaned === 'full-width' ? rawCleaned : 'default';
 const embedUrl = stegaClean(rawEmbedUrl) ?? '';
-const validAspectRatios = ['16/9', '4/3', '1/1', '21/9'];
-const cleanAspectRatio = validAspectRatios.includes(stegaClean(rawAspectRatio) ?? '') ? stegaClean(rawAspectRatio) : '16/9';
 ---
 
 {cleanVariant === 'default' && (
@@ -34,7 +31,7 @@ const cleanAspectRatio = validAspectRatios.includes(stegaClean(rawAspectRatio) ?
     )}
 
     <div class="w-full">
-      <div class="relative w-full overflow-hidden rounded-sm" style={`aspect-ratio: ${cleanAspectRatio}`}>
+      <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
         {embedUrl ? (
           <iframe
             src={embedUrl}
@@ -65,7 +62,7 @@ const cleanAspectRatio = validAspectRatios.includes(stegaClean(rawAspectRatio) ?
     )}
 
     <div class="w-full max-w-3xl mx-auto">
-      <div class="relative w-full overflow-hidden rounded-sm" style={`aspect-ratio: ${cleanAspectRatio}`}>
+      <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
         {embedUrl ? (
           <iframe
             src={embedUrl}
@@ -96,7 +93,7 @@ const cleanAspectRatio = validAspectRatios.includes(stegaClean(rawAspectRatio) ?
     )}
 
     <div class="w-full">
-      <div class="relative w-full overflow-hidden" style={`aspect-ratio: ${cleanAspectRatio}`}>
+      <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9">
         {embedUrl ? (
           <iframe
             src={embedUrl}

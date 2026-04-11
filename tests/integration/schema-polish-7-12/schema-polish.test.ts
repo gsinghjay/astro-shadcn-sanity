@@ -249,7 +249,8 @@ describe('Story 7-12: Schema Validation, Preview & Resolver Polish', () => {
       expect(refTypes).toContain('sponsor')
       expect(refTypes).toContain('project')
       expect(refTypes).toContain('event')
-      expect(refTypes).toHaveLength(4)
+      expect(refTypes).toContain('article')
+      expect(refTypes).toHaveLength(5)
     })
   })
 

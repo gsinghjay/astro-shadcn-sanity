@@ -14,7 +14,7 @@ export const tabsBlock = defineBlock({
     {name: 'brutalist', title: 'Brutalist'},
   ],
   fields: [
-    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required().max(150)}),
+    defineField({name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.max(150)}),
     defineField({
       name: 'tabs',
       title: 'Tabs',

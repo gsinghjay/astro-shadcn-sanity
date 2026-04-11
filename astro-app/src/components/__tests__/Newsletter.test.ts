@@ -73,4 +73,31 @@ describe('Newsletter', () => {
 
     expect(html).toContain('No spam ever.');
   });
+
+  test('banner variant renders disclaimer when provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Newsletter, {
+      props: { ...baseProps, variant: 'banner' },
+    });
+
+    expect(html).toContain('No spam ever.');
+  });
+
+  test('split variant renders disclaimer when provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Newsletter, {
+      props: { ...baseProps, variant: 'split' },
+    });
+
+    expect(html).toContain('No spam ever.');
+  });
+
+  test('inline variant renders disclaimer when provided', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Newsletter, {
+      props: { ...baseProps, variant: 'inline' },
+    });
+
+    expect(html).toContain('No spam ever.');
+  });
 });

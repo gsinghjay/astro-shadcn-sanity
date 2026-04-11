@@ -31,6 +31,12 @@ const {
   ALL_EVENT_SLUGS_QUERY,
   ALL_TESTIMONIALS_QUERY,
   SPONSOR_PROJECTS_QUERY,
+  ALL_ARTICLES_QUERY,
+  ALL_ARTICLE_SLUGS_QUERY,
+  ARTICLE_BY_SLUG_QUERY,
+  getAllArticles,
+  getArticleBySlug,
+  resolveBlockArticles,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -217,6 +223,46 @@ describe("GROQ query definitions", () => {
     expect(SPONSOR_PROJECTS_QUERY).toContain("slug.current");
     expect(SPONSOR_PROJECTS_QUERY).toContain("status");
     expect(SPONSOR_PROJECTS_QUERY).toContain("order(title asc)");
+  });
+
+  it("ALL_ARTICLES_QUERY targets article type ordered by publishedAt desc", () => {
+    expect(ALL_ARTICLES_QUERY).toContain('_type == "article"');
+    expect(ALL_ARTICLES_QUERY).toContain("order(publishedAt desc)");
+    expect(ALL_ARTICLES_QUERY).toContain("title");
+    expect(ALL_ARTICLES_QUERY).toContain("slug.current");
+    expect(ALL_ARTICLES_QUERY).toContain("excerpt");
+    expect(ALL_ARTICLES_QUERY).toContain("featuredImage");
+    expect(ALL_ARTICLES_QUERY).toContain("author->");
+    expect(ALL_ARTICLES_QUERY).toContain("publishedAt");
+    expect(ALL_ARTICLES_QUERY).toContain("category->");
+  });
+
+  it("ALL_ARTICLE_SLUGS_QUERY targets article type with slug projection", () => {
+    expect(ALL_ARTICLE_SLUGS_QUERY).toContain('_type == "article"');
+    expect(ALL_ARTICLE_SLUGS_QUERY).toContain("defined(slug.current)");
+    expect(ALL_ARTICLE_SLUGS_QUERY).toContain("slug.current");
+  });
+
+  it("ARTICLE_BY_SLUG_QUERY fetches single article by slug with full fields", () => {
+    expect(ARTICLE_BY_SLUG_QUERY).toContain('_type == "article"');
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("$slug");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("title");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("slug.current");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("excerpt");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("body[]");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("author->");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("publishedAt");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("updatedAt");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("category->");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("tags");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("relatedArticles[]->");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("seo");
+  });
+
+  it("ARTICLE_BY_SLUG_QUERY includes expanded author fields", () => {
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("role");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("image{");
+    expect(ARTICLE_BY_SLUG_QUERY).toContain("sameAs");
   });
 });
 
@@ -524,6 +570,80 @@ describe("getProjectBySlug()", () => {
   });
 });
 
+describe("getAllArticles()", () => {
+  it("fetches and returns articles from Sanity", async () => {
+    const mockArticles = [
+      { _id: "art-1", title: "First Post", slug: "first-post", publishedAt: "2026-04-10" },
+      { _id: "art-2", title: "Second Post", slug: "second-post", publishedAt: "2026-04-09" },
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockArticles,
+    } as never);
+
+    const result = await getAllArticles();
+    expect(result).toEqual(mockArticles);
+    expect(sanityClient.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("returns cached result on subsequent calls without additional API calls", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockArticles = [
+      { _id: "art-1", title: "First Post" },
+    ];
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({
+      result: mockArticles,
+    } as never);
+
+    await freshModule.getAllArticles();
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    const cached = await freshModule.getAllArticles();
+    expect(cached).toEqual(mockArticles);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getArticleBySlug()", () => {
+  it("fetches an article by slug with the correct query and params", async () => {
+    const mockArticle = {
+      _id: "art-1",
+      title: "First Post",
+      slug: "first-post",
+      body: [],
+      author: { name: "Jane Doe", slug: "jane-doe" },
+    };
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockArticle,
+    } as never);
+
+    const result = await getArticleBySlug("first-post");
+    expect(result).toEqual(mockArticle);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      ARTICLE_BY_SLUG_QUERY,
+      { slug: "first-post", site: "" },
+      expect.objectContaining({
+        filterResponse: false,
+        perspective: "published",
+      }),
+    );
+  });
+
+  it("returns null when article is not found", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+    } as never);
+
+    const result = await getArticleBySlug("nonexistent");
+    expect(result).toBeNull();
+  });
+});
+
 describe("resolveBlockSponsors()", () => {
   const allSponsors = [
     { _id: "sp-1", name: "Alpha", featured: true },
@@ -579,6 +699,134 @@ describe("resolveBlockSponsors()", () => {
       const block = { _type: "sponsorCards", displayMode: "manual", sponsors: null };
       expect(resolveBlockSponsors(block, allSponsors)).toEqual([]);
     });
+  });
+});
+
+describe("resolveBlockArticles()", () => {
+  const allArticles = [
+    {
+      _id: "art-1",
+      title: "First",
+      slug: "first",
+      publishedAt: "2026-01-05T00:00:00Z",
+      category: { _id: "cat-news", title: "News", slug: "news" },
+    },
+    {
+      _id: "art-2",
+      title: "Second",
+      slug: "second",
+      publishedAt: "2026-01-04T00:00:00Z",
+      category: { _id: "cat-blog", title: "Blog", slug: "blog" },
+    },
+    {
+      _id: "art-3",
+      title: "Third",
+      slug: "third",
+      publishedAt: "2026-01-03T00:00:00Z",
+      category: { _id: "cat-news", title: "News", slug: "news" },
+    },
+    {
+      _id: "art-4",
+      title: "Fourth",
+      slug: "fourth",
+      publishedAt: "2026-01-02T00:00:00Z",
+      category: null,
+    },
+  ] as any[];
+
+  it("returns all articles when contentType is 'all'", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("returns all articles when contentType is null (defaults to all)", () => {
+    const block = { _type: "articleList", contentType: null, categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("applies limit by slicing from the top (pre-sorted newest first)", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 2 };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(2);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-2"]);
+  });
+
+  it("uses default limit of 6 when limit is null", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: null };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(4);
+  });
+
+  it("filters by category when contentType is 'by-category'", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(2);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-3"]);
+  });
+
+  it("filters by multiple categories", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }, { _id: "cat-blog" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(3);
+    expect(result.map((a: any) => a._id)).toEqual(["art-1", "art-2", "art-3"]);
+  });
+
+  it("excludes articles with null category when filtering by category", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 10,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result.find((a: any) => a._id === "art-4")).toBeUndefined();
+  });
+
+  it("returns all articles when contentType is 'by-category' but categories is empty", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [],
+      limit: 10,
+    };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("returns all articles when contentType is 'by-category' but categories is null", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: null,
+      limit: 10,
+    };
+    expect(resolveBlockArticles(block, allArticles)).toEqual(allArticles);
+  });
+
+  it("applies limit after category filtering", () => {
+    const block = {
+      _type: "articleList",
+      contentType: "by-category",
+      categories: [{ _id: "cat-news" }],
+      limit: 1,
+    };
+    const result = resolveBlockArticles(block, allArticles);
+    expect(result).toHaveLength(1);
+    expect(result[0]._id).toBe("art-1");
+  });
+
+  it("returns empty array when input is empty", () => {
+    const block = { _type: "articleList", contentType: "all", categories: null, limit: 10 };
+    expect(resolveBlockArticles(block, [])).toEqual([]);
   });
 });
 
@@ -711,6 +959,8 @@ describe("Multi-site query patterns", () => {
       { name: "ALL_EVENTS_QUERY", query: ALL_EVENTS_QUERY },
       { name: "ALL_EVENT_SLUGS_QUERY", query: ALL_EVENT_SLUGS_QUERY },
       { name: "EVENTS_BY_MONTH_QUERY", query: EVENTS_BY_MONTH_QUERY },
+      { name: "ALL_ARTICLES_QUERY", query: ALL_ARTICLES_QUERY },
+      { name: "ALL_ARTICLE_SLUGS_QUERY", query: ALL_ARTICLE_SLUGS_QUERY },
     ];
 
     for (const { name, query } of listQueries) {
@@ -724,6 +974,7 @@ describe("Multi-site query patterns", () => {
       { name: "PROJECT_BY_SLUG_QUERY", query: PROJECT_BY_SLUG_QUERY },
       { name: "EVENT_BY_SLUG_QUERY", query: EVENT_BY_SLUG_QUERY },
       { name: "PAGE_BY_SLUG_QUERY", query: PAGE_BY_SLUG_QUERY },
+      { name: "ARTICLE_BY_SLUG_QUERY", query: ARTICLE_BY_SLUG_QUERY },
     ];
 
     for (const { name, query } of detailQueries) {

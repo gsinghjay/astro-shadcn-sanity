@@ -1,9 +1,11 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
+import {CreditCardIcon} from '@sanity/icons'
 
 export const sponsorshipTierItem = defineType({
   name: 'sponsorshipTierItem',
   title: 'Sponsorship Tier',
   type: 'object',
+  icon: CreditCardIcon,
   fields: [
     defineField({
       name: 'name',

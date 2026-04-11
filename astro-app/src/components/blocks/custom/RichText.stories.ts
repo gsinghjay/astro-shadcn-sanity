@@ -8,15 +8,15 @@ export default {
     docs: {
       description: {
         component:
-          'Portable Text renderer for long-form content. Supports prose (default), narrow (672px), and wide width variants.',
+          'Portable Text renderer for long-form content. Supports prose (default), standard (672px), highlighted (full width), and sidebar variants.',
       },
     },
   },
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['prose', 'narrow', 'wide'],
-      description: 'Width variant',
+      options: ['prose', 'standard', 'highlighted', 'sidebar'],
+      description: 'Content variant',
     },
     backgroundVariant: {
       control: { type: 'select' },
@@ -78,17 +78,17 @@ export const Default = {
   },
 }
 
-export const Narrow = {
+export const Standard = {
   args: {
     _type: 'richText',
-    _key: 'story-rt-narrow',
-    variant: 'narrow',
+    _key: 'story-rt-standard',
+    variant: 'standard',
     content: [
       {
         _type: 'block',
         _key: 'b1',
         style: 'h2',
-        children: [{ _type: 'span', text: 'Narrow Width Content' }],
+        children: [{ _type: 'span', text: 'Standard Width Content' }],
       },
       {
         _type: 'block',
@@ -105,6 +105,48 @@ export const Narrow = {
         _type: 'block',
         _key: 'b4',
         children: [{ _type: 'span', text: 'At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.' }],
+      },
+    ],
+  },
+}
+
+export const Highlighted = {
+  args: {
+    _type: 'richText',
+    _key: 'story-rt-highlighted',
+    variant: 'highlighted',
+    content: [
+      {
+        _type: 'block',
+        _key: 'b1',
+        style: 'h2',
+        children: [{ _type: 'span', text: 'Highlighted Content' }],
+      },
+      {
+        _type: 'block',
+        _key: 'b2',
+        children: [{ _type: 'span', text: 'Full-width prose typography with no maximum width cap. Ideal for highlighted or emphasized content sections.' }],
+      },
+    ],
+  },
+}
+
+export const Sidebar = {
+  args: {
+    _type: 'richText',
+    _key: 'story-rt-sidebar',
+    variant: 'sidebar',
+    content: [
+      {
+        _type: 'block',
+        _key: 'b1',
+        style: 'h2',
+        children: [{ _type: 'span', text: 'Sidebar Content' }],
+      },
+      {
+        _type: 'block',
+        _key: 'b2',
+        children: [{ _type: 'span', text: 'Compact content with a left border treatment, suitable for supplementary information or aside content.' }],
       },
     ],
   },

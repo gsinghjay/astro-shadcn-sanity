@@ -61,9 +61,9 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
         <Button type="submit">{submitButtonLabel}</Button>
       </form>
     </SectionContent>
-    {disclaimer && (
+    {privacyDisclaimerText && (
       <SectionContent>
-        <p class="text-xs text-muted-foreground">{disclaimer}</p>
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
       </SectionContent>
     )}
   </Section>
@@ -86,8 +86,8 @@ const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCl
           <Input type="email" placeholder={inputPlaceholder} />
           <Button type="submit" class="w-full">{submitButtonLabel}</Button>
         </form>
-        {disclaimer && (
-          <p class="text-xs text-muted-foreground">{disclaimer}</p>
+        {privacyDisclaimerText && (
+          <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
         )}
       </SectionContent>
     </SectionSplit>
