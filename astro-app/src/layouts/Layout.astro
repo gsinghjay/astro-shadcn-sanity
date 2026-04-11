@@ -113,6 +113,7 @@ const orgJsonLd = {
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <link rel="canonical" href={Astro.url.href} />
     {seo?.noIndex && <meta name="robots" content="noindex" />}
+    <slot name="head" />
     <meta
       http-equiv="Content-Security-Policy"
       content={cspContent}

@@ -13,6 +13,8 @@ import type {
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
   SPONSOR_PROJECTS_QUERY_RESULT,
+  ALL_ARTICLES_QUERY_RESULT,
+  ARTICLE_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -83,6 +85,18 @@ export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
  * Named "SanityEvent" to avoid collision with the global DOM Event type.
  */
 export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
+
+/**
+ * Article type — derived from the generated ALL_ARTICLES_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Article = ALL_ARTICLES_QUERY_RESULT[number];
+
+/**
+ * RelatedArticle type — narrower projection from the detail query's relatedArticles[]->.
+ * Lacks author and category fields. Used by ArticleCard to accept both shapes.
+ */
+export type RelatedArticle = NonNullable<NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>['relatedArticles']>[number];
 
 /**
  * Module-level sync tag collector.
@@ -475,6 +489,70 @@ export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.c
 export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
   const { result } = await loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
     query: EVENT_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Article queries (Story 19.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch all articles for build-time caching.
+ * Ordered by publishedAt descending (newest first).
+ */
+export const ALL_ARTICLES_QUERY = defineQuery(groq`*[_type == "article" && ($site == "" || site == $site)] | order(publishedAt desc){
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt },
+  author->{ name, "slug": slug.current },
+  publishedAt,
+  category->{ title, "slug": slug.current }
+}`);
+
+/**
+ * GROQ query: fetch all article slugs for static path generation.
+ */
+export const ALL_ARTICLE_SLUGS_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single article by slug with full fields.
+ * Includes body with portable text, expanded author, category, related articles, tags, and SEO.
+ */
+export const ARTICLE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "article" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt },
+  body[]${PORTABLE_TEXT_PROJECTION},
+  author->{ name, "slug": slug.current, role, image{ ${IMAGE_PROJECTION}, alt }, sameAs },
+  publishedAt,
+  updatedAt,
+  category->{ title, "slug": slug.current },
+  tags,
+  relatedArticles[]->{ _id, title, "slug": slug.current, excerpt, featuredImage{ ${IMAGE_PROJECTION}, alt }, publishedAt },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } }
+}`);
+
+/**
+ * Fetch all articles from Sanity.
+ * Result is cached for the duration of the build (module-level memoization).
+ */
+let _articlesCache: ALL_ARTICLES_QUERY_RESULT | null = null;
+
+export async function getAllArticles(): Promise<ALL_ARTICLES_QUERY_RESULT> {
+  if (!visualEditingEnabled && _articlesCache) return _articlesCache;
+  const { result } = await loadQuery<ALL_ARTICLES_QUERY_RESULT>({ query: ALL_ARTICLES_QUERY, params: getSiteParams() });
+  _articlesCache = result ?? [];
+  return _articlesCache;
+}
+
+/**
+ * Fetch a single article by slug from Sanity.
+ */
+export async function getArticleBySlug(slug: string): Promise<ARTICLE_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLE_BY_SLUG_QUERY_RESULT>({
+    query: ARTICLE_BY_SLUG_QUERY,
     params: { slug, ...getSiteParams() },
   });
   return result;
