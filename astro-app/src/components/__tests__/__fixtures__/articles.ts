@@ -1,3 +1,8 @@
+import type {
+  ARTICLE_BY_SLUG_QUERY_RESULT,
+  SITE_SETTINGS_QUERY_RESULT,
+} from '@/sanity.types';
+
 export const articleFull = {
   _id: 'art-1',
   title: 'Getting Started with Astro',
@@ -52,3 +57,105 @@ export const articleNoAuthorSlug = {
     slug: 'news',
   },
 } as any;
+
+/* ------------------------------------------------------------------ */
+/*  Story 19.6 — Article JSON-LD fixtures                             */
+/* ------------------------------------------------------------------ */
+
+// Fully-populated article matching the ARTICLE_BY_SLUG_QUERY shape.
+// category.slug 'blog' drives the default Article branch.
+//
+// Final cast to NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT> because TypeGen
+// emits a deeply-nested union for body blocks that a fixture doesn't need
+// to reproduce exhaustively. If this cast drifts when TypeGen regenerates,
+// reconcile by updating the fixture — do NOT widen the cast.
+export const articleDetailFull = {
+  _id: 'art-detail-1',
+  title: 'Deep Dive: Astro Server Islands',
+  slug: 'deep-dive-astro-server-islands',
+  excerpt:
+    'How Astro 5 server islands unlock dynamic content inside static pages.',
+  featuredImage: {
+    asset: {
+      _id: 'image-A1b2c3D4e5f6G7h8i9J0-1600x900-jpg',
+      url: 'https://cdn.sanity.io/images/test/test/A1b2c3D4e5f6G7h8i9J0-1600x900.jpg',
+      metadata: {
+        lqip: 'data:image/jpeg;base64,mockLqip',
+        dimensions: {
+          _type: 'sanity.imageDimensions',
+          width: 1600,
+          height: 900,
+          aspectRatio: 1.7778,
+        },
+      },
+    },
+    alt: 'Astro server islands diagram',
+  },
+  body: [],
+  author: {
+    name: 'Alex Singh',
+    slug: 'alex-singh',
+    role: 'Senior Developer',
+    image: null,
+    sameAs: ['https://github.com/alexsingh', 'https://twitter.com/alexsingh'],
+  },
+  publishedAt: '2026-04-11T09:00:00.000Z',
+  updatedAt: '2026-04-11T15:30:00.000Z',
+  category: { title: 'Blog', slug: 'blog' },
+  tags: ['astro', 'server-islands'],
+  relatedArticles: null,
+  seo: null,
+} as NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
+
+// News-category variant — drives the NewsArticle branch.
+export const articleDetailNews = {
+  ...articleDetailFull,
+  _id: 'art-detail-2',
+  title: 'Program Wins 2026 Award',
+  slug: 'program-wins-2026-award',
+  category: { title: 'News', slug: 'news' },
+} as NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
+
+/**
+ * Minimal but valid SITE_SETTINGS_QUERY_RESULT. Every field from the query is
+ * present (or null where the type allows).
+ */
+export const siteSettingsFull = {
+  siteName: 'Test Org',
+  siteDescription: 'Test description',
+  logo: {
+    asset: {
+      _id: 'image-Log0000Log0000Log0000Log00-600x60-png',
+      url: 'https://cdn.sanity.io/images/test/test/Log0000Log0000Log0000Log00-600x60.png',
+      metadata: {
+        lqip: null,
+        dimensions: {
+          _type: 'sanity.imageDimensions',
+          width: 600,
+          height: 60,
+          aspectRatio: 10,
+        },
+      },
+    },
+    alt: 'Test Org logo',
+  },
+  logoLight: null,
+  navigationItems: null,
+  ctaButton: null,
+  footerContent: null,
+  socialLinks: null,
+  contactInfo: null,
+  footerLinks: null,
+  resourceLinks: null,
+  programLinks: null,
+  currentSemester: null,
+  aiSearch: null,
+} as NonNullable<SITE_SETTINGS_QUERY_RESULT>;
+
+/**
+ * No-logo variant — drives the `publisher.logo` omission branch.
+ */
+export const siteSettingsNoLogo = {
+  ...siteSettingsFull,
+  logo: null,
+} as NonNullable<SITE_SETTINGS_QUERY_RESULT>;
