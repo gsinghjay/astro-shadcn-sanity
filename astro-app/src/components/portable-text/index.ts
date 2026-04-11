@@ -4,12 +4,14 @@ import PortableTextCallout from './PortableTextCallout.astro';
 import PortableTextLink from './PortableTextLink.astro';
 import PortableTextInternalLink from './PortableTextInternalLink.astro';
 import PortableTextVideoEmbed from './PortableTextVideoEmbed.astro';
+import PortableTextTable from './PortableTextTable.astro';
 
 export const portableTextComponents: SomePortableTextComponents = {
   type: {
     image: PortableTextImage,
     callout: PortableTextCallout,
     videoEmbed: PortableTextVideoEmbed,
+    table: PortableTextTable,
   },
   mark: {
     link: PortableTextLink,

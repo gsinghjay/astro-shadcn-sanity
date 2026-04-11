@@ -1,0 +1,34 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ArticleCard from '@/components/ArticleCard.astro';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { getAllArticles } from '@/lib/sanity';
+
+const articles = await getAllArticles();
+---
+
+<Layout title="Articles" seo={{ metaDescription: 'Browse articles, blog posts, and news from the program.' }}>
+  <Section>
+    <SectionContent>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: 'Articles' },
+      ]} />
+
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Articles</h1>
+    </SectionContent>
+
+    {articles.length > 0 ? (
+      <SectionGrid size="lg">
+        {articles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </SectionGrid>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No articles to display.</p>
+      </SectionContent>
+    )}
+  </Section>
+</Layout>
