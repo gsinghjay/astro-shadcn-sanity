@@ -65,6 +65,40 @@ export const articleListMinimal: ArticleListBlock = {
   ctaButtons: null,
 };
 
+export const articleListBrutalist: ArticleListBlock = {
+  _type: 'articleList',
+  _key: 'test-al-5',
+  backgroundVariant: null,
+  spacing: 'default',
+  maxWidth: 'default',
+  variant: 'brutalist',
+  heading: 'Dispatches',
+  description: 'Field reports from the edge of the web.',
+  contentType: 'all',
+  categories: null,
+  limit: 6,
+  ctaButtons: [
+    { _key: 'btn-brutal', text: 'Read the archive', url: '/articles', variant: 'default' },
+  ],
+};
+
+export const articleListMagazine: ArticleListBlock = {
+  _type: 'articleList',
+  _key: 'test-al-6',
+  backgroundVariant: null,
+  spacing: 'default',
+  maxWidth: 'default',
+  variant: 'magazine',
+  heading: 'The Long Read',
+  description: 'Editor-picked features of the week.',
+  contentType: 'all',
+  categories: null,
+  limit: 6,
+  ctaButtons: [
+    { _key: 'btn-mag', text: 'Browse all issues', url: '/articles', variant: 'outline' },
+  ],
+};
+
 /**
  * Sample article fixtures for rendering tests.
  * Uses minimal image metadata (no real Sanity asset refs) so urlFor() will fail

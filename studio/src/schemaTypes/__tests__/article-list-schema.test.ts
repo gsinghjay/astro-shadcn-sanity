@@ -59,14 +59,12 @@ describe('articleList block schema (Story 19.4)', () => {
       expect(articleList.name).toBe('articleList')
     })
 
-    test('retains variants: grid, split-featured, list', () => {
+    test('variants include grid, split-featured, list, brutalist, magazine (Story 19.8)', () => {
       const variantField = findField('variant')
       expect(variantField).toBeDefined()
       const options = (variantField!.options as {list: Array<{value: string}>}).list
       const values = options.map((o) => o.value)
-      expect(values).toContain('grid')
-      expect(values).toContain('split-featured')
-      expect(values).toContain('list')
+      expect(values).toEqual(['grid', 'split-featured', 'list', 'brutalist', 'magazine'])
     })
   })
 

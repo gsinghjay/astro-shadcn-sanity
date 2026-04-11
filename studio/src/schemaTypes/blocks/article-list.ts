@@ -11,6 +11,8 @@ export const articleList = defineBlock({
     {name: 'grid', title: 'Grid'},
     {name: 'split-featured', title: 'Split Featured'},
     {name: 'list', title: 'List'},
+    {name: 'brutalist', title: 'Brutalist'},
+    {name: 'magazine', title: 'Magazine'},
   ],
   hiddenByVariant: {
     description: ['list'],
