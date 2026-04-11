@@ -38,7 +38,7 @@ const authorSlug = article.author?.slug ? stegaClean(article.author.slug) : null
 const categoryTitle = article.category?.title ?? null;
 
 // Related articles (max 3)
-const relatedArticles = (article.relatedArticles ?? []).slice(0, 3);
+const relatedArticles = (article.relatedArticles ?? []).filter(Boolean).slice(0, 3);
 
 // OG article tags — stegaClean all values for meta tags
 const cleanPublishedAt = article.publishedAt ? stegaClean(article.publishedAt) : null;
@@ -50,7 +50,7 @@ const cleanAuthorSlug = authorSlug;
 
 <Layout
   title={article.title ?? 'Article'}
-  seo={article.seo ?? { metaDescription: article.excerpt }}
+  seo={article.seo ?? { metaDescription: article.excerpt, ogImage: article.featuredImage }}
   ogType="article"
   preloadImage={imageUrl ?? undefined}
 >
@@ -76,7 +76,7 @@ const cleanAuthorSlug = authorSlug;
         <div class="aspect-video overflow-hidden">
           <img
             src={imageUrl}
-            alt={article.featuredImage?.alt || stegaClean(article.title) || 'Article image'}
+            alt={stegaClean(article.featuredImage?.alt) || stegaClean(article.title) || 'Article image'}
             class="w-full h-full object-cover"
             width={imageDimensions?.width ?? 1200}
             height={imageDimensions?.height ?? 630}
@@ -93,7 +93,7 @@ const cleanAuthorSlug = authorSlug;
             <Badge variant="outline">{article.category!.title}</Badge>
           )}
           {formattedDate && (
-            <time datetime={article.publishedAt ?? undefined} class="text-sm text-muted-foreground">
+            <time datetime={article.publishedAt ? stegaClean(article.publishedAt) : undefined} class="text-sm text-muted-foreground">
               {formattedDate}
             </time>
           )}

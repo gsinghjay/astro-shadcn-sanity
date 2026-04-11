@@ -27,7 +27,7 @@ const articleSlug = stegaClean(article.slug);
     <a href={`/articles/${articleSlug}`} class="block aspect-video overflow-hidden">
       <img
         src={imageUrl}
-        alt={article.featuredImage?.alt || stegaClean(article.title) || 'Article image'}
+        alt={stegaClean(article.featuredImage?.alt) || stegaClean(article.title) || 'Article image'}
         class="w-full h-full object-cover"
         width="640"
         height="360"
@@ -36,13 +36,13 @@ const articleSlug = stegaClean(article.slug);
       />
     </a>
   )}
-  <div class="flex flex-col gap-3 p-6 pt-0">
+  <div class={`flex flex-col gap-3 p-6 ${imageUrl ? 'pt-0' : ''}`}>
     <div class="flex items-center gap-3 flex-wrap">
       {article.category?.title && (
         <Badge variant="outline">{article.category.title}</Badge>
       )}
       {formattedDate && (
-        <time datetime={article.publishedAt ?? undefined} class="text-sm text-muted-foreground">
+        <time datetime={article.publishedAt ? stegaClean(article.publishedAt) : undefined} class="text-sm text-muted-foreground">
           {formattedDate}
         </time>
       )}

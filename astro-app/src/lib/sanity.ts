@@ -502,7 +502,7 @@ export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_
  * GROQ query: fetch all articles for build-time caching.
  * Ordered by publishedAt descending (newest first).
  */
-export const ALL_ARTICLES_QUERY = defineQuery(groq`*[_type == "article" && ($site == "" || site == $site)] | order(publishedAt desc){
+export const ALL_ARTICLES_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){
   _id, title, "slug": slug.current,
   excerpt,
   featuredImage{ ${IMAGE_PROJECTION}, alt },
