@@ -65,10 +65,11 @@ export const articleNoAuthorSlug = {
 // Fully-populated article matching the ARTICLE_BY_SLUG_QUERY shape.
 // category.slug 'blog' drives the default Article branch.
 //
-// Final cast to NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT> because TypeGen
-// emits a deeply-nested union for body blocks that a fixture doesn't need
-// to reproduce exhaustively. If this cast drifts when TypeGen regenerates,
-// reconcile by updating the fixture — do NOT widen the cast.
+// Typed via `satisfies NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>` so any future
+// TypeGen drift (new/removed/renamed fields) breaks compilation and forces
+// reconciliation. The `body` field's complex union is narrowed via an explicit
+// element-type cast on an empty array (the only field whose full union we'd
+// otherwise have to reproduce exhaustively).
 export const articleDetailFull = {
   _id: 'art-detail-1',
   title: 'Deep Dive: Astro Server Islands',
@@ -82,7 +83,7 @@ export const articleDetailFull = {
       metadata: {
         lqip: 'data:image/jpeg;base64,mockLqip',
         dimensions: {
-          _type: 'sanity.imageDimensions',
+          _type: 'sanity.imageDimensions' as const,
           width: 1600,
           height: 900,
           aspectRatio: 1.7778,
@@ -91,7 +92,7 @@ export const articleDetailFull = {
     },
     alt: 'Astro server islands diagram',
   },
-  body: [],
+  body: [] as NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>['body'],
   author: {
     name: 'Alex Singh',
     slug: 'alex-singh',
@@ -105,7 +106,7 @@ export const articleDetailFull = {
   tags: ['astro', 'server-islands'],
   relatedArticles: null,
   seo: null,
-} as NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
+} satisfies NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
 
 // News-category variant — drives the NewsArticle branch.
 export const articleDetailNews = {
@@ -114,7 +115,7 @@ export const articleDetailNews = {
   title: 'Program Wins 2026 Award',
   slug: 'program-wins-2026-award',
   category: { title: 'News', slug: 'news' },
-} as NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
+} satisfies NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
 
 /**
  * Minimal but valid SITE_SETTINGS_QUERY_RESULT. Every field from the query is
@@ -130,7 +131,7 @@ export const siteSettingsFull = {
       metadata: {
         lqip: null,
         dimensions: {
-          _type: 'sanity.imageDimensions',
+          _type: 'sanity.imageDimensions' as const,
           width: 600,
           height: 60,
           aspectRatio: 10,
@@ -150,7 +151,7 @@ export const siteSettingsFull = {
   programLinks: null,
   currentSemester: null,
   aiSearch: null,
-} as NonNullable<SITE_SETTINGS_QUERY_RESULT>;
+} satisfies NonNullable<SITE_SETTINGS_QUERY_RESULT>;
 
 /**
  * No-logo variant — drives the `publisher.logo` omission branch.
@@ -158,4 +159,4 @@ export const siteSettingsFull = {
 export const siteSettingsNoLogo = {
   ...siteSettingsFull,
   logo: null,
-} as NonNullable<SITE_SETTINGS_QUERY_RESULT>;
+} satisfies NonNullable<SITE_SETTINGS_QUERY_RESULT>;

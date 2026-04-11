@@ -3,7 +3,13 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import ArticleCard from '@/components/ArticleCard.astro';
-import { sanityClient, ALL_ARTICLE_SLUGS_QUERY, getArticleBySlug, getSiteParams, getSiteSettings } from '@/lib/sanity';
+import {
+  sanityClient,
+  ALL_ARTICLE_SLUGS_QUERY,
+  getArticleBySlug,
+  getSiteParams,
+  getSiteSettings,
+} from '@/lib/sanity';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';

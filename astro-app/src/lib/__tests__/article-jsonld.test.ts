@@ -27,12 +27,19 @@ vi.mock('@/lib/image', () => ({
 }));
 
 import { buildArticleJsonLd } from '@/lib/article-jsonld';
+import type {
+  ARTICLE_BY_SLUG_QUERY_RESULT,
+  SITE_SETTINGS_QUERY_RESULT,
+} from '@/sanity.types';
 import {
   articleDetailFull,
   articleDetailNews,
   siteSettingsFull,
   siteSettingsNoLogo,
 } from '@/components/__tests__/__fixtures__/articles';
+
+type TestArticle = NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>;
+type TestSiteSettings = NonNullable<SITE_SETTINGS_QUERY_RESULT>;
 
 const TEST_URL = 'https://example.com/articles/test-slug';
 
@@ -99,7 +106,7 @@ describe('buildArticleJsonLd — @type resolution', () => {
     const override = {
       ...articleDetailNews,
       category: { title: 'News', slug: 'NEWS' },
-    } as typeof articleDetailNews;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result['@type']).toBe('Article');
   });
@@ -108,7 +115,7 @@ describe('buildArticleJsonLd — @type resolution', () => {
     const override = {
       ...articleDetailFull,
       category: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result['@type']).toBe('Article');
   });
@@ -141,7 +148,7 @@ describe('buildArticleJsonLd — required fields', () => {
     const override = {
       ...articleDetailFull,
       title: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result.headline).toBe('Untitled');
   });
@@ -150,7 +157,7 @@ describe('buildArticleJsonLd — required fields', () => {
     const override = {
       ...articleDetailFull,
       excerpt: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('description');
   });
@@ -180,7 +187,7 @@ describe('buildArticleJsonLd — datetime hardening', () => {
     const override = {
       ...articleDetailFull,
       updatedAt: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result.dateModified).toBe('2026-04-11T09:00:00.000Z');
   });
@@ -189,7 +196,7 @@ describe('buildArticleJsonLd — datetime hardening', () => {
     const override = {
       ...articleDetailFull,
       updatedAt: 'garbage',
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result.dateModified).toBe('2026-04-11T09:00:00.000Z');
   });
@@ -199,7 +206,7 @@ describe('buildArticleJsonLd — datetime hardening', () => {
       ...articleDetailFull,
       publishedAt: 'not-a-date',
       updatedAt: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('datePublished');
     expect(result).not.toHaveProperty('dateModified');
@@ -210,7 +217,7 @@ describe('buildArticleJsonLd — datetime hardening', () => {
       ...articleDetailFull,
       publishedAt: null,
       updatedAt: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('datePublished');
     expect(result).not.toHaveProperty('dateModified');
@@ -236,7 +243,7 @@ describe('buildArticleJsonLd — image omission', () => {
     const override = {
       ...articleDetailFull,
       featuredImage: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('image');
   });
@@ -248,7 +255,7 @@ describe('buildArticleJsonLd — image omission', () => {
         ...articleDetailFull.featuredImage!,
         asset: null,
       },
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('image');
   });
@@ -287,7 +294,7 @@ describe('buildArticleJsonLd — author object', () => {
         ...articleDetailFull.author!,
         name: null,
       },
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect((result.author as Record<string, unknown>).name).toBe('Unknown');
   });
@@ -299,7 +306,7 @@ describe('buildArticleJsonLd — author object', () => {
         ...articleDetailFull.author!,
         slug: null,
       },
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result.author).toBeDefined();
     expect(result.author).not.toHaveProperty('url');
@@ -325,8 +332,21 @@ describe('buildArticleJsonLd — author object', () => {
         ...articleDetailFull.author!,
         sameAs: [],
       },
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.author).not.toHaveProperty('sameAs');
+  });
+
+  test('author.sameAs is OMITTED when all entries are empty strings', () => {
+    const override = {
+      ...articleDetailFull,
+      author: {
+        ...articleDetailFull.author!,
+        sameAs: ['', ''],
+      },
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.author).toBeDefined();
     expect(result.author).not.toHaveProperty('sameAs');
   });
 
@@ -337,7 +357,7 @@ describe('buildArticleJsonLd — author object', () => {
         ...articleDetailFull.author!,
         sameAs: null,
       },
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result.author).not.toHaveProperty('sameAs');
   });
@@ -346,7 +366,7 @@ describe('buildArticleJsonLd — author object', () => {
     const override = {
       ...articleDetailFull,
       author: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
     expect(result).not.toHaveProperty('author');
   });
@@ -382,7 +402,7 @@ describe('buildArticleJsonLd — publisher object', () => {
     const override = {
       ...siteSettingsFull,
       siteName: null,
-    } as typeof siteSettingsFull;
+    } as TestSiteSettings;
     const result = buildArticleJsonLd(articleDetailFull, override, TEST_URL);
     const publisher = result.publisher as Record<string, unknown>;
     expect(publisher.name).toBe('YWCC Industry Capstone');
@@ -443,7 +463,7 @@ describe('buildArticleJsonLd — cleanliness', () => {
       author: null,
       publishedAt: null,
       updatedAt: null,
-    } as typeof articleDetailFull;
+    } as TestArticle;
     const result = buildArticleJsonLd(
       override,
       siteSettingsNoLogo,
@@ -560,5 +580,292 @@ describe('articles/[slug].astro integration', () => {
     expect(jsonLdTag).toBeGreaterThan(-1);
     expect(jsonLdTag).toBeGreaterThan(fragmentOpen);
     expect(jsonLdTag).toBeLessThan(fragmentClose);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P1: canonicalUrl validation
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — canonicalUrl validation (CR P1)', () => {
+  test('throws TypeError when canonicalUrl is a relative path', () => {
+    expect(() =>
+      buildArticleJsonLd(articleDetailFull, siteSettingsFull, '/articles/foo'),
+    ).toThrow(TypeError);
+  });
+
+  test('throws TypeError when canonicalUrl is an empty string', () => {
+    expect(() =>
+      buildArticleJsonLd(articleDetailFull, siteSettingsFull, ''),
+    ).toThrow(TypeError);
+  });
+
+  test('throws TypeError when canonicalUrl is unparseable garbage', () => {
+    expect(() =>
+      buildArticleJsonLd(articleDetailFull, siteSettingsFull, 'not a url'),
+    ).toThrow(TypeError);
+  });
+
+  test('throws TypeError when canonicalUrl uses file:// scheme', () => {
+    expect(() =>
+      buildArticleJsonLd(
+        articleDetailFull,
+        siteSettingsFull,
+        'file:///build/articles/foo.html',
+      ),
+    ).toThrow(/http\(s\) scheme/);
+  });
+
+  test('throws TypeError when canonicalUrl uses data: scheme', () => {
+    expect(() =>
+      buildArticleJsonLd(
+        articleDetailFull,
+        siteSettingsFull,
+        'data:text/html,<p>foo</p>',
+      ),
+    ).toThrow(/http\(s\) scheme/);
+  });
+
+  test('accepts http:// canonicalUrl', () => {
+    expect(() =>
+      buildArticleJsonLd(
+        articleDetailFull,
+        siteSettingsFull,
+        'http://example.com/articles/foo',
+      ),
+    ).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P2: strict ISO 8601 datetime validation
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — strict ISO 8601 (CR P2)', () => {
+  test('datePublished is OMITTED when publishedAt is year-only "2026"', () => {
+    const override = {
+      ...articleDetailFull,
+      publishedAt: '2026',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result).not.toHaveProperty('datePublished');
+  });
+
+  test('datePublished is OMITTED when publishedAt is "April 11 2026" (loose Date.parse match)', () => {
+    const override = {
+      ...articleDetailFull,
+      publishedAt: 'April 11 2026',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result).not.toHaveProperty('datePublished');
+  });
+
+  test('datePublished is OMITTED when publishedAt is year-zero "0000-01-01"', () => {
+    const override = {
+      ...articleDetailFull,
+      publishedAt: '0000-01-01',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result).not.toHaveProperty('datePublished');
+  });
+
+  test('datePublished accepts date-only ISO "2026-04-11"', () => {
+    const override = {
+      ...articleDetailFull,
+      publishedAt: '2026-04-11',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.datePublished).toBe('2026-04-11');
+  });
+
+  test('datePublished accepts full ISO with timezone "2026-04-11T09:00:00+00:00"', () => {
+    const override = {
+      ...articleDetailFull,
+      publishedAt: '2026-04-11T09:00:00+00:00',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.datePublished).toBe('2026-04-11T09:00:00+00:00');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P3: whitespace-only fallbacks
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — whitespace fallbacks (CR P3)', () => {
+  test('headline falls back to "Untitled" when title is whitespace-only', () => {
+    const override = {
+      ...articleDetailFull,
+      title: '   ',
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.headline).toBe('Untitled');
+  });
+
+  test('description is OMITTED when excerpt is whitespace-only', () => {
+    const override = {
+      ...articleDetailFull,
+      excerpt: '   ',
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result).not.toHaveProperty('description');
+  });
+
+  test('publisher.name falls back when siteName is whitespace-only', () => {
+    const override = {
+      ...siteSettingsFull,
+      siteName: '   ',
+    } as TestSiteSettings;
+    const result = buildArticleJsonLd(articleDetailFull, override, TEST_URL);
+    const publisher = result.publisher as Record<string, unknown>;
+    expect(publisher.name).toBe('YWCC Industry Capstone');
+  });
+
+  test('author.name falls back to "Unknown" when name is whitespace-only', () => {
+    const override = {
+      ...articleDetailFull,
+      author: {
+        ...articleDetailFull.author,
+        name: '   ',
+      },
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect((result.author as Record<string, unknown>).name).toBe('Unknown');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P4: sameAs whitespace trimming
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — sameAs whitespace filter (CR P4)', () => {
+  test('author.sameAs drops whitespace-only entries and keeps real URLs', () => {
+    const override = {
+      ...articleDetailFull,
+      author: {
+        ...articleDetailFull.author,
+        sameAs: ['   ', 'https://github.com/x', '  '],
+      },
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    const author = result.author as Record<string, unknown>;
+    expect(author.sameAs).toEqual(['https://github.com/x']);
+  });
+
+  test('author.sameAs is OMITTED when all entries are whitespace', () => {
+    const override = {
+      ...articleDetailFull,
+      author: {
+        ...articleDetailFull.author,
+        sameAs: ['  ', '   '],
+      },
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result.author).toBeDefined();
+    expect(result.author).not.toHaveProperty('sameAs');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P5: NewsArticle requires datePublished → downgrade when missing
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — NewsArticle datePublished requirement (CR P5)', () => {
+  test('@type downgrades from "NewsArticle" to "Article" when publishedAt is null', () => {
+    const override = {
+      ...articleDetailNews,
+      publishedAt: null,
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result['@type']).toBe('Article');
+    expect(result).not.toHaveProperty('datePublished');
+  });
+
+  test('@type downgrades when news category has invalid publishedAt ("garbage")', () => {
+    const override = {
+      ...articleDetailNews,
+      publishedAt: 'garbage',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result['@type']).toBe('Article');
+  });
+
+  test('@type downgrades when news category has loose Date.parse match "2026"', () => {
+    const override = {
+      ...articleDetailNews,
+      publishedAt: '2026',
+      updatedAt: null,
+    } as TestArticle;
+    const result = buildArticleJsonLd(override, siteSettingsFull, TEST_URL);
+    expect(result['@type']).toBe('Article');
+  });
+
+  test('@type remains "NewsArticle" when news category + valid ISO publishedAt', () => {
+    const result = buildArticleJsonLd(
+      articleDetailNews,
+      siteSettingsFull,
+      TEST_URL,
+    );
+    expect(result['@type']).toBe('NewsArticle');
+    expect(result.datePublished).toBeDefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CR P6: mainEntityOfPage strips query + fragment
+// ---------------------------------------------------------------------------
+
+describe('buildArticleJsonLd — canonical URL stripping (CR P6)', () => {
+  test('mainEntityOfPage strips query string from canonicalUrl', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo?preview=1',
+    );
+    expect(result.mainEntityOfPage).toBe('https://example.com/articles/foo');
+  });
+
+  test('mainEntityOfPage strips hash fragment from canonicalUrl', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo#section',
+    );
+    expect(result.mainEntityOfPage).toBe('https://example.com/articles/foo');
+  });
+
+  test('mainEntityOfPage strips both query AND fragment', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo?preview=1&utm=x#top',
+    );
+    expect(result.mainEntityOfPage).toBe('https://example.com/articles/foo');
+  });
+
+  test('mainEntityOfPage preserves trailing slash in pathname', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo/',
+    );
+    expect(result.mainEntityOfPage).toBe('https://example.com/articles/foo/');
+  });
+
+  test('author.url origin is still derived correctly after stripping', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo?preview=1',
+    );
+    const author = result.author as Record<string, unknown>;
+    expect(author.url).toBe('https://example.com/authors/alex-singh');
   });
 });
