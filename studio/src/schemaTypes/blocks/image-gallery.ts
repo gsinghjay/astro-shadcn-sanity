@@ -12,9 +12,6 @@ export const imageGallery = defineBlock({
     {name: 'masonry', title: 'Masonry'},
     {name: 'single', title: 'Single'},
   ],
-  hiddenByVariant: {
-    columns: ['masonry', 'single'],
-  },
   fields: [
     ...headerFields(),
     defineField({
@@ -24,20 +21,6 @@ export const imageGallery = defineBlock({
       description: 'Gallery images with optional captions',
       of: [defineArrayMember({type: 'galleryImage'})],
       validation: (Rule) => Rule.required().min(1).max(30),
-    }),
-    defineField({
-      name: 'columns',
-      title: 'Columns',
-      type: 'string',
-      options: {
-        list: [
-          {title: '2 Columns', value: '2'},
-          {title: '3 Columns', value: '3'},
-          {title: '4 Columns', value: '4'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: '3',
     }),
   ],
 })

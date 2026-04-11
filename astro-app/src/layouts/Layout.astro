@@ -14,9 +14,7 @@ import type { SeoProps } from "@/lib/types";
 interface Props {
   title?: string;
   seo?: SeoProps | null;
-  hideNav?: boolean;
   ogType?: string;
-  template?: string;
   preloadImage?: string;
   preloadImageSrcset?: string;
   preloadImageSizes?: string;
@@ -29,9 +27,7 @@ const defaultDescription = siteSettings?.siteDescription || "";
 const {
   title = defaultTitle,
   seo,
-  hideNav = false,
   ogType,
-  template = 'default',
   preloadImage,
   preloadImageSrcset,
   preloadImageSizes,
@@ -117,6 +113,13 @@ const orgJsonLd = {
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <link rel="canonical" href={Astro.url.href} />
     {seo?.noIndex && <meta name="robots" content="noindex" />}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${stegaClean(siteSettings?.siteName) ?? 'YWCC Industry Capstone'} — Articles`}
+      href="/rss.xml"
+    />
+    <slot name="head" />
     <meta
       http-equiv="Content-Security-Policy"
       content={cspContent}
@@ -131,25 +134,24 @@ const orgJsonLd = {
       </script>
     )}
     {gtmId && (
-      <script define:vars={{ pagePath: Astro.url.pathname, pageTitle: fullTitle, pageTemplate: template }}>
+      <script define:vars={{ pagePath: Astro.url.pathname, pageTitle: fullTitle }}>
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({
           event: 'page_view',
           page: {
             path: pagePath,
             title: pageTitle,
-            template: pageTemplate
           }
         });
       </script>
     )}
   </head>
   <body class="antialiased">
-    {!hideNav && <Header />}
+    <Header />
     <main>
       <slot />
     </main>
-    {!hideNav && <Footer />}
+    <Footer />
     <script src="../scripts/main.ts"></script>
     {visualEditingEnabled && <VisualEditingMPA client:only="react" />}
     {(liveContentEnabled || visualEditingEnabled) && <SanityLiveUpdater />}

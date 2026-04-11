@@ -18,7 +18,7 @@ export const sponsorCards = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
-      validation: (Rule) => Rule.required().max(150),
+      validation: (Rule) => Rule.max(150),
     }),
     ...displayModeBlock({
       referenceType: 'sponsor',

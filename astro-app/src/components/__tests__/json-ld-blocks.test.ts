@@ -345,7 +345,6 @@ describe('MapBlock JSON-LD', () => {
         heading: 'Our Office',
         address: '123 Main St, City, ST 12345',
         coordinates: { lat: 40.7128, lng: -74.006 },
-        zoom: 15,
         variant: 'default',
       },
     });

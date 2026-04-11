@@ -61,6 +61,7 @@ import {stepItem} from '../../../studio/src/schemaTypes/objects/step-item'
 import {tabItem} from '../../../studio/src/schemaTypes/objects/tab-item'
 import {teamMember} from '../../../studio/src/schemaTypes/objects/team-member'
 import {timelineEntry} from '../../../studio/src/schemaTypes/objects/timeline-entry'
+import {sponsorshipTierItem} from '../../../studio/src/schemaTypes/objects/sponsorship-tier-item'
 
 // Helper to find a field in a schema (works with defineBlock output which wraps in defineType)
 function findField(schema: any, fieldName: string): any | undefined {
@@ -287,12 +288,6 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(typeof field.description).toBe('string')
     })
 
-    test('map-block zoom has description', () => {
-      const field = findField(mapBlock, 'zoom')
-      expect(field).toBeDefined()
-      expect(field.description).toBeDefined()
-    })
-
     test('comparison-column highlighted has description', () => {
       const field = findField(comparisonColumn, 'highlighted')
       expect(field).toBeDefined()
@@ -354,11 +349,10 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       return rule._calls
     }
 
-    test('heading fields call required() and max(150)', () => {
+    test('heading fields call max(150)', () => {
       const samples = [accordion, cardGrid, newsletter, timeline, videoEmbed]
       for (const schema of samples) {
         const calls = getCalls(schema, 'heading')
-        expect(calls.some((c) => c.method === 'required')).toBe(true)
         expect(calls.some((c) => c.method === 'max' && c.args[0] === 150)).toBe(true)
       }
     })
@@ -402,12 +396,6 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       expect(calls.some((c) => c.method === 'required')).toBe(true)
       expect(calls.some((c) => c.method === 'min' && c.args[0] === -180)).toBe(true)
       expect(calls.some((c) => c.method === 'max' && c.args[0] === 180)).toBe(true)
-    })
-
-    test('map-block zoom calls min(1) and max(20)', () => {
-      const calls = getCalls(mapBlock, 'zoom')
-      expect(calls.some((c) => c.method === 'min' && c.args[0] === 1)).toBe(true)
-      expect(calls.some((c) => c.method === 'max' && c.args[0] === 20)).toBe(true)
     })
 
     test('map-block address calls max(500)', () => {
@@ -487,6 +475,35 @@ describe('Story 18.5: Schema Validation & Editor Descriptions', () => {
       const field = findField(comparisonRow, 'feature')
       expect(field).toBeDefined()
       expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem name has validation', () => {
+      const field = findField(sponsorshipTierItem, 'name')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem price has validation', () => {
+      const field = findField(sponsorshipTierItem, 'price')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem benefits array has validation', () => {
+      const field = findField(sponsorshipTierItem, 'benefits')
+      expect(field).toBeDefined()
+      expect(field.validation).toBeDefined()
+    })
+
+    test('sponsorshipTierItem highlighted has description', () => {
+      const field = findField(sponsorshipTierItem, 'highlighted')
+      expect(field).toBeDefined()
+      expect(field.description).toBeDefined()
+      expect(typeof field.description).toBe('string')
+    })
+
+    test('sponsorshipTierItem has icon', () => {
+      expect(sponsorshipTierItem.icon).toBeDefined()
     })
   })
 })

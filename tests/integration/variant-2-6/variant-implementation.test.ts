@@ -144,11 +144,11 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       expect(variantField, 'richText missing variant field').toBeDefined()
     })
 
-    test('2.6-INT-018 — richText variant field has 3 options', () => {
+    test('2.6-INT-018 — richText variant field has 4 options', () => {
       const schema = richText as BlockSchema
       const variantField = schema.fields.find((f) => f.name === 'variant')
       const values = variantField.options.list.map((o: any) => o.value)
-      expect(values).toEqual(['prose', 'narrow', 'wide'])
+      expect(values).toEqual(['prose', 'standard', 'highlighted', 'sidebar'])
     })
 
     test('2.6-INT-019 — richText variant field initialValue is prose (default)', () => {
@@ -228,7 +228,7 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
 
     test('2.6-INT-028 — all richText variant values survive stegaClean', async () => {
       const { stegaClean } = await import('@sanity/client/stega')
-      const variants = ['prose', 'narrow', 'wide']
+      const variants = ['prose', 'standard', 'highlighted', 'sidebar']
       for (const v of variants) {
         expect(stegaClean(v)).toBe(v)
       }
@@ -252,15 +252,15 @@ describe('Story 2-6: Content & Feature Layout Variants', () => {
       expect(source).toContain('safeUrlFor(feature.image)')
     })
 
-    test('2.6-INT-031 — richText narrow variant sets --section-width to 672px', async () => {
+    test('2.6-INT-031 — richText standard variant sets --section-width to 672px', async () => {
       const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/RichText.astro'), 'utf8')
-      expect(source).toContain("cleanVariant === 'narrow'")
+      expect(source).toContain("cleanVariant === 'standard'")
       expect(source).toContain('--section-width: 672px')
     })
 
-    test('2.6-INT-032 — richText wide variant still uses SectionProse', async () => {
+    test('2.6-INT-032 — richText highlighted variant still uses SectionProse', async () => {
       const source = await readFile(fromAstroAppRoot('src/components/blocks/custom/RichText.astro'), 'utf8')
-      expect(source).toContain("cleanVariant === 'wide'")
+      expect(source).toContain("cleanVariant === 'highlighted'")
       expect(source).toContain('<SectionProse size="lg" class="max-w-none">')
     })
   })

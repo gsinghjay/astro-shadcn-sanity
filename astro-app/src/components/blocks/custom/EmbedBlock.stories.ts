@@ -20,7 +20,6 @@ export default {
     },
     heading: { control: 'text', description: 'Section heading' },
     embedUrl: { control: 'text', description: 'URL to embed in iframe' },
-    aspectRatio: { control: 'text', description: 'Aspect ratio (e.g., "16/9", "4/3")' },
     caption: { control: 'text', description: 'Caption text below embed' },
     backgroundVariant: {
       control: { type: 'select' },
@@ -47,7 +46,6 @@ export const Default = {
     variant: 'default',
     heading: 'Watch the Demo',
     embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    aspectRatio: '16/9',
     caption: 'A quick walkthrough of our platform features.',
   },
 }
@@ -59,7 +57,6 @@ export const Contained = {
     variant: 'contained',
     heading: 'Product Overview',
     embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    aspectRatio: '16/9',
     caption: 'See how teams use our tools to ship faster.',
   },
 }
@@ -70,6 +67,5 @@ export const FullWidth = {
     _key: 'story-embed-full-width',
     variant: 'full-width',
     embedUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    aspectRatio: '21/9',
   },
 }
