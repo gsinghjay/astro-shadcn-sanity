@@ -113,6 +113,12 @@ const orgJsonLd = {
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <link rel="canonical" href={Astro.url.href} />
     {seo?.noIndex && <meta name="robots" content="noindex" />}
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${stegaClean(siteSettings?.siteName) ?? 'YWCC Industry Capstone'} — Articles`}
+      href="/rss.xml"
+    />
     <slot name="head" />
     <meta
       http-equiv="Content-Security-Policy"
