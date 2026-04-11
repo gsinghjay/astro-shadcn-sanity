@@ -770,7 +770,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       contentType,
       categories[]->{ _id },
       limit,
-      ctaButtons[]{ _key, text, url, variant }
+      ctaButtons[]{ _key, text, url, variant },
+      showNewsletterCta
     },
     _type == "comparisonTable" => {
       heading,
