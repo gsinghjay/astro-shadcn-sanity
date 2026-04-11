@@ -21,8 +21,8 @@ describe('ArticleCard', () => {
     });
 
     expect(html).toContain('loading="lazy"');
-    expect(html).toContain('width="640"');
-    expect(html).toContain('height="360"');
+    expect(html).toContain('width="1280"');
+    expect(html).toContain('height="720"');
     expect(html).toContain('alt="Astro framework logo"');
     expect(html).toContain('background-image');
   });

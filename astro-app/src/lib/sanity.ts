@@ -505,10 +505,10 @@ export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_
 export const ALL_ARTICLES_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){
   _id, title, "slug": slug.current,
   excerpt,
-  featuredImage{ ${IMAGE_PROJECTION}, alt },
+  featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   author->{ name, "slug": slug.current },
   publishedAt,
-  category->{ title, "slug": slug.current }
+  category->{ _id, title, "slug": slug.current }
 }`);
 
 /**
@@ -545,6 +545,43 @@ export async function getAllArticles(): Promise<ALL_ARTICLES_QUERY_RESULT> {
   const { result } = await loadQuery<ALL_ARTICLES_QUERY_RESULT>({ query: ALL_ARTICLES_QUERY, params: getSiteParams() });
   _articlesCache = result ?? [];
   return _articlesCache;
+}
+
+/**
+ * Resolve articles for an articleList block from the pre-fetched cache.
+ * Filters based on contentType config (all/by-category) and applies limit.
+ * Articles arrive pre-sorted by publishedAt desc from the GROQ query,
+ * so no re-sorting is needed here.
+ */
+export function resolveBlockArticles(
+  block: {
+    _type: string;
+    contentType?: string | null;
+    categories?: Array<{ _id: string } | null> | null;
+    limit?: number | null;
+  },
+  allArticles: Article[],
+): Article[] {
+  const mode = stegaClean(block.contentType) ?? 'all';
+  const limit = block.limit ?? 6;
+
+  let filtered: Article[];
+  if (mode === 'by-category' && block.categories && block.categories.length > 0) {
+    const categoryIds = new Set(
+      block.categories
+        .filter((c): c is { _id: string } => !!c && !!c._id)
+        .map((c) => c._id),
+    );
+    filtered =
+      categoryIds.size > 0
+        ? allArticles.filter((a) => a.category?._id && categoryIds.has(a.category._id))
+        : allArticles;
+  } else {
+    // 'all' or no categories selected — show everything
+    filtered = allArticles;
+  }
+
+  return filtered.slice(0, limit);
 }
 
 /**
@@ -731,6 +768,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       contentType,
+      categories[]->{ _id },
       limit,
       ctaButtons[]{ _key, text, url, variant }
     },
