@@ -80,11 +80,11 @@ describe('Story 21-9: Block Variant Audit', () => {
     const blocksWithVariants = Object.entries(schemaMap).filter(([, variants]) => variants.length > 0)
 
     test('21.9-INT-001 — all 37 blocks have schema files', () => {
-      expect(schemaFiles.length).toBe(37)
+      expect(schemaFiles.length).toBe(38)
     })
 
     test('21.9-INT-002 — all 37 blocks have component files', () => {
-      expect(componentFiles.length).toBe(37)
+      expect(componentFiles.length).toBe(38)
     })
 
     test('21.9-INT-003 — every schema file has a matching component file', () => {

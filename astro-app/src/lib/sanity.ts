@@ -40,8 +40,11 @@ const PORTABLE_TEXT_PROJECTION = `{
  * Shared per-type block field projections.
  * Used by both PAGE_BY_SLUG_QUERY and LISTING_PAGE_QUERY to ensure
  * consistent data resolution (images, portable text, references).
+ *
+ * Split into INNER (all blocks except columnsBlock) and full (adds columnsBlock
+ * which references INNER for its sub-arrays). This avoids circular const init.
  */
-const BLOCK_FIELDS_PROJECTION = `
+const INNER_BLOCK_FIELDS_PROJECTION = `
     _type,
     _key,
     backgroundVariant,
@@ -250,6 +253,14 @@ const BLOCK_FIELDS_PROJECTION = `
       beforeLabel,
       afterLabel,
       caption
+    }`;
+
+const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
+    _type == "columnsBlock" => {
+      leftBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
+      rightBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
+      reverseOnMobile,
+      verticalAlign
     }`;
 
 const visualEditingEnabled =
