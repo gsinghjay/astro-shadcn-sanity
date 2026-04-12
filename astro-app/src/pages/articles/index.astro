@@ -2,10 +2,14 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import ArticleCard from '@/components/ArticleCard.astro';
+import ArticleCategoryChips from '@/components/ArticleCategoryChips.astro';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
-import { getAllArticles } from '@/lib/sanity';
+import { getAllArticles, getAllArticleCategories } from '@/lib/sanity';
 
-const articles = await getAllArticles();
+const [articles, categories] = await Promise.all([
+  getAllArticles(),
+  getAllArticleCategories(),
+]);
 ---
 
 <Layout title="Articles" seo={{ metaDescription: 'Browse articles, blog posts, and news from the program.' }}>
@@ -17,6 +21,8 @@ const articles = await getAllArticles();
       ]} />
 
       <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Articles</h1>
+
+      <ArticleCategoryChips categories={categories} />
     </SectionContent>
 
     {articles.length > 0 ? (
