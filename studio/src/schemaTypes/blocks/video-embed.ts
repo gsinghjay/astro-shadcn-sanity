@@ -24,7 +24,8 @@ export const videoEmbed = defineBlock({
             const isYouTube =
               /youtube\.com\/watch\?v=/.test(url) ||
               /youtu\.be\//.test(url) ||
-              /youtube\.com\/embed\//.test(url)
+              /youtube\.com\/embed\//.test(url) ||
+              /youtube\.com\/shorts\//.test(url)
             return isYouTube || 'Only YouTube URLs are supported'
           }),
     }),

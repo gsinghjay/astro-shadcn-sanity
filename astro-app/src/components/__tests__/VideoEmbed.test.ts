@@ -15,6 +15,16 @@ describe('VideoEmbed (shared component)', () => {
     expect(html).toContain('aspect-video');
   });
 
+  test('renders iframe for YouTube Shorts URL', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(VideoEmbed, {
+      props: { url: 'https://www.youtube.com/shorts/AbCdEf12345' },
+    });
+
+    expect(html).toContain('src="https://www.youtube-nocookie.com/embed/AbCdEf12345"');
+    expect(html).toContain('<iframe');
+  });
+
   test('does not render when URL is invalid', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(VideoEmbed, {
@@ -124,5 +134,19 @@ describe('VideoEmbed (block component)', () => {
 
     expect(html).toContain('src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"');
     expect(html).toContain('title="My Video Title"');
+  });
+
+  test('renders Shorts URL via shared VideoEmbed component', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockVideoEmbed, {
+      props: {
+        _type: 'videoEmbed' as const,
+        _key: 'test-key',
+        videoUrl: 'https://www.youtube.com/shorts/AbCdEf12345',
+      },
+    });
+
+    expect(html).toContain('src="https://www.youtube-nocookie.com/embed/AbCdEf12345"');
+    expect(html).toContain('<iframe');
   });
 });
