@@ -10,6 +10,8 @@ import { stegaClean } from '@sanity/client/stega';
 import { Icon } from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
+import { JsonLd } from '@/components/ui/json-ld';
+import { buildAuthorJsonLd } from '@/lib/author-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const authors = await sanityClient.fetch<ALL_AUTHOR_SLUGS_QUERY_RESULT>(ALL_AUTHOR_SLUGS_QUERY, getSiteParams());
@@ -41,12 +43,18 @@ const articles = author.articles ?? [];
 
 // SEO: bio fallback to role
 const metaDescription = author.bio || author.role || undefined;
+
+// Person JSON-LD structured data (Story 20.3)
+const authorJsonLd = buildAuthorJsonLd(author, Astro.url.href);
 ---
 
 <Layout
   title={`${author.name ?? 'Author'} | Authors`}
   seo={metaDescription ? { metaDescription } : undefined}
 >
+  <Fragment slot="head">
+    <JsonLd schema={authorJsonLd} />
+  </Fragment>
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
