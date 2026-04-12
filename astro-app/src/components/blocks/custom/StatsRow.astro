@@ -27,9 +27,8 @@ const statsJsonLd = (stats ?? []).filter(s => s.value && s.label).map(stat => {
   };
 });
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
-const isDark = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
+// Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 const sectionBg = bgClasses[bgVariant] ?? '';
-const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 
 const rawVariant = stegaClean(variant);
 const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' || rawVariant === 'brutalist' || rawVariant === 'ticker' ? rawVariant : 'grid';
@@ -40,7 +39,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'grid' && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-muted'} ${gridBorderClass}`}
+    class={`border-y ${sectionBg || 'bg-muted'} border-border`}
     data-animate
   >
     {heading && (
@@ -52,7 +51,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
           <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
-          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+          <div class={`label-caps text-muted-foreground`}>
             {stat.label}
           </div>
         </div>
@@ -106,7 +105,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'brutalist' && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass}`}
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} border-border`}
     data-animate
   >
     {heading && (
@@ -118,7 +117,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
           <div class="font-mono tabular-nums text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
-          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+          <div class={`label-caps text-muted-foreground`}>
             {stat.label}
           </div>
         </div>
@@ -130,7 +129,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'ticker' && stats && stats.length > 0 && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass} overflow-hidden`}
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} border-border overflow-hidden`}
     data-animate
   >
     <Marquee>
@@ -140,7 +139,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
             <span class="font-mono tabular-nums text-4xl md:text-5xl font-bold tracking-[-0.04em] leading-none">
               {stat.value}
             </span>
-            <span class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+            <span class={`label-caps text-muted-foreground`}>
               {stat.label}
             </span>
           </div>

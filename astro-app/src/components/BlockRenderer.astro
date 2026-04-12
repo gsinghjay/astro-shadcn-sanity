@@ -39,5 +39,5 @@ function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
   const Component = allBlocks[block._type];
   if (!Component) return null;
   const extraProps = getBlockExtraProps(block);
-  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth} blockType={block._type}><Component {...block} {...extraProps} /></BlockWrapper>;
+  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth} alignment={block.alignment} blockType={block._type}><Component {...block} {...extraProps} /></BlockWrapper>;
 })}

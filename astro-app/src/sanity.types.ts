@@ -72,6 +72,7 @@ export type BeforeAfter = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "side-by-side" | "stacked" | "toggle";
   heading?: string;
   beforeImage?: {
@@ -109,6 +110,7 @@ export type CardGrid = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid-2" | "grid-3" | "grid-4" | "masonry" | "brutalist";
   heading?: string;
   description?: string;
@@ -133,6 +135,7 @@ export type MetricsDashboard = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "row" | "card" | "terminal" | "brutalist-grid";
   heading?: string;
   description?: string;
@@ -157,6 +160,7 @@ export type CountdownTimer = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "inline" | "hero" | "banner" | "brutalist";
   heading?: string;
   description?: string;
@@ -178,6 +182,7 @@ export type MapBlock = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "split" | "full-width";
   heading?: string;
   address?: string;
@@ -200,6 +205,7 @@ export type EmbedBlock = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "contained" | "full-width";
   heading?: string;
   embedUrl?: string;
@@ -220,6 +226,7 @@ export type TabsBlock = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "pills" | "underline" | "brutalist";
   heading?: string;
   tabs?: Array<
@@ -243,6 +250,7 @@ export type Accordion = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "bordered" | "separated" | "technical";
   heading?: string;
   description?: string;
@@ -267,6 +275,7 @@ export type Newsletter = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "inline" | "banner" | "split" | "brutalist";
   heading?: string;
   description?: string;
@@ -289,6 +298,7 @@ export type LinkCards = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "list" | "icon-list";
   heading?: string;
   description?: string;
@@ -313,6 +323,7 @@ export type ProductShowcase = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "featured" | "detail";
   heading?: string;
   description?: string;
@@ -337,6 +348,7 @@ export type ServiceCards = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "list" | "alternating" | "icon-grid" | "specification";
   heading?: string;
   description?: string;
@@ -361,6 +373,7 @@ export type PricingTable = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "simple" | "featured" | "comparison" | "brutalist";
   heading?: string;
   description?: string;
@@ -694,6 +707,7 @@ export type VideoEmbed = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "full-width" | "split" | "split-asymmetric";
   heading?: string;
   description?: string;
@@ -722,6 +736,7 @@ export type SponsorshipTiers = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "brutalist";
   heading?: string;
   description?: string;
@@ -746,6 +761,7 @@ export type AnnouncementBar = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "inline" | "floating";
   icon?:
     | "info"
@@ -837,6 +853,7 @@ export type Divider = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "line" | "short" | "labeled";
   label?: string;
 };
@@ -855,6 +872,7 @@ export type Pullquote = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "centered" | "split" | "sidebar" | "brutalist";
   quote?: string;
   attribution?: string;
@@ -883,6 +901,7 @@ export type Timeline = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "vertical" | "split" | "horizontal" | "engineering";
   heading?: string;
   description?: string;
@@ -912,6 +931,7 @@ export type ComparisonTable = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "table" | "stacked" | "specification";
   heading?: string;
   description?: string;
@@ -981,6 +1001,7 @@ export type ArticleList = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "split-featured" | "list" | "brutalist" | "magazine";
   heading?: string;
   description?: string;
@@ -1013,6 +1034,7 @@ export type ImageGallery = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "masonry" | "single";
   heading?: string;
   description?: string;
@@ -1037,6 +1059,7 @@ export type TeamGrid = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "grid-compact" | "split";
   heading?: string;
   description?: string;
@@ -1068,6 +1091,7 @@ export type ProjectCards = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "case-study" | "blueprint";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
@@ -1092,6 +1116,8 @@ export type EventList = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
+  variant?: "grid" | "list" | "timeline";
   heading?: string;
   eventStatus?: "all" | "upcoming" | "past";
   limit?: number;
@@ -1118,6 +1144,7 @@ export type Testimonials = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?:
     | "grid"
     | "masonry"
@@ -1156,6 +1183,7 @@ export type SponsorCards = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "default" | "showcase" | "brutalist-tier";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
@@ -1187,6 +1215,7 @@ export type ContactForm = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "stacked" | "split" | "split-image";
   heading?: string;
   description?: string;
@@ -1217,6 +1246,7 @@ export type FaqSection = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "split" | "stacked" | "spread-header" | "narrow" | "technical";
   heading?: string;
   items?: Array<
@@ -1240,6 +1270,7 @@ export type RichText = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "prose" | "standard" | "highlighted" | "sidebar";
   content?: PortableText;
 };
@@ -1258,6 +1289,7 @@ export type SponsorSteps = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "steps" | "split" | "spread";
   heading?: string;
   subheading?: string;
@@ -1287,6 +1319,7 @@ export type LogoCloud = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "marquee" | "flex-wrap" | "tiered" | "grid-prominent";
   heading?: string;
   autoPopulate?: boolean;
@@ -1311,6 +1344,7 @@ export type TextWithImage = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?:
     | "split"
     | "split-asymmetric"
@@ -1344,6 +1378,7 @@ export type StatsRow = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?: "grid" | "split" | "spread" | "brutalist" | "ticker";
   heading?: string;
   stats?: Array<
@@ -1367,6 +1402,7 @@ export type CtaBanner = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?:
     | "centered"
     | "split"
@@ -1406,6 +1442,7 @@ export type FeatureGrid = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?:
     | "grid"
     | "grid-centered"
@@ -1436,12 +1473,14 @@ export type HeroBanner = {
     | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  alignment?: "left" | "center" | "right";
   variant?:
     | "centered"
     | "split"
     | "split-asymmetric"
     | "overlay"
     | "spread"
+    | "split-bleed"
     | "brutalist";
   heading?: string;
   subheading?: string;
@@ -1459,7 +1498,6 @@ export type HeroBanner = {
       _key: string;
     } & Button
   >;
-  alignment?: "left" | "center" | "right";
 };
 
 export type ListingPage = {
@@ -3092,6 +3130,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
           | "white";
         spacing?: "default" | "large" | "none" | "small";
         maxWidth?: "default" | "full" | "narrow";
+        alignment?: "center" | "left" | "right";
         variant?: "full-width" | "split-asymmetric" | "split";
         heading?: string;
         description?: string;
@@ -3516,6 +3555,7 @@ export type ARTICLE_BY_SLUG_QUERY_RESULT = {
           | "white";
         spacing?: "default" | "large" | "none" | "small";
         maxWidth?: "default" | "full" | "narrow";
+        alignment?: "center" | "left" | "right";
         variant?: "full-width" | "split-asymmetric" | "split";
         heading?: string;
         description?: string;
@@ -4251,7 +4291,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid" | "list" | "timeline" | null;
         heading: string | null;
         eventStatus: "all" | "past" | "upcoming" | null;
         limit: number | null;
@@ -4382,6 +4422,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
+                alignment?: "center" | "left" | "right";
                 variant?: "full-width" | "split-asymmetric" | "split";
                 heading?: string;
                 description?: string;
@@ -4535,6 +4576,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | "centered"
           | "overlay"
           | "split-asymmetric"
+          | "split-bleed"
           | "split"
           | "spread"
           | null;
@@ -5124,6 +5166,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
@@ -5599,6 +5642,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
@@ -6195,7 +6239,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid" | "list" | "timeline" | null;
         heading: string | null;
         eventStatus: "all" | "past" | "upcoming" | null;
         limit: number | null;
@@ -6326,6 +6370,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
+                alignment?: "center" | "left" | "right";
                 variant?: "full-width" | "split-asymmetric" | "split";
                 heading?: string;
                 description?: string;
@@ -6479,6 +6524,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | "centered"
           | "overlay"
           | "split-asymmetric"
+          | "split-bleed"
           | "split"
           | "spread"
           | null;
@@ -7068,6 +7114,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
@@ -7543,6 +7590,7 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
@@ -8382,7 +8430,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "grid" | "list" | "timeline" | null;
         heading: string | null;
         eventStatus: "all" | "past" | "upcoming" | null;
         limit: number | null;
@@ -8513,6 +8561,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
+                alignment?: "center" | "left" | "right";
                 variant?: "full-width" | "split-asymmetric" | "split";
                 heading?: string;
                 description?: string;
@@ -8666,6 +8715,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | "centered"
           | "overlay"
           | "split-asymmetric"
+          | "split-bleed"
           | "split"
           | "spread"
           | null;
@@ -9255,6 +9305,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
@@ -9730,6 +9781,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
               variant?: "full-width" | "split-asymmetric" | "split";
               heading?: string;
               description?: string;
