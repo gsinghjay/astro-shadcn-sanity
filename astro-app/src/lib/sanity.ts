@@ -18,6 +18,8 @@ import type {
   ALL_ARTICLE_CATEGORIES_QUERY_RESULT,
   ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT,
   ARTICLES_BY_CATEGORY_QUERY_RESULT,
+  ALL_AUTHORS_QUERY_RESULT,
+  AUTHOR_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -94,6 +96,12 @@ export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
  * Array element type extracted for use in component props and helper functions.
  */
 export type Article = ALL_ARTICLES_QUERY_RESULT[number];
+
+/**
+ * Author type — derived from the generated ALL_AUTHORS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Author = ALL_AUTHORS_QUERY_RESULT[number];
 
 /**
  * RelatedArticle type — narrower projection from the detail query's relatedArticles[]->.
@@ -687,6 +695,86 @@ export async function getArticlesByCategory(
     params: { categoryId, ...getSiteParams() },
   });
   return result ?? [];
+}
+
+// ---------------------------------------------------------------------------
+// Author queries (Story 20.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch all authors for build-time caching.
+ * Ordered by name ascending (alphabetical).
+ */
+export const ALL_AUTHORS_QUERY = defineQuery(groq`*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){
+  _id, name, "slug": slug.current,
+  role, bio,
+  image{ ${IMAGE_PROJECTION}, alt }
+}`);
+
+/**
+ * GROQ query: fetch all author slugs for static path generation.
+ */
+export const ALL_AUTHOR_SLUGS_QUERY = defineQuery(groq`*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single author by slug with full fields.
+ * Includes reverse reference query for articles by this author.
+ * Articles projection matches ALL_ARTICLES_QUERY field-for-field so ArticleCard
+ * can render them without type casting.
+ */
+export const AUTHOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current,
+  role, bio, credentials,
+  image{ ${IMAGE_PROJECTION}, alt },
+  sameAs,
+  socialLinks[]{ _key, platform, url },
+  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){
+    _id, title, "slug": slug.current,
+    excerpt,
+    featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+    author->{ name, "slug": slug.current },
+    publishedAt,
+    category->{ _id, title, "slug": slug.current }
+  }
+}`);
+
+/**
+ * Fetch all authors from Sanity.
+ * Result is cached for the duration of the build (module-level memoization).
+ */
+let _authorsCache: ALL_AUTHORS_QUERY_RESULT | null = null;
+
+export async function getAllAuthors(): Promise<ALL_AUTHORS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _authorsCache) return _authorsCache;
+  const { result } = await loadQuery<ALL_AUTHORS_QUERY_RESULT>({ query: ALL_AUTHORS_QUERY, params: getSiteParams() });
+  _authorsCache = result ?? [];
+  return _authorsCache;
+}
+
+/**
+ * Fetch a single author by slug from Sanity.
+ */
+export async function getAuthorBySlug(slug: string): Promise<AUTHOR_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<AUTHOR_BY_SLUG_QUERY_RESULT>({
+    query: AUTHOR_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+/**
+ * Reset all module-level caches. Useful for testing and SSR scenarios
+ * where stale data could persist across requests.
+ */
+export function resetAllCaches(): void {
+  _siteSettingsCache = null;
+  _sponsorsCache = null;
+  _projectsCache = null;
+  _testimonialsCache = null;
+  _eventsCache = null;
+  _articlesCache = null;
+  _articleCategoriesCache = null;
+  _authorsCache = null;
 }
 
 // ---------------------------------------------------------------------------

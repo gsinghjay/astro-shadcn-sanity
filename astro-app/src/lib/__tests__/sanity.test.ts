@@ -37,6 +37,11 @@ const {
   getAllArticles,
   getArticleBySlug,
   resolveBlockArticles,
+  ALL_AUTHORS_QUERY,
+  ALL_AUTHOR_SLUGS_QUERY,
+  AUTHOR_BY_SLUG_QUERY,
+  getAllAuthors,
+  getAuthorBySlug,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -263,6 +268,45 @@ describe("GROQ query definitions", () => {
     expect(ARTICLE_BY_SLUG_QUERY).toContain("role");
     expect(ARTICLE_BY_SLUG_QUERY).toContain("image{");
     expect(ARTICLE_BY_SLUG_QUERY).toContain("sameAs");
+  });
+
+  it("ALL_AUTHORS_QUERY targets author type ordered by name asc", () => {
+    expect(ALL_AUTHORS_QUERY).toContain('_type == "author"');
+    expect(ALL_AUTHORS_QUERY).toContain("order(name asc)");
+    expect(ALL_AUTHORS_QUERY).toContain("name");
+    expect(ALL_AUTHORS_QUERY).toContain("slug.current");
+    expect(ALL_AUTHORS_QUERY).toContain("role");
+    expect(ALL_AUTHORS_QUERY).toContain("bio");
+    expect(ALL_AUTHORS_QUERY).toContain("image{");
+    expect(ALL_AUTHORS_QUERY).toContain("defined(slug.current)");
+  });
+
+  it("ALL_AUTHOR_SLUGS_QUERY targets author type with slug projection", () => {
+    expect(ALL_AUTHOR_SLUGS_QUERY).toContain('_type == "author"');
+    expect(ALL_AUTHOR_SLUGS_QUERY).toContain("defined(slug.current)");
+    expect(ALL_AUTHOR_SLUGS_QUERY).toContain("slug.current");
+  });
+
+  it("AUTHOR_BY_SLUG_QUERY fetches single author by slug with full fields", () => {
+    expect(AUTHOR_BY_SLUG_QUERY).toContain('_type == "author"');
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("$slug");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("name");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("slug.current");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("role");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("bio");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("credentials");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("image{");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("sameAs");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("socialLinks[]");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("platform");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("url");
+  });
+
+  it("AUTHOR_BY_SLUG_QUERY includes inline reverse reference for articles", () => {
+    expect(AUTHOR_BY_SLUG_QUERY).toContain('_type == "article"');
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("author._ref == ^._id");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("order(publishedAt desc)");
+    expect(AUTHOR_BY_SLUG_QUERY).toContain("category->");
   });
 });
 
@@ -644,6 +688,78 @@ describe("getArticleBySlug()", () => {
   });
 });
 
+describe("getAllAuthors()", () => {
+  it("fetches and returns authors from Sanity", async () => {
+    const mockAuthors = [
+      { _id: "auth-1", name: "Alice", slug: "alice", role: "Developer" },
+      { _id: "auth-2", name: "Bob", slug: "bob", role: "Writer" },
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockAuthors,
+    } as never);
+
+    const result = await getAllAuthors();
+    expect(result).toEqual(mockAuthors);
+    expect(sanityClient.fetch).toHaveBeenCalledOnce();
+  });
+
+  it("returns cached result on subsequent calls without additional API calls", async () => {
+    vi.resetModules();
+    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockAuthors = [{ _id: "auth-1", name: "Alice" }];
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({
+      result: mockAuthors,
+    } as never);
+
+    await freshModule.getAllAuthors();
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    const cached = await freshModule.getAllAuthors();
+    expect(cached).toEqual(mockAuthors);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getAuthorBySlug()", () => {
+  it("fetches an author by slug with the correct query and params", async () => {
+    const mockAuthor = {
+      _id: "auth-1",
+      name: "Alice",
+      slug: "alice",
+      role: "Developer",
+      articles: [],
+    };
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: mockAuthor,
+    } as never);
+
+    const result = await getAuthorBySlug("alice");
+    expect(result).toEqual(mockAuthor);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      AUTHOR_BY_SLUG_QUERY,
+      { slug: "alice", site: "" },
+      expect.objectContaining({
+        filterResponse: false,
+        perspective: "published",
+      }),
+    );
+  });
+
+  it("returns null when author is not found", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({
+      result: null,
+    } as never);
+
+    const result = await getAuthorBySlug("nonexistent");
+    expect(result).toBeNull();
+  });
+});
+
 describe("resolveBlockSponsors()", () => {
   const allSponsors = [
     { _id: "sp-1", name: "Alpha", featured: true },
@@ -975,6 +1091,7 @@ describe("Multi-site query patterns", () => {
       { name: "EVENT_BY_SLUG_QUERY", query: EVENT_BY_SLUG_QUERY },
       { name: "PAGE_BY_SLUG_QUERY", query: PAGE_BY_SLUG_QUERY },
       { name: "ARTICLE_BY_SLUG_QUERY", query: ARTICLE_BY_SLUG_QUERY },
+      { name: "AUTHOR_BY_SLUG_QUERY", query: AUTHOR_BY_SLUG_QUERY },
     ];
 
     for (const { name, query } of detailQueries) {
@@ -994,5 +1111,20 @@ describe("Multi-site query patterns", () => {
     expect(PROJECT_BY_SLUG_QUERY).toContain(
       '*[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]',
     );
+  });
+
+  it("AUTHOR_BY_SLUG_QUERY has site filter on nested articles sub-query", () => {
+    // Nested sub-query: *[_type == "article" && author._ref == ^._id && ...]
+    expect(AUTHOR_BY_SLUG_QUERY).toContain(
+      '*[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)]',
+    );
+  });
+
+  it("ALL_AUTHORS_QUERY includes site filter", () => {
+    expect(ALL_AUTHORS_QUERY).toContain('$site == "" || site == $site');
+  });
+
+  it("ALL_AUTHOR_SLUGS_QUERY includes site filter", () => {
+    expect(ALL_AUTHOR_SLUGS_QUERY).toContain('$site == "" || site == $site');
   });
 });

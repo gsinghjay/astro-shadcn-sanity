@@ -1,0 +1,57 @@
+---
+import type { Author } from '@/lib/sanity';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  author: Author;
+}
+
+const { author } = Astro.props;
+
+const imageBuilder = safeUrlFor(author.image);
+const imageUrl = imageBuilder?.width(400).height(400).fit('crop').url() ?? null;
+const lqip = author.image?.asset?.metadata?.lqip ?? null;
+const authorSlug = stegaClean(author.slug);
+---
+
+<article class="flex flex-col gap-4 border border-border bg-card overflow-hidden">
+  <a href={`/authors/${authorSlug}`} class="block aspect-square overflow-hidden bg-muted">
+    {imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={stegaClean(author.image?.alt) || stegaClean(author.name) || 'Author'}
+        class="w-full h-full object-cover"
+        width="400"
+        height="400"
+        loading="lazy"
+        style={lqipStyle(lqip)}
+      />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center">
+        <span class="text-4xl font-bold text-muted-foreground">
+          {(stegaClean(author.name) || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+        </span>
+      </div>
+    )}
+  </a>
+  <div class="flex flex-col gap-2 p-6 pt-0">
+    <h3 class="text-lg font-semibold">
+      <a
+        href={`/authors/${authorSlug}`}
+        class="hover:text-primary hover:underline"
+        data-gtm-category="author"
+        data-gtm-action="detail"
+        data-gtm-label={stegaClean(author.name)}
+      >
+        {author.name}
+      </a>
+    </h3>
+    {author.role && (
+      <p class="text-sm text-muted-foreground">{author.role}</p>
+    )}
+    {author.bio && (
+      <p class="text-sm text-card-foreground leading-relaxed line-clamp-3">{author.bio}</p>
+    )}
+  </div>
+</article>
