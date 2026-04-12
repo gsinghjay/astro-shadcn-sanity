@@ -5,7 +5,12 @@ import type { AstroComponentFactory } from 'astro/runtime/server/render/astro/fa
 
 const allBlocks: Record<string, AstroComponentFactory> = {};
 
-const customModules = import.meta.glob('./blocks/custom/*.astro', { eager: true });
+// Exclude ColumnsBlock from eager glob to avoid circular dependency:
+// ColumnsBlock → BlockRenderer → block-registry → (glob) → ColumnsBlock
+const customModules = import.meta.glob(
+  ['./blocks/custom/*.astro', '!./blocks/custom/ColumnsBlock.astro'],
+  { eager: true },
+);
 for (const [path, mod] of Object.entries(customModules)) {
   const filename = path.split('/').pop()!.replace('.astro', '');
   const typeName = filename[0].toLowerCase() + filename.slice(1);
@@ -16,6 +21,22 @@ const uiModules = import.meta.glob('./blocks/*.astro', { eager: true });
 for (const [path, mod] of Object.entries(uiModules)) {
   const name = path.split('/').pop()!.replace('.astro', '');
   allBlocks[name] = (mod as { default: AstroComponentFactory }).default;
+}
+
+// ColumnsBlock loaded lazily — resolved by BlockRenderer before first render.
+// By that time all static imports are cached, so the dynamic import completes instantly.
+const containerBlockLoaders = import.meta.glob('./blocks/custom/ColumnsBlock.astro');
+let _resolvePromise: Promise<void> | null = null;
+
+export function resolveContainerBlocks(): Promise<void> {
+  return (_resolvePromise ??= (async () => {
+    for (const [path, loader] of Object.entries(containerBlockLoaders)) {
+      const mod = (await loader()) as { default: AstroComponentFactory };
+      const filename = path.split('/').pop()!.replace('.astro', '');
+      const typeName = filename[0].toLowerCase() + filename.slice(1);
+      allBlocks[typeName] = mod.default;
+    }
+  })());
 }
 
 export { allBlocks };

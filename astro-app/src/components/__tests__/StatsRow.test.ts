@@ -35,13 +35,15 @@ describe('StatsRow', () => {
     expect(html).toBeDefined();
   });
 
-  test('grid variant uses the existing manual 2x4 grid classes', async () => {
+  test('grid variant uses container-query-aware grid classes', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {
       props: { ...statsFull, variant: 'grid' },
     });
 
-    expect(html).toContain('grid-cols-2 md:grid-cols-4');
+    // 4 stats → grid-cols-2 @md:grid-cols-4 (container queries, not viewport)
+    expect(html).toContain('grid-cols-2');
+    expect(html).toContain('@md:grid-cols-4');
   });
 
   test('split variant renders a single-column stat stack', async () => {
@@ -108,6 +110,7 @@ describe('StatsRow', () => {
       props: { ...statsFull, variant: 'legacy-variant' },
     });
 
-    expect(html).toContain('grid-cols-2 md:grid-cols-4');
+    expect(html).toContain('grid-cols-2');
+    expect(html).toContain('@md:grid-cols-4');
   });
 });
