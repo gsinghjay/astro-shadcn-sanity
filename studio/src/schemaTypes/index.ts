@@ -34,6 +34,8 @@ import {articleCategory} from './documents/article-category'
 import {article} from './documents/article'
 // Document schemas — authors (Story 20.1)
 import {author} from './documents/author'
+// Document schemas — listing pages (Story 21.0)
+import {listingPage} from './documents/listing-page'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -113,6 +115,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   article,
   // Documents — authors (Story 20.1)
   author,
+  // Documents — listing pages (Story 21.0)
+  listingPage,
   // Blocks — homepage
   heroBanner,
   featureGrid,

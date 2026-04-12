@@ -1,7 +1,8 @@
 ---
 /**
  * Sidebar layout — extends Layout with a two-column structure.
- * Slots: "header" (full-width above grid), default (left content), "sidebar" (right sticky).
+ * Slots: "header" (full-width above grid), default (left content),
+ *        "sidebar" (right sticky), "footer" (full-width below grid).
  * On mobile, sidebar stacks above content for filter-first UX.
  */
 import Layout from './Layout.astro';
@@ -35,6 +36,7 @@ const hasSidebar = Astro.slots.has('sidebar');
   ) : (
     <slot />
   )}
+  <slot name="footer" />
 </Layout>
 
 <style is:global>
