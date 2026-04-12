@@ -1,0 +1,70 @@
+---
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+import type { ALL_ARTICLE_CATEGORIES_QUERY_RESULT } from '@/sanity.types';
+
+interface Props {
+  // Bound to the GROQ result type so the prop shape stays in lockstep
+  // with `ALL_ARTICLE_CATEGORIES_QUERY` and TypeGen owns the field list.
+  categories: ALL_ARTICLE_CATEGORIES_QUERY_RESULT;
+  currentCategorySlug?: string | null;
+}
+
+const { categories, currentCategorySlug } = Astro.props;
+
+// Defensive filter — half-created Studio documents with null title/slug must
+// NOT crash the build or leak into the DOM. Keep only entries where both
+// title and slug are non-null and non-empty.
+type CategoryChip = { _id: string; title: string; slug: string };
+
+const validCategories: CategoryChip[] = (categories ?? [])
+  .filter((c): c is { _id: string; title: string; slug: string } => {
+    if (!c) return false;
+    if (typeof c.title !== 'string' || c.title.length === 0) return false;
+    if (typeof c.slug !== 'string' || c.slug.length === 0) return false;
+    return true;
+  })
+  .map((c) => ({
+    _id: c._id,
+    // Clean stega markers BEFORE using values in href attributes and visible text
+    // so anchors don't get poisoned and slugs stay URL-safe.
+    title: stegaClean(c.title),
+    slug: stegaClean(c.slug),
+  }));
+
+// AC #13 — render nothing when there are no valid categories.
+const hasChips = validCategories.length > 0;
+
+// Clean the current-category comparison slug once so equality checks against
+// the cleaned category slugs work even when the prop carries stega markers.
+const cleanCurrent = currentCategorySlug ? stegaClean(currentCategorySlug) : null;
+const isAllActive = !cleanCurrent;
+---
+
+{hasChips && (
+  <nav aria-label="Article categories" class="flex flex-wrap items-center gap-2">
+    <Badge
+      href="/articles"
+      variant={isAllActive ? 'default' : 'outline'}
+      data-gtm-category="article"
+      data-gtm-action="category-nav"
+      data-gtm-label="all"
+    >
+      All
+    </Badge>
+    {validCategories.map((category) => {
+      const isActive = category.slug === cleanCurrent;
+      return (
+        <Badge
+          href={`/articles/category/${category.slug}`}
+          variant={isActive ? 'default' : 'outline'}
+          data-gtm-category="article"
+          data-gtm-action="category-nav"
+          data-gtm-label={category.slug}
+        >
+          {category.title}
+        </Badge>
+      );
+    })}
+  </nav>
+)}

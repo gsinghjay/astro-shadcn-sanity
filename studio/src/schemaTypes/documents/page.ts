@@ -1,6 +1,7 @@
-import {defineType, defineField, defineArrayMember} from 'sanity'
+import {defineType, defineField} from 'sanity'
 import {DocumentIcon} from '@sanity/icons'
 import {siteField, siteScopedIsUnique} from '../fields/site-field'
+import {PAGE_BLOCK_MEMBERS, PAGE_BLOCK_INSERT_MENU} from '../helpers/block-members'
 
 export const page = defineType({
   name: 'page',
@@ -43,77 +44,8 @@ export const page = defineType({
       title: 'Page Blocks',
       type: 'array',
       group: 'content',
-      of: [
-        defineArrayMember({type: 'heroBanner'}),
-        defineArrayMember({type: 'featureGrid'}),
-        defineArrayMember({type: 'sponsorCards'}),
-        defineArrayMember({type: 'richText'}),
-        defineArrayMember({type: 'ctaBanner'}),
-        defineArrayMember({type: 'faqSection'}),
-        defineArrayMember({type: 'contactForm'}),
-        defineArrayMember({type: 'logoCloud'}),
-        defineArrayMember({type: 'statsRow'}),
-        defineArrayMember({type: 'sponsorSteps'}),
-        defineArrayMember({type: 'textWithImage'}),
-        defineArrayMember({type: 'testimonials'}),
-        defineArrayMember({type: 'eventList'}),
-        defineArrayMember({type: 'projectCards'}),
-        defineArrayMember({type: 'teamGrid'}),
-        defineArrayMember({type: 'imageGallery'}),
-        defineArrayMember({type: 'articleList'}),
-        defineArrayMember({type: 'comparisonTable'}),
-        defineArrayMember({type: 'timeline'}),
-        defineArrayMember({type: 'pullquote'}),
-        defineArrayMember({type: 'divider'}),
-        defineArrayMember({type: 'announcementBar'}),
-        defineArrayMember({type: 'sponsorshipTiers'}),
-        defineArrayMember({type: 'videoEmbed'}),
-        // Essential blocks (Story 17.20)
-        defineArrayMember({type: 'pricingTable'}),
-        defineArrayMember({type: 'serviceCards'}),
-        defineArrayMember({type: 'productShowcase'}),
-        defineArrayMember({type: 'linkCards'}),
-        defineArrayMember({type: 'newsletter'}),
-        defineArrayMember({type: 'accordion'}),
-        defineArrayMember({type: 'tabsBlock'}),
-        defineArrayMember({type: 'embedBlock'}),
-        defineArrayMember({type: 'mapBlock'}),
-        defineArrayMember({type: 'countdownTimer'}),
-        defineArrayMember({type: 'metricsDashboard'}),
-        defineArrayMember({type: 'cardGrid'}),
-        defineArrayMember({type: 'beforeAfter'}),
-      ],
-      options: {
-        insertMenu: {
-          filter: true,
-          groups: [
-            {name: 'heroes', title: 'Heroes', of: ['heroBanner']},
-            {
-              name: 'content',
-              title: 'Content',
-              of: ['richText', 'textWithImage', 'faqSection', 'articleList', 'timeline', 'pullquote', 'serviceCards', 'linkCards', 'accordion', 'tabsBlock'],
-            },
-            {
-              name: 'display',
-              title: 'Display',
-              of: ['teamGrid', 'imageGallery', 'productShowcase', 'mapBlock', 'cardGrid', 'beforeAfter'],
-            },
-            {
-              name: 'media',
-              title: 'Media & Stats',
-              of: ['statsRow', 'featureGrid', 'videoEmbed', 'embedBlock', 'metricsDashboard'],
-            },
-            {name: 'social', title: 'Social Proof', of: ['sponsorCards', 'projectCards', 'logoCloud', 'sponsorSteps', 'testimonials', 'eventList', 'sponsorshipTiers']},
-            {name: 'data', title: 'Data', of: ['comparisonTable', 'pricingTable']},
-            {name: 'cta', title: 'Calls to Action', of: ['ctaBanner', 'contactForm', 'newsletter']},
-            {name: 'utility', title: 'Utility', of: ['divider', 'announcementBar', 'countdownTimer']},
-          ],
-          views: [
-            {name: 'list'},
-            {name: 'grid', previewImageUrl: (type: string) => `/static/block-previews/${type}.png`},
-          ],
-        },
-      },
+      of: PAGE_BLOCK_MEMBERS,
+      options: {insertMenu: PAGE_BLOCK_INSERT_MENU},
     }),
   ],
 })

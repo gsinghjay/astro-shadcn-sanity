@@ -2,33 +2,170 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import ArticleCard from '@/components/ArticleCard.astro';
+import ArticleCategoryChips from '@/components/ArticleCategoryChips.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
-import { getAllArticles } from '@/lib/sanity';
+import { Badge } from '@/components/ui/badge';
+import { getAllArticles, getAllArticleCategories, getListingPage } from '@/lib/sanity';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
 
-const articles = await getAllArticles();
+const [articles, categories, listingPage] = await Promise.all([
+  getAllArticles(),
+  getAllArticleCategories(),
+  getListingPage('articles'),
+]);
+
+const pageTitle = listingPage?.title ?? 'Articles';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse articles, blog posts, and news from the program.' };
+
+const featuredArticle = articles[0] ?? null;
+const remainingArticles = articles.slice(1);
+
+type Article = NonNullable<typeof featuredArticle>;
+
+function articleHref(article: Article): string {
+  const slug = stegaClean(article.slug);
+  return slug ? `/articles/${slug}` : '#';
+}
+
+function heroSrcset(article: Article): string | undefined {
+  const builder = safeUrlFor(article.featuredImage);
+  if (!builder) return undefined;
+  return [640, 960, 1280, 1600, 1920]
+    .map((w) => `${builder.width(w).height(Math.round((w * 9) / 16)).fit('crop').url()} ${w}w`)
+    .join(', ');
+}
 ---
 
-<Layout title="Articles" seo={{ metaDescription: 'Browse articles, blog posts, and news from the program.' }}>
+<Layout title={pageTitle} seo={pageSeo}>
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} />
+  )}
+
   <Section>
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
-        { label: 'Articles' },
+        { label: pageTitle },
       ]} />
 
-      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Articles</h1>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageTitle}</h1>
+      {pageDescription && (
+        <p class="text-lg text-muted-foreground">{pageDescription}</p>
+      )}
+
+      <ArticleCategoryChips categories={categories} />
     </SectionContent>
 
     {articles.length > 0 ? (
-      <SectionGrid size="lg">
-        {articles.map((article) => (
-          <ArticleCard article={article} />
-        ))}
-      </SectionGrid>
+      <>
+        {/* Magazine hero — featured article */}
+        {featuredArticle && (() => {
+          const heroImg = safeUrlFor(featuredArticle.featuredImage)?.width(1600).height(900).fit('crop').url() ?? null;
+          const srcset = heroSrcset(featuredArticle);
+          const lqip = featuredArticle.featuredImage?.asset?.metadata?.lqip ?? null;
+          const href = articleHref(featuredArticle);
+          const alt = stegaClean(featuredArticle.featuredImage?.alt) || stegaClean(featuredArticle.title) || '';
+          const date = featuredArticle.publishedAt
+            ? new Date(stegaClean(featuredArticle.publishedAt)!).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+            : null;
+          const authorSlug = featuredArticle.author?.slug ? stegaClean(featuredArticle.author.slug) : null;
+          return (
+            <article class="flex flex-col gap-6">
+              {heroImg && (
+                <a href={href} class="block aspect-[16/9] overflow-hidden">
+                  <img
+                    src={heroImg}
+                    srcset={srcset}
+                    sizes="100vw"
+                    alt={alt}
+                    width={1600}
+                    height={900}
+                    loading="eager"
+                    fetchpriority="high"
+                    class="w-full h-full object-cover"
+                    style={lqipStyle(lqip)}
+                  />
+                </a>
+              )}
+              <div class="flex flex-col gap-4 max-w-4xl">
+                <div class="flex items-center gap-4 flex-wrap">
+                  {featuredArticle.category?.title && (
+                    <Badge variant="outline">{featuredArticle.category.title}</Badge>
+                  )}
+                  {date && (
+                    <time
+                      datetime={stegaClean(featuredArticle.publishedAt) ?? undefined}
+                      class="text-sm text-muted-foreground"
+                    >
+                      {date}
+                    </time>
+                  )}
+                </div>
+                <h2 class="text-4xl md:text-6xl font-bold tracking-[-0.03em] leading-[1.05]">
+                  <a
+                    href={href}
+                    class="hover:text-primary hover:underline"
+                    data-gtm-category="article"
+                    data-gtm-action="detail"
+                    data-gtm-label={stegaClean(featuredArticle.title) ?? undefined}
+                  >
+                    {featuredArticle.title}
+                  </a>
+                </h2>
+                {featuredArticle.excerpt && (
+                  <p class="text-lg text-muted-foreground leading-relaxed line-clamp-4">{featuredArticle.excerpt}</p>
+                )}
+                {featuredArticle.author?.name && (
+                  <p class="text-sm text-muted-foreground">
+                    by{' '}
+                    {authorSlug ? (
+                      <a
+                        href={`/authors/${authorSlug}`}
+                        class="hover:text-primary hover:underline"
+                        data-gtm-category="author"
+                        data-gtm-action="detail"
+                        data-gtm-label={stegaClean(featuredArticle.author.name)}
+                      >
+                        {featuredArticle.author.name}
+                      </a>
+                    ) : (
+                      <span>{featuredArticle.author.name}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+            </article>
+          );
+        })()}
+        {/* Remaining articles grid — tiered by count */}
+        {remainingArticles.length === 1 && (
+          <div class="max-w-3xl mx-auto">
+            <ArticleCard article={remainingArticles[0]} />
+          </div>
+        )}
+        {remainingArticles.length >= 2 && (
+          <SectionGrid
+            class={
+              remainingArticles.length === 2
+                ? 'grid-cols-1 md:grid-cols-2'
+                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            }
+          >
+            {remainingArticles.map((article) => <ArticleCard article={article} />)}
+          </SectionGrid>
+        )}
+      </>
     ) : (
       <SectionContent>
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       </SectionContent>
     )}
   </Section>
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} />
+  )}
 </Layout>

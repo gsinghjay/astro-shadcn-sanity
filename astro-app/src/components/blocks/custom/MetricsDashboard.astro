@@ -1,6 +1,7 @@
 ---
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent } from '@/components/ui/tile';
+import { Icon } from '@/components/ui/icon';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { MetricsDashboardBlock } from '@/lib/types';
@@ -60,7 +61,7 @@ const trendArrow = (trend?: string) => {
       {metrics.map((metric) => (
         <Tile variant="floating">
           <TileContent>
-            {metric.icon && <span class="text-2xl" aria-hidden="true">{metric.icon}</span>}
+            {metric.icon && <Icon name={metric.icon} class="size-6" />}
             <span class="text-sm text-muted-foreground">{metric.label}</span>
             <span class="text-3xl font-bold">{metric.value}</span>
             {metric.change && (
@@ -90,7 +91,7 @@ const trendArrow = (trend?: string) => {
     <div class="w-full flex flex-wrap items-center justify-center gap-8 md:gap-16">
       {metrics.map((metric) => (
         <div class="flex flex-col items-center text-center gap-1">
-          {metric.icon && <span class="text-2xl" aria-hidden="true">{metric.icon}</span>}
+          {metric.icon && <Icon name={metric.icon} class="size-6" />}
           <span class="text-4xl font-bold">{metric.value}</span>
           <span class="text-sm text-muted-foreground">{metric.label}</span>
           {metric.change && (
@@ -122,7 +123,7 @@ const trendArrow = (trend?: string) => {
           <TileContent class="flex-row items-center gap-4">
             {metric.icon && (
               <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
-                <span class="text-2xl" aria-hidden="true">{metric.icon}</span>
+                <Icon name={metric.icon} class="size-6" />
               </div>
             )}
             <div class="flex-1 min-w-0">

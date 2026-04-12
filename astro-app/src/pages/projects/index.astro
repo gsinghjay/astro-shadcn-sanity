@@ -1,26 +1,42 @@
 ---
 import SidebarLayout from '@/layouts/SidebarLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
-import { getAllProjects } from '@/lib/sanity';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { getAllProjects, getListingPage } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { Section, SectionContent } from '@/components/ui/section';
 import ProjectCard from '@/components/ProjectCard.astro';
 
-const projects = await getAllProjects();
+const [projects, listingPage] = await Promise.all([
+  getAllProjects(),
+  getListingPage('projects'),
+]);
 const allTechs = [...new Set(projects.flatMap(p => (p.technologyTags ?? []).map(t => stegaClean(t))))].sort();
 const allIndustries = [...new Set(projects.map(p => p.sponsor?.industry ? stegaClean(p.sponsor.industry) : '').filter(Boolean))].sort();
 const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
+
+const pageTitle = listingPage?.title ?? 'Projects';
+const pageH1 = listingPage?.title ?? 'Capstone Projects';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' };
 ---
 
-<SidebarLayout title="Projects" seo={{ metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' }}>
+<SidebarLayout title={pageTitle} seo={pageSeo}>
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} slot="header" />
+  )}
+
   <Section slot="header">
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
-        { label: 'Projects' },
+        { label: pageTitle },
       ]} />
 
-      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Capstone Projects</h1>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageH1}</h1>
+      {pageDescription && (
+        <p class="text-lg text-muted-foreground">{pageDescription}</p>
+      )}
     </SectionContent>
   </Section>
 
@@ -82,6 +98,10 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
         </div>
       )}
     </div>
+  )}
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} slot="footer" />
   )}
 </SidebarLayout>
 

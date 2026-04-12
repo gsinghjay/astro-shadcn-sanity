@@ -29,10 +29,15 @@ test.describe('Articles smoke — Story 19.7 CTA integration', () => {
     // a slug — keeps the test resilient to dataset changes (slug renames,
     // unpublished articles, multi-site filtering). AC #14 only requires "one
     // article detail page", and "the first one we find" is good enough.
+    //
+    // Story 19.10 added a category chip nav that also emits `/articles/...`
+    // links, so scope the locator to anchors INSIDE an `<article>` (the
+    // ArticleCard's root element) and exclude the `/articles/category/...`
+    // chip path defensively.
     await page.goto('/articles')
     await page.waitForLoadState('domcontentloaded')
     const firstArticleHref = await page
-      .locator('a[href^="/articles/"]')
+      .locator('article a[href^="/articles/"]:not([href*="/articles/category/"])')
       .first()
       .getAttribute('href')
     expect(firstArticleHref, 'no /articles/<slug> link found on /articles listing').toBeTruthy()

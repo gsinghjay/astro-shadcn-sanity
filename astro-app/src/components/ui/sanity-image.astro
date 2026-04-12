@@ -1,5 +1,5 @@
 ---
-import { urlFor } from '@/lib/image';
+import { urlFor, lqipStyle } from '@/lib/image';
 
 interface Props {
   image: {
@@ -55,7 +55,7 @@ const srcset = image.asset
 ---
 
 {lqip ? (
-  <div style={`background-image: url(${lqip}); background-size: cover;`}>
+  <div style={lqipStyle(lqip)}>
     <img
       src={optimizedUrl}
       srcset={srcset}

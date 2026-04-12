@@ -1,0 +1,53 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import AuthorCard from '@/components/AuthorCard.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import { getAllAuthors, getListingPage } from '@/lib/sanity';
+
+const [authors, listingPage] = await Promise.all([
+  getAllAuthors(),
+  getListingPage('authors'),
+]);
+
+const pageTitle = listingPage?.title ?? 'Authors';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Meet the authors behind our articles and learn about their expertise and background.' };
+---
+
+<Layout title={pageTitle} seo={pageSeo}>
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} />
+  )}
+
+  <Section>
+    <SectionContent>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: pageTitle },
+      ]} />
+
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageTitle}</h1>
+      {pageDescription && (
+        <p class="text-lg text-muted-foreground">{pageDescription}</p>
+      )}
+    </SectionContent>
+
+    {authors.length > 0 ? (
+      <SectionGrid size="lg">
+        {authors.map((author) => (
+          <AuthorCard author={author} />
+        ))}
+      </SectionGrid>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No authors to display.</p>
+      </SectionContent>
+    )}
+  </Section>
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} />
+  )}
+</Layout>

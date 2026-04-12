@@ -45,10 +45,17 @@ const iconSets: Record<string, any> = {
   "simple-icons": simpleIcons,
 }
 
+function toKebab(s: string): string {
+  return s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase()
+}
+
 function resolveIconName(): string | undefined {
   if (name) {
-    if (name.includes(":")) return name
-    return `lucide:${name}`
+    if (name.includes(":")) {
+      const [prefix, id] = name.split(":")
+      return `${prefix}:${toKebab(id)}`
+    }
+    return `lucide:${toKebab(name)}`
   }
   if (href) {
     const hrefKey = Object.keys(hrefMap).find((key) => href.toString().includes(key))

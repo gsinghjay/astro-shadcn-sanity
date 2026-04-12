@@ -55,12 +55,13 @@ describe('Story 1-3: Schema Infrastructure (ATDD)', () => {
         'newsletter', 'accordion', 'tabsBlock', 'embedBlock',
         'mapBlock', 'countdownTimer', 'metricsDashboard', 'cardGrid',
         'beforeAfter',
+        'columnsBlock',
       ]
 
       for (const type of expectedTypes) {
         expect(blockTypeNames, `Missing block type: ${type}`).toContain(type)
       }
-      expect(blockTypeNames).toHaveLength(37)
+      expect(blockTypeNames).toHaveLength(38)
     })
 
     test('[P0] 1.3-INT-022 — page title is required string', () => {
