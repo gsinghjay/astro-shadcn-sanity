@@ -1,21 +1,19 @@
 ---
 import type { SanityEvent } from '@/lib/sanity';
+import type { EventListBlock } from '@/lib/types';
 import { Section, SectionContent } from '@/components/ui/section';
 import EventCard from '@/components/EventCard.astro';
 import { JsonLd } from '@/components/ui/json-ld';
 import { stegaClean } from '@sanity/client/stega';
 
-interface Props {
-  heading?: string | null;
-  eventStatus?: 'all' | 'upcoming' | 'past' | null;
-  limit?: number | null;
+interface Props extends EventListBlock {
   events?: SanityEvent[];
   class?: string;
   id?: string;
-  [key: string]: unknown;
 }
 
-const { heading, events = [] } = Astro.props;
+const { heading, events = [], variant: rawVariant, class: className, id } = Astro.props;
+const cleanVariant = stegaClean(rawVariant ?? 'grid');
 
 const eventsJsonLd = events.filter(e => e.title).map(e => ({
   "@type": "Event",
@@ -26,28 +24,199 @@ const eventsJsonLd = events.filter(e => e.title).map(e => ({
   ...(e.description && { "description": stegaClean(e.description) }),
   "eventStatus": "https://schema.org/EventScheduled",
   "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-  ...(e.slug?.current && { "url": `${Astro.url.origin}/events/${e.slug.current}` }),
+  ...(e.slug && { "url": `${Astro.url.origin}/events/${stegaClean(e.slug)}` }),
 }));
+
+// Group events by month/year for timeline variant
+function groupByMonth(items: SanityEvent[]): { label: string; events: SanityEvent[] }[] {
+  const groups = new Map<string, SanityEvent[]>();
+  for (const event of items) {
+    const d = event.date ? new Date(event.date) : null;
+    const key = d
+      ? d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      : 'No Date';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(event);
+  }
+  return [...groups.entries()].map(([label, evts]) => ({ label, events: evts }));
+}
+
+const eventGroups = cleanVariant === 'timeline' ? groupByMonth(events) : [];
+
+// Badge styling per eventType
+function badgeClass(eventType: string | null | undefined): string {
+  const clean = eventType ? stegaClean(eventType) : null;
+  const map: Record<string, string> = {
+    showcase: 'bg-primary/10 text-primary',
+    networking: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+    workshop: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+  };
+  return clean ? map[clean] ?? 'bg-muted text-muted-foreground' : 'bg-muted text-muted-foreground';
+}
+
+function formatDate(dateStr: string | null | undefined): string | null {
+  if (!dateStr) return null;
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+// Derive status from explicit field or date fallback
+function deriveStatus(e: SanityEvent): string {
+  const status = e.status ? stegaClean(e.status) : null;
+  if (status) return status;
+  if (!e.date) return 'upcoming';
+  return new Date(e.date) >= new Date() ? 'upcoming' : 'past';
+}
+
+function statusBadge(status: string): { text: string; cls: string } {
+  return status === 'upcoming'
+    ? { text: 'Upcoming', cls: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' }
+    : status === 'past'
+      ? { text: 'Past', cls: 'bg-muted text-muted-foreground' }
+      : { text: status, cls: 'bg-muted text-muted-foreground' };
+}
 ---
 
 {eventsJsonLd.length > 0 && eventsJsonLd.map(e => <JsonLd schema={e} />)}
 
-<Section data-animate>
-  {heading && (
-    <SectionContent>
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
-    </SectionContent>
-  )}
-
-  <SectionContent>
-    {events.length > 0 ? (
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {events.map((e) => (
-          <EventCard event={e} />
-        ))}
-      </div>
-    ) : (
-      <p class="text-muted-foreground text-center py-8">No events to display.</p>
+{cleanVariant === 'grid' ? (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
     )}
-  </SectionContent>
-</Section>
+
+    <SectionContent>
+      {events.length > 0 ? (
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {events.map((e) => (
+            <EventCard event={e} />
+          ))}
+        </div>
+      ) : (
+        <p class="text-muted-foreground text-center py-8">No events to display.</p>
+      )}
+    </SectionContent>
+  </Section>
+
+) : cleanVariant === 'list' ? (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionContent>
+      {events.length > 0 ? (
+        <ul class="flex flex-col divide-y divide-border">
+          {events.map((e) => {
+            const date = formatDate(e.date);
+            const status = deriveStatus(e);
+            const badge = statusBadge(status);
+            return (
+              <li class="flex flex-wrap items-center gap-x-4 gap-y-1 py-3 first:pt-0 last:pb-0">
+                {date && (
+                  <time datetime={e.date ?? undefined} class="text-sm font-medium text-muted-foreground min-w-[120px]">
+                    {date}
+                  </time>
+                )}
+                {e.slug ? (
+                  <a
+                    href={`/events/${stegaClean(e.slug)}`}
+                    class="font-medium hover:text-primary hover:underline flex-1 min-w-0"
+                    data-gtm-category="event"
+                    data-gtm-label={stegaClean(e.title)}
+                  >
+                    {e.title}
+                  </a>
+                ) : (
+                  <span class="font-medium flex-1 min-w-0">{e.title}</span>
+                )}
+                {e.eventType && (
+                  <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badgeClass(e.eventType)}`}>
+                    {e.eventType}
+                  </span>
+                )}
+                <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badge.cls}`}>
+                  {badge.text}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p class="text-muted-foreground text-center py-8">No events to display.</p>
+      )}
+    </SectionContent>
+  </Section>
+
+) : cleanVariant === 'timeline' ? (
+  <Section data-animate class={className} id={id}>
+    {heading && (
+      <SectionContent>
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionContent>
+      {events.length > 0 ? (
+        <div class="space-y-8">
+          {eventGroups.map(group => (
+            <div>
+              <h3 class="label-caps text-muted-foreground tracking-wider mb-4">{group.label}</h3>
+              <div class="relative before:absolute before:left-[11px] before:top-0 before:h-full before:w-px before:bg-border">
+                {group.events.map((e) => {
+                  const date = formatDate(e.date);
+                  const status = deriveStatus(e);
+                  const badge = statusBadge(status);
+                  return (
+                    <div class="relative flex gap-4 pb-6 last:pb-0">
+                      <div class="relative flex-shrink-0 mt-1.5">
+                        <div class={`w-[24px] h-[24px] border-2 ${status === 'upcoming' ? 'bg-primary border-primary' : 'bg-muted border-border'}`} />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        {date && (
+                          <time datetime={e.date ?? undefined} class="text-sm text-muted-foreground block">
+                            {date}
+                          </time>
+                        )}
+                        {e.slug ? (
+                          <a
+                            href={`/events/${stegaClean(e.slug)}`}
+                            class="font-semibold hover:text-primary hover:underline"
+                            data-gtm-category="event"
+                            data-gtm-label={stegaClean(e.title)}
+                          >
+                            {e.title}
+                          </a>
+                        ) : (
+                          <span class="font-semibold">{e.title}</span>
+                        )}
+                        <div class="flex flex-wrap gap-2 mt-1">
+                          {e.eventType && (
+                            <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badgeClass(e.eventType)}`}>
+                              {e.eventType}
+                            </span>
+                          )}
+                          <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badge.cls}`}>
+                            {badge.text}
+                          </span>
+                        </div>
+                        {e.location && (
+                          <p class="text-sm text-muted-foreground mt-1">{e.location}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p class="text-muted-foreground text-center py-8">No events to display.</p>
+      )}
+    </SectionContent>
+  </Section>
+) : null}
