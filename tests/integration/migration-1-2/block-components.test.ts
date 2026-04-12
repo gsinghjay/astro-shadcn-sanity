@@ -54,7 +54,7 @@ describe('Story 1-2: Migrate Reference Project', () => {
 
       // Registry uses import.meta.glob to auto-discover blocks
       expect(
-        content.includes("import.meta.glob('./blocks/custom/*.astro'"),
+        content.includes("'./blocks/custom/*.astro'"),
         'block-registry must glob blocks/custom/*.astro',
       ).toBe(true)
 

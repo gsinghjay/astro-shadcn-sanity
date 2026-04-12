@@ -88,6 +88,8 @@ import {countdownTimer} from './blocks/countdown-timer'
 import {metricsDashboard} from './blocks/metrics-dashboard'
 import {cardGrid} from './blocks/card-grid'
 import {beforeAfter} from './blocks/before-after'
+// Block schemas — layout (Story 21.10)
+import {columnsBlock} from './blocks/columns-block'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -176,4 +178,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   metricsDashboard,
   cardGrid,
   beforeAfter,
+  // Blocks — layout (Story 21.10)
+  columnsBlock,
 ]

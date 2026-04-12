@@ -79,12 +79,12 @@ describe('Story 21-9: Block Variant Audit', () => {
   describe('Part 1: Schema↔Component Variant Alignment', () => {
     const blocksWithVariants = Object.entries(schemaMap).filter(([, variants]) => variants.length > 0)
 
-    test('21.9-INT-001 — all 37 blocks have schema files', () => {
-      expect(schemaFiles.length).toBe(37)
+    test('21.9-INT-001 — all 38 blocks have schema files', () => {
+      expect(schemaFiles.length).toBe(38)
     })
 
-    test('21.9-INT-002 — all 37 blocks have component files', () => {
-      expect(componentFiles.length).toBe(37)
+    test('21.9-INT-002 — all 38 blocks have component files', () => {
+      expect(componentFiles.length).toBe(38)
     })
 
     test('21.9-INT-003 — every schema file has a matching component file', () => {
@@ -94,7 +94,7 @@ describe('Story 21-9: Block Variant Audit', () => {
       }
     })
 
-    test('21.9-INT-004 — all 37 blocks define variants', () => {
+    test('21.9-INT-004 — all 38 blocks define variants', () => {
       const blocksWithoutVariants = Object.entries(schemaMap)
         .filter(([, variants]) => variants.length === 0)
         .map(([name]) => name)
