@@ -121,14 +121,18 @@ function statusBadge(status: string): { text: string; cls: string } {
                     {date}
                   </time>
                 )}
-                <a
-                  href={`/events/${stegaClean(e.slug)}`}
-                  class="font-medium hover:text-primary hover:underline flex-1 min-w-0"
-                  data-gtm-category="event"
-                  data-gtm-label={stegaClean(e.title)}
-                >
-                  {e.title}
-                </a>
+                {e.slug ? (
+                  <a
+                    href={`/events/${stegaClean(e.slug)}`}
+                    class="font-medium hover:text-primary hover:underline flex-1 min-w-0"
+                    data-gtm-category="event"
+                    data-gtm-label={stegaClean(e.title)}
+                  >
+                    {e.title}
+                  </a>
+                ) : (
+                  <span class="font-medium flex-1 min-w-0">{e.title}</span>
+                )}
                 {e.eventType && (
                   <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badgeClass(e.eventType)}`}>
                     {e.eventType}
@@ -177,14 +181,18 @@ function statusBadge(status: string): { text: string; cls: string } {
                             {date}
                           </time>
                         )}
-                        <a
-                          href={`/events/${stegaClean(e.slug)}`}
-                          class="font-semibold hover:text-primary hover:underline"
-                          data-gtm-category="event"
-                          data-gtm-label={stegaClean(e.title)}
-                        >
-                          {e.title}
-                        </a>
+                        {e.slug ? (
+                          <a
+                            href={`/events/${stegaClean(e.slug)}`}
+                            class="font-semibold hover:text-primary hover:underline"
+                            data-gtm-category="event"
+                            data-gtm-label={stegaClean(e.title)}
+                          >
+                            {e.title}
+                          </a>
+                        ) : (
+                          <span class="font-semibold">{e.title}</span>
+                        )}
                         <div class="flex flex-wrap gap-2 mt-1">
                           {e.eventType && (
                             <span class={`inline-flex items-center px-2 py-0.5 text-xs font-medium ${badgeClass(e.eventType)}`}>

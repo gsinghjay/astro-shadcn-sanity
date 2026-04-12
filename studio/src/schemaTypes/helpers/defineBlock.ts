@@ -37,21 +37,32 @@ export function defineBlock(config: DefineBlockConfig) {
       ]
     : []
 
-  // Apply hiddenByVariant to block-specific fields
+  // Apply hiddenByVariant to fields
   // Composes with any existing hidden function on the field instead of replacing it
+  function withHiddenByVariant(
+    fields: ReturnType<typeof defineField>[],
+    hiddenMap: Record<string, string[]>,
+  ): ReturnType<typeof defineField>[] {
+    return fields.map((field) => {
+      const fieldName = (field as {name: string}).name
+      const hiddenVariants = hiddenMap[fieldName]
+      if (!hiddenVariants) return field
+      const existingHidden = (field as {hidden?: (ctx: {parent?: {variant?: string}}) => boolean})
+        .hidden
+      return {
+        ...field,
+        hidden: ({parent}: {parent?: {variant?: string}}) =>
+          (existingHidden ? existingHidden({parent}) : false) ||
+          hiddenVariants.includes(parent?.variant ?? ''),
+      }
+    })
+  }
+
+  const processedBaseFields = config.hiddenByVariant
+    ? withHiddenByVariant(blockBaseFields, config.hiddenByVariant)
+    : blockBaseFields
   const blockFields = config.hiddenByVariant
-    ? config.fields.map((field) => {
-        const fieldName = (field as {name: string}).name
-        const hiddenVariants = config.hiddenByVariant![fieldName]
-        if (!hiddenVariants) return field
-        const existingHidden = (field as {hidden?: (ctx: {parent?: {variant?: string}}) => boolean}).hidden
-        return {
-          ...field,
-          hidden: ({parent}: {parent?: {variant?: string}}) =>
-            (existingHidden ? existingHidden({parent}) : false) ||
-            hiddenVariants.includes(parent?.variant ?? ''),
-        }
-      })
+    ? withHiddenByVariant(config.fields, config.hiddenByVariant)
     : config.fields
 
   return defineType({
@@ -67,7 +78,7 @@ export function defineBlock(config: DefineBlockConfig) {
       },
       ...(config.fieldsets ?? []),
     ],
-    fields: [...blockBaseFields, ...variantFields, ...blockFields],
+    fields: [...processedBaseFields, ...variantFields, ...blockFields],
     preview: {
       select: selectFields,
       prepare(selection) {

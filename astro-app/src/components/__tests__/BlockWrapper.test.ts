@@ -59,33 +59,33 @@ describe('BlockWrapper', () => {
     expect(html).not.toContain('bg-');
   });
 
-  test('maps spacing "large" to --section-py override', async () => {
+  test('maps spacing "large" to --block-section-py override', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'large' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('--section-py');
+    expect(html).toContain('--block-section-py');
     expect(html).toContain('calc(var(--spacing) * 20)');
   });
 
-  test('maps spacing "small" to --section-py override', async () => {
+  test('maps spacing "small" to --block-section-py override', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'small' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('--section-py');
+    expect(html).toContain('--block-section-py');
     expect(html).toContain('calc(var(--spacing) * 6)');
   });
 
-  test('maps spacing "none" to --section-py: 0px', async () => {
+  test('maps spacing "none" to --block-section-py: 0px', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'none' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('--section-py: 0px');
+    expect(html).toContain('--block-section-py: 0px');
   });
 
   test('maps maxWidth "narrow" to max-w-4xl', async () => {

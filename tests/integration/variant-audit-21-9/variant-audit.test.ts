@@ -189,13 +189,13 @@ describe('Story 21-9: Block Variant Audit', () => {
   })
 
   describe('Part 5: BlockWrapper spacing override', () => {
-    test('21.9-INT-011 — BlockWrapper uses --section-py override instead of py-* classes', () => {
+    test('21.9-INT-011 — BlockWrapper uses --block-section-py override instead of py-* classes', () => {
       const wrapper = readFileSync(
         join(__dirname, '../../../astro-app/src/components/BlockWrapper.astro'),
         'utf8',
       )
-      // Should set --section-py via inline style, not use py-* utility classes
-      expect(wrapper).toContain('--section-py')
+      // Should set --block-section-py via inline style, not use py-* utility classes
+      expect(wrapper).toContain('--block-section-py')
       expect(wrapper).not.toMatch(/py-6|py-8|py-20|py-24|py-0/)
     })
   })
