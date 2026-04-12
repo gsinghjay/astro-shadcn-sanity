@@ -10,6 +10,7 @@ import {
   getSiteParams,
   getSiteSettings,
 } from '@/lib/sanity';
+import type { ALL_ARTICLE_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
@@ -21,8 +22,10 @@ import { buildArticleJsonLd } from '@/lib/article-jsonld';
 import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const articles = await sanityClient.fetch<Array<{ slug: string }>>(ALL_ARTICLE_SLUGS_QUERY, getSiteParams());
-  return articles.map((a) => ({ params: { slug: a.slug } }));
+  const articles = await sanityClient.fetch<ALL_ARTICLE_SLUGS_QUERY_RESULT>(ALL_ARTICLE_SLUGS_QUERY, getSiteParams());
+  return articles
+    .filter((a): a is { slug: string } => typeof a.slug === 'string' && a.slug.length > 0)
+    .map((a) => ({ params: { slug: a.slug } }));
 };
 
 const { slug } = Astro.params;

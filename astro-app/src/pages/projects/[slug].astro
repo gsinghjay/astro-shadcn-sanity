@@ -5,6 +5,7 @@ import Breadcrumb from '@/components/Breadcrumb.astro';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import type { Testimonial } from '@/lib/sanity';
 import { sanityClient, ALL_PROJECT_SLUGS_QUERY, getProjectBySlug, getSiteParams } from '@/lib/sanity';
+import type { ALL_PROJECT_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
@@ -13,8 +14,10 @@ import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
-  return projects.map((p) => ({ params: { slug: p.slug } }));
+  const projects = await sanityClient.fetch<ALL_PROJECT_SLUGS_QUERY_RESULT>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
+  return projects
+    .filter((p): p is { slug: string } => typeof p.slug === 'string' && p.slug.length > 0)
+    .map((p) => ({ params: { slug: p.slug } }));
 };
 
 const { slug } = Astro.params;
