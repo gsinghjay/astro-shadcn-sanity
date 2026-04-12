@@ -11,7 +11,7 @@ import {
   getSiteSettings,
 } from '@/lib/sanity';
 import type { ALL_ARTICLE_SLUGS_QUERY_RESULT } from '@/sanity.types';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
@@ -99,7 +99,7 @@ const cleanAuthorSlug = authorSlug;
             height={imageDimensions?.height ?? 630}
             loading="eager"
             fetchpriority="high"
-            style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+            style={lqipStyle(lqip)}
           />
         </div>
       )}
@@ -159,7 +159,7 @@ const cleanAuthorSlug = authorSlug;
         </div>
       )}
 
-      <a href="/articles" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-articles">
+      <a href="/articles" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-articles">
         &larr; Back to Articles
       </a>
     </SectionContent>

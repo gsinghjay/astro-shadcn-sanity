@@ -3412,6 +3412,93 @@ export type ARTICLES_BY_CATEGORY_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_AUTHORS_QUERY
+// Query: *[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){  _id, name, "slug": slug.current,  role, bio,  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }}
+export type ALL_AUTHORS_QUERY_RESULT = Array<{
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  role: string | null;
+  bio: string | null;
+  image: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_AUTHOR_SLUGS_QUERY
+// Query: *[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }
+export type ALL_AUTHOR_SLUGS_QUERY_RESULT = Array<{
+  slug: string | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: AUTHOR_BY_SLUG_QUERY
+// Query: *[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  role, bio, credentials,  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  sameAs,  socialLinks[]{ _key, platform, url },  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){    _id, title, "slug": slug.current,    excerpt,    featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },    author->{ name, "slug": slug.current },    publishedAt,    category->{ _id, title, "slug": slug.current }  }}
+export type AUTHOR_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  role: string | null;
+  bio: string | null;
+  credentials: Array<string> | null;
+  image: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+  sameAs: Array<string> | null;
+  socialLinks: Array<{
+    _key: string;
+    platform: "github" | "linkedin" | "other" | "twitter" | "website" | null;
+    url: string | null;
+  }> | null;
+  articles: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    excerpt: string | null;
+    featuredImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+    author: {
+      name: string | null;
+      slug: string | null;
+    } | null;
+    publishedAt: string | null;
+    category: {
+      _id: string;
+      title: string | null;
+      slug: string | null;
+    } | null;
+  }>;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: SPONSOR_BY_EMAIL_QUERY
 // Query: *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current}
 export type SPONSOR_BY_EMAIL_QUERY_RESULT = {
@@ -5622,6 +5709,9 @@ declare module "@sanity/client" {
     '*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_ARTICLE_CATEGORY_SLUGS_QUERY_RESULT;
     '*[_type == "articleCategory" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current, description\n}': ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT;
     '*[_type == "article" && defined(slug.current) && category._ref == $categoryId && ($site == "" || site == $site)] | order(publishedAt desc){\n  _id, title, "slug": slug.current,\n  excerpt,\n  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  author->{ name, "slug": slug.current },\n  publishedAt,\n  category->{ _id, title, "slug": slug.current }\n}': ARTICLES_BY_CATEGORY_QUERY_RESULT;
+    '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  role, bio,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n}': ALL_AUTHORS_QUERY_RESULT;
+    '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_AUTHOR_SLUGS_QUERY_RESULT;
+    '*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  role, bio, credentials,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  sameAs,\n  socialLinks[]{ _key, platform, url },\n  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){\n    _id, title, "slug": slug.current,\n    excerpt,\n    featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n    author->{ name, "slug": slug.current },\n    publishedAt,\n    category->{ _id, title, "slug": slug.current }\n  }\n}': AUTHOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
