@@ -1,6 +1,7 @@
 import {
   CogIcon,
   DocumentIcon,
+  DocumentsIcon,
   CreditCardIcon,
   ProjectsIcon,
   CommentIcon,
@@ -34,6 +35,26 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
             S.document()
               .schemaType('siteSettings')
               .documentId(`siteSettings-${siteId}`),
+          ),
+        // Singleton group: Listing Pages (Story 21.0)
+        S.listItem()
+          .title('Listing Pages')
+          .icon(DocumentsIcon)
+          .child(
+            S.list()
+              .title('Listing Pages')
+              .items(
+                ['articles', 'authors', 'events', 'projects', 'sponsors'].map((route) =>
+                  S.listItem()
+                    .title(route.charAt(0).toUpperCase() + route.slice(1))
+                    .child(
+                      S.document()
+                        .schemaType('listingPage')
+                        .documentId(`listingPage-${route}-${siteId}`)
+                        .initialValueTemplate(`listingPage-${route}-${siteId}`),
+                    ),
+                ),
+              ),
           ),
         S.divider(),
         ...SITE_AWARE_TYPES.map((type) => {

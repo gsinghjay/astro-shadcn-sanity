@@ -1,6 +1,6 @@
 ---
 import type { Props as PTProps } from 'astro-portabletext/types';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 
 interface ImageNode {
   _type: 'image';
@@ -25,7 +25,7 @@ const src = safeUrlFor(node)?.width(width).url() ?? null;
 {src && (
   <figure class="my-8">
     {lqip ? (
-      <div style={`background-image: url(${lqip}); background-size: cover;`}>
+      <div style={lqipStyle(lqip)}>
         <img
           src={src}
           alt={alt || ''}

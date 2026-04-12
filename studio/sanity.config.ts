@@ -53,7 +53,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         const filtered = prev.filter(
           (t) =>
             !SITE_AWARE_TYPES.includes(t.schemaType) &&
-            t.schemaType !== 'siteSettings',
+            t.schemaType !== 'siteSettings' &&
+            t.schemaType !== 'listingPage',
         )
         const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
           id: `${type}-${opts.siteId}`,
@@ -61,13 +62,21 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: type,
           value: {site: opts.siteId},
         }))
-        return [...filtered, ...siteTemplates]
+        // Listing page singletons — pre-populate route for each (Story 21.0)
+        const listingTemplates = ['articles', 'authors', 'events', 'projects', 'sponsors'].map((route) => ({
+          id: `listingPage-${route}-${opts.siteId}`,
+          title: `Listing Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
+          schemaType: 'listingPage',
+          value: {route},
+        }))
+        return [...filtered, ...siteTemplates, ...listingTemplates]
       },
     },
     document: {
       actions: (input, context) => {
         if (
           context.schemaType === 'siteSettings' ||
+          context.schemaType === 'listingPage' ||
           context.documentId === `siteSettings-${opts.siteId}`
         ) {
           return input.filter(
@@ -81,7 +90,9 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
       newDocumentOptions: (prev) =>
         prev.filter(
           (t) =>
-            t.templateId !== 'siteSettings' && t.templateId !== 'submission',
+            t.templateId !== 'siteSettings' &&
+            t.templateId !== 'submission' &&
+            t.templateId !== 'listingPage',
         ),
     },
   }
@@ -112,6 +123,20 @@ export default defineConfig([
     ],
     schema: {
       types: createSchemaTypesForWorkspace('production'),
+      templates: (prev) => {
+        const filtered = prev.filter(
+          (t) => !CAPSTONE_SINGLETON_TYPES.has(t.schemaType),
+        )
+        return [
+          ...filtered,
+          // Listing page singletons — pre-populate route for each (Story 21.0)
+          {id: 'listingPage-articles', schemaType: 'listingPage', title: 'Listing Page (Articles)', value: {route: 'articles'}},
+          {id: 'listingPage-authors', schemaType: 'listingPage', title: 'Listing Page (Authors)', value: {route: 'authors'}},
+          {id: 'listingPage-events', schemaType: 'listingPage', title: 'Listing Page (Events)', value: {route: 'events'}},
+          {id: 'listingPage-projects', schemaType: 'listingPage', title: 'Listing Page (Projects)', value: {route: 'projects'}},
+          {id: 'listingPage-sponsors', schemaType: 'listingPage', title: 'Listing Page (Sponsors)', value: {route: 'sponsors'}},
+        ]
+      },
     },
     document: {
       actions: (input, context) =>

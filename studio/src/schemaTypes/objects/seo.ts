@@ -11,13 +11,19 @@ export const seo = defineType({
       name: 'metaTitle',
       title: 'Meta Title',
       type: 'string',
-      validation: (Rule) => Rule.max(60),
+      description: 'Recommended length: 60 characters or fewer (search engines truncate beyond ~60).',
+      validation: (Rule) =>
+        Rule.max(60).warning('Meta titles longer than 60 characters are usually truncated in search results.'),
     }),
     defineField({
       name: 'metaDescription',
       title: 'Meta Description',
       type: 'text',
-      validation: (Rule) => Rule.max(160),
+      description: 'Recommended length: 160 characters or fewer (search engines truncate beyond ~160).',
+      validation: (Rule) =>
+        Rule.max(160).warning(
+          'Meta descriptions longer than 160 characters are usually truncated in search results.',
+        ),
     }),
     defineField({
       name: 'noIndex',

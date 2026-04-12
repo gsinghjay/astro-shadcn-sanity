@@ -8,6 +8,8 @@ import {
   articleListMinimal,
   articleListBrutalist,
   articleListMagazine,
+  articleListWithNewsletterCta,
+  articleListBrutalistWithNewsletterCta,
   sampleArticles,
   sampleArticlesWithImages,
 } from './__fixtures__/article-list';
@@ -624,6 +626,84 @@ describe('ArticleList (Story 19.4)', () => {
       });
       expect(html).toContain('Minimal');
       expect(html).toContain('href="/articles/minimal"');
+    });
+  });
+
+  describe('showNewsletterCta flag (Story 19.7)', () => {
+    test('grid variant renders the compact ArticleNewsletterCta when showNewsletterCta is true', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListWithNewsletterCta, articles: sampleArticles },
+      });
+      // Presence: compact form carries the article-list-block GTM label
+      expect(html).toContain('data-gtm-label="article-list-block"');
+      // And is an actual <form> with the email input
+      expect(html).toContain('type="email"');
+    });
+
+    test('grid variant does NOT render the CTA when showNewsletterCta is false (articleListFull default)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListFull, articles: sampleArticles },
+      });
+      expect(html).not.toContain('data-gtm-label="article-list-block"');
+    });
+
+    test('grid variant does NOT render the CTA when showNewsletterCta is explicitly false', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: {
+          ...articleListWithNewsletterCta,
+          showNewsletterCta: false,
+          articles: sampleArticles,
+        },
+      });
+      expect(html).not.toContain('data-gtm-label="article-list-block"');
+    });
+
+    test('grid variant does NOT render the CTA when showNewsletterCta is null (articleListMinimal default)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListMinimal, articles: sampleArticles },
+      });
+      expect(html).not.toContain('data-gtm-label="article-list-block"');
+    });
+
+    test('brutalist variant ALSO renders the compact CTA when the flag is true — proves shared template insertion', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListBrutalistWithNewsletterCta, articles: sampleArticles },
+      });
+      expect(html).toContain('data-gtm-label="article-list-block"');
+    });
+
+    test('CTA is rendered even when articles is empty (toggle is independent of content)', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListWithNewsletterCta, articles: [] },
+      });
+      // Empty state still renders
+      expect(html).toContain('No articles to display');
+      // And so does the CTA — the toggle is editor-controlled, not data-gated
+      expect(html).toContain('data-gtm-label="article-list-block"');
+    });
+
+    test('CTA appears AFTER the card markup and BEFORE ctaButtons in source order', async () => {
+      const container = await AstroContainer.create();
+      const html = await container.renderToString(ArticleList, {
+        props: { ...articleListWithNewsletterCta, articles: sampleArticles },
+      });
+      const firstArticleIdx = html.indexOf('Astro 5 Released');
+      const ctaIdx = html.indexOf('data-gtm-label="article-list-block"');
+      const ctaButtonIdx = html.indexOf('View All Articles');
+
+      expect(firstArticleIdx).toBeGreaterThan(-1);
+      expect(ctaIdx).toBeGreaterThan(-1);
+      expect(ctaButtonIdx).toBeGreaterThan(-1);
+
+      // Order: cards → compact CTA → ctaButtons
+      expect(ctaIdx).toBeGreaterThan(firstArticleIdx);
+      expect(ctaButtonIdx).toBeGreaterThan(ctaIdx);
     });
   });
 });
