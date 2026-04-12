@@ -25,13 +25,12 @@ export function defineBlock(config: DefineBlockConfig) {
     ? [
         defineField({
           name: 'variant',
-          title: 'Variant',
+          title: 'Block Variant',
           description: 'Choose a layout variant for this block',
           type: 'string',
           fieldset: 'layout',
           options: {
             list: config.variants.map((v) => ({title: v.title, value: v.name})),
-            layout: 'radio',
           },
           initialValue: config.variants[0]?.name,
         }),
@@ -60,7 +59,12 @@ export function defineBlock(config: DefineBlockConfig) {
     title: config.title,
     type: 'object',
     fieldsets: [
-      {name: 'layout', title: 'Layout Options', options: {collapsible: true, collapsed: true}},
+      {
+        name: 'layout',
+        title: 'Layout Options',
+        description: 'Controls visual layout, background, spacing, and width',
+        options: {collapsible: true, collapsed: true},
+      },
       ...(config.fieldsets ?? []),
     ],
     fields: [...blockBaseFields, ...variantFields, ...blockFields],

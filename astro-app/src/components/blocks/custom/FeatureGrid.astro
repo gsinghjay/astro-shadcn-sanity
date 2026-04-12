@@ -18,7 +18,7 @@ const cleanVariant = stegaClean(variant ?? 'grid');
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const sectionBg = bgClasses[bgVariant] ?? '';
-const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
+// Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
@@ -172,7 +172,7 @@ const gridClass =
           </span>
           <h3 class="font-bold text-lg mt-2">{feature.title}</h3>
           {feature.description && (
-            <p class={`text-sm mt-1 ${isDarkBg ? 'text-background/70' : 'text-muted-foreground'}`}>{feature.description}</p>
+            <p class={`text-sm mt-1 text-muted-foreground`}>{feature.description}</p>
           )}
         </div>
       ))}
@@ -196,7 +196,7 @@ const gridClass =
                 <TileTitle class="text-lg">{feature.title}</TileTitle>
               </div>
               <div class="flex flex-col items-start justify-center">
-                <TileDescription class={`whitespace-pre-line ${isDarkBg ? 'text-background/70' : ''}`}>{feature.description}</TileDescription>
+                <TileDescription class={`whitespace-pre-line `}>{feature.description}</TileDescription>
               </div>
             </TileSplit>
           </Tile>

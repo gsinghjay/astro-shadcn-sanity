@@ -6,29 +6,47 @@ interface Props {
   backgroundVariant?: string | null;
   spacing?: string | null;
   maxWidth?: string | null;
+  alignment?: string | null;
   blockType?: string;
 }
 
-const { backgroundVariant, spacing, maxWidth, blockType } = Astro.props;
+const { backgroundVariant, spacing, maxWidth, alignment, blockType } = Astro.props;
 
 const bg = stegaClean(backgroundVariant) ?? 'white';
 const sp = stegaClean(spacing) ?? 'default';
 const mw = stegaClean(maxWidth) ?? 'default';
+const align = stegaClean(alignment) ?? 'left';
 
-const spacingClasses: Record<string, string> = {
-  none: 'py-0',
-  small: 'py-6 md:py-8',
-  default: '',
-  large: 'py-20 md:py-24',
-};
+const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bg);
 
 const maxWidthClasses: Record<string, string> = {
   narrow: 'max-w-4xl mx-auto',
   default: '',
   full: 'max-w-none',
 };
+
+const alignClasses: Record<string, string> = {
+  left: '',
+  center: 'text-center',
+  right: 'text-end',
+};
+
+const spacingMap: Record<string, string> = {
+  none: '0px',
+  small: 'calc(var(--spacing) * 6)',
+  default: '',
+  large: 'calc(var(--spacing) * 20)',
+};
+
+const spacingValue = spacingMap[sp] ?? '';
 ---
 
-<div class:list={[bgClasses[bg], spacingClasses[sp], maxWidthClasses[mw]]} data-gtm-section={blockType}>
+<div
+  class:list={[bgClasses[bg], maxWidthClasses[mw], alignClasses[align]]}
+  data-gtm-section={blockType}
+  data-bg-theme={isDarkBg ? 'dark' : undefined}
+  data-align={align !== 'left' ? align : undefined}
+  style={spacingValue ? `--section-py: ${spacingValue}` : undefined}
+>
   <slot />
 </div>
