@@ -39,9 +39,14 @@ const { gtmId } = Astro.props;
 )}
 
 <script>
+  let cookieConsentInitialized = false;
+
   function initCookieConsent(): void {
     const banner = document.querySelector<HTMLElement>('[data-cookie-consent-banner]');
     if (!banner) return;
+
+    if (cookieConsentInitialized) return;
+    cookieConsentInitialized = true;
 
     const gtmId = banner.dataset.gtmId;
     const acceptBtn = banner.querySelector<HTMLButtonElement>('[data-cookie-accept]');
@@ -144,5 +149,6 @@ const { gtmId } = Astro.props;
     });
   }
 
+  document.addEventListener('DOMContentLoaded', initCookieConsent);
   document.addEventListener('astro:page-load', initCookieConsent);
 </script>

@@ -33,6 +33,16 @@ export type SanityImageSource =
   | null
   | undefined;
 
+/**
+ * Returns a sanitised inline CSS style for a Sanity LQIP blur placeholder.
+ * Validates that the value is a `data:image/` URI before embedding it in CSS,
+ * preventing injection through a corrupted or malicious metadata value.
+ */
+export function lqipStyle(lqip: string | null | undefined): string | undefined {
+  if (!lqip || !lqip.startsWith('data:image/')) return undefined;
+  return `background-image: url(${lqip}); background-size: cover;`;
+}
+
 export function safeUrlFor(image: SanityImageSource): ReturnType<typeof urlFor> | null {
   if (!image?.asset) return null;
   try {

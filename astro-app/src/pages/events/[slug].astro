@@ -4,13 +4,16 @@ import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import AddToCalendar from '@/components/AddToCalendar.astro';
 import { sanityClient, ALL_EVENT_SLUGS_QUERY, getEventBySlug, getSiteSettings, getSiteParams } from '@/lib/sanity';
+import type { ALL_EVENT_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const events = await sanityClient.fetch<Array<{ slug: string }>>(ALL_EVENT_SLUGS_QUERY, getSiteParams());
-  return events.map((e) => ({ params: { slug: e.slug } }));
+  const events = await sanityClient.fetch<ALL_EVENT_SLUGS_QUERY_RESULT>(ALL_EVENT_SLUGS_QUERY, getSiteParams());
+  return events
+    .filter((e): e is { slug: string } => typeof e.slug === 'string' && e.slug.length > 0)
+    .map((e) => ({ params: { slug: e.slug } }));
 };
 
 const { slug } = Astro.params;
@@ -133,7 +136,7 @@ const eventJsonLd = {
         />
       )}
 
-      <a href="/events" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-events">
+      <a href="/events" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-events">
         &larr; Back to Events
       </a>
     </SectionContent>

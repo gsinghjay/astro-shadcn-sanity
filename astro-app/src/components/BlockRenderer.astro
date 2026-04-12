@@ -1,12 +1,12 @@
 ---
-import type { PageBlock } from '@/lib/types';
+import type { PageBlock, InnerPageBlock } from '@/lib/types';
 import type { Sponsor, Project, Testimonial, SanityEvent, Article } from '@/lib/sanity';
 import { resolveBlockSponsors, resolveBlockProjects, resolveBlockTestimonials, resolveBlockEvents, resolveBlockArticles } from '@/lib/sanity';
-import { allBlocks } from './block-registry';
+import { allBlocks, resolveContainerBlocks } from './block-registry';
 import BlockWrapper from './BlockWrapper.astro';
 
 interface Props {
-  blocks: PageBlock[];
+  blocks: (PageBlock | InnerPageBlock)[];
   sponsors?: Sponsor[];
   projects?: Project[];
   testimonials?: Testimonial[];
@@ -16,7 +16,10 @@ interface Props {
 
 const { blocks, sponsors = [], projects = [], testimonials = [], events = [], articles = [] } = Astro.props;
 
-function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
+// Resolve lazily-loaded container blocks (e.g. ColumnsBlock) before rendering
+await resolveContainerBlocks();
+
+function getBlockExtraProps(block: PageBlock | InnerPageBlock): Record<string, unknown> {
   switch (block._type) {
     case 'logoCloud':
     case 'sponsorCards':
@@ -29,6 +32,8 @@ function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
       return { events: resolveBlockEvents(block, events) };
     case 'articleList':
       return { articles: resolveBlockArticles(block, articles) };
+    case 'columnsBlock':
+      return { sponsors, projects, testimonials, events, articles };
     default:
       return {};
   }
@@ -39,5 +44,5 @@ function getBlockExtraProps(block: PageBlock): Record<string, unknown> {
   const Component = allBlocks[block._type];
   if (!Component) return null;
   const extraProps = getBlockExtraProps(block);
-  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth} blockType={block._type}><Component {...block} {...extraProps} /></BlockWrapper>;
+  return <BlockWrapper backgroundVariant={block.backgroundVariant} spacing={block.spacing} maxWidth={block.maxWidth} alignment={block.alignment} blockType={block._type}><Component {...block} {...extraProps} /></BlockWrapper>;
 })}
