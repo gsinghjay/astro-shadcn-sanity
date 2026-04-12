@@ -15,6 +15,9 @@ import type {
   SPONSOR_PROJECTS_QUERY_RESULT,
   ALL_ARTICLES_QUERY_RESULT,
   ARTICLE_BY_SLUG_QUERY_RESULT,
+  ALL_ARTICLE_CATEGORIES_QUERY_RESULT,
+  ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT,
+  ARTICLES_BY_CATEGORY_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -593,6 +596,97 @@ export async function getArticleBySlug(slug: string): Promise<ARTICLE_BY_SLUG_QU
     params: { slug, ...getSiteParams() },
   });
   return result;
+}
+
+// ---------------------------------------------------------------------------
+// Article category queries (Story 19.10)
+// ---------------------------------------------------------------------------
+
+/**
+ * Shared category-detail projection. The chip-row query intentionally
+ * narrows this with its own field list (description is unused there).
+ */
+const ARTICLE_CATEGORY_PROJECTION = `_id, title, "slug": slug.current, description`;
+
+/**
+ * GROQ query: fetch all article categories (for chip row + build-time caching).
+ * Ordered alphabetically by title. `description` is intentionally NOT projected
+ * here — the chip row never reads it. The full projection lives on
+ * ARTICLE_CATEGORY_BY_SLUG_QUERY.
+ */
+export const ALL_ARTICLE_CATEGORIES_QUERY = defineQuery(groq`*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)] | order(title asc){
+  _id, title, "slug": slug.current
+}`);
+
+/**
+ * GROQ query: fetch all article category slugs for static path generation.
+ */
+export const ALL_ARTICLE_CATEGORY_SLUGS_QUERY = defineQuery(groq`*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single article category by slug.
+ */
+export const ARTICLE_CATEGORY_BY_SLUG_QUERY = defineQuery(groq`*[_type == "articleCategory" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  ${ARTICLE_CATEGORY_PROJECTION}
+}`);
+
+/**
+ * GROQ query: fetch all articles for a given category id.
+ * Projection MATCHES ALL_ARTICLES_QUERY field-for-field so the result type
+ * is structurally assignable to Article[] and <ArticleCard> can reuse it
+ * without `as any` casts.
+ */
+export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && category._ref == $categoryId && ($site == "" || site == $site)] | order(publishedAt desc){
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  author->{ name, "slug": slug.current },
+  publishedAt,
+  category->{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * Fetch all article categories from Sanity.
+ * Result is cached for the duration of the build (module-level memoization),
+ * mirroring getAllArticles(). Cache is bypassed when visual editing is active.
+ */
+let _articleCategoriesCache: ALL_ARTICLE_CATEGORIES_QUERY_RESULT | null = null;
+
+export async function getAllArticleCategories(): Promise<ALL_ARTICLE_CATEGORIES_QUERY_RESULT> {
+  if (!visualEditingEnabled && _articleCategoriesCache) return _articleCategoriesCache;
+  const { result } = await loadQuery<ALL_ARTICLE_CATEGORIES_QUERY_RESULT>({
+    query: ALL_ARTICLE_CATEGORIES_QUERY,
+    params: getSiteParams(),
+  });
+  _articleCategoriesCache = result ?? [];
+  return _articleCategoriesCache;
+}
+
+/**
+ * Fetch a single article category by slug (uncached — per-request).
+ */
+export async function getArticleCategoryBySlug(
+  slug: string,
+): Promise<ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT>({
+    query: ARTICLE_CATEGORY_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+/**
+ * Fetch all articles for a given category id (uncached — per-request).
+ * Returns [] when no articles match so callers can render the empty state.
+ */
+export async function getArticlesByCategory(
+  categoryId: string,
+): Promise<ARTICLES_BY_CATEGORY_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLES_BY_CATEGORY_QUERY_RESULT>({
+    query: ARTICLES_BY_CATEGORY_QUERY,
+    params: { categoryId, ...getSiteParams() },
+  });
+  return result ?? [];
 }
 
 // ---------------------------------------------------------------------------
