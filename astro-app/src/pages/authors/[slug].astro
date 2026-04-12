@@ -1,0 +1,150 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ArticleCard from '@/components/ArticleCard.astro';
+import { sanityClient, ALL_AUTHOR_SLUGS_QUERY, getAuthorBySlug, getSiteParams } from '@/lib/sanity';
+import type { ALL_AUTHOR_SLUGS_QUERY_RESULT } from '@/sanity.types';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
+import { stegaClean } from '@sanity/client/stega';
+import { Icon } from '@/components/ui/icon';
+import { Badge } from '@/components/ui/badge';
+import { Section, SectionContent } from '@/components/ui/section';
+import { JsonLd } from '@/components/ui/json-ld';
+import { buildAuthorJsonLd } from '@/lib/author-jsonld';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const authors = await sanityClient.fetch<ALL_AUTHOR_SLUGS_QUERY_RESULT>(ALL_AUTHOR_SLUGS_QUERY, getSiteParams());
+  return authors
+    .filter((a): a is { slug: string } => typeof a.slug === 'string' && a.slug.length > 0)
+    .map((a) => ({ params: { slug: a.slug } }));
+};
+
+const { slug } = Astro.params;
+const author = await getAuthorBySlug(slug as string);
+if (!author) return Astro.redirect('/404');
+
+// Author image — above-fold LCP candidate
+const imageBuilder = safeUrlFor(author.image);
+const imageUrl = imageBuilder?.width(300).height(300).fit('crop').url() ?? null;
+const lqip = author.image?.asset?.metadata?.lqip ?? null;
+
+// Social link icon mapping
+const platformIcons: Record<string, string> = {
+  linkedin: 'lucide:linkedin',
+  github: 'lucide:github',
+  twitter: 'lucide:twitter',
+  website: 'lucide:globe',
+  other: 'lucide:link',
+};
+
+// Articles by this author (from inline reverse reference query)
+const articles = author.articles ?? [];
+
+// SEO: bio fallback to role
+const metaDescription = author.bio || author.role || undefined;
+
+// Person JSON-LD structured data (Story 20.3)
+const authorJsonLd = buildAuthorJsonLd(author, Astro.url.href);
+---
+
+<Layout
+  title={`${author.name ?? 'Author'} | Authors`}
+  seo={metaDescription ? { metaDescription } : undefined}
+>
+  <Fragment slot="head">
+    <JsonLd schema={authorJsonLd} />
+  </Fragment>
+  <Section>
+    <SectionContent>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: 'Authors', href: '/authors' },
+        { label: author.name ?? 'Author' },
+      ]} />
+
+      <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+        {imageUrl ? (
+          <div class="w-[200px] h-[200px] bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden rounded-full">
+            <img
+              src={imageUrl}
+              alt={stegaClean(author.image?.alt) || stegaClean(author.name) || 'Author'}
+              class="w-full h-full object-cover"
+              width="200"
+              height="200"
+              loading="eager"
+              fetchpriority="high"
+              style={lqipStyle(lqip)}
+            />
+          </div>
+        ) : (
+          <div class="w-[200px] h-[200px] bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden rounded-full">
+            <span class="text-4xl font-bold text-muted-foreground">
+              {(stegaClean(author.name) || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
+            </span>
+          </div>
+        )}
+
+        <div class="flex-1">
+          <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] mb-4">
+            {author.name}
+          </h1>
+
+          {author.role && (
+            <p class="text-lg text-muted-foreground mb-4">{author.role}</p>
+          )}
+
+          {author.bio && (
+            <p class="text-lg leading-relaxed mb-6">{author.bio}</p>
+          )}
+
+          {author.credentials && author.credentials.length > 0 && (
+            <div class="flex flex-wrap gap-2 mb-6">
+              {author.credentials.map((credential: string) => (
+                <Badge variant="outline">{credential}</Badge>
+              ))}
+            </div>
+          )}
+
+          {author.socialLinks && author.socialLinks.filter((l) => l.url).length > 0 && (
+            <div class="flex items-center gap-4">
+              {author.socialLinks.filter((l) => l.url).map((link) => {
+                const platform = stegaClean(link.platform) || 'other';
+                const iconName = platformIcons[platform] || platformIcons.other;
+                return (
+                  <a
+                    href={stegaClean(link.url)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-muted-foreground hover:text-foreground transition-colors"
+                    data-gtm-category="author"
+                    data-gtm-action="social"
+                    data-gtm-label={`${stegaClean(author.name)}-${platform}`}
+                    title={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                  >
+                    <Icon name={iconName} class="w-5 h-5" />
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {articles.length > 0 && (
+        <div>
+          <h2 class="text-2xl font-bold mb-6">Articles by {author.name}</h2>
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <ArticleCard article={article} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <a href="/authors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-authors">
+        &larr; Back to Authors
+      </a>
+    </SectionContent>
+  </Section>
+</Layout>

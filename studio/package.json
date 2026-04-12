@@ -12,7 +12,9 @@
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "schema:extract": "sanity schema extract --path=schema.json",
-    "schema:deploy": "sanity schema deploy",
+    "schema:deploy": "sanity schema deploy --workspace capstone && sanity schema deploy --workspace rwc-us && sanity schema deploy --workspace rwc-intl",
+    "schema:deploy:capstone": "sanity schema deploy --workspace capstone",
+    "schema:deploy:rwc": "sanity schema deploy --workspace rwc-us && sanity schema deploy --workspace rwc-intl",
     "typegen": "sanity schema extract --path=schema.json && sanity typegen generate"
   },
   "keywords": [

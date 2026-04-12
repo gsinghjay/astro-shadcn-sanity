@@ -59,33 +59,33 @@ describe('BlockWrapper', () => {
     expect(html).not.toContain('bg-');
   });
 
-  test('maps spacing "large" to py-20 md:py-24', async () => {
+  test('maps spacing "large" to --block-section-py override', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'large' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('py-20');
-    expect(html).toContain('md:py-24');
+    expect(html).toContain('--block-section-py');
+    expect(html).toContain('calc(var(--spacing) * 20)');
   });
 
-  test('maps spacing "small" to py-6 md:py-8', async () => {
+  test('maps spacing "small" to --block-section-py override', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'small' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('py-6');
-    expect(html).toContain('md:py-8');
+    expect(html).toContain('--block-section-py');
+    expect(html).toContain('calc(var(--spacing) * 6)');
   });
 
-  test('maps spacing "none" to py-0', async () => {
+  test('maps spacing "none" to --block-section-py: 0px', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
       props: { spacing: 'none' },
       slots: { default: '<p>content</p>' },
     });
-    expect(html).toContain('py-0');
+    expect(html).toContain('--block-section-py: 0px');
   });
 
   test('maps maxWidth "narrow" to max-w-4xl', async () => {
@@ -148,6 +148,28 @@ describe('BlockWrapper', () => {
     expect(html).toContain('text-background');
   });
 
+  test('sets data-bg-theme="dark" for dark background variants', async () => {
+    const container = await AstroContainer.create();
+    for (const bg of ['dark', 'hatched', 'primary', 'blueprint', 'mono']) {
+      const html = await container.renderToString(BlockWrapper, {
+        props: { backgroundVariant: bg },
+        slots: { default: '<p>content</p>' },
+      });
+      expect(html, `${bg} should have data-bg-theme="dark"`).toContain('data-bg-theme="dark"');
+    }
+  });
+
+  test('does not set data-bg-theme for light background variants', async () => {
+    const container = await AstroContainer.create();
+    for (const bg of ['white', 'light', 'hatched-light', 'stripe']) {
+      const html = await container.renderToString(BlockWrapper, {
+        props: { backgroundVariant: bg },
+        slots: { default: '<p>content</p>' },
+      });
+      expect(html, `${bg} should NOT have data-bg-theme`).not.toContain('data-bg-theme');
+    }
+  });
+
   test('maps backgroundVariant "hatched-light" to bg-hatched-light', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BlockWrapper, {
@@ -155,5 +177,46 @@ describe('BlockWrapper', () => {
       slots: { default: '<p>content</p>' },
     });
     expect(html).toContain('bg-hatched-light');
+  });
+
+  test('maps alignment "center" to text-center and data-align', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { alignment: 'center' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).toContain('text-center');
+    expect(html).toContain('data-align="center"');
+  });
+
+  test('maps alignment "right" to text-end and data-align', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { alignment: 'right' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).toContain('text-end');
+    expect(html).toContain('data-align="right"');
+  });
+
+  test('alignment "left" adds no class or data-align', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { alignment: 'left' },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).not.toContain('text-center');
+    expect(html).not.toContain('text-end');
+    expect(html).not.toContain('data-align');
+  });
+
+  test('null alignment defaults to left (no class)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockWrapper, {
+      props: { alignment: null },
+      slots: { default: '<p>content</p>' },
+    });
+    expect(html).not.toContain('text-center');
+    expect(html).not.toContain('data-align');
   });
 });

@@ -1,6 +1,7 @@
 ---
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Icon } from '@/components/ui/icon';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
 import type { LinkCardsBlock } from '@/lib/types';
@@ -30,7 +31,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
       {links.map((link) => (
         <Tile variant="floating" href={link.url}>
           <TileContent>
-            {link.icon && <span class="text-3xl" aria-hidden="true">{link.icon}</span>}
+            {link.icon && <Icon name={link.icon} class="size-8" />}
             <TileTitle>{link.title}</TileTitle>
             {link.description && <TileDescription>{link.description}</TileDescription>}
             <span class="text-sm text-primary font-medium mt-auto">Learn more &rarr;</span>
@@ -57,7 +58,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
         <li>
           <Tile variant="floating" href={link.url}>
             <TileContent class="flex-row items-center gap-4">
-              {link.icon && <span class="text-2xl flex-shrink-0" aria-hidden="true">{link.icon}</span>}
+              {link.icon && <Icon name={link.icon} class="size-6 flex-shrink-0" />}
               <div class="flex-1 min-w-0">
                 <TileTitle>{link.title}</TileTitle>
                 {link.description && <TileDescription>{link.description}</TileDescription>}
@@ -88,7 +89,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
           <TileContent class="flex-row items-center gap-4">
             <div class="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-primary/10 rounded-sm">
               {link.icon ? (
-                <span class="text-2xl" aria-hidden="true">{link.icon}</span>
+                <Icon name={link.icon} class="size-6" />
               ) : (
                 <span class="text-primary text-lg font-bold" aria-hidden="true">{(link.title ?? '').charAt(0)}</span>
               )}
