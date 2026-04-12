@@ -1,6 +1,6 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {ProjectsIcon, SearchIcon} from '@sanity/icons'
-import {siteField} from '../fields/site-field'
+import {siteField, siteScopedIsUnique} from '../fields/site-field'
 
 export const project = defineType({
   name: 'project',
@@ -30,7 +30,7 @@ export const project = defineType({
       title: 'Slug',
       type: 'slug',
       group: 'main',
-      options: {source: 'title'},
+      options: {source: 'title', isUnique: siteScopedIsUnique},
       validation: (Rule) => Rule.required(),
     }),
     {...siteField, group: 'main'},

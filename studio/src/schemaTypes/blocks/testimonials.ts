@@ -7,15 +7,28 @@ export const testimonials = defineBlock({
   title: 'Testimonials',
   icon: CommentIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid (responsive grid of testimonial cards)'},
+    {name: 'masonry', title: 'Masonry (Pinterest-style flowing grid)'},
+    {name: 'split', title: 'Split (heading/buttons left, stacked reviews right)'},
+    {name: 'carousel', title: 'Carousel (horizontal slider with nav arrows)'},
+    {name: 'marquee', title: 'Marquee (auto-scrolling rows, opposite directions)'},
+    {name: 'brutalist-quote', title: 'Brutalist Quote'},
+    {name: 'spotlight', title: 'Spotlight'},
+  ],
+  hiddenByVariant: {
+    testimonialSource: ['carousel', 'marquee'],
+  },
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.max(150),
     }),
     defineField({
-      name: 'displayMode',
-      title: 'Display Mode',
+      name: 'testimonialSource',
+      title: 'Testimonial Source',
       type: 'string',
       options: {
         list: [
@@ -32,7 +45,7 @@ export const testimonials = defineBlock({
       name: 'testimonials',
       title: 'Testimonials',
       type: 'array',
-      hidden: ({parent}) => parent?.displayMode !== 'manual',
+      hidden: ({parent}) => parent?.testimonialSource !== 'manual',
       of: [
         defineArrayMember({
           type: 'reference',
@@ -41,8 +54,8 @@ export const testimonials = defineBlock({
       ],
       validation: (Rule) =>
         Rule.custom((testimonials, context) => {
-          const parent = context.parent as {displayMode?: string}
-          if (parent?.displayMode === 'manual' && (!testimonials || testimonials.length === 0)) {
+          const parent = context.parent as {testimonialSource?: string}
+          if (parent?.testimonialSource === 'manual' && (!testimonials || testimonials.length === 0)) {
             return 'Add at least one testimonial in manual mode'
           }
           return true

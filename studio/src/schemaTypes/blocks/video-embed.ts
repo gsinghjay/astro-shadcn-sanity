@@ -1,6 +1,7 @@
 import {defineField} from 'sanity'
 import {PlayIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {headerFields, validateYouTubeUrl} from '../helpers/commonFields'
 import {YouTubePreview} from './YouTubePreview'
 
 export const videoEmbed = defineBlock({
@@ -9,37 +10,39 @@ export const videoEmbed = defineBlock({
   icon: PlayIcon,
   components: {preview: YouTubePreview},
   preview: {
-    select: {title: 'title', subtitle: 'videoUrl'},
+    select: {title: 'heading', subtitle: 'youtubeUrl'},
   },
+  variants: [
+    {name: 'full-width', title: 'Full Width'},
+    {name: 'split', title: 'Split'},
+    {name: 'split-asymmetric', title: 'Split Asymmetric'},
+  ],
   fields: [
+    ...headerFields(),
     defineField({
-      name: 'videoUrl',
-      title: 'Video URL',
+      name: 'youtubeUrl',
+      title: 'YouTube URL',
       type: 'url',
+      description: 'YouTube video URL (e.g., https://www.youtube.com/watch?v=...)',
       validation: (Rule) =>
         Rule.required()
           .uri({scheme: ['https']})
-          .custom((url) => {
-            if (!url) return true
-            const isYouTube =
-              /youtube\.com\/watch\?v=/.test(url) ||
-              /youtu\.be\//.test(url) ||
-              /youtube\.com\/embed\//.test(url) ||
-              /youtube\.com\/shorts\//.test(url)
-            return isYouTube || 'Only YouTube URLs are supported'
-          }),
+          .custom(validateYouTubeUrl),
     }),
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      description: 'Accessible title for the video player',
-    }),
-    defineField({
-      name: 'caption',
-      title: 'Caption',
-      type: 'text',
-      description: 'Optional caption displayed below the video',
+      name: 'posterImage',
+      title: 'Poster Image',
+      type: 'image',
+      description: 'Custom thumbnail (optional — falls back to YouTube thumbnail)',
+      options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt Text',
+          type: 'string',
+          description: 'Describe the thumbnail for screen readers',
+        }),
+      ],
     }),
   ],
 })

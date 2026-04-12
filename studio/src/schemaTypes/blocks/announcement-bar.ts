@@ -1,6 +1,7 @@
 import {defineField} from 'sanity'
 import {BellIcon} from '@sanity/icons'
 import {defineBlock} from '../helpers/defineBlock'
+import {LUCIDE_ICON_OPTIONS} from '../helpers/commonFields'
 
 export const announcementBar = defineBlock({
   name: 'announcementBar',
@@ -19,13 +20,17 @@ export const announcementBar = defineBlock({
       name: 'icon',
       title: 'Icon',
       type: 'string',
-      description: 'Icon name from the Lucide icon set (e.g. "info", "alert-triangle")',
+      description: 'Optional icon from the Lucide icon set',
+      options: {
+        list: LUCIDE_ICON_OPTIONS,
+        layout: 'dropdown',
+      },
     }),
     defineField({
       name: 'text',
       title: 'Text',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().max(150),
     }),
     defineField({
       name: 'link',
@@ -36,6 +41,7 @@ export const announcementBar = defineBlock({
           name: 'label',
           title: 'Label',
           type: 'string',
+          validation: (Rule) => Rule.max(100),
         }),
         defineField({
           name: 'href',
@@ -50,6 +56,7 @@ export const announcementBar = defineBlock({
       name: 'dismissible',
       title: 'Dismissible',
       type: 'boolean',
+      description: 'Allow users to dismiss the banner with a close button',
       initialValue: false,
     }),
   ],

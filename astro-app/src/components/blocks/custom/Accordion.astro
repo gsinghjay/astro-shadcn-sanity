@@ -1,0 +1,140 @@
+---
+import { Section, SectionContent } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import type { AccordionBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
+
+interface Props extends AccordionBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, description, items = [], variant: rawVariant, class: className, id } = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'bordered' || rawCleaned === 'separated' || rawCleaned === 'technical' ? rawCleaned : 'default';
+
+const faqJsonLd = items.length > 0 ? {
+  "@type": "FAQPage",
+  "mainEntity": items.filter(item => item.title && item.content).map(item => ({
+    "@type": "Question",
+    "name": stegaClean(item.title),
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": stegaClean(item.content),
+    },
+  })),
+} : null;
+---
+
+{faqJsonLd && <JsonLd schema={faqJsonLd} />}
+
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full max-w-3xl divide-y">
+      {items.map((item) => (
+        <details class="group">
+          <summary class="flex cursor-pointer items-center justify-between py-4 text-left font-medium transition-colors hover:text-primary">
+            {item.title}
+            <span class="ml-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="pb-4 text-muted-foreground leading-relaxed">
+            {item.content}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'bordered' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full max-w-3xl space-y-0">
+      {items.map((item, i) => (
+        <details class={cn('group border-x border-b', i === 0 && 'border-t')}>
+          <summary class="flex cursor-pointer items-center justify-between p-4 text-left font-medium transition-colors hover:text-primary hover:bg-muted/50">
+            {item.title}
+            <span class="ml-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-4 pb-4 text-muted-foreground leading-relaxed">
+            {item.content}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'separated' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full max-w-3xl space-y-3">
+      {items.map((item) => (
+        <details class="group border rounded-sm">
+          <summary class="flex cursor-pointer items-center justify-between p-4 text-left font-medium transition-colors hover:text-primary hover:bg-muted/50">
+            {item.title}
+            <span class="ml-4 flex-shrink-0 text-muted-foreground transition-transform group-open:rotate-45">+</span>
+          </summary>
+          <div class="px-4 pb-4 text-muted-foreground leading-relaxed">
+            {item.content}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'technical' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-3xl">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+    </SectionContent>
+
+    <div class="w-full max-w-3xl space-y-0">
+      {items.map((item, i) => (
+        <details class="group border-l-4 border-border open:border-primary transition-colors">
+          <summary class="flex cursor-pointer items-center gap-4 py-4 pl-6 text-left font-medium transition-colors hover:text-primary">
+            <span class="font-mono text-xs font-bold text-muted-foreground flex-shrink-0">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            {item.title}
+          </summary>
+          <div class="pl-6 pb-4 ml-6 border-l border-border text-muted-foreground leading-relaxed">
+            {item.content}
+          </div>
+        </details>
+      ))}
+    </div>
+  </Section>
+)}

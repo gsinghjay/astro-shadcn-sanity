@@ -39,7 +39,7 @@ const currentPath = Astro.url.pathname;
 
 const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';
-const ctaText = ctaButton?.text || 'Become a Sponsor';
+const ctaText = stegaClean(ctaButton?.text) || 'Become a Sponsor';
 const ctaHref = ctaButton?.url || '/contact';
 
 // Split siteName for header display (e.g., "YWCC Industry Capstone" → "YWCC" + "Industry Capstone")
@@ -77,7 +77,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                   data-gtm-category="navigation"
                   data-gtm-label={stegaClean(item.label)}
                 >
-                  {item.label}
+                  {stegaClean(item.label)}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <NavigationMenuSub>
@@ -88,7 +88,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                           data-gtm-category="navigation"
                           data-gtm-label={stegaClean(child.label)}
                         >
-                          {child.label}
+                          {stegaClean(child.label)}
                         </NavigationMenuSubLink>
                       </NavigationMenuSubItem>
                     ))}
@@ -106,7 +106,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                 data-gtm-category="navigation"
                 data-gtm-label={stegaClean(item.label)}
               >
-                {item.label}
+                {stegaClean(item.label)}
               </NavigationMenuLink>
             )}
           </NavigationMenuItem>
@@ -135,7 +135,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                     <Collapsible>
                       <CollapsibleTrigger>
                         <SidebarMenuButton class="h-10 rounded-md px-4 text-lg font-bold uppercase tracking-wider">
-                          {item.label}
+                          {stegaClean(item.label)}
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
@@ -147,7 +147,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                                 data-gtm-category="navigation"
                                 data-gtm-label={stegaClean(child.label)}
                               >
-                                {child.label}
+                                {stegaClean(child.label)}
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
@@ -161,7 +161,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
                       data-gtm-category="navigation"
                       data-gtm-label={stegaClean(item.label)}
                     >
-                      {item.label}
+                      {stegaClean(item.label)}
                     </SidebarMenuButton>
                   )}
                 </SidebarMenuItem>

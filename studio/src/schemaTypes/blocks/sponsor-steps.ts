@@ -7,29 +7,38 @@ export const sponsorSteps = defineBlock({
   title: 'Sponsor Steps',
   icon: OlistIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'steps', title: 'Steps (vertical on mobile, horizontal on desktop with connecting line)'},
+    {name: 'split', title: 'Split (heading/buttons left, step grid right)'},
+    {name: 'spread', title: 'Spread (centered heading above, steps spread horizontally)'},
+  ],
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.max(150),
     }),
     defineField({
       name: 'subheading',
       title: 'Subheading',
       type: 'string',
+      description: 'Supporting text below the heading',
+      validation: (Rule) => Rule.max(200),
     }),
     defineField({
       name: 'items',
       title: 'Steps',
       type: 'array',
       of: [defineArrayMember({type: 'stepItem'})],
-      validation: (Rule) => Rule.min(1).error('Add at least one step'),
+      validation: (Rule) => [Rule.min(1).error('Add at least one step'), Rule.max(10)],
     }),
     defineField({
       name: 'ctaButtons',
       title: 'CTA Buttons',
       type: 'array',
       of: [defineArrayMember({type: 'button'})],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

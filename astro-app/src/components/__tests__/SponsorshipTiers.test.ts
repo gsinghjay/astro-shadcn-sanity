@@ -127,6 +127,24 @@ describe('SponsorshipTiers', () => {
     expect(html).not.toContain('<h3');
   });
 
+  test('tier cards have no rounded-lg class', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).not.toContain('rounded-lg');
+  });
+
+  test('highlighted tier uses shadow-sm not shadow-lg', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: tiersFull,
+    });
+
+    expect(html).not.toContain('shadow-lg');
+  });
+
   test('root section has data-animate attribute', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorshipTiers, {
@@ -134,5 +152,35 @@ describe('SponsorshipTiers', () => {
     });
 
     expect(html).toContain('data-animate');
+  });
+
+  test('brutalist variant renders tier color bars and monospace pricing', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: { ...tiersFull, variant: 'brutalist' },
+    });
+
+    expect(html).toContain('border-2 border-foreground');
+    expect(html).toContain('font-mono');
+    expect(html).toContain('h-2');
+  });
+
+  test('brutalist variant renders square bullet points', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: { ...tiersFull, variant: 'brutalist' },
+    });
+
+    expect(html).toContain('&#9632;');
+  });
+
+  test('brutalist variant preserves GTM tracking attributes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorshipTiers, {
+      props: { ...tiersFull, variant: 'brutalist' },
+    });
+
+    expect(html).toContain('data-gtm-category="sponsorship"');
+    expect(html).toContain('data-gtm-action="click"');
   });
 });

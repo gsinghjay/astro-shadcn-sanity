@@ -11,49 +11,200 @@ interface Props extends TextWithImageBlock {
   id?: string;
 }
 
-const { heading, content, image, imagePosition } = Astro.props;
-const isRight = stegaClean(imagePosition) !== 'left';
+const { heading, content, image, imagePosition, variant } = Astro.props;
+
+// Clean variant value and default to 'split'
+const cleanVariant = stegaClean(variant ?? 'split');
+
+// Determine image position behavior based on variant
+// reversed and floating variants ignore imagePosition
+const shouldPlaceImageLeft = (() => {
+  if (cleanVariant === 'reversed') return true;
+  if (cleanVariant === 'floating' || cleanVariant === 'split-asymmetric') return false;
+  // split (default) uses imagePosition
+  return stegaClean(imagePosition) === 'left';
+})();
+
 const imgSrc = safeUrlFor(image)?.width(800).height(600).fit('crop').url() ?? null;
 const lqip = image?.asset?.metadata?.lqip;
+
+// Get grid layout classes based on variant
+const getGridClasses = (variant: string): string => {
+  switch (variant) {
+    case 'split-asymmetric':
+      return '@5xl:grid-cols-[1fr_2fr]';
+    case 'floating':
+      return ''; // Default grid-cols-2, will add border styling to wrapper
+    default:
+      return '';
+  }
+};
+
+const gridClass = getGridClasses(cleanVariant);
 ---
 
-<Section data-animate>
-  <SectionSplit>
-    <SectionContent class="justify-center">
-      {heading && (
-        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
-      )}
-      {content && (
-        <div class="text-muted-foreground leading-relaxed prose">
-          <PortableText value={content} components={portableTextComponents} />
+{cleanVariant === 'brutalist' && (
+  <Section data-animate>
+    <SectionSplit>
+      <SectionMedia class="aspect-[4/3]">
+        <div class="border-2 border-border h-full">
+          {imgSrc && lqip ? (
+            <div style={`background-image: url(${lqip}); background-size: cover;`} class="h-full">
+              <img
+                src={imgSrc}
+                alt={image?.alt || heading || ''}
+                width={800}
+                height={600}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={image?.alt || heading || ''}
+              width={800}
+              height={600}
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
         </div>
-      )}
-    </SectionContent>
+        {image?.alt && (
+          <p class="font-mono text-xs text-muted-foreground mt-2 tracking-wide">{image.alt}</p>
+        )}
+      </SectionMedia>
 
-    <SectionMedia class={`aspect-[4/3] ${!isRight ? '@lg:order-first' : ''}`}>
-      {imgSrc && lqip ? (
-        <div style={`background-image: url(${lqip}); background-size: cover;`}>
-          <img
-            src={imgSrc}
-            alt={image?.alt || heading || ''}
-            width={800}
-            height={600}
-            class="w-full h-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        </div>
-      ) : imgSrc ? (
-        <img
-          src={imgSrc}
-          alt={image?.alt || heading || ''}
-          width={800}
-          height={600}
-          class="w-full h-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : null}
-    </SectionMedia>
-  </SectionSplit>
+      <SectionContent class="justify-center pl-8 border-l-4 border-border">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {content && (
+          <div class="text-muted-foreground leading-relaxed prose">
+            <PortableText value={content} components={portableTextComponents} />
+          </div>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant !== 'brutalist' && (
+<Section data-animate>
+  {cleanVariant === 'floating' ? (
+    // Floating variant with card styling
+    <div class="border shadow-sm p-8 bg-card">
+      <SectionSplit class={gridClass}>
+        <SectionContent class="justify-center">
+          {heading && (
+            <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+          )}
+          {content && (
+            <div class="text-muted-foreground leading-relaxed prose">
+              <PortableText value={content} components={portableTextComponents} />
+            </div>
+          )}
+        </SectionContent>
+
+        <SectionMedia class="aspect-[4/3]">
+          {imgSrc && lqip ? (
+            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+              <img
+                src={imgSrc}
+                alt={image?.alt || heading || ''}
+                width={800}
+                height={600}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={image?.alt || heading || ''}
+              width={800}
+              height={600}
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+        </SectionMedia>
+      </SectionSplit>
+    </div>
+  ) : (
+    // Default split, reversed, and split-asymmetric variants
+    <SectionSplit class={gridClass}>
+      {shouldPlaceImageLeft && (
+        <SectionMedia class="aspect-[4/3] @5xl:order-first" data-variant={cleanVariant}>
+          {imgSrc && lqip ? (
+            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+              <img
+                src={imgSrc}
+                alt={image?.alt || heading || ''}
+                width={800}
+                height={600}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={image?.alt || heading || ''}
+              width={800}
+              height={600}
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+        </SectionMedia>
+      )}
+
+      <SectionContent class="justify-center">
+        {heading && (
+          <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+        )}
+        {content && (
+          <div class="text-muted-foreground leading-relaxed prose">
+            <PortableText value={content} components={portableTextComponents} />
+          </div>
+        )}
+      </SectionContent>
+
+      {!shouldPlaceImageLeft && (
+        <SectionMedia class="aspect-[4/3]" data-variant={cleanVariant}>
+          {imgSrc && lqip ? (
+            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+              <img
+                src={imgSrc}
+                alt={image?.alt || heading || ''}
+                width={800}
+                height={600}
+                class="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ) : imgSrc ? (
+            <img
+              src={imgSrc}
+              alt={image?.alt || heading || ''}
+              width={800}
+              height={600}
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          ) : null}
+        </SectionMedia>
+      )}
+    </SectionSplit>
+  )}
 </Section>
+)}

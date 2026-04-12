@@ -29,7 +29,6 @@ export const imageGalleryFull: ImageGalleryBlock = {
     { _key: 'gi-2', image: testImage, caption: 'Project Beta' },
     { _key: 'gi-3', image: testImage, caption: null },
   ],
-  columns: '3',
 };
 
 export const imageGalleryMasonry: ImageGalleryBlock = {
@@ -45,7 +44,6 @@ export const imageGalleryMasonry: ImageGalleryBlock = {
     { _key: 'gi-4', image: testImage, caption: 'Landscape shot' },
     { _key: 'gi-5', image: testImage, caption: null },
   ],
-  columns: null,
 };
 
 export const imageGallerySingle: ImageGalleryBlock = {
@@ -60,7 +58,6 @@ export const imageGallerySingle: ImageGalleryBlock = {
   images: [
     { _key: 'gi-6', image: testImage, caption: 'Hero photograph' },
   ],
-  columns: null,
 };
 
 export const imageGalleryMinimal: ImageGalleryBlock = {
@@ -73,5 +70,4 @@ export const imageGalleryMinimal: ImageGalleryBlock = {
   heading: null,
   description: null,
   images: null,
-  columns: null,
 };

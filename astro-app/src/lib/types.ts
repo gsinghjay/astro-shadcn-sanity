@@ -45,6 +45,20 @@ export type DividerBlock = Extract<PageBlock, { _type: 'divider' }>;
 export type AnnouncementBarBlock = Extract<PageBlock, { _type: 'announcementBar' }>;
 export type SponsorshipTiersBlock = Extract<PageBlock, { _type: 'sponsorshipTiers' }>;
 export type VideoEmbedBlock = Extract<PageBlock, { _type: 'videoEmbed' }>;
+// Essential blocks (Story 17.20)
+export type PricingTableBlock = Extract<PageBlock, { _type: 'pricingTable' }>;
+export type ServiceCardsBlock = Extract<PageBlock, { _type: 'serviceCards' }>;
+export type ProductShowcaseBlock = Extract<PageBlock, { _type: 'productShowcase' }>;
+export type LinkCardsBlock = Extract<PageBlock, { _type: 'linkCards' }>;
+export type NewsletterBlock = Extract<PageBlock, { _type: 'newsletter' }>;
+export type AccordionBlock = Extract<PageBlock, { _type: 'accordion' }>;
+export type TabsBlockBlock = Extract<PageBlock, { _type: 'tabsBlock' }>;
+export type EmbedBlockBlock = Extract<PageBlock, { _type: 'embedBlock' }>;
+export type MapBlockBlock = Extract<PageBlock, { _type: 'mapBlock' }>;
+export type CountdownTimerBlock = Extract<PageBlock, { _type: 'countdownTimer' }>;
+export type MetricsDashboardBlock = Extract<PageBlock, { _type: 'metricsDashboard' }>;
+export type CardGridBlock = Extract<PageBlock, { _type: 'cardGrid' }>;
+export type BeforeAfterBlock = Extract<PageBlock, { _type: 'beforeAfter' }>;
 
 // ---------------------------------------------------------------------------
 // Layout types — shared across Layout, SidebarLayout, PortalLayout
@@ -53,6 +67,7 @@ export type VideoEmbedBlock = Extract<PageBlock, { _type: 'videoEmbed' }>;
 export interface SeoProps {
   metaTitle?: string | null;
   metaDescription?: string | null;
+  noIndex?: boolean | null;
   ogImage?: {
     asset?: {
       _id: string;

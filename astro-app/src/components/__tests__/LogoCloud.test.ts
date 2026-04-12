@@ -1,7 +1,7 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect } from 'vitest';
 import LogoCloud from '../blocks/custom/LogoCloud.astro';
-import { logoCloudFull, logoCloudMinimal, logoCloudMarquee, logoCloudFlexWrap } from './__fixtures__/logo-cloud';
+import { logoCloudFull, logoCloudMinimal } from './__fixtures__/logo-cloud';
 
 describe('LogoCloud', () => {
   test('renders heading and sponsor logos', async () => {
@@ -42,6 +42,16 @@ describe('LogoCloud', () => {
     expect(html).toContain('https://techcorp.example.com');
   });
 
+  test('logo cells use opacity-only hover (no hover:bg-background)', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LogoCloud, {
+      props: logoCloudFull,
+    });
+
+    expect(html).not.toContain('hover:bg-background');
+    expect(html).not.toContain('transition-colors');
+  });
+
   test('handles minimal data without crashing', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
@@ -50,67 +60,46 @@ describe('LogoCloud', () => {
     expect(html).toBeDefined();
   });
 
-  test('grid variant renders grid layout', async () => {
+  test('marquee variant renders two marquee lanes with larger logos', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LogoCloud, {
-      props: { ...logoCloudFull, variant: 'grid' },
+      props: { ...logoCloudFull, variant: 'marquee' },
+    });
+
+    const marqueeLaneCount = (html.match(/group\/marquee/g) ?? []).length;
+    expect(marqueeLaneCount).toBe(2);
+    expect(html).toContain('bg-foreground');
+  });
+
+  test('tiered variant renders tier headers', async () => {
+    const platinumSponsor = { ...logoCloudFull.sponsors![0], tier: 'platinum' };
+    const goldSponsor = { ...logoCloudFull.sponsors![1], tier: 'gold' };
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LogoCloud, {
+      props: { ...logoCloudFull, variant: 'tiered', sponsors: [platinumSponsor, goldSponsor] },
+    });
+
+    expect(html).toContain('PLATINUM PARTNERS');
+    expect(html).toContain('GOLD PARTNERS');
+  });
+
+  test('grid-prominent variant renders platinum sponsors with col-span-2', async () => {
+    const platinumSponsor = { ...logoCloudFull.sponsors![0], tier: 'platinum' };
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LogoCloud, {
+      props: { ...logoCloudFull, variant: 'grid-prominent', sponsors: [platinumSponsor] },
+    });
+
+    expect(html).toContain('col-span-2');
+  });
+
+  test('unknown variant falls back to default grid layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LogoCloud, {
+      props: { ...logoCloudFull, variant: 'nonexistent' },
     });
 
     expect(html).toContain('grid-cols-2');
-    expect(html).not.toContain('group/marquee');
-    expect(html).not.toContain('flex-wrap');
-  });
-
-  test('null variant defaults to grid layout', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(LogoCloud, {
-      props: logoCloudFull, // variant: null
-    });
-
-    expect(html).toContain('grid-cols-2');
-    expect(html).not.toContain('group/marquee');
-  });
-
-  test('marquee variant renders marquee scroll container', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(LogoCloud, {
-      props: logoCloudMarquee,
-    });
-
-    expect(html).toContain('group/marquee');
-    expect(html).toContain('TechCorp');
-    expect(html).toContain('DataLabs');
-    expect(html).not.toContain('grid-cols-2');
-  });
-
-  test('marquee variant renders heading', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(LogoCloud, {
-      props: logoCloudMarquee,
-    });
-
-    expect(html).toContain('Trusted By');
-  });
-
-  test('flex-wrap variant renders flex-wrap layout', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(LogoCloud, {
-      props: logoCloudFlexWrap,
-    });
-
-    expect(html).toContain('flex-wrap');
-    expect(html).toContain('TechCorp');
-    expect(html).toContain('DataLabs');
-    expect(html).not.toContain('grid-cols-2');
-    expect(html).not.toContain('group/marquee');
-  });
-
-  test('flex-wrap variant renders heading', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(LogoCloud, {
-      props: logoCloudFlexWrap,
-    });
-
-    expect(html).toContain('Trusted By');
+    expect(html).toContain('lg:grid-cols-8');
   });
 });

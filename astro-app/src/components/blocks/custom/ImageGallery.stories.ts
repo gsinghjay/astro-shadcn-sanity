@@ -32,42 +32,50 @@ const galleryImages = [
 ]
 
 export default {
-  title: 'Blocks/ImageGallery',
+  title: 'Components/ImageGallery',
   component: ImageGallery,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Image gallery with grid, masonry, and single-image layouts.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['grid', 'masonry', 'single'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
-export const GridThreeColumns = {
+export const Grid = {
   args: {
     _type: 'imageGallery',
-    _key: 'story-ig-grid3',
+    _key: 'story-ig-grid',
     variant: 'grid',
     heading: 'Photography',
     description: 'A curated selection of images exploring Swiss design principles in the built environment.',
     images: galleryImages,
-    columns: '3',
-  },
-}
-
-export const GridTwoColumns = {
-  args: {
-    _type: 'imageGallery',
-    _key: 'story-ig-grid2',
-    variant: 'grid',
-    heading: 'Selected Works',
-    images: galleryImages.slice(0, 4),
-    columns: '2',
-  },
-}
-
-export const GridFourColumns = {
-  args: {
-    _type: 'imageGallery',
-    _key: 'story-ig-grid4',
-    variant: 'grid',
-    heading: 'Archive',
-    images: galleryImages,
-    columns: '4',
   },
 }
 

@@ -1,0 +1,139 @@
+---
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import type { MapBlockBlock } from '@/lib/types';
+import { JsonLd } from '@/components/ui/json-ld';
+
+interface Props extends MapBlockBlock {
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  address,
+  coordinates,
+  caption,
+  contactInfo,
+  variant: rawVariant,
+  class: className,
+  id,
+} = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'split' || rawCleaned === 'full-width' ? rawCleaned : 'default';
+
+const hasContact = contactInfo?.phone || contactInfo?.email;
+const mapJsonLd = (heading || coordinates) ? {
+  "@type": hasContact ? "LocalBusiness" : "Place",
+  ...(heading && { "name": stegaClean(heading) }),
+  ...(address && { "address": stegaClean(address) }),
+  ...(coordinates?.lat != null && coordinates?.lng != null && {
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": coordinates.lat,
+      "longitude": coordinates.lng,
+    },
+  }),
+  ...(caption && { "description": stegaClean(caption) }),
+  ...(contactInfo?.phone && { "telephone": stegaClean(contactInfo.phone) }),
+  ...(contactInfo?.email && { "email": stegaClean(contactInfo.email) }),
+} : null;
+---
+
+{mapJsonLd && <JsonLd schema={mapJsonLd} />}
+
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="w-full aspect-video bg-muted rounded-sm flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-4xl">📍</span>
+          {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
+          {coordinates?.lat != null && coordinates?.lng != null && (
+            <p class="text-xs text-muted-foreground">
+              {coordinates.lat.toFixed(4)}, {coordinates.lng.toFixed(4)}
+            </p>
+          )}
+        </div>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionSplit>
+      <div class="w-full aspect-video bg-muted rounded-sm flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-4xl">📍</span>
+          {address && <p class="text-sm text-muted-foreground max-w-xs">{address}</p>}
+        </div>
+      </div>
+
+      <SectionContent class="justify-center">
+        {address && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Address</h3>
+            <p>{address}</p>
+          </div>
+        )}
+        {contactInfo?.phone && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Phone</h3>
+            <p>{contactInfo.phone}</p>
+          </div>
+        )}
+        {contactInfo?.email && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Email</h3>
+            <p>{contactInfo.email}</p>
+          </div>
+        )}
+        {contactInfo?.hours && (
+          <div class="space-y-1">
+            <h3 class="font-bold text-sm uppercase tracking-wide text-muted-foreground">Hours</h3>
+            <p class="whitespace-pre-line">{contactInfo.hours}</p>
+          </div>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'full-width' && (
+  <Section class={cn('max-w-none', className)} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full">
+      <div class="w-full aspect-[21/9] bg-muted flex items-center justify-center border">
+        <div class="text-center space-y-2">
+          <span class="text-5xl">📍</span>
+          {address && <p class="text-muted-foreground">{address}</p>}
+        </div>
+      </div>
+      {caption && (
+        <p class="mt-3 text-sm text-muted-foreground text-center">{caption}</p>
+      )}
+    </div>
+  </Section>
+)}

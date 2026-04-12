@@ -1,102 +1,231 @@
 ---
+import type { LogoCloudBlock } from '@/lib/types';
 import type { Sponsor } from '@/lib/sanity';
-import { Section, SectionGrid } from '@/components/ui/section';
+import { Section, SectionContent } from '@/components/ui/section';
 import { Marquee, MarqueeContent } from '@/components/ui/marquee';
-import { Logo } from '@/components/ui/logo';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 
-interface Props {
-  heading?: string | null;
-  autoPopulate?: boolean | null;
+interface Props extends Omit<LogoCloudBlock, 'sponsors'> {
   sponsors?: Sponsor[];
-  variant?: string | null;
   class?: string;
   id?: string;
-  [key: string]: unknown;
 }
 
-const { heading, sponsors, variant: rawVariant } = Astro.props;
-const variant = stegaClean(rawVariant) ?? 'grid';
+const { heading, sponsors, variant: rawVariant, class: className, id } = Astro.props;
+const cleanVariant = (() => {
+  const v = stegaClean(rawVariant);
+  return v === 'marquee' || v === 'flex-wrap' || v === 'tiered' || v === 'grid-prominent' ? v : 'grid';
+})();
+
+const tierOrder = ['platinum', 'gold', 'silver', 'bronze'];
+const tierLabels: Record<string, string> = {
+  platinum: 'PLATINUM PARTNERS',
+  gold: 'GOLD PARTNERS',
+  silver: 'SILVER PARTNERS',
+  bronze: 'BRONZE PARTNERS',
+};
+
+function groupByTier(list: Sponsor[]) {
+  const groups = new Map<string, Sponsor[]>();
+  for (const s of list) {
+    const t = stegaClean(s.tier) || 'silver';
+    if (!groups.has(t)) groups.set(t, []);
+    groups.get(t)!.push(s);
+  }
+  return tierOrder.filter(t => groups.has(t)).map(t => ({ tier: t, sponsors: groups.get(t)! }));
+}
 ---
 
-{variant === 'grid' && (
-  <Section size="sm" class="bg-muted border-y border-border" data-animate>
+{cleanVariant === 'grid' && (
+  <Section size="sm" class:list={["bg-muted border-y border-border", className]} id={id} data-animate>
     {heading && (
       <div class="text-center">
-        <span class="label-caps text-muted-foreground">{heading}</span>
+        <h2 class="label-caps text-muted-foreground">{heading}</h2>
       </div>
     )}
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border">
+
+    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border list-none">
       {sponsors?.map((sponsor) => {
         const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
         const content = (
-          <div class="bg-muted p-6 flex items-center justify-center h-24 hover:bg-background transition-colors duration-200">
+          <div class="bg-muted p-6 flex items-center justify-center h-24">
             {logoUrl ? (
-              <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
             )}
           </div>
         );
-        return sponsor.website ? (
-          <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener">
-            {content}
-          </a>
-        ) : (
-          content
+
+        return (
+          <li>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>
+                {content}
+              </a>
+            ) : (
+              content
+            )}
+          </li>
         );
       })}
-    </div>
+    </ul>
   </Section>
 )}
 
-{variant === 'marquee' && (
-  <Section class="bg-muted border-y border-border" data-animate>
+{cleanVariant === 'marquee' && (
+  <Section class:list={["bg-foreground text-background", className]} id={id} data-animate>
     {heading && (
-      <div class="text-center">
-        <span class="label-caps text-muted-foreground">{heading}</span>
-      </div>
+      <SectionContent class="items-center text-center">
+        <span class="label-caps text-background/60">{heading}</span>
+      </SectionContent>
     )}
-    <Marquee class="mask-x-from-95%">
-      <MarqueeContent>
-        {sponsors?.map((sponsor) => {
-          const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(48).fit('max').url() ?? null;
-          return (
-            <Logo href={sponsor.website ? stegaClean(sponsor.website) : undefined}>
-              {logoUrl ? (
-                <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity object-contain" loading="lazy" />
-              ) : (
-                <span class="text-sm font-bold text-muted-foreground whitespace-nowrap">{sponsor.name}</span>
-              )}
-            </Logo>
-          );
-        })}
-      </MarqueeContent>
-    </Marquee>
+    {sponsors && sponsors.length > 0 && (
+      <>
+        {(['left', 'right'] as const).map((direction) => (
+          <Marquee>
+            <MarqueeContent direction={direction} pauseOnHover>
+              {sponsors.map((sponsor) => {
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+                const item = (
+                  <div class="flex items-center justify-center px-8 h-20">
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-14 max-w-[160px] opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
+                    ) : (
+                      <span class="text-base font-bold text-background/70 whitespace-nowrap">{sponsor.name}</span>
+                    )}
+                  </div>
+                );
+                return sponsor.website ? (
+                  <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{item}</a>
+                ) : item;
+              })}
+            </MarqueeContent>
+          </Marquee>
+        ))}
+      </>
+    )}
   </Section>
 )}
 
-{variant === 'flex-wrap' && (
-  <Section class="bg-muted border-y border-border" data-animate>
+{cleanVariant === 'tiered' && (
+  <Section class={className} id={id} data-animate>
     {heading && (
-      <div class="text-center">
-        <span class="label-caps text-muted-foreground">{heading}</span>
-      </div>
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
     )}
-    <SectionGrid class="flex flex-wrap justify-center">
+    <SectionContent>
+      {groupByTier(sponsors ?? []).map((group, i) => (
+        <>
+          {i > 0 && <hr class="border-border" />}
+          <div class="space-y-4">
+            <span class="label-caps text-muted-foreground">{tierLabels[group.tier] ?? group.tier.toUpperCase()}</span>
+            <ul class="flex flex-wrap items-center gap-8 list-none">
+              {group.sponsors.map((sponsor) => {
+                const isPlatinum = stegaClean(sponsor.tier) === 'platinum';
+                const w = isPlatinum ? 160 : 120;
+                const h = isPlatinum ? 60 : 40;
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+                const item = (
+                  <div class:list={["flex items-center justify-center", isPlatinum ? 'h-20' : 'h-14']}>
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-14 max-w-[160px]' : 'max-h-10 max-w-[120px]']} width={w} height={h} loading="lazy" />
+                    ) : (
+                      <span class:list={["font-bold text-muted-foreground", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
+                    )}
+                  </div>
+                );
+                return (
+                  <li>
+                    {sponsor.website ? (
+                      <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{item}</a>
+                    ) : item}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </>
+      ))}
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'flex-wrap' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <ul class="flex flex-wrap justify-center gap-8 px-8 list-none">
       {sponsors?.map((sponsor) => {
-        const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(48).fit('max').url() ?? null;
-        return (
-          <Logo href={sponsor.website ? stegaClean(sponsor.website) : undefined}>
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+        const content = (
+          <div class="flex items-center justify-center h-20 px-4">
             {logoUrl ? (
-              <img src={logoUrl} alt={sponsor.name} class="max-h-10 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity object-contain" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-12 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground whitespace-nowrap">{sponsor.name}</span>
             )}
-          </Logo>
+          </div>
+        );
+        return (
+          <li>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>{content}</a>
+            ) : content}
+          </li>
         );
       })}
-    </SectionGrid>
+    </ul>
+  </Section>
+)}
+
+{cleanVariant === 'grid-prominent' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl list-none">
+      {(sponsors ?? []).map((sponsor) => {
+        const tier = stegaClean(sponsor.tier) || 'silver';
+        const isPlatinum = tier === 'platinum';
+        const isGold = tier === 'gold';
+        const w = isPlatinum ? 200 : isGold ? 160 : 120;
+        const h = isPlatinum ? 80 : isGold ? 60 : 40;
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+        const content = (
+          <div class:list={[
+            "bg-background p-6 flex items-center justify-center",
+            isPlatinum && 'h-32',
+            isGold && 'h-24',
+            !isPlatinum && !isGold && 'h-20',
+          ]}>
+            {logoUrl ? (
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-16 max-w-[200px]' : isGold ? 'max-h-12 max-w-[160px]' : 'max-h-8 max-w-[120px]']} width={w} height={h} loading="lazy" />
+            ) : (
+              <span class:list={["font-bold text-muted-foreground text-center leading-tight", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
+            )}
+          </div>
+        );
+
+        return (
+          <li class:list={[isPlatinum && 'col-span-2']}>
+            {sponsor.website ? (
+              <a href={stegaClean(sponsor.website)} target="_blank" rel="noopener" title={stegaClean(sponsor.name)}>
+                {content}
+              </a>
+            ) : (
+              content
+            )}
+          </li>
+        );
+      })}
+    </ul>
   </Section>
 )}

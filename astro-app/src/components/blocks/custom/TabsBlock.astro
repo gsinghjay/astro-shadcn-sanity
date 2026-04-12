@@ -1,0 +1,125 @@
+---
+import { Section, SectionContent } from '@/components/ui/section';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import type { TabsBlockBlock } from '@/lib/types';
+
+interface Props extends TabsBlockBlock {
+  class?: string;
+  id?: string;
+}
+
+const { heading, tabs = [], variant: rawVariant, class: className, id } = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'default' || rawCleaned === 'pills' || rawCleaned === 'underline' || rawCleaned === 'brutalist' ? rawCleaned : 'default';
+const firstTab = tabs[0]?._key || 'tab-0';
+---
+
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList>
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key}>{tab.label}</TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'pills' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList class="bg-transparent gap-2 p-0">
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key} class="rounded-full data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'underline' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList class="bg-transparent border-b rounded-none p-0 gap-0">
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key} class="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 pb-3">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        {tabs.map((tab) => (
+          <TabsContent value={tab._key}>
+            <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+          </TabsContent>
+        ))}
+      </Tabs>
+    </div>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="w-full max-w-3xl">
+      <Tabs defaultValue={firstTab}>
+        <TabsList class="bg-transparent rounded-none p-0 gap-0">
+          {tabs.map((tab) => (
+            <TabsTrigger value={tab._key} class="rounded-none border-2 border-border px-6 py-3 font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary">
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <div class="border-t-4 border-primary">
+          {tabs.map((tab) => (
+            <TabsContent value={tab._key}>
+              <div class="p-6 text-muted-foreground leading-relaxed">{tab.content}</div>
+            </TabsContent>
+          ))}
+        </div>
+      </Tabs>
+    </div>
+  </Section>
+)}

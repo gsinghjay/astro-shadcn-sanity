@@ -54,4 +54,42 @@ describe('SponsorSteps', () => {
     });
     expect(html).toBeDefined();
   });
+
+  test('steps variant keeps connecting-line classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorSteps, {
+      props: { ...sponsorStepsFull, variant: 'steps' },
+    });
+
+    expect(html).toContain('bg-border');
+    expect(html).toContain('h-px flex-1');
+  });
+
+  test('split variant renders grid and omits connecting-line classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorSteps, {
+      props: { ...sponsorStepsFull, variant: 'split' },
+    });
+
+    expect(html).toContain('sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]');
+    expect(html).not.toContain('h-px flex-1');
+  });
+
+  test('spread variant renders spread container classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorSteps, {
+      props: { ...sponsorStepsFull, variant: 'spread' },
+    });
+
+    expect(html).toContain('@5xl:justify-between');
+  });
+
+  test('unknown variant falls back to steps layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(SponsorSteps, {
+      props: { ...sponsorStepsFull, variant: 'legacy-variant' },
+    });
+
+    expect(html).toContain('bg-border');
+  });
 });

@@ -3,23 +3,10 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
-import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, prefetchPages, getSiteParams } from '@/lib/sanity';
-import { stegaClean } from '@sanity/client/stega';
+import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getAllArticles, prefetchPages, getSiteParams } from '@/lib/sanity';
 import { urlFor } from '@/lib/image';
 
-import DefaultTemplate from '@/layouts/templates/DefaultTemplate.astro';
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
-import LandingTemplate from '@/layouts/templates/LandingTemplate.astro';
-import SidebarTemplate from '@/layouts/templates/SidebarTemplate.astro';
-import TwoColumnTemplate from '@/layouts/templates/TwoColumnTemplate.astro';
-
-const templates = {
-  default: DefaultTemplate,
-  fullWidth: FullWidthTemplate,
-  landing: LandingTemplate,
-  sidebar: SidebarTemplate,
-  twoColumn: TwoColumnTemplate,
-};
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
 
@@ -38,24 +25,22 @@ const { slug } = Astro.params;
 // In static mode: fetch page data and render inline
 // In VE mode: skip fetch — server island handles its own data fetching
 let page = null;
-let template: keyof typeof templates = 'default';
-let TemplateComponent: typeof DefaultTemplate = DefaultTemplate;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
 let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
 let events: Awaited<ReturnType<typeof getAllEvents>> = [];
+let articles: Awaited<ReturnType<typeof getAllArticles>> = [];
 
 if (!visualEditingEnabled) {
   page = await getPage(slug as string);
   if (!page) {
     return Astro.redirect('/404');
   }
-  template = stegaClean(page.template) as keyof typeof templates;
-  TemplateComponent = templates[template] ?? DefaultTemplate;
   sponsors = await getAllSponsors();
   projects = await getAllProjects();
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
+  articles = await getAllArticles();
 }
 
 // Extract first hero image for <link rel="preload"> (LCP optimization)
@@ -66,18 +51,21 @@ const heroImage = firstBlock?._type === 'heroBanner'
 const preloadImageUrl = heroImage?.asset
   ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
+const preloadSrcset = heroImage?.asset
+  ? [640, 1024, 1440, 1920].map(w => `${urlFor(heroImage).width(w).height(Math.round(w * 1080 / 1920)).fit('crop').url()} ${w}w`).join(', ')
+  : undefined;
 ---
 
 <Layout
   title={page?.title ?? undefined}
   seo={page?.seo}
-  hideNav={!visualEditingEnabled && template === 'landing'}
-  template={template}
   preloadImage={preloadImageUrl}
+  preloadImageSrcset={preloadSrcset}
+  preloadImageSizes="100vw"
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>
-      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div slot="fallback" class="mx-auto max-w-7xl px-(--gutter) py-12">
         <div class="animate-pulse space-y-8">
           <div class="h-10 bg-muted rounded w-2/5"></div>
           <div class="h-64 bg-muted rounded"></div>
@@ -89,8 +77,8 @@ const preloadImageUrl = heroImage?.asset
       </div>
     </SanityPageContent>
   ) : (
-    <TemplateComponent>
-      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
-    </TemplateComponent>
+    <FullWidthTemplate>
+      <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} articles={articles} />
+    </FullWidthTemplate>
   )}
 </Layout>

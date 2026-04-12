@@ -13,6 +13,8 @@ import type {
   ALL_EVENTS_QUERY_RESULT,
   EVENT_BY_SLUG_QUERY_RESULT,
   SPONSOR_PROJECTS_QUERY_RESULT,
+  ALL_ARTICLES_QUERY_RESULT,
+  ARTICLE_BY_SLUG_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -85,6 +87,18 @@ export type Testimonial = ALL_TESTIMONIALS_QUERY_RESULT[number];
 export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
 
 /**
+ * Article type — derived from the generated ALL_ARTICLES_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Article = ALL_ARTICLES_QUERY_RESULT[number];
+
+/**
+ * RelatedArticle type — narrower projection from the detail query's relatedArticles[]->.
+ * Lacks author and category fields. Used by ArticleCard to accept both shapes.
+ */
+export type RelatedArticle = NonNullable<NonNullable<ARTICLE_BY_SLUG_QUERY_RESULT>['relatedArticles']>[number];
+
+/**
  * Module-level sync tag collector.
  * Accumulates sync tags from all loadQuery() calls during a page render.
  * Use getSyncTags() to retrieve and resetSyncTags() to clear between pages.
@@ -152,7 +166,8 @@ export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings" &&
   footerLinks[]{ _key, label, href },
   resourceLinks[]{ _key, label, href, external },
   programLinks[]{ _key, label, href },
-  currentSemester
+  currentSemester,
+  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }
 }`);
 
 /**
@@ -227,7 +242,7 @@ export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && sl
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
   tier, description, website, featured, industry,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
 }`);
 
@@ -331,7 +346,7 @@ export const PROJECT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "project" && sl
   team[]{ _key, name, role },
   mentor{ name, title, department },
   outcome,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
 }`);
 
@@ -372,13 +387,13 @@ export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESUL
 
 /**
  * Resolve testimonials for a testimonials block from the pre-fetched cache.
- * Filters based on displayMode config (all/industry/student/byProject/manual).
+ * Filters based on testimonialSource config (all/industry/student/byProject/manual).
  */
 export function resolveBlockTestimonials(
-  block: { _type: string; displayMode?: string | null; testimonials?: Array<{ _id: string }> | null },
+  block: { _type: string; testimonialSource?: string | null; testimonials?: Array<{ _id: string }> | null },
   allTestimonials: Testimonial[],
 ): Testimonial[] {
-  const mode = stegaClean(block.displayMode) ?? 'all';
+  const mode = stegaClean(block.testimonialSource) ?? 'all';
   if (mode === 'all') return allTestimonials;
   if (mode === 'industry') return allTestimonials.filter(t => stegaClean(t.type) === 'industry');
   if (mode === 'student') return allTestimonials.filter(t => stegaClean(t.type) === 'student');
@@ -413,14 +428,14 @@ export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
 
 /**
  * Resolve events for an eventList block from the pre-fetched cache.
- * Filters based on filterBy config (all/upcoming/past) and applies limit.
+ * Filters based on eventStatus config (all/upcoming/past) and applies limit.
  * Status field takes priority; date comparison is fallback when status is unset.
  */
 export function resolveBlockEvents(
-  block: { _type: string; filterBy?: string | null; limit?: number | null },
+  block: { _type: string; eventStatus?: string | null; limit?: number | null },
   allEvents: SanityEvent[],
 ): SanityEvent[] {
-  const filter = stegaClean(block.filterBy) ?? 'upcoming';
+  const filter = stegaClean(block.eventStatus) ?? 'upcoming';
   const limit = block.limit ?? 10;
   const now = new Date().toISOString();
 
@@ -465,7 +480,7 @@ export const ALL_EVENT_SLUGS_QUERY = defineQuery(groq`*[_type == "event" && defi
 export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, title, "slug": slug.current,
   date, endDate, location, description, eventType, status, isAllDay, category,
-  seo { metaTitle, metaDescription, ogImage { ${IMAGE_PROJECTION}, alt } }
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } }
 }`);
 
 /**
@@ -474,6 +489,107 @@ export const EVENT_BY_SLUG_QUERY = defineQuery(groq`*[_type == "event" && slug.c
 export async function getEventBySlug(slug: string): Promise<EVENT_BY_SLUG_QUERY_RESULT> {
   const { result } = await loadQuery<EVENT_BY_SLUG_QUERY_RESULT>({
     query: EVENT_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Article queries (Story 19.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch all articles for build-time caching.
+ * Ordered by publishedAt descending (newest first).
+ */
+export const ALL_ARTICLES_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  author->{ name, "slug": slug.current },
+  publishedAt,
+  category->{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * GROQ query: fetch all article slugs for static path generation.
+ */
+export const ALL_ARTICLE_SLUGS_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single article by slug with full fields.
+ * Includes body with portable text, expanded author, category, related articles, tags, and SEO.
+ */
+export const ARTICLE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "article" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt },
+  body[]${PORTABLE_TEXT_PROJECTION},
+  author->{ name, "slug": slug.current, role, image{ ${IMAGE_PROJECTION}, alt }, sameAs },
+  publishedAt,
+  updatedAt,
+  category->{ title, "slug": slug.current },
+  tags,
+  relatedArticles[]->{ _id, title, "slug": slug.current, excerpt, featuredImage{ ${IMAGE_PROJECTION}, alt }, publishedAt },
+  seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } }
+}`);
+
+/**
+ * Fetch all articles from Sanity.
+ * Result is cached for the duration of the build (module-level memoization).
+ */
+let _articlesCache: ALL_ARTICLES_QUERY_RESULT | null = null;
+
+export async function getAllArticles(): Promise<ALL_ARTICLES_QUERY_RESULT> {
+  if (!visualEditingEnabled && _articlesCache) return _articlesCache;
+  const { result } = await loadQuery<ALL_ARTICLES_QUERY_RESULT>({ query: ALL_ARTICLES_QUERY, params: getSiteParams() });
+  _articlesCache = result ?? [];
+  return _articlesCache;
+}
+
+/**
+ * Resolve articles for an articleList block from the pre-fetched cache.
+ * Filters based on contentType config (all/by-category) and applies limit.
+ * Articles arrive pre-sorted by publishedAt desc from the GROQ query,
+ * so no re-sorting is needed here.
+ */
+export function resolveBlockArticles(
+  block: {
+    _type: string;
+    contentType?: string | null;
+    categories?: Array<{ _id: string } | null> | null;
+    limit?: number | null;
+  },
+  allArticles: Article[],
+): Article[] {
+  const mode = stegaClean(block.contentType) ?? 'all';
+  const limit = block.limit ?? 6;
+
+  let filtered: Article[];
+  if (mode === 'by-category' && block.categories && block.categories.length > 0) {
+    const categoryIds = new Set(
+      block.categories
+        .filter((c): c is { _id: string } => !!c && !!c._id)
+        .map((c) => c._id),
+    );
+    filtered =
+      categoryIds.size > 0
+        ? allArticles.filter((a) => a.category?._id && categoryIds.has(a.category._id))
+        : allArticles;
+  } else {
+    // 'all' or no categories selected — show everything
+    filtered = allArticles;
+  }
+
+  return filtered.slice(0, limit);
+}
+
+/**
+ * Fetch a single article by slug from Sanity.
+ */
+export async function getArticleBySlug(slug: string): Promise<ARTICLE_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLE_BY_SLUG_QUERY_RESULT>({
+    query: ARTICLE_BY_SLUG_QUERY,
     params: { slug, ...getSiteParams() },
   });
   return result;
@@ -543,7 +659,7 @@ export async function getSponsorProjects(email: string) {
 }
 
 /**
- * GROQ query: fetch a single page by slug with template and blocks.
+ * GROQ query: fetch a single page by slug with blocks.
  * Includes type-conditional projections for all block types.
  * Sponsor data is NOT inlined — it's fetched once via ALL_SPONSORS_QUERY
  * and resolved per-block via resolveBlockSponsors().
@@ -552,10 +668,10 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
   _id,
   title,
   "slug": slug.current,
-  template,
   seo {
     metaTitle,
     metaDescription,
+    noIndex,
     ogImage { ${IMAGE_PROJECTION}, alt }
   },
   blocks[]{
@@ -596,7 +712,6 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "logoCloud" => {
       heading,
       autoPopulate,
-      variant,
       sponsors[]->{ _id }
     },
     _type == "sponsorSteps" => {
@@ -616,9 +731,8 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       heading,
       description,
       successMessage,
-      variant,
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
-      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }
+      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
     },
     _type == "sponsorCards" => {
       heading,
@@ -632,12 +746,12 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     },
     _type == "testimonials" => {
       heading,
-      displayMode,
+      testimonialSource,
       testimonials[]->{ _id }
     },
     _type == "eventList" => {
       heading,
-      filterBy,
+      eventStatus,
       limit
     },
     _type == "teamGrid" => {
@@ -648,21 +762,21 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     _type == "imageGallery" => {
       heading,
       description,
-      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption },
-      columns
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
     },
     _type == "articleList" => {
       heading,
       description,
-      source,
+      contentType,
+      categories[]->{ _id },
       limit,
-      links[]{ _key, text, url, variant }
+      ctaButtons[]{ _key, text, url, variant }
     },
     _type == "comparisonTable" => {
       heading,
       description,
-      columns[]{ _key, title, highlighted },
-      rows[]{ _key, feature, values, isHeader },
+      options[]{ _key, title, highlighted },
+      criteria[]{ _key, feature, values, isHeader },
       links[]{ _key, text, url, variant }
     },
     _type == "timeline" => {
@@ -692,8 +806,81 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
       tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
     },
     _type == "videoEmbed" => {
-      videoUrl,
-      title,
+      heading,
+      description,
+      youtubeUrl,
+      posterImage{ ${IMAGE_PROJECTION}, alt }
+    },
+    _type == "pricingTable" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
+    },
+    _type == "serviceCards" => {
+      heading,
+      description,
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
+    },
+    _type == "productShowcase" => {
+      heading,
+      description,
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
+    },
+    _type == "linkCards" => {
+      heading,
+      description,
+      links[]{ _key, title, description, icon, url }
+    },
+    _type == "newsletter" => {
+      heading,
+      description,
+      inputPlaceholder,
+      submitButtonLabel,
+      privacyDisclaimerText
+    },
+    _type == "accordion" => {
+      heading,
+      description,
+      items[]{ _key, title, content }
+    },
+    _type == "tabsBlock" => {
+      heading,
+      tabs[]{ _key, label, content }
+    },
+    _type == "embedBlock" => {
+      heading,
+      embedUrl,
+      caption
+    },
+    _type == "mapBlock" => {
+      heading,
+      address,
+      coordinates{ lat, lng },
+      caption,
+      contactInfo{ phone, email, hours }
+    },
+    _type == "countdownTimer" => {
+      heading,
+      description,
+      targetDate,
+      completedMessage
+    },
+    _type == "metricsDashboard" => {
+      heading,
+      description,
+      metrics[]{ _key, label, value, change, trend, icon }
+    },
+    _type == "cardGrid" => {
+      heading,
+      description,
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
+    },
+    _type == "beforeAfter" => {
+      heading,
+      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      beforeLabel,
+      afterLabel,
       caption
     }
   }

@@ -4,71 +4,156 @@ import { Section, SectionContent } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { stegaClean } from '@sanity/client/stega';
+import { JsonLd } from '@/components/ui/json-ld';
+import { extractNumericPrice } from '@/lib/structured-data';
 
 interface Props extends SponsorshipTiersBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, description, tiers } = Astro.props;
+const { heading, description, tiers, variant: rawVariant, class: className, id } = Astro.props;
 const tiersList = tiers ?? [];
+
+const offersJsonLd = tiersList.filter(t => t.name && t.price).map(tier => ({
+  "@type": "Offer",
+  "name": stegaClean(tier.name),
+  "price": extractNumericPrice(stegaClean(tier.price) || ''),
+  "priceCurrency": "USD",
+  ...(tier.benefits?.length && { "description": tier.benefits.map(b => stegaClean(b)).join('. ') }),
+  ...(tier.ctaButton?.url && { "url": stegaClean(tier.ctaButton.url) }),
+  "availability": "https://schema.org/InStock",
+}));
+const cleanVariant = (() => {
+  const v = stegaClean(rawVariant);
+  return v === 'brutalist' ? v : 'default';
+})();
+
+const tierBarColors: Record<string, string> = {
+  platinum: 'bg-primary',
+  gold: 'bg-[#E89B32]',
+  silver: 'bg-[#D4D4D4]',
+  bronze: 'bg-[#A3A3A3]',
+};
 ---
 
-<Section data-animate>
-  <SectionContent>
-    {heading && (
-      <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
-    )}
-    {description && (
-      <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
-    )}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-      {tiersList.map((tier) => {
-        const isHighlighted = tier.highlighted === true;
-        return (
-          <div
-            class:list={[
-              'relative flex flex-col rounded-lg p-6',
-              isHighlighted
-                ? 'ring-2 ring-primary shadow-lg'
-                : 'border border-border shadow-sm',
-            ]}
-          >
-            {isHighlighted && (
-              <Badge class="absolute -top-3 left-1/2 -translate-x-1/2">Recommended</Badge>
-            )}
+{offersJsonLd.length > 0 && offersJsonLd.map(o => <JsonLd schema={o} />)}
 
-            <div class="mb-4">
-              <h3 class="text-xl font-semibold">{tier.name}</h3>
-              <p class="text-3xl font-bold mt-2">{tier.price}</p>
+{cleanVariant === 'default' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        {tiersList.map((tier) => {
+          const isHighlighted = tier.highlighted === true;
+          return (
+            <div
+              class:list={[
+                'relative flex flex-col p-6',
+                isHighlighted
+                  ? 'ring-2 ring-primary shadow-sm'
+                  : 'border border-border shadow-sm',
+              ]}
+            >
+              {isHighlighted && (
+                <Badge class="absolute -top-3 left-1/2 -translate-x-1/2">Recommended</Badge>
+              )}
+
+              <div class="mb-4">
+                <h3 class="text-xl font-semibold">{tier.name}</h3>
+                <p class="text-3xl font-bold mt-2">{tier.price}</p>
+              </div>
+
+              <ul class="flex-1 space-y-3 mb-6">
+                {(tier.benefits ?? []).map((benefit) => (
+                  <li class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {tier.ctaButton && (
+                <Button
+                  href={tier.ctaButton.url}
+                  variant={isHighlighted ? 'default' : (stegaClean(tier.ctaButton.variant) || 'outline')}
+                  class="w-full"
+                  data-gtm-category="sponsorship"
+                  data-gtm-action="click"
+                  data-gtm-label={stegaClean(tier.name)}
+                  aria-label={`${stegaClean(tier.ctaButton.text) || 'Learn more'} for ${stegaClean(tier.name) || 'this tier'}`}
+                >
+                  {tier.ctaButton.text}
+                </Button>
+              )}
             </div>
+          );
+        })}
+      </div>
+    </SectionContent>
+  </Section>
+)}
 
-            <ul class="flex-1 space-y-3 mb-6">
-              {(tier.benefits ?? []).map((benefit) => (
-                <li class="flex items-start gap-2">
-                  <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" />
-                  </svg>
-                  <span class="text-sm">{benefit}</span>
-                </li>
-              ))}
-            </ul>
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent>
+      {heading && (
+        <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.1]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
+      )}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        {tiersList.map((tier) => {
+          const isHighlighted = tier.highlighted === true;
+          const tierName = stegaClean(tier.name)?.toLowerCase() || 'silver';
+          const barColor = tierBarColors[tierName] ?? 'bg-[#A3A3A3]';
+          return (
+            <div class:list={[
+              'relative flex flex-col border-2 border-foreground',
+              isHighlighted && 'ring-2 ring-primary',
+            ]}>
+              <div class:list={[barColor, "h-2"]} />
+              <div class="p-6 flex flex-col flex-1">
+                <div class="mb-4">
+                  <span class="font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">{tier.name}</span>
+                  <p class="text-3xl font-bold mt-2 font-mono">{tier.price}</p>
+                </div>
 
-            {tier.ctaButton && (
-              <Button
-                href={tier.ctaButton.url}
-                variant={isHighlighted ? 'default' : (stegaClean(tier.ctaButton.variant) || 'outline')}
-                class="w-full"
-                data-gtm-category="sponsorship"
-                data-gtm-action="click"
-                data-gtm-label={stegaClean(tier.name)}
-              >
-                {tier.ctaButton.text}
-              </Button>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  </SectionContent>
-</Section>
+                <ul class="flex-1 space-y-3 mb-6">
+                  {(tier.benefits ?? []).map((benefit) => (
+                    <li class="flex items-start gap-2">
+                      <span class="text-primary mt-0.5 font-mono font-bold" aria-hidden="true">&#9632;</span>
+                      <span class="text-sm">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {tier.ctaButton && (
+                  <Button
+                    href={tier.ctaButton.url}
+                    variant={isHighlighted ? 'default' : (stegaClean(tier.ctaButton.variant) || 'outline')}
+                    class="w-full"
+                    data-gtm-category="sponsorship"
+                    data-gtm-action="click"
+                    data-gtm-label={stegaClean(tier.name)}
+                    aria-label={`${stegaClean(tier.ctaButton.text) || 'Learn more'} for ${stegaClean(tier.name) || 'this tier'}`}
+                  >
+                    {tier.ctaButton.text}
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </SectionContent>
+  </Section>
+)}

@@ -10,7 +10,7 @@ export const contactForm = defineBlock({
   variants: [
     {name: 'stacked', title: 'Stacked'},
     {name: 'split', title: 'Split'},
-    {name: 'split-image', title: 'Split Image'},
+    {name: 'split-image', title: 'Split with Image'},
   ],
   hiddenByVariant: {
     backgroundImages: ['stacked', 'split'],
@@ -20,17 +20,20 @@ export const contactForm = defineBlock({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.max(150),
     }),
     defineField({
       name: 'description',
       title: 'Description',
       type: 'text',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'successMessage',
       title: 'Success Message',
       type: 'string',
       description: 'Shown after successful form submission',
+      validation: (Rule) => Rule.max(500),
     }),
     defineField({
       name: 'form',
@@ -44,6 +47,7 @@ export const contactForm = defineBlock({
       name: 'backgroundImages',
       title: 'Background Images',
       type: 'array',
+      description: 'Background images for the form section',
       of: [
         defineArrayMember({
           type: 'image',
@@ -53,11 +57,11 @@ export const contactForm = defineBlock({
               name: 'alt',
               title: 'Alt Text',
               type: 'string',
-              validation: (Rule) => Rule.required(),
             }),
           ],
         }),
       ],
+      validation: (Rule) => Rule.max(5),
     }),
   ],
 })

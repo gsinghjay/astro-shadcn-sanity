@@ -167,10 +167,14 @@ const projectsForClient = isAuthorized && sponsor
   </PortalLayout>
 )}
 
-{/* GTM: portal sponsor view — only fires for authorized users */}
+{/* GTM: portal sponsor view — only fires for authorized users with consent */}
 {isAuthorized && (
   <script define:vars={{ sponsorSlug: slug }}>
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'portal_sponsor_view', sponsor_slug: sponsorSlug });
+    try {
+      if (localStorage.getItem('cookie-consent') === 'accepted') {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'portal_sponsor_view', sponsor_slug: sponsorSlug });
+      }
+    } catch { /* localStorage unavailable */ }
   </script>
 )}

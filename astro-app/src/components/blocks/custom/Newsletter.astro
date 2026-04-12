@@ -1,0 +1,119 @@
+---
+import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { stegaClean } from '@sanity/client/stega';
+import { cn } from '@/lib/utils';
+import type { NewsletterBlock } from '@/lib/types';
+
+interface Props extends NewsletterBlock {
+  class?: string;
+  id?: string;
+}
+
+const {
+  heading,
+  description,
+  inputPlaceholder = 'Enter your email',
+  submitButtonLabel = 'Subscribe',
+  privacyDisclaimerText,
+  variant: rawVariant,
+  class: className,
+  id,
+} = Astro.props;
+const rawCleaned = stegaClean(rawVariant);
+const cleanVariant = rawCleaned === 'inline' || rawCleaned === 'banner' || rawCleaned === 'split' || rawCleaned === 'brutalist' ? rawCleaned : 'inline';
+---
+
+{cleanVariant === 'inline' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-2xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
+        <Input type="email" placeholder={inputPlaceholder} class="flex-1" />
+        <Button type="submit">{submitButtonLabel}</Button>
+      </form>
+      {privacyDisclaimerText && (
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+      )}
+    </SectionContent>
+  </Section>
+)}
+
+{cleanVariant === 'banner' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="flex-row flex-wrap items-center justify-between gap-6">
+      <div class="flex-1 min-w-0">
+        {heading && (
+          <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-muted-foreground mt-2">{description}</p>
+        )}
+      </div>
+      <form class="flex gap-2 flex-shrink-0" onsubmit="return false;">
+        <Input type="email" placeholder={inputPlaceholder} class="w-64" />
+        <Button type="submit">{submitButtonLabel}</Button>
+      </form>
+    </SectionContent>
+    {privacyDisclaimerText && (
+      <SectionContent>
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+      </SectionContent>
+    )}
+  </Section>
+)}
+
+{cleanVariant === 'split' && (
+  <Section class={className} id={id} data-animate>
+    <SectionSplit>
+      <SectionContent>
+        {heading && (
+          <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        )}
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
+      </SectionContent>
+
+      <SectionContent class="justify-center">
+        <form class="flex flex-col gap-4 w-full" onsubmit="return false;">
+          <Input type="email" placeholder={inputPlaceholder} />
+          <Button type="submit" class="w-full">{submitButtonLabel}</Button>
+        </form>
+        {privacyDisclaimerText && (
+          <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+        )}
+      </SectionContent>
+    </SectionSplit>
+  </Section>
+)}
+
+{cleanVariant === 'brutalist' && (
+  <Section class={className} id={id} data-animate>
+    <SectionContent class="max-w-2xl mx-auto items-center text-center">
+      {heading && (
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05] border-l-4 border-primary pl-6 text-left">{heading}</h2>
+      )}
+      {description && (
+        <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+      )}
+      <form class="flex w-full max-w-md gap-2" onsubmit="return false;">
+        <input
+          type="email"
+          placeholder={inputPlaceholder}
+          class="flex-1 h-10 border-2 border-background bg-transparent px-3 font-mono text-sm placeholder:font-mono focus:outline-none focus:border-primary"
+        />
+        <Button type="submit" variant="outline" class="uppercase tracking-wider font-bold border-2">{submitButtonLabel}</Button>
+      </form>
+      {privacyDisclaimerText && (
+        <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+      )}
+    </SectionContent>
+  </Section>
+)}

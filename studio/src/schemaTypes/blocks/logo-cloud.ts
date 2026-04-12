@@ -11,12 +11,15 @@ export const logoCloud = defineBlock({
     {name: 'grid', title: 'Grid'},
     {name: 'marquee', title: 'Marquee'},
     {name: 'flex-wrap', title: 'Flex Wrap'},
+    {name: 'tiered', title: 'Tiered'},
+    {name: 'grid-prominent', title: 'Grid Prominent'},
   ],
   fields: [
     defineField({
       name: 'heading',
       title: 'Heading',
       type: 'string',
+      validation: (Rule) => Rule.max(150),
     }),
     defineField({
       name: 'autoPopulate',

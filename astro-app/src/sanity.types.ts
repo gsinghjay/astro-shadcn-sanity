@@ -25,52 +25,30 @@ export type AnnouncementBarLink = {
   href?: string;
 };
 
-export type VideoEmbed = {
-  _type: "videoEmbed";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
-  spacing?: "none" | "small" | "default" | "large";
-  maxWidth?: "narrow" | "default" | "full";
-  videoUrl?: string;
-  title?: string;
-  caption?: string;
-};
-
-export type SponsorshipTiers = {
-  _type: "sponsorshipTiers";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
-  spacing?: "none" | "small" | "default" | "large";
-  maxWidth?: "narrow" | "default" | "full";
-  heading?: string;
-  description?: string;
-  tiers?: Array<{
-    name?: string;
-    price?: string;
-    benefits?: Array<string>;
-    highlighted?: boolean;
-    ctaButton?: Button;
-    _key: string;
-  }>;
-};
-
-export type AnnouncementBar = {
-  _type: "announcementBar";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
-  spacing?: "none" | "small" | "default" | "large";
-  maxWidth?: "narrow" | "default" | "full";
-  variant?: "inline" | "floating";
-  icon?: string;
-  text?: string;
-  link?: AnnouncementBarLink;
-  dismissible?: boolean;
-};
-
-export type Divider = {
-  _type: "divider";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
-  spacing?: "none" | "small" | "default" | "large";
-  maxWidth?: "narrow" | "default" | "full";
-  variant?: "line" | "short" | "labeled";
+export type ServiceItemLink = {
   label?: string;
+  href?: string;
+};
+
+export type ProductItemLink = {
+  label?: string;
+  href?: string;
+};
+
+export type Coordinates = {
+  lat?: number;
+  lng?: number;
+};
+
+export type ContactInfo = {
+  phone?: string;
+  email?: string;
+  hours?: string;
+};
+
+export type CardGridItemLink = {
+  label?: string;
+  href?: string;
 };
 
 export type SanityImageAssetReference = {
@@ -80,12 +58,804 @@ export type SanityImageAssetReference = {
   [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
 };
 
-export type Pullquote = {
-  _type: "pullquote";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+export type BeforeAfter = {
+  _type: "beforeAfter";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "sidebar";
+  variant?: "side-by-side" | "stacked" | "toggle";
+  heading?: string;
+  beforeImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  afterImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  beforeLabel?: string;
+  afterLabel?: string;
+  caption?: string;
+};
+
+export type CardGrid = {
+  _type: "cardGrid";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid-2" | "grid-3" | "grid-4" | "masonry" | "brutalist";
+  heading?: string;
+  description?: string;
+  cards?: Array<
+    {
+      _key: string;
+    } & CardGridItem
+  >;
+};
+
+export type MetricsDashboard = {
+  _type: "metricsDashboard";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "row" | "card" | "terminal" | "brutalist-grid";
+  heading?: string;
+  description?: string;
+  metrics?: Array<
+    {
+      _key: string;
+    } & MetricItem
+  >;
+};
+
+export type CountdownTimer = {
+  _type: "countdownTimer";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "inline" | "hero" | "banner" | "brutalist";
+  heading?: string;
+  description?: string;
+  targetDate?: string;
+  completedMessage?: string;
+};
+
+export type MapBlock = {
+  _type: "mapBlock";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "split" | "full-width";
+  heading?: string;
+  address?: string;
+  coordinates?: Coordinates;
+  caption?: string;
+  contactInfo?: ContactInfo;
+};
+
+export type EmbedBlock = {
+  _type: "embedBlock";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "contained" | "full-width";
+  heading?: string;
+  embedUrl?: string;
+  caption?: string;
+};
+
+export type TabsBlock = {
+  _type: "tabsBlock";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "pills" | "underline" | "brutalist";
+  heading?: string;
+  tabs?: Array<
+    {
+      _key: string;
+    } & TabItem
+  >;
+};
+
+export type Accordion = {
+  _type: "accordion";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "bordered" | "separated" | "technical";
+  heading?: string;
+  description?: string;
+  items?: Array<
+    {
+      _key: string;
+    } & AccordionItem
+  >;
+};
+
+export type Newsletter = {
+  _type: "newsletter";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "inline" | "banner" | "split" | "brutalist";
+  heading?: string;
+  description?: string;
+  inputPlaceholder?: string;
+  submitButtonLabel?: string;
+  privacyDisclaimerText?: string;
+};
+
+export type LinkCards = {
+  _type: "linkCards";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "list" | "icon-list";
+  heading?: string;
+  description?: string;
+  links?: Array<
+    {
+      _key: string;
+    } & LinkCardItem
+  >;
+};
+
+export type ProductShowcase = {
+  _type: "productShowcase";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "featured" | "detail";
+  heading?: string;
+  description?: string;
+  products?: Array<
+    {
+      _key: string;
+    } & ProductItem
+  >;
+};
+
+export type ServiceCards = {
+  _type: "serviceCards";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "list" | "alternating" | "icon-grid" | "specification";
+  heading?: string;
+  description?: string;
+  services?: Array<
+    {
+      _key: string;
+    } & ServiceItem
+  >;
+};
+
+export type PricingTable = {
+  _type: "pricingTable";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "simple" | "featured" | "comparison" | "brutalist";
+  heading?: string;
+  description?: string;
+  tiers?: Array<
+    {
+      _key: string;
+    } & PricingTier
+  >;
+};
+
+export type SponsorshipTierItem = {
+  _type: "sponsorshipTierItem";
+  name?: string;
+  price?: string;
+  benefits?: Array<string>;
+  highlighted?: boolean;
+  ctaButton?: Button;
+};
+
+export type CardGridItem = {
+  _type: "cardGridItem";
+  title?: string;
+  description?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  link?: CardGridItemLink;
+  badge?: string;
+};
+
+export type MetricItem = {
+  _type: "metricItem";
+  label?: string;
+  value?: string;
+  change?: string;
+  trend?: "up" | "down" | "neutral";
+  icon?:
+    | "info"
+    | "alert-triangle"
+    | "alert-circle"
+    | "check-circle"
+    | "circle-help"
+    | "bell"
+    | "megaphone"
+    | "star"
+    | "zap"
+    | "gift"
+    | "heart"
+    | "sparkles"
+    | "flame"
+    | "crown"
+    | "trophy"
+    | "target"
+    | "rocket"
+    | "shield"
+    | "shield-check"
+    | "lock"
+    | "key"
+    | "clock"
+    | "calendar"
+    | "timer"
+    | "tag"
+    | "wallet"
+    | "credit-card"
+    | "dollar-sign"
+    | "trending-up"
+    | "trending-down"
+    | "bar-chart-3"
+    | "pie-chart"
+    | "mail"
+    | "phone"
+    | "message-circle"
+    | "send"
+    | "globe"
+    | "map-pin"
+    | "compass"
+    | "external-link"
+    | "link"
+    | "file-text"
+    | "book-open"
+    | "image"
+    | "video"
+    | "music"
+    | "code"
+    | "terminal"
+    | "database"
+    | "cloud"
+    | "server"
+    | "cpu"
+    | "wifi"
+    | "users"
+    | "user"
+    | "handshake"
+    | "graduation-cap"
+    | "settings"
+    | "wrench"
+    | "palette"
+    | "layers"
+    | "box"
+    | "package"
+    | "lightbulb"
+    | "x"
+    | "check"
+    | "plus"
+    | "minus"
+    | "arrow-right"
+    | "arrow-up-right";
+};
+
+export type TabItem = {
+  _type: "tabItem";
+  label?: string;
+  content?: string;
+};
+
+export type AccordionItem = {
+  _type: "accordionItem";
+  title?: string;
+  content?: string;
+};
+
+export type LinkCardItem = {
+  _type: "linkCardItem";
+  title?: string;
+  description?: string;
+  icon?:
+    | "info"
+    | "alert-triangle"
+    | "alert-circle"
+    | "check-circle"
+    | "circle-help"
+    | "bell"
+    | "megaphone"
+    | "star"
+    | "zap"
+    | "gift"
+    | "heart"
+    | "sparkles"
+    | "flame"
+    | "crown"
+    | "trophy"
+    | "target"
+    | "rocket"
+    | "shield"
+    | "shield-check"
+    | "lock"
+    | "key"
+    | "clock"
+    | "calendar"
+    | "timer"
+    | "tag"
+    | "wallet"
+    | "credit-card"
+    | "dollar-sign"
+    | "trending-up"
+    | "trending-down"
+    | "bar-chart-3"
+    | "pie-chart"
+    | "mail"
+    | "phone"
+    | "message-circle"
+    | "send"
+    | "globe"
+    | "map-pin"
+    | "compass"
+    | "external-link"
+    | "link"
+    | "file-text"
+    | "book-open"
+    | "image"
+    | "video"
+    | "music"
+    | "code"
+    | "terminal"
+    | "database"
+    | "cloud"
+    | "server"
+    | "cpu"
+    | "wifi"
+    | "users"
+    | "user"
+    | "handshake"
+    | "graduation-cap"
+    | "settings"
+    | "wrench"
+    | "palette"
+    | "layers"
+    | "box"
+    | "package"
+    | "lightbulb"
+    | "x"
+    | "check"
+    | "plus"
+    | "minus"
+    | "arrow-right"
+    | "arrow-up-right";
+  url?: string;
+};
+
+export type ProductItem = {
+  _type: "productItem";
+  title?: string;
+  description?: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  price?: string;
+  badge?: string;
+  link?: ProductItemLink;
+};
+
+export type ServiceItem = {
+  _type: "serviceItem";
+  title?: string;
+  description?: string;
+  icon?:
+    | "info"
+    | "alert-triangle"
+    | "alert-circle"
+    | "check-circle"
+    | "circle-help"
+    | "bell"
+    | "megaphone"
+    | "star"
+    | "zap"
+    | "gift"
+    | "heart"
+    | "sparkles"
+    | "flame"
+    | "crown"
+    | "trophy"
+    | "target"
+    | "rocket"
+    | "shield"
+    | "shield-check"
+    | "lock"
+    | "key"
+    | "clock"
+    | "calendar"
+    | "timer"
+    | "tag"
+    | "wallet"
+    | "credit-card"
+    | "dollar-sign"
+    | "trending-up"
+    | "trending-down"
+    | "bar-chart-3"
+    | "pie-chart"
+    | "mail"
+    | "phone"
+    | "message-circle"
+    | "send"
+    | "globe"
+    | "map-pin"
+    | "compass"
+    | "external-link"
+    | "link"
+    | "file-text"
+    | "book-open"
+    | "image"
+    | "video"
+    | "music"
+    | "code"
+    | "terminal"
+    | "database"
+    | "cloud"
+    | "server"
+    | "cpu"
+    | "wifi"
+    | "users"
+    | "user"
+    | "handshake"
+    | "graduation-cap"
+    | "settings"
+    | "wrench"
+    | "palette"
+    | "layers"
+    | "box"
+    | "package"
+    | "lightbulb"
+    | "x"
+    | "check"
+    | "plus"
+    | "minus"
+    | "arrow-right"
+    | "arrow-up-right";
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  link?: ServiceItemLink;
+};
+
+export type PricingTier = {
+  _type: "pricingTier";
+  name?: string;
+  price?: string;
+  interval?: string;
+  description?: string;
+  features?: Array<string>;
+  highlighted?: boolean;
+  ctaText?: string;
+  ctaUrl?: string;
+};
+
+export type VideoEmbed = {
+  _type: "videoEmbed";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "full-width" | "split" | "split-asymmetric";
+  heading?: string;
+  description?: string;
+  youtubeUrl?: string;
+  posterImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+};
+
+export type SponsorshipTiers = {
+  _type: "sponsorshipTiers";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "brutalist";
+  heading?: string;
+  description?: string;
+  tiers?: Array<
+    {
+      _key: string;
+    } & SponsorshipTierItem
+  >;
+};
+
+export type AnnouncementBar = {
+  _type: "announcementBar";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "inline" | "floating";
+  icon?:
+    | "info"
+    | "alert-triangle"
+    | "alert-circle"
+    | "check-circle"
+    | "circle-help"
+    | "bell"
+    | "megaphone"
+    | "star"
+    | "zap"
+    | "gift"
+    | "heart"
+    | "sparkles"
+    | "flame"
+    | "crown"
+    | "trophy"
+    | "target"
+    | "rocket"
+    | "shield"
+    | "shield-check"
+    | "lock"
+    | "key"
+    | "clock"
+    | "calendar"
+    | "timer"
+    | "tag"
+    | "wallet"
+    | "credit-card"
+    | "dollar-sign"
+    | "trending-up"
+    | "trending-down"
+    | "bar-chart-3"
+    | "pie-chart"
+    | "mail"
+    | "phone"
+    | "message-circle"
+    | "send"
+    | "globe"
+    | "map-pin"
+    | "compass"
+    | "external-link"
+    | "link"
+    | "file-text"
+    | "book-open"
+    | "image"
+    | "video"
+    | "music"
+    | "code"
+    | "terminal"
+    | "database"
+    | "cloud"
+    | "server"
+    | "cpu"
+    | "wifi"
+    | "users"
+    | "user"
+    | "handshake"
+    | "graduation-cap"
+    | "settings"
+    | "wrench"
+    | "palette"
+    | "layers"
+    | "box"
+    | "package"
+    | "lightbulb"
+    | "x"
+    | "check"
+    | "plus"
+    | "minus"
+    | "arrow-right"
+    | "arrow-up-right";
+  text?: string;
+  link?: AnnouncementBarLink;
+  dismissible?: boolean;
+};
+
+export type Divider = {
+  _type: "divider";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "line" | "short" | "labeled";
+  label?: string;
+};
+
+export type Pullquote = {
+  _type: "pullquote";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
+  spacing?: "none" | "small" | "default" | "large";
+  maxWidth?: "narrow" | "default" | "full";
+  variant?: "centered" | "split" | "sidebar" | "brutalist";
   quote?: string;
   attribution?: string;
   role?: string;
@@ -101,10 +871,19 @@ export type Pullquote = {
 
 export type Timeline = {
   _type: "timeline";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "vertical" | "split" | "horizontal";
+  variant?: "vertical" | "split" | "horizontal" | "engineering";
   heading?: string;
   description?: string;
   items?: Array<
@@ -121,18 +900,27 @@ export type Timeline = {
 
 export type ComparisonTable = {
   _type: "comparisonTable";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "table" | "stacked";
+  variant?: "table" | "stacked" | "specification";
   heading?: string;
   description?: string;
-  columns?: Array<
+  options?: Array<
     {
       _key: string;
     } & ComparisonColumn
   >;
-  rows?: Array<
+  criteria?: Array<
     {
       _key: string;
     } & ComparisonRow
@@ -172,17 +960,38 @@ export type ComparisonColumn = {
   highlighted?: boolean;
 };
 
+export type ArticleCategoryReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "articleCategory";
+};
+
 export type ArticleList = {
   _type: "articleList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "split-featured" | "list";
+  variant?: "grid" | "split-featured" | "list" | "brutalist" | "magazine";
   heading?: string;
   description?: string;
-  source?: "all" | "blog" | "news";
+  contentType?: "all" | "by-category";
+  categories?: Array<
+    {
+      _key: string;
+    } & ArticleCategoryReference
+  >;
   limit?: number;
-  links?: Array<
+  ctaButtons?: Array<
     {
       _key: string;
     } & Button
@@ -191,7 +1000,16 @@ export type ArticleList = {
 
 export type ImageGallery = {
   _type: "imageGallery";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "masonry" | "single";
@@ -202,12 +1020,20 @@ export type ImageGallery = {
       _key: string;
     } & GalleryImage
   >;
-  columns?: "2" | "3" | "4";
 };
 
 export type TeamGrid = {
   _type: "teamGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "grid" | "grid-compact" | "split";
@@ -229,9 +1055,19 @@ export type ProjectReference = {
 
 export type ProjectCards = {
   _type: "projectCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "case-study" | "blueprint";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   projects?: Array<
@@ -243,11 +1079,20 @@ export type ProjectCards = {
 
 export type EventList = {
   _type: "eventList";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   heading?: string;
-  filterBy?: "all" | "upcoming" | "past";
+  eventStatus?: "all" | "upcoming" | "past";
   limit?: number;
 };
 
@@ -260,11 +1105,28 @@ export type TestimonialReference = {
 
 export type Testimonials = {
   _type: "testimonials";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?:
+    | "grid"
+    | "masonry"
+    | "split"
+    | "carousel"
+    | "marquee"
+    | "brutalist-quote"
+    | "spotlight";
   heading?: string;
-  displayMode?: "all" | "industry" | "student" | "byProject" | "manual";
+  testimonialSource?: "all" | "industry" | "student" | "byProject" | "manual";
   testimonials?: Array<
     {
       _key: string;
@@ -281,9 +1143,19 @@ export type SponsorReference = {
 
 export type SponsorCards = {
   _type: "sponsorCards";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "default" | "showcase" | "brutalist-tier";
   heading?: string;
   displayMode?: "all" | "featured" | "manual";
   sponsors?: Array<
@@ -302,7 +1174,16 @@ export type FormReference = {
 
 export type ContactForm = {
   _type: "contactForm";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
   variant?: "stacked" | "split" | "split-image";
@@ -323,9 +1204,19 @@ export type ContactForm = {
 
 export type FaqSection = {
   _type: "faqSection";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "split" | "stacked" | "spread-header" | "narrow" | "technical";
   heading?: string;
   items?: Array<
     {
@@ -336,17 +1227,37 @@ export type FaqSection = {
 
 export type RichText = {
   _type: "richText";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "prose" | "standard" | "highlighted" | "sidebar";
   content?: PortableText;
 };
 
 export type SponsorSteps = {
   _type: "sponsorSteps";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "steps" | "split" | "spread";
   heading?: string;
   subheading?: string;
   items?: Array<
@@ -363,10 +1274,19 @@ export type SponsorSteps = {
 
 export type LogoCloud = {
   _type: "logoCloud";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "grid" | "marquee" | "flex-wrap";
+  variant?: "grid" | "marquee" | "flex-wrap" | "tiered" | "grid-prominent";
   heading?: string;
   autoPopulate?: boolean;
   sponsors?: Array<
@@ -378,9 +1298,24 @@ export type LogoCloud = {
 
 export type TextWithImage = {
   _type: "textWithImage";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?:
+    | "split"
+    | "split-asymmetric"
+    | "reversed"
+    | "floating"
+    | "brutalist";
   heading?: string;
   content?: PortableText;
   image?: {
@@ -396,9 +1331,19 @@ export type TextWithImage = {
 
 export type StatsRow = {
   _type: "statsRow";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?: "grid" | "split" | "spread" | "brutalist" | "ticker";
   heading?: string;
   stats?: Array<
     {
@@ -409,10 +1354,25 @@ export type StatsRow = {
 
 export type CtaBanner = {
   _type: "ctaBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "spread" | "overlay";
+  variant?:
+    | "centered"
+    | "split"
+    | "spread"
+    | "overlay"
+    | "brutalist"
+    | "data-cta";
   heading?: string;
   description?: string;
   backgroundImages?: Array<{
@@ -433,9 +1393,25 @@ export type CtaBanner = {
 
 export type FeatureGrid = {
   _type: "featureGrid";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
+  variant?:
+    | "grid"
+    | "grid-centered"
+    | "horizontal-cards"
+    | "sidebar-grid"
+    | "stacked"
+    | "numbered-brutalist";
   heading?: string;
   items?: Array<
     {
@@ -447,10 +1423,25 @@ export type FeatureGrid = {
 
 export type HeroBanner = {
   _type: "heroBanner";
-  backgroundVariant?: "white" | "light" | "dark" | "primary";
+  backgroundVariant?:
+    | "white"
+    | "light"
+    | "dark"
+    | "primary"
+    | "hatched"
+    | "hatched-light"
+    | "blueprint"
+    | "mono"
+    | "stripe";
   spacing?: "none" | "small" | "default" | "large";
   maxWidth?: "narrow" | "default" | "full";
-  variant?: "centered" | "split" | "split-asymmetric" | "overlay" | "spread";
+  variant?:
+    | "centered"
+    | "split"
+    | "split-asymmetric"
+    | "overlay"
+    | "spread"
+    | "brutalist";
   heading?: string;
   subheading?: string;
   backgroundImages?: Array<{
@@ -599,6 +1590,14 @@ export type SiteSettings = {
     _key: string;
   }>;
   currentSemester?: string;
+  aiSearch?: {
+    enabled?: boolean;
+    apiUrl?: string;
+    placeholder?: string;
+    theme?: "auto" | "light" | "dark";
+    hideBranding?: boolean;
+    openByDefault?: boolean;
+  };
 };
 
 export type GalleryImage = {
@@ -649,7 +1648,77 @@ export type StatItem = {
 
 export type FeatureItem = {
   _type: "featureItem";
-  icon?: string;
+  icon?:
+    | "info"
+    | "alert-triangle"
+    | "alert-circle"
+    | "check-circle"
+    | "circle-help"
+    | "bell"
+    | "megaphone"
+    | "star"
+    | "zap"
+    | "gift"
+    | "heart"
+    | "sparkles"
+    | "flame"
+    | "crown"
+    | "trophy"
+    | "target"
+    | "rocket"
+    | "shield"
+    | "shield-check"
+    | "lock"
+    | "key"
+    | "clock"
+    | "calendar"
+    | "timer"
+    | "tag"
+    | "wallet"
+    | "credit-card"
+    | "dollar-sign"
+    | "trending-up"
+    | "trending-down"
+    | "bar-chart-3"
+    | "pie-chart"
+    | "mail"
+    | "phone"
+    | "message-circle"
+    | "send"
+    | "globe"
+    | "map-pin"
+    | "compass"
+    | "external-link"
+    | "link"
+    | "file-text"
+    | "book-open"
+    | "image"
+    | "video"
+    | "music"
+    | "code"
+    | "terminal"
+    | "database"
+    | "cloud"
+    | "server"
+    | "cpu"
+    | "wifi"
+    | "users"
+    | "user"
+    | "handshake"
+    | "graduation-cap"
+    | "settings"
+    | "wrench"
+    | "palette"
+    | "layers"
+    | "box"
+    | "package"
+    | "lightbulb"
+    | "x"
+    | "check"
+    | "plus"
+    | "minus"
+    | "arrow-right"
+    | "arrow-up-right";
   image?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -682,6 +1751,13 @@ export type EventReference = {
   [internalGroqTypeReferenceTo]?: "event";
 };
 
+export type ArticleReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "article";
+};
+
 export type PortableText = Array<
   | {
       children?: Array<{
@@ -703,7 +1779,8 @@ export type PortableText = Array<
               | PageReference
               | SponsorReference
               | ProjectReference
-              | EventReference;
+              | EventReference
+              | ArticleReference;
             _type: "internalLink";
             _key: string;
           }
@@ -731,6 +1808,17 @@ export type PortableText = Array<
       _type: "callout";
       _key: string;
     }
+  | {
+      caption?: string;
+      rows?: Array<{
+        isHeader?: boolean;
+        cells?: Array<string>;
+        _type: "tableRow";
+        _key: string;
+      }>;
+      _type: "table";
+      _key: string;
+    }
 >;
 
 export type Page = {
@@ -742,7 +1830,6 @@ export type Page = {
   title?: string;
   slug?: Slug;
   site?: "rwc-us" | "rwc-intl";
-  template?: "default" | "fullWidth" | "landing" | "sidebar" | "twoColumn";
   seo?: Seo;
   blocks?: Array<
     | ({
@@ -817,6 +1904,45 @@ export type Page = {
     | ({
         _key: string;
       } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
   >;
 };
 
@@ -929,6 +2055,7 @@ export type Seo = {
   _type: "seo";
   metaTitle?: string;
   metaDescription?: string;
+  noIndex?: boolean;
   ogImage?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -937,6 +2064,91 @@ export type Seo = {
     alt?: string;
     _type: "image";
   };
+};
+
+export type AuthorReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "author";
+};
+
+export type Article = {
+  _id: string;
+  _type: "article";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  excerpt?: string;
+  featuredImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  body?: PortableText;
+  author?: AuthorReference;
+  publishedAt?: string;
+  updatedAt?: string;
+  category?: ArticleCategoryReference;
+  tags?: Array<string>;
+  relatedArticles?: Array<
+    {
+      _key: string;
+    } & ArticleReference
+  >;
+  seo?: Seo;
+};
+
+export type ArticleCategory = {
+  _id: string;
+  _type: "articleCategory";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  site?: "rwc-us" | "rwc-intl";
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type Author = {
+  _id: string;
+  _type: "author";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  site?: "rwc-us" | "rwc-intl";
+  role?: string;
+  bio?: string;
+  credentials?: Array<string>;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  sameAs?: Array<string>;
+  socialLinks?: Array<{
+    platform?: "linkedin" | "github" | "twitter" | "website" | "other";
+    url?: string;
+    _key: string;
+  }>;
 };
 
 export type Event = {
@@ -957,12 +2169,6 @@ export type Event = {
   eventType?: "showcase" | "networking" | "workshop";
   status?: "upcoming" | "past";
   seo?: Seo;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type Sponsor = {
@@ -1154,17 +2360,45 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | Options
   | AnnouncementBarLink
+  | ServiceItemLink
+  | ProductItemLink
+  | Coordinates
+  | ContactInfo
+  | CardGridItemLink
+  | SanityImageAssetReference
+  | BeforeAfter
+  | CardGrid
+  | MetricsDashboard
+  | CountdownTimer
+  | MapBlock
+  | EmbedBlock
+  | TabsBlock
+  | Accordion
+  | Newsletter
+  | LinkCards
+  | ProductShowcase
+  | ServiceCards
+  | PricingTable
+  | SponsorshipTierItem
+  | CardGridItem
+  | MetricItem
+  | TabItem
+  | AccordionItem
+  | LinkCardItem
+  | ProductItem
+  | ServiceItem
+  | PricingTier
   | VideoEmbed
   | SponsorshipTiers
   | AnnouncementBar
   | Divider
-  | SanityImageAssetReference
   | Pullquote
   | Timeline
   | ComparisonTable
   | TimelineEntry
   | ComparisonRow
   | ComparisonColumn
+  | ArticleCategoryReference
   | ArticleList
   | ImageGallery
   | TeamGrid
@@ -1199,13 +2433,18 @@ export type AllSanitySchemaTypes =
   | FaqItem
   | PageReference
   | EventReference
+  | ArticleReference
   | PortableText
   | Page
   | Button
   | Project
   | Seo
-  | Event
+  | AuthorReference
+  | Article
+  | ArticleCategory
   | Slug
+  | Author
+  | Event
   | Sponsor
   | Link
   | FormField
@@ -1221,7 +2460,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type == "siteSettings" && _id == $siteSettingsId][0]{  siteName,  siteDescription,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },  ctaButton{ text, url },  footerContent{ text, copyrightText },  socialLinks[]{ _key, platform, url },  contactInfo{ address, email, phone },  footerLinks[]{ _key, label, href },  resourceLinks[]{ _key, label, href, external },  programLinks[]{ _key, label, href },  currentSemester}
+// Query: *[_type == "siteSettings" && _id == $siteSettingsId][0]{  siteName,  siteDescription,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },  ctaButton{ text, url },  footerContent{ text, copyrightText },  socialLinks[]{ _key, platform, url },  contactInfo{ address, email, phone },  footerLinks[]{ _key, label, href },  resourceLinks[]{ _key, label, href, external },  programLinks[]{ _key, label, href },  currentSemester,  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }}
 export type SITE_SETTINGS_QUERY_RESULT = {
   siteName: string | null;
   siteDescription: string | null;
@@ -1298,6 +2537,14 @@ export type SITE_SETTINGS_QUERY_RESULT = {
     href: string | null;
   }> | null;
   currentSemester: string | null;
+  aiSearch: {
+    enabled: boolean | null;
+    apiUrl: string | null;
+    placeholder: string | null;
+    theme: "auto" | "dark" | "light" | null;
+    hideBranding: boolean | null;
+    openByDefault: boolean | null;
+  } | null;
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -1342,7 +2589,7 @@ export type ALL_SPONSOR_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: SPONSOR_BY_SLUG_QUERY
-// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }}
+// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, featured, industry,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }}
 export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   _id: string;
   name: string | null;
@@ -1368,6 +2615,7 @@ export type SPONSOR_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -1500,7 +2748,7 @@ export type ALL_PROJECT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PROJECT_BY_SLUG_QUERY
-// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+// Query: *[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },  technologyTags,  semester,  status,  team[]{ _key, name, role },  mentor{ name, title, department },  outcome,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
 export type PROJECT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1518,6 +2766,10 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
         markDefs: Array<
           | {
               reference:
+                | {
+                    _type: "article";
+                    slug: string | null;
+                  }
                 | {
                     _type: "event";
                     slug: string | null;
@@ -1574,14 +2826,44 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
         markDefs: null;
       }
     | {
+        caption?: string;
+        rows?: Array<{
+          isHeader?: boolean;
+          cells?: Array<string>;
+          _type: "tableRow";
+          _key: string;
+        }>;
+        _type: "table";
+        _key: string;
+        markDefs: null;
+      }
+    | {
         _key: string;
         _type: "videoEmbed";
-        backgroundVariant?: "dark" | "light" | "primary" | "white";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
         spacing?: "default" | "large" | "none" | "small";
         maxWidth?: "default" | "full" | "narrow";
-        videoUrl?: string;
-        title?: string;
-        caption?: string;
+        variant?: "full-width" | "split-asymmetric" | "split";
+        heading?: string;
+        description?: string;
+        youtubeUrl?: string;
+        posterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
         markDefs: null;
       }
   > | null;
@@ -1694,6 +2976,7 @@ export type PROJECT_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -1804,7 +3087,7 @@ export type ALL_EVENT_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: EVENT_BY_SLUG_QUERY
-// Query: *[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status, isAllDay, category,  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
+// Query: *[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  date, endDate, location, description, eventType, status, isAllDay, category,  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
 export type EVENT_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
@@ -1820,6 +3103,240 @@ export type EVENT_BY_SLUG_QUERY_RESULT = {
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_ARTICLES_QUERY
+// Query: *[_type == "article" && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){  _id, title, "slug": slug.current,  excerpt,  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  author->{ name, "slug": slug.current },  publishedAt,  category->{ _id, title, "slug": slug.current }}
+export type ALL_ARTICLES_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  excerpt: string | null;
+  featuredImage: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
+  author: {
+    name: string | null;
+    slug: string | null;
+  } | null;
+  publishedAt: string | null;
+  category: {
+    _id: string;
+    title: string | null;
+    slug: string | null;
+  } | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ALL_ARTICLE_SLUGS_QUERY
+// Query: *[_type == "article" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }
+export type ALL_ARTICLE_SLUGS_QUERY_RESULT = Array<{
+  slug: string | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: ARTICLE_BY_SLUG_QUERY
+// Query: *[_type == "article" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, title, "slug": slug.current,  excerpt,  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },  body[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},  author->{ name, "slug": slug.current, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, sameAs },  publishedAt,  updatedAt,  category->{ title, "slug": slug.current },  tags,  relatedArticles[]->{ _id, title, "slug": slug.current, excerpt, featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, publishedAt },  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }}
+export type ARTICLE_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  excerpt: string | null;
+  featuredImage: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+  } | null;
+  body: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs: Array<
+          | {
+              reference:
+                | {
+                    _type: "article";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "event";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "page";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "project";
+                    slug: string | null;
+                  }
+                | {
+                    _type: "sponsor";
+                    slug: string | null;
+                  }
+                | null;
+              _type: "internalLink";
+              _key: string;
+            }
+          | {
+              href?: string;
+              _type: "link";
+              _key: string;
+            }
+        > | null;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        tone?: "info" | "success" | "warning";
+        text?: string;
+        _type: "callout";
+        _key: string;
+        markDefs: null;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string | null;
+          metadata: {
+            lqip: string | null;
+            dimensions: SanityImageDimensions | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        alt: string | null;
+        caption: string | null;
+        _type: "image";
+        _key: string;
+        markDefs: null;
+      }
+    | {
+        caption?: string;
+        rows?: Array<{
+          isHeader?: boolean;
+          cells?: Array<string>;
+          _type: "tableRow";
+          _key: string;
+        }>;
+        _type: "table";
+        _key: string;
+        markDefs: null;
+      }
+    | {
+        _key: string;
+        _type: "videoEmbed";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "full-width" | "split-asymmetric" | "split";
+        heading?: string;
+        description?: string;
+        youtubeUrl?: string;
+        posterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        markDefs: null;
+      }
+  > | null;
+  author: {
+    name: string | null;
+    slug: string | null;
+    role: string | null;
+    image: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+    sameAs: Array<string> | null;
+  } | null;
+  publishedAt: string | null;
+  updatedAt: string | null;
+  category: {
+    title: string | null;
+    slug: string | null;
+  } | null;
+  tags: Array<string> | null;
+  relatedArticles: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    excerpt: string | null;
+    featuredImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+    publishedAt: string | null;
+  }> | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -2054,21 +3571,15 @@ export type SPONSOR_PROJECTS_QUERY_RESULT = Array<{
 
 // Source: ../astro-app/src/lib/sanity.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  template,  seo {    metaTitle,    metaDescription,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      variant,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      variant,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      displayMode,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      filterBy,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },      columns    },    _type == "articleList" => {      heading,      description,      source,      limit,      links[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      columns[]{ _key, title, highlighted },      rows[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      videoUrl,      title,      caption    }  }}
+// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  seo {    metaTitle,    metaDescription,    noIndex,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant }    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }  }}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
   _id: string;
   title: string | null;
   slug: string | null;
-  template:
-    | "default"
-    | "fullWidth"
-    | "landing"
-    | "sidebar"
-    | "twoColumn"
-    | null;
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
+    noIndex: boolean | null;
     ogImage: {
       asset: {
         _id: string;
@@ -2083,13 +3594,119 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
   } | null;
   blocks: Array<
     | {
+        _type: "accordion";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "bordered" | "default" | "separated" | "technical" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
         _type: "announcementBar";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
-        icon: string | null;
+        icon:
+          | "alert-circle"
+          | "alert-triangle"
+          | "arrow-right"
+          | "arrow-up-right"
+          | "bar-chart-3"
+          | "bell"
+          | "book-open"
+          | "box"
+          | "calendar"
+          | "check-circle"
+          | "check"
+          | "circle-help"
+          | "clock"
+          | "cloud"
+          | "code"
+          | "compass"
+          | "cpu"
+          | "credit-card"
+          | "crown"
+          | "database"
+          | "dollar-sign"
+          | "external-link"
+          | "file-text"
+          | "flame"
+          | "gift"
+          | "globe"
+          | "graduation-cap"
+          | "handshake"
+          | "heart"
+          | "image"
+          | "info"
+          | "key"
+          | "layers"
+          | "lightbulb"
+          | "link"
+          | "lock"
+          | "mail"
+          | "map-pin"
+          | "megaphone"
+          | "message-circle"
+          | "minus"
+          | "music"
+          | "package"
+          | "palette"
+          | "phone"
+          | "pie-chart"
+          | "plus"
+          | "rocket"
+          | "send"
+          | "server"
+          | "settings"
+          | "shield-check"
+          | "shield"
+          | "sparkles"
+          | "star"
+          | "tag"
+          | "target"
+          | "terminal"
+          | "timer"
+          | "trending-down"
+          | "trending-up"
+          | "trophy"
+          | "user"
+          | "users"
+          | "video"
+          | "wallet"
+          | "wifi"
+          | "wrench"
+          | "x"
+          | "zap"
+          | null;
         text: string | null;
         link: {
           label: string | null;
@@ -2100,15 +3717,34 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "articleList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "grid" | "list" | "split-featured" | null;
+        variant:
+          | "brutalist"
+          | "grid"
+          | "list"
+          | "magazine"
+          | "split-featured"
+          | null;
         heading: string | null;
         description: string | null;
-        source: "all" | "blog" | "news" | null;
+        contentType: "all" | "by-category" | null;
+        categories: Array<{
+          _id: string;
+        }> | null;
         limit: number | null;
-        links: Array<{
+        ctaButtons: Array<{
           _key: string;
           text: string | null;
           url: string | null;
@@ -2116,20 +3752,127 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         }> | null;
       }
     | {
-        _type: "comparisonTable";
+        _type: "beforeAfter";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "stacked" | "table" | null;
+        variant: "side-by-side" | "stacked" | "toggle" | null;
+        heading: string | null;
+        beforeImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        afterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        beforeLabel: string | null;
+        afterLabel: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "cardGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "grid-2"
+          | "grid-3"
+          | "grid-4"
+          | "masonry"
+          | null;
         heading: string | null;
         description: string | null;
-        columns: Array<{
+        cards: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+          badge: string | null;
+        }> | null;
+      }
+    | {
+        _type: "comparisonTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "specification" | "stacked" | "table" | null;
+        heading: string | null;
+        description: string | null;
+        options: Array<{
           _key: string;
           title: string | null;
           highlighted: boolean | null;
         }> | null;
-        rows: Array<{
+        criteria: Array<{
           _key: string;
           feature: string | null;
           values: Array<string> | null;
@@ -2145,25 +3888,23 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "contactForm";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "split-image" | "split" | "stacked" | null;
         heading: string | null;
         description: string | null;
         successMessage: string | null;
-        backgroundImages: Array<{
-          _key: string;
-          asset: {
-            _id: string;
-            url: string | null;
-            metadata: {
-              lqip: string | null;
-              dimensions: SanityImageDimensions | null;
-            } | null;
-          } | null;
-          alt: string | null;
-        }> | null;
         form: {
           _id: string;
           title: string | null;
@@ -2204,14 +3945,65 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             text: string | null;
           } | null;
         } | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+      }
+    | {
+        _type: "countdownTimer";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "hero" | "inline" | null;
+        heading: string | null;
+        description: string | null;
+        targetDate: string | null;
+        completedMessage: string | null;
       }
     | {
         _type: "ctaBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "overlay" | "split" | "spread" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread"
+          | null;
         heading: string | null;
         description: string | null;
         backgroundImages: Array<{
@@ -2236,30 +4028,87 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "divider";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "labeled" | "line" | "short" | null;
         label: string | null;
       }
     | {
+        _type: "embedBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "contained" | "default" | "full-width" | null;
+        heading: string | null;
+        embedUrl: string | null;
+        caption: string | null;
+      }
+    | {
         _type: "eventList";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: null;
         heading: string | null;
-        filterBy: "all" | "past" | "upcoming" | null;
+        eventStatus: "all" | "past" | "upcoming" | null;
         limit: number | null;
       }
     | {
         _type: "faqSection";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
@@ -2277,6 +4126,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 markDefs: Array<
                   | {
                       reference:
+                        | {
+                            _type: "article";
+                            slug: string | null;
+                          }
                         | {
                             _type: "event";
                             slug: string | null;
@@ -2333,14 +4186,44 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 markDefs: null;
               }
             | {
+                caption?: string;
+                rows?: Array<{
+                  isHeader?: boolean;
+                  cells?: Array<string>;
+                  _type: "tableRow";
+                  _key: string;
+                }>;
+                _type: "table";
+                _key: string;
+                markDefs: null;
+              }
+            | {
                 _key: string;
                 _type: "videoEmbed";
-                backgroundVariant?: "dark" | "light" | "primary" | "white";
+                backgroundVariant?:
+                  | "blueprint"
+                  | "dark"
+                  | "hatched-light"
+                  | "hatched"
+                  | "light"
+                  | "mono"
+                  | "primary"
+                  | "stripe"
+                  | "white";
                 spacing?: "default" | "large" | "none" | "small";
                 maxWidth?: "default" | "full" | "narrow";
-                videoUrl?: string;
-                title?: string;
-                caption?: string;
+                variant?: "full-width" | "split-asymmetric" | "split";
+                heading?: string;
+                description?: string;
+                youtubeUrl?: string;
+                posterImage?: {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot?: SanityImageHotspot;
+                  crop?: SanityImageCrop;
+                  alt?: string;
+                  _type: "image";
+                };
                 markDefs: null;
               }
           > | null;
@@ -2349,14 +4232,102 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "featureGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "numbered-brutalist"
+          | "sidebar-grid"
+          | "stacked"
+          | null;
         heading: string | null;
         items: Array<{
           _key: string;
-          icon: string | null;
+          icon:
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "box"
+            | "calendar"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "external-link"
+            | "file-text"
+            | "flame"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "image"
+            | "info"
+            | "key"
+            | "layers"
+            | "lightbulb"
+            | "link"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "megaphone"
+            | "message-circle"
+            | "minus"
+            | "music"
+            | "package"
+            | "palette"
+            | "phone"
+            | "pie-chart"
+            | "plus"
+            | "rocket"
+            | "send"
+            | "server"
+            | "settings"
+            | "shield-check"
+            | "shield"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "user"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
           title: string | null;
           description: string | null;
           image: {
@@ -2376,10 +4347,21 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "heroBanner";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant:
+          | "brutalist"
           | "centered"
           | "overlay"
           | "split-asymmetric"
@@ -2411,7 +4393,17 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "imageGallery";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid" | "masonry" | "single" | null;
@@ -2434,15 +4426,128 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           } | null;
           caption: string | null;
         }> | null;
-        columns: "2" | "3" | "4" | null;
+      }
+    | {
+        _type: "linkCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "icon-list" | "list" | null;
+        heading: string | null;
+        description: string | null;
+        links: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "box"
+            | "calendar"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "external-link"
+            | "file-text"
+            | "flame"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "image"
+            | "info"
+            | "key"
+            | "layers"
+            | "lightbulb"
+            | "link"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "megaphone"
+            | "message-circle"
+            | "minus"
+            | "music"
+            | "package"
+            | "palette"
+            | "phone"
+            | "pie-chart"
+            | "plus"
+            | "rocket"
+            | "send"
+            | "server"
+            | "settings"
+            | "shield-check"
+            | "shield"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "user"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          url: string | null;
+        }> | null;
       }
     | {
         _type: "logoCloud";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "flex-wrap" | "grid" | "marquee" | null;
+        variant:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered"
+          | null;
         heading: string | null;
         autoPopulate: boolean | null;
         sponsors: Array<{
@@ -2450,12 +4555,249 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         }> | null;
       }
     | {
-        _type: "projectCards";
+        _type: "mapBlock";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "default" | "full-width" | "split" | null;
+        heading: string | null;
+        address: string | null;
+        coordinates: {
+          lat: number | null;
+          lng: number | null;
+        } | null;
+        caption: string | null;
+        contactInfo: {
+          phone: string | null;
+          email: string | null;
+          hours: string | null;
+        } | null;
+      }
+    | {
+        _type: "metricsDashboard";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
+        heading: string | null;
+        description: string | null;
+        metrics: Array<{
+          _key: string;
+          label: string | null;
+          value: string | null;
+          change: string | null;
+          trend: "down" | "neutral" | "up" | null;
+          icon:
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "box"
+            | "calendar"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "external-link"
+            | "file-text"
+            | "flame"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "image"
+            | "info"
+            | "key"
+            | "layers"
+            | "lightbulb"
+            | "link"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "megaphone"
+            | "message-circle"
+            | "minus"
+            | "music"
+            | "package"
+            | "palette"
+            | "phone"
+            | "pie-chart"
+            | "plus"
+            | "rocket"
+            | "send"
+            | "server"
+            | "settings"
+            | "shield-check"
+            | "shield"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "user"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+        }> | null;
+      }
+    | {
+        _type: "newsletter";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "inline" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        inputPlaceholder: string | null;
+        submitButtonLabel: string | null;
+        privacyDisclaimerText: string | null;
+      }
+    | {
+        _type: "pricingTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "comparison" | "featured" | "simple" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          interval: string | null;
+          description: string | null;
+          features: Array<string> | null;
+          highlighted: boolean | null;
+          ctaText: string | null;
+          ctaUrl: string | null;
+        }> | null;
+      }
+    | {
+        _type: "productShowcase";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "detail" | "featured" | "grid" | null;
+        heading: string | null;
+        description: string | null;
+        products: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          price: string | null;
+          badge: string | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "projectCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "blueprint" | "case-study" | "default" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         projects: Array<{
@@ -2465,10 +4807,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "pullquote";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "centered" | "sidebar" | "split" | null;
+        variant: "brutalist" | "centered" | "sidebar" | "split" | null;
         quote: string | null;
         attribution: string | null;
         role: string | null;
@@ -2489,10 +4841,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "richText";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
         content: Array<
           | {
               children?: Array<{
@@ -2506,6 +4868,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               markDefs: Array<
                 | {
                     reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
                       | {
                           _type: "event";
                           slug: string | null;
@@ -2562,25 +4928,185 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               markDefs: null;
             }
           | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
-              videoUrl?: string;
-              title?: string;
-              caption?: string;
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
               markDefs: null;
             }
         > | null;
       }
     | {
-        _type: "sponsorCards";
+        _type: "serviceCards";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification"
+          | null;
+        heading: string | null;
+        description: string | null;
+        services: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "box"
+            | "calendar"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "external-link"
+            | "file-text"
+            | "flame"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "image"
+            | "info"
+            | "key"
+            | "layers"
+            | "lightbulb"
+            | "link"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "megaphone"
+            | "message-circle"
+            | "minus"
+            | "music"
+            | "package"
+            | "palette"
+            | "phone"
+            | "pie-chart"
+            | "plus"
+            | "rocket"
+            | "send"
+            | "server"
+            | "settings"
+            | "shield-check"
+            | "shield"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "user"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "sponsorCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-tier" | "default" | "showcase" | null;
         heading: string | null;
         displayMode: "all" | "featured" | "manual" | null;
         sponsors: Array<{
@@ -2590,10 +5116,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorshipTiers";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist" | "default" | null;
         heading: string | null;
         description: string | null;
         tiers: Array<{
@@ -2612,10 +5148,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "sponsorSteps";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "split" | "spread" | "steps" | null;
         heading: string | null;
         subheading: string | null;
         items: Array<{
@@ -2634,10 +5180,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "statsRow";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant: "brutalist" | "grid" | "split" | "spread" | "ticker" | null;
         heading: string | null;
         stats: Array<{
           _key: string;
@@ -2647,9 +5203,43 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         }> | null;
       }
     | {
+        _type: "tabsBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "default" | "pills" | "underline" | null;
+        heading: string | null;
+        tabs: Array<{
+          _key: string;
+          label: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
         _type: "teamGrid";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "grid-compact" | "grid" | "split" | null;
@@ -2682,12 +5272,30 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "testimonials";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight"
+          | null;
         heading: string | null;
-        displayMode:
+        testimonialSource:
           | "all"
           | "byProject"
           | "industry"
@@ -2701,10 +5309,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "textWithImage";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
+        variant:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split"
+          | null;
         heading: string | null;
         content: Array<
           | {
@@ -2719,6 +5343,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               markDefs: Array<
                 | {
                     reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
                       | {
                           _type: "event";
                           slug: string | null;
@@ -2775,14 +5403,44 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               markDefs: null;
             }
           | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
               _key: string;
               _type: "videoEmbed";
-              backgroundVariant?: "dark" | "light" | "primary" | "white";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
               spacing?: "default" | "large" | "none" | "small";
               maxWidth?: "default" | "full" | "narrow";
-              videoUrl?: string;
-              title?: string;
-              caption?: string;
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
               markDefs: null;
             }
         > | null;
@@ -2802,10 +5460,20 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "timeline";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: "horizontal" | "split" | "vertical" | null;
+        variant: "engineering" | "horizontal" | "split" | "vertical" | null;
         heading: string | null;
         description: string | null;
         items: Array<{
@@ -2837,13 +5505,34 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
     | {
         _type: "videoEmbed";
         _key: string;
-        backgroundVariant: "dark" | "light" | "primary" | "white" | null;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
         spacing: "default" | "large" | "none" | "small" | null;
         maxWidth: "default" | "full" | "narrow" | null;
-        variant: null;
-        videoUrl: string | null;
-        title: string | null;
-        caption: string | null;
+        variant: "full-width" | "split-asymmetric" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        youtubeUrl: string | null;
+        posterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
       }
   > | null;
 } | null;
@@ -2852,23 +5541,26 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type == "siteSettings" && _id == $siteSettingsId][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester\n}': SITE_SETTINGS_QUERY_RESULT;
+    '*[_type == "siteSettings" && _id == $siteSettingsId][0]{\n  siteName,\n  siteDescription,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  logoLight{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  navigationItems[]{ _key, label, href, children[]{ _key, label, href } },\n  ctaButton{ text, url },\n  footerContent{ text, copyrightText },\n  socialLinks[]{ _key, platform, url },\n  contactInfo{ address, email, phone },\n  footerLinks[]{ _key, label, href },\n  resourceLinks[]{ _key, label, href, external },\n  programLinks[]{ _key, label, href },\n  currentSemester,\n  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type == "page" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PAGE_SLUGS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured\n}': ALL_SPONSORS_QUERY_RESULT;
     '*[_type == "sponsor" && hidden != true && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_SPONSOR_SLUGS_QUERY_RESULT;
-    '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, featured, industry,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }\n}': SPONSOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "project" && ($site == "" || site == $site)] | order(title asc){\n  _id, title, "slug": slug.current,\n  content,\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, industry, hidden },\n  technologyTags,\n  semester,\n  status,\n  outcome,\n  featured\n}': ALL_PROJECTS_QUERY_RESULT;
     '*[_type == "project" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_PROJECT_SLUGS_QUERY_RESULT;
-    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "project" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  sponsor->{ _id, name, "slug": slug.current, logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, tier, industry, description, website, hidden },\n  technologyTags,\n  semester,\n  status,\n  team[]{ _key, name, role },\n  mentor{ name, title, department },\n  outcome,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  "testimonials": *[_type == "testimonial" && project._ref == ^._id && ($site == "" || site == $site)]{ _id, name, quote, role, organization, type, videoUrl, photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': PROJECT_BY_SLUG_QUERY_RESULT;
     '*[_type == "testimonial" && ($site == "" || site == $site)] | order(name asc){\n  _id, name, quote, role, organization, type, videoUrl,\n  photo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  project->{ _id, title, "slug": slug.current }\n}': ALL_TESTIMONIALS_QUERY_RESULT;
     '*[_type == "event" && ($site == "" || site == $site)] | order(date asc){\n  _id, title, "slug": slug.current, date, endDate, location,\n  description, eventType, status, isAllDay, category\n}': ALL_EVENTS_QUERY_RESULT;
     '*[_type == "event"\n  && dateTime(date) >= dateTime($monthStart)\n  && dateTime(date) <= dateTime($monthEnd)\n  && ($site == "" || site == $site)\n] | order(date asc) {\n  _id, title, "slug": slug.current, date, endDate,\n  location, eventType, status, description, isAllDay, category\n}': EVENTS_BY_MONTH_QUERY_RESULT;
     '*[_type == "event" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_EVENT_SLUGS_QUERY_RESULT;
-    '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status, isAllDay, category,\n  seo { metaTitle, metaDescription, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "event" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  date, endDate, location, description, eventType, status, isAllDay, category,\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': EVENT_BY_SLUG_QUERY_RESULT;
+    '*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){\n  _id, title, "slug": slug.current,\n  excerpt,\n  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  author->{ name, "slug": slug.current },\n  publishedAt,\n  category->{ _id, title, "slug": slug.current }\n}': ALL_ARTICLES_QUERY_RESULT;
+    '*[_type == "article" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_ARTICLE_SLUGS_QUERY_RESULT;
+    '*[_type == "article" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current,\n  excerpt,\n  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  body[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n  author->{ name, "slug": slug.current, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, sameAs },\n  publishedAt,\n  updatedAt,\n  category->{ title, "slug": slug.current },\n  tags,\n  relatedArticles[]->{ _id, title, "slug": slug.current, excerpt, featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }, publishedAt },\n  seo { metaTitle, metaDescription, noIndex, ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt } }\n}': ARTICLE_BY_SLUG_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref in\n  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id\n  && ($site == "" || site == $site)\n] | order(title asc) {\n  _id, title, "slug": slug.current, status\n}': SPONSOR_PROJECTS_QUERY_RESULT;
-    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  template,\n  seo {\n    metaTitle,\n    metaDescription,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      variant,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      variant,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      displayMode,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      filterBy,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption },\n      columns\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      source,\n      limit,\n      links[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      columns[]{ _key, title, highlighted },\n      rows[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      videoUrl,\n      title,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
+    '*[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id,\n  title,\n  "slug": slug.current,\n  seo {\n    metaTitle,\n    metaDescription,\n    noIndex,\n    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n  },\n  blocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }\n  }\n}': PAGE_BY_SLUG_QUERY_RESULT;
   }
 }

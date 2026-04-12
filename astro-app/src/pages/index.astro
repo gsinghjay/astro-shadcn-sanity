@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
-import { getPage, getAllSponsors, getAllTestimonials, getAllEvents } from '../lib/sanity';
+import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents } from '../lib/sanity';
 import { urlFor } from '../lib/image';
 
 const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
@@ -11,6 +11,7 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 // In VE mode: skip fetch — server island handles its own data fetching
 let page = null;
 let sponsors: Awaited<ReturnType<typeof getAllSponsors>> = [];
+let projects: Awaited<ReturnType<typeof getAllProjects>> = [];
 let testimonials: Awaited<ReturnType<typeof getAllTestimonials>> = [];
 let events: Awaited<ReturnType<typeof getAllEvents>> = [];
 if (!visualEditingEnabled) {
@@ -19,6 +20,7 @@ if (!visualEditingEnabled) {
     return Astro.redirect('/404');
   }
   sponsors = await getAllSponsors();
+  projects = await getAllProjects();
   testimonials = await getAllTestimonials();
   events = await getAllEvents();
 }
@@ -31,12 +33,15 @@ const heroImage = firstBlock?._type === 'heroBanner'
 const preloadImageUrl = heroImage?.asset
   ? urlFor(heroImage).width(1920).height(1080).fit('crop').url()
   : undefined;
+const preloadSrcset = heroImage?.asset
+  ? [640, 1024, 1440, 1920].map(w => `${urlFor(heroImage).width(w).height(Math.round(w * 1080 / 1920)).fit('crop').url()} ${w}w`).join(', ')
+  : undefined;
 ---
 
-<Layout title={page?.title ?? undefined} seo={page?.seo} preloadImage={preloadImageUrl}>
+<Layout title={page?.title ?? undefined} seo={page?.seo} preloadImage={preloadImageUrl} preloadImageSrcset={preloadSrcset} preloadImageSizes="100vw">
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug="home">
-      <div slot="fallback" class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      <div slot="fallback" class="mx-auto max-w-7xl px-(--gutter) py-12">
         <div class="animate-pulse space-y-8">
           <div class="h-10 bg-muted rounded w-2/5"></div>
           <div class="h-64 bg-muted rounded"></div>
@@ -48,6 +53,6 @@ const preloadImageUrl = heroImage?.asset
       </div>
     </SanityPageContent>
   ) : (
-    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} testimonials={testimonials} events={events} />
+    <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} />
   )}
 </Layout>

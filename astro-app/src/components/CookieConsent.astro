@@ -1,0 +1,148 @@
+---
+interface Props {
+  gtmId?: string;
+}
+const { gtmId } = Astro.props;
+---
+
+{gtmId && (
+  <div
+    data-cookie-consent-banner
+    data-gtm-id={gtmId}
+    data-state="hidden"
+    inert
+    role="dialog"
+    aria-label="Cookie consent"
+    aria-live="polite"
+    class="fixed bottom-0 inset-x-0 z-50 bg-foreground text-background p-4 md:p-6"
+  >
+    <div class="mx-auto max-w-screen-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <p class="text-sm text-background/80 max-w-2xl">
+        We use cookies to analyze site traffic and optimize your experience. By clicking "Accept," you consent to our use of analytics cookies.
+      </p>
+      <div class="flex gap-3 shrink-0">
+        <button
+          data-cookie-reject
+          class="px-4 py-2 text-sm font-medium text-background/60 hover:text-background border border-background/20 hover:border-background/40 transition-colors"
+        >
+          Reject
+        </button>
+        <button
+          data-cookie-accept
+          class="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+        >
+          Accept
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  function initCookieConsent(): void {
+    const banner = document.querySelector<HTMLElement>('[data-cookie-consent-banner]');
+    if (!banner) return;
+
+    const gtmId = banner.dataset.gtmId;
+    const acceptBtn = banner.querySelector<HTMLButtonElement>('[data-cookie-accept]');
+    const rejectBtn = banner.querySelector<HTMLButtonElement>('[data-cookie-reject]');
+    let gtmInjected = false;
+
+    function getConsent(): string | null {
+      try {
+        return localStorage.getItem('cookie-consent');
+      } catch {
+        return null;
+      }
+    }
+
+    function setConsent(value: string): void {
+      try {
+        localStorage.setItem('cookie-consent', value);
+      } catch {
+        // Storage unavailable (private browsing, disabled) — consent still works for this session
+      }
+    }
+
+    function showBanner(): void {
+      banner!.dataset.state = 'visible';
+      banner!.removeAttribute('inert');
+    }
+
+    function hideBanner(): void {
+      banner!.dataset.state = 'hidden';
+      banner!.setAttribute('inert', '');
+    }
+
+    function injectGtm(id: string): void {
+      if (gtmInjected) return;
+      gtmInjected = true;
+
+      (function (w: Window, d: Document, s: string, l: string, i: string) {
+        (w as any)[l] = (w as any)[l] || [];
+        (w as any)[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        const f = d.getElementsByTagName(s)[0];
+        const j = d.createElement(s) as HTMLScriptElement;
+        const dl = l !== 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f?.parentNode?.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', id);
+
+      const noscript = document.createElement('noscript');
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.googletagmanager.com/ns.html?id=${id}`;
+      iframe.height = '0';
+      iframe.width = '0';
+      iframe.style.display = 'none';
+      iframe.style.visibility = 'hidden';
+      noscript.appendChild(iframe);
+      document.body.insertBefore(noscript, document.body.firstChild);
+    }
+
+    function handleConsent(accepted: boolean): void {
+      const value = accepted ? 'accepted' : 'rejected';
+      setConsent(value);
+      hideBanner();
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'consent_update',
+        consent_status: value,
+      });
+
+      if (accepted && gtmId) {
+        injectGtm(gtmId);
+      }
+    }
+
+    // Check existing consent
+    const consent = getConsent();
+    if (consent === 'accepted') {
+      hideBanner();
+      if (gtmId) injectGtm(gtmId);
+    } else if (consent === 'rejected') {
+      hideBanner();
+    } else {
+      showBanner();
+    }
+
+    acceptBtn?.addEventListener('click', () => handleConsent(true));
+    rejectBtn?.addEventListener('click', () => handleConsent(false));
+
+    // Escape key dismisses the banner
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && banner!.dataset.state === 'visible') {
+        hideBanner();
+      }
+    });
+
+    // Cookie Settings trigger from footer
+    document.querySelector('[data-cookie-settings-trigger]')?.addEventListener('click', () => {
+      showBanner();
+      acceptBtn?.focus();
+    });
+  }
+
+  document.addEventListener('astro:page-load', initCookieConsent);
+</script>

@@ -1,9 +1,45 @@
 import TextWithImage from './TextWithImage.astro'
 
 export default {
-  title: 'Blocks/TextWithImage',
+  title: 'Components/TextWithImage',
   component: TextWithImage,
   tags: ['autodocs'],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Split-layout block pairing prose content with an image. Supports left/right positioning and asymmetric ratios.',
+      },
+    },
+  },
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['split', 'reversed', 'floating', 'split-asymmetric', 'brutalist'],
+      description: 'Layout variant',
+    },
+    heading: { control: 'text', description: 'Section heading' },
+    imagePosition: {
+      control: { type: 'select' },
+      options: ['left', 'right'],
+      description: 'Image placement relative to text',
+    },
+    backgroundVariant: {
+      control: { type: 'select' },
+      options: ['white', 'light', 'dark', 'primary', 'hatched', 'hatched-light'],
+      description: 'Background color theme',
+    },
+    spacing: {
+      control: { type: 'select' },
+      options: ['none', 'small', 'default', 'large'],
+      description: 'Vertical padding',
+    },
+    maxWidth: {
+      control: { type: 'select' },
+      options: ['narrow', 'default', 'full'],
+      description: 'Maximum content width',
+    },
+  },
 }
 
 export const ImageRight = {
@@ -41,5 +77,40 @@ export const Minimal = {
       { _type: 'block', _key: 'b1', style: 'normal', children: [{ _type: 'span', _key: 's1', text: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' }] },
     ],
     image: { asset: { url: 'https://placehold.co/800x600/e2e8f0/475569?text=Placeholder' }, alt: 'Placeholder image' },
+  },
+}
+
+export const Brutalist = {
+  args: {
+    _type: 'textWithImage',
+    _key: 'story-twi-brutalist',
+    variant: 'brutalist',
+    heading: 'Where Industry Meets Academia',
+    imagePosition: 'right',
+    backgroundVariant: 'hatched-light',
+    image: {
+      asset: {
+        _ref: 'image-placeholder-800x600-jpg',
+        _type: 'reference' as const,
+        metadata: { lqip: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQN' },
+      },
+      alt: 'Students presenting capstone project to industry sponsors',
+    },
+    content: [
+      {
+        _type: 'block',
+        _key: 'b1',
+        style: 'normal',
+        children: [{ _type: 'span', _key: 's1', text: 'The NJIT Capstone Program bridges the gap between classroom theory and production-grade engineering. Student teams work directly with Fortune 500 sponsors to solve real business challenges — shipping code, not prototypes.' }],
+        markDefs: [],
+      },
+      {
+        _type: 'block',
+        _key: 'b2',
+        style: 'normal',
+        children: [{ _type: 'span', _key: 's2', text: 'Every project follows industry-standard practices: agile sprints, CI/CD pipelines, code review, and stakeholder demos. Graduates leave with deployed systems on their resumes, not just coursework.' }],
+        markDefs: [],
+      },
+    ],
   },
 }

@@ -1,40 +1,207 @@
 ---
 import type { FeatureGridBlock } from '@/lib/types';
-import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
-import { Tile, TileContent, TileTitle, TileDescription } from '@/components/ui/tile';
+import { Section, SectionContent, SectionGrid, SectionSplit, SectionProse } from '@/components/ui/section';
+import { Tile, TileContent, TileTitle, TileDescription, TileSplit, TileMedia } from '@/components/ui/tile';
+import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
+import { bgClasses } from '@/lib/utils';
 
 interface Props extends FeatureGridBlock {
   class?: string;
   id?: string;
 }
 
-const { heading, columns, items } = Astro.props;
+const { heading, columns, items, variant, backgroundVariant } = Astro.props;
+
+// Clean variant value and default to 'grid'
+const cleanVariant = stegaClean(variant ?? 'grid');
+
+const bgVariant = stegaClean(backgroundVariant) ?? 'white';
+const sectionBg = bgClasses[bgVariant] ?? '';
+const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
+
+// For grid variant, determine grid size based on columns
 const cols = columns || 3;
 const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
+const gridClass =
+  gridSize === 'lg'
+    ? 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(400px,1fr))]'
+    : gridSize === 'sm'
+      ? 'grid-cols-[repeat(auto-fit,minmax(200px,1fr))]'
+      : 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]';
 ---
 
-<Section data-animate>
-  {heading && (
-    <SectionContent class="max-w-3xl">
-      <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
-    </SectionContent>
-  )}
+{cleanVariant === 'grid' ? (
+  // Default grid variant - matches current behavior exactly
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
 
-  <SectionGrid size={gridSize}>
-    {(items ?? []).map((feature, i) => (
-      <Tile variant="floating">
-        <TileContent>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border-2 border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-              <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200">
-                {String(i + 1).padStart(2, '0')}
-              </span>
+    <div class={`grid w-full gap-6 ${gridClass}`}>
+      {(items ?? []).map((feature, i) => (
+        <Tile variant="floating">
+          <TileContent>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <TileTitle>{feature.title}</TileTitle>
             </div>
-            <TileTitle>{feature.title}</TileTitle>
-          </div>
-          <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
-        </TileContent>
-      </Tile>
-    ))}
-  </SectionGrid>
-</Section>
+            <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+          </TileContent>
+        </Tile>
+      ))}
+    </div>
+  </Section>
+) : cleanVariant === 'grid-centered' ? (
+  // Grid-centered variant - centered alignment
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl mx-auto items-center text-center">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionGrid size={gridSize}>
+      {(items ?? []).map((feature, i) => (
+        <Tile variant="floating" class="items-center text-center">
+          <TileContent class="items-center text-center">
+            <div class="flex flex-col items-center gap-3 w-full">
+              <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <TileTitle>{feature.title}</TileTitle>
+            </div>
+            <TileDescription class="whitespace-pre-line text-center">{feature.description}</TileDescription>
+          </TileContent>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+) : cleanVariant === 'horizontal-cards' ? (
+  // Horizontal-cards variant - image left, text right
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionGrid>
+      {(items ?? []).map((feature, i) => (
+        <Tile variant="floating">
+          <TileSplit>
+            <TileMedia>
+              {feature.image ? (
+                <img
+                  src={safeUrlFor(feature.image)?.width(460).height(260).fit('crop').url() ?? ''}
+                  alt={stegaClean(feature.image.alt) || stegaClean(feature.title) || 'Feature image'}
+                  width={460}
+                  height={260}
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <div class="w-full h-full bg-muted flex items-center justify-center">
+                  <span class="text-sm text-muted-foreground">No image</span>
+                </div>
+              )}
+            </TileMedia>
+            <TileContent>
+              <TileTitle>{feature.title}</TileTitle>
+              <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+            </TileContent>
+          </TileSplit>
+        </Tile>
+      ))}
+    </SectionGrid>
+  </Section>
+) : cleanVariant === 'sidebar-grid' ? (
+  // Sidebar-grid variant - sticky sidebar with grid
+  <Section class={sectionBg} data-animate>
+    <SectionSplit class="@5xl:grid-cols-[1fr_2fr]">
+      <SectionContent class="@5xl:sticky @5xl:top-[calc(var(--section-py)+var(--header-height,0px))]">
+        <SectionProse>
+          {heading && (
+            <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+          )}
+        </SectionProse>
+      </SectionContent>
+
+      <SectionGrid size="lg">
+        {(items ?? []).map((feature, i) => (
+          <Tile variant="floating">
+            <TileContent>
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
+                  <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <TileTitle>{feature.title}</TileTitle>
+              </div>
+              <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
+            </TileContent>
+          </Tile>
+        ))}
+      </SectionGrid>
+    </SectionSplit>
+  </Section>
+) : cleanVariant === 'numbered-brutalist' ? (
+  // Numbered-brutalist variant - oversized monospace numbers, thick left red border, hover transition
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <SectionGrid>
+      {(items ?? []).map((feature, i) => (
+        <div class="border-l-4 border-primary pl-6 py-4 hover:border-l-8 transition-all duration-200 group">
+          <span class="font-mono text-6xl font-bold text-primary/20 leading-none block" aria-hidden="true">
+            {String(i + 1).padStart(2, '0')}
+          </span>
+          <h3 class="font-bold text-lg mt-2">{feature.title}</h3>
+          {feature.description && (
+            <p class={`text-sm mt-1 ${isDarkBg ? 'text-background/70' : 'text-muted-foreground'}`}>{feature.description}</p>
+          )}
+        </div>
+      ))}
+    </SectionGrid>
+  </Section>
+) : (
+  // Stacked variant - single column with horizontal split
+  <Section class={sectionBg} data-animate>
+    {heading && (
+      <SectionContent class="max-w-3xl">
+        <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+      </SectionContent>
+    )}
+
+    <div class="space-y-12 pt-12">
+      {(items ?? []).map((feature, i) => (
+        <div class={`${i > 0 ? 'pt-12 border-t' : ''}`}>
+          <Tile>
+            <TileSplit class="gap-8">
+              <div class="flex flex-col items-start justify-center min-w-0">
+                <TileTitle class="text-lg">{feature.title}</TileTitle>
+              </div>
+              <div class="flex flex-col items-start justify-center">
+                <TileDescription class={`whitespace-pre-line ${isDarkBg ? 'text-background/70' : ''}`}>{feature.description}</TileDescription>
+              </div>
+            </TileSplit>
+          </Tile>
+        </div>
+      ))}
+    </div>
+  </Section>
+)}

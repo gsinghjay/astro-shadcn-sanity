@@ -100,23 +100,71 @@ describe('Testimonials', () => {
     expect(html).toBeDefined();
   });
 
-  test('renders YouTube video embed with privacy-enhanced URL', async () => {
+  test('masonry variant renders masonry column classes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'masonry' },
+    });
+
+    expect(html).toContain('columns-2xs');
+  });
+
+  test('split variant renders single-column review stack', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'split' },
+    });
+
+    expect(html).toContain('grid-cols-1');
+  });
+
+  test('carousel variant renders native carousel markup', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'carousel' },
+    });
+
+    expect(html).toContain('data-slot="native-carousel"');
+    expect(html).toContain('var(--breakpoint-sm)');
+  });
+
+  test('marquee variant renders two marquee lanes', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'marquee' },
+    });
+
+    const marqueeLaneCount = (html.match(/group\/marquee/g) ?? []).length;
+    expect(marqueeLaneCount).toBe(2);
+  });
+
+  test('unknown variant falls back to grid layout', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'legacy-variant' },
+    });
+
+    expect(html).toContain('md:grid-cols-2 lg:grid-cols-3');
+  });
+
+  test('renders YouTube video facade with video ID', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[0] },
     });
-    expect(html).toContain('youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(html).toContain('data-youtube-facade="dQw4w9WgXcQ"');
+    expect(html).not.toContain('<iframe');
   });
 
-  test('renders YouTube short URL video embed', async () => {
+  test('renders YouTube short URL video facade', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[2] },
     });
-    expect(html).toContain('youtube-nocookie.com/embed/jNQXAC9IVRw');
+    expect(html).toContain('data-youtube-facade="jNQXAC9IVRw"');
   });
 
-  test('uses lazy loading on video iframes', async () => {
+  test('uses lazy loading on video thumbnail', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[0] },
@@ -124,45 +172,67 @@ describe('Testimonials', () => {
     expect(html).toContain('loading="lazy"');
   });
 
-  test('sets accessible title on video iframes', async () => {
+  test('sets accessible aria-label on video facade button', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[0] },
     });
-    expect(html).toContain('title="Jane Smith video testimonial"');
+    expect(html).toContain('aria-label="Play video: Jane Smith video testimonial"');
   });
 
-  test('does not render iframe when videoUrl is null', async () => {
+  test('does not render facade when videoUrl is null', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[1] },
     });
-    expect(html).not.toContain('<iframe');
+    expect(html).not.toContain('data-youtube-facade');
   });
 
-  test('renders quote text below video embed', async () => {
+  test('renders quote text below video facade', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialsData[0] },
     });
-    expect(html).toContain('<iframe');
+    expect(html).toContain('data-youtube-facade');
     expect(html).toContain('This project transformed our workflow');
   });
 
-  test('renders YouTube embed URL format video', async () => {
+  test('renders YouTube embed URL format video facade', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialEmbedUrl },
     });
-    expect(html).toContain('youtube-nocookie.com/embed/L_jWHffIx5E');
+    expect(html).toContain('data-youtube-facade="L_jWHffIx5E"');
   });
 
-  test('does not render iframe for non-YouTube URL', async () => {
+  test('does not render facade for non-YouTube URL', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TestimonialCard, {
       props: { testimonial: testimonialInvalidUrl },
     });
-    expect(html).not.toContain('<iframe');
+    expect(html).not.toContain('data-youtube-facade');
     expect(html).toContain('Great experience overall');
+  });
+
+  test('brutalist-quote variant renders carousel with oversized quotation mark', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'brutalist-quote' },
+    });
+
+    expect(html).toContain('data-slot="native-carousel"');
+    expect(html).toContain('text-[8rem]');
+    expect(html).toContain('font-mono');
+  });
+
+  test('spotlight variant renders single full-width testimonial', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonials, {
+      props: { ...testimonialsFull, variant: 'spotlight' },
+    });
+
+    expect(html).toContain('w-48 h-48');
+    expect(html).toContain('Jane Smith');
+    expect(html).toContain('Acme Corp');
   });
 });
