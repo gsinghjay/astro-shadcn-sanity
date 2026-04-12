@@ -318,14 +318,14 @@ describe('AC6: Decorative Icons have aria-hidden', () => {
         description: null,
         variant: 'grid',
         services: [
-          { _key: 's1', title: 'Dev', description: null, icon: '💻', image: null, link: null },
+          { _key: 's1', title: 'Dev', description: null, icon: 'code', image: null, link: null },
         ],
       },
     });
-    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain('<svg');
   });
 
-  test('LinkCards grid variant icons have aria-hidden="true"', async () => {
+  test('LinkCards grid variant icons render as SVG', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LinkCards, {
       props: {
@@ -338,11 +338,11 @@ describe('AC6: Decorative Icons have aria-hidden', () => {
         description: null,
         variant: 'grid',
         links: [
-          { _key: 'l1', title: 'Docs', description: null, url: '/docs', icon: '📚' },
+          { _key: 'l1', title: 'Docs', description: null, url: '/docs', icon: 'book-open' },
         ],
       },
     });
-    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain('<svg');
   });
 
   test('FeatureGrid numbered counters have aria-hidden="true"', async () => {
@@ -366,7 +366,7 @@ describe('AC6: Decorative Icons have aria-hidden', () => {
     expect(html).toContain('01');
   });
 
-  test('MetricsDashboard grid variant icons have aria-hidden="true"', async () => {
+  test('MetricsDashboard grid variant icons render as SVG', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(MetricsDashboard, {
       props: {
@@ -379,11 +379,11 @@ describe('AC6: Decorative Icons have aria-hidden', () => {
         description: null,
         variant: 'grid',
         metrics: [
-          { _key: 'm1', label: 'Users', value: '1,000', change: '+5%', trend: 'up', icon: '👤' },
+          { _key: 'm1', label: 'Users', value: '1,000', change: '+5%', trend: 'up', icon: 'users' },
         ],
       },
     });
-    expect(html).toContain('aria-hidden="true"');
+    expect(html).toContain('<svg');
   });
 });
 

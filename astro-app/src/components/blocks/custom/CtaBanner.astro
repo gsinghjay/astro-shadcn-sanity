@@ -18,8 +18,7 @@ const layoutVariant = stegaClean(rawVariant) ?? 'centered';
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const sectionBg = bgClasses[bgVariant] ?? '';
-const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
-const descColor = isDarkBg ? 'text-background/70' : 'text-muted-foreground';
+// Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
@@ -61,7 +60,7 @@ const firstImage = backgroundImages?.[0];
       </h2>
 
       {description && (
-        <p class={`text-lg leading-relaxed max-w-2xl ${descColor}`}>{description}</p>
+        <p class={`text-lg leading-relaxed max-w-2xl text-muted-foreground`}>{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (
@@ -94,7 +93,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class={`text-lg leading-relaxed max-w-xl ${descColor}`}>{description}</p>
+          <p class={`text-lg leading-relaxed max-w-xl text-muted-foreground`}>{description}</p>
         )}
 
         {ctaButtons && ctaButtons.length > 0 && (
@@ -142,7 +141,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class={`text-lg leading-relaxed max-w-xl ${descColor}`}>{description}</p>
+          <p class={`text-lg leading-relaxed max-w-xl text-muted-foreground`}>{description}</p>
         )}
       </SectionContent>
 
@@ -223,7 +222,7 @@ const firstImage = backgroundImages?.[0];
       </h2>
 
       {description && (
-        <p class={`text-lg leading-relaxed max-w-2xl ${descColor}`}>{description}</p>
+        <p class={`text-lg leading-relaxed max-w-2xl text-muted-foreground`}>{description}</p>
       )}
 
       {ctaButtons && ctaButtons.length > 0 && (
@@ -258,7 +257,7 @@ const firstImage = backgroundImages?.[0];
                 <div class="font-mono tabular-nums text-5xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-1">
                   {stat.value}
                 </div>
-                <div class={`label-caps ${isDarkBg ? 'text-background/40' : 'text-muted-foreground'}`}>
+                <div class={`label-caps text-muted-foreground`}>
                   {stat.label}
                 </div>
               </div>
@@ -273,7 +272,7 @@ const firstImage = backgroundImages?.[0];
         </h2>
 
         {description && (
-          <p class={`text-lg leading-relaxed ${descColor}`}>{description}</p>
+          <p class={`text-lg leading-relaxed text-muted-foreground`}>{description}</p>
         )}
 
         {ctaButtons && ctaButtons.length > 0 && (

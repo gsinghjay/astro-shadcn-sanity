@@ -16,10 +16,24 @@ describe('FeatureGrid', () => {
     expect(html).toContain('Community');
   });
 
-  test('renders numbered items', async () => {
+  test('renders icons when provided, numbers as fallback', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(FeatureGrid, {
       props: featureGridFull,
+    });
+
+    // Items with icons should render SVG, not numbered boxes
+    expect(html).toContain('<svg');
+    expect(html).not.toContain('>01<');
+  });
+
+  test('renders numbered items when icons are null', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(FeatureGrid, {
+      props: {
+        ...featureGridFull,
+        items: featureGridFull.items?.map(item => ({ ...item, icon: null })) ?? [],
+      },
     });
 
     expect(html).toContain('01');
