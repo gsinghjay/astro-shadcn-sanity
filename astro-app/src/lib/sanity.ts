@@ -20,6 +20,7 @@ import type {
   ARTICLES_BY_CATEGORY_QUERY_RESULT,
   ALL_AUTHORS_QUERY_RESULT,
   AUTHOR_BY_SLUG_QUERY_RESULT,
+  LISTING_PAGE_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -762,6 +763,51 @@ export async function getAuthorBySlug(slug: string): Promise<AUTHOR_BY_SLUG_QUER
   return result;
 }
 
+// ---------------------------------------------------------------------------
+// Listing Page queries (Story 21.0)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch a singleton listing page document by its fixed ID.
+ * Projects all fields including block expansions for header/footer composition.
+ */
+export const LISTING_PAGE_QUERY = defineQuery(groq`*[_type == "listingPage" && _id == $id][0]{
+  _id, route, title, description,
+  seo{ metaTitle, metaDescription, noIndex, ogImage{ asset->{ _id, url, metadata { dimensions, lqip } }, alt } },
+  headerBlocks[]{ ..., image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
+  footerBlocks[]{ ..., image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
+}`);
+
+/**
+ * Returns the listing page document ID for a given route.
+ * Multi-site aware: appends site ID for RWC workspaces.
+ */
+function getListingPageId(route: string): string {
+  return isMultiSite ? `listingPage-${route}-${SITE_ID}` : `listingPage-${route}`;
+}
+
+/**
+ * Fetch a listing page singleton from Sanity.
+ * Returns null when document doesn't exist — pages MUST work without singletons.
+ * Uses a Map cache (keyed by route) since there are 5 distinct documents.
+ */
+const _listingPageCache = new Map<string, LISTING_PAGE_QUERY_RESULT>();
+
+export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _listingPageCache.has(route)) {
+    return _listingPageCache.get(route)!;
+  }
+  const id = getListingPageId(route);
+  const { result } = await loadQuery<LISTING_PAGE_QUERY_RESULT>({
+    query: LISTING_PAGE_QUERY,
+    params: { id },
+  });
+  if (result) {
+    _listingPageCache.set(route, result);
+  }
+  return result ?? null;
+}
+
 /**
  * Reset all module-level caches. Useful for testing and SSR scenarios
  * where stale data could persist across requests.
@@ -775,6 +821,7 @@ export function resetAllCaches(): void {
   _articlesCache = null;
   _articleCategoriesCache = null;
   _authorsCache = null;
+  _listingPageCache.clear();
 }
 
 // ---------------------------------------------------------------------------

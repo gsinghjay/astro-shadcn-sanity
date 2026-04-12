@@ -1462,6 +1462,259 @@ export type HeroBanner = {
   alignment?: "left" | "center" | "right";
 };
 
+export type ListingPage = {
+  _id: string;
+  _type: "listingPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  route?: "articles" | "authors" | "events" | "projects" | "sponsors";
+  title?: string;
+  description?: string;
+  seo?: Seo;
+  headerBlocks?: Array<
+    | ({
+        _key: string;
+      } & HeroBanner)
+    | ({
+        _key: string;
+      } & FeatureGrid)
+    | ({
+        _key: string;
+      } & SponsorCards)
+    | ({
+        _key: string;
+      } & RichText)
+    | ({
+        _key: string;
+      } & CtaBanner)
+    | ({
+        _key: string;
+      } & FaqSection)
+    | ({
+        _key: string;
+      } & ContactForm)
+    | ({
+        _key: string;
+      } & LogoCloud)
+    | ({
+        _key: string;
+      } & StatsRow)
+    | ({
+        _key: string;
+      } & SponsorSteps)
+    | ({
+        _key: string;
+      } & TextWithImage)
+    | ({
+        _key: string;
+      } & Testimonials)
+    | ({
+        _key: string;
+      } & EventList)
+    | ({
+        _key: string;
+      } & ProjectCards)
+    | ({
+        _key: string;
+      } & TeamGrid)
+    | ({
+        _key: string;
+      } & ImageGallery)
+    | ({
+        _key: string;
+      } & ArticleList)
+    | ({
+        _key: string;
+      } & ComparisonTable)
+    | ({
+        _key: string;
+      } & Timeline)
+    | ({
+        _key: string;
+      } & Pullquote)
+    | ({
+        _key: string;
+      } & Divider)
+    | ({
+        _key: string;
+      } & AnnouncementBar)
+    | ({
+        _key: string;
+      } & SponsorshipTiers)
+    | ({
+        _key: string;
+      } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
+  >;
+  footerBlocks?: Array<
+    | ({
+        _key: string;
+      } & HeroBanner)
+    | ({
+        _key: string;
+      } & FeatureGrid)
+    | ({
+        _key: string;
+      } & SponsorCards)
+    | ({
+        _key: string;
+      } & RichText)
+    | ({
+        _key: string;
+      } & CtaBanner)
+    | ({
+        _key: string;
+      } & FaqSection)
+    | ({
+        _key: string;
+      } & ContactForm)
+    | ({
+        _key: string;
+      } & LogoCloud)
+    | ({
+        _key: string;
+      } & StatsRow)
+    | ({
+        _key: string;
+      } & SponsorSteps)
+    | ({
+        _key: string;
+      } & TextWithImage)
+    | ({
+        _key: string;
+      } & Testimonials)
+    | ({
+        _key: string;
+      } & EventList)
+    | ({
+        _key: string;
+      } & ProjectCards)
+    | ({
+        _key: string;
+      } & TeamGrid)
+    | ({
+        _key: string;
+      } & ImageGallery)
+    | ({
+        _key: string;
+      } & ArticleList)
+    | ({
+        _key: string;
+      } & ComparisonTable)
+    | ({
+        _key: string;
+      } & Timeline)
+    | ({
+        _key: string;
+      } & Pullquote)
+    | ({
+        _key: string;
+      } & Divider)
+    | ({
+        _key: string;
+      } & AnnouncementBar)
+    | ({
+        _key: string;
+      } & SponsorshipTiers)
+    | ({
+        _key: string;
+      } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
+  >;
+};
+
+export type Seo = {
+  _type: "seo";
+  metaTitle?: string;
+  metaDescription?: string;
+  noIndex?: boolean;
+  ogImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+};
+
 export type Submission = {
   _id: string;
   _type: "submission";
@@ -2052,21 +2305,6 @@ export type Project = {
   seo?: Seo;
 };
 
-export type Seo = {
-  _type: "seo";
-  metaTitle?: string;
-  metaDescription?: string;
-  noIndex?: boolean;
-  ogImage?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-};
-
 export type AuthorReference = {
   _ref: string;
   _type: "reference";
@@ -2421,6 +2659,8 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
+  | ListingPage
+  | Seo
   | Submission
   | Testimonial
   | SanityImageCrop
@@ -2439,7 +2679,6 @@ export type AllSanitySchemaTypes =
   | Page
   | Button
   | Project
-  | Seo
   | AuthorReference
   | Article
   | ArticleCategory
@@ -3496,6 +3735,2230 @@ export type AUTHOR_BY_SLUG_QUERY_RESULT = {
       slug: string | null;
     } | null;
   }>;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: LISTING_PAGE_QUERY
+// Query: *[_type == "listingPage" && _id == $id][0]{  _id, route, title, description,  seo{ metaTitle, metaDescription, noIndex, ogImage{ asset->{ _id, url, metadata { dimensions, lqip } }, alt } },  headerBlocks[]{ ..., image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },  footerBlocks[]{ ..., image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }}
+export type LISTING_PAGE_QUERY_RESULT = {
+  _id: string;
+  route: "articles" | "authors" | "events" | "projects" | "sponsors" | null;
+  title: string | null;
+  description: string | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          dimensions: SanityImageDimensions | null;
+          lqip: string | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
+  headerBlocks: Array<
+    | {
+        _key: string;
+        _type: "accordion";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "bordered" | "default" | "separated" | "technical";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & AccordionItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "announcementBar";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "floating" | "inline";
+        icon?:
+          | "alert-circle"
+          | "alert-triangle"
+          | "arrow-right"
+          | "arrow-up-right"
+          | "bar-chart-3"
+          | "bell"
+          | "book-open"
+          | "box"
+          | "calendar"
+          | "check-circle"
+          | "check"
+          | "circle-help"
+          | "clock"
+          | "cloud"
+          | "code"
+          | "compass"
+          | "cpu"
+          | "credit-card"
+          | "crown"
+          | "database"
+          | "dollar-sign"
+          | "external-link"
+          | "file-text"
+          | "flame"
+          | "gift"
+          | "globe"
+          | "graduation-cap"
+          | "handshake"
+          | "heart"
+          | "image"
+          | "info"
+          | "key"
+          | "layers"
+          | "lightbulb"
+          | "link"
+          | "lock"
+          | "mail"
+          | "map-pin"
+          | "megaphone"
+          | "message-circle"
+          | "minus"
+          | "music"
+          | "package"
+          | "palette"
+          | "phone"
+          | "pie-chart"
+          | "plus"
+          | "rocket"
+          | "send"
+          | "server"
+          | "settings"
+          | "shield-check"
+          | "shield"
+          | "sparkles"
+          | "star"
+          | "tag"
+          | "target"
+          | "terminal"
+          | "timer"
+          | "trending-down"
+          | "trending-up"
+          | "trophy"
+          | "user"
+          | "users"
+          | "video"
+          | "wallet"
+          | "wifi"
+          | "wrench"
+          | "x"
+          | "zap";
+        text?: string;
+        link?: AnnouncementBarLink;
+        dismissible?: boolean;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "articleList";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid" | "list" | "magazine" | "split-featured";
+        heading?: string;
+        description?: string;
+        contentType?: "all" | "by-category";
+        categories?: Array<
+          {
+            _key: string;
+          } & ArticleCategoryReference
+        >;
+        limit?: number;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        showNewsletterCta?: boolean;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "beforeAfter";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "side-by-side" | "stacked" | "toggle";
+        heading?: string;
+        beforeImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        afterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        beforeLabel?: string;
+        afterLabel?: string;
+        caption?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "cardGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid-2" | "grid-3" | "grid-4" | "masonry";
+        heading?: string;
+        description?: string;
+        cards?: Array<
+          {
+            _key: string;
+          } & CardGridItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "comparisonTable";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "specification" | "stacked" | "table";
+        heading?: string;
+        description?: string;
+        options?: Array<
+          {
+            _key: string;
+          } & ComparisonColumn
+        >;
+        criteria?: Array<
+          {
+            _key: string;
+          } & ComparisonRow
+        >;
+        links?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "contactForm";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "split-image" | "split" | "stacked";
+        heading?: string;
+        description?: string;
+        successMessage?: string;
+        form?: FormReference;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "countdownTimer";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "banner" | "brutalist" | "hero" | "inline";
+        heading?: string;
+        description?: string;
+        targetDate?: string;
+        completedMessage?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "ctaBanner";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread";
+        heading?: string;
+        description?: string;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "divider";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "labeled" | "line" | "short";
+        label?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "embedBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "contained" | "default" | "full-width";
+        heading?: string;
+        embedUrl?: string;
+        caption?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "eventList";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        heading?: string;
+        eventStatus?: "all" | "past" | "upcoming";
+        limit?: number;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "faqSection";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical";
+        heading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & FaqItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "featureGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "numbered-brutalist"
+          | "sidebar-grid"
+          | "stacked";
+        heading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & FeatureItem
+        >;
+        columns?: 2 | 3 | 4;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "heroBanner";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "centered"
+          | "overlay"
+          | "split-asymmetric"
+          | "split"
+          | "spread";
+        heading?: string;
+        subheading?: string;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        alignment?: "center" | "left" | "right";
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "imageGallery";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid" | "masonry" | "single";
+        heading?: string;
+        description?: string;
+        images?: Array<
+          {
+            _key: string;
+          } & GalleryImage
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "linkCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid" | "icon-list" | "list";
+        heading?: string;
+        description?: string;
+        links?: Array<
+          {
+            _key: string;
+          } & LinkCardItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "logoCloud";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered";
+        heading?: string;
+        autoPopulate?: boolean;
+        sponsors?: Array<
+          {
+            _key: string;
+          } & SponsorReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "mapBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "default" | "full-width" | "split";
+        heading?: string;
+        address?: string;
+        coordinates?: Coordinates;
+        caption?: string;
+        contactInfo?: ContactInfo;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "metricsDashboard";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist-grid" | "card" | "grid" | "row" | "terminal";
+        heading?: string;
+        description?: string;
+        metrics?: Array<
+          {
+            _key: string;
+          } & MetricItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "newsletter";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "banner" | "brutalist" | "inline" | "split";
+        heading?: string;
+        description?: string;
+        inputPlaceholder?: string;
+        submitButtonLabel?: string;
+        privacyDisclaimerText?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "pricingTable";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "comparison" | "featured" | "simple";
+        heading?: string;
+        description?: string;
+        tiers?: Array<
+          {
+            _key: string;
+          } & PricingTier
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "productShowcase";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "detail" | "featured" | "grid";
+        heading?: string;
+        description?: string;
+        products?: Array<
+          {
+            _key: string;
+          } & ProductItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "projectCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "blueprint" | "case-study" | "default";
+        heading?: string;
+        displayMode?: "all" | "featured" | "manual";
+        projects?: Array<
+          {
+            _key: string;
+          } & ProjectReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "pullquote";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "centered" | "sidebar" | "split";
+        quote?: string;
+        attribution?: string;
+        role?: string;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "richText";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "highlighted" | "prose" | "sidebar" | "standard";
+        content?: PortableText;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "serviceCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification";
+        heading?: string;
+        description?: string;
+        services?: Array<
+          {
+            _key: string;
+          } & ServiceItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist-tier" | "default" | "showcase";
+        heading?: string;
+        displayMode?: "all" | "featured" | "manual";
+        sponsors?: Array<
+          {
+            _key: string;
+          } & SponsorReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorshipTiers";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "default";
+        heading?: string;
+        description?: string;
+        tiers?: Array<
+          {
+            _key: string;
+          } & SponsorshipTierItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorSteps";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "split" | "spread" | "steps";
+        heading?: string;
+        subheading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & StepItem
+        >;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "statsRow";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid" | "split" | "spread" | "ticker";
+        heading?: string;
+        stats?: Array<
+          {
+            _key: string;
+          } & StatItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "tabsBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "default" | "pills" | "underline";
+        heading?: string;
+        tabs?: Array<
+          {
+            _key: string;
+          } & TabItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "teamGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid-compact" | "grid" | "split";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & TeamMember
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "testimonials";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight";
+        heading?: string;
+        testimonialSource?:
+          | "all"
+          | "byProject"
+          | "industry"
+          | "manual"
+          | "student";
+        testimonials?: Array<
+          {
+            _key: string;
+          } & TestimonialReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "textWithImage";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split";
+        heading?: string;
+        content?: PortableText;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        imagePosition?: "left" | "right";
+      }
+    | {
+        _key: string;
+        _type: "timeline";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "engineering" | "horizontal" | "split" | "vertical";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & TimelineEntry
+        >;
+        links?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "videoEmbed";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "full-width" | "split-asymmetric" | "split";
+        heading?: string;
+        description?: string;
+        youtubeUrl?: string;
+        posterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        image: null;
+      }
+  > | null;
+  footerBlocks: Array<
+    | {
+        _key: string;
+        _type: "accordion";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "bordered" | "default" | "separated" | "technical";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & AccordionItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "announcementBar";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "floating" | "inline";
+        icon?:
+          | "alert-circle"
+          | "alert-triangle"
+          | "arrow-right"
+          | "arrow-up-right"
+          | "bar-chart-3"
+          | "bell"
+          | "book-open"
+          | "box"
+          | "calendar"
+          | "check-circle"
+          | "check"
+          | "circle-help"
+          | "clock"
+          | "cloud"
+          | "code"
+          | "compass"
+          | "cpu"
+          | "credit-card"
+          | "crown"
+          | "database"
+          | "dollar-sign"
+          | "external-link"
+          | "file-text"
+          | "flame"
+          | "gift"
+          | "globe"
+          | "graduation-cap"
+          | "handshake"
+          | "heart"
+          | "image"
+          | "info"
+          | "key"
+          | "layers"
+          | "lightbulb"
+          | "link"
+          | "lock"
+          | "mail"
+          | "map-pin"
+          | "megaphone"
+          | "message-circle"
+          | "minus"
+          | "music"
+          | "package"
+          | "palette"
+          | "phone"
+          | "pie-chart"
+          | "plus"
+          | "rocket"
+          | "send"
+          | "server"
+          | "settings"
+          | "shield-check"
+          | "shield"
+          | "sparkles"
+          | "star"
+          | "tag"
+          | "target"
+          | "terminal"
+          | "timer"
+          | "trending-down"
+          | "trending-up"
+          | "trophy"
+          | "user"
+          | "users"
+          | "video"
+          | "wallet"
+          | "wifi"
+          | "wrench"
+          | "x"
+          | "zap";
+        text?: string;
+        link?: AnnouncementBarLink;
+        dismissible?: boolean;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "articleList";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid" | "list" | "magazine" | "split-featured";
+        heading?: string;
+        description?: string;
+        contentType?: "all" | "by-category";
+        categories?: Array<
+          {
+            _key: string;
+          } & ArticleCategoryReference
+        >;
+        limit?: number;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        showNewsletterCta?: boolean;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "beforeAfter";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "side-by-side" | "stacked" | "toggle";
+        heading?: string;
+        beforeImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        afterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        beforeLabel?: string;
+        afterLabel?: string;
+        caption?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "cardGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid-2" | "grid-3" | "grid-4" | "masonry";
+        heading?: string;
+        description?: string;
+        cards?: Array<
+          {
+            _key: string;
+          } & CardGridItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "comparisonTable";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "specification" | "stacked" | "table";
+        heading?: string;
+        description?: string;
+        options?: Array<
+          {
+            _key: string;
+          } & ComparisonColumn
+        >;
+        criteria?: Array<
+          {
+            _key: string;
+          } & ComparisonRow
+        >;
+        links?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "contactForm";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "split-image" | "split" | "stacked";
+        heading?: string;
+        description?: string;
+        successMessage?: string;
+        form?: FormReference;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "countdownTimer";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "banner" | "brutalist" | "hero" | "inline";
+        heading?: string;
+        description?: string;
+        targetDate?: string;
+        completedMessage?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "ctaBanner";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread";
+        heading?: string;
+        description?: string;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "divider";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "labeled" | "line" | "short";
+        label?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "embedBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "contained" | "default" | "full-width";
+        heading?: string;
+        embedUrl?: string;
+        caption?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "eventList";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        heading?: string;
+        eventStatus?: "all" | "past" | "upcoming";
+        limit?: number;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "faqSection";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical";
+        heading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & FaqItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "featureGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "numbered-brutalist"
+          | "sidebar-grid"
+          | "stacked";
+        heading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & FeatureItem
+        >;
+        columns?: 2 | 3 | 4;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "heroBanner";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "centered"
+          | "overlay"
+          | "split-asymmetric"
+          | "split"
+          | "spread";
+        heading?: string;
+        subheading?: string;
+        backgroundImages?: Array<{
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+          _key: string;
+        }>;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        alignment?: "center" | "left" | "right";
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "imageGallery";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid" | "masonry" | "single";
+        heading?: string;
+        description?: string;
+        images?: Array<
+          {
+            _key: string;
+          } & GalleryImage
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "linkCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid" | "icon-list" | "list";
+        heading?: string;
+        description?: string;
+        links?: Array<
+          {
+            _key: string;
+          } & LinkCardItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "logoCloud";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered";
+        heading?: string;
+        autoPopulate?: boolean;
+        sponsors?: Array<
+          {
+            _key: string;
+          } & SponsorReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "mapBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "default" | "full-width" | "split";
+        heading?: string;
+        address?: string;
+        coordinates?: Coordinates;
+        caption?: string;
+        contactInfo?: ContactInfo;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "metricsDashboard";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist-grid" | "card" | "grid" | "row" | "terminal";
+        heading?: string;
+        description?: string;
+        metrics?: Array<
+          {
+            _key: string;
+          } & MetricItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "newsletter";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "banner" | "brutalist" | "inline" | "split";
+        heading?: string;
+        description?: string;
+        inputPlaceholder?: string;
+        submitButtonLabel?: string;
+        privacyDisclaimerText?: string;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "pricingTable";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "comparison" | "featured" | "simple";
+        heading?: string;
+        description?: string;
+        tiers?: Array<
+          {
+            _key: string;
+          } & PricingTier
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "productShowcase";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "detail" | "featured" | "grid";
+        heading?: string;
+        description?: string;
+        products?: Array<
+          {
+            _key: string;
+          } & ProductItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "projectCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "blueprint" | "case-study" | "default";
+        heading?: string;
+        displayMode?: "all" | "featured" | "manual";
+        projects?: Array<
+          {
+            _key: string;
+          } & ProjectReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "pullquote";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "centered" | "sidebar" | "split";
+        quote?: string;
+        attribution?: string;
+        role?: string;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "richText";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "highlighted" | "prose" | "sidebar" | "standard";
+        content?: PortableText;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "serviceCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification";
+        heading?: string;
+        description?: string;
+        services?: Array<
+          {
+            _key: string;
+          } & ServiceItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorCards";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist-tier" | "default" | "showcase";
+        heading?: string;
+        displayMode?: "all" | "featured" | "manual";
+        sponsors?: Array<
+          {
+            _key: string;
+          } & SponsorReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorshipTiers";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "default";
+        heading?: string;
+        description?: string;
+        tiers?: Array<
+          {
+            _key: string;
+          } & SponsorshipTierItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "sponsorSteps";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "split" | "spread" | "steps";
+        heading?: string;
+        subheading?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & StepItem
+        >;
+        ctaButtons?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "statsRow";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "grid" | "split" | "spread" | "ticker";
+        heading?: string;
+        stats?: Array<
+          {
+            _key: string;
+          } & StatItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "tabsBlock";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "brutalist" | "default" | "pills" | "underline";
+        heading?: string;
+        tabs?: Array<
+          {
+            _key: string;
+          } & TabItem
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "teamGrid";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "grid-compact" | "grid" | "split";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & TeamMember
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "testimonials";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight";
+        heading?: string;
+        testimonialSource?:
+          | "all"
+          | "byProject"
+          | "industry"
+          | "manual"
+          | "student";
+        testimonials?: Array<
+          {
+            _key: string;
+          } & TestimonialReference
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "textWithImage";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split";
+        heading?: string;
+        content?: PortableText;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        imagePosition?: "left" | "right";
+      }
+    | {
+        _key: string;
+        _type: "timeline";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "engineering" | "horizontal" | "split" | "vertical";
+        heading?: string;
+        description?: string;
+        items?: Array<
+          {
+            _key: string;
+          } & TimelineEntry
+        >;
+        links?: Array<
+          {
+            _key: string;
+          } & Button
+        >;
+        image: null;
+      }
+    | {
+        _key: string;
+        _type: "videoEmbed";
+        backgroundVariant?:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white";
+        spacing?: "default" | "large" | "none" | "small";
+        maxWidth?: "default" | "full" | "narrow";
+        variant?: "full-width" | "split-asymmetric" | "split";
+        heading?: string;
+        description?: string;
+        youtubeUrl?: string;
+        posterImage?: {
+          asset?: SanityImageAssetReference;
+          media?: unknown;
+          hotspot?: SanityImageHotspot;
+          crop?: SanityImageCrop;
+          alt?: string;
+          _type: "image";
+        };
+        image: null;
+      }
+  > | null;
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
@@ -5712,6 +8175,7 @@ declare module "@sanity/client" {
     '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  role, bio,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n}': ALL_AUTHORS_QUERY_RESULT;
     '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_AUTHOR_SLUGS_QUERY_RESULT;
     '*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  role, bio, credentials,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  sameAs,\n  socialLinks[]{ _key, platform, url },\n  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){\n    _id, title, "slug": slug.current,\n    excerpt,\n    featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n    author->{ name, "slug": slug.current },\n    publishedAt,\n    category->{ _id, title, "slug": slug.current }\n  }\n}': AUTHOR_BY_SLUG_QUERY_RESULT;
+    '*[_type == "listingPage" && _id == $id][0]{\n  _id, route, title, description,\n  seo{ metaTitle, metaDescription, noIndex, ogImage{ asset->{ _id, url, metadata { dimensions, lqip } }, alt } },\n  headerBlocks[]{ ..., image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n  footerBlocks[]{ ..., image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } }\n}': LISTING_PAGE_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;
