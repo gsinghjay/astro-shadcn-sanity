@@ -134,6 +134,7 @@ export const INNER_BLOCK_INSERT_MENU = {
     INNER_DISPLAY_GROUP,
     ...BASE_INSERT_MENU_GROUPS.slice(2),
   ],
+  views: INSERT_MENU_VIEWS,
 }
 
 /** Insert menu for page-level block arrays (columnsBlock in display group) */

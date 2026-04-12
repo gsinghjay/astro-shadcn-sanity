@@ -7,7 +7,7 @@ export const columnsBlock = defineBlock({
   name: 'columnsBlock',
   title: 'Columns',
   icon: InlineIcon,
-  preview: {select: {title: 'heading'}},
+  preview: {select: {title: 'variant'}},
   variants: [
     {name: 'equal', title: 'Equal (50/50)'},
     {name: 'wide-left', title: 'Wide Left (2/3 + 1/3)'},

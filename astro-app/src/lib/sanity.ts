@@ -257,6 +257,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
 
 const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
     _type == "columnsBlock" => {
+      variant,
       leftBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
       rightBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
       reverseOnMobile,

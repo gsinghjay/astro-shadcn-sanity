@@ -103,10 +103,8 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-rev', reverseOnMobile: true },
     });
 
-    expect(html).toContain('order-2');
-    expect(html).toContain('lg:order-1');
-    expect(html).toContain('order-1');
-    expect(html).toContain('lg:order-2');
+    expect(html).toContain('order-2 lg:order-1');
+    expect(html).toContain('order-1 lg:order-2');
   });
 
   test('does not apply order classes when reverseOnMobile is false', async () => {
@@ -115,8 +113,8 @@ describe('ColumnsBlock', () => {
       props: baseProps,
     });
 
-    expect(html).not.toContain('order-2');
-    expect(html).not.toContain('lg:order-1');
+    expect(html).not.toContain('order-2 lg:order-1');
+    expect(html).not.toContain('order-1 lg:order-2');
   });
 
   test('defaults to equal variant when variant is undefined', async () => {

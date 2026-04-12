@@ -41,10 +41,11 @@ const alignClass = verticalAlign === 'center' ? 'items-center'
 const shouldReverse = stegaClean(reverseOnMobile) === true;
 ---
 
+{(leftBlocks.length > 0 || rightBlocks.length > 0) && (
 <div class:list={['grid gap-8 lg:gap-16', gridClass, alignClass]}>
   <div class:list={[shouldReverse && 'order-2 lg:order-1']}>
     <BlockRenderer
-      blocks={leftBlocks ?? []}
+      blocks={leftBlocks}
       sponsors={sponsors}
       projects={projects}
       testimonials={testimonials}
@@ -54,7 +55,7 @@ const shouldReverse = stegaClean(reverseOnMobile) === true;
   </div>
   <div class:list={[shouldReverse && 'order-1 lg:order-2']}>
     <BlockRenderer
-      blocks={rightBlocks ?? []}
+      blocks={rightBlocks}
       sponsors={sponsors}
       projects={projects}
       testimonials={testimonials}
@@ -63,3 +64,4 @@ const shouldReverse = stegaClean(reverseOnMobile) === true;
     />
   </div>
 </div>
+)}
