@@ -10,7 +10,8 @@ import {
   getSiteParams,
   getSiteSettings,
 } from '@/lib/sanity';
-import { safeUrlFor } from '@/lib/image';
+import type { ALL_ARTICLE_SLUGS_QUERY_RESULT } from '@/sanity.types';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
@@ -18,10 +19,13 @@ import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 import { JsonLd } from '@/components/ui/json-ld';
 import { buildArticleJsonLd } from '@/lib/article-jsonld';
+import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const articles = await sanityClient.fetch<Array<{ slug: string }>>(ALL_ARTICLE_SLUGS_QUERY, getSiteParams());
-  return articles.map((a) => ({ params: { slug: a.slug } }));
+  const articles = await sanityClient.fetch<ALL_ARTICLE_SLUGS_QUERY_RESULT>(ALL_ARTICLE_SLUGS_QUERY, getSiteParams());
+  return articles
+    .filter((a): a is { slug: string } => typeof a.slug === 'string' && a.slug.length > 0)
+    .map((a) => ({ params: { slug: a.slug } }));
 };
 
 const { slug } = Astro.params;
@@ -95,7 +99,7 @@ const cleanAuthorSlug = authorSlug;
             height={imageDimensions?.height ?? 630}
             loading="eager"
             fetchpriority="high"
-            style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+            style={lqipStyle(lqip)}
           />
         </div>
       )}
@@ -142,6 +146,8 @@ const cleanAuthorSlug = authorSlug;
         </div>
       )}
 
+      <ArticleNewsletterCta variant="article-body" />
+
       {relatedArticles.length > 0 && (
         <div>
           <h2 class="text-2xl font-bold mb-6">Related Articles</h2>
@@ -153,7 +159,7 @@ const cleanAuthorSlug = authorSlug;
         </div>
       )}
 
-      <a href="/articles" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-articles">
+      <a href="/articles" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-articles">
         &larr; Back to Articles
       </a>
     </SectionContent>

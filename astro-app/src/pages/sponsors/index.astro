@@ -1,16 +1,38 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { getAllSponsors } from '@/lib/sanity';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { getAllSponsors, getListingPage } from '@/lib/sanity';
 import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
 import SponsorCard from '@/components/SponsorCard.astro';
 
-const sponsors = await getAllSponsors();
+const [sponsors, listingPage] = await Promise.all([
+  getAllSponsors(),
+  getListingPage('sponsors'),
+]);
+
+const pageTitle = listingPage?.title ?? 'Sponsors';
+const pageH1 = listingPage?.title ?? 'Our Sponsors';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Meet the industry sponsors partnering with YWCC to provide real-world capstone project experiences for students.' };
 ---
 
-<Layout title="Sponsors" seo={{ metaDescription: 'Meet the industry sponsors partnering with YWCC to provide real-world capstone project experiences for students.' }}>
+<Layout title={pageTitle} seo={pageSeo}>
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} />
+  )}
+
   <Section>
     <SectionContent>
-      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Our Sponsors</h1>
+      <Breadcrumb baseUrl={Astro.url.origin} items={[
+        { label: 'Home', href: '/' },
+        { label: pageTitle },
+      ]} />
+
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageH1}</h1>
+      {pageDescription && (
+        <p class="text-lg text-muted-foreground">{pageDescription}</p>
+      )}
     </SectionContent>
 
     <SectionGrid size="lg">
@@ -19,4 +41,8 @@ const sponsors = await getAllSponsors();
       ))}
     </SectionGrid>
   </Section>
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} />
+  )}
 </Layout>

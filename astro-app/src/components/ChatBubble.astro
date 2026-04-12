@@ -114,5 +114,6 @@ const siteId = import.meta.env.PUBLIC_SITE_ID || "default";
     setTimeout(() => observer.disconnect(), 5000);
   }
 
+  document.addEventListener("DOMContentLoaded", initChatBubble);
   document.addEventListener("astro:page-load", initChatBubble);
 </script>

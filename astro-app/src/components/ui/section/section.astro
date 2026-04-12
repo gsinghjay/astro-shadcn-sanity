@@ -51,7 +51,7 @@ const slot = await Astro.slots.render("default")
 <style is:global>
   [data-slot="section"] {
     --section-width: var(--container, var(--breakpoint-xl));
-    --section-py: calc(var(--spacing) * 12);
+    --section-py: var(--block-section-py, calc(var(--spacing) * 12));
     --section-px: max(
       var(--gutter, 24px),
       calc((100cqw - var(--section-width)) / 2)
@@ -63,16 +63,16 @@ const slot = await Astro.slots.render("default")
   }
 
   [data-slot="section"][data-size="sm"] {
-    --section-py: calc(var(--spacing) * 8);
+    --section-py: var(--block-section-py, calc(var(--spacing) * 8));
   }
 
   [data-slot="section"][data-size="lg"] {
-    --section-py: calc(var(--spacing) * 24);
+    --section-py: var(--block-section-py, calc(var(--spacing) * 24));
   }
 
   @media (min-width: 1024px) {
     [data-slot="section"] {
-      --section-py: calc(var(--spacing) * 16);
+      --section-py: var(--block-section-py, calc(var(--spacing) * 16));
     }
 
     [data-slot="section"][data-variant="floating"] {
@@ -80,11 +80,11 @@ const slot = await Astro.slots.render("default")
     }
 
     [data-slot="section"][data-size="sm"] {
-      --section-py: calc(var(--spacing) * 12);
+      --section-py: var(--block-section-py, calc(var(--spacing) * 12));
     }
 
     [data-slot="section"][data-size="lg"] {
-      --section-py: calc(var(--spacing) * 32);
+      --section-py: var(--block-section-py, calc(var(--spacing) * 32));
     }
   }
 </style>

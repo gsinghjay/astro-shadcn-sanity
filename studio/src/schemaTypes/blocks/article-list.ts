@@ -63,5 +63,12 @@ export const articleList = defineBlock({
       of: [defineArrayMember({type: 'button'})],
       validation: (Rule) => Rule.max(5),
     }),
+    defineField({
+      name: 'showNewsletterCta',
+      title: 'Show Newsletter CTA',
+      type: 'boolean',
+      description: 'Display a newsletter signup below the article list',
+      initialValue: false,
+    }),
   ],
 })
