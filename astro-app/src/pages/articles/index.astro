@@ -23,12 +23,15 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse articles, blog po
 const featuredArticle = articles[0] ?? null;
 const remainingArticles = articles.slice(1);
 
-function articleHref(article: typeof featuredArticle): string {
-  return `/articles/${stegaClean(article!.slug)}`;
+type Article = NonNullable<typeof featuredArticle>;
+
+function articleHref(article: Article): string {
+  const slug = stegaClean(article.slug);
+  return slug ? `/articles/${slug}` : '#';
 }
 
-function heroSrcset(article: typeof featuredArticle): string | undefined {
-  const builder = safeUrlFor(article!.featuredImage);
+function heroSrcset(article: Article): string | undefined {
+  const builder = safeUrlFor(article.featuredImage);
   if (!builder) return undefined;
   return [640, 960, 1280, 1600, 1920]
     .map((w) => `${builder.width(w).height(Math.round((w * 9) / 16)).fit('crop').url()} ${w}w`)

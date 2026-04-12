@@ -36,6 +36,222 @@ const PORTABLE_TEXT_PROJECTION = `{
   }
 }`;
 
+/**
+ * Shared per-type block field projections.
+ * Used by both PAGE_BY_SLUG_QUERY and LISTING_PAGE_QUERY to ensure
+ * consistent data resolution (images, portable text, references).
+ */
+const BLOCK_FIELDS_PROJECTION = `
+    _type,
+    _key,
+    backgroundVariant,
+    spacing,
+    maxWidth,
+    variant,
+    _type == "heroBanner" => {
+      heading,
+      subheading,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
+      ctaButtons[]{ _key, text, url, variant },
+      alignment
+    },
+    _type == "featureGrid" => {
+      heading,
+      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
+      columns
+    },
+    _type == "ctaBanner" => {
+      heading,
+      description,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
+      ctaButtons[]{ _key, text, url, variant }
+    },
+    _type == "statsRow" => {
+      heading,
+      stats[]{ _key, value, label, description }
+    },
+    _type == "textWithImage" => {
+      heading,
+      content[]${PORTABLE_TEXT_PROJECTION},
+      image{ ${IMAGE_PROJECTION}, alt },
+      imagePosition
+    },
+    _type == "logoCloud" => {
+      heading,
+      autoPopulate,
+      sponsors[]->{ _id }
+    },
+    _type == "sponsorSteps" => {
+      heading,
+      subheading,
+      items[]{ _key, title, description, list },
+      ctaButtons[]{ _key, text, url, variant }
+    },
+    _type == "richText" => {
+      content[]${PORTABLE_TEXT_PROJECTION}
+    },
+    _type == "faqSection" => {
+      heading,
+      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
+    },
+    _type == "contactForm" => {
+      heading,
+      description,
+      successMessage,
+      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
+    },
+    _type == "sponsorCards" => {
+      heading,
+      displayMode,
+      sponsors[]->{ _id }
+    },
+    _type == "projectCards" => {
+      heading,
+      displayMode,
+      projects[]->{ _id }
+    },
+    _type == "testimonials" => {
+      heading,
+      testimonialSource,
+      testimonials[]->{ _id }
+    },
+    _type == "eventList" => {
+      heading,
+      eventStatus,
+      limit
+    },
+    _type == "teamGrid" => {
+      heading,
+      description,
+      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
+    },
+    _type == "imageGallery" => {
+      heading,
+      description,
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
+    },
+    _type == "articleList" => {
+      heading,
+      description,
+      contentType,
+      categories[]->{ _id },
+      limit,
+      ctaButtons[]{ _key, text, url, variant },
+      showNewsletterCta
+    },
+    _type == "comparisonTable" => {
+      heading,
+      description,
+      options[]{ _key, title, highlighted },
+      criteria[]{ _key, feature, values, isHeader },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "timeline" => {
+      heading,
+      description,
+      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "pullquote" => {
+      quote,
+      attribution,
+      role,
+      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
+    },
+    _type == "divider" => {
+      label
+    },
+    _type == "announcementBar" => {
+      icon,
+      text,
+      link{ label, href },
+      dismissible
+    },
+    _type == "sponsorshipTiers" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
+    },
+    _type == "videoEmbed" => {
+      heading,
+      description,
+      youtubeUrl,
+      posterImage{ ${IMAGE_PROJECTION}, alt }
+    },
+    _type == "pricingTable" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
+    },
+    _type == "serviceCards" => {
+      heading,
+      description,
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
+    },
+    _type == "productShowcase" => {
+      heading,
+      description,
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
+    },
+    _type == "linkCards" => {
+      heading,
+      description,
+      links[]{ _key, title, description, icon, url }
+    },
+    _type == "newsletter" => {
+      heading,
+      description,
+      inputPlaceholder,
+      submitButtonLabel,
+      privacyDisclaimerText
+    },
+    _type == "accordion" => {
+      heading,
+      description,
+      items[]{ _key, title, content }
+    },
+    _type == "tabsBlock" => {
+      heading,
+      tabs[]{ _key, label, content }
+    },
+    _type == "embedBlock" => {
+      heading,
+      embedUrl,
+      caption
+    },
+    _type == "mapBlock" => {
+      heading,
+      address,
+      coordinates{ lat, lng },
+      caption,
+      contactInfo{ phone, email, hours }
+    },
+    _type == "countdownTimer" => {
+      heading,
+      description,
+      targetDate,
+      completedMessage
+    },
+    _type == "metricsDashboard" => {
+      heading,
+      description,
+      metrics[]{ _key, label, value, change, trend, icon }
+    },
+    _type == "cardGrid" => {
+      heading,
+      description,
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
+    },
+    _type == "beforeAfter" => {
+      heading,
+      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      beforeLabel,
+      afterLabel,
+      caption
+    }`;
+
 const visualEditingEnabled =
   import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
 const token = import.meta.env.SANITY_API_READ_TOKEN;
@@ -773,9 +989,9 @@ export async function getAuthorBySlug(slug: string): Promise<AUTHOR_BY_SLUG_QUER
  */
 export const LISTING_PAGE_QUERY = defineQuery(groq`*[_type == "listingPage" && _id == $id][0]{
   _id, route, title, description,
-  seo{ metaTitle, metaDescription, noIndex, ogImage{ asset->{ _id, url, metadata { dimensions, lqip } }, alt } },
-  headerBlocks[]{ ..., image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
-  footerBlocks[]{ ..., image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } }
+  seo{ metaTitle, metaDescription, noIndex, ogImage{ ${IMAGE_PROJECTION}, alt } },
+  headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  footerBlocks[]{${BLOCK_FIELDS_PROJECTION}}
 }`);
 
 /**
@@ -791,7 +1007,7 @@ function getListingPageId(route: string): string {
  * Returns null when document doesn't exist — pages MUST work without singletons.
  * Uses a Map cache (keyed by route) since there are 5 distinct documents.
  */
-const _listingPageCache = new Map<string, LISTING_PAGE_QUERY_RESULT>();
+const _listingPageCache = new Map<string, LISTING_PAGE_QUERY_RESULT | null>();
 
 export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_RESULT | null> {
   if (!visualEditingEnabled && _listingPageCache.has(route)) {
@@ -802,10 +1018,9 @@ export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_
     query: LISTING_PAGE_QUERY,
     params: { id },
   });
-  if (result) {
-    _listingPageCache.set(route, result);
-  }
-  return result ?? null;
+  const value = result ?? null;
+  _listingPageCache.set(route, value);
+  return value;
 }
 
 /**
@@ -903,217 +1118,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     noIndex,
     ogImage { ${IMAGE_PROJECTION}, alt }
   },
-  blocks[]{
-    _type,
-    _key,
-    backgroundVariant,
-    spacing,
-    maxWidth,
-    variant,
-    _type == "heroBanner" => {
-      heading,
-      subheading,
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
-      ctaButtons[]{ _key, text, url, variant },
-      alignment
-    },
-    _type == "featureGrid" => {
-      heading,
-      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
-      columns
-    },
-    _type == "ctaBanner" => {
-      heading,
-      description,
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
-      ctaButtons[]{ _key, text, url, variant }
-    },
-    _type == "statsRow" => {
-      heading,
-      stats[]{ _key, value, label, description }
-    },
-    _type == "textWithImage" => {
-      heading,
-      content[]${PORTABLE_TEXT_PROJECTION},
-      image{ ${IMAGE_PROJECTION}, alt },
-      imagePosition
-    },
-    _type == "logoCloud" => {
-      heading,
-      autoPopulate,
-      sponsors[]->{ _id }
-    },
-    _type == "sponsorSteps" => {
-      heading,
-      subheading,
-      items[]{ _key, title, description, list },
-      ctaButtons[]{ _key, text, url, variant }
-    },
-    _type == "richText" => {
-      content[]${PORTABLE_TEXT_PROJECTION}
-    },
-    _type == "faqSection" => {
-      heading,
-      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
-    },
-    _type == "contactForm" => {
-      heading,
-      description,
-      successMessage,
-      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
-    },
-    _type == "sponsorCards" => {
-      heading,
-      displayMode,
-      sponsors[]->{ _id }
-    },
-    _type == "projectCards" => {
-      heading,
-      displayMode,
-      projects[]->{ _id }
-    },
-    _type == "testimonials" => {
-      heading,
-      testimonialSource,
-      testimonials[]->{ _id }
-    },
-    _type == "eventList" => {
-      heading,
-      eventStatus,
-      limit
-    },
-    _type == "teamGrid" => {
-      heading,
-      description,
-      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
-    },
-    _type == "imageGallery" => {
-      heading,
-      description,
-      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
-    },
-    _type == "articleList" => {
-      heading,
-      description,
-      contentType,
-      categories[]->{ _id },
-      limit,
-      ctaButtons[]{ _key, text, url, variant },
-      showNewsletterCta
-    },
-    _type == "comparisonTable" => {
-      heading,
-      description,
-      options[]{ _key, title, highlighted },
-      criteria[]{ _key, feature, values, isHeader },
-      links[]{ _key, text, url, variant }
-    },
-    _type == "timeline" => {
-      heading,
-      description,
-      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
-      links[]{ _key, text, url, variant }
-    },
-    _type == "pullquote" => {
-      quote,
-      attribution,
-      role,
-      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
-    },
-    _type == "divider" => {
-      label
-    },
-    _type == "announcementBar" => {
-      icon,
-      text,
-      link{ label, href },
-      dismissible
-    },
-    _type == "sponsorshipTiers" => {
-      heading,
-      description,
-      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
-    },
-    _type == "videoEmbed" => {
-      heading,
-      description,
-      youtubeUrl,
-      posterImage{ ${IMAGE_PROJECTION}, alt }
-    },
-    _type == "pricingTable" => {
-      heading,
-      description,
-      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
-    },
-    _type == "serviceCards" => {
-      heading,
-      description,
-      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
-    },
-    _type == "productShowcase" => {
-      heading,
-      description,
-      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
-    },
-    _type == "linkCards" => {
-      heading,
-      description,
-      links[]{ _key, title, description, icon, url }
-    },
-    _type == "newsletter" => {
-      heading,
-      description,
-      inputPlaceholder,
-      submitButtonLabel,
-      privacyDisclaimerText
-    },
-    _type == "accordion" => {
-      heading,
-      description,
-      items[]{ _key, title, content }
-    },
-    _type == "tabsBlock" => {
-      heading,
-      tabs[]{ _key, label, content }
-    },
-    _type == "embedBlock" => {
-      heading,
-      embedUrl,
-      caption
-    },
-    _type == "mapBlock" => {
-      heading,
-      address,
-      coordinates{ lat, lng },
-      caption,
-      contactInfo{ phone, email, hours }
-    },
-    _type == "countdownTimer" => {
-      heading,
-      description,
-      targetDate,
-      completedMessage
-    },
-    _type == "metricsDashboard" => {
-      heading,
-      description,
-      metrics[]{ _key, label, value, change, trend, icon }
-    },
-    _type == "cardGrid" => {
-      heading,
-      description,
-      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
-    },
-    _type == "beforeAfter" => {
-      heading,
-      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
-      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
-      beforeLabel,
-      afterLabel,
-      caption
-    }
-  }
+  blocks[]{${BLOCK_FIELDS_PROJECTION}}
 }`);
 
 /**

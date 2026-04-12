@@ -35,7 +35,7 @@ describe('Story 21.0: GROQ & Fetch Function', () => {
   })
 
   test('getListingPage returns null pattern (not throw)', () => {
-    expect(sanityTsContent).toMatch(/return result \?\? null/)
+    expect(sanityTsContent).toMatch(/result \?\? null/)
   })
 
   test('_listingPageCache uses Map (keyed by route)', () => {
