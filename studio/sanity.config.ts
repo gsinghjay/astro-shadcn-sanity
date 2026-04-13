@@ -4,6 +4,7 @@ import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
+import {media} from 'sanity-plugin-media'
 import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
@@ -45,6 +46,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         },
       }),
       visionTool(),
+      media(),
       formSchema({}),
     ],
     schema: {
@@ -119,6 +121,7 @@ export default defineConfig([
         },
       }),
       visionTool(),
+      media(),
       formSchema({}),
     ],
     schema: {

@@ -20,6 +20,10 @@ vi.mock('@/lib/image', () => ({
       url: () => 'https://cdn.sanity.io/mock-image.jpg',
     };
   },
+  lqipStyle: (lqip: string | null | undefined) => {
+    if (!lqip || !lqip.startsWith('data:image/')) return undefined;
+    return `background-image: url(${lqip}); background-size: cover;`;
+  },
 }));
 
 function extractJsonLd(html: string): Record<string, unknown>[] {
