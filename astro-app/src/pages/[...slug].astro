@@ -14,7 +14,9 @@ const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLE
 // getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
   const pages = await sanityClient.fetch<ALL_PAGE_SLUGS_QUERY_RESULT>(ALL_PAGE_SLUGS_QUERY, getSiteParams());
-  const validPages = pages.filter((p): p is { slug: string } => typeof p.slug === 'string' && p.slug.length > 0);
+  // Exclude slugs that have dedicated page routes (e.g., /gallery/index.astro)
+  const DEDICATED_ROUTES = new Set(['gallery']);
+  const validPages = pages.filter((p): p is { slug: string } => typeof p.slug === 'string' && p.slug.length > 0 && !DEDICATED_ROUTES.has(p.slug));
   // Pre-fetch all pages in parallel batches to populate the cache
   await prefetchPages(validPages.map(p => p.slug));
   return validPages.map((page) => ({

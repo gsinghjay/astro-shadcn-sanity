@@ -1,5 +1,15 @@
 import {defineType, defineField} from 'sanity'
 
+/** Canonical category options — frontend CATEGORY_LABELS in ImageGallery.astro must stay in sync */
+export const GALLERY_CATEGORY_OPTIONS = [
+  {title: 'Web Apps', value: 'web-apps'},
+  {title: 'Mobile', value: 'mobile'},
+  {title: 'AI/ML', value: 'ai-ml'},
+  {title: 'Data Viz', value: 'data-viz'},
+  {title: 'IoT', value: 'iot'},
+  {title: 'Other', value: 'other'},
+] as const
+
 export const galleryImage = defineType({
   name: 'galleryImage',
   title: 'Gallery Image',
@@ -46,14 +56,7 @@ export const galleryImage = defineType({
       title: 'Category',
       type: 'string',
       options: {
-        list: [
-          {title: 'Web Apps', value: 'web-apps'},
-          {title: 'Mobile', value: 'mobile'},
-          {title: 'AI/ML', value: 'ai-ml'},
-          {title: 'Data Viz', value: 'data-viz'},
-          {title: 'IoT', value: 'iot'},
-          {title: 'Other', value: 'other'},
-        ],
+        list: [...GALLERY_CATEGORY_OPTIONS],
         layout: 'dropdown',
       },
     }),
