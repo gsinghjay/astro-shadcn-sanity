@@ -69,7 +69,7 @@ const slot = await Astro.slots.render("default")
   }
 
   [data-slot="banner"] {
-    --banner-width: var(--container, var(--breakpoint-xl));
+    --banner-width: var(--container, var(--grid-max-width));
     --banner-px: max(
       var(--grid-margin),
       calc((100cqw - var(--banner-width)) / 2)

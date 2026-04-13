@@ -214,7 +214,7 @@ export const MagazineThreeArticles = {
     docs: {
       description: {
         story:
-          'Magazine boundary case — 3 articles total. Hero renders first; the remaining 2 cards fill a `grid-cols-1 md:grid-cols-2` grid (the middle tier of the tiered remaining-articles layout, between the single-centered-card tier at 1 remaining and the 3-column tier at ≥3 remaining). Added in Story 19.9 code review to close the 2-remaining tier visual coverage gap.',
+          'Magazine boundary case — 3 articles total. Hero renders first; the remaining 2 cards fill a `grid-cols-1 @2xl:grid-cols-2` grid (the middle tier of the tiered remaining-articles layout, between the single-centered-card tier at 1 remaining and the 3-column tier at ≥3 remaining). Added in Story 19.9 code review to close the 2-remaining tier visual coverage gap.',
       },
     },
   },
@@ -235,7 +235,7 @@ export const MagazineFourArticles = {
     docs: {
       description: {
         story:
-          'Magazine boundary case — 4 articles total. Hero renders first; remaining 3 cards fill a `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` grid, exercising the upper tier of the tiered remaining-articles layout.',
+          'Magazine boundary case — 4 articles total. Hero renders first; remaining 3 cards fill a `grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3` grid, exercising the upper tier of the tiered remaining-articles layout.',
       },
     },
   },

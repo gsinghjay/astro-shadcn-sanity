@@ -47,7 +47,7 @@ const slot = await Astro.slots.render("default")
 
 <style is:global>
   [data-slot="header"] {
-    --header-width: var(--container, var(--breakpoint-xl));
+    --header-width: var(--container, var(--grid-max-width));
     --header-px: max(
       var(--grid-margin),
       calc((100cqw - var(--header-width)) / 2)

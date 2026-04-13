@@ -47,7 +47,7 @@ const slot = await Astro.slots.render("default")
 
 <style is:global>
   [data-slot="footer"] {
-    --footer-width: var(--container, var(--breakpoint-xl));
+    --footer-width: var(--container, var(--grid-max-width));
     --footer-py: calc(var(--spacing) * 12);
     --footer-px: max(
       var(--grid-margin),
