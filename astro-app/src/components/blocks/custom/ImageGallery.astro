@@ -9,9 +9,11 @@ import { JsonLd } from '@/components/ui/json-ld';
 interface Props extends ImageGalleryBlock {
   class?: string;
   id?: string;
+  /** When true, renders content without the Section/SectionContent wrapper (for embedding in a page's own Section) */
+  bare?: boolean;
 }
 
-const { heading, description, images, variant: rawVariant, _key: blockKey } = Astro.props;
+const { heading, description, images, variant: rawVariant, _key: blockKey, bare = false } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -87,7 +89,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
 
 {galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
 
-{variant === 'grid' && (
+{variant === 'grid' && !bare && (
   <Section data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
@@ -96,22 +98,24 @@ const hasFilters = years.length > 0 || categories.length > 0;
       </SectionContent>
     )}
     <SectionContent>
-      {/* Filter pills */}
+      {/* Filter bar — Swiss geometric style */}
       {hasFilters && (
-        <div class="gallery-filters flex flex-wrap gap-2 mb-8" data-gallery-target={galleryId}>
+        <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
           {years.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="year" data-filter-value="all">All Years</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-muted-foreground mr-1">Year</span>
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
               {years.map(year => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
               ))}
             </div>
           )}
           {categories.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="category" data-filter-value="all">All Categories</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-muted-foreground mr-1">Category</span>
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
               {categories.map(cat => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
               ))}
             </div>
           )}
@@ -186,6 +190,71 @@ const hasFilters = years.length > 0 || categories.length > 0;
   </Section>
 )}
 
+{variant === 'grid' && bare && (
+  <Fragment>
+    {heading && (
+      <div>
+        <h2 class="text-4xl md:text-5xl font-[750] tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </div>
+    )}
+
+    {/* Filter bar — Swiss geometric style */}
+    {hasFilters && (
+      <div class="gallery-filters space-y-3 border-b border-border pb-6" data-gallery-target={galleryId}>
+        {years.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="label-caps text-muted-foreground mr-1">Year</span>
+            <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
+            {years.map(year => (
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
+            ))}
+          </div>
+        )}
+        {categories.length > 0 && (
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="label-caps text-muted-foreground mr-1">Category</span>
+            <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
+            {categories.map(cat => (
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
+            ))}
+          </div>
+        )}
+      </div>
+    )}
+
+    {/* Gallery container */}
+    <div id={galleryId} class="pswp-gallery">
+      {featuredItems.length > 0 && (
+        <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
+          {featuredItems.map((item) => (
+            <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+              {item.image?.asset && (
+                <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                  <img src={urlFor(item.image).width(1200).height(800).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw" alt={item.image.alt || ''} width={1200} height={800} class="aspect-[3/2] w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
+                </a>
+              )}
+              {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+      <div class="grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
+        {regularItems.map((item) => (
+          <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+            {item.image?.asset && (
+              <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                <img src={urlFor(item.image).width(800).height(600).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" alt={item.image.alt || ''} width={800} height={600} class="aspect-video w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
+              </a>
+            )}
+            {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    </div>
+  </Fragment>
+)}
+
 {variant === 'masonry' && (
   <Section data-animate>
     {heading && (
@@ -196,20 +265,22 @@ const hasFilters = years.length > 0 || categories.length > 0;
     )}
     {hasFilters && (
       <SectionContent>
-        <div class="gallery-filters flex flex-wrap gap-2 mb-8" data-gallery-target={galleryId}>
+        <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
           {years.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="year" data-filter-value="all">All Years</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-muted-foreground mr-1">Year</span>
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
               {years.map(year => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
               ))}
             </div>
           )}
           {categories.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="category" data-filter-value="all">All Categories</button>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="label-caps text-muted-foreground mr-1">Category</span>
+              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
               {categories.map(cat => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
               ))}
             </div>
           )}
@@ -288,20 +359,22 @@ const hasFilters = years.length > 0 || categories.length > 0;
       )}
       <SectionContent>
         {hasFilters && (
-          <div class="gallery-filters flex flex-wrap gap-2 mb-8" data-gallery-target={galleryId}>
+          <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
             {years.length > 0 && (
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="year" data-filter-value="all">All Years</button>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="label-caps text-muted-foreground mr-1">Year</span>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
                 {years.map(year => (
-                  <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
+                  <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
                 ))}
               </div>
             )}
             {categories.length > 0 && (
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="category" data-filter-value="all">All Categories</button>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="label-caps text-muted-foreground mr-1">Category</span>
+                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
                 {categories.map(cat => (
-                  <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
+                  <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
                 ))}
               </div>
             )}
@@ -480,13 +553,13 @@ const hasFilters = years.length > 0 || categories.length > 0;
           activeCategory = filterValue;
         }
 
-        // Update active pill styling within the same filter group
+        // Update active pill styling via data-state attribute (Swiss design pattern)
         filterBar.querySelectorAll(`.gallery-filter-pill[data-filter-type="${filterType}"]`).forEach(p => {
-          p.classList.remove('active', 'bg-primary', 'text-primary-foreground');
-          p.classList.add('bg-muted', 'text-muted-foreground');
+          p.removeAttribute('data-state');
+          p.setAttribute('aria-pressed', 'false');
         });
-        pill.classList.add('active', 'bg-primary', 'text-primary-foreground');
-        pill.classList.remove('bg-muted', 'text-muted-foreground');
+        pill.setAttribute('data-state', 'active');
+        pill.setAttribute('aria-pressed', 'true');
 
         applyFilters();
       });

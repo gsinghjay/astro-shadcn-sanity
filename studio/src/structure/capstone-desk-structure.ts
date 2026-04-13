@@ -39,6 +39,14 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
                     .initialValueTemplate('listingPage-events'),
                 ),
               S.listItem()
+                .title('Gallery')
+                .child(
+                  S.document()
+                    .schemaType('listingPage')
+                    .documentId('listingPage-gallery')
+                    .initialValueTemplate('listingPage-gallery'),
+                ),
+              S.listItem()
                 .title('Projects')
                 .child(
                   S.document()
