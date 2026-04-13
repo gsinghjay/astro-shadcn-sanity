@@ -1,3 +1,45 @@
+## [1.17.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.16.0...v1.17.0) (2026-04-13)
+
+### Features
+
+* add dedicated gallery page with breadcrumbs, Swiss design filters, and CMS listing page ([5cbb36f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5cbb36f37a8f6f77f14b3667d2b8a8f2b39df028))
+* add Swiss Style concept stories for projects page redesign ([c1421be](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c1421be04d8552ce3cd6003cee32113550af06a0))
+* **articles:** add category archive pages and chip navigation (Story 19.10) ([855eb72](https://github.com/gsinghjay/astro-shadcn-sanity/commit/855eb72a1f0e15e0d13ac894a2e42392fbf0cf3d))
+* **articles:** add newsletter CTA to detail pages and articleList block (Story 19.7) ([1c81c0a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1c81c0ace613ec19fe556b539b2c8b33346848c3))
+* **authors:** add author listing and detail pages with review hardening (Story 20.2) ([1e3dfdb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1e3dfdbb0c4c137fe67540de478d082bb77154f6))
+* **authors:** add Person JSON-LD structured data to author detail pages (Story 20.3) ([77a4ae5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/77a4ae5252ca58db70d044531aa2d2c685ea380a))
+* **blocks:** add ColumnsBlock two-column layout wrapper (Story 21.10) ([672e090](https://github.com/gsinghjay/astro-shadcn-sanity/commit/672e090357157235526d09e77c783fb7abd307cc))
+* **blocks:** variant audit, EventList variants, BlockWrapper improvements (Story 21.9) ([7ea3b5a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7ea3b5a427dc503ca06a3893edb05a79ee0822de))
+* establish 12-column grid system and migrate to container queries ([256229d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/256229d6563c68c7e512450f82708f659cd0fe14))
+* flagship capstone image gallery with PhotoSwipe, filters, and deep linking ([20d5d84](https://github.com/gsinghjay/astro-shadcn-sanity/commit/20d5d84c94f5b1aafe5b8dc32cf87f31927e87aa))
+* **listing-pages:** add CMS-editable singleton listing page documents (Story 21.0) ([c4397f5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c4397f5359567d73a7a0bee672dda73d5863f8b6))
+* promote Swiss Style concept components to projects listing page ([39cad15](https://github.com/gsinghjay/astro-shadcn-sanity/commit/39cad150ea6fea3c448ba6b0548efccbc9db60e6))
+* **seo:** add Article/NewsArticle JSON-LD to article detail pages (Story 19.6) ([07b4e0d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/07b4e0d35c2f4d01337526c8158df0ee0d1afb73))
+
+### Bug Fixes
+
+* **articles:** harden newsletter CTA per code review (Story 19.7) ([8efd133](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8efd133eee0928af3e00686b8b2690bd23bd7ae9))
+* **blocks:** code review patches — race fix, empty guard, GROQ variant, test titles (Story 21.10) ([3f69a2b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3f69a2b9b8cc1cad1295382925fd4b3a55541987))
+* **blocks:** code review patches — spacing override, null slug, hiddenByVariant, cleanup ([4f63316](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4f63316d8b674663063e4aa6f46974ca63c278a5))
+* **blocks:** fix Lucide icon rendering, logo cloud cropping, and remove brutalist hovers ([ae2e4c8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ae2e4c8f58a2f784bb69726f893953760f2cdcdf))
+* code review fixes for 12-column grid system ([5a3dcf1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5a3dcf1302b904cd33597be2a1009b9132991c79))
+* correct container query breakpoints and ColumnsBlock containment ([c940c36](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c940c3680735a835a87860ac95eb5d57d6f9b006))
+* improve header nav accessibility and update stale schema description ([b6e3dee](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b6e3dee59b103c75ba74a7c84398b7ba9af9efa0))
+* **listing-pages:** extract shared BLOCK_FIELDS_PROJECTION, fix null caching and slug guard ([6ab5944](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6ab59447ca784942515e025af14e1b5206b41c00))
+* resolve 3 Sanity review findings for image gallery ([1acb2aa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1acb2aa170d216ba9fa15b6ac90a6cc330450a8c))
+* resolve 9 code review findings for image gallery (Story 22.4) ([d2a2719](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d2a2719c028f92986e6bf478bef2be85fc386127)), closes [#11](https://github.com/gsinghjay/astro-shadcn-sanity/issues/11) [#6](https://github.com/gsinghjay/astro-shadcn-sanity/issues/6) [#7](https://github.com/gsinghjay/astro-shadcn-sanity/issues/7) [#8](https://github.com/gsinghjay/astro-shadcn-sanity/issues/8)
+* restore site logo, nested nav dropdowns, and lower hamburger breakpoint ([f16cae2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f16cae2a963c8996bfa2fd873cbdb13ac4a14149))
+* Sanity review fixes — pin Vite 6, remove dead code, deterministic gallery ID ([6bee0ab](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6bee0ab19ecb5a1366db1ffc2a523250c1d650e6))
+* Sanity review fixes — StatsRow text sizing, dead gutter fallbacks, SponsorSteps grid ([53039da](https://github.com/gsinghjay/astro-shadcn-sanity/commit/53039da97c6d3a7b96f5b79ba2ead29bf09c2df2))
+* **seo:** harden Article JSON-LD builder per code review (Story 19.6) ([f115de7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f115de751b9a0c4a4ab5fe4b877c2b2150115f6e))
+* **studio:** deploy schema to all workspaces, not just capstone ([8bcf552](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8bcf5528a71cf68e5fab47cc4f76e88223344416))
+* **types:** use TypeGen result types in getStaticPaths across all detail pages ([87aaa23](https://github.com/gsinghjay/astro-shadcn-sanity/commit/87aaa2343765e3a97a58783487730fc8734424fb))
+* use DOMContentLoaded for ChatBubble and CookieConsent init ([4411576](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4411576529c8f2bcca71aa57eeae89fd079adc7c))
+
+### Miscellaneous
+
+* deleted old screenshots ([1ac6633](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1ac6633320c706b8edc986849cf6192d316fdc1e))
+
 ## [1.16.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.15.0...v1.16.0) (2026-04-11)
 
 ### Features
