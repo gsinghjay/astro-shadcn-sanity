@@ -10,7 +10,7 @@ interface Props extends ImageGalleryBlock {
   id?: string;
 }
 
-const { heading, description, images, variant: rawVariant } = Astro.props;
+const { heading, description, images, variant: rawVariant, _key: blockKey } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -58,18 +58,9 @@ const galleryJsonLd = galleryImages.length > 0 ? {
   "image": galleryImages,
 } : null;
 
-const galleryId = `gallery-${Math.random().toString(36).slice(2, 8)}`;
+const galleryId = `gallery-${blockKey || 'default'}`;
 const hasFilters = years.length > 0 || categories.length > 0;
 
-/**
- * Renders a single gallery figure element.
- * Used across grid, masonry, and single variants.
- */
-const renderFigure = (item: typeof galleryItems[number], imgWidth: number, imgHeight?: number) => {
-  const cleanCategory = stegaClean(item.category) ?? '';
-  const yearStr = item.year ? String(item.year) : '';
-  return { cleanCategory, yearStr, imgWidth, imgHeight };
-};
 ---
 
 {galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
