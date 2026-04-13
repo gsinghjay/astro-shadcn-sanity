@@ -78,8 +78,9 @@ describe('ImageGallery', () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ImageGallery, { props: imageGalleryWithFeatured });
 
-    expect(html).toContain('All Years');
+    expect(html).toContain('Year');
     expect(html).toContain('data-filter-type="year"');
+    expect(html).toContain('data-filter-value="all"');
     expect(html).toContain('data-filter-value="2024"');
     expect(html).toContain('data-filter-value="2025"');
     expect(html).toContain('data-filter-value="2026"');
@@ -89,8 +90,9 @@ describe('ImageGallery', () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ImageGallery, { props: imageGalleryWithFeatured });
 
-    expect(html).toContain('All Categories');
+    expect(html).toContain('Category');
     expect(html).toContain('data-filter-type="category"');
+    expect(html).toContain('data-filter-value="all"');
     expect(html).toContain('AI/ML');
     expect(html).toContain('Web Apps');
     expect(html).toContain('Mobile');
@@ -204,8 +206,8 @@ describe('ImageGallery', () => {
     const masonryWithFilters = { ...imageGalleryWithFeatured, variant: 'masonry' as const };
     const html = await container.renderToString(ImageGallery, { props: masonryWithFilters });
 
-    expect(html).toContain('All Years');
-    expect(html).toContain('All Categories');
+    expect(html).toContain('Year');
+    expect(html).toContain('Category');
     expect(html).toContain('gallery-filter-pill');
   });
 

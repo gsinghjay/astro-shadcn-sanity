@@ -65,7 +65,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           value: {site: opts.siteId},
         }))
         // Listing page singletons — pre-populate route for each (Story 21.0)
-        const listingTemplates = ['articles', 'authors', 'events', 'projects', 'sponsors'].map((route) => ({
+        const listingTemplates = ['articles', 'authors', 'events', 'gallery', 'projects', 'sponsors'].map((route) => ({
           id: `listingPage-${route}-${opts.siteId}`,
           title: `Listing Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
           schemaType: 'listingPage',

@@ -5,6 +5,7 @@ import { urlFor, safeUrlFor, lqipStyle } from '@/lib/image';
 import { getSiteSettings } from '@/lib/sanity';
 import { Section, SectionContent, SectionMasonry } from '@/components/ui/section';
 import { JsonLd } from '@/components/ui/json-ld';
+import GalleryFilterBar from './_partials/GalleryFilterBar.astro';
 
 interface Props extends ImageGalleryBlock {
   class?: string;
@@ -16,6 +17,7 @@ interface Props extends ImageGalleryBlock {
 const { heading, description, images, variant: rawVariant, _key: blockKey, bare = false } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
+/** @sync studio/src/schemaTypes/objects/gallery-image.ts — GALLERY_CATEGORY_OPTIONS is the source of truth */
 const CATEGORY_LABELS: Record<string, string> = {
   'web-apps': 'Web Apps',
   'mobile': 'Mobile',
@@ -98,29 +100,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
       </SectionContent>
     )}
     <SectionContent>
-      {/* Filter bar — Swiss geometric style */}
-      {hasFilters && (
-        <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
-          {years.length > 0 && (
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="label-caps text-muted-foreground mr-1">Year</span>
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
-              {years.map(year => (
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
-              ))}
-            </div>
-          )}
-          {categories.length > 0 && (
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="label-caps text-muted-foreground mr-1">Category</span>
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
-              {categories.map(cat => (
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
 
       {/* Gallery container — featured + regular inside one pswp-gallery */}
       <div id={galleryId} class="pswp-gallery">
@@ -199,29 +179,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
       </div>
     )}
 
-    {/* Filter bar — Swiss geometric style */}
-    {hasFilters && (
-      <div class="gallery-filters space-y-3 border-b border-border pb-6" data-gallery-target={galleryId}>
-        {years.length > 0 && (
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="label-caps text-muted-foreground mr-1">Year</span>
-            <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
-            {years.map(year => (
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
-            ))}
-          </div>
-        )}
-        {categories.length > 0 && (
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="label-caps text-muted-foreground mr-1">Category</span>
-            <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
-            {categories.map(cat => (
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
-            ))}
-          </div>
-        )}
-      </div>
-    )}
+    {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} />}
 
     {/* Gallery container */}
     <div id={galleryId} class="pswp-gallery">
@@ -265,26 +223,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
     )}
     {hasFilters && (
       <SectionContent>
-        <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
-          {years.length > 0 && (
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="label-caps text-muted-foreground mr-1">Year</span>
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
-              {years.map(year => (
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
-              ))}
-            </div>
-          )}
-          {categories.length > 0 && (
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="label-caps text-muted-foreground mr-1">Category</span>
-              <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
-              {categories.map(cat => (
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
-              ))}
-            </div>
-          )}
-        </div>
+        <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />
       </SectionContent>
     )}
     <SectionMasonry>
@@ -358,28 +297,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
         </SectionContent>
       )}
       <SectionContent>
-        {hasFilters && (
-          <div class="gallery-filters space-y-3 mb-8 border-b border-border pb-6" data-gallery-target={galleryId}>
-            {years.length > 0 && (
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="label-caps text-muted-foreground mr-1">Year</span>
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
-                {years.map(year => (
-                  <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
-                ))}
-              </div>
-            )}
-            {categories.length > 0 && (
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="label-caps text-muted-foreground mr-1">Category</span>
-                <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
-                {categories.map(cat => (
-                  <button type="button" class="gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground" aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
         <div id={galleryId} class="pswp-gallery">
           <figure>
             {item.image?.asset && (
