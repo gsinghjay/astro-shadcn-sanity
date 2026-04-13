@@ -1,5 +1,5 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, vi } from 'vitest';
 import ImageGallery from '../blocks/custom/ImageGallery.astro';
 import {
   imageGalleryFull,
@@ -8,6 +8,13 @@ import {
   imageGallerySingle,
   imageGalleryMinimal,
 } from './__fixtures__/image-gallery';
+
+// Mock getSiteSettings to avoid Sanity API dependency
+vi.mock('@/lib/sanity', () => ({
+  getSiteSettings: vi.fn().mockResolvedValue({
+    title: 'YWCC Industry Capstone',
+  }),
+}));
 
 describe('ImageGallery', () => {
   test('renders heading and captions in grid variant', async () => {
@@ -167,5 +174,46 @@ describe('ImageGallery', () => {
 
     expect(html).toContain('background-image: url(data:image/jpeg;base64');
     expect(html).toContain('background-size: cover');
+  });
+
+  test('renders JSON-LD with creator Organization from siteSettings', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ImageGallery, { props: imageGalleryFull });
+
+    const jsonLdMatch = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
+    expect(jsonLdMatch).not.toBeNull();
+
+    const jsonLd = JSON.parse(jsonLdMatch![1]);
+    expect(jsonLd.creator).toBeDefined();
+    expect(jsonLd.creator['@type']).toBe('Organization');
+    expect(jsonLd.creator.name).toBe('YWCC Industry Capstone');
+  });
+
+  test('renders featured images inside pswp-gallery container', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ImageGallery, { props: imageGalleryWithFeatured });
+
+    // Featured row should be inside pswp-gallery, not a sibling
+    const pswpGalleryMatch = html.match(/class="pswp-gallery[^"]*"[^>]*>([\s\S]*)/);
+    expect(pswpGalleryMatch).not.toBeNull();
+    expect(pswpGalleryMatch![1]).toContain('gallery-featured');
+  });
+
+  test('masonry variant renders filter pills when year/category data exists', async () => {
+    const container = await AstroContainer.create();
+    const masonryWithFilters = { ...imageGalleryWithFeatured, variant: 'masonry' as const };
+    const html = await container.renderToString(ImageGallery, { props: masonryWithFilters });
+
+    expect(html).toContain('All Years');
+    expect(html).toContain('All Categories');
+    expect(html).toContain('gallery-filter-pill');
+  });
+
+  test('single variant includes 1200w and 1600w in srcset', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(ImageGallery, { props: imageGallerySingle });
+
+    expect(html).toContain('1200w');
+    expect(html).toContain('1600w');
   });
 });
