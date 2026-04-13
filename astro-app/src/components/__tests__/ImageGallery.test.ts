@@ -18,7 +18,7 @@ describe('ImageGallery', () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(ImageGallery, { props: imageGalleryFull });
 
-    expect(html).toContain('lg:grid-cols-3');
+    expect(html).toContain('@5xl:grid-cols-3');
   });
 
   test('renders masonry variant with heading', async () => {

@@ -41,9 +41,9 @@ describe('StatsRow', () => {
       props: { ...statsFull, variant: 'grid' },
     });
 
-    // 4 stats → grid-cols-2 @md:grid-cols-4 (container queries, not viewport)
+    // 4 stats → grid-cols-2 @6xl:grid-cols-4 (container queries, not viewport)
     expect(html).toContain('grid-cols-2');
-    expect(html).toContain('@md:grid-cols-4');
+    expect(html).toContain('@6xl:grid-cols-4');
   });
 
   test('split variant renders a single-column stat stack', async () => {
@@ -104,6 +104,35 @@ describe('StatsRow', () => {
     expect(html).toContain('text-primary-foreground');
   });
 
+  test('brutalist variant uses container query text sizing', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: { ...statsFull, variant: 'brutalist' },
+    });
+
+    // Container-query breakpoints, not viewport — consistent with grid variant
+    expect(html).toContain('@3xl:text-7xl');
+    expect(html).toContain('@5xl:text-8xl');
+    expect(html).not.toContain('@md:text-7xl');
+    expect(html).not.toContain('@lg:text-8xl');
+  });
+
+  test('renders QuantitativeValue JSON-LD for stats', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(StatsRow, {
+      props: statsFull,
+    });
+
+    const jsonLdMatches = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)];
+    expect(jsonLdMatches.length).toBeGreaterThan(0);
+
+    const schema = JSON.parse(jsonLdMatches[0][1]);
+    expect(schema['@context']).toBe('https://schema.org');
+    expect(schema['@type']).toBe('QuantitativeValue');
+    expect(schema.name).toBe('Members');
+    expect(schema.value).toBe('500');
+  });
+
   test('unknown variant falls back to grid layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(StatsRow, {
@@ -111,6 +140,6 @@ describe('StatsRow', () => {
     });
 
     expect(html).toContain('grid-cols-2');
-    expect(html).toContain('@md:grid-cols-4');
+    expect(html).toContain('@6xl:grid-cols-4');
   });
 });

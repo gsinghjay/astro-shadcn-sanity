@@ -40,7 +40,7 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse upcoming and past
 
       <div id="events-list">
         {events.length > 0 ? (
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div class="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
             {events.map((e) => (
               <EventCard event={e} />
             ))}

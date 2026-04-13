@@ -453,8 +453,8 @@ const remainingArticles = articles.slice(1);
           <SectionGrid
             class={
               remainingArticles.length === 2
-                ? 'grid-cols-1 md:grid-cols-2'
-                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                ? 'grid-cols-1 @2xl:grid-cols-2'
+                : 'grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3'
             }
           >
             {remainingArticles.map((article) => <ArticleCard article={article} />)}

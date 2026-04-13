@@ -39,7 +39,7 @@ describe('ColumnsBlock', () => {
       props: baseProps,
     });
 
-    expect(html).toContain('lg:grid-cols-2');
+    expect(html).toContain('@4xl:grid-cols-2');
     expect(html).toContain('items-start');
   });
 
@@ -49,7 +49,7 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-wl', variant: 'wide-left' },
     });
 
-    expect(html).toContain('lg:grid-cols-[2fr_1fr]');
+    expect(html).toContain('@4xl:grid-cols-[2fr_1fr]');
   });
 
   test('applies wide-right variant grid classes', async () => {
@@ -58,7 +58,7 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-wr', variant: 'wide-right' },
     });
 
-    expect(html).toContain('lg:grid-cols-[1fr_2fr]');
+    expect(html).toContain('@4xl:grid-cols-[1fr_2fr]');
   });
 
   test('applies sidebar-left variant grid classes', async () => {
@@ -67,7 +67,7 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-sl', variant: 'sidebar-left' },
     });
 
-    expect(html).toContain('lg:grid-cols-[minmax(280px,1fr)_3fr]');
+    expect(html).toContain('@4xl:grid-cols-[minmax(280px,1fr)_3fr]');
   });
 
   test('applies sidebar-right variant grid classes', async () => {
@@ -76,7 +76,7 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-sr', variant: 'sidebar-right' },
     });
 
-    expect(html).toContain('lg:grid-cols-[3fr_minmax(280px,1fr)]');
+    expect(html).toContain('@4xl:grid-cols-[3fr_minmax(280px,1fr)]');
   });
 
   test('applies center vertical alignment', async () => {
@@ -103,8 +103,8 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-rev', reverseOnMobile: true },
     });
 
-    expect(html).toContain('order-2 lg:order-1');
-    expect(html).toContain('order-1 lg:order-2');
+    expect(html).toContain('order-2 @4xl:order-1');
+    expect(html).toContain('order-1 @4xl:order-2');
   });
 
   test('does not apply order classes when reverseOnMobile is false', async () => {
@@ -113,8 +113,8 @@ describe('ColumnsBlock', () => {
       props: baseProps,
     });
 
-    expect(html).not.toContain('order-2 lg:order-1');
-    expect(html).not.toContain('order-1 lg:order-2');
+    expect(html).not.toContain('order-2 @4xl:order-1');
+    expect(html).not.toContain('order-1 @4xl:order-2');
   });
 
   test('defaults to equal variant when variant is undefined', async () => {
@@ -123,7 +123,7 @@ describe('ColumnsBlock', () => {
       props: { ...baseProps, _key: 'test-cols-def', variant: undefined },
     });
 
-    expect(html).toContain('lg:grid-cols-2');
+    expect(html).toContain('@4xl:grid-cols-2');
     expect(html).toContain('items-start');
   });
 
@@ -134,6 +134,6 @@ describe('ColumnsBlock', () => {
     });
 
     expect(html).toContain('gap-8');
-    expect(html).toContain('lg:gap-16');
+    expect(html).toContain('@4xl:gap-16');
   });
 });

@@ -73,8 +73,8 @@ describe('VariantLayout', () => {
       slots: { content: '<div>Grid item</div>' },
     });
 
-    // SectionGrid renders with "grid w-full gap-6" classes
-    expect(html).toMatch(/class="[^"]*grid w-full gap-6[^"]*"/);
+    // SectionGrid renders with "grid w-full gap-(--grid-gutter)" classes
+    expect(html).toMatch(/class="[^"]*grid w-full gap-\(--grid-gutter\)[^"]*"/);
     expect(html).toContain('<div>Grid item</div>');
   });
 
