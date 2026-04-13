@@ -78,7 +78,7 @@ const isActive = (href: string) =>
       >
         <Icon name="search" class="h-4 w-4" />
         <span class="label-caps text-[10px]">Search</span>
-        <kbd class="border-2 border-foreground/20 px-1.5 py-0.5 text-[10px] font-mono text-foreground/40 leading-none">⌘K</kbd>
+        <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/40 leading-none">⌘K</kbd>
       </button>
 
       {/* CTA button — Swiss structural accent */}
@@ -197,7 +197,7 @@ const isActive = (href: string) =>
                       'inline-flex h-11 items-center bg-transparent px-4 py-0 text-[11px] font-bold uppercase tracking-[0.15em] rounded-none',
                       isActive(item.href || '')
                         ? 'text-primary'
-                        : 'text-foreground/50',
+                        : 'text-foreground',
                     ]}
                     href={item.href}
                     data-gtm-category="navigation"
@@ -228,7 +228,7 @@ const isActive = (href: string) =>
                     'inline-flex h-11 items-center bg-transparent px-4 py-0 text-[11px] font-bold uppercase tracking-[0.15em] no-underline transition-colors hover:text-primary rounded-none',
                     isActive(item.href || '')
                       ? 'text-primary'
-                      : 'text-foreground/50',
+                      : 'text-foreground',
                   ]}
                   variant="trigger"
                   href={item.href}
@@ -251,7 +251,7 @@ const isActive = (href: string) =>
         'inline-flex h-11 items-center px-4 text-[10px] font-mono uppercase tracking-[0.12em] no-underline transition-colors hover:text-foreground border-b-[3px] -mb-[3px]',
         isActive('/contact')
           ? 'text-primary border-primary'
-          : 'border-transparent text-foreground/40',
+          : 'border-transparent text-foreground',
       ]}
       data-gtm-category="navigation"
       data-gtm-label="Contact"

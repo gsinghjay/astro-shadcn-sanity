@@ -89,7 +89,7 @@ export const siteSettings = defineType({
               name: 'children',
               title: 'Sub-items',
               type: 'array',
-              description: 'Dropdown sub-navigation items (not yet rendered in header — planned for future story)',
+              description: 'Dropdown sub-navigation items shown under this parent in the header nav bar',
               of: [
                 defineArrayMember({
                   type: 'object',
