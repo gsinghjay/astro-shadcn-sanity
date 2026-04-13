@@ -185,10 +185,9 @@
   --grid-margin: var(--grid-gutter);
   --grid-max-width: var(--breakpoint-xl);
 
-  /* Gutter system — single source of truth for edge/container padding.
+  /* Gutter system — edge/container padding for floating variants.
      Responsive: 16px (mobile) → 24px (sm 640px) → 32px (lg 1024px).
-     Referenced by section, header, footer, banner via var(--grid-margin)
-     and by templates via px-(--grid-margin). */
+     Referenced by section, header, footer, banner floating variant width calc. */
   --gutter: 1rem;
   --radius: 0;
   --background: #ffffff;

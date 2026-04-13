@@ -121,7 +121,7 @@ const gridColsClass = statCount <= 1 ? 'grid-cols-1'
     <div class:list={['grid gap-8 @3xl:gap-10 @5xl:gap-12', gridColsClass]}>
       {(stats ?? []).map((stat) => (
         <div class="border-t-4 border-primary pt-4">
-          <div class="font-mono tabular-nums text-5xl @md:text-7xl @lg:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
+          <div class="font-mono tabular-nums text-5xl @3xl:text-7xl @5xl:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
           <div class={`label-caps text-muted-foreground`}>
