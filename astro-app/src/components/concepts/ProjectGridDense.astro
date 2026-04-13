@@ -1,0 +1,85 @@
+---
+/**
+ * ProjectGridDense — Swiss Style 3-column dense grid for quick scanning.
+ *
+ * Mini-cards: status dot, title, sponsor, max 2 tags.
+ * Sharp edges, structural borders, no shadows, label-caps tags.
+ */
+
+interface Project {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsorName: string | null;
+  tags: string[];
+}
+
+interface Props {
+  projects: Project[];
+}
+
+const { projects } = Astro.props;
+
+const dotColors: Record<string, string> = {
+  active: 'bg-green-700',
+  completed: 'bg-primary',
+  archived: 'bg-muted-foreground',
+};
+
+const maxVisibleTags = 2;
+---
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {projects.map((project) => {
+    const visibleTags = project.tags.slice(0, maxVisibleTags);
+    const remainingCount = project.tags.length - maxVisibleTags;
+
+    return (
+      <a
+        href={`/projects/${project.slug}`}
+        class="block no-underline text-inherit group"
+      >
+        <div class="border border-border bg-card p-5 transition-colors duration-150 hover:border-foreground h-full flex flex-col gap-3">
+          {/* Title row with status dot */}
+          <div class="flex items-start gap-2">
+            <span
+              class={`w-2 h-2 shrink-0 mt-1.5 ${dotColors[project.status] || dotColors.active}`}
+              role="img"
+              aria-label={`Status: ${project.status}`}
+            />
+            <h3 class="text-base font-[750] tracking-[-0.03em] leading-[1.05] group-hover:text-primary transition-colors line-clamp-2">
+              {project.title}
+            </h3>
+          </div>
+
+          {/* Sponsor */}
+          {project.sponsorName ? (
+            <p class="label-caps text-muted-foreground pl-4">
+              {project.sponsorName}
+            </p>
+          ) : (
+            <p class="label-caps text-muted-foreground/50 pl-4">
+              No sponsor
+            </p>
+          )}
+
+          {/* Tags */}
+          {project.tags.length > 0 && (
+            <div class="flex flex-wrap gap-1 mt-auto pt-2 pl-4 border-t border-border">
+              {visibleTags.map((tag) => (
+                <span class="label-caps border border-border px-2 py-0.5 text-muted-foreground">
+                  {tag}
+                </span>
+              ))}
+              {remainingCount > 0 && (
+                <span class="label-caps bg-muted px-2 py-0.5 text-muted-foreground">
+                  +{remainingCount}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </a>
+    );
+  })}
+</div>

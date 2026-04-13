@@ -1,0 +1,22 @@
+---
+import StoryContainer from './StoryContainer.astro';
+import ProjectGridDense from './ProjectGridDense.astro';
+
+interface Project {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsorName: string | null;
+  tags: string[];
+}
+
+interface Props {
+  projects: Project[];
+}
+
+const props = Astro.props;
+---
+
+<StoryContainer maxWidth="full">
+  <ProjectGridDense {...props} />
+</StoryContainer>
