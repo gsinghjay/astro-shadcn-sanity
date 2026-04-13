@@ -99,7 +99,7 @@ describe('LogoCloud', () => {
       props: { ...logoCloudFull, variant: 'nonexistent' },
     });
 
-    expect(html).toContain('grid-cols-2');
-    expect(html).toContain('lg:grid-cols-8');
+    expect(html).toContain('auto-fit');
+    expect(html).toContain('gap-px');
   });
 });

@@ -23,7 +23,7 @@ const hasSidebar = Astro.slots.has('sidebar');
 <Layout title={title} seo={seo} hideNav={hideNav} ogType={ogType}>
   <slot name="header" />
   {hasSidebar ? (
-    <div class="mx-auto w-full max-w-[var(--breakpoint-xl)] px-(--gutter) pb-12 flex flex-col lg:grid lg:gap-8 lg:pb-16" style={`--sidebar-width: ${sidebarWidth};`} data-sidebar-layout>
+    <div class="mx-auto w-full max-w-(--grid-max-width) px-(--gutter) pb-12 flex flex-col lg:grid lg:gap-8 lg:pb-16" style={`--sidebar-width: ${sidebarWidth};`} data-sidebar-layout>
       <div>
         <slot />
       </div>

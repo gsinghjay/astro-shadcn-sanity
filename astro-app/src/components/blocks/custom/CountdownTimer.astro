@@ -74,12 +74,12 @@ const placeholderUnits = [
       {description && (
         <p class="text-xl leading-relaxed text-muted-foreground">{description}</p>
       )}
-      <div class="flex items-center gap-6 md:gap-8 justify-center" data-countdown={targetDate} data-completed-message={completedMessage}>
+      <div class="flex items-center gap-6 @md:gap-8 justify-center" data-countdown={targetDate} data-completed-message={completedMessage}>
         {placeholderUnits.map((unit, i) => (
           <Fragment>
             {i > 0 && <span class="text-4xl font-bold text-muted-foreground">:</span>}
             <div class="flex flex-col items-center">
-              <span class="text-6xl md:text-8xl font-bold tabular-nums">{unit.value}</span>
+              <span class="text-6xl @md:text-8xl font-bold tabular-nums">{unit.value}</span>
               <span class="text-sm uppercase tracking-wide text-muted-foreground mt-2">{unit.label}</span>
             </div>
           </Fragment>
@@ -119,13 +119,13 @@ const placeholderUnits = [
       {description && (
         <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
       )}
-      <div class="flex items-start gap-4 md:gap-6 justify-center" data-countdown={targetDate} data-completed-message={completedMessage}>
+      <div class="flex items-start gap-4 @md:gap-6 justify-center" data-countdown={targetDate} data-completed-message={completedMessage}>
         {placeholderUnits.map((unit, i) => (
           <Fragment>
-            {i > 0 && <span class="text-4xl md:text-6xl font-bold text-primary font-mono self-center mt-2">:</span>}
+            {i > 0 && <span class="text-4xl @md:text-6xl font-bold text-primary font-mono self-center mt-2">:</span>}
             <div class="flex flex-col items-center">
-              <div class="border-brutal border-foreground/30 px-4 py-3 md:px-6 md:py-4">
-                <span class="text-5xl md:text-7xl font-bold font-mono tabular-nums leading-none">{unit.value}</span>
+              <div class="border-brutal border-foreground/30 px-4 py-3 @md:px-6 @md:py-4">
+                <span class="text-5xl @md:text-7xl font-bold font-mono tabular-nums leading-none">{unit.value}</span>
               </div>
               <span class="label-caps text-muted-foreground text-[10px] mt-2">{unit.label}</span>
             </div>

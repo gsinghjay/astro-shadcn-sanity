@@ -45,7 +45,7 @@ function groupByTier(list: Sponsor[]) {
       </div>
     )}
 
-    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border list-none">
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-px list-none">
       {sponsors?.map((sponsor) => {
         const logoUrl = safeUrlFor(sponsor.logo)?.width(120).url() ?? null;
         const content = (
@@ -190,7 +190,7 @@ function groupByTier(list: Sponsor[]) {
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       </SectionContent>
     )}
-    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl list-none">
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-px list-none">
       {(sponsors ?? []).map((sponsor) => {
         const tier = stegaClean(sponsor.tier) || 'silver';
         const isPlatinum = tier === 'platinum';

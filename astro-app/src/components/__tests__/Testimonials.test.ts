@@ -144,7 +144,7 @@ describe('Testimonials', () => {
       props: { ...testimonialsFull, variant: 'legacy-variant' },
     });
 
-    expect(html).toContain('md:grid-cols-2 lg:grid-cols-3');
+    expect(html).toContain('@md:grid-cols-2 @lg:grid-cols-3');
   });
 
   test('renders YouTube video facade with video ID', async () => {

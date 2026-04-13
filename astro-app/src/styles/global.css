@@ -179,10 +179,16 @@
 }
 
 :root {
+  /* 12-column grid tokens */
+  --grid-columns: 12;
+  --grid-gutter: 24px;
+  --grid-margin: var(--grid-gutter);
+  --grid-max-width: var(--breakpoint-xl);
+
   /* Gutter system — single source of truth for edge/container padding.
      Responsive: 16px (mobile) → 24px (sm 640px) → 32px (lg 1024px).
-     Referenced by section, header, footer, banner via var(--gutter, 24px)
-     and by templates via px-(--gutter). */
+     Referenced by section, header, footer, banner via var(--grid-margin)
+     and by templates via px-(--grid-margin). */
   --gutter: 1rem;
   --radius: 0;
   --background: #ffffff;
@@ -296,9 +302,35 @@
 
 @media (min-width: 1024px) {
   :root {
+    --grid-gutter: 32px;
     --gutter: 2rem;
   }
 }
+
+/* === 12-COLUMN GRID SYSTEM === *
+ * Formal grid foundation for Swiss design discipline.
+ * All layouts expressed as column spans of this 12-column grid.
+ *
+ * Tokens:
+ *   --grid-columns   Number of columns (12)
+ *   --grid-gutter    Gap between columns (24px mobile, 32px desktop)
+ *   --grid-margin    Outer page margin (= gutter)
+ *   --grid-max-width Maximum content width (1280px from Tailwind v4)
+ *
+ * Column Span Reference (12-column grid):
+ *   Full width:    col-span-12  (12/12)
+ *   Major content: col-span-8   (8/12) — prose, main content
+ *   Minor sidebar: col-span-4   (4/12) — sidebar, aside
+ *   Two-thirds:    col-span-8   (8/12) — split major
+ *   One-third:     col-span-4   (4/12) — split minor
+ *   Half:          col-span-6   (6/12) — equal split
+ *   Quarter:       col-span-3   (3/12) — card grids (4-up)
+ *   Third:         col-span-4   (4/12) — card grids (3-up)
+ *   Sixth:         col-span-2   (2/12) — icon grids, logo clouds
+ *
+ * Tailwind v4 provides grid-cols-12 and col-span-* natively.
+ * Container queries (@lg:, @3xl:, @5xl:) used for internal layout.
+ */
 
 @layer base {
   * {

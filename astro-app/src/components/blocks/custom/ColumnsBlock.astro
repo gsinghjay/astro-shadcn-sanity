@@ -28,12 +28,12 @@ const {
 const variant = stegaClean(rawVariant ?? 'equal');
 const verticalAlign = stegaClean(rawVerticalAlign ?? 'top');
 
-const gridClass = variant === 'equal' ? 'grid-cols-1 lg:grid-cols-2'
-  : variant === 'wide-left' ? 'grid-cols-1 lg:grid-cols-[2fr_1fr]'
-  : variant === 'wide-right' ? 'grid-cols-1 lg:grid-cols-[1fr_2fr]'
-  : variant === 'sidebar-left' ? 'grid-cols-1 lg:grid-cols-[minmax(280px,1fr)_3fr]'
-  : variant === 'sidebar-right' ? 'grid-cols-1 lg:grid-cols-[3fr_minmax(280px,1fr)]'
-  : 'grid-cols-1 lg:grid-cols-2';
+const gridClass = variant === 'equal' ? 'grid-cols-1 @lg:grid-cols-2'
+  : variant === 'wide-left' ? 'grid-cols-1 @lg:grid-cols-[2fr_1fr]'
+  : variant === 'wide-right' ? 'grid-cols-1 @lg:grid-cols-[1fr_2fr]'
+  : variant === 'sidebar-left' ? 'grid-cols-1 @lg:grid-cols-[minmax(280px,1fr)_3fr]'
+  : variant === 'sidebar-right' ? 'grid-cols-1 @lg:grid-cols-[3fr_minmax(280px,1fr)]'
+  : 'grid-cols-1 @lg:grid-cols-2';
 
 const alignClass = verticalAlign === 'center' ? 'items-center'
   : verticalAlign === 'stretch' ? 'items-stretch'
@@ -42,8 +42,8 @@ const shouldReverse = stegaClean(reverseOnMobile) === true;
 ---
 
 {(leftBlocks.length > 0 || rightBlocks.length > 0) && (
-<div class:list={['grid gap-8 lg:gap-16', gridClass, alignClass]}>
-  <div class:list={[shouldReverse && 'order-2 lg:order-1']}>
+<div class:list={['grid gap-8 @lg:gap-16', gridClass, alignClass]}>
+  <div class:list={[shouldReverse && 'order-2 @lg:order-1']}>
     <BlockRenderer
       blocks={leftBlocks}
       sponsors={sponsors}
@@ -53,7 +53,7 @@ const shouldReverse = stegaClean(reverseOnMobile) === true;
       articles={articles}
     />
   </div>
-  <div class:list={[shouldReverse && 'order-1 lg:order-2']}>
+  <div class:list={[shouldReverse && 'order-1 @lg:order-2']}>
     <BlockRenderer
       blocks={rightBlocks}
       sponsors={sponsors}

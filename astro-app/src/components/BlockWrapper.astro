@@ -42,7 +42,7 @@ const spacingValue = spacingMap[sp] ?? '';
 ---
 
 <div
-  class:list={[bgClasses[bg], maxWidthClasses[mw], alignClasses[align]]}
+  class:list={['@container', bgClasses[bg], maxWidthClasses[mw], alignClasses[align]]}
   data-gtm-section={blockType}
   data-bg-theme={isDarkBg ? 'dark' : undefined}
   data-align={align !== 'left' ? align : undefined}

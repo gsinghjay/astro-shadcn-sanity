@@ -50,10 +50,10 @@ const slot = await Astro.slots.render("default")
 
 <style is:global>
   [data-slot="section"] {
-    --section-width: var(--container, var(--breakpoint-xl));
+    --section-width: var(--container, var(--grid-max-width));
     --section-py: var(--block-section-py, calc(var(--spacing) * 12));
     --section-px: max(
-      var(--gutter, 24px),
+      var(--grid-margin),
       calc((100cqw - var(--section-width)) / 2)
     );
   }

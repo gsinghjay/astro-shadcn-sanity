@@ -71,7 +71,7 @@ describe('SponsorSteps', () => {
       props: { ...sponsorStepsFull, variant: 'split' },
     });
 
-    expect(html).toContain('sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]');
+    expect(html).toContain('grid-cols-1 @sm:grid-cols-2 @3xl:grid-cols-3');
     expect(html).not.toContain('h-px flex-1');
   });
 

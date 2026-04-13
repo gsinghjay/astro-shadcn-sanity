@@ -59,7 +59,7 @@ const brandSecondary = nameParts.slice(1).join(' ');
     </LogoText>
   </Logo>
 
-  <NavigationMenu class="hidden md:flex" aria-label="Main navigation">
+  <NavigationMenu class="hidden xl:flex" aria-label="Main navigation">
     <NavigationMenuList>
       {(navigationItems || []).map((item) => {
         const hasChildren = item.children && item.children.length > 0;
@@ -116,8 +116,8 @@ const brandSecondary = nameParts.slice(1).join(' ');
   </NavigationMenu>
 
   <HeaderActions>
-    <Button href={ctaHref} class="hidden md:inline-flex" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
-    <div class="md:hidden">
+    <Button href={ctaHref} class="hidden xl:inline-flex" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
+    <div class="xl:hidden">
       <Sheet>
         <SheetTrigger variant="ghost" size="icon">
           <Icon name="menu" />
