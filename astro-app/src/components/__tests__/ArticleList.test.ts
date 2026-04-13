@@ -433,9 +433,9 @@ describe('ArticleList (Story 19.4)', () => {
         props: { ...articleListMagazine, articles: sampleArticles },
       });
       // AC #20: remaining articles in responsive grid after hero. With 3 articles
-      // total (2 remaining), the post-review tier logic now uses @md:grid-cols-2
-      // without @lg:grid-cols-3 — the 3-col class only activates with ≥3 remaining.
-      expect(html).toContain('@md:grid-cols-2');
+      // total (2 remaining), the post-review tier logic now uses @2xl:grid-cols-2
+      // without @5xl:grid-cols-3 — the 3-col class only activates with ≥3 remaining.
+      expect(html).toContain('@2xl:grid-cols-2');
       // Both non-hero articles rendered
       expect(html).toContain('Sanity Visual Editing Tips');
       expect(html).toContain('Why CSS Container Queries Matter');
@@ -454,11 +454,11 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toContain('Sanity Visual Editing Tips');
       expect(html).toContain('max-w-3xl mx-auto');
       // Neither grid tier class is emitted for a single remaining item
-      expect(html).not.toContain('@md:grid-cols-2');
-      expect(html).not.toContain('@lg:grid-cols-3');
+      expect(html).not.toContain('@2xl:grid-cols-2');
+      expect(html).not.toContain('@5xl:grid-cols-3');
     });
 
-    test('with >=4 articles uses @lg:grid-cols-3 for the remaining-articles grid', async () => {
+    test('with >=4 articles uses @5xl:grid-cols-3 for the remaining-articles grid', async () => {
       // Post-review patch: the 3-col class only activates when ≥3 articles remain
       // (i.e., ≥4 total articles once the hero is extracted).
       const fourArticles = [
@@ -467,7 +467,7 @@ describe('ArticleList (Story 19.4)', () => {
           _id: 'article-4',
           title: 'Fourth Article for Grid Coverage',
           slug: 'fourth-article',
-          excerpt: 'A fourth article to exercise the @lg:grid-cols-3 tier.',
+          excerpt: 'A fourth article to exercise the @5xl:grid-cols-3 tier.',
           featuredImage: null,
           author: { name: 'Sam Taylor', slug: 'sam-taylor' },
           publishedAt: '2026-02-15T09:00:00Z',
@@ -479,7 +479,7 @@ describe('ArticleList (Story 19.4)', () => {
         props: { ...articleListMagazine, articles: fourArticles },
       });
       // 4 total → 3 remaining → full 3-col tier activated
-      expect(html).toContain('grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3');
+      expect(html).toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
       expect(html).toContain('Fourth Article for Grid Coverage');
     });
 
@@ -492,7 +492,7 @@ describe('ArticleList (Story 19.4)', () => {
       expect(html).toContain('Astro 5 Released');
       // AC #21: no remaining-grid marker when there is only 1 article.
       // Neither the 3-col tier NOR the single-card contained layout renders.
-      expect(html).not.toContain('grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3');
+      expect(html).not.toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
       expect(html).not.toContain('max-w-3xl mx-auto');
     });
 

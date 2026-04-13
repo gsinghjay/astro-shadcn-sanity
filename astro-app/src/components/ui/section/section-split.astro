@@ -8,11 +8,11 @@ interface Props extends HTMLAttributes<"div"> {
 }
 
 const ratioMap: Record<string, string> = {
-  '5:7': '@lg:grid-cols-[5fr_7fr]',
-  '7:5': '@lg:grid-cols-[7fr_5fr]',
-  '6:6': '@lg:grid-cols-2',
-  '4:8': '@lg:grid-cols-[4fr_8fr]',
-  '8:4': '@lg:grid-cols-[8fr_4fr]',
+  '5:7': '@4xl:grid-cols-[5fr_7fr]',
+  '7:5': '@4xl:grid-cols-[7fr_5fr]',
+  '6:6': '@4xl:grid-cols-2',
+  '4:8': '@4xl:grid-cols-[4fr_8fr]',
+  '8:4': '@4xl:grid-cols-[8fr_4fr]',
 };
 
 const { class: className, ratio = '5:7', ...props } = Astro.props

@@ -41,9 +41,9 @@ describe('StatsRow', () => {
       props: { ...statsFull, variant: 'grid' },
     });
 
-    // 4 stats → grid-cols-2 @md:grid-cols-4 (container queries, not viewport)
+    // 4 stats → grid-cols-2 @6xl:grid-cols-4 (container queries, not viewport)
     expect(html).toContain('grid-cols-2');
-    expect(html).toContain('@md:grid-cols-4');
+    expect(html).toContain('@6xl:grid-cols-4');
   });
 
   test('split variant renders a single-column stat stack', async () => {
@@ -111,6 +111,6 @@ describe('StatsRow', () => {
     });
 
     expect(html).toContain('grid-cols-2');
-    expect(html).toContain('@md:grid-cols-4');
+    expect(html).toContain('@6xl:grid-cols-4');
   });
 });

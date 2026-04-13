@@ -14,7 +14,7 @@ const slot = await Astro.slots.render("default")
   slot?.trim().length > 0 && (
     <div
       class={cn(
-        "grid grid-cols-2 @lg:grid-cols-4 gap-(--grid-gutter)",
+        "grid grid-cols-2 @4xl:grid-cols-4 gap-(--grid-gutter)",
         className
       )}
       {...props}

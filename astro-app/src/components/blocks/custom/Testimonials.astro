@@ -82,7 +82,7 @@ if (isByProject) {
                 {group.title}
               </a>
             </h3>
-            <div class="grid gap-6 @md:grid-cols-2 @lg:grid-cols-3">
+            <div class="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
               {group.testimonials.map((t) => (
                 <TestimonialCard testimonial={t} />
               ))}
@@ -93,7 +93,7 @@ if (isByProject) {
     ) : (
       <SectionContent>
         {testimonials.length > 0 ? (
-          <div class="grid gap-6 @md:grid-cols-2 @lg:grid-cols-3">
+          <div class="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
             {testimonials.map((t) => (
               <TestimonialCard testimonial={t} />
             ))}
