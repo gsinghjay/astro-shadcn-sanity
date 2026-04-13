@@ -2,17 +2,22 @@
 import type { ImageGalleryBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
 import { urlFor, safeUrlFor, lqipStyle } from '@/lib/image';
+import { getSiteSettings } from '@/lib/sanity';
 import { Section, SectionContent, SectionMasonry } from '@/components/ui/section';
 import { JsonLd } from '@/components/ui/json-ld';
+import GalleryFilterBar from './_partials/GalleryFilterBar.astro';
 
 interface Props extends ImageGalleryBlock {
   class?: string;
   id?: string;
+  /** When true, renders content without the Section/SectionContent wrapper (for embedding in a page's own Section) */
+  bare?: boolean;
 }
 
-const { heading, description, images, variant: rawVariant, _key: blockKey } = Astro.props;
+const { heading, description, images, variant: rawVariant, _key: blockKey, bare = false } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
+/** @sync studio/src/schemaTypes/objects/gallery-image.ts — GALLERY_CATEGORY_OPTIONS is the source of truth */
 const CATEGORY_LABELS: Record<string, string> = {
   'web-apps': 'Web Apps',
   'mobile': 'Mobile',
@@ -37,24 +42,45 @@ const regularItems = galleryItems.filter(item => item.featured !== true);
 const years = [...new Set(galleryItems.map(i => i.year).filter((y): y is number => y != null))].sort();
 const categories = [...new Set(galleryItems.map(i => stegaClean(i.category)).filter((c): c is string => c != null))].sort();
 
-// JSON-LD structured data
-const galleryImages = galleryItems.filter(img => img.image?.asset).map(img => ({
-  "@type": "ImageObject" as const,
-  "contentUrl": safeUrlFor(img.image)?.width(1200).url(),
-  ...(img.caption && { "name": stegaClean(img.caption) }),
-  ...(img.image?.alt && { "description": stegaClean(img.image.alt) }),
-  "width": img.fullWidth,
-  "height": img.fullHeight,
-  "thumbnailUrl": safeUrlFor(img.image)?.width(400).url(),
-}));
+// JSON-LD structured data — filter out items where safeUrlFor returns null
+const galleryImages = galleryItems
+  .filter(img => img.image?.asset)
+  .map(img => {
+    const contentUrl = safeUrlFor(img.image)?.width(1200).url();
+    const thumbnailUrl = safeUrlFor(img.image)?.width(400).url();
+    if (!contentUrl) return null;
+    return {
+      "@type": "ImageObject" as const,
+      "contentUrl": contentUrl,
+      ...(img.caption && { "name": stegaClean(img.caption) }),
+      ...(img.image?.alt && { "description": stegaClean(img.image.alt) }),
+      "width": img.fullWidth,
+      "height": img.fullHeight,
+      ...(thumbnailUrl && { "thumbnailUrl": thumbnailUrl }),
+    };
+  })
+  .filter((img): img is NonNullable<typeof img> => img !== null);
 
 const earliestYear = years.length > 0 ? Math.min(...years) : null;
+
+// Fetch siteSettings for JSON-LD creator (cached at module level)
+let creatorOrg: { "@type": "Organization"; "name": string } | null = null;
+try {
+  const siteSettings = await getSiteSettings();
+  const siteName = stegaClean(siteSettings.title);
+  if (siteName) {
+    creatorOrg = { "@type": "Organization", "name": siteName };
+  }
+} catch {
+  // siteSettings unavailable — omit creator
+}
 
 const galleryJsonLd = galleryImages.length > 0 ? {
   "@type": "ImageGallery",
   ...(heading && { "name": stegaClean(heading) }),
   ...(description && { "description": stegaClean(description) }),
   ...(earliestYear && { "dateCreated": new Date(earliestYear, 0, 1).toISOString() }),
+  ...(creatorOrg && { "creator": creatorOrg }),
   "image": galleryImages,
 } : null;
 
@@ -65,7 +91,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
 
 {galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
 
-{variant === 'grid' && (
+{variant === 'grid' && !bare && (
   <Section data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
@@ -74,32 +100,45 @@ const hasFilters = years.length > 0 || categories.length > 0;
       </SectionContent>
     )}
     <SectionContent>
-      {/* Filter pills */}
-      {hasFilters && (
-        <div class="gallery-filters flex flex-wrap gap-2 mb-8" data-gallery-target={galleryId}>
-          {years.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="year" data-filter-value="all">All Years</button>
-              {years.map(year => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
-              ))}
-            </div>
-          )}
-          {categories.length > 0 && (
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="gallery-filter-pill active bg-primary text-primary-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors" data-filter-type="category" data-filter-value="all">All Categories</button>
-              {categories.map(cat => (
-                <button type="button" class="gallery-filter-pill bg-muted text-muted-foreground px-4 py-1.5 rounded-full text-sm font-medium transition-colors hover:bg-muted/80" data-filter-type="category" data-filter-value={cat}>{CATEGORY_LABELS[cat] || cat}</button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
 
-      {/* Featured hero row */}
-      {featuredItems.length > 0 && (
-        <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
-          {featuredItems.map((item) => (
+      {/* Gallery container — featured + regular inside one pswp-gallery */}
+      <div id={galleryId} class="pswp-gallery">
+        {/* Featured hero row */}
+        {featuredItems.length > 0 && (
+          <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
+            {featuredItems.map((item) => (
+              <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+                {item.image?.asset && (
+                  <a
+                    href={urlFor(item.image).width(1600).url()}
+                    data-pswp-width={item.fullWidth}
+                    data-pswp-height={item.fullHeight}
+                    target="_blank"
+                    class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+                  >
+                    <img
+                      src={urlFor(item.image).width(1200).height(800).fit('crop').url()}
+                      srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
+                      alt={item.image.alt || ''}
+                      width={1200}
+                      height={800}
+                      class="aspect-[3/2] w-full object-cover"
+                      loading="lazy"
+                      style={lqipStyle(item.image.asset.metadata?.lqip)}
+                    />
+                  </a>
+                )}
+                {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        )}
+
+        {/* Main grid */}
+        <div class="grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
+          {regularItems.map((item) => (
             <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
               {item.image?.asset && (
                 <a
@@ -110,13 +149,13 @@ const hasFilters = years.length > 0 || categories.length > 0;
                   class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
                 >
                   <img
-                    src={urlFor(item.image).width(1200).height(800).fit('crop').url()}
-                    srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
+                    src={urlFor(item.image).width(800).height(600).fit('crop').url()}
+                    srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     alt={item.image.alt || ''}
-                    width={1200}
-                    height={800}
-                    class="aspect-[3/2] w-full object-cover"
+                    width={800}
+                    height={600}
+                    class="aspect-video w-full object-cover"
                     loading="lazy"
                     style={lqipStyle(item.image.asset.metadata?.lqip)}
                   />
@@ -126,39 +165,52 @@ const hasFilters = years.length > 0 || categories.length > 0;
             </figure>
           ))}
         </div>
-      )}
+      </div>
+    </SectionContent>
+  </Section>
+)}
 
-      {/* Main grid */}
-      <div id={galleryId} class="pswp-gallery grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
+{variant === 'grid' && bare && (
+  <Fragment>
+    {heading && (
+      <div>
+        <h2 class="text-4xl md:text-5xl font-[750] tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </div>
+    )}
+
+    {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} />}
+
+    {/* Gallery container */}
+    <div id={galleryId} class="pswp-gallery">
+      {featuredItems.length > 0 && (
+        <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
+          {featuredItems.map((item) => (
+            <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+              {item.image?.asset && (
+                <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                  <img src={urlFor(item.image).width(1200).height(800).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw" alt={item.image.alt || ''} width={1200} height={800} class="aspect-[3/2] w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
+                </a>
+              )}
+              {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
+      <div class="grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
         {regularItems.map((item) => (
           <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
             {item.image?.asset && (
-              <a
-                href={urlFor(item.image).width(1600).url()}
-                data-pswp-width={item.fullWidth}
-                data-pswp-height={item.fullHeight}
-                target="_blank"
-                class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
-              >
-                <img
-                  src={urlFor(item.image).width(800).height(600).fit('crop').url()}
-                  srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  alt={item.image.alt || ''}
-                  width={800}
-                  height={600}
-                  class="aspect-video w-full object-cover"
-                  loading="lazy"
-                  style={lqipStyle(item.image.asset.metadata?.lqip)}
-                />
+              <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                <img src={urlFor(item.image).width(800).height(600).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" alt={item.image.alt || ''} width={800} height={600} class="aspect-video w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
               </a>
             )}
             {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
           </figure>
         ))}
       </div>
-    </SectionContent>
-  </Section>
+    </div>
+  </Fragment>
 )}
 
 {variant === 'masonry' && (
@@ -169,9 +221,41 @@ const hasFilters = years.length > 0 || categories.length > 0;
         {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
       </SectionContent>
     )}
+    {hasFilters && (
+      <SectionContent>
+        <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />
+      </SectionContent>
+    )}
     <SectionMasonry>
       <div id={galleryId} class="pswp-gallery contents">
-        {galleryItems.map((item) => (
+        {/* Featured hero row in masonry */}
+        {featuredItems.length > 0 && featuredItems.map((item) => (
+          <figure class="col-span-full" data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+            {item.image?.asset && (
+              <a
+                href={urlFor(item.image).width(1600).url()}
+                data-pswp-width={item.fullWidth}
+                data-pswp-height={item.fullHeight}
+                target="_blank"
+                class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+              >
+                <img
+                  src={urlFor(item.image).width(1200).height(800).fit('crop').url()}
+                  srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`}
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  alt={item.image.alt || ''}
+                  width={1200}
+                  height={800}
+                  class="aspect-[3/2] w-full object-cover"
+                  loading="lazy"
+                  style={lqipStyle(item.image.asset.metadata?.lqip)}
+                />
+              </a>
+            )}
+            {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        ))}
+        {regularItems.map((item) => (
           <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
             {item.image?.asset && (
               <a
@@ -213,6 +297,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
         </SectionContent>
       )}
       <SectionContent>
+        {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
         <div id={galleryId} class="pswp-gallery">
           <figure>
             {item.image?.asset && (
@@ -225,7 +310,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
               >
                 <img
                   src={urlFor(item.image).width(1600).url()}
-                  srcset={`${urlFor(item.image).width(400).url()} 400w, ${urlFor(item.image).width(600).url()} 600w, ${urlFor(item.image).width(800).url()} 800w`}
+                  srcset={`${urlFor(item.image).width(400).url()} 400w, ${urlFor(item.image).width(600).url()} 600w, ${urlFor(item.image).width(800).url()} 800w, ${urlFor(item.image).width(1200).url()} 1200w, ${urlFor(item.image).width(1600).url()} 1600w`}
                   sizes="100vw"
                   alt={item.image.alt || ''}
                   width={item.image.asset.metadata?.dimensions?.width || 1600}
@@ -248,71 +333,99 @@ const hasFilters = years.length > 0 || categories.length > 0;
   import PhotoSwipeLightbox from 'photoswipe/lightbox';
   import 'photoswipe/style.css';
 
-  const lightbox = new PhotoSwipeLightbox({
-    gallery: '.pswp-gallery',
-    children: 'a',
-    pswpModule: () => import('photoswipe'),
-  });
+  let lightbox: InstanceType<typeof PhotoSwipeLightbox> | null = null;
 
-  // Caption overlay
-  lightbox.on('uiRegister', () => {
-    lightbox.pswp!.ui.registerElement({
-      name: 'caption',
-      order: 9,
-      isButton: false,
-      appendTo: 'root',
-      html: '',
-      onInit: (el) => {
-        el.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:16px 24px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:14px;text-align:center;pointer-events:none;';
-        lightbox.pswp!.on('change', () => {
-          const slide = lightbox.pswp!.currSlide?.data.element;
-          const caption = slide?.closest('figure')?.querySelector('figcaption')?.textContent || '';
-          el.textContent = caption;
-          el.style.display = caption ? '' : 'none';
-        });
-      },
+  function initLightbox() {
+    if (lightbox) {
+      lightbox.destroy();
+      lightbox = null;
+    }
+
+    lightbox = new PhotoSwipeLightbox({
+      gallery: '.pswp-gallery',
+      children: 'a:not([hidden])',
+      pswpModule: () => import('photoswipe'),
     });
 
-    // Share button
-    lightbox.pswp!.ui.registerElement({
-      name: 'share-button',
-      order: 8,
-      isButton: true,
-      tagName: 'button',
-      html: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
-      onClick: (_event, el) => {
-        navigator.clipboard.writeText(window.location.href).then(() => {
+    // Caption overlay
+    lightbox.on('uiRegister', () => {
+      lightbox!.pswp!.ui.registerElement({
+        name: 'caption',
+        order: 9,
+        isButton: false,
+        appendTo: 'root',
+        html: '',
+        onInit: (el) => {
+          el.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:16px 24px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:14px;text-align:center;pointer-events:none;';
+          lightbox!.pswp!.on('change', () => {
+            const slide = lightbox!.pswp!.currSlide?.data.element;
+            const caption = slide?.closest('figure')?.querySelector('figcaption')?.textContent || '';
+            el.textContent = caption;
+            el.style.display = caption ? '' : 'none';
+          });
+        },
+      });
+
+      // Share button
+      lightbox!.pswp!.ui.registerElement({
+        name: 'share-button',
+        order: 8,
+        isButton: true,
+        tagName: 'button',
+        html: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+        onClick: (_event, el) => {
+          if (!navigator.clipboard) {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copy failed</span>';
+            setTimeout(() => { el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'; }, 2000);
+            return;
+          }
           const originalHtml = el.innerHTML;
-          el.innerHTML = '<span style="font-size:12px;color:#fff;">Copied!</span>';
-          setTimeout(() => { el.innerHTML = originalHtml; }, 2000);
-        });
-      },
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copied!</span>';
+            setTimeout(() => { el.innerHTML = originalHtml; }, 2000);
+          }).catch(() => {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copy failed</span>';
+            setTimeout(() => { el.innerHTML = originalHtml; }, 2000);
+          });
+        },
+      });
     });
-  });
 
-  // Deep linking: update URL on slide change
-  lightbox.on('change', () => {
-    const index = lightbox.pswp!.currIndex;
-    const url = new URL(window.location.href);
-    url.searchParams.set('img', String(index + 1));
-    history.replaceState(null, '', url.toString());
-  });
+    // Set ?img= on first open (before any change event fires)
+    lightbox.on('afterInit', () => {
+      const index = lightbox!.pswp!.currIndex;
+      const url = new URL(window.location.href);
+      url.searchParams.set('img', String(index + 1));
+      history.replaceState(null, '', url.toString());
+    });
 
-  // Clear ?img= param when lightbox closes
-  lightbox.on('close', () => {
-    const url = new URL(window.location.href);
-    url.searchParams.delete('img');
-    history.replaceState(null, '', url.toString());
-  });
+    // Deep linking: update URL on slide change
+    lightbox.on('change', () => {
+      const index = lightbox!.pswp!.currIndex;
+      const url = new URL(window.location.href);
+      url.searchParams.set('img', String(index + 1));
+      history.replaceState(null, '', url.toString());
+    });
 
-  lightbox.init();
+    // Clear ?img= param when lightbox closes
+    lightbox.on('close', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('img');
+      history.replaceState(null, '', url.toString());
+    });
 
-  // Deep linking: open to ?img=N on page load
+    lightbox.init();
+  }
+
+  initLightbox();
+
+  // Deep linking: open to ?img=N on page load (with bounds check)
   const params = new URLSearchParams(window.location.search);
   const imgParam = params.get('img');
-  if (imgParam) {
+  if (imgParam && lightbox) {
     const imgIndex = parseInt(imgParam, 10) - 1;
-    if (imgIndex >= 0) {
+    const totalItems = document.querySelectorAll('.pswp-gallery a').length;
+    if (imgIndex >= 0 && imgIndex < totalItems) {
       lightbox.loadAndOpen(imgIndex);
     }
   }
@@ -323,24 +436,28 @@ const hasFilters = years.length > 0 || categories.length > 0;
     if (!targetId) return;
 
     const gallery = document.getElementById(targetId);
-    const featuredContainer = gallery?.previousElementSibling?.classList.contains('gallery-featured')
-      ? gallery.previousElementSibling
-      : null;
+    if (!gallery) return;
 
     let activeYear = 'all';
     let activeCategory = 'all';
 
     function applyFilters() {
-      const containers = [gallery, featuredContainer].filter(Boolean) as Element[];
-      containers.forEach(container => {
-        container.querySelectorAll('figure').forEach(fig => {
-          const figYear = fig.getAttribute('data-year') || '';
-          const figCategory = fig.getAttribute('data-category') || '';
-          const yearMatch = activeYear === 'all' || figYear === activeYear;
-          const categoryMatch = activeCategory === 'all' || figCategory === activeCategory;
-          (fig as HTMLElement).style.display = (yearMatch && categoryMatch) ? '' : 'none';
-        });
+      gallery!.querySelectorAll('figure').forEach(fig => {
+        const figYear = fig.getAttribute('data-year') || '';
+        const figCategory = fig.getAttribute('data-category') || '';
+        const yearMatch = activeYear === 'all' || figYear === activeYear;
+        const categoryMatch = activeCategory === 'all' || figCategory === activeCategory;
+        const visible = yearMatch && categoryMatch;
+        (fig as HTMLElement).style.display = visible ? '' : 'none';
+        // Hide/show anchor for PhotoSwipe filtering
+        const anchor = fig.querySelector('a');
+        if (anchor) {
+          anchor.toggleAttribute('hidden', !visible);
+        }
       });
+
+      // Reinitialize PhotoSwipe to update its item list after filtering
+      initLightbox();
     }
 
     filterBar.querySelectorAll('.gallery-filter-pill').forEach(pill => {
@@ -354,13 +471,13 @@ const hasFilters = years.length > 0 || categories.length > 0;
           activeCategory = filterValue;
         }
 
-        // Update active pill styling within the same filter group
+        // Update active pill styling via data-state attribute (Swiss design pattern)
         filterBar.querySelectorAll(`.gallery-filter-pill[data-filter-type="${filterType}"]`).forEach(p => {
-          p.classList.remove('active', 'bg-primary', 'text-primary-foreground');
-          p.classList.add('bg-muted', 'text-muted-foreground');
+          p.removeAttribute('data-state');
+          p.setAttribute('aria-pressed', 'false');
         });
-        pill.classList.add('active', 'bg-primary', 'text-primary-foreground');
-        pill.classList.remove('bg-muted', 'text-muted-foreground');
+        pill.setAttribute('data-state', 'active');
+        pill.setAttribute('aria-pressed', 'true');
 
         applyFilters();
       });

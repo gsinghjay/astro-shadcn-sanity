@@ -1,0 +1,33 @@
+---
+interface Props {
+  galleryId: string;
+  years: number[];
+  categories: string[];
+  categoryLabels: Record<string, string>;
+  class?: string;
+}
+
+const { galleryId, years, categories, categoryLabels, class: className } = Astro.props;
+const pillClass = 'gallery-filter-pill label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground';
+---
+
+<div class:list={['gallery-filters space-y-3 border-b border-border pb-6', className]} data-gallery-target={galleryId}>
+  {years.length > 0 && (
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="label-caps text-muted-foreground mr-1">Year</span>
+      <button type="button" class={pillClass} data-state="active" aria-pressed="true" data-filter-type="year" data-filter-value="all">All</button>
+      {years.map(year => (
+        <button type="button" class={pillClass} aria-pressed="false" data-filter-type="year" data-filter-value={String(year)}>{year}</button>
+      ))}
+    </div>
+  )}
+  {categories.length > 0 && (
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="label-caps text-muted-foreground mr-1">Category</span>
+      <button type="button" class={pillClass} data-state="active" aria-pressed="true" data-filter-type="category" data-filter-value="all">All</button>
+      {categories.map(cat => (
+        <button type="button" class={pillClass} aria-pressed="false" data-filter-type="category" data-filter-value={cat}>{categoryLabels[cat] || cat}</button>
+      ))}
+    </div>
+  )}
+</div>
