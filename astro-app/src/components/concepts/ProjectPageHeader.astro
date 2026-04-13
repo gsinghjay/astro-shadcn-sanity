@@ -1,0 +1,73 @@
+---
+/**
+ * ProjectPageHeader — Swiss Style stats summary header concept.
+ *
+ * Title + description + stats bar with middot dividers + optional sort.
+ * Weight 750 headings, label-caps stats, structural border separator.
+ */
+
+interface Props {
+  title: string;
+  description?: string;
+  totalProjects: number;
+  activeCount: number;
+  completedCount: number;
+  industryCount: number;
+  sortOptions?: string[];
+}
+
+const {
+  title,
+  description,
+  totalProjects,
+  activeCount,
+  completedCount,
+  industryCount,
+  sortOptions,
+} = Astro.props;
+---
+
+<div class="border-b-2 border-foreground pb-6">
+  <h1 class="text-4xl md:text-5xl font-[750] tracking-[-0.03em] leading-[1.05]">{title}</h1>
+
+  {description && (
+    <p class="mt-3 text-base text-muted-foreground leading-[1.5] tracking-[-0.01em]">{description}</p>
+  )}
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+    {/* Stats bar */}
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{totalProjects}</span>
+        {' '}projects
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{activeCount}</span>
+        {' '}active
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{completedCount}</span>
+        {' '}completed
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{industryCount}</span>
+        {' '}industries
+      </span>
+    </div>
+
+    {/* Sort dropdown (visual only) */}
+    {sortOptions && sortOptions.length > 0 && (
+      <div class="flex items-center gap-2">
+        <label for="project-sort" class="label-caps text-muted-foreground">Sort by</label>
+        <select id="project-sort" class="border border-border bg-background px-3 py-1.5 text-sm font-[750] tracking-[-0.01em] focus:outline-none focus:border-foreground">
+          {sortOptions.map((option) => (
+            <option>{option}</option>
+          ))}
+        </select>
+      </div>
+    )}
+  </div>
+</div>

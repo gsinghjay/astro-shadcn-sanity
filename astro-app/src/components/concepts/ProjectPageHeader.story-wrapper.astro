@@ -1,0 +1,20 @@
+---
+import StoryContainer from './StoryContainer.astro';
+import ProjectPageHeader from './ProjectPageHeader.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  totalProjects: number;
+  activeCount: number;
+  completedCount: number;
+  industryCount: number;
+  sortOptions?: string[];
+}
+
+const props = Astro.props;
+---
+
+<StoryContainer maxWidth="full">
+  <ProjectPageHeader {...props} />
+</StoryContainer>

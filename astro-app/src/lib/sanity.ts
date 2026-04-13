@@ -132,7 +132,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     _type == "imageGallery" => {
       heading,
       description,
-      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption, featured, year, category }
     },
     _type == "articleList" => {
       heading,

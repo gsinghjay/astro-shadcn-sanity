@@ -9,14 +9,14 @@ interface Props
     VariantProps<typeof variants> {}
 
 const variants = cva(
-  "relative top-0 z-50 mx-auto flex h-(--header-height) items-center justify-between gap-8 border-b border-transparent px-(--header-px) py-4",
+  "relative top-0 z-50 mx-auto",
   {
     variants: {
       variant: {
         default: "bg-background sticky w-full",
         floating: [
           "w-[calc(100%-2*var(--gutter))] max-w-(--header-width)",
-          "top-2 mt-2 h-[calc(var(--header-height)-var(--spacing)*2)] overflow-hidden",
+          "top-2 mt-2 overflow-hidden",
           "bg-background border-border sticky border",
         ],
       },
@@ -65,6 +65,12 @@ const slot = await Astro.slots.render("default")
   @media (min-width: 1024px) {
     [data-slot="header"][data-variant="floating"] {
       --header-px: calc(var(--spacing) * 16);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    :root:has([data-slot="header"]) {
+      --header-height: calc(var(--spacing) * 27);
     }
   }
 </style>

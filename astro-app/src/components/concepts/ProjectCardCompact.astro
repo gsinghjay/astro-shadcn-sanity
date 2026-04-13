@@ -1,0 +1,66 @@
+---
+/**
+ * ProjectCardCompact — Swiss Style condensed single-row project card.
+ *
+ * All info on one horizontal line: status dot, title, sponsor, semester, tag count.
+ * Designed for list/table views where density matters.
+ * Sharp edges, structural borders, label-caps metadata.
+ */
+
+interface Props {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsorName: string | null;
+  semester: string;
+  tagCount: number;
+}
+
+const { title, slug, status, sponsorName, semester, tagCount } = Astro.props;
+
+const dotColors: Record<string, string> = {
+  active: 'bg-green-700',
+  completed: 'bg-primary',
+  archived: 'bg-muted-foreground',
+};
+---
+
+<a
+  href={`/projects/${slug}`}
+  class="flex items-center gap-4 px-4 py-3 no-underline text-inherit transition-colors duration-150 hover:bg-muted/50 group border-b border-border"
+>
+  {/* Status dot */}
+  <span
+    class={`w-2 h-2 shrink-0 ${dotColors[status] || dotColors.active}`}
+    role="img"
+    aria-label={`Status: ${status}`}
+  />
+
+  {/* Title */}
+  <span class="font-[750] text-sm tracking-[-0.01em] truncate flex-1 min-w-0 group-hover:text-primary transition-colors">
+    {title}
+  </span>
+
+  {/* Sponsor name */}
+  {sponsorName ? (
+    <span class="label-caps shrink-0 w-28 truncate text-right text-muted-foreground">
+      {sponsorName}
+    </span>
+  ) : (
+    <span class="label-caps shrink-0 w-28 truncate text-right text-muted-foreground/50">
+      No sponsor
+    </span>
+  )}
+
+  {/* Semester */}
+  <span class="label-caps shrink-0 w-24 text-right text-muted-foreground">
+    {semester}
+  </span>
+
+  {/* Tag count */}
+  {tagCount > 0 && (
+    <span class="label-caps border border-border px-2 py-0.5 shrink-0 min-w-[2rem] text-center text-muted-foreground">
+      {tagCount}
+    </span>
+  )}
+</a>

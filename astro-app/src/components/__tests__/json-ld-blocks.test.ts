@@ -1,6 +1,13 @@
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { describe, test, expect, vi, beforeEach } from 'vitest';
 
+// Mock getSiteSettings to avoid Sanity API dependency
+vi.mock('@/lib/sanity', () => ({
+  getSiteSettings: vi.fn().mockResolvedValue({
+    title: 'YWCC Industry Capstone',
+  }),
+}));
+
 // Mock image utilities before imports
 vi.mock('@/lib/image', () => ({
   urlFor: (img: unknown) => ({
@@ -19,6 +26,10 @@ vi.mock('@/lib/image', () => ({
       }),
       url: () => 'https://cdn.sanity.io/mock-image.jpg',
     };
+  },
+  lqipStyle: (lqip: string | null | undefined) => {
+    if (!lqip || !lqip.startsWith('data:image/')) return undefined;
+    return `background-image: url(${lqip}); background-size: cover;`;
   },
 }));
 
