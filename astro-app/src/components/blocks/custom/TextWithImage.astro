@@ -4,7 +4,7 @@ import { Section, SectionSplit, SectionContent, SectionMedia } from '@/component
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
 import { stegaClean } from '@sanity/client/stega';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 
 interface Props extends TextWithImageBlock {
   class?: string;
@@ -49,7 +49,7 @@ const gridClass = getGridClasses(cleanVariant);
       <SectionMedia class="aspect-[4/3]">
         <div class="border-2 border-border h-full">
           {imgSrc && lqip ? (
-            <div style={`background-image: url(${lqip}); background-size: cover;`} class="h-full">
+            <div style={lqipStyle(lqip)} class="h-full">
               <img
                 src={imgSrc}
                 alt={image?.alt || heading || ''}
@@ -110,7 +110,7 @@ const gridClass = getGridClasses(cleanVariant);
 
         <SectionMedia class="aspect-[4/3]">
           {imgSrc && lqip ? (
-            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+            <div style={lqipStyle(lqip)}>
               <img
                 src={imgSrc}
                 alt={image?.alt || heading || ''}
@@ -141,7 +141,7 @@ const gridClass = getGridClasses(cleanVariant);
       {shouldPlaceImageLeft && (
         <SectionMedia class="aspect-[4/3] @5xl:order-first" data-variant={cleanVariant}>
           {imgSrc && lqip ? (
-            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+            <div style={lqipStyle(lqip)}>
               <img
                 src={imgSrc}
                 alt={image?.alt || heading || ''}
@@ -180,7 +180,7 @@ const gridClass = getGridClasses(cleanVariant);
       {!shouldPlaceImageLeft && (
         <SectionMedia class="aspect-[4/3]" data-variant={cleanVariant}>
           {imgSrc && lqip ? (
-            <div style={`background-image: url(${lqip}); background-size: cover;`}>
+            <div style={lqipStyle(lqip)}>
               <img
                 src={imgSrc}
                 alt={image?.alt || heading || ''}

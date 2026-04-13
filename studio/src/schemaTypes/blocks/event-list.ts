@@ -7,6 +7,14 @@ export const eventList = defineBlock({
   title: 'Event List',
   icon: CalendarIcon,
   preview: {select: {title: 'heading'}},
+  variants: [
+    {name: 'grid', title: 'Grid'},
+    {name: 'list', title: 'List'},
+    {name: 'timeline', title: 'Timeline'},
+  ],
+  hiddenByVariant: {
+    limit: ['timeline'],
+  },
   fields: [
     defineField({
       name: 'heading',

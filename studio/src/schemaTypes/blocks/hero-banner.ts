@@ -13,10 +13,11 @@ export const heroBanner = defineBlock({
     {name: 'split-asymmetric', title: 'Split Asymmetric'},
     {name: 'overlay', title: 'Overlay'},
     {name: 'spread', title: 'Spread'},
+    {name: 'split-bleed', title: 'Split Bleed'},
     {name: 'brutalist', title: 'Brutalist'},
   ],
   hiddenByVariant: {
-    alignment: ['split', 'split-asymmetric', 'spread'],
+    alignment: ['split', 'split-asymmetric', 'split-bleed', 'spread'],
     backgroundImages: ['brutalist'],
   },
   fields: [
@@ -60,17 +61,6 @@ export const heroBanner = defineBlock({
       of: [defineArrayMember({type: 'button'})],
       validation: (Rule) => Rule.max(5),
     }),
-    defineField({
-      name: 'alignment',
-      title: 'Alignment',
-      type: 'string',
-      description: 'Horizontal text alignment',
-      fieldset: 'layout',
-      options: {
-        list: ['left', 'center', 'right'],
-        layout: 'radio',
-      },
-      initialValue: 'center',
-    }),
+    // alignment is now a block-base field; hiddenByVariant still controls visibility
   ],
 })

@@ -1,0 +1,26 @@
+---
+import StoryContainer from './StoryContainer.astro';
+import ProjectCardEnhanced from './ProjectCardEnhanced.astro';
+
+interface Sponsor {
+  name: string;
+  logoUrl: string;
+  industry: string;
+}
+
+interface Props {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsor: Sponsor | null;
+  excerpt: string;
+  semester: string;
+  tags: string[];
+}
+
+const props = Astro.props;
+---
+
+<StoryContainer maxWidth="lg">
+  <ProjectCardEnhanced {...props} />
+</StoryContainer>

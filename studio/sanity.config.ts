@@ -4,6 +4,7 @@ import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
+import {media} from 'sanity-plugin-media'
 import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
@@ -45,6 +46,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         },
       }),
       visionTool(),
+      media(),
       formSchema({}),
     ],
     schema: {
@@ -53,7 +55,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         const filtered = prev.filter(
           (t) =>
             !SITE_AWARE_TYPES.includes(t.schemaType) &&
-            t.schemaType !== 'siteSettings',
+            t.schemaType !== 'siteSettings' &&
+            t.schemaType !== 'listingPage',
         )
         const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
           id: `${type}-${opts.siteId}`,
@@ -61,13 +64,21 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: type,
           value: {site: opts.siteId},
         }))
-        return [...filtered, ...siteTemplates]
+        // Listing page singletons — pre-populate route for each (Story 21.0)
+        const listingTemplates = ['articles', 'authors', 'events', 'gallery', 'projects', 'sponsors'].map((route) => ({
+          id: `listingPage-${route}-${opts.siteId}`,
+          title: `Listing Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
+          schemaType: 'listingPage',
+          value: {route},
+        }))
+        return [...filtered, ...siteTemplates, ...listingTemplates]
       },
     },
     document: {
       actions: (input, context) => {
         if (
           context.schemaType === 'siteSettings' ||
+          context.schemaType === 'listingPage' ||
           context.documentId === `siteSettings-${opts.siteId}`
         ) {
           return input.filter(
@@ -81,7 +92,9 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
       newDocumentOptions: (prev) =>
         prev.filter(
           (t) =>
-            t.templateId !== 'siteSettings' && t.templateId !== 'submission',
+            t.templateId !== 'siteSettings' &&
+            t.templateId !== 'submission' &&
+            t.templateId !== 'listingPage',
         ),
     },
   }
@@ -108,10 +121,26 @@ export default defineConfig([
         },
       }),
       visionTool(),
+      media(),
       formSchema({}),
     ],
     schema: {
       types: createSchemaTypesForWorkspace('production'),
+      templates: (prev) => {
+        const filtered = prev.filter(
+          (t) => !CAPSTONE_SINGLETON_TYPES.has(t.schemaType),
+        )
+        return [
+          ...filtered,
+          // Listing page singletons — pre-populate route for each (Story 21.0)
+          {id: 'listingPage-articles', schemaType: 'listingPage', title: 'Listing Page (Articles)', value: {route: 'articles'}},
+          {id: 'listingPage-authors', schemaType: 'listingPage', title: 'Listing Page (Authors)', value: {route: 'authors'}},
+          {id: 'listingPage-events', schemaType: 'listingPage', title: 'Listing Page (Events)', value: {route: 'events'}},
+          {id: 'listingPage-gallery', schemaType: 'listingPage', title: 'Listing Page (Gallery)', value: {route: 'gallery'}},
+          {id: 'listingPage-projects', schemaType: 'listingPage', title: 'Listing Page (Projects)', value: {route: 'projects'}},
+          {id: 'listingPage-sponsors', schemaType: 'listingPage', title: 'Listing Page (Sponsors)', value: {route: 'sponsors'}},
+        ]
+      },
     },
     document: {
       actions: (input, context) =>

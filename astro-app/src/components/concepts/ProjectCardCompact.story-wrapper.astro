@@ -1,0 +1,21 @@
+---
+import StoryContainer from './StoryContainer.astro';
+import ProjectCardCompact from './ProjectCardCompact.astro';
+
+interface Props {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsorName: string | null;
+  semester: string;
+  tagCount: number;
+}
+
+const props = Astro.props;
+---
+
+<StoryContainer maxWidth="xl">
+  <div class="border-t border-border">
+    <ProjectCardCompact {...props} />
+  </div>
+</StoryContainer>

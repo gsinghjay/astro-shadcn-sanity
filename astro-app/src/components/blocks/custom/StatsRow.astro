@@ -27,12 +27,18 @@ const statsJsonLd = (stats ?? []).filter(s => s.value && s.label).map(stat => {
   };
 });
 const bgVariant = stegaClean(backgroundVariant) ?? 'light';
-const isDark = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
+// Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 const sectionBg = bgClasses[bgVariant] ?? '';
-const gridBorderClass = isDark ? 'border-foreground' : 'border-border';
 
 const rawVariant = stegaClean(variant);
 const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVariant === 'spread' || rawVariant === 'brutalist' || rawVariant === 'ticker' ? rawVariant : 'grid';
+
+// Adaptive grid columns based on stat count
+const statCount = (stats ?? []).length;
+const gridColsClass = statCount <= 1 ? 'grid-cols-1'
+  : statCount === 2 ? 'grid-cols-2'
+  : statCount === 3 ? 'grid-cols-1 @2xl:grid-cols-3'
+  : 'grid-cols-2 @6xl:grid-cols-4';
 ---
 
 {statsJsonLd.length > 0 && statsJsonLd.map(s => <JsonLd schema={s} />)}
@@ -40,19 +46,19 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'grid' && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-muted'} ${gridBorderClass}`}
+    class={`border-y ${sectionBg || 'bg-muted'} border-border`}
     data-animate
   >
     {heading && (
       <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
     )}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+    <div class:list={['grid gap-8 @3xl:gap-10 @5xl:gap-12', gridColsClass]}>
       {(stats ?? []).map((stat) => (
         <div class="text-center">
-          <div class="text-4xl md:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
+          <div class="text-4xl @3xl:text-5xl @5xl:text-6xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
-          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+          <div class={`label-caps text-muted-foreground`}>
             {stat.label}
           </div>
         </div>
@@ -106,19 +112,19 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'brutalist' && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass}`}
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} border-border`}
     data-animate
   >
     {heading && (
       <h2 class="text-2xl md:text-3xl font-bold tracking-[-0.03em] text-center mb-8">{heading}</h2>
     )}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+    <div class:list={['grid gap-8 @3xl:gap-10 @5xl:gap-12', gridColsClass]}>
       {(stats ?? []).map((stat) => (
         <div class="border-t-4 border-primary pt-4">
-          <div class="font-mono tabular-nums text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
+          <div class="font-mono tabular-nums text-5xl @3xl:text-7xl @5xl:text-8xl font-bold tracking-[-0.04em] leading-none mb-3">
             {stat.value}
           </div>
-          <div class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+          <div class={`label-caps text-muted-foreground`}>
             {stat.label}
           </div>
         </div>
@@ -130,7 +136,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
 {cleanVariant === 'ticker' && stats && stats.length > 0 && (
   <Section
     size="sm"
-    class={`border-y ${sectionBg || 'bg-foreground text-background'} ${gridBorderClass} overflow-hidden`}
+    class={`border-y ${sectionBg || 'bg-foreground text-background'} border-border overflow-hidden`}
     data-animate
   >
     <Marquee>
@@ -140,7 +146,7 @@ const cleanVariant = rawVariant === 'grid' || rawVariant === 'split' || rawVaria
             <span class="font-mono tabular-nums text-4xl md:text-5xl font-bold tracking-[-0.04em] leading-none">
               {stat.value}
             </span>
-            <span class={`label-caps ${isDark ? 'text-background/40' : 'text-muted-foreground'}`}>
+            <span class={`label-caps text-muted-foreground`}>
               {stat.label}
             </span>
           </div>

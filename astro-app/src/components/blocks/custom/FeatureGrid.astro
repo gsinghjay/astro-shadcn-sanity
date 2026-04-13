@@ -2,6 +2,7 @@
 import type { FeatureGridBlock } from '@/lib/types';
 import { Section, SectionContent, SectionGrid, SectionSplit, SectionProse } from '@/components/ui/section';
 import { Tile, TileContent, TileTitle, TileDescription, TileSplit, TileMedia } from '@/components/ui/tile';
+import { Icon } from '@/components/ui/icon';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 import { bgClasses } from '@/lib/utils';
@@ -18,17 +19,17 @@ const cleanVariant = stegaClean(variant ?? 'grid');
 
 const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const sectionBg = bgClasses[bgVariant] ?? '';
-const isDarkBg = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
+// Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 
 // For grid variant, determine grid size based on columns
 const cols = columns || 3;
 const gridSize = cols === 2 ? 'lg' : cols === 4 ? 'sm' : 'default';
 const gridClass =
   gridSize === 'lg'
-    ? 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(400px,1fr))]'
+    ? 'grid-cols-1 @4xl:grid-cols-2'
     : gridSize === 'sm'
-      ? 'grid-cols-[repeat(auto-fit,minmax(200px,1fr))]'
-      : 'grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]';
+      ? 'grid-cols-2 @2xl:grid-cols-3 @5xl:grid-cols-4'
+      : 'grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3';
 ---
 
 {cleanVariant === 'grid' ? (
@@ -46,9 +47,13 @@ const gridClass =
           <TileContent>
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
+                {feature.icon ? (
+                  <Icon name={feature.icon} class="size-5 group-hover/tile:text-primary-foreground transition-colors duration-200" />
+                ) : (
+                  <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                )}
               </div>
               <TileTitle>{feature.title}</TileTitle>
             </div>
@@ -73,9 +78,13 @@ const gridClass =
           <TileContent class="items-center text-center">
             <div class="flex flex-col items-center gap-3 w-full">
               <div class="w-10 h-10 flex-shrink-0 flex items-center justify-center border border-foreground group-hover/tile:bg-primary group-hover/tile:border-primary transition-colors duration-200">
-                <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
+                {feature.icon ? (
+                  <Icon name={feature.icon} class="size-5 group-hover/tile:text-primary-foreground transition-colors duration-200" />
+                ) : (
+                  <span class="text-xs font-bold group-hover/tile:text-primary-foreground transition-colors duration-200" aria-hidden="true">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                )}
               </div>
               <TileTitle>{feature.title}</TileTitle>
             </div>
@@ -172,7 +181,7 @@ const gridClass =
           </span>
           <h3 class="font-bold text-lg mt-2">{feature.title}</h3>
           {feature.description && (
-            <p class={`text-sm mt-1 ${isDarkBg ? 'text-background/70' : 'text-muted-foreground'}`}>{feature.description}</p>
+            <p class={`text-sm mt-1 text-muted-foreground`}>{feature.description}</p>
           )}
         </div>
       ))}
@@ -196,7 +205,7 @@ const gridClass =
                 <TileTitle class="text-lg">{feature.title}</TileTitle>
               </div>
               <div class="flex flex-col items-start justify-center">
-                <TileDescription class={`whitespace-pre-line ${isDarkBg ? 'text-background/70' : ''}`}>{feature.description}</TileDescription>
+                <TileDescription class="whitespace-pre-line">{feature.description}</TileDescription>
               </div>
             </TileSplit>
           </Tile>

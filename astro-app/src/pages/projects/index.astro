@@ -1,87 +1,67 @@
 ---
 import SidebarLayout from '@/layouts/SidebarLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
-import { getAllProjects } from '@/lib/sanity';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { getAllProjects, getListingPage } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
 import { Section, SectionContent } from '@/components/ui/section';
-import ProjectCard from '@/components/ProjectCard.astro';
+import ProjectCardEnhanced from '@/components/ProjectCardEnhanced.astro';
+import ProjectFilterBar from '@/components/ProjectFilterBar.astro';
+import ProjectPageHeader from '@/components/ProjectPageHeader.astro';
+import ProjectEmptyState from '@/components/ProjectEmptyState.astro';
 
-const projects = await getAllProjects();
+const [projects, listingPage] = await Promise.all([
+  getAllProjects(),
+  getListingPage('projects'),
+]);
 const allTechs = [...new Set(projects.flatMap(p => (p.technologyTags ?? []).map(t => stegaClean(t))))].sort();
 const allIndustries = [...new Set(projects.map(p => p.sponsor?.industry ? stegaClean(p.sponsor.industry) : '').filter(Boolean))].sort();
-const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
+
+const pageTitle = listingPage?.title ?? 'Projects';
+const pageH1 = listingPage?.title ?? 'Capstone Projects';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' };
 ---
 
-<SidebarLayout title="Projects" seo={{ metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' }}>
+<SidebarLayout title={pageTitle} seo={pageSeo}>
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} slot="header" />
+  )}
+
   <Section slot="header">
     <SectionContent>
       <Breadcrumb baseUrl={Astro.url.origin} items={[
         { label: 'Home', href: '/' },
-        { label: 'Projects' },
+        { label: pageTitle },
       ]} />
 
-      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Capstone Projects</h1>
+      <ProjectPageHeader
+        title={pageH1}
+        description={pageDescription}
+        projects={projects}
+      />
     </SectionContent>
   </Section>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="grid grid-cols-1 @2xl:grid-cols-2 gap-6">
     {projects.map((project) => (
-      <ProjectCard project={project} />
+      <ProjectCardEnhanced project={project} />
     ))}
   </div>
 
-  {hasFilters && (
-    <div slot="sidebar" data-project-filters class="space-y-6">
-      {allTechs.length > 0 && (
-        <div>
-          <h3 class="text-sm font-semibold text-foreground mb-3">Technology</h3>
-          <div class="flex flex-wrap gap-2">
-            <button
-              data-filter-tech="all"
-              data-state="active"
-              aria-pressed="true"
-              class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-            >
-              All
-            </button>
-            {allTechs.map((tech) => (
-              <button
-                data-filter-tech={tech}
-                aria-pressed="false"
-                class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-              >
-                {tech}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+  {/* Empty state — hidden by default, shown by filter JS */}
+  <div class="hidden" data-empty-state-wrap>
+    <ProjectEmptyState variant="filtered" />
+  </div>
 
-      {allIndustries.length > 0 && (
-        <div>
-          <h3 class="text-sm font-semibold text-foreground mb-3">Industry</h3>
-          <div class="flex flex-wrap gap-2">
-            <button
-              data-filter-industry="all"
-              data-state="active"
-              aria-pressed="true"
-              class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-            >
-              All Industries
-            </button>
-            {allIndustries.map((industry) => (
-              <button
-                data-filter-industry={industry}
-                aria-pressed="false"
-                class="px-3 py-1 text-sm border border-border transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted"
-              >
-                {industry}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+  <ProjectFilterBar
+    slot="sidebar"
+    techs={allTechs}
+    industries={allIndustries}
+  />
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} slot="footer" />
   )}
 </SidebarLayout>
 
@@ -95,19 +75,55 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
     if (!container) return;
 
     const cards = document.querySelectorAll<HTMLElement>('[data-project-card]');
+    const emptyWrap = document.querySelector<HTMLElement>('[data-empty-state-wrap]');
+    const clearFilterBtns = document.querySelectorAll<HTMLElement>('[data-clear-filters]');
+    const clearFiltersWrap = container.querySelector<HTMLElement>('[data-clear-filters-wrap]');
     let activeTech = 'all';
     let activeIndustry = 'all';
 
     function applyFilters() {
+      let visibleCount = 0;
       cards.forEach((el) => {
         const techs = el.dataset.techTags?.split(',').filter(Boolean) ?? [];
         const industry = el.dataset.industry ?? '';
 
         const matchesTech = activeTech === 'all' || techs.includes(activeTech);
         const matchesIndustry = activeIndustry === 'all' || industry === activeIndustry;
+        const visible = matchesTech && matchesIndustry;
 
-        el.dataset.state = (matchesTech && matchesIndustry) ? 'visible' : 'hidden';
+        el.dataset.state = visible ? 'visible' : 'hidden';
+        if (visible) visibleCount++;
       });
+
+      // Toggle empty state
+      if (emptyWrap) {
+        emptyWrap.classList.toggle('hidden', visibleCount > 0);
+      }
+
+      // Toggle clear-all button
+      const hasActiveFilters = activeTech !== 'all' || activeIndustry !== 'all';
+      if (clearFiltersWrap) {
+        clearFiltersWrap.classList.toggle('hidden', !hasActiveFilters);
+      }
+    }
+
+    function resetFilters() {
+      activeTech = 'all';
+      activeIndustry = 'all';
+
+      container.querySelectorAll<HTMLElement>('[data-filter-tech]').forEach(b => {
+        const isAll = b.dataset.filterTech === 'all';
+        b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+        b.dataset.state = isAll ? 'active' : '';
+      });
+
+      container.querySelectorAll<HTMLElement>('[data-filter-industry]').forEach(b => {
+        const isAll = b.dataset.filterIndustry === 'all';
+        b.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+        b.dataset.state = isAll ? 'active' : '';
+      });
+
+      applyFilters();
     }
 
     container.querySelectorAll<HTMLElement>('[data-filter-tech]').forEach(btn => {
@@ -130,6 +146,11 @@ const hasFilters = allTechs.length > 0 || allIndustries.length > 0;
         });
         applyFilters();
       });
+    });
+
+    // Clear-all buttons (sidebar + empty state)
+    clearFilterBtns.forEach(btn => {
+      btn.addEventListener('click', resetFilters);
     });
   }
 

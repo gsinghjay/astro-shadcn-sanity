@@ -48,7 +48,7 @@ const tierBarColors: Record<string, string> = {
       {description && (
         <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
       )}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div class="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-6 items-start">
         {tiersList.map((tier) => {
           const isHighlighted = tier.highlighted === true;
           return (
@@ -110,7 +110,7 @@ const tierBarColors: Record<string, string> = {
       {description && (
         <p class="text-muted-foreground leading-relaxed max-w-2xl">{description}</p>
       )}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <div class="grid grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3 gap-6 items-start">
         {tiersList.map((tier) => {
           const isHighlighted = tier.highlighted === true;
           const tierName = stegaClean(tier.name)?.toLowerCase() || 'silver';

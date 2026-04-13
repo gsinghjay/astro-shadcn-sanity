@@ -1,6 +1,6 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
-import { Header as HeaderUI, HeaderActions } from '@/components/ui/header';
+import { Header as HeaderUI } from '@/components/ui/header';
 import { Logo, LogoText } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
@@ -42,138 +42,221 @@ const logoAlt = logo?.alt || 'NJIT';
 const ctaText = stegaClean(ctaButton?.text) || 'Become a Sponsor';
 const ctaHref = ctaButton?.url || '/contact';
 
-// Split siteName for header display (e.g., "YWCC Industry Capstone" → "YWCC" + "Industry Capstone")
+// Split siteName for Swiss Style brand display
 const nameParts = (siteName || 'YWCC Industry Capstone').split(' ');
 const brandPrimary = nameParts[0];
 const brandSecondary = nameParts.slice(1).join(' ');
+
+// Active state detection
+const isActive = (href: string) =>
+  currentPath === href || (href !== '/' && currentPath.startsWith(href));
 ---
 
 <HeaderUI class="border-b-2 border-foreground">
-  <Logo href="/">
-    <img src={logoUrl} alt={logoAlt} class="h-8 w-auto" width="160" height="40" />
-    <LogoText>
-      <span class="flex flex-col">
-        <span class="text-xs font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>
-        <span class="text-2xs uppercase tracking-wider leading-tight text-muted-foreground">{brandSecondary}</span>
-      </span>
-    </LogoText>
-  </Logo>
+  {/* Primary row: brand + utility */}
+  <div class="flex h-16 items-center justify-between px-(--header-px)">
+    {/* Brand — heavy left */}
+    <Logo href="/">
+      <img src={logoUrl} alt={logoAlt} class="h-8 w-auto shrink-0" width="160" height="40" />
+      <LogoText>
+        <span class="flex flex-col">
+          <span class="text-xs font-bold uppercase tracking-widest leading-tight">{brandPrimary}</span>
+          <span class="text-2xs uppercase tracking-wider leading-tight text-muted-foreground">{brandSecondary}</span>
+        </span>
+      </LogoText>
+    </Logo>
 
-  <NavigationMenu class="hidden md:flex" aria-label="Main navigation">
-    <NavigationMenuList>
-      {(navigationItems || []).map((item) => {
-        const hasChildren = item.children && item.children.length > 0;
-        const isActive = currentPath === item.href || (item.href !== '/' && currentPath.startsWith(item.href || ''));
-        return (
-          <NavigationMenuItem>
-            {hasChildren ? (
-              <>
-                <NavigationMenuTrigger
+    {/* Utility — light right */}
+    <div class="flex items-center gap-6">
+      {/* Search trigger — typographic, no input */}
+      <button
+        type="button"
+        class="hidden lg:inline-flex items-center gap-3 bg-transparent text-foreground/60 transition-colors hover:text-foreground cursor-pointer"
+        aria-label="Search site"
+        data-gtm-category="navigation"
+        data-gtm-label="search"
+      >
+        <Icon name="search" class="h-4 w-4" />
+        <span class="label-caps text-[10px]">Search</span>
+        <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/40 leading-none">⌘K</kbd>
+      </button>
+
+      {/* CTA button — Swiss structural accent */}
+      <Button
+        href={ctaHref}
+        class="hidden lg:inline-flex bg-primary text-primary-foreground hover:bg-primary/90 px-5 py-2 text-[11px] font-bold uppercase tracking-[0.15em]"
+        data-gtm-category="navigation"
+        data-gtm-label="header-cta"
+      >
+        {ctaText}
+      </Button>
+
+      {/* Mobile hamburger */}
+      <div class="lg:hidden">
+        <Sheet>
+          <SheetTrigger variant="ghost" size="icon">
+            <Icon name="menu" />
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Navigation</SheetTitle>
+            </SheetHeader>
+            <SidebarMenu class="p-4">
+              {/* Search button in mobile drawer */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider has-[>svg]:px-4"
+                >
+                  <Icon name="search" class="h-5 w-5" />
+                  Search
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <li role="separator"><Separator class="my-2" /></li>
+              {/* Nav links — nested items use collapsible */}
+              {(navigationItems || []).map((item) => {
+                const hasChildren = item.children && item.children.length > 0;
+                return (
+                  <SidebarMenuItem>
+                    {hasChildren ? (
+                      <Collapsible>
+                        <CollapsibleTrigger>
+                          <SidebarMenuButton class="h-10 rounded-md px-4 text-lg font-bold uppercase tracking-wider">
+                            {stegaClean(item.label)}
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.children!.map((child) => (
+                              <SidebarMenuSubItem>
+                                <SidebarMenuSubButton
+                                  href={child.href}
+                                  data-gtm-category="navigation"
+                                  data-gtm-label={stegaClean(child.label)}
+                                >
+                                  {stegaClean(child.label)}
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuButton
+                        class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider has-[>svg]:px-4"
+                        href={item.href}
+                        data-gtm-category="navigation"
+                        data-gtm-label={stegaClean(item.label)}
+                      >
+                        {stegaClean(item.label)}
+                      </SidebarMenuButton>
+                    )}
+                  </SidebarMenuItem>
+                );
+              })}
+              {/* Contact — utility link */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  class="h-10 w-full rounded-md px-4 text-lg font-mono uppercase tracking-wider has-[>svg]:px-4 text-foreground/40"
+                  href="/contact"
+                  data-gtm-category="navigation"
+                  data-gtm-label="Contact"
+                >
+                  Contact
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <div class="px-4">
+              <Separator class="my-2" />
+              <Button
+                href={ctaHref}
+                class="w-full justify-center bg-primary text-primary-foreground hover:bg-primary/90"
+                data-gtm-category="navigation"
+                data-gtm-label="header-cta"
+              >
+                {ctaText}
+              </Button>
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </div>
+  </div>
+
+  {/* Nav row — items with children get dropdown, others are plain links */}
+  <nav class="hidden lg:flex items-center px-(--header-px) border-t-2 border-foreground" aria-label="Main navigation">
+    <NavigationMenu>
+      <NavigationMenuList>
+        {(navigationItems || []).map((item) => {
+          const hasChildren = item.children && item.children.length > 0;
+          return (
+            <NavigationMenuItem>
+              {hasChildren ? (
+                <>
+                  <NavigationMenuTrigger
+                    class:list={[
+                      'inline-flex h-11 items-center bg-transparent px-4 py-0 text-[11px] font-bold uppercase tracking-[0.15em] rounded-none',
+                      isActive(item.href || '')
+                        ? 'text-primary'
+                        : 'text-foreground',
+                    ]}
+                    href={item.href}
+                    data-gtm-category="navigation"
+                    data-gtm-label={stegaClean(item.label)}
+                  >
+                    {stegaClean(item.label)}
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent class="border border-border shadow-sm">
+                    <NavigationMenuSub class="gap-0 min-w-[240px]">
+                      {item.children!.map((child) => (
+                        <NavigationMenuSubItem>
+                          <NavigationMenuSubLink
+                            class="rounded-none px-4 py-2.5 text-[11px] font-bold uppercase tracking-[0.15em] text-foreground/70 hover:text-primary hover:bg-accent/50"
+                            href={child.href}
+                            data-gtm-category="navigation"
+                            data-gtm-label={stegaClean(child.label)}
+                          >
+                            {stegaClean(child.label)}
+                          </NavigationMenuSubLink>
+                        </NavigationMenuSubItem>
+                      ))}
+                    </NavigationMenuSub>
+                  </NavigationMenuContent>
+                </>
+              ) : (
+                <NavigationMenuLink
                   class:list={[
-                    'inline-flex h-8 items-center bg-transparent px-3 py-0 text-xs font-bold uppercase tracking-widest',
-                    isActive ? 'text-primary' : '',
+                    'inline-flex h-11 items-center bg-transparent px-4 py-0 text-[11px] font-bold uppercase tracking-[0.15em] no-underline transition-colors hover:text-primary rounded-none',
+                    isActive(item.href || '')
+                      ? 'text-primary'
+                      : 'text-foreground',
                   ]}
+                  variant="trigger"
                   href={item.href}
                   data-gtm-category="navigation"
                   data-gtm-label={stegaClean(item.label)}
                 >
                   {stegaClean(item.label)}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <NavigationMenuSub>
-                    {item.children!.map((child) => (
-                      <NavigationMenuSubItem>
-                        <NavigationMenuSubLink
-                          href={child.href}
-                          data-gtm-category="navigation"
-                          data-gtm-label={stegaClean(child.label)}
-                        >
-                          {stegaClean(child.label)}
-                        </NavigationMenuSubLink>
-                      </NavigationMenuSubItem>
-                    ))}
-                  </NavigationMenuSub>
-                </NavigationMenuContent>
-              </>
-            ) : (
-              <NavigationMenuLink
-                class:list={[
-                  'inline-flex h-8 items-center bg-transparent px-3 py-0 text-xs font-bold uppercase tracking-widest',
-                  isActive ? 'text-primary' : '',
-                ]}
-                variant="trigger"
-                href={item.href}
-                data-gtm-category="navigation"
-                data-gtm-label={stegaClean(item.label)}
-              >
-                {stegaClean(item.label)}
-              </NavigationMenuLink>
-            )}
-          </NavigationMenuItem>
-        );
-      })}
-    </NavigationMenuList>
-  </NavigationMenu>
-
-  <HeaderActions>
-    <Button href={ctaHref} class="hidden md:inline-flex" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
-    <div class="md:hidden">
-      <Sheet>
-        <SheetTrigger variant="ghost" size="icon">
-          <Icon name="menu" />
-        </SheetTrigger>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>Navigation</SheetTitle>
-          </SheetHeader>
-          <SidebarMenu class="p-4">
-            {(navigationItems || []).map((item) => {
-              const hasChildren = item.children && item.children.length > 0;
-              return (
-                <SidebarMenuItem>
-                  {hasChildren ? (
-                    <Collapsible>
-                      <CollapsibleTrigger>
-                        <SidebarMenuButton class="h-10 rounded-md px-4 text-lg font-bold uppercase tracking-wider">
-                          {stegaClean(item.label)}
-                        </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.children!.map((child) => (
-                            <SidebarMenuSubItem>
-                              <SidebarMenuSubButton
-                                href={child.href}
-                                data-gtm-category="navigation"
-                                data-gtm-label={stegaClean(child.label)}
-                              >
-                                {stegaClean(child.label)}
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  ) : (
-                    <SidebarMenuButton
-                      class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider has-[>svg]:px-4"
-                      href={item.href}
-                      data-gtm-category="navigation"
-                      data-gtm-label={stegaClean(item.label)}
-                    >
-                      {stegaClean(item.label)}
-                    </SidebarMenuButton>
-                  )}
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-          <div class="px-4">
-            <Separator class="my-2" />
-            <Button href={ctaHref} class="w-full justify-center" data-gtm-category="navigation" data-gtm-label="header-cta">{ctaText}</Button>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </div>
-  </HeaderActions>
+                </NavigationMenuLink>
+              )}
+            </NavigationMenuItem>
+          );
+        })}
+      </NavigationMenuList>
+    </NavigationMenu>
+    {/* Contact — pushed right, monospace accent */}
+    <span class="flex-1" />
+    <a
+      href="/contact"
+      class:list={[
+        'inline-flex h-11 items-center px-4 text-[10px] font-mono uppercase tracking-[0.12em] no-underline transition-colors hover:text-foreground border-b-[3px] -mb-[3px]',
+        isActive('/contact')
+          ? 'text-primary border-primary'
+          : 'border-transparent text-foreground',
+      ]}
+      data-gtm-category="navigation"
+      data-gtm-label="Contact"
+    >
+      Contact
+    </a>
+  </nav>
 </HeaderUI>

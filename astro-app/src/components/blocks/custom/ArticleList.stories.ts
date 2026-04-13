@@ -214,7 +214,7 @@ export const MagazineThreeArticles = {
     docs: {
       description: {
         story:
-          'Magazine boundary case — 3 articles total. Hero renders first; the remaining 2 cards fill a `grid-cols-1 md:grid-cols-2` grid (the middle tier of the tiered remaining-articles layout, between the single-centered-card tier at 1 remaining and the 3-column tier at ≥3 remaining). Added in Story 19.9 code review to close the 2-remaining tier visual coverage gap.',
+          'Magazine boundary case — 3 articles total. Hero renders first; the remaining 2 cards fill a `grid-cols-1 @2xl:grid-cols-2` grid (the middle tier of the tiered remaining-articles layout, between the single-centered-card tier at 1 remaining and the 3-column tier at ≥3 remaining). Added in Story 19.9 code review to close the 2-remaining tier visual coverage gap.',
       },
     },
   },
@@ -235,7 +235,7 @@ export const MagazineFourArticles = {
     docs: {
       description: {
         story:
-          'Magazine boundary case — 4 articles total. Hero renders first; remaining 3 cards fill a `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` grid, exercising the upper tier of the tiered remaining-articles layout.',
+          'Magazine boundary case — 4 articles total. Hero renders first; remaining 3 cards fill a `grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3` grid, exercising the upper tier of the tiered remaining-articles layout.',
       },
     },
   },
@@ -255,6 +255,52 @@ export const Empty = {
       description: {
         story:
           'Intentional empty state. Renders "No articles to display." inside <SectionContent>. All 5 variants share this behavior — shown here via the grid variant.',
+      },
+    },
+  },
+} satisfies Story;
+
+export const GridWithNewsletterCta = {
+  args: {
+    _type: 'articleList',
+    _key: 'story-al-grid-newsletter',
+    variant: 'grid',
+    heading: 'Latest Articles',
+    description: 'News and insights from our team on technology, design, and community.',
+    contentType: 'all',
+    limit: 6,
+    ctaButtons: sharedButtons,
+    showNewsletterCta: true,
+    articles: storyArticles,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Story 19.7 — grid variant with the compact `<ArticleNewsletterCta>` rendered between the cards grid and the ctaButtons. Used for visual review of the layout decision (D1 in code review): the compact CTA wrapper carries `mt-8 pt-6 border-t` per AC #3, AND the parent `<Section>` uses `flex flex-col gap-16` (64px), so the visual gap between the cards and the border-t separator is the spec-mandated `gap-16 + mt-8` (~96px).',
+      },
+    },
+  },
+} satisfies Story;
+
+export const BrutalistWithNewsletterCta = {
+  args: {
+    _type: 'articleList',
+    _key: 'story-al-brutalist-newsletter',
+    variant: 'brutalist',
+    heading: 'Dispatches',
+    description: 'Field reports from the edge of the web.',
+    contentType: 'all',
+    limit: 6,
+    ctaButtons: sharedButtons,
+    showNewsletterCta: true,
+    articles: storyArticles,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Story 19.7 — brutalist variant with the compact `<ArticleNewsletterCta>`. Pairs with `GridWithNewsletterCta` to verify the CTA insertion is shared across variants and to compare the visual rhythm in a brutalist context (border-brutal cards above, plain border-t separator below).',
       },
     },
   },

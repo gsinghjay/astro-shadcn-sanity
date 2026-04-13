@@ -1,6 +1,6 @@
 ---
 import type { Article, RelatedArticle } from '@/lib/sanity';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 
@@ -39,7 +39,7 @@ const articleSlug = stegaClean(article.slug);
         width="1280"
         height="720"
         loading="lazy"
-        style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+        style={lqipStyle(lqip)}
       />
     </a>
   )}
