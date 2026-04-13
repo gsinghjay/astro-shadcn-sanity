@@ -1,0 +1,21 @@
+---
+import ProjectFilterBar from './ProjectFilterBar.astro';
+
+interface FilterItem {
+  label: string;
+  count: number;
+}
+
+interface Props {
+  techFilters: FilterItem[];
+  industryFilters: FilterItem[];
+  activeTechCount?: number;
+  activeIndustryCount?: number;
+}
+
+const props = Astro.props;
+---
+
+<div class="p-6">
+  <ProjectFilterBar {...props} />
+</div>

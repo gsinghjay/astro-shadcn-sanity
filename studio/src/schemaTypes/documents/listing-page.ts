@@ -28,6 +28,7 @@ export const listingPage = defineType({
           {title: 'Articles', value: 'articles'},
           {title: 'Authors', value: 'authors'},
           {title: 'Events', value: 'events'},
+          {title: 'Gallery', value: 'gallery'},
           {title: 'Projects', value: 'projects'},
           {title: 'Sponsors', value: 'sponsors'},
         ],

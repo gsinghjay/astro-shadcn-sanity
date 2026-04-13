@@ -1,0 +1,57 @@
+---
+/**
+ * ProjectPageHeader — Swiss Style stats summary header for listing pages.
+ * Computes aggregate stats from the projects array.
+ */
+import type { Project } from '@/lib/sanity';
+import { stegaClean } from '@sanity/client/stega';
+
+interface Props {
+  title: string;
+  description?: string | null;
+  projects: Project[];
+}
+
+const { title, description, projects } = Astro.props;
+
+const totalProjects = projects.length;
+const activeCount = projects.filter(p => stegaClean(p.status) === 'active').length;
+const completedCount = projects.filter(p => stegaClean(p.status) === 'completed').length;
+const industryCount = [...new Set(
+  projects
+    .map(p => p.sponsor?.industry ? stegaClean(p.sponsor.industry) : '')
+    .filter(Boolean)
+)].length;
+---
+
+<div class="border-b-2 border-foreground pb-6">
+  <h1 class="text-4xl md:text-5xl font-[750] tracking-[-0.03em] leading-[1.05]">{title}</h1>
+
+  {description && (
+    <p class="mt-3 text-base text-muted-foreground leading-[1.5] tracking-[-0.01em]">{description}</p>
+  )}
+
+  {totalProjects > 0 && (
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{totalProjects}</span>
+        {' '}projects
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{activeCount}</span>
+        {' '}active
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{completedCount}</span>
+        {' '}completed
+      </span>
+      <span class="text-border" aria-hidden="true">&middot;</span>
+      <span class="label-caps">
+        <span class="text-foreground font-[750] text-sm">{industryCount}</span>
+        {' '}industries
+      </span>
+    </div>
+  )}
+</div>

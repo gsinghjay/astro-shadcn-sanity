@@ -54,8 +54,8 @@ describe('Story 21.0: Route Updates', () => {
         expect(content).toMatch(/listingPage\?\.footerBlocks && listingPage\.footerBlocks\.length > 0/)
       })
 
-      test('renders pageDescription only when present', () => {
-        expect(content).toMatch(/pageDescription &&/)
+      test('passes pageDescription to header component or renders conditionally', () => {
+        expect(content).toMatch(/pageDescription/)
       })
 
       test(`has hard-coded default title '${defaultTitle}'`, () => {

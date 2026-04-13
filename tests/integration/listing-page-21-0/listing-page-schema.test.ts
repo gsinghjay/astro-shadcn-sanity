@@ -58,9 +58,9 @@ describe('Story 21.0: Listing Page Schema', () => {
       expect(getValidationChain(routeField)).toContain('required')
     })
 
-    test('has 5 route options', () => {
+    test('has 6 route options', () => {
       const values = routeField.options.list.map((o: any) => o.value)
-      expect(values).toEqual(['articles', 'authors', 'events', 'projects', 'sponsors'])
+      expect(values).toEqual(['articles', 'authors', 'events', 'gallery', 'projects', 'sponsors'])
     })
 
     test('is readOnly', () => {
