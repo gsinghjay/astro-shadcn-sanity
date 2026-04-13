@@ -1,35 +1,97 @@
 ---
 import type { ImageGalleryBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
-import { urlFor, safeUrlFor } from '@/lib/image';
+import { urlFor, safeUrlFor, lqipStyle } from '@/lib/image';
+import { getSiteSettings } from '@/lib/sanity';
 import { Section, SectionContent, SectionMasonry } from '@/components/ui/section';
 import { JsonLd } from '@/components/ui/json-ld';
+import GalleryFilterBar from './_partials/GalleryFilterBar.astro';
 
 interface Props extends ImageGalleryBlock {
   class?: string;
   id?: string;
+  /** When true, renders content without the Section/SectionContent wrapper (for embedding in a page's own Section) */
+  bare?: boolean;
 }
 
-const { heading, description, images, variant: rawVariant } = Astro.props;
+const { heading, description, images, variant: rawVariant, _key: blockKey, bare = false } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
 
-const galleryImages = (images ?? []).filter(img => img.image?.asset).map(img => ({
-  "@type": "ImageObject" as const,
-  "contentUrl": safeUrlFor(img.image)?.width(1200).url(),
-  ...(img.caption && { "name": stegaClean(img.caption) }),
-  ...(img.image?.alt && { "description": stegaClean(img.image.alt) }),
-}));
+/** @sync studio/src/schemaTypes/objects/gallery-image.ts — GALLERY_CATEGORY_OPTIONS is the source of truth */
+const CATEGORY_LABELS: Record<string, string> = {
+  'web-apps': 'Web Apps',
+  'mobile': 'Mobile',
+  'ai-ml': 'AI/ML',
+  'data-viz': 'Data Viz',
+  'iot': 'IoT',
+  'other': 'Other',
+};
+
+// Pre-compute gallery items with dimensions
+const galleryItems = (images ?? []).map(item => {
+  const w = item.image?.asset?.metadata?.dimensions?.width || 1600;
+  const h = item.image?.asset?.metadata?.dimensions?.height || 900;
+  return { ...item, fullWidth: w, fullHeight: h };
+});
+
+// Separate featured from regular images
+const featuredItems = galleryItems.filter(item => item.featured === true);
+const regularItems = galleryItems.filter(item => item.featured !== true);
+
+// Derive filter values from images
+const years = [...new Set(galleryItems.map(i => i.year).filter((y): y is number => y != null))].sort();
+const categories = [...new Set(galleryItems.map(i => stegaClean(i.category)).filter((c): c is string => c != null))].sort();
+
+// JSON-LD structured data — filter out items where safeUrlFor returns null
+const galleryImages = galleryItems
+  .filter(img => img.image?.asset)
+  .map(img => {
+    const contentUrl = safeUrlFor(img.image)?.width(1200).url();
+    const thumbnailUrl = safeUrlFor(img.image)?.width(400).url();
+    if (!contentUrl) return null;
+    return {
+      "@type": "ImageObject" as const,
+      "contentUrl": contentUrl,
+      ...(img.caption && { "name": stegaClean(img.caption) }),
+      ...(img.image?.alt && { "description": stegaClean(img.image.alt) }),
+      "width": img.fullWidth,
+      "height": img.fullHeight,
+      ...(thumbnailUrl && { "thumbnailUrl": thumbnailUrl }),
+    };
+  })
+  .filter((img): img is NonNullable<typeof img> => img !== null);
+
+const earliestYear = years.length > 0 ? Math.min(...years) : null;
+
+// Fetch siteSettings for JSON-LD creator (cached at module level)
+let creatorOrg: { "@type": "Organization"; "name": string } | null = null;
+try {
+  const siteSettings = await getSiteSettings();
+  const siteName = stegaClean(siteSettings.title);
+  if (siteName) {
+    creatorOrg = { "@type": "Organization", "name": siteName };
+  }
+} catch {
+  // siteSettings unavailable — omit creator
+}
+
 const galleryJsonLd = galleryImages.length > 0 ? {
   "@type": "ImageGallery",
   ...(heading && { "name": stegaClean(heading) }),
   ...(description && { "description": stegaClean(description) }),
+  ...(earliestYear && { "dateCreated": new Date(earliestYear, 0, 1).toISOString() }),
+  ...(creatorOrg && { "creator": creatorOrg }),
   "image": galleryImages,
 } : null;
+
+const galleryId = `gallery-${blockKey || 'default'}`;
+const hasFilters = years.length > 0 || categories.length > 0;
+
 ---
 
 {galleryJsonLd && <JsonLd schema={galleryJsonLd} />}
 
-{variant === 'grid' && (
+{variant === 'grid' && !bare && (
   <Section data-animate>
     {heading && (
       <SectionContent class="max-w-3xl">
@@ -38,26 +100,117 @@ const galleryJsonLd = galleryImages.length > 0 ? {
       </SectionContent>
     )}
     <SectionContent>
+      {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
+
+      {/* Gallery container — featured + regular inside one pswp-gallery */}
+      <div id={galleryId} class="pswp-gallery">
+        {/* Featured hero row */}
+        {featuredItems.length > 0 && (
+          <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
+            {featuredItems.map((item) => (
+              <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+                {item.image?.asset && (
+                  <a
+                    href={urlFor(item.image).width(1600).url()}
+                    data-pswp-width={item.fullWidth}
+                    data-pswp-height={item.fullHeight}
+                    target="_blank"
+                    class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+                  >
+                    <img
+                      src={urlFor(item.image).width(1200).height(800).fit('crop').url()}
+                      srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw"
+                      alt={item.image.alt || ''}
+                      width={1200}
+                      height={800}
+                      class="aspect-[3/2] w-full object-cover"
+                      loading="lazy"
+                      style={lqipStyle(item.image.asset.metadata?.lqip)}
+                    />
+                  </a>
+                )}
+                {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        )}
+
+        {/* Main grid */}
+        <div class="grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
+          {regularItems.map((item) => (
+            <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+              {item.image?.asset && (
+                <a
+                  href={urlFor(item.image).width(1600).url()}
+                  data-pswp-width={item.fullWidth}
+                  data-pswp-height={item.fullHeight}
+                  target="_blank"
+                  class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+                >
+                  <img
+                    src={urlFor(item.image).width(800).height(600).fit('crop').url()}
+                    srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    alt={item.image.alt || ''}
+                    width={800}
+                    height={600}
+                    class="aspect-video w-full object-cover"
+                    loading="lazy"
+                    style={lqipStyle(item.image.asset.metadata?.lqip)}
+                  />
+                </a>
+              )}
+              {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      </div>
+    </SectionContent>
+  </Section>
+)}
+
+{variant === 'grid' && bare && (
+  <Fragment>
+    {heading && (
+      <div>
+        <h2 class="text-4xl md:text-5xl font-[750] tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
+      </div>
+    )}
+
+    {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} />}
+
+    {/* Gallery container */}
+    <div id={galleryId} class="pswp-gallery">
+      {featuredItems.length > 0 && (
+        <div class="gallery-featured grid gap-6 grid-cols-1 @3xl:grid-cols-2 mb-8">
+          {featuredItems.map((item) => (
+            <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+              {item.image?.asset && (
+                <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                  <img src={urlFor(item.image).width(1200).height(800).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 50vw" alt={item.image.alt || ''} width={1200} height={800} class="aspect-[3/2] w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
+                </a>
+              )}
+              {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+      )}
       <div class="grid gap-6 grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3">
-        {(images ?? []).map((item) => (
-          <figure>
+        {regularItems.map((item) => (
+          <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
             {item.image?.asset && (
-              <img
-                src={urlFor(item.image).width(800).height(600).fit('crop').url()}
-                alt={item.image.alt || ''}
-                width={800}
-                height={600}
-                class="aspect-video w-full object-cover"
-                loading="lazy"
-                style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
-              />
+              <a href={urlFor(item.image).width(1600).url()} data-pswp-width={item.fullWidth} data-pswp-height={item.fullHeight} target="_blank" class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in">
+                <img src={urlFor(item.image).width(800).height(600).fit('crop').url()} srcset={`${urlFor(item.image).width(400).height(300).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(450).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(600).fit('crop').url()} 800w`} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" alt={item.image.alt || ''} width={800} height={600} class="aspect-video w-full object-cover" loading="lazy" style={lqipStyle(item.image.asset.metadata?.lqip)} />
+              </a>
             )}
             {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
           </figure>
         ))}
       </div>
-    </SectionContent>
-  </Section>
+    </div>
+  </Fragment>
 )}
 
 {variant === 'masonry' && (
@@ -68,29 +221,73 @@ const galleryJsonLd = galleryImages.length > 0 ? {
         {description && <p class="mt-4 text-lg text-muted-foreground">{description}</p>}
       </SectionContent>
     )}
+    {hasFilters && (
+      <SectionContent>
+        <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />
+      </SectionContent>
+    )}
     <SectionMasonry>
-      {(images ?? []).map((item) => (
-        <figure>
-          {item.image?.asset && (
-            <img
-              src={urlFor(item.image).width(800).url()}
-              alt={item.image.alt || ''}
-              width={item.image.asset.metadata?.dimensions?.width || 800}
-              height={item.image.asset.metadata?.dimensions?.height || 600}
-              class="w-full object-cover"
-              loading="lazy"
-              style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
-            />
-          )}
-          {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
-        </figure>
-      ))}
+      <div id={galleryId} class="pswp-gallery contents">
+        {/* Featured hero row in masonry */}
+        {featuredItems.length > 0 && featuredItems.map((item) => (
+          <figure class="col-span-full" data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+            {item.image?.asset && (
+              <a
+                href={urlFor(item.image).width(1600).url()}
+                data-pswp-width={item.fullWidth}
+                data-pswp-height={item.fullHeight}
+                target="_blank"
+                class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+              >
+                <img
+                  src={urlFor(item.image).width(1200).height(800).fit('crop').url()}
+                  srcset={`${urlFor(item.image).width(400).height(267).fit('crop').url()} 400w, ${urlFor(item.image).width(600).height(400).fit('crop').url()} 600w, ${urlFor(item.image).width(800).height(533).fit('crop').url()} 800w`}
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  alt={item.image.alt || ''}
+                  width={1200}
+                  height={800}
+                  class="aspect-[3/2] w-full object-cover"
+                  loading="lazy"
+                  style={lqipStyle(item.image.asset.metadata?.lqip)}
+                />
+              </a>
+            )}
+            {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        ))}
+        {regularItems.map((item) => (
+          <figure data-year={item.year ? String(item.year) : undefined} data-category={stegaClean(item.category) || undefined}>
+            {item.image?.asset && (
+              <a
+                href={urlFor(item.image).width(1600).url()}
+                data-pswp-width={item.fullWidth}
+                data-pswp-height={item.fullHeight}
+                target="_blank"
+                class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+              >
+                <img
+                  src={urlFor(item.image).width(800).url()}
+                  srcset={`${urlFor(item.image).width(400).url()} 400w, ${urlFor(item.image).width(600).url()} 600w, ${urlFor(item.image).width(800).url()} 800w`}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  alt={item.image.alt || ''}
+                  width={item.image.asset.metadata?.dimensions?.width || 800}
+                  height={item.image.asset.metadata?.dimensions?.height || 600}
+                  class="w-full object-cover"
+                  loading="lazy"
+                  style={lqipStyle(item.image.asset.metadata?.lqip)}
+                />
+              </a>
+            )}
+            {item.caption && <figcaption class="mt-2 text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
     </SectionMasonry>
   </Section>
 )}
 
 {variant === 'single' && (() => {
-  const item = images?.[0];
+  const item = galleryItems[0];
   return item ? (
     <Section data-animate>
       {heading && (
@@ -100,21 +297,190 @@ const galleryJsonLd = galleryImages.length > 0 ? {
         </SectionContent>
       )}
       <SectionContent>
-        <figure>
-          {item.image?.asset && (
-            <img
-              src={urlFor(item.image).width(1600).url()}
-              alt={item.image.alt || ''}
-              width={item.image.asset.metadata?.dimensions?.width || 1600}
-              height={item.image.asset.metadata?.dimensions?.height || 900}
-              class="w-full object-cover"
-              loading="lazy"
-              style={item.image.asset.metadata?.lqip ? `background-image: url(${item.image.asset.metadata.lqip}); background-size: cover;` : undefined}
-            />
-          )}
-          {item.caption && <figcaption class="mt-4 text-center text-sm text-muted-foreground">{item.caption}</figcaption>}
-        </figure>
+        {hasFilters && <GalleryFilterBar galleryId={galleryId} years={years} categories={categories} categoryLabels={CATEGORY_LABELS} class="mb-8" />}
+        <div id={galleryId} class="pswp-gallery">
+          <figure>
+            {item.image?.asset && (
+              <a
+                href={urlFor(item.image).width(1600).url()}
+                data-pswp-width={item.fullWidth}
+                data-pswp-height={item.fullHeight}
+                target="_blank"
+                class="block transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg cursor-zoom-in"
+              >
+                <img
+                  src={urlFor(item.image).width(1600).url()}
+                  srcset={`${urlFor(item.image).width(400).url()} 400w, ${urlFor(item.image).width(600).url()} 600w, ${urlFor(item.image).width(800).url()} 800w, ${urlFor(item.image).width(1200).url()} 1200w, ${urlFor(item.image).width(1600).url()} 1600w`}
+                  sizes="100vw"
+                  alt={item.image.alt || ''}
+                  width={item.image.asset.metadata?.dimensions?.width || 1600}
+                  height={item.image.asset.metadata?.dimensions?.height || 900}
+                  class="w-full object-cover"
+                  loading="lazy"
+                  style={lqipStyle(item.image.asset.metadata?.lqip)}
+                />
+              </a>
+            )}
+            {item.caption && <figcaption class="mt-4 text-center text-sm text-muted-foreground">{item.caption}</figcaption>}
+          </figure>
+        </div>
       </SectionContent>
     </Section>
   ) : null;
 })()}
+
+<script>
+  import PhotoSwipeLightbox from 'photoswipe/lightbox';
+  import 'photoswipe/style.css';
+
+  let lightbox: InstanceType<typeof PhotoSwipeLightbox> | null = null;
+
+  function initLightbox() {
+    if (lightbox) {
+      lightbox.destroy();
+      lightbox = null;
+    }
+
+    lightbox = new PhotoSwipeLightbox({
+      gallery: '.pswp-gallery',
+      children: 'a:not([hidden])',
+      pswpModule: () => import('photoswipe'),
+    });
+
+    // Caption overlay
+    lightbox.on('uiRegister', () => {
+      lightbox!.pswp!.ui.registerElement({
+        name: 'caption',
+        order: 9,
+        isButton: false,
+        appendTo: 'root',
+        html: '',
+        onInit: (el) => {
+          el.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:16px 24px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:14px;text-align:center;pointer-events:none;';
+          lightbox!.pswp!.on('change', () => {
+            const slide = lightbox!.pswp!.currSlide?.data.element;
+            const caption = slide?.closest('figure')?.querySelector('figcaption')?.textContent || '';
+            el.textContent = caption;
+            el.style.display = caption ? '' : 'none';
+          });
+        },
+      });
+
+      // Share button
+      lightbox!.pswp!.ui.registerElement({
+        name: 'share-button',
+        order: 8,
+        isButton: true,
+        tagName: 'button',
+        html: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+        onClick: (_event, el) => {
+          if (!navigator.clipboard) {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copy failed</span>';
+            setTimeout(() => { el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>'; }, 2000);
+            return;
+          }
+          const originalHtml = el.innerHTML;
+          navigator.clipboard.writeText(window.location.href).then(() => {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copied!</span>';
+            setTimeout(() => { el.innerHTML = originalHtml; }, 2000);
+          }).catch(() => {
+            el.innerHTML = '<span style="font-size:12px;color:#fff;">Copy failed</span>';
+            setTimeout(() => { el.innerHTML = originalHtml; }, 2000);
+          });
+        },
+      });
+    });
+
+    // Set ?img= on first open (before any change event fires)
+    lightbox.on('afterInit', () => {
+      const index = lightbox!.pswp!.currIndex;
+      const url = new URL(window.location.href);
+      url.searchParams.set('img', String(index + 1));
+      history.replaceState(null, '', url.toString());
+    });
+
+    // Deep linking: update URL on slide change
+    lightbox.on('change', () => {
+      const index = lightbox!.pswp!.currIndex;
+      const url = new URL(window.location.href);
+      url.searchParams.set('img', String(index + 1));
+      history.replaceState(null, '', url.toString());
+    });
+
+    // Clear ?img= param when lightbox closes
+    lightbox.on('close', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('img');
+      history.replaceState(null, '', url.toString());
+    });
+
+    lightbox.init();
+  }
+
+  initLightbox();
+
+  // Deep linking: open to ?img=N on page load (with bounds check)
+  const params = new URLSearchParams(window.location.search);
+  const imgParam = params.get('img');
+  if (imgParam && lightbox) {
+    const imgIndex = parseInt(imgParam, 10) - 1;
+    const totalItems = document.querySelectorAll('.pswp-gallery a').length;
+    if (imgIndex >= 0 && imgIndex < totalItems) {
+      lightbox.loadAndOpen(imgIndex);
+    }
+  }
+
+  // Filter UI logic
+  document.querySelectorAll('.gallery-filters').forEach(filterBar => {
+    const targetId = filterBar.getAttribute('data-gallery-target');
+    if (!targetId) return;
+
+    const gallery = document.getElementById(targetId);
+    if (!gallery) return;
+
+    let activeYear = 'all';
+    let activeCategory = 'all';
+
+    function applyFilters() {
+      gallery!.querySelectorAll('figure').forEach(fig => {
+        const figYear = fig.getAttribute('data-year') || '';
+        const figCategory = fig.getAttribute('data-category') || '';
+        const yearMatch = activeYear === 'all' || figYear === activeYear;
+        const categoryMatch = activeCategory === 'all' || figCategory === activeCategory;
+        const visible = yearMatch && categoryMatch;
+        (fig as HTMLElement).style.display = visible ? '' : 'none';
+        // Hide/show anchor for PhotoSwipe filtering
+        const anchor = fig.querySelector('a');
+        if (anchor) {
+          anchor.toggleAttribute('hidden', !visible);
+        }
+      });
+
+      // Reinitialize PhotoSwipe to update its item list after filtering
+      initLightbox();
+    }
+
+    filterBar.querySelectorAll('.gallery-filter-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const filterType = pill.getAttribute('data-filter-type');
+        const filterValue = pill.getAttribute('data-filter-value') || 'all';
+
+        if (filterType === 'year') {
+          activeYear = filterValue;
+        } else if (filterType === 'category') {
+          activeCategory = filterValue;
+        }
+
+        // Update active pill styling via data-state attribute (Swiss design pattern)
+        filterBar.querySelectorAll(`.gallery-filter-pill[data-filter-type="${filterType}"]`).forEach(p => {
+          p.removeAttribute('data-state');
+          p.setAttribute('aria-pressed', 'false');
+        });
+        pill.setAttribute('data-state', 'active');
+        pill.setAttribute('aria-pressed', 'true');
+
+        applyFilters();
+      });
+    });
+  });
+</script>
