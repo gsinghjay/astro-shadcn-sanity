@@ -1,10 +1,19 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { sanityClient } from "sanity:client";
 
-// Ensure Visual Editing is off for unit tests (getViteConfig loads .env)
-vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+// Mock astro:env modules — vi.mock is hoisted, so these run before any imports.
+// Defaults mirror astro.config.mjs env.schema defaults for a standard test env.
+vi.mock("astro:env/client", () => ({
+  PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+  PUBLIC_SANITY_DATASET: "production",
+  PUBLIC_SITE_ID: "capstone",
+}));
 
-// Must import AFTER stubbing env so module-level const picks up the stub
+vi.mock("astro:env/server", () => ({
+  SANITY_API_READ_TOKEN: undefined,
+}));
+
+// Must import AFTER mocking env so module-level const picks up the mock
 const {
   loadQuery,
   getSiteSettings,
@@ -46,12 +55,7 @@ const {
 
 // Reset module state between tests (clears _siteSettingsCache)
 beforeEach(() => {
-  vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
   vi.restoreAllMocks();
-});
-
-afterEach(() => {
-  vi.unstubAllEnvs();
 });
 
 describe("GROQ query definitions", () => {
@@ -481,7 +485,14 @@ describe("getAllSponsors()", () => {
   it("returns cached result on subsequent calls without additional API calls", async () => {
     // Use a fresh module so cache is empty and no test-ordering dependency
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -557,7 +568,14 @@ describe("getAllProjects()", () => {
 
   it("returns cached result on subsequent calls without additional API calls", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -631,7 +649,14 @@ describe("getAllArticles()", () => {
 
   it("returns cached result on subsequent calls without additional API calls", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -705,7 +730,14 @@ describe("getAllAuthors()", () => {
 
   it("returns cached result on subsequent calls without additional API calls", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -949,7 +981,14 @@ describe("resolveBlockArticles()", () => {
 describe("prefetchPages() and getPage() cache", () => {
   it("prefetchPages populates cache and getPage returns cached results", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -975,7 +1014,14 @@ describe("prefetchPages() and getPage() cache", () => {
 
   it("getPage fetches from API on cache miss", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -989,7 +1035,14 @@ describe("prefetchPages() and getPage() cache", () => {
 
   it("prefetchPages is a no-op when Visual Editing is enabled", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "true");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: true,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: "test-token",
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -999,7 +1052,14 @@ describe("prefetchPages() and getPage() cache", () => {
 
   it("prefetchPages respects concurrency chunking", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
 
@@ -1040,9 +1100,14 @@ describe("getSiteParams() (production defaults)", () => {
 describe("getSiteParams() (rwc dataset)", () => {
   it("getSiteParams returns site ID for rwc dataset", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
-    vi.stubEnv("PUBLIC_SANITY_DATASET", "rwc");
-    vi.stubEnv("PUBLIC_SITE_ID", "rwc-us");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "rwc",
+      PUBLIC_SITE_ID: "rwc-us",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const freshModule = await import("@/lib/sanity");
 
     expect(freshModule.getSiteParams()).toEqual({ site: "rwc-us" });
@@ -1050,9 +1115,14 @@ describe("getSiteParams() (rwc dataset)", () => {
 
   it("getSiteParams returns rwc-intl for international site", async () => {
     vi.resetModules();
-    vi.stubEnv("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "false");
-    vi.stubEnv("PUBLIC_SANITY_DATASET", "rwc");
-    vi.stubEnv("PUBLIC_SITE_ID", "rwc-intl");
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "rwc",
+      PUBLIC_SITE_ID: "rwc-intl",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
     const freshModule = await import("@/lib/sanity");
 
     expect(freshModule.getSiteParams()).toEqual({ site: "rwc-intl" });

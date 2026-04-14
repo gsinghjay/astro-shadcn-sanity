@@ -237,33 +237,47 @@ describe('Story 15-3: Multi-Site GROQ Filtering (ATDD)', () => {
   // ---------------------------------------------------------------------------
   describe('AC5: Environment variable usage', () => {
     test('[P1] 15.3-INT-014 — DATASET is derived from PUBLIC_SANITY_DATASET env var', () => {
+      // Migrated from import.meta.env to astro:env/client typed import
       expect(
         sanityTsContent,
-        'DATASET must read from import.meta.env.PUBLIC_SANITY_DATASET',
-      ).toMatch(/const\s+DATASET\s*=\s*import\.meta\.env\.PUBLIC_SANITY_DATASET/)
+        'DATASET must be assigned from the PUBLIC_SANITY_DATASET import',
+      ).toMatch(/const\s+DATASET\s*=\s*PUBLIC_SANITY_DATASET/)
+      expect(
+        sanityTsContent,
+        'PUBLIC_SANITY_DATASET must be imported from astro:env/client',
+      ).toMatch(/import\s*\{[^}]*PUBLIC_SANITY_DATASET[^}]*\}\s*from\s*['"]astro:env\/client['"]/)
     })
 
     test('[P1] 15.3-INT-015 — DATASET has a default fallback value', () => {
-      // DATASET should default to 'production' when env var is not set
+      // Default is now declared in astro.config.mjs env.schema, not inline || fallback
+      const configPath = path.resolve(__dirname, '../../../astro-app/astro.config.mjs')
+      const configContent = fs.readFileSync(configPath, 'utf-8')
       expect(
-        sanityTsContent,
-        'DATASET must have a fallback default value',
-      ).toMatch(/PUBLIC_SANITY_DATASET\s*\|\|\s*['"]production['"]/)
+        configContent,
+        'PUBLIC_SANITY_DATASET must have a default in env.schema',
+      ).toMatch(/PUBLIC_SANITY_DATASET:\s*envField\.string\([\s\S]*?default:\s*['"]production['"]/)
     })
 
     test('[P1] 15.3-INT-016 — SITE_ID is derived from PUBLIC_SITE_ID env var', () => {
+      // Migrated from import.meta.env to astro:env/client typed import
       expect(
         sanityTsContent,
-        'SITE_ID must read from import.meta.env.PUBLIC_SITE_ID',
-      ).toMatch(/const\s+SITE_ID\s*=\s*import\.meta\.env\.PUBLIC_SITE_ID/)
+        'SITE_ID must be assigned from the PUBLIC_SITE_ID import',
+      ).toMatch(/const\s+SITE_ID\s*=\s*PUBLIC_SITE_ID/)
+      expect(
+        sanityTsContent,
+        'PUBLIC_SITE_ID must be imported from astro:env/client',
+      ).toMatch(/import\s*\{[^}]*PUBLIC_SITE_ID[^}]*\}\s*from\s*['"]astro:env\/client['"]/)
     })
 
     test('[P1] 15.3-INT-017 — SITE_ID has a default fallback value', () => {
-      // SITE_ID should default to a known value when env var is not set
+      // Default is now declared in astro.config.mjs env.schema, not inline || fallback
+      const configPath = path.resolve(__dirname, '../../../astro-app/astro.config.mjs')
+      const configContent = fs.readFileSync(configPath, 'utf-8')
       expect(
-        sanityTsContent,
-        'SITE_ID must have a fallback default value',
-      ).toMatch(/PUBLIC_SITE_ID\s*\|\|\s*['"]/)
+        configContent,
+        'PUBLIC_SITE_ID must have a default in env.schema',
+      ).toMatch(/PUBLIC_SITE_ID:\s*envField\.string\([\s\S]*?default:\s*['"]/)
     })
   })
 

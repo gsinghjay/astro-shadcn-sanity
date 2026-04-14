@@ -26,22 +26,9 @@ describe('CSS theme selectors in global.css', () => {
     }
   });
 
-  it('contains .dark[data-site-theme="blue"] selector with primary/ring/destructive', () => {
-    const darkBlueBlock = css.match(/\.dark\[data-site-theme="blue"\]\s*\{([^}]+)\}/);
-    expect(darkBlueBlock).not.toBeNull();
-    const blockContent = darkBlueBlock![1];
-    expect(blockContent).toContain('--primary');
-    expect(blockContent).toContain('--ring');
-    expect(blockContent).toContain('--destructive');
-  });
-
-  it('contains .dark[data-site-theme="green"] selector with primary/ring/destructive', () => {
-    const darkGreenBlock = css.match(/\.dark\[data-site-theme="green"\]\s*\{([^}]+)\}/);
-    expect(darkGreenBlock).not.toBeNull();
-    const blockContent = darkGreenBlock![1];
-    expect(blockContent).toContain('--primary');
-    expect(blockContent).toContain('--ring');
-    expect(blockContent).toContain('--destructive');
+  it('does not contain .dark theme selectors (dark mode disabled)', () => {
+    expect(css).not.toMatch(/\.dark\[data-site-theme=/);
+    expect(css).not.toMatch(/\.dark\s*\{[^}]*--background/);
   });
 
   it('does NOT contain a redundant [data-site-theme="red"] selector', () => {
@@ -72,17 +59,20 @@ describe('CSS theme selectors in global.css', () => {
   });
 });
 
-describe('astro.config.mjs vite.define', () => {
+describe('astro.config.mjs env.schema', () => {
   const configPath = resolve(__dirname, '../../../astro.config.mjs');
   const config = readFileSync(configPath, 'utf-8');
 
-  it('includes PUBLIC_SITE_THEME in vite.define', () => {
-    expect(config).toContain('"import.meta.env.PUBLIC_SITE_THEME"');
+  it('declares PUBLIC_SITE_THEME in env.schema via envField.enum', () => {
+    expect(config).toContain('PUBLIC_SITE_THEME: envField.enum(');
   });
 
   it('validates PUBLIC_SITE_THEME against allowed values', () => {
-    expect(config).toContain('VALID_SITE_THEMES');
-    expect(config).toMatch(/\["red",\s*"blue",\s*"green"\]/);
+    expect(config).toMatch(/values:\s*\["red",\s*"blue",\s*"green"\]/);
+  });
+
+  it('does not use vite.define for PUBLIC_SITE_THEME', () => {
+    expect(config).not.toContain('"import.meta.env.PUBLIC_SITE_THEME"');
   });
 });
 
@@ -90,15 +80,12 @@ describe('Layout.astro data-site-theme attribute', () => {
   const layoutPath = resolve(__dirname, '../../layouts/Layout.astro');
   const layout = readFileSync(layoutPath, 'utf-8');
 
-  it('reads PUBLIC_SITE_THEME from import.meta.env', () => {
-    expect(layout).toContain("import.meta.env.PUBLIC_SITE_THEME");
+  it('imports PUBLIC_SITE_THEME from astro:env/client', () => {
+    expect(layout).toContain('PUBLIC_SITE_THEME');
+    expect(layout).toContain('astro:env/client');
   });
 
   it('sets data-site-theme attribute on <html>', () => {
     expect(layout).toMatch(/data-site-theme=\{siteTheme\}/);
-  });
-
-  it('defaults to red when env var is missing', () => {
-    expect(layout).toMatch(/\|\|\s*['"]red['"]/);
   });
 });

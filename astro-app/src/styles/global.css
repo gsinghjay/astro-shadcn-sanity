@@ -2,12 +2,12 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Dark mode disabled — light-only theme */
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-inter, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+  --font-display: var(--font-inter, 'Helvetica Neue', Helvetica, Arial, sans-serif);
   --font-mono: 'Courier New', Courier, monospace;
   --font-size-2xs: 0.625rem;
 
@@ -223,26 +223,7 @@
   --sidebar-ring: #cc0000;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #f7f7f7;
-  --card: #171717;
-  --card-foreground: #f7f7f7;
-  --popover: #171717;
-  --popover-foreground: #f7f7f7;
-  --primary: #cc0000;
-  --primary-foreground: #ffffff;
-  --secondary: #262626;
-  --secondary-foreground: #f7f7f7;
-  --muted: #262626;
-  --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #f7f7f7;
-  --destructive: #990000;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #cc0000;
-}
+/* .dark theme removed — light-only */
 
 /* Dark-background block overrides (Story 21-9)
    When BlockWrapper applies a dark background variant, flip CSS custom
@@ -281,17 +262,7 @@
   --sidebar-ring: #059669;
 }
 
-.dark[data-site-theme="blue"] {
-  --primary: #2563eb;
-  --ring: #2563eb;
-  --destructive: #1e40af;
-}
-
-.dark[data-site-theme="green"] {
-  --primary: #059669;
-  --ring: #059669;
-  --destructive: #047857;
-}
+/* .dark site theme overrides removed — light-only */
 
 @media (min-width: 640px) {
   :root {
