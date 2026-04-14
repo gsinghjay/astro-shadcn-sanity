@@ -34,7 +34,8 @@ const slug = stegaClean(project.slug);
 const status = stegaClean(project.status) || 'active';
 const sponsor = project.sponsor;
 const sponsorSlug = sponsor ? stegaClean(sponsor.slug) : null;
-const logoUrl = sponsor?.logo ? safeUrlFor(sponsor.logo)?.width(64).height(64).url() ?? null : null;
+// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
+const logoUrl = sponsor?.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: sponsor.logo.alt })?.width(64).fit('max').url() ?? null : null;
 const excerpt = portableTextExcerpt(project.content);
 const techs = project.technologyTags ?? [];
 const industry = sponsor?.industry ? stegaClean(sponsor.industry) : '';
@@ -48,6 +49,8 @@ const remainingCount = techs.length - maxVisibleTags;
   data-project-card
   data-tech-tags={techs.map(t => stegaClean(t)).join(',')}
   data-industry={industry}
+  data-sort-title={stegaClean(project.title ?? '').toLowerCase()}
+  data-sort-date={project._createdAt ?? ''}
 >
   <a
     href={`/projects/${slug}`}
