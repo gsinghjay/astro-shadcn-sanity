@@ -548,7 +548,7 @@ export function resolveBlockProjects(
  * GROQ query: fetch all projects with resolved sponsor references.
  */
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
-  _id, title, "slug": slug.current,
+  _id, _createdAt, title, "slug": slug.current,
   content,
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry, hidden },
   technologyTags,
