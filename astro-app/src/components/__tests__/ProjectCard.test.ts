@@ -31,7 +31,7 @@ describe('ProjectCard', () => {
     });
 
     expect(html).toContain('Acme logo');
-    expect(html).toMatch(/src="[^"]*w=48[^"]*h=48/);
+    expect(html).toMatch(/src="[^"]*w=48[^"]*fit=max/);
   });
 
   test('renders technology tags as badges', async () => {

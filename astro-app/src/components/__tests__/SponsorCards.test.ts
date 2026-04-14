@@ -43,8 +43,8 @@ describe('SponsorCards', () => {
     });
 
     expect(html).toContain('Acme logo');
-    // urlFor outputs CDN URL with w= and h= params
-    expect(html).toMatch(/src="[^"]*w=112[^"]*h=112/);
+    // urlFor uses single-dim sizing to preserve aspect ratio (w= + fit=max)
+    expect(html).toMatch(/src="[^"]*w=112[^"]*fit=max/);
   });
 
   test('renders initials fallback when no logo', async () => {
