@@ -49,6 +49,8 @@ const remainingCount = techs.length - maxVisibleTags;
   data-project-card
   data-tech-tags={techs.map(t => stegaClean(t)).join(',')}
   data-industry={industry}
+  data-sort-title={stegaClean(project.title ?? '').toLowerCase()}
+  data-sort-date={project._createdAt ?? ''}
 >
   <a
     href={`/projects/${slug}`}
