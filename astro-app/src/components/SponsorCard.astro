@@ -25,7 +25,10 @@ interface Props {
 
 const { sponsor } = Astro.props;
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
-const logoUrl = sponsorLogoUrl(sponsor.logo);
+// Prefer square variant for cards, fall back to primary logo
+const cardLogo = sponsor.logoSquare?.asset ? sponsor.logoSquare : sponsor.logo;
+const logoUrl = sponsorLogoUrl(cardLogo);
+const logoAlt = cardLogo?.alt || `${sponsor.name} logo`;
 ---
 
 <Tile variant="floating" class={`${tier.border} border-2 transition-all duration-150`}>
@@ -34,7 +37,7 @@ const logoUrl = sponsorLogoUrl(sponsor.logo);
       <a href={`/sponsors/${stegaClean(sponsor.slug)}`} class="flex items-center gap-4 no-underline text-inherit" data-gtm-category="sponsor" data-gtm-action="detail" data-gtm-label={stegaClean(sponsor.name)}>
         <div class="w-14 h-14 bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
           {logoUrl ? (
-            <img src={logoUrl} alt={sponsor.logo?.alt || `${sponsor.name} logo`} class="w-full h-full object-contain p-1" loading="lazy" />
+            <img src={logoUrl} alt={logoAlt} class="w-full h-full object-contain p-1" loading="lazy" />
           ) : (
             <span class="text-lg font-bold text-muted-foreground">
               {(sponsor.name || '').split(' ').map((w: string) => w[0]).join('').slice(0, 2)}
