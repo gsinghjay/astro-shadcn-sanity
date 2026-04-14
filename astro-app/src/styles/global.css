@@ -6,8 +6,8 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-inter);
   --font-mono: 'Courier New', Courier, monospace;
   --font-size-2xs: 0.625rem;
 

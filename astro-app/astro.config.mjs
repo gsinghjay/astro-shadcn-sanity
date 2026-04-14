@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import { loadEnv } from "vite";
 import sanity from "@sanity/astro";
 import tailwindcss from "@tailwindcss/vite";
@@ -30,6 +30,18 @@ const liveContentEnabled = env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED || process.env
 export default defineConfig({
   output: "static",
   site: siteUrl,
+  experimental: {
+    fonts: [
+      {
+        provider: fontProviders.fontsource(),
+        name: "Inter",
+        cssVariable: "--font-inter",
+        weights: ["100 900"],
+        styles: ["normal"],
+        fallbacks: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+      },
+    ],
+  },
   adapter: cloudflare({ platformProxy: { enabled: true } }),
   vite: {
     plugins: [tailwindcss()],
