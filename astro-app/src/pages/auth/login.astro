@@ -8,6 +8,7 @@
 export const prerender = false;
 
 import "../../styles/global.css";
+import { Font } from "astro:assets";
 
 function safeRedirect(url: string | null, fallback: string): string {
   if (!url) return fallback;
@@ -20,6 +21,7 @@ const redirect = safeRedirect(Astro.url.searchParams.get('redirect'), '/student/
 
 <html lang="en">
   <head>
+    <Font cssVariable="--font-inter" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />

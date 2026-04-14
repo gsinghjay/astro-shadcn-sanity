@@ -7,6 +7,7 @@
 export const prerender = false;
 
 import "../../styles/global.css";
+import { Font } from "astro:assets";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -21,6 +22,7 @@ const redirect = safeRedirect(Astro.url.searchParams.get('redirect'), '/portal/'
 
 <html lang="en">
   <head>
+    <Font cssVariable="--font-inter" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />

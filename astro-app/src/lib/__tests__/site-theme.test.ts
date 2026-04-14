@@ -26,22 +26,9 @@ describe('CSS theme selectors in global.css', () => {
     }
   });
 
-  it('contains .dark[data-site-theme="blue"] selector with primary/ring/destructive', () => {
-    const darkBlueBlock = css.match(/\.dark\[data-site-theme="blue"\]\s*\{([^}]+)\}/);
-    expect(darkBlueBlock).not.toBeNull();
-    const blockContent = darkBlueBlock![1];
-    expect(blockContent).toContain('--primary');
-    expect(blockContent).toContain('--ring');
-    expect(blockContent).toContain('--destructive');
-  });
-
-  it('contains .dark[data-site-theme="green"] selector with primary/ring/destructive', () => {
-    const darkGreenBlock = css.match(/\.dark\[data-site-theme="green"\]\s*\{([^}]+)\}/);
-    expect(darkGreenBlock).not.toBeNull();
-    const blockContent = darkGreenBlock![1];
-    expect(blockContent).toContain('--primary');
-    expect(blockContent).toContain('--ring');
-    expect(blockContent).toContain('--destructive');
+  it('does not contain .dark theme selectors (dark mode disabled)', () => {
+    expect(css).not.toMatch(/\.dark\[data-site-theme=/);
+    expect(css).not.toMatch(/\.dark\s*\{[^}]*--background/);
   });
 
   it('does NOT contain a redundant [data-site-theme="red"] selector', () => {

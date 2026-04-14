@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { resolve } from 'path';
 
 const ROOT = resolve(__dirname, '../../..');
@@ -60,19 +60,19 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
       'utf-8',
     );
 
-    it('maps --font-sans to var(--font-inter) in @theme', () => {
-      expect(cssContent).toMatch(/--font-sans\s*:\s*var\(--font-inter\)/);
+    it('maps --font-sans to var(--font-inter) with system font fallbacks in @theme', () => {
+      expect(cssContent).toMatch(/--font-sans\s*:\s*var\(--font-inter,\s*'Helvetica Neue'/);
     });
 
-    it('maps --font-display to var(--font-inter) in @theme', () => {
-      expect(cssContent).toMatch(/--font-display\s*:\s*var\(--font-inter\)/);
+    it('maps --font-display to var(--font-inter) with system font fallbacks in @theme', () => {
+      expect(cssContent).toMatch(/--font-display\s*:\s*var\(--font-inter,\s*'Helvetica Neue'/);
     });
 
-    it('does not hardcode Helvetica Neue in --font-sans (Fonts API handles fallbacks)', () => {
-      // The @theme block should use var(--font-inter), not a hardcoded font stack
+    it('uses var(--font-inter) as primary value (not hardcoded font stack alone)', () => {
+      // The @theme block should use var(--font-inter, ...) not a bare font stack
       const themeMatch = cssContent.match(/@theme\s*\{([^}]+)\}/);
       expect(themeMatch).toBeTruthy();
-      expect(themeMatch![1]).not.toMatch(/--font-sans\s*:.*Helvetica/);
+      expect(themeMatch![1]).toMatch(/--font-sans\s*:\s*var\(--font-inter/);
     });
 
     it('preserves --font-mono in @theme (not touched)', () => {
@@ -127,7 +127,6 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
       });
 
       it('contains woff2 font file (self-hosted, no external requests)', () => {
-        const { readdirSync } = require('fs');
         const fontsDir = resolve(DIST, '_astro/fonts');
         const files = readdirSync(fontsDir);
         const woff2Files = files.filter((f: string) => f.endsWith('.woff2'));
