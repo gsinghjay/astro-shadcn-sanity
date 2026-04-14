@@ -117,11 +117,16 @@ const isActive = (href: string) =>
                 return (
                   <SidebarMenuItem>
                     {hasChildren ? (
-                      <Collapsible>
-                        <CollapsibleTrigger>
-                          <SidebarMenuButton class="h-10 rounded-md px-4 text-lg font-bold uppercase tracking-wider">
+                      <Collapsible open>
+                        <CollapsibleTrigger class="w-full h-10 rounded-md px-4">
+                          <a
+                            href={item.href}
+                            class="flex-1 text-lg font-bold uppercase tracking-wider no-underline text-foreground"
+                            data-gtm-category="navigation"
+                            data-gtm-label={stegaClean(item.label)}
+                          >
                             {stegaClean(item.label)}
-                          </SidebarMenuButton>
+                          </a>
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                           <SidebarMenuSub>

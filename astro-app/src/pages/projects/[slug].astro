@@ -42,7 +42,8 @@ const sponsor = project.sponsor;
 const cleanTier = stegaClean(sponsor?.tier) || 'silver';
 const sponsorSlug = sponsor ? stegaClean(sponsor.slug) : null;
 
-const logoUrl = safeUrlFor(sponsor?.logo)?.width(200).height(200).url() ?? null;
+// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
+const logoUrl = sponsor?.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: sponsor.logo.alt })?.width(200).fit('max').url() ?? null : null;
 const team = project.team ?? [];
 const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
@@ -79,7 +80,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
                 <img
                   src={logoUrl}
                   alt={sponsor.logo?.alt || `${sponsor.name} logo`}
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-contain p-2"
                   width="200"
                   height="200"
                   loading="lazy"
