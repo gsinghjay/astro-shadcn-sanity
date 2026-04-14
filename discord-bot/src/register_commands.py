@@ -73,12 +73,15 @@ def main():
         "Content-Type": "application/json",
     }
 
-    response = httpx.put(url, headers=headers, json=commands, timeout=10.0)
-    if response.status_code in (200, 201):
-        for command in response.json():
-            print(f"✓ Registered command: /{command['name']}")
-    else:
-        print(f"✗ Failed: {response.status_code} {response.text}")
+    try:
+        response = httpx.put(url, headers=headers, json=commands, timeout=10.0)
+        if response.status_code in (200, 201):
+            for command in response.json():
+                print(f"✓ Registered command: /{command['name']}")
+        else:
+            print(f"✗ Failed: {response.status_code} {response.text}")
+    except (httpx.ConnectError, httpx.TimeoutException) as e:
+        print(f"✗ Network error: {e}")
 
 
 if __name__ == "__main__":

@@ -39,7 +39,8 @@ async def query_sanity(dataset: str, groq: str, params: dict | None = None, env=
         to_js({"method": "GET"}, dict_converter=Object.fromEntries),
     )
     if not response.ok:
-        raise RuntimeError(f"Sanity request failed with status {response.status}")
+        text = await response.text()
+        raise RuntimeError(f"Sanity request failed with status {response.status}: {text}")
 
     # Get raw JSON text and parse with Python's json module
     text = await response.text()
