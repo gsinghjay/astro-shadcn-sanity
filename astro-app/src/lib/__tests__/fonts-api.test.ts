@@ -95,10 +95,9 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
   describe('Task 4: No font-related Vite defines (AC: #1)', () => {
     const configContent = readFileSync(resolve(ROOT, 'astro.config.mjs'), 'utf-8');
 
-    it('does not have font-related entries in vite.define', () => {
+    it('does not have a vite.define block (astro:env handles PUBLIC_* injection)', () => {
       const defineMatch = configContent.match(/define\s*:\s*\{([\s\S]*?)\}/);
-      expect(defineMatch).toBeTruthy();
-      expect(defineMatch![1]).not.toMatch(/font/i);
+      expect(defineMatch).toBeNull();
     });
   });
 

@@ -106,6 +106,8 @@ function astroVirtualModuleStubs(): Plugin {
     'virtual:astro:assets/fonts/runtime': 'export {};',
     'virtual:astro:assets/fonts/internal': 'export {};',
     'sanity:client': `export const sanityClient = { config() { return { projectId: '49nk9b0w', dataset: 'production', apiVersion: '2025-03-01' }; }, fetch() { return Promise.resolve({ result: null }); } };`,
+    'astro:env/client': `export const PUBLIC_GTM_ID = ""; export const PUBLIC_SANITY_VISUAL_EDITING_ENABLED = false; export const PUBLIC_SANITY_LIVE_CONTENT_ENABLED = false; export const PUBLIC_SITE_URL = "http://localhost:4321"; export const PUBLIC_SANITY_STUDIO_URL = "http://localhost:3333"; export const PUBLIC_SANITY_DATASET = "production"; export const PUBLIC_SITE_ID = "capstone"; export const PUBLIC_SITE_THEME = "red";`,
+    'astro:env/server': `export const PUBLIC_SANITY_STUDIO_PROJECT_ID = "placeholder"; export const PUBLIC_SANITY_STUDIO_DATASET = "production"; export const SANITY_API_READ_TOKEN = undefined;`,
     'astro:actions': `export const actions = new Proxy({}, { get: () => () => Promise.resolve({ data: null, error: null }) }); export function isInputError() { return false; }; export class ActionError extends Error { constructor(opts) { super(opts?.message); this.code = opts?.code; } }; export function defineAction(opts) { return opts?.handler || (() => {}); };`,
   }
 

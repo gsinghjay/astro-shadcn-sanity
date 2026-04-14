@@ -2,6 +2,8 @@ import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
 import { stegaClean } from "@sanity/client/stega";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_SANITY_DATASET, PUBLIC_SITE_ID } from "astro:env/client";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -264,17 +266,15 @@ const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
       verticalAlign
     }`;
 
-const visualEditingEnabled =
-  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
-const token = import.meta.env.SANITY_API_READ_TOKEN;
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const token = SANITY_API_READ_TOKEN;
 
 /**
- * Multi-site context constants — resolved at build time via Vite's
- * static replacement of `import.meta.env` values.
+ * Multi-site context constants — resolved at build time via astro:env schema.
  * Each CF Pages build is isolated (one site = one set of env vars).
  */
-const DATASET = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
-const SITE_ID = import.meta.env.PUBLIC_SITE_ID || 'capstone';
+const DATASET = PUBLIC_SANITY_DATASET;
+const SITE_ID = PUBLIC_SITE_ID;
 const isMultiSite = DATASET === 'rwc';
 
 /**
