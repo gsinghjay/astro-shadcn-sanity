@@ -62,7 +62,7 @@ const statusStyles: Record<string, string> = {
               {safeUrlFor(project.sponsor?.logo) ? (
                 <div class="aspect-video @3xl:aspect-auto @3xl:h-full flex items-center justify-center p-8 bg-muted">
                   <img
-                    src={safeUrlFor({ asset: project.sponsor!.logo!.asset, alt: project.sponsor!.logo!.alt })!.width(200).fit('max').url()}
+                    src={safeUrlFor(project.sponsor!.logo)!.width(200).height(200).url()}
                     alt={project.sponsor?.logo?.alt || `${project.sponsor?.name} logo`}
                     class="max-h-24 object-contain"
                     loading="lazy"

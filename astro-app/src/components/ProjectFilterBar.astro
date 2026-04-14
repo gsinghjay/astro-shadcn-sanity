@@ -3,7 +3,6 @@
  * ProjectFilterBar — Swiss Style collapsible filter sidebar for projects.
  * Emits data-filter-tech and data-filter-industry buttons matching
  * the existing client-side filter script selectors.
- * Always renders the sort dropdown; filter sections are conditional on available data.
  */
 
 interface Props {
@@ -15,95 +14,78 @@ const { techs, industries } = Astro.props;
 const hasFilters = techs.length > 0 || industries.length > 0;
 ---
 
-<div data-project-filters class="space-y-4">
-  {/* Sort dropdown — always rendered */}
-  <div class="border-b border-border pb-3">
-    <label for="project-sort" class="label-caps block mb-2">Sort by</label>
-    <select
-      id="project-sort"
-      data-project-sort
-      class="w-full border border-border bg-background px-3 py-2 text-sm"
-    >
-      <option value="newest" selected>Newest First</option>
-      <option value="oldest">Oldest First</option>
-      <option value="title-asc">Title A-Z</option>
-      <option value="title-desc">Title Z-A</option>
-    </select>
+{hasFilters && (
+  <div data-project-filters class="space-y-4">
+    {/* Heading */}
+    <div class="flex items-center justify-between border-b border-border pb-3">
+      <h2 class="label-caps">Filters</h2>
+    </div>
+
+    {/* Technology collapsible group */}
+    {techs.length > 0 && (
+      <details class="group" open>
+        <summary class="flex cursor-pointer items-center justify-between py-2 border-b border-border select-none">
+          <span class="label-caps">Technology</span>
+        </summary>
+        <div class="flex flex-wrap gap-2 pt-3 pb-1">
+          <button
+            data-filter-tech="all"
+            data-state="active"
+            aria-pressed="true"
+            class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
+          >
+            All
+          </button>
+          {techs.map((tech) => (
+            <button
+              data-filter-tech={tech}
+              aria-pressed="false"
+              class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
+            >
+              {tech}
+            </button>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {/* Industry collapsible group */}
+    {industries.length > 0 && (
+      <details class="group" open>
+        <summary class="flex cursor-pointer items-center justify-between py-2 border-b border-border select-none">
+          <span class="label-caps">Industry</span>
+        </summary>
+        <div class="flex flex-wrap gap-2 pt-3 pb-1">
+          <button
+            data-filter-industry="all"
+            data-state="active"
+            aria-pressed="true"
+            class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
+          >
+            All Industries
+          </button>
+          {industries.map((industry) => (
+            <button
+              data-filter-industry={industry}
+              aria-pressed="false"
+              class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
+            >
+              {industry}
+            </button>
+          ))}
+        </div>
+      </details>
+    )}
+
+    {/* Clear all — hidden by default, shown by JS when filters active */}
+    <div class="border-t border-border pt-3 hidden" data-clear-filters-wrap>
+      <button
+        type="button"
+        data-clear-filters
+        class="label-caps text-primary underline underline-offset-4 transition-colors hover:text-primary/80"
+      >
+        Clear all filters
+      </button>
+    </div>
   </div>
-
-  {hasFilters && (
-    <>
-      {/* Heading */}
-      <div class="flex items-center justify-between border-b border-border pb-3">
-        <h2 class="label-caps">Filters</h2>
-      </div>
-
-      {/* Technology collapsible group */}
-      {techs.length > 0 && (
-        <details class="group" open>
-          <summary class="flex cursor-pointer items-center justify-between py-2 border-b border-border select-none">
-            <span class="label-caps">Technology</span>
-          </summary>
-          <div class="flex flex-wrap gap-2 pt-3 pb-1">
-            <button
-              data-filter-tech="all"
-              data-state="active"
-              aria-pressed="true"
-              class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
-            >
-              All
-            </button>
-            {techs.map((tech) => (
-              <button
-                data-filter-tech={tech}
-                aria-pressed="false"
-                class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
-              >
-                {tech}
-              </button>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {/* Industry collapsible group */}
-      {industries.length > 0 && (
-        <details class="group" open>
-          <summary class="flex cursor-pointer items-center justify-between py-2 border-b border-border select-none">
-            <span class="label-caps">Industry</span>
-          </summary>
-          <div class="flex flex-wrap gap-2 pt-3 pb-1">
-            <button
-              data-filter-industry="all"
-              data-state="active"
-              aria-pressed="true"
-              class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
-            >
-              All Industries
-            </button>
-            {industries.map((industry) => (
-              <button
-                data-filter-industry={industry}
-                aria-pressed="false"
-                class="label-caps border border-border px-3 py-1 transition-colors data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary hover:bg-muted hover:border-foreground"
-              >
-                {industry}
-              </button>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {/* Clear all — hidden by default, shown by JS when filters active */}
-      <div class="border-t border-border pt-3 hidden" data-clear-filters-wrap>
-        <button
-          type="button"
-          data-clear-filters
-          class="label-caps text-primary underline underline-offset-4 transition-colors hover:text-primary/80"
-        >
-          Clear all filters
-        </button>
-      </div>
-    </>
-  )}
-</div>
+)}

@@ -37,7 +37,6 @@ export const sponsor = defineType({
       type: 'image',
       group: 'main',
       options: {hotspot: true},
-      description: 'Primary logo — used as fallback when square or horizontal variants are not provided.',
       validation: (Rule) => Rule.required(),
       fields: [
         defineField({
@@ -45,36 +44,6 @@ export const sponsor = defineType({
           title: 'Alt Text',
           type: 'string',
           validation: (Rule) => Rule.required(),
-        }),
-      ],
-    }),
-    defineField({
-      name: 'logoSquare',
-      title: 'Logo (Square)',
-      type: 'image',
-      group: 'main',
-      options: {hotspot: true},
-      description: 'Optional square icon version for small contexts like listing cards. Falls back to primary logo if empty.',
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
-        }),
-      ],
-    }),
-    defineField({
-      name: 'logoHorizontal',
-      title: 'Logo (Horizontal)',
-      type: 'image',
-      group: 'main',
-      options: {hotspot: true},
-      description: 'Optional wide/horizontal version for detail pages and large displays. Falls back to primary logo if empty.',
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alt Text',
-          type: 'string',
         }),
       ],
     }),

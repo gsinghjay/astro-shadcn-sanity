@@ -78,42 +78,8 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone project
     const emptyWrap = document.querySelector<HTMLElement>('[data-empty-state-wrap]');
     const clearFilterBtns = document.querySelectorAll<HTMLElement>('[data-clear-filters]');
     const clearFiltersWrap = container.querySelector<HTMLElement>('[data-clear-filters-wrap]');
-    const sortSelect = container.querySelector<HTMLSelectElement>('[data-project-sort]');
     let activeTech = 'all';
     let activeIndustry = 'all';
-    let activeSort = 'newest';
-
-    function applySorting() {
-      const parent = cards[0]?.parentElement;
-      if (!parent) return;
-
-      const visible: HTMLElement[] = [];
-      const hidden: HTMLElement[] = [];
-      cards.forEach((el) => {
-        if (el.dataset.state === 'hidden') {
-          hidden.push(el);
-        } else {
-          visible.push(el);
-        }
-      });
-
-      visible.sort((a, b) => {
-        switch (activeSort) {
-          case 'newest':
-            return (b.dataset.sortDate ?? '').localeCompare(a.dataset.sortDate ?? '');
-          case 'oldest':
-            return (a.dataset.sortDate ?? '').localeCompare(b.dataset.sortDate ?? '');
-          case 'title-asc':
-            return (a.dataset.sortTitle ?? '').localeCompare(b.dataset.sortTitle ?? '');
-          case 'title-desc':
-            return (b.dataset.sortTitle ?? '').localeCompare(a.dataset.sortTitle ?? '');
-          default:
-            return 0;
-        }
-      });
-
-      visible.forEach((el) => parent.appendChild(el));
-    }
 
     function applyFilters() {
       let visibleCount = 0;
@@ -139,8 +105,6 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone project
       if (clearFiltersWrap) {
         clearFiltersWrap.classList.toggle('hidden', !hasActiveFilters);
       }
-
-      applySorting();
     }
 
     function resetFilters() {
@@ -160,14 +124,6 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone project
       });
 
       applyFilters();
-    }
-
-    // Sort dropdown change event
-    if (sortSelect) {
-      sortSelect.addEventListener('change', () => {
-        activeSort = sortSelect.value;
-        applySorting();
-      });
     }
 
     container.querySelectorAll<HTMLElement>('[data-filter-tech]').forEach(btn => {
@@ -196,9 +152,6 @@ const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone project
     clearFilterBtns.forEach(btn => {
       btn.addEventListener('click', resetFilters);
     });
-
-    // Apply default "Newest First" sort on page load
-    applyFilters();
   }
 
   initProjectFilter();

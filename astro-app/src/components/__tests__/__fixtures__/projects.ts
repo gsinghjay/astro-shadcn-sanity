@@ -2,7 +2,6 @@ import type { Project } from '@/lib/sanity';
 
 export const projectFull: Project = {
   _id: 'project-1',
-  _createdAt: '2025-10-15T12:00:00Z',
   title: 'Smart Campus Navigation',
   slug: 'smart-campus-navigation',
   content: [
@@ -42,7 +41,6 @@ export const projectFull: Project = {
 
 export const projectHiddenSponsor: Project = {
   _id: 'project-3',
-  _createdAt: '2025-11-01T10:00:00Z',
   title: 'Hidden Sponsor Project',
   slug: 'hidden-sponsor-project',
   content: null,
@@ -63,7 +61,6 @@ export const projectHiddenSponsor: Project = {
 
 export const projectMinimal: Project = {
   _id: 'project-2',
-  _createdAt: '2025-09-01T08:00:00Z',
   title: 'Minimal Project',
   slug: 'minimal-project',
   content: null,

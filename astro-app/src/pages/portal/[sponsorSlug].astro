@@ -41,9 +41,8 @@ let logoUrl: string | null = null;
 let logoLqip: string | undefined;
 let tierLabel: string | null = null;
 if (isAuthorized && sponsor) {
-  // Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
-  const logoBuilder = sponsor.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: sponsor.logo.alt }) : null;
-  logoUrl = logoBuilder?.width(120).fit('max').url() ?? null;
+  const logoBuilder = sponsor.logo ? safeUrlFor(sponsor.logo) : null;
+  logoUrl = logoBuilder?.width(120).height(120).url() ?? null;
   logoLqip = sponsor.logo?.asset?.metadata?.lqip ?? undefined;
   tierLabel = sponsor.tier
     ? sponsor.tier.charAt(0).toUpperCase() + sponsor.tier.slice(1)

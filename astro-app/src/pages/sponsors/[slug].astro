@@ -30,11 +30,7 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
 
-// Prefer horizontal variant for detail pages, fall back to primary logo
-const detailLogo = sponsor.logoHorizontal?.asset ? sponsor.logoHorizontal : sponsor.logo;
-// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
-const logoUrl = detailLogo ? safeUrlFor({ asset: detailLogo.asset, alt: detailLogo.alt })?.width(200).fit('max').url() ?? null : null;
-const logoAlt = detailLogo?.alt || `${sponsor.name} logo`;
+const logoUrl = safeUrlFor(sponsor.logo)?.width(200).height(200).url() ?? null;
 const projects = sponsor.projects ?? [];
 
 const sponsorJsonLd = {
@@ -63,8 +59,8 @@ const sponsorJsonLd = {
           <div class="w-[200px] h-[200px] bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
             <img
               src={logoUrl}
-              alt={logoAlt}
-              class="w-full h-full object-contain p-2"
+              alt={sponsor.logo?.alt || `${sponsor.name} logo`}
+              class="w-full h-full object-cover"
               width="200"
               height="200"
               loading="eager"

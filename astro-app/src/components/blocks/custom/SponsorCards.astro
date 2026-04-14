@@ -55,7 +55,7 @@ const tierBarColors: Record<string, string> = {
     <SectionContent>
       <div class="space-y-6">
         {(sponsors ?? []).map((sponsor) => {
-          const logoUrl = safeUrlFor({ asset: sponsor.logo?.asset, alt: sponsor.logo?.alt })?.width(160).fit('max').url() ?? null;
+          const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(80).fit('max').url() ?? null;
           return (
             <div class="flex flex-col md:flex-row gap-6 border-2 border-border p-6 items-center">
               <div class="flex-shrink-0 w-40 h-20 flex items-center justify-center bg-muted">
