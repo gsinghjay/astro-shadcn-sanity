@@ -83,7 +83,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
     <!-- Programs Section -->
     <div class="lg:col-span-2">
       <FooterGroup>
-        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Programs</FooterGroupLabel>
+        <FooterGroupLabel class="text-background/60 uppercase text-xs tracking-widest font-bold mb-4">Programs</FooterGroupLabel>
         <FooterMenu>
           {(programLinks || []).map((item) => (
             <FooterMenuItem>
@@ -97,7 +97,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
     <!-- Resources Section -->
     <div class="lg:col-span-2">
       <FooterGroup>
-        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Resources</FooterGroupLabel>
+        <FooterGroupLabel class="text-background/60 uppercase text-xs tracking-widest font-bold mb-4">Resources</FooterGroupLabel>
         <FooterMenu>
           {(resourceLinks || []).map((item) => (
             <FooterMenuItem>
@@ -117,7 +117,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
     <!-- Contact Information -->
     <div class="lg:col-span-2">
       <FooterGroup>
-        <FooterGroupLabel class="text-background/40 uppercase text-xs tracking-widest font-bold mb-4">Contact</FooterGroupLabel>
+        <FooterGroupLabel class="text-background/60 uppercase text-xs tracking-widest font-bold mb-4">Contact</FooterGroupLabel>
         <FooterMenu>
           {addressLine1 && (
             <FooterMenuItem>
@@ -146,14 +146,14 @@ const addressLine2 = addressLines.slice(2).join(', ');
 
   <!-- Bottom Bar -->
   <FooterSpread class="border-t border-background/10 pt-8 mt-12">
-    <FooterCopyright class="text-background/40 text-sm">&copy; {footerContent?.copyrightText || `${new Date().getFullYear()} All rights reserved.`}</FooterCopyright>
+    <FooterCopyright class="text-background/60 text-sm">&copy; {footerContent?.copyrightText || `${new Date().getFullYear()} All rights reserved.`}</FooterCopyright>
     <FooterMenu orientation="horizontal" class="flex-wrap justify-center md:justify-end">
       {(footerLinks || []).map((item) => (
         <FooterMenuItem>
           <FooterMenuLink
             href={item.href}
             {...((item.href || '').startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
-            class="text-background/40 hover:text-background text-xs transition-colors"
+            class="text-background/60 hover:text-background text-xs transition-colors"
             data-gtm-category="footer"
             data-gtm-label={stegaClean(item.label)}
           >{item.label}</FooterMenuLink>
@@ -164,7 +164,7 @@ const addressLine2 = addressLines.slice(2).join(', ');
           <button
             type="button"
             data-cookie-settings-trigger
-            class="text-background/40 hover:text-background text-xs transition-colors cursor-pointer"
+            class="text-background/60 hover:text-background text-xs transition-colors cursor-pointer"
             data-gtm-category="footer"
             data-gtm-label="cookie-settings"
           >Cookie Settings</button>

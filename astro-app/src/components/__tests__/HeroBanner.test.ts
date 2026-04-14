@@ -305,7 +305,7 @@ describe('HeroBanner', () => {
       expect(html).toContain('srcset="');
       expect(html).toContain('640w');
       expect(html).toContain('1024w');
-      expect(html).toContain('1440w');
+      expect(html).toContain('1280w');
       expect(html).toContain('1920w');
       expect(html).toContain('sizes="100vw"');
     });

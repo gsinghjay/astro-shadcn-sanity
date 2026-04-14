@@ -71,14 +71,13 @@ const isActive = (href: string) =>
       {/* Search trigger — typographic, no input */}
       <button
         type="button"
-        class="hidden lg:inline-flex items-center gap-3 bg-transparent text-foreground/60 transition-colors hover:text-foreground cursor-pointer"
-        aria-label="Search site"
+        class="hidden lg:inline-flex items-center gap-3 bg-transparent text-foreground/70 transition-colors hover:text-foreground cursor-pointer"
         data-gtm-category="navigation"
         data-gtm-label="search"
       >
         <Icon name="search" class="h-4 w-4" />
         <span class="label-caps text-[10px]">Search</span>
-        <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/40 leading-none">⌘K</kbd>
+        <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/70 leading-none" aria-hidden="true">⌘K</kbd>
       </button>
 
       {/* CTA button — Swiss structural accent */}

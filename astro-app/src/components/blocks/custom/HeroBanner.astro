@@ -43,7 +43,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
-          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1280, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -123,7 +123,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
-          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1280, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -359,7 +359,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
       <div class="absolute inset-0">
         <img
           src={urlFor(firstImage).width(1920).height(1080).fit('crop').url()}
-          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1440, 1920])}
+          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1280, 1920])}
           sizes="100vw"
           alt={firstImage.alt || ''}
           width={1920}
