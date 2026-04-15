@@ -20,6 +20,13 @@ const bgVariant = stegaClean(backgroundVariant) ?? 'white';
 const sectionBg = bgClasses[bgVariant] ?? '';
 // Dark bg text handled globally by BlockWrapper [data-bg-theme="dark"] CSS override
 
+const firstImage = backgroundImages?.[0];
+const hasImage = !!firstImage?.asset;
+const isPatternedBg = ['hatched', 'blueprint'].includes(bgVariant);
+const invertHoverClass = 'bg-transparent border-background text-background hover:bg-background hover:text-foreground';
+const overlayHoverClass = 'bg-transparent border-background text-background hover:bg-background/10 hover:text-background';
+const outlineHoverClass = (hasImage || isPatternedBg) ? overlayHoverClass : invertHoverClass;
+
 const primaryBtnMap: Record<string, string> = {
   primary: 'bg-background text-primary hover:bg-background/90',
   dark: '',
@@ -30,25 +37,23 @@ const primaryBtnMap: Record<string, string> = {
   white: '',
   'hatched-light': '',
   stripe: '',
-  brutalist: 'border-2 border-background bg-transparent text-background hover:bg-background hover:text-foreground',
+  brutalist: `border-2 ${outlineHoverClass}`,
   'data-cta': '',
 };
 
 const secondaryBtnMap: Record<string, string> = {
   primary: 'bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
-  dark: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
-  hatched: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
-  blueprint: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
-  mono: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  dark: outlineHoverClass,
+  hatched: outlineHoverClass,
+  blueprint: outlineHoverClass,
+  mono: outlineHoverClass,
   light: '',
   white: '',
   'hatched-light': '',
   stripe: '',
-  brutalist: 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
-  'data-cta': 'bg-transparent border-background text-background hover:bg-background hover:text-foreground',
+  brutalist: outlineHoverClass,
+  'data-cta': outlineHoverClass,
 };
-
-const firstImage = backgroundImages?.[0];
 ---
 
 {/* CENTERED variant — identical to pre-variant output (AC #4) */}
@@ -231,7 +236,7 @@ const firstImage = backgroundImages?.[0];
             <Button
               href={btn.url}
               variant={i === 0 ? 'outline' : (btn.variant || 'outline')}
-              class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['brutalist'] : secondaryBtnMap[bgVariant] || secondaryBtnMap['brutalist']}
+              class={i === 0 ? primaryBtnMap[bgVariant] || primaryBtnMap['brutalist'] : outlineHoverClass}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}

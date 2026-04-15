@@ -17,7 +17,7 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
-  lighthouse:
+  site-health:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,9 +38,15 @@ jobs:
           PUBLIC_SANITY_STUDIO_URL: ${{ vars.PUBLIC_SANITY_STUDIO_URL }}
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
           PUBLIC_SANITY_VISUAL_EDITING_ENABLED: ${{ vars.PUBLIC_SANITY_VISUAL_EDITING_ENABLED }}
-      - name: Run Lighthouse CI
+      - name: Serve built site
+        run: npx --yes http-server astro-app/dist -p 4321 --silent &
+      - name: Wait for server
+        run: npx --yes wait-on http://localhost:4321
+      - name: Run Lighthouse CI (/demo/ pages)
         run: npx lhci autorun
         continue-on-error: true
         env:
-          # Optional: install GitHub App for PR status checks (see tech-spec Task 4)
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+      - name: Run Pa11y CI (/demo/ pages)
+        run: npx --yes pa11y-ci --config .pa11yci.cjs
+        continue-on-error: true
