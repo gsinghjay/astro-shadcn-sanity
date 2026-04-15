@@ -1,3 +1,35 @@
+## [1.18.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.17.0...v1.18.0) (2026-04-15)
+
+### Features
+
+* **env:** adopt astro:env schema validation for typed env vars ([add79ab](https://github.com/gsinghjay/astro-shadcn-sanity/commit/add79ab95788d8a8749513306fc9aa882473b72e))
+* **fonts:** adopt Astro Fonts API with self-hosted Inter via Fontsource ([34ae16a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/34ae16af39190f15d3760ed5846dbb17a8a043f2))
+* **projects:** add sorting controls to /projects listing page ([6262947](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6262947a80f1015c5f4878858d11c0c4cdd2e552))
+* **schema:** add optional logoSquare and logoHorizontal fields to sponsor ([2783f50](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2783f506f8078c5b14ea6d16f6f22c101e13c81f))
+
+### Bug Fixes
+
+* **blocks:** contact-form image bleed, feature-grid columns/description, icon picker ([f0de7bf](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f0de7bf1a172f66ea412ad80b5c7f5cc159aa0fc))
+* **blocks:** hero glass card, pullquote avatar, service-cards alternation, testimonials split + carousel ([49b5f00](https://github.com/gsinghjay/astro-shadcn-sanity/commit/49b5f005d122bed579aab9b6f7e682f0255f1a5d))
+* **blocks:** restore readable contrast on dark-bg wrappers across custom blocks ([38b8610](https://github.com/gsinghjay/astro-shadcn-sanity/commit/38b8610ffa01e920212f2ee258444ab9dc4ccc45)), closes [#6b6b6b](https://github.com/gsinghjay/astro-shadcn-sanity/issues/6b6b6b) [#525252](https://github.com/gsinghjay/astro-shadcn-sanity/issues/525252) [#e5e5e5](https://github.com/gsinghjay/astro-shadcn-sanity/issues/e5e5e5) [#d4d4d4](https://github.com/gsinghjay/astro-shadcn-sanity/issues/d4d4d4)
+* **fonts:** code review patches — CSS fallback, italic style, Font injection, disable dark mode ([6bfb656](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6bfb65672537fa9dc26a2530509ea57c74855bed))
+* **hero:** make centered-variant card semi-transparent so hero image shows through ([c442934](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c4429343f94cbacbc02c8683f9f8a28ed9eb14bf))
+* resolve Lighthouse accessibility issues and optimize hero image srcset ([723703e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/723703e7575fa6fc46564acec1868a986e674295))
+* **tests:** align sponsor schema + logo URL assertions with PR [#641](https://github.com/gsinghjay/astro-shadcn-sanity/issues/641) changes ([027b7d9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/027b7d99bc4e751110a430b7cd8a77ca32ba1a0b))
+* **ui:** apply sponsor logo crop fix across all components ([40b0542](https://github.com/gsinghjay/astro-shadcn-sanity/commit/40b05426776a964cb9b847f92608246868551468))
+* **ui:** make mobile nav parents clickable and fix sponsor logo cropping ([bca74af](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bca74af73d3c739e9fdab73f7365cc876cc79a55))
+* **ui:** unify outline button hover behavior on dark hero/CTA banners ([5613cbc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5613cbc4f497b8363b370dfa911f660c4cc1b0c7)), closes [#222](https://github.com/gsinghjay/astro-shadcn-sanity/issues/222)
+
+### Miscellaneous
+
+* **ci:** audit every built page in Lighthouse CI, assert perf + LCP thresholds ([8e774cd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8e774cda5cbae5e3d3c3c50b5e22690588f5a82f))
+* **ci:** replace Lighthouse CI job with Lighthouse CI + Pa11y CI over /demo/ pages ([ef22de0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ef22de0c7832ebda333be42bc7aa0b3f0c6824b1))
+* **seo:** exclude /demo/ routes from sitemap and robots.txt ([4361f1a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/4361f1a25c43e81197173b96ce856fca223f66ea)), closes [#12](https://github.com/gsinghjay/astro-shadcn-sanity/issues/12) [#13](https://github.com/gsinghjay/astro-shadcn-sanity/issues/13)
+
+### Tests
+
+* **schema:** update featureGrid field-count assertion to include description ([79c3e75](https://github.com/gsinghjay/astro-shadcn-sanity/commit/79c3e750d6b884865d0ba9fec563979e1c9798fe))
+
 ## [1.17.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.16.0...v1.17.0) (2026-04-13)
 
 ### Features
