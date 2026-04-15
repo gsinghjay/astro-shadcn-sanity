@@ -22,6 +22,12 @@ const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
 const isDarkHero = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
 const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
 
+const hasImage = !!firstImage?.asset;
+const isPatternedBg = ['hatched', 'blueprint'].includes(bgVariant);
+const invertHoverClass = 'bg-transparent border-background text-background hover:bg-background hover:text-foreground';
+const overlayHoverClass = 'bg-transparent border-background text-background hover:bg-background/10 hover:text-background';
+const outlineHoverClass = (hasImage || isPatternedBg) ? overlayHoverClass : invertHoverClass;
+
 function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
   return widths
     .map(w => {
@@ -97,7 +103,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -177,7 +183,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -213,7 +219,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
@@ -266,7 +272,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
@@ -319,7 +325,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 size="lg"
                 data-gtm-category="cta"
                 data-gtm-action="click"
@@ -393,7 +399,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -429,7 +435,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? (isDarkHero ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : '') : ''}
+                class={i > 0 ? (isDarkHero ? outlineHoverClass : '') : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
