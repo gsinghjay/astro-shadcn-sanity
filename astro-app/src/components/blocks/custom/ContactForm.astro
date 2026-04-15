@@ -181,7 +181,7 @@ const firstImageUrl = safeUrlFor(firstImage)?.width(800).height(1000).url() ?? n
       </SectionContent>
 
       {firstImageUrl && (
-        <SectionMedia class="-mr-(--section-px) p-1 @5xl:z-90 @5xl:-mt-[calc(var(--section-py)+var(--header-height,0px))]">
+        <SectionMedia class="-mr-(--section-px) p-1 @5xl:-my-(--section-py)">
           <img
             src={firstImageUrl}
             alt={firstImage?.alt ?? ''}
