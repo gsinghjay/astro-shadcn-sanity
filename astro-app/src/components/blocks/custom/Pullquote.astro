@@ -39,7 +39,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
               </Avatar>
             )}
             <div class="text-muted-foreground">
-              <cite class="not-italic font-medium text-foreground">{attribution}</cite>
+              <cite class="not-italic font-medium text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
               {role && <span class="block text-sm">{role}</span>}
             </div>
           </footer>
@@ -72,7 +72,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
                 </Avatar>
               )}
               <footer class="text-muted-foreground">
-                <cite class="not-italic font-medium text-foreground text-lg">{attribution}</cite>
+                <cite class="not-italic font-medium text-lg text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
                 {role && <span class="block text-sm">{role}</span>}
               </footer>
             </>
@@ -92,7 +92,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
         </p>
         {attribution && (
           <footer class="text-muted-foreground mt-4">
-            <cite class="not-italic font-medium text-foreground">{attribution}</cite>
+            <cite class="not-italic font-medium text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
             {role && <span class="block text-sm">{role}</span>}
           </footer>
         )}
@@ -110,7 +110,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
         </p>
         {attribution && (
           <footer class="mt-8 font-mono">
-            <cite class="not-italic font-bold text-foreground">{attribution}</cite>
+            <cite class="not-italic font-bold text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
             {role && <span class="block text-sm text-muted-foreground mt-1">{role}</span>}
           </footer>
         )}

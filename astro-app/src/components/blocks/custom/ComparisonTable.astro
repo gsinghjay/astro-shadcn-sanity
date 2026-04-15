@@ -22,7 +22,7 @@ const colCountClass: Record<number, string> = { 1: '@5xl:grid-cols-1', 2: '@5xl:
 let specDataIdx = 0;
 const specStripeClasses = dataRows.map(row => {
   if (row.isHeader) return '';
-  const cls = specDataIdx % 2 !== 0 ? 'bg-hatched-light' : '';
+  const cls = specDataIdx % 2 !== 0 ? 'bg-hatched-light [[data-bg-theme=dark]_&]:bg-hatched' : '';
   specDataIdx++;
   return cls;
 });
