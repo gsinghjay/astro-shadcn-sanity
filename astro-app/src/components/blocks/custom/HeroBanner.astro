@@ -20,7 +20,7 @@ const firstImage = backgroundImages?.[0];
 const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
 const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
 const isDarkHero = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
-const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
+const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground/50';
 
 const hasImage = !!firstImage?.asset;
 const isPatternedBg = ['hatched', 'blueprint'].includes(bgVariant);
