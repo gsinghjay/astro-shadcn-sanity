@@ -126,9 +126,10 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       const fieldNames = getBlockFields(featureGrid).map((f: any) => f.name)
       expect(fieldNames).toContain('variant')
       expect(fieldNames).toContain('heading')
+      expect(fieldNames).toContain('description')
       expect(fieldNames).toContain('items')
       expect(fieldNames).toContain('columns')
-      expect(fieldNames).toHaveLength(4)
+      expect(fieldNames).toHaveLength(5)
     })
 
     test('[P1] 2.1-INT-009 — featureGrid items is array of featureItem with icon, image, title, description', () => {

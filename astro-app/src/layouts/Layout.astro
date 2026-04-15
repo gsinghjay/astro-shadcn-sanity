@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import CookieConsent from "../components/CookieConsent.astro";
@@ -9,6 +10,7 @@ import SanityLiveUpdater from "../components/SanityLiveUpdater.astro";
 import { getSiteSettings, getSyncTags } from "../lib/sanity";
 import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
 import type { SeoProps } from "@/lib/types";
 
 interface Props {
@@ -39,11 +41,8 @@ const cleanDescription = stegaClean(
   seo?.metaDescription ?? defaultDescription
 );
 
-const visualEditingEnabled =
-  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
-
-// Fallback to process.env for Cloudflare Pages git integration builds (no .env file)
-const gtmId = import.meta.env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID;
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const gtmId = PUBLIC_GTM_ID;
 
 const fullTitle = cleanSeoTitle
   ? cleanSeoTitle
@@ -56,10 +55,8 @@ const ogImageUrl = seo?.ogImage?.asset
   ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
   : null;
 
-const siteTheme = import.meta.env.PUBLIC_SITE_THEME || 'red';
-
-const liveContentEnabled =
-  import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED === "true";
+const siteTheme = PUBLIC_SITE_THEME;
+const liveContentEnabled = PUBLIC_SANITY_LIVE_CONTENT_ENABLED;
 
 const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
 
@@ -96,6 +93,7 @@ const orgJsonLd = {
 <!doctype html>
 <html lang="en" data-site-theme={siteTheme}>
   <head>
+    <Font cssVariable="--font-inter" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />

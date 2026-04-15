@@ -10,8 +10,17 @@ export default getViteConfig({
         import.meta.dirname,
         "./src/lib/__tests__/__mocks__/sanity-client.ts",
       ),
+      "astro:env/client": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-client.ts",
+      ),
+      "astro:env/server": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-server.ts",
+      ),
     },
   },
+  /* @ts-expect-error — getViteConfig types don't include test but Vitest reads it */
   test: {
     globals: true,
     include: [

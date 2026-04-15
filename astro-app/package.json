@@ -38,7 +38,7 @@
     "@schedule-x/theme-default": "^4.2.0",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
-    "astro": "^5.17.1",
+    "astro": "^5.18.1",
     "astro-portabletext": "^0.10.0",
     "better-auth": "^1.5.0",
     "class-variance-authority": "^0.7.1",

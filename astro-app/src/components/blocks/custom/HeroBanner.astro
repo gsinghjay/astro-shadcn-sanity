@@ -20,7 +20,13 @@ const firstImage = backgroundImages?.[0];
 const bgVariant = stegaClean(backgroundVariant) ?? 'dark';
 const heroBg = bgClasses[bgVariant] ?? 'bg-foreground text-background';
 const isDarkHero = ['dark', 'hatched', 'primary', 'blueprint', 'mono'].includes(bgVariant);
-const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground';
+const cardBg = bgVariant === 'hatched' ? 'bg-hatched' : 'bg-foreground/50';
+
+const hasImage = !!firstImage?.asset;
+const isPatternedBg = ['hatched', 'blueprint'].includes(bgVariant);
+const invertHoverClass = 'bg-transparent border-background text-background hover:bg-background hover:text-foreground';
+const overlayHoverClass = 'bg-transparent border-background text-background hover:bg-background/10 hover:text-background';
+const outlineHoverClass = (hasImage || isPatternedBg) ? overlayHoverClass : invertHoverClass;
 
 function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, baseHeight: number, widths: number[]) {
   return widths
@@ -43,7 +49,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
-          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1280, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -80,7 +86,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
       </div>
     )}
 
-    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} ${cardBg} p-8 md:p-12`}>
+    <SectionContent class={`relative z-10 ${isCentered ? 'items-center text-center' : ''} ${cardBg} text-background p-8 md:p-12`}>
       <h1 class="text-5xl md:text-6xl font-bold leading-[0.95] tracking-[-0.04em]">
         {heading}
       </h1>
@@ -97,7 +103,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -123,7 +129,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             ? urlFor(image).width(1920).height(1080).fit('crop').url()
             : '';
           const isFirst = index === 0;
-          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1440, 1920]) : undefined;
+          const srcset = image.asset ? buildSrcset(image, 1920, 1080, [640, 1024, 1280, 1920]) : undefined;
           return (
             <div
               class="hero-carousel-slide absolute inset-0 transition-opacity duration-1000"
@@ -177,7 +183,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -213,7 +219,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
@@ -266,7 +272,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}
@@ -319,7 +325,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+                class={i > 0 ? outlineHoverClass : ''}
                 size="lg"
                 data-gtm-category="cta"
                 data-gtm-action="click"
@@ -359,7 +365,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
       <div class="absolute inset-0">
         <img
           src={urlFor(firstImage).width(1920).height(1080).fit('crop').url()}
-          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1440, 1920])}
+          srcset={buildSrcset(firstImage, 1920, 1080, [640, 1024, 1280, 1920])}
           sizes="100vw"
           alt={firstImage.alt || ''}
           width={1920}
@@ -393,7 +399,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
             <Button
               href={btn.url}
               variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-              class={i > 0 ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : ''}
+              class={i > 0 ? outlineHoverClass : ''}
               data-gtm-category="cta"
               data-gtm-action="click"
               data-gtm-label={stegaClean(btn.text)}
@@ -429,7 +435,7 @@ function buildSrcset(image: NonNullable<typeof firstImage>, baseWidth: number, b
               <Button
                 href={btn.url}
                 variant={i === 0 ? 'default' : (btn.variant || 'outline')}
-                class={i > 0 ? (isDarkHero ? 'bg-transparent border-background text-background hover:bg-background hover:text-foreground' : '') : ''}
+                class={i > 0 ? (isDarkHero ? outlineHoverClass : '') : ''}
                 data-gtm-category="cta"
                 data-gtm-action="click"
                 data-gtm-label={stegaClean(btn.text)}

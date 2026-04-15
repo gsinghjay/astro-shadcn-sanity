@@ -4,8 +4,9 @@ import BlockRenderer from '../components/BlockRenderer.astro';
 import SanityPageContent from '../components/SanityPageContent.astro';
 import { getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents } from '../lib/sanity';
 import { urlFor } from '../lib/image';
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
 
-const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
 
 // In static mode: fetch page data and render inline
 // In VE mode: skip fetch — server island handles its own data fetching

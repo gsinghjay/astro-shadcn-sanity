@@ -2,6 +2,8 @@ import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
 import { stegaClean } from "@sanity/client/stega";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_SANITY_DATASET, PUBLIC_SITE_ID } from "astro:env/client";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -60,6 +62,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     },
     _type == "featureGrid" => {
       heading,
+      description,
       items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
       columns
     },
@@ -264,17 +267,15 @@ const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
       verticalAlign
     }`;
 
-const visualEditingEnabled =
-  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
-const token = import.meta.env.SANITY_API_READ_TOKEN;
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const token = SANITY_API_READ_TOKEN;
 
 /**
- * Multi-site context constants — resolved at build time via Vite's
- * static replacement of `import.meta.env` values.
+ * Multi-site context constants — resolved at build time via astro:env schema.
  * Each CF Pages build is isolated (one site = one set of env vars).
  */
-const DATASET = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
-const SITE_ID = import.meta.env.PUBLIC_SITE_ID || 'capstone';
+const DATASET = PUBLIC_SANITY_DATASET;
+const SITE_ID = PUBLIC_SITE_ID;
 const isMultiSite = DATASET === 'rwc';
 
 /**
@@ -448,6 +449,8 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
 export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  logoSquare{ ${IMAGE_PROJECTION}, alt },
+  logoHorizontal{ ${IMAGE_PROJECTION}, alt },
   tier, description, website, featured
 }`);
 
@@ -481,6 +484,8 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  logoSquare{ ${IMAGE_PROJECTION}, alt },
+  logoHorizontal{ ${IMAGE_PROJECTION}, alt },
   tier, description, website, featured, industry,
   seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
@@ -544,7 +549,7 @@ export function resolveBlockProjects(
  * GROQ query: fetch all projects with resolved sponsor references.
  */
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
-  _id, title, "slug": slug.current,
+  _id, _createdAt, title, "slug": slug.current,
   content,
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry, hidden },
   technologyTags,

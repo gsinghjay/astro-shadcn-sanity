@@ -12,7 +12,7 @@ interface Props extends FeatureGridBlock {
   id?: string;
 }
 
-const { heading, columns, items, variant, backgroundVariant } = Astro.props;
+const { heading, description, columns, items, variant, backgroundVariant } = Astro.props;
 
 // Clean variant value and default to 'grid'
 const cleanVariant = stegaClean(variant ?? 'grid');
@@ -38,6 +38,9 @@ const gridClass =
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </SectionContent>
     )}
 
@@ -69,6 +72,9 @@ const gridClass =
     {heading && (
       <SectionContent class="max-w-3xl mx-auto items-center text-center">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </SectionContent>
     )}
 
@@ -100,10 +106,13 @@ const gridClass =
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </SectionContent>
     )}
 
-    <SectionGrid>
+    <SectionGrid size={gridSize}>
       {(items ?? []).map((feature, i) => (
         <Tile variant="floating">
           <TileSplit>
@@ -142,6 +151,9 @@ const gridClass =
           {heading && (
             <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
           )}
+          {description && (
+            <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+          )}
         </SectionProse>
       </SectionContent>
 
@@ -170,6 +182,9 @@ const gridClass =
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </SectionContent>
     )}
 
@@ -193,6 +208,9 @@ const gridClass =
     {heading && (
       <SectionContent class="max-w-3xl">
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+        {description && (
+          <p class="text-lg leading-relaxed text-muted-foreground">{description}</p>
+        )}
       </SectionContent>
     )}
 

@@ -12,10 +12,13 @@
  * is injected server-side via define:vars — never imported in client JS bundles.
  * The token MUST have viewer (read-only) permissions only.
  */
-const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
+
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
 
 // Only pass token to client when visual editing is enabled (non-production)
-const liveToken = visualEditingEnabled ? (import.meta.env.SANITY_API_READ_TOKEN ?? '') : '';
+const liveToken = visualEditingEnabled ? (SANITY_API_READ_TOKEN ?? '') : '';
 ---
 
 {/* Server-side token injection — only when visual editing is active */}
@@ -28,11 +31,12 @@ const liveToken = visualEditingEnabled ? (import.meta.env.SANITY_API_READ_TOKEN 
 {/* Bundled client module — processed by Vite, can import from project modules */}
 <script>
   import { createLiveClient, startLiveSubscription } from '@/lib/sanity-live';
+  import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
 
   const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
   const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET || 'production';
   const apiVersion = '2025-03-01';
-  const visualEditing = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+  const visualEditing = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
 
   if (projectId) {
     const token = visualEditing ? window.__SANITY_LIVE_TOKEN__ : undefined;

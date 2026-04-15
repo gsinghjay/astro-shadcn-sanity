@@ -29,19 +29,12 @@ const urls = walkIndexHtml(DIST)
   .map((p) => `${BASE_URL}/${p.replace(/index\.html$/, '')}`);
 
 module.exports = {
-  ci: {
-    collect: {
-      url: urls.length > 0 ? urls : [`${BASE_URL}/demo/`],
-      numberOfRuns: 1,
-    },
-    assert: {
-      assertions: {
-        'categories:performance': ['warn', { minScore: 0.89 }],
-        'largest-contentful-paint': ['warn', { maxNumericValue: 2000 }],
-      },
-    },
-    upload: {
-      target: 'temporary-public-storage',
+  defaults: {
+    standard: 'WCAG2AA',
+    timeout: 60000,
+    chromeLaunchConfig: {
+      args: ['--no-sandbox', '--disable-dev-shm-usage'],
     },
   },
+  urls: urls.length > 0 ? urls : [`${BASE_URL}/demo/`],
 };

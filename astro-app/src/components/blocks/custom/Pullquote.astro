@@ -1,7 +1,7 @@
 ---
 import type { PullquoteBlock } from '@/lib/types';
 import { Section, SectionContent, SectionSplit } from '@/components/ui/section';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor, lqipStyle } from '@/lib/image';
 
@@ -30,16 +30,21 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
           <footer class="flex items-center gap-3 mt-6 text-base font-normal tracking-normal leading-normal">
             {imgSrc && (
               <Avatar>
-                <AvatarImage
+                <img
                   src={imgSrc}
                   alt={stegaClean(image?.alt) || stegaClean(attribution) || 'Quote author'}
+                  width={44}
+                  height={44}
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-square size-full object-cover"
                   style={lqipStyle(lqip)}
                 />
                 <AvatarFallback>{initials}</AvatarFallback>
               </Avatar>
             )}
             <div class="text-muted-foreground">
-              <cite class="not-italic font-medium text-foreground">{attribution}</cite>
+              <cite class="not-italic font-medium text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
               {role && <span class="block text-sm">{role}</span>}
             </div>
           </footer>
@@ -63,16 +68,21 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
             <>
               {imgSrc && (
                 <Avatar class="w-16 h-16">
-                  <AvatarImage
+                  <img
                     src={imgSrc}
                     alt={stegaClean(image?.alt) || stegaClean(attribution) || 'Quote author'}
+                    width={64}
+                    height={64}
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-square size-full object-cover"
                     style={lqipStyle(lqip)}
                   />
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
               )}
               <footer class="text-muted-foreground">
-                <cite class="not-italic font-medium text-foreground text-lg">{attribution}</cite>
+                <cite class="not-italic font-medium text-lg text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
                 {role && <span class="block text-sm">{role}</span>}
               </footer>
             </>
@@ -92,7 +102,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
         </p>
         {attribution && (
           <footer class="text-muted-foreground mt-4">
-            <cite class="not-italic font-medium text-foreground">{attribution}</cite>
+            <cite class="not-italic font-medium text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
             {role && <span class="block text-sm">{role}</span>}
           </footer>
         )}
@@ -110,7 +120,7 @@ const initials = attribution?.split(' ').filter(Boolean).map(n => n[0]).join('')
         </p>
         {attribution && (
           <footer class="mt-8 font-mono">
-            <cite class="not-italic font-bold text-foreground">{attribution}</cite>
+            <cite class="not-italic font-bold text-foreground [[data-bg-theme=dark]_&]:text-background">{attribution}</cite>
             {role && <span class="block text-sm text-muted-foreground mt-1">{role}</span>}
           </footer>
         )}
