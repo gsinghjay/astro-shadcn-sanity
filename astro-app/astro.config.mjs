@@ -121,7 +121,8 @@ export default defineConfig({
       filter: (page) =>
         !page.includes('/portal/') &&
         !page.includes('/auth/') &&
-        !page.includes('/student/'),
+        !page.includes('/student/') &&
+        !page.includes('/demo/'),
     }),
   ],
 });

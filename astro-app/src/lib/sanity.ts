@@ -62,6 +62,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     },
     _type == "featureGrid" => {
       heading,
+      description,
       items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
       columns
     },

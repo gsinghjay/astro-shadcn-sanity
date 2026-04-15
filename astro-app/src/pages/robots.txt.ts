@@ -8,12 +8,14 @@ Allow: /
 Disallow: /portal/
 Disallow: /auth/
 Disallow: /student/
+Disallow: /demo/
 
 User-agent: Cloudflare-AI-Search
 Allow: /
 Disallow: /portal/
 Disallow: /auth/
 Disallow: /student/
+Disallow: /demo/
 
 Sitemap: ${siteUrl}/sitemap-index.xml`;
 
