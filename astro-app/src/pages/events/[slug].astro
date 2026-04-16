@@ -58,8 +58,8 @@ const formattedEndTime = endDate
 const eventJsonLd = {
   "@type": "Event",
   "name": stegaClean(event.title),
-  "startDate": event.date,
-  ...(event.endDate && { "endDate": event.endDate }),
+  "startDate": stegaClean(event.date),
+  ...(event.endDate && { "endDate": stegaClean(event.endDate) }),
   ...(event.location && {
     "location": {
       "@type": "Place",

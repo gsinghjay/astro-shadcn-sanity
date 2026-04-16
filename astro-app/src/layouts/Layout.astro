@@ -12,6 +12,8 @@ import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
 import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
 import type { SeoProps } from "@/lib/types";
+import { buildOrgJsonLd } from "@/lib/org-jsonld";
+import { buildPageGraph } from "@/lib/page-jsonld";
 
 interface Props {
   title?: string;
@@ -81,14 +83,7 @@ const cspConnectSrc = [
 const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com";
 
 const hasStructuredData = Astro.slots.has('structured-data');
-const fallbackOrgJsonLd = hasStructuredData ? null : {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  "@id": `${Astro.url.origin}/#organization`,
-  "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
-  "url": Astro.url.origin,
-  ...(cleanDescription && { "description": cleanDescription }),
-};
+const fallbackOrgJsonLd = hasStructuredData ? null : buildPageGraph(await buildOrgJsonLd(Astro.url.origin));
 ---
 
 <!doctype html>

@@ -108,8 +108,6 @@ describe('Breadcrumb', () => {
           { label: 'Sponsors', href: '/sponsors' },
           { label: 'Acme Corp' },
         ],
-        baseUrl: 'https://example.com',
-        currentPath: '/sponsors/acme',
       },
     });
 

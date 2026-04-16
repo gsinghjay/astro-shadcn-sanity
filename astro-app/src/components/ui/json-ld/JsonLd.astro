@@ -3,16 +3,13 @@ import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   schema: Record<string, unknown> | Record<string, unknown>[];
-  raw?: boolean;
 }
 
-const { schema, raw = false } = Astro.props;
+const { schema } = Astro.props;
 const cleaned = stegaClean(schema);
-const output = raw
-  ? cleaned
-  : Array.isArray(cleaned)
-    ? cleaned.map(s => ({ '@context': 'https://schema.org', ...s }))
-    : { '@context': 'https://schema.org', ...cleaned };
+const output = Array.isArray(cleaned)
+  ? cleaned.map(s => ({ '@context': 'https://schema.org', ...s }))
+  : { '@context': 'https://schema.org', ...cleaned };
 ---
 
 <script type="application/ld+json" set:html={JSON.stringify(output)} />
