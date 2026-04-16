@@ -3,6 +3,8 @@ export const prerender = false;
 
 import PortalLayout from '@/layouts/PortalLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
 import GitHubDashboard from '@/components/portal/GitHubDashboard';
 import RepoLinker from '@/components/portal/RepoLinker';
 import { getDrizzle } from '@/lib/db';
@@ -148,16 +150,19 @@ const serializedLinks = links.map(l => ({
   ...l,
   linkedAt: l.linkedAt instanceof Date ? l.linkedAt.toISOString() : String(l.linkedAt),
 }));
+
+const breadcrumbItems = [
+  { label: 'Portal', href: '/portal/' },
+  { label: 'Project Progress' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
 <PortalLayout title="Project Progress" activeNav="/portal/progress" sponsorSlug={sponsor?.slug}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <div class="flex flex-col gap-6">
-    <Breadcrumb
-      items={[
-        { label: 'Portal', href: '/portal/' },
-        { label: 'Project Progress' },
-      ]}
-    />
+    <Breadcrumb items={breadcrumbItems} />
 
     <div class="flex flex-col gap-2">
       <h1 class="text-2xl font-bold tracking-tight">Project Progress</h1>

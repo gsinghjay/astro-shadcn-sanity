@@ -6,6 +6,8 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import PortalCalendar from "@/components/portal/PortalCalendar";
 import { loadQuery, ALL_EVENTS_QUERY, SPONSOR_BY_EMAIL_QUERY, getSiteParams } from "@/lib/sanity";
 import type { ALL_EVENTS_QUERY_RESULT, SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
+import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-jsonld";
+import { buildPageGraph } from "@/lib/page-jsonld";
 
 const user = Astro.locals.user;
 
@@ -20,16 +22,19 @@ const { result: events } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({
   query: ALL_EVENTS_QUERY,
   params: getSiteParams(),
 });
+
+const breadcrumbItems = [
+  { label: "Portal", href: "/portal/" },
+  { label: "Events" },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
 <PortalLayout title="Events" activeNav="/portal/events" sponsorSlug={sponsor?.slug}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <div class="flex flex-col gap-6">
-    <Breadcrumb
-      items={[
-        { label: "Portal", href: "/portal/" },
-        { label: "Events" },
-      ]}
-    />
+    <Breadcrumb items={breadcrumbItems} />
 
     <div class="flex flex-col gap-2">
       <h1 class="text-2xl font-bold tracking-tight uppercase">Events & Schedule</h1>

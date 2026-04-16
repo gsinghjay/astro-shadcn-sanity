@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import Breadcrumb from '../Breadcrumb.astro';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 
 describe('Breadcrumb', () => {
   it('renders a nav element with aria-label "Breadcrumb"', async () => {
@@ -65,7 +66,6 @@ describe('Breadcrumb', () => {
 
     expect(html).toContain('aria-current="page"');
     expect(html).toContain('Acme Corp');
-    // Last item should NOT be a link
     expect(html).not.toContain('href="Acme Corp"');
   });
 
@@ -95,12 +95,11 @@ describe('Breadcrumb', () => {
       },
     });
 
-    // Count aria-hidden separators — should be exactly 1 (between Home and Current)
     const separatorCount = (html.match(/aria-hidden="true"/g) || []).length;
     expect(separatorCount).toBe(1);
   });
 
-  it('renders JSON-LD BreadcrumbList structured data', async () => {
+  it('does NOT emit JSON-LD in its own HTML output', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(Breadcrumb, {
       props: {
@@ -110,47 +109,115 @@ describe('Breadcrumb', () => {
           { label: 'Acme Corp' },
         ],
         baseUrl: 'https://example.com',
+        currentPath: '/sponsors/acme',
       },
     });
 
-    expect(html).toContain('application/ld+json');
-    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
-    expect(jsonLdMatch).not.toBeNull();
+    expect(html).not.toContain('application/ld+json');
+  });
+});
 
-    const jsonLd = JSON.parse(jsonLdMatch![1]);
-    expect(jsonLd['@context']).toBe('https://schema.org');
-    expect(jsonLd['@type']).toBe('BreadcrumbList');
-    expect(jsonLd.itemListElement).toHaveLength(3);
+describe('buildBreadcrumbJsonLd', () => {
+  it('returns BreadcrumbList with absolute URLs', () => {
+    const result = buildBreadcrumbJsonLd(
+      [
+        { label: 'Home', href: '/' },
+        { label: 'Sponsors', href: '/sponsors' },
+        { label: 'Acme Corp' },
+      ],
+      'https://example.com',
+      '/sponsors/acme',
+    );
 
-    expect(jsonLd.itemListElement[0].position).toBe(1);
-    expect(jsonLd.itemListElement[0].name).toBe('Home');
-    expect(jsonLd.itemListElement[0].item).toBe('https://example.com/');
-
-    expect(jsonLd.itemListElement[1].position).toBe(2);
-    expect(jsonLd.itemListElement[1].name).toBe('Sponsors');
-    expect(jsonLd.itemListElement[1].item).toBe('https://example.com/sponsors');
-
-    // Last item (current page) has no item URL per Schema.org spec
-    expect(jsonLd.itemListElement[2].position).toBe(3);
-    expect(jsonLd.itemListElement[2].name).toBe('Acme Corp');
-    expect(jsonLd.itemListElement[2].item).toBeUndefined();
+    expect(result['@type']).toBe('BreadcrumbList');
+    const items = result.itemListElement as Array<Record<string, unknown>>;
+    expect(items[0].item).toBe('https://example.com/');
+    expect(items[1].item).toBe('https://example.com/sponsors');
   });
 
-  it('renders JSON-LD with relative URLs when baseUrl is omitted', async () => {
-    const container = await AstroContainer.create();
-    const html = await container.renderToString(Breadcrumb, {
-      props: {
-        items: [
-          { label: 'Home', href: '/' },
-          { label: 'Current' },
-        ],
-      },
+  it('includes @id with #breadcrumb fragment', () => {
+    const result = buildBreadcrumbJsonLd(
+      [{ label: 'Home', href: '/' }, { label: 'Page' }],
+      'https://example.com',
+      '/some-page',
+    );
+
+    expect(result['@id']).toBe('https://example.com/some-page#breadcrumb');
+  });
+
+  it('omits @id when baseUrl is empty', () => {
+    const result = buildBreadcrumbJsonLd(
+      [{ label: 'Home', href: '/' }, { label: 'Page' }],
+      '',
+      '/some-page',
+    );
+
+    expect(result['@id']).toBeUndefined();
+  });
+
+  it('omits @id when currentPath is empty', () => {
+    const result = buildBreadcrumbJsonLd(
+      [{ label: 'Home', href: '/' }, { label: 'Page' }],
+      'https://example.com',
+      '',
+    );
+
+    expect(result['@id']).toBeUndefined();
+  });
+
+  it('uses 1-based positions', () => {
+    const result = buildBreadcrumbJsonLd(
+      [
+        { label: 'Home', href: '/' },
+        { label: 'Articles', href: '/articles' },
+        { label: 'My Article' },
+      ],
+      'https://example.com',
+      '/articles/my-article',
+    );
+
+    const items = result.itemListElement as Array<Record<string, unknown>>;
+    expect(items[0].position).toBe(1);
+    expect(items[1].position).toBe(2);
+    expect(items[2].position).toBe(3);
+  });
+
+  it('last item omits item URL per Schema.org spec', () => {
+    const result = buildBreadcrumbJsonLd(
+      [
+        { label: 'Home', href: '/' },
+        { label: 'Current Page' },
+      ],
+      'https://example.com',
+      '/current',
+    );
+
+    const items = result.itemListElement as Array<Record<string, unknown>>;
+    expect(items[1].item).toBeUndefined();
+    expect(items[1].name).toBe('Current Page');
+  });
+
+  it('does not include @context (for @graph consumption)', () => {
+    const result = buildBreadcrumbJsonLd(
+      [{ label: 'Home', href: '/' }, { label: 'Page' }],
+      'https://example.com',
+      '/page',
+    );
+
+    expect(result).not.toHaveProperty('@context');
+  });
+
+  it('stegaClean()s labels', () => {
+    const result = buildBreadcrumbJsonLd(
+      [{ label: 'Home', href: '/' }, { label: 'Page' }],
+      'https://example.com',
+      '/page',
+    );
+
+    const items = result.itemListElement as Array<Record<string, unknown>>;
+    items.forEach(item => {
+      expect(typeof item.name).toBe('string');
+      expect(item.name).not.toMatch(/[\u200B-\u200D\uFEFF]/);
     });
-
-    const jsonLdMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
-    expect(jsonLdMatch).not.toBeNull();
-
-    const jsonLd = JSON.parse(jsonLdMatch![1]);
-    expect(jsonLd.itemListElement[0].item).toBe('/');
   });
 });

@@ -17,8 +17,10 @@ import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
-import { JsonLd } from '@/components/ui/json-ld';
 import { buildArticleJsonLd } from '@/lib/article-jsonld';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -35,6 +37,15 @@ if (!article) return Astro.redirect('/404');
 // Site settings + Article JSON-LD (Story 19.6)
 const siteSettings = await getSiteSettings();
 const articleJsonLd = buildArticleJsonLd(article, siteSettings, Astro.url.href);
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Articles', href: '/articles' },
+  { label: article.title ?? 'Article' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, articleJsonLd);
 
 // Featured image — above-fold LCP candidate
 const imageBuilder = safeUrlFor(article.featuredImage);
@@ -78,16 +89,12 @@ const cleanAuthorSlug = authorSlug;
     {cleanTags.map((tag: string) => (
       <meta property="article:tag" content={tag} />
     ))}
-    <JsonLd schema={articleJsonLd} />
   </Fragment>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
 
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Articles', href: '/articles' },
-        { label: article.title ?? 'Article' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       {imageUrl && (
         <div class="aspect-video overflow-hidden">

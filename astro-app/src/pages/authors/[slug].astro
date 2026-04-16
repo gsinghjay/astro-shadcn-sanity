@@ -10,8 +10,10 @@ import { stegaClean } from '@sanity/client/stega';
 import { Icon } from '@/components/ui/icon';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
-import { JsonLd } from '@/components/ui/json-ld';
 import { buildAuthorJsonLd } from '@/lib/author-jsonld';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const authors = await sanityClient.fetch<ALL_AUTHOR_SLUGS_QUERY_RESULT>(ALL_AUTHOR_SLUGS_QUERY, getSiteParams());
@@ -46,22 +48,25 @@ const metaDescription = author.bio || author.role || undefined;
 
 // Person JSON-LD structured data (Story 20.3)
 const authorJsonLd = buildAuthorJsonLd(author, Astro.url.href);
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Authors', href: '/authors' },
+  { label: author.name ?? 'Author' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, authorJsonLd);
 ---
 
 <Layout
   title={`${author.name ?? 'Author'} | Authors`}
   seo={metaDescription ? { metaDescription } : undefined}
 >
-  <Fragment slot="head">
-    <JsonLd schema={authorJsonLd} />
-  </Fragment>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Authors', href: '/authors' },
-        { label: author.name ?? 'Author' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
         {imageUrl ? (

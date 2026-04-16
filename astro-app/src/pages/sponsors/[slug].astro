@@ -9,6 +9,9 @@ import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { Section, SectionContent } from '@/components/ui/section';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const sponsors = await sanityClient.fetch<ALL_SPONSOR_SLUGS_QUERY_RESULT>(ALL_SPONSOR_SLUGS_QUERY, getSiteParams());
@@ -38,7 +41,6 @@ const logoAlt = detailLogo?.alt || `${sponsor.name} logo`;
 const projects = sponsor.projects ?? [];
 
 const sponsorJsonLd = {
-  "@context": "https://schema.org",
   "@type": "Organization",
   "@id": Astro.url.href,
   "name": stegaClean(sponsor.name),
@@ -46,17 +48,22 @@ const sponsorJsonLd = {
   ...(sponsor.description && { "description": stegaClean(sponsor.description) }),
   ...(logoUrl && { "logo": logoUrl }),
 };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Sponsors', href: '/sponsors' },
+  { label: sponsor.name ?? 'Sponsor' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, sponsorJsonLd);
 ---
 
 <Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.seo ?? (sponsor.description ? { metaDescription: sponsor.description } : undefined)} template="detail">
-  <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Sponsors', href: '/sponsors' },
-        { label: sponsor.name ?? 'Sponsor' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
         {logoUrl && (

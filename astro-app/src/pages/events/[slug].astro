@@ -8,6 +8,9 @@ import type { ALL_EVENT_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const events = await sanityClient.fetch<ALL_EVENT_SLUGS_QUERY_RESULT>(ALL_EVENT_SLUGS_QUERY, getSiteParams());
@@ -53,7 +56,6 @@ const formattedEndTime = endDate
   : null;
 
 const eventJsonLd = {
-  "@context": "https://schema.org",
   "@type": "Event",
   "name": stegaClean(event.title),
   "startDate": event.date,
@@ -72,18 +74,23 @@ const eventJsonLd = {
     "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
   },
 };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Events', href: '/events' },
+  { label: event.title ?? 'Event' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, eventJsonLd);
 ---
 
 <Layout title={event.title ?? 'Event'} seo={event.seo ?? (event.description ? { metaDescription: event.description } : undefined)} template="detail">
-  <script type="application/ld+json" set:html={JSON.stringify(eventJsonLd)} />
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
 
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Events', href: '/events' },
-        { label: event.title ?? 'Event' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3 flex-wrap">

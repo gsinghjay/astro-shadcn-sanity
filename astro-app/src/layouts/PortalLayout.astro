@@ -69,6 +69,7 @@ const avatarLetter = email.charAt(0).toUpperCase();
 ---
 
 <Layout title={title} seo={seo} template="portal">
+  <slot name="structured-data" slot="structured-data" />
   <Fragment slot="default">
     <meta slot="head" name="robots" content="noindex" />
 

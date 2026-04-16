@@ -356,11 +356,13 @@ describe('authors/[slug].astro — JSON-LD integration', () => {
     expect(pageContent).toContain('buildAuthorJsonLd');
   });
 
-  test('imports JsonLd', () => {
-    expect(pageContent).toContain('JsonLd');
+  test('imports buildPageGraph', () => {
+    expect(pageContent).toContain('buildPageGraph');
   });
 
-  test('renders <JsonLd component', () => {
-    expect(pageContent).toContain('<JsonLd');
+  test('emits structured data via structured-data slot', () => {
+    expect(pageContent).toContain('slot="structured-data"');
+    expect(pageContent).toContain('application/ld+json');
+    expect(pageContent).toContain('pageGraph');
   });
 });
