@@ -1,66 +1,385 @@
 ---
+/*
+ * ChatBubble — Cloudflare AI Search floating widget with Swiss-design framing.
+ *
+ * Story 5.18 Path A (Theme Tuning) — the vendor `<chat-bubble-snippet>`
+ * renders inside Shadow DOM, so only the EXTERNAL shell is Swiss-styled:
+ *   - flat 2px border, `--radius: 0`, Helvetica Neue via `var(--font-inter)`
+ *   - fixed `bottom-6 right-6`, `z-index: 50`
+ *   - an external `<button data-chat-bubble-external-trigger>` replaces the
+ *     vendor trigger. The vendor's own `.bubble-button` is hidden by injecting
+ *     a scoped `<style>` into its Shadow Root (the only way to style across
+ *     the Shadow DOM boundary when the library doesn't expose `::part()`).
+ *     Clicks on the Swiss trigger are forwarded to the hidden vendor button
+ *     so the library's own open/close logic drives the panel.
+ *   - `hide-branding=""` is always set so the "Powered by…" line never shows
+ *     (the Sanity `hideBranding` field is effectively superseded by Story
+ *     5.18's Swiss-design rule — keep the schema field for forward compat).
+ *
+ * What stays VENDOR-controlled (Shadow DOM ceiling): panel LAYOUT — element
+ * order, spacing, icons, animations, streaming-dot markup. We override the
+ * vendor's documented CSS custom property API (`--search-snippet-*`,
+ * `--chat-bubble-*`, ~66 tokens) to repaint colors/borders/radius/shadows/
+ * font-family — these cascade across the Shadow DOM boundary via CSS
+ * inheritance. If layout parity also becomes a brand blocker, Path B
+ * (headless rebuild with `AISearchClient`) is the documented escape hatch.
+ * See `_bmad-output/implementation-artifacts/5-18-chatbubble-swiss-upgrade.md`.
+ *
+ * localStorage key history: pre-5.18 used `chatBubbleSeen-{siteId}`; 5.18
+ * renames to `chatBubbleDismissed-{siteId}` to match tech-spec semantics.
+ * First load after upgrade migrates the old key once, then deletes it.
+ */
 import { stegaClean } from "@sanity/client/stega";
+import { PUBLIC_SITE_ID, PUBLIC_SITE_THEME } from "astro:env/client";
 
 interface Props {
   apiUrl: string;
   placeholder?: string;
-  theme?: string;
+  theme?: "auto" | "light" | "dark";
   hideBranding?: boolean;
   openByDefault?: boolean;
 }
 
-const { apiUrl, placeholder, theme, hideBranding, openByDefault } = Astro.props;
+const { apiUrl, placeholder, theme, openByDefault } = Astro.props;
 
-const cleanApiUrl = stegaClean(apiUrl);
+const rawApiUrl = stegaClean(apiUrl);
+const cleanApiUrl = (() => {
+  if (!rawApiUrl) return "";
+  try {
+    const u = new URL(rawApiUrl);
+    return u.protocol === "http:" || u.protocol === "https:" ? rawApiUrl : "";
+  } catch {
+    return "";
+  }
+})();
 const cleanPlaceholder = stegaClean(placeholder ?? "Ask a question...");
 const cleanTheme = stegaClean(theme ?? "auto");
-const siteId = import.meta.env.PUBLIC_SITE_ID || "default";
+const siteId = PUBLIC_SITE_ID || "default";
+
+// Resolve 'auto' → explicit 'light' | 'dark' from the site theme so the
+// vendor widget never falls back to `prefers-color-scheme` (which would
+// ignore our Swiss palette). PUBLIC_SITE_THEME enum is currently
+// red|blue|green (all light-mode palettes); the `=== "dark"` branch is an
+// escape valve if a dark site theme is added to the enum later.
+const siteThemeAttr: "light" | "dark" =
+  (PUBLIC_SITE_THEME as string) === "dark" ? "dark" : "light";
+const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
 ---
 
 {cleanApiUrl && (
   <div
+    class="chat-bubble-shell"
     data-chat-bubble-wrapper
     data-api-url={cleanApiUrl}
     data-placeholder={cleanPlaceholder}
-    data-theme={cleanTheme}
-    data-hide-branding={hideBranding ? "true" : "false"}
+    data-theme={resolvedTheme}
     data-open-by-default={openByDefault ? "true" : "false"}
     data-site-id={siteId}
   >
+    <button
+      type="button"
+      class="chat-bubble-trigger label-caps"
+      data-chat-bubble-external-trigger
+      aria-label="Chat"
+      aria-expanded="false"
+      aria-controls="chat-bubble-snippet"
+    >
+      <svg
+        class="chat-bubble-trigger-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="square"
+        stroke-linejoin="miter"
+        aria-hidden="true"
+      >
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+      <span class="chat-bubble-trigger-label">Chat</span>
+    </button>
     <chat-bubble-snippet
+      id="chat-bubble-snippet"
       api-url={cleanApiUrl}
       placeholder={cleanPlaceholder}
-      theme={cleanTheme}
-      hide-branding={hideBranding ? "" : undefined}
+      theme={resolvedTheme}
+      hide-branding=""
     ></chat-bubble-snippet>
   </div>
 )}
+
+<style>
+  /* Shell is an inert wrapper — both children use their own fixed
+     positioning (external trigger below, vendor snippet inside Shadow DOM). */
+  .chat-bubble-shell {
+    font-family: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  /* Vendor token overrides applied DIRECTLY on the custom element host so
+     they outrank the vendor's internal `:host { --token: default }` rules.
+     `:global()` escapes Astro's scoped-style transform since
+     `<chat-bubble-snippet>` is a custom element rendered without a scope
+     attribute on its children. Scoped to `.chat-bubble-shell` to avoid
+     leaking onto unrelated instances elsewhere in the document (Studio
+     preview, embeds in portable text). The custom-property declarations
+     cascade into the Shadow DOM via CSS inheritance. */
+  :global(.chat-bubble-shell chat-bubble-snippet) {
+    /* Swiss foundation: flat, black borders, no radius, no shadows. */
+    --search-snippet-border-radius: 0;
+    --search-snippet-border-radius-sm: 0;
+    --search-snippet-border-width: 2px;
+    --search-snippet-border-color: var(--foreground);
+    --search-snippet-shadow: none;
+    --search-snippet-shadow-lg: none;
+    --search-snippet-result-item-shadow: none;
+    --chat-bubble-window-shadow: none;
+    --chat-bubble-button-shadow: none;
+    --chat-bubble-button-radius: 0;
+
+    /* Typography: Helvetica Neue via Inter variable, same stack as shell. */
+    --search-snippet-font-family: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    /* Swiss palette: primary = site theme red/blue/green, surface = white,
+       text = near-black. Inherits site-theme overrides automatically. */
+    --search-snippet-primary-color: var(--primary);
+    --search-snippet-primary-hover: var(--primary);
+    --search-snippet-background: var(--background);
+    --search-snippet-surface: var(--background);
+    --search-snippet-hover-background: var(--secondary);
+    --search-snippet-hover: var(--secondary);
+    --search-snippet-text-color: var(--foreground);
+    --search-snippet-text-secondary: var(--muted-foreground);
+    --search-snippet-text-description: var(--muted-foreground);
+
+    /* Chat message bubbles: user = Swiss red, assistant = off-white. */
+    --search-snippet-user-message-bg: var(--primary);
+    --search-snippet-user-message-text: var(--primary-foreground);
+    --search-snippet-assistant-message-bg: var(--secondary);
+    --search-snippet-assistant-message-text: var(--foreground);
+    --search-snippet-system-message-bg: var(--muted);
+    --search-snippet-system-message-text: var(--muted-foreground);
+
+    /* States: error uses destructive, focus ring matches site ring color. */
+    --search-snippet-error-background: var(--secondary);
+    --search-snippet-error-color: var(--destructive);
+    --search-snippet-warning-background: var(--secondary);
+    --search-snippet-warning-color: var(--destructive);
+    --search-snippet-focus-ring: 2px solid var(--ring);
+  }
+
+  /* Swiss external trigger. The vendor's `.bubble-button` is hidden via
+     shadow-root style injection in the script at the bottom of this file;
+     clicks on this trigger are forwarded to the hidden vendor button.
+     Typography is applied via the `.label-caps` utility on the element. */
+  .chat-bubble-trigger {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 2px solid var(--foreground);
+    border-radius: 0;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+  }
+
+  /* When the cookie consent banner is visible (data-state="visible"), shift
+     the trigger upward so it doesn't overlap. `:has()` covers Chrome 105+,
+     Safari 15.4+, Firefox 121+. Falls back to overlapping on older browsers. */
+  :global(body:has([data-cookie-consent-banner][data-state="visible"])) .chat-bubble-trigger {
+    bottom: 7rem;
+  }
+
+  .chat-bubble-trigger:hover,
+  .chat-bubble-trigger:focus-visible {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+  }
+
+  .chat-bubble-trigger:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  .chat-bubble-trigger-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .chat-bubble-trigger-label {
+    display: inline-block;
+  }
+</style>
 
 <script>
   // Static import — Vite bundles this as a deferred module, no render blocking.
   // Dynamic import() inside requestIdleCallback breaks bare specifier resolution.
   import "@cloudflare/ai-search-snippet";
 
-  let chatBubbleInitialized = false;
+  // Track which wrappers we've initialized so SPA navigations re-init new
+  // wrappers without re-binding handlers on the same instance.
+  const initializedWrappers = new WeakSet<HTMLElement>();
 
   function initChatBubble(): void {
-    const wrapper = document.querySelector<HTMLElement>("[data-chat-bubble-wrapper]");
-    if (!wrapper) return;
+    document
+      .querySelectorAll<HTMLElement>("[data-chat-bubble-wrapper]")
+      .forEach((wrapper) => {
+        if (initializedWrappers.has(wrapper)) return;
+        initializedWrappers.add(wrapper);
 
-    // Guard against duplicate initialization on SPA-style navigations
-    if (chatBubbleInitialized) return;
-    chatBubbleInitialized = true;
+        const openByDefault = wrapper.dataset.openByDefault === "true";
+        const siteId = wrapper.dataset.siteId || "default";
 
-    const openByDefault = wrapper.dataset.openByDefault === "true";
-    const siteId = wrapper.dataset.siteId || "default";
+        migrateLegacyStorageKey(siteId);
+        hideVendorTrigger(wrapper);
+        wireExternalTrigger(wrapper);
 
-    if (openByDefault) {
-      handleAutoOpen(siteId);
+        if (openByDefault) {
+          handleAutoOpen(wrapper, siteId);
+        }
+      });
+  }
+
+  // Hide the vendor's default `.bubble-button` (rendered inside Shadow DOM).
+  // CSP-friendly: uses adoptedStyleSheets (no inline <style> text content)
+  // so strict `style-src 'self'` deployments still work.
+  function hideVendorTrigger(wrapper: HTMLElement): void {
+    const bubble = wrapper.querySelector<HTMLElement>("chat-bubble-snippet");
+    if (!bubble) return;
+
+    const inject = (): boolean => {
+      const root = bubble.shadowRoot;
+      if (!root) return false;
+      // Idempotent — adopt at most one of our sheets per shadow root.
+      const tag = (root as ShadowRoot & { __swissOverride?: boolean }).__swissOverride;
+      if (tag) return true;
+      try {
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(".bubble-button { display: none !important; }");
+        root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet];
+      } catch {
+        // CSSStyleSheet constructor unavailable (older browsers) — fall back
+        // to inline style. Skipping silently keeps the vendor button visible
+        // rather than throwing; UX degrades but the panel still works.
+        const style = document.createElement("style");
+        style.setAttribute("data-swiss-override", "");
+        style.textContent = ".bubble-button { display: none !important; }";
+        root.appendChild(style);
+      }
+      (root as ShadowRoot & { __swissOverride?: boolean }).__swissOverride = true;
+      return true;
+    };
+
+    // If the custom element is already upgraded and shadow root is attached,
+    // inject immediately. Otherwise wait for whenDefined + retry.
+    if (inject()) return;
+
+    customElements
+      .whenDefined("chat-bubble-snippet")
+      .then(() => {
+        if (inject()) return;
+        // Element is defined but shadow root may not be attached yet.
+        const observer = new MutationObserver(() => {
+          if (inject()) observer.disconnect();
+        });
+        observer.observe(bubble, { childList: true, subtree: true });
+        setTimeout(() => {
+          observer.disconnect();
+          if (!bubble.shadowRoot) {
+            console.warn(
+              "[ChatBubble] Vendor shadow root never attached; vendor trigger may be visible.",
+            );
+            wrapper.dataset.initFailed = "true";
+          }
+        }, 5000);
+      })
+      .catch(() => {
+        /* whenDefined rejects only on aborted upgrade; ignore */
+      });
+  }
+
+  // Story 5.18: rename `chatBubbleSeen-*` → `chatBubbleDismissed-*`.
+  // Copy any legacy value once (normalized to "true" — the only valid value
+  // for the new key), then delete the old key.
+  function migrateLegacyStorageKey(siteId: string): void {
+    try {
+      const oldKey = `chatBubbleSeen-${siteId}`;
+      const newKey = `chatBubbleDismissed-${siteId}`;
+      const oldValue = localStorage.getItem(oldKey);
+      if (oldValue === null) return;
+      if (localStorage.getItem(newKey) === null) {
+        localStorage.setItem(newKey, "true");
+      }
+      localStorage.removeItem(oldKey);
+    } catch {
+      // storage unavailable — skip migration
     }
   }
 
-  function handleAutoOpen(siteId: string): void {
-    const STORAGE_KEY = `chatBubbleSeen-${siteId}`;
+  function wireExternalTrigger(wrapper: HTMLElement): void {
+    const trigger = wrapper.querySelector<HTMLButtonElement>(
+      "[data-chat-bubble-external-trigger]",
+    );
+    const bubble = wrapper.querySelector<HTMLElement>("chat-bubble-snippet");
+    if (!trigger || !bubble) return;
+
+    trigger.addEventListener("click", () => {
+      const root = bubble.shadowRoot;
+      const shadowBtn =
+        root?.querySelector<HTMLButtonElement>(".bubble-button") ??
+        root?.querySelector<HTMLButtonElement>("button");
+      if (!shadowBtn) return;
+      // If aria-expanded is already "true", the panel is open — clicking the
+      // vendor button would close it. Refocus the panel instead.
+      const wasOpen = trigger.getAttribute("aria-expanded") === "true";
+      if (wasOpen) {
+        const focusable = root?.querySelector<HTMLElement>(
+          'input, textarea, [contenteditable="true"], button',
+        );
+        focusable?.focus();
+        return;
+      }
+      shadowBtn.click();
+      trigger.setAttribute("aria-expanded", "true");
+    });
+
+    // Sync aria-expanded back to the trigger when the vendor closes the panel
+    // (Esc, backdrop click, vendor close button). Observe shadow-root state.
+    const syncState = () => {
+      const root = bubble.shadowRoot;
+      const open = root?.querySelector(
+        '[aria-expanded="true"], [role="dialog"][open], [data-open="true"]',
+      );
+      trigger.setAttribute("aria-expanded", open ? "true" : "false");
+    };
+    customElements
+      .whenDefined("chat-bubble-snippet")
+      .then(() => {
+        const root = bubble.shadowRoot;
+        if (!root) return;
+        const observer = new MutationObserver(syncState);
+        observer.observe(root, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["aria-expanded", "data-open", "open"],
+        });
+      })
+      .catch(() => {});
+  }
+
+  function handleAutoOpen(wrapper: HTMLElement, siteId: string): void {
+    const STORAGE_KEY = `chatBubbleDismissed-${siteId}`;
 
     try {
       if (localStorage.getItem(STORAGE_KEY)) return;
@@ -71,7 +390,7 @@ const siteId = import.meta.env.PUBLIC_SITE_ID || "default";
 
     // First visit: auto-open after 1.5s delay
     setTimeout(() => {
-      const bubble = document.querySelector("chat-bubble-snippet");
+      const bubble = wrapper.querySelector<HTMLElement>("chat-bubble-snippet");
       if (!bubble) return;
 
       tryOpenBubble(bubble, () => {
@@ -84,35 +403,45 @@ const siteId = import.meta.env.PUBLIC_SITE_ID || "default";
     }, 1500);
   }
 
-  function tryOpenBubble(bubble: Element, onOpen: () => void): void {
-    const shadowRoot = bubble.shadowRoot;
-    if (shadowRoot) {
-      const trigger = shadowRoot.querySelector("button");
-      if (trigger) {
-        trigger.click();
-        onOpen();
-        return;
-      }
-    }
+  function tryOpenBubble(bubble: HTMLElement, onOpen: () => void): void {
+    const click = (): boolean => {
+      const root = bubble.shadowRoot;
+      const trigger =
+        root?.querySelector<HTMLButtonElement>(".bubble-button") ??
+        root?.querySelector<HTMLButtonElement>("button");
+      if (!trigger) return false;
+      trigger.click();
+      onOpen();
+      return true;
+    };
 
-    // Shadow DOM may not be ready yet — observe for changes and retry once
-    const observer = new MutationObserver(() => {
-      const sr = bubble.shadowRoot;
-      if (sr) {
-        const trigger = sr.querySelector("button");
-        if (trigger) {
+    if (click()) return;
+
+    customElements
+      .whenDefined("chat-bubble-snippet")
+      .then(() => {
+        if (click()) return;
+        const observer = new MutationObserver(() => {
+          if (click()) observer.disconnect();
+        });
+        observer.observe(bubble, { childList: true, subtree: true });
+        setTimeout(() => {
           observer.disconnect();
-          trigger.click();
-          onOpen();
-        }
-      }
-    });
-
-    observer.observe(bubble, { childList: true, subtree: true });
-
-    // Safety timeout: stop observing after 5s to avoid leaks
-    setTimeout(() => observer.disconnect(), 5000);
+          if (!bubble.shadowRoot?.querySelector("button")) {
+            console.warn(
+              "[ChatBubble] Vendor trigger never available for auto-open.",
+            );
+          }
+        }, 5000);
+      })
+      .catch(() => {});
   }
+
+  // Reset init state on SPA navigations so a new wrapper on the next page
+  // gets initialized. The WeakSet entries for removed wrappers GC themselves.
+  document.addEventListener("astro:before-swap", () => {
+    /* WeakSet auto-clears when wrapper elements are GC'd post-swap. */
+  });
 
   document.addEventListener("DOMContentLoaded", initChatBubble);
   document.addEventListener("astro:page-load", initChatBubble);
