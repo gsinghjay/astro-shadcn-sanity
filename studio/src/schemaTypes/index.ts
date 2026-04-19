@@ -36,6 +36,8 @@ import {article} from './documents/article'
 import {author} from './documents/author'
 // Document schemas — listing pages (Story 21.0)
 import {listingPage} from './documents/listing-page'
+// Document schemas — portal pages (Story 22.9)
+import {portalPage} from './documents/portal-page'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -119,6 +121,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   author,
   // Documents — listing pages (Story 21.0)
   listingPage,
+  // Documents — portal pages (Story 22.9)
+  portalPage,
   // Blocks — homepage
   heroBanner,
   featureGrid,

@@ -667,76 +667,114 @@ export type MetricItem = {
   change?: string;
   trend?: "up" | "down" | "neutral";
   icon?:
-    | "info"
-    | "alert-triangle"
+    | "activity"
     | "alert-circle"
+    | "alert-triangle"
+    | "arrow-right"
+    | "arrow-up-right"
+    | "award"
+    | "bar-chart-3"
+    | "bell"
+    | "book"
+    | "book-open"
+    | "bookmark"
+    | "bot"
+    | "box"
+    | "brain"
+    | "briefcase"
+    | "building-2"
+    | "calendar"
+    | "camera"
+    | "check"
     | "check-circle"
     | "circle-help"
-    | "bell"
-    | "megaphone"
-    | "star"
-    | "zap"
-    | "gift"
-    | "heart"
-    | "sparkles"
-    | "flame"
+    | "clipboard"
+    | "clock"
+    | "cloud"
+    | "code"
+    | "compass"
+    | "cpu"
+    | "credit-card"
     | "crown"
-    | "trophy"
-    | "target"
+    | "database"
+    | "dollar-sign"
+    | "download"
+    | "pencil"
+    | "external-link"
+    | "eye"
+    | "file-text"
+    | "filter"
+    | "flag"
+    | "flame"
+    | "folder"
+    | "gift"
+    | "simple-icons:github"
+    | "globe"
+    | "graduation-cap"
+    | "layout-grid"
+    | "handshake"
+    | "heart"
+    | "house"
+    | "image"
+    | "info"
+    | "key"
+    | "laptop"
+    | "layers"
+    | "lightbulb"
+    | "link"
+    | "simple-icons:linkedin"
+    | "list"
+    | "lock"
+    | "mail"
+    | "map"
+    | "map-pin"
+    | "megaphone"
+    | "menu"
+    | "message-circle"
+    | "mic"
+    | "minus"
+    | "monitor"
+    | "music"
+    | "network"
+    | "package"
+    | "palette"
+    | "phone"
+    | "pie-chart"
+    | "play"
+    | "play-circle"
+    | "plus"
+    | "refresh-cw"
     | "rocket"
+    | "save"
+    | "search"
+    | "send"
+    | "server"
+    | "settings"
+    | "share-2"
     | "shield"
     | "shield-check"
-    | "lock"
-    | "key"
-    | "clock"
-    | "calendar"
-    | "timer"
+    | "smartphone"
+    | "sparkles"
+    | "star"
     | "tag"
-    | "wallet"
-    | "credit-card"
-    | "dollar-sign"
-    | "trending-up"
-    | "trending-down"
-    | "bar-chart-3"
-    | "pie-chart"
-    | "mail"
-    | "phone"
-    | "message-circle"
-    | "send"
-    | "globe"
-    | "map-pin"
-    | "compass"
-    | "external-link"
-    | "link"
-    | "file-text"
-    | "book-open"
-    | "image"
-    | "video"
-    | "music"
-    | "code"
+    | "target"
     | "terminal"
-    | "database"
-    | "cloud"
-    | "server"
-    | "cpu"
-    | "wifi"
-    | "users"
+    | "thumbs-up"
+    | "timer"
+    | "trending-down"
+    | "trending-up"
+    | "trophy"
+    | "simple-icons:x"
+    | "upload"
     | "user"
-    | "handshake"
-    | "graduation-cap"
-    | "settings"
+    | "users"
+    | "users-round"
+    | "video"
+    | "wallet"
+    | "wifi"
     | "wrench"
-    | "palette"
-    | "layers"
-    | "box"
-    | "package"
-    | "lightbulb"
     | "x"
-    | "check"
-    | "plus"
-    | "minus"
-    | "arrow-right"
-    | "arrow-up-right";
+    | "zap";
 };
 
 export type TabItem = {
@@ -756,76 +794,114 @@ export type LinkCardItem = {
   title?: string;
   description?: string;
   icon?:
-    | "info"
-    | "alert-triangle"
+    | "activity"
     | "alert-circle"
+    | "alert-triangle"
+    | "arrow-right"
+    | "arrow-up-right"
+    | "award"
+    | "bar-chart-3"
+    | "bell"
+    | "book"
+    | "book-open"
+    | "bookmark"
+    | "bot"
+    | "box"
+    | "brain"
+    | "briefcase"
+    | "building-2"
+    | "calendar"
+    | "camera"
+    | "check"
     | "check-circle"
     | "circle-help"
-    | "bell"
-    | "megaphone"
-    | "star"
-    | "zap"
-    | "gift"
-    | "heart"
-    | "sparkles"
-    | "flame"
+    | "clipboard"
+    | "clock"
+    | "cloud"
+    | "code"
+    | "compass"
+    | "cpu"
+    | "credit-card"
     | "crown"
-    | "trophy"
-    | "target"
+    | "database"
+    | "dollar-sign"
+    | "download"
+    | "pencil"
+    | "external-link"
+    | "eye"
+    | "file-text"
+    | "filter"
+    | "flag"
+    | "flame"
+    | "folder"
+    | "gift"
+    | "simple-icons:github"
+    | "globe"
+    | "graduation-cap"
+    | "layout-grid"
+    | "handshake"
+    | "heart"
+    | "house"
+    | "image"
+    | "info"
+    | "key"
+    | "laptop"
+    | "layers"
+    | "lightbulb"
+    | "link"
+    | "simple-icons:linkedin"
+    | "list"
+    | "lock"
+    | "mail"
+    | "map"
+    | "map-pin"
+    | "megaphone"
+    | "menu"
+    | "message-circle"
+    | "mic"
+    | "minus"
+    | "monitor"
+    | "music"
+    | "network"
+    | "package"
+    | "palette"
+    | "phone"
+    | "pie-chart"
+    | "play"
+    | "play-circle"
+    | "plus"
+    | "refresh-cw"
     | "rocket"
+    | "save"
+    | "search"
+    | "send"
+    | "server"
+    | "settings"
+    | "share-2"
     | "shield"
     | "shield-check"
-    | "lock"
-    | "key"
-    | "clock"
-    | "calendar"
-    | "timer"
+    | "smartphone"
+    | "sparkles"
+    | "star"
     | "tag"
-    | "wallet"
-    | "credit-card"
-    | "dollar-sign"
-    | "trending-up"
-    | "trending-down"
-    | "bar-chart-3"
-    | "pie-chart"
-    | "mail"
-    | "phone"
-    | "message-circle"
-    | "send"
-    | "globe"
-    | "map-pin"
-    | "compass"
-    | "external-link"
-    | "link"
-    | "file-text"
-    | "book-open"
-    | "image"
-    | "video"
-    | "music"
-    | "code"
+    | "target"
     | "terminal"
-    | "database"
-    | "cloud"
-    | "server"
-    | "cpu"
-    | "wifi"
-    | "users"
+    | "thumbs-up"
+    | "timer"
+    | "trending-down"
+    | "trending-up"
+    | "trophy"
+    | "simple-icons:x"
+    | "upload"
     | "user"
-    | "handshake"
-    | "graduation-cap"
-    | "settings"
+    | "users"
+    | "users-round"
+    | "video"
+    | "wallet"
+    | "wifi"
     | "wrench"
-    | "palette"
-    | "layers"
-    | "box"
-    | "package"
-    | "lightbulb"
     | "x"
-    | "check"
-    | "plus"
-    | "minus"
-    | "arrow-right"
-    | "arrow-up-right";
+    | "zap";
   url?: string;
 };
 
@@ -851,76 +927,114 @@ export type ServiceItem = {
   title?: string;
   description?: string;
   icon?:
-    | "info"
-    | "alert-triangle"
+    | "activity"
     | "alert-circle"
+    | "alert-triangle"
+    | "arrow-right"
+    | "arrow-up-right"
+    | "award"
+    | "bar-chart-3"
+    | "bell"
+    | "book"
+    | "book-open"
+    | "bookmark"
+    | "bot"
+    | "box"
+    | "brain"
+    | "briefcase"
+    | "building-2"
+    | "calendar"
+    | "camera"
+    | "check"
     | "check-circle"
     | "circle-help"
-    | "bell"
-    | "megaphone"
-    | "star"
-    | "zap"
-    | "gift"
-    | "heart"
-    | "sparkles"
-    | "flame"
+    | "clipboard"
+    | "clock"
+    | "cloud"
+    | "code"
+    | "compass"
+    | "cpu"
+    | "credit-card"
     | "crown"
-    | "trophy"
-    | "target"
+    | "database"
+    | "dollar-sign"
+    | "download"
+    | "pencil"
+    | "external-link"
+    | "eye"
+    | "file-text"
+    | "filter"
+    | "flag"
+    | "flame"
+    | "folder"
+    | "gift"
+    | "simple-icons:github"
+    | "globe"
+    | "graduation-cap"
+    | "layout-grid"
+    | "handshake"
+    | "heart"
+    | "house"
+    | "image"
+    | "info"
+    | "key"
+    | "laptop"
+    | "layers"
+    | "lightbulb"
+    | "link"
+    | "simple-icons:linkedin"
+    | "list"
+    | "lock"
+    | "mail"
+    | "map"
+    | "map-pin"
+    | "megaphone"
+    | "menu"
+    | "message-circle"
+    | "mic"
+    | "minus"
+    | "monitor"
+    | "music"
+    | "network"
+    | "package"
+    | "palette"
+    | "phone"
+    | "pie-chart"
+    | "play"
+    | "play-circle"
+    | "plus"
+    | "refresh-cw"
     | "rocket"
+    | "save"
+    | "search"
+    | "send"
+    | "server"
+    | "settings"
+    | "share-2"
     | "shield"
     | "shield-check"
-    | "lock"
-    | "key"
-    | "clock"
-    | "calendar"
-    | "timer"
+    | "smartphone"
+    | "sparkles"
+    | "star"
     | "tag"
-    | "wallet"
-    | "credit-card"
-    | "dollar-sign"
-    | "trending-up"
-    | "trending-down"
-    | "bar-chart-3"
-    | "pie-chart"
-    | "mail"
-    | "phone"
-    | "message-circle"
-    | "send"
-    | "globe"
-    | "map-pin"
-    | "compass"
-    | "external-link"
-    | "link"
-    | "file-text"
-    | "book-open"
-    | "image"
-    | "video"
-    | "music"
-    | "code"
+    | "target"
     | "terminal"
-    | "database"
-    | "cloud"
-    | "server"
-    | "cpu"
-    | "wifi"
-    | "users"
+    | "thumbs-up"
+    | "timer"
+    | "trending-down"
+    | "trending-up"
+    | "trophy"
+    | "simple-icons:x"
+    | "upload"
     | "user"
-    | "handshake"
-    | "graduation-cap"
-    | "settings"
+    | "users"
+    | "users-round"
+    | "video"
+    | "wallet"
+    | "wifi"
     | "wrench"
-    | "palette"
-    | "layers"
-    | "box"
-    | "package"
-    | "lightbulb"
     | "x"
-    | "check"
-    | "plus"
-    | "minus"
-    | "arrow-right"
-    | "arrow-up-right";
+    | "zap";
   image?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -1015,76 +1129,114 @@ export type AnnouncementBar = {
   alignment?: "left" | "center" | "right";
   variant?: "inline" | "floating";
   icon?:
-    | "info"
-    | "alert-triangle"
+    | "activity"
     | "alert-circle"
+    | "alert-triangle"
+    | "arrow-right"
+    | "arrow-up-right"
+    | "award"
+    | "bar-chart-3"
+    | "bell"
+    | "book"
+    | "book-open"
+    | "bookmark"
+    | "bot"
+    | "box"
+    | "brain"
+    | "briefcase"
+    | "building-2"
+    | "calendar"
+    | "camera"
+    | "check"
     | "check-circle"
     | "circle-help"
-    | "bell"
-    | "megaphone"
-    | "star"
-    | "zap"
-    | "gift"
-    | "heart"
-    | "sparkles"
-    | "flame"
+    | "clipboard"
+    | "clock"
+    | "cloud"
+    | "code"
+    | "compass"
+    | "cpu"
+    | "credit-card"
     | "crown"
-    | "trophy"
-    | "target"
+    | "database"
+    | "dollar-sign"
+    | "download"
+    | "pencil"
+    | "external-link"
+    | "eye"
+    | "file-text"
+    | "filter"
+    | "flag"
+    | "flame"
+    | "folder"
+    | "gift"
+    | "simple-icons:github"
+    | "globe"
+    | "graduation-cap"
+    | "layout-grid"
+    | "handshake"
+    | "heart"
+    | "house"
+    | "image"
+    | "info"
+    | "key"
+    | "laptop"
+    | "layers"
+    | "lightbulb"
+    | "link"
+    | "simple-icons:linkedin"
+    | "list"
+    | "lock"
+    | "mail"
+    | "map"
+    | "map-pin"
+    | "megaphone"
+    | "menu"
+    | "message-circle"
+    | "mic"
+    | "minus"
+    | "monitor"
+    | "music"
+    | "network"
+    | "package"
+    | "palette"
+    | "phone"
+    | "pie-chart"
+    | "play"
+    | "play-circle"
+    | "plus"
+    | "refresh-cw"
     | "rocket"
+    | "save"
+    | "search"
+    | "send"
+    | "server"
+    | "settings"
+    | "share-2"
     | "shield"
     | "shield-check"
-    | "lock"
-    | "key"
-    | "clock"
-    | "calendar"
-    | "timer"
+    | "smartphone"
+    | "sparkles"
+    | "star"
     | "tag"
-    | "wallet"
-    | "credit-card"
-    | "dollar-sign"
-    | "trending-up"
-    | "trending-down"
-    | "bar-chart-3"
-    | "pie-chart"
-    | "mail"
-    | "phone"
-    | "message-circle"
-    | "send"
-    | "globe"
-    | "map-pin"
-    | "compass"
-    | "external-link"
-    | "link"
-    | "file-text"
-    | "book-open"
-    | "image"
-    | "video"
-    | "music"
-    | "code"
+    | "target"
     | "terminal"
-    | "database"
-    | "cloud"
-    | "server"
-    | "cpu"
-    | "wifi"
-    | "users"
+    | "thumbs-up"
+    | "timer"
+    | "trending-down"
+    | "trending-up"
+    | "trophy"
+    | "simple-icons:x"
+    | "upload"
     | "user"
-    | "handshake"
-    | "graduation-cap"
-    | "settings"
+    | "users"
+    | "users-round"
+    | "video"
+    | "wallet"
+    | "wifi"
     | "wrench"
-    | "palette"
-    | "layers"
-    | "box"
-    | "package"
-    | "lightbulb"
     | "x"
-    | "check"
-    | "plus"
-    | "minus"
-    | "arrow-right"
-    | "arrow-up-right";
+    | "zap";
   text?: string;
   link?: AnnouncementBarLink;
   dismissible?: boolean;
@@ -1752,6 +1904,263 @@ export type HeroBanner = {
   >;
 };
 
+export type PortalPage = {
+  _id: string;
+  _type: "portalPage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  route?:
+    | "dashboard"
+    | "events"
+    | "progress"
+    | "sponsorship"
+    | "login"
+    | "denied";
+  title?: string;
+  description?: string;
+  headerBlocks?: Array<
+    | ({
+        _key: string;
+      } & HeroBanner)
+    | ({
+        _key: string;
+      } & FeatureGrid)
+    | ({
+        _key: string;
+      } & SponsorCards)
+    | ({
+        _key: string;
+      } & RichText)
+    | ({
+        _key: string;
+      } & CtaBanner)
+    | ({
+        _key: string;
+      } & FaqSection)
+    | ({
+        _key: string;
+      } & ContactForm)
+    | ({
+        _key: string;
+      } & LogoCloud)
+    | ({
+        _key: string;
+      } & StatsRow)
+    | ({
+        _key: string;
+      } & SponsorSteps)
+    | ({
+        _key: string;
+      } & TextWithImage)
+    | ({
+        _key: string;
+      } & Testimonials)
+    | ({
+        _key: string;
+      } & EventList)
+    | ({
+        _key: string;
+      } & ProjectCards)
+    | ({
+        _key: string;
+      } & TeamGrid)
+    | ({
+        _key: string;
+      } & ImageGallery)
+    | ({
+        _key: string;
+      } & ArticleList)
+    | ({
+        _key: string;
+      } & ComparisonTable)
+    | ({
+        _key: string;
+      } & Timeline)
+    | ({
+        _key: string;
+      } & Pullquote)
+    | ({
+        _key: string;
+      } & Divider)
+    | ({
+        _key: string;
+      } & AnnouncementBar)
+    | ({
+        _key: string;
+      } & SponsorshipTiers)
+    | ({
+        _key: string;
+      } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
+    | ({
+        _key: string;
+      } & ColumnsBlock)
+  >;
+  footerBlocks?: Array<
+    | ({
+        _key: string;
+      } & HeroBanner)
+    | ({
+        _key: string;
+      } & FeatureGrid)
+    | ({
+        _key: string;
+      } & SponsorCards)
+    | ({
+        _key: string;
+      } & RichText)
+    | ({
+        _key: string;
+      } & CtaBanner)
+    | ({
+        _key: string;
+      } & FaqSection)
+    | ({
+        _key: string;
+      } & ContactForm)
+    | ({
+        _key: string;
+      } & LogoCloud)
+    | ({
+        _key: string;
+      } & StatsRow)
+    | ({
+        _key: string;
+      } & SponsorSteps)
+    | ({
+        _key: string;
+      } & TextWithImage)
+    | ({
+        _key: string;
+      } & Testimonials)
+    | ({
+        _key: string;
+      } & EventList)
+    | ({
+        _key: string;
+      } & ProjectCards)
+    | ({
+        _key: string;
+      } & TeamGrid)
+    | ({
+        _key: string;
+      } & ImageGallery)
+    | ({
+        _key: string;
+      } & ArticleList)
+    | ({
+        _key: string;
+      } & ComparisonTable)
+    | ({
+        _key: string;
+      } & Timeline)
+    | ({
+        _key: string;
+      } & Pullquote)
+    | ({
+        _key: string;
+      } & Divider)
+    | ({
+        _key: string;
+      } & AnnouncementBar)
+    | ({
+        _key: string;
+      } & SponsorshipTiers)
+    | ({
+        _key: string;
+      } & VideoEmbed)
+    | ({
+        _key: string;
+      } & PricingTable)
+    | ({
+        _key: string;
+      } & ServiceCards)
+    | ({
+        _key: string;
+      } & ProductShowcase)
+    | ({
+        _key: string;
+      } & LinkCards)
+    | ({
+        _key: string;
+      } & Newsletter)
+    | ({
+        _key: string;
+      } & Accordion)
+    | ({
+        _key: string;
+      } & TabsBlock)
+    | ({
+        _key: string;
+      } & EmbedBlock)
+    | ({
+        _key: string;
+      } & MapBlock)
+    | ({
+        _key: string;
+      } & CountdownTimer)
+    | ({
+        _key: string;
+      } & MetricsDashboard)
+    | ({
+        _key: string;
+      } & CardGrid)
+    | ({
+        _key: string;
+      } & BeforeAfter)
+    | ({
+        _key: string;
+      } & ColumnsBlock)
+  >;
+  dashboardCards?: Array<{
+    title?: string;
+    description?: string;
+    iconName?: string;
+    route?: string;
+    enabled?: boolean;
+    _key: string;
+  }>;
+};
+
 export type ListingPage = {
   _id: string;
   _type: "listingPage";
@@ -2208,76 +2617,114 @@ export type StatItem = {
 export type FeatureItem = {
   _type: "featureItem";
   icon?:
-    | "info"
-    | "alert-triangle"
+    | "activity"
     | "alert-circle"
+    | "alert-triangle"
+    | "arrow-right"
+    | "arrow-up-right"
+    | "award"
+    | "bar-chart-3"
+    | "bell"
+    | "book"
+    | "book-open"
+    | "bookmark"
+    | "bot"
+    | "box"
+    | "brain"
+    | "briefcase"
+    | "building-2"
+    | "calendar"
+    | "camera"
+    | "check"
     | "check-circle"
     | "circle-help"
-    | "bell"
-    | "megaphone"
-    | "star"
-    | "zap"
-    | "gift"
-    | "heart"
-    | "sparkles"
-    | "flame"
+    | "clipboard"
+    | "clock"
+    | "cloud"
+    | "code"
+    | "compass"
+    | "cpu"
+    | "credit-card"
     | "crown"
-    | "trophy"
-    | "target"
+    | "database"
+    | "dollar-sign"
+    | "download"
+    | "pencil"
+    | "external-link"
+    | "eye"
+    | "file-text"
+    | "filter"
+    | "flag"
+    | "flame"
+    | "folder"
+    | "gift"
+    | "simple-icons:github"
+    | "globe"
+    | "graduation-cap"
+    | "layout-grid"
+    | "handshake"
+    | "heart"
+    | "house"
+    | "image"
+    | "info"
+    | "key"
+    | "laptop"
+    | "layers"
+    | "lightbulb"
+    | "link"
+    | "simple-icons:linkedin"
+    | "list"
+    | "lock"
+    | "mail"
+    | "map"
+    | "map-pin"
+    | "megaphone"
+    | "menu"
+    | "message-circle"
+    | "mic"
+    | "minus"
+    | "monitor"
+    | "music"
+    | "network"
+    | "package"
+    | "palette"
+    | "phone"
+    | "pie-chart"
+    | "play"
+    | "play-circle"
+    | "plus"
+    | "refresh-cw"
     | "rocket"
+    | "save"
+    | "search"
+    | "send"
+    | "server"
+    | "settings"
+    | "share-2"
     | "shield"
     | "shield-check"
-    | "lock"
-    | "key"
-    | "clock"
-    | "calendar"
-    | "timer"
+    | "smartphone"
+    | "sparkles"
+    | "star"
     | "tag"
-    | "wallet"
-    | "credit-card"
-    | "dollar-sign"
-    | "trending-up"
-    | "trending-down"
-    | "bar-chart-3"
-    | "pie-chart"
-    | "mail"
-    | "phone"
-    | "message-circle"
-    | "send"
-    | "globe"
-    | "map-pin"
-    | "compass"
-    | "external-link"
-    | "link"
-    | "file-text"
-    | "book-open"
-    | "image"
-    | "video"
-    | "music"
-    | "code"
+    | "target"
     | "terminal"
-    | "database"
-    | "cloud"
-    | "server"
-    | "cpu"
-    | "wifi"
-    | "users"
+    | "thumbs-up"
+    | "timer"
+    | "trending-down"
+    | "trending-up"
+    | "trophy"
+    | "simple-icons:x"
+    | "upload"
     | "user"
-    | "handshake"
-    | "graduation-cap"
-    | "settings"
+    | "users"
+    | "users-round"
+    | "video"
+    | "wallet"
+    | "wifi"
     | "wrench"
-    | "palette"
-    | "layers"
-    | "box"
-    | "package"
-    | "lightbulb"
     | "x"
-    | "check"
-    | "plus"
-    | "minus"
-    | "arrow-right"
-    | "arrow-up-right";
+    | "zap";
   image?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -2993,6 +3440,7 @@ export type AllSanitySchemaTypes =
   | CtaBanner
   | FeatureGrid
   | HeroBanner
+  | PortalPage
   | ListingPage
   | Seo
   | Submission
@@ -4194,18 +4642,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
         icon:
+          | "activity"
           | "alert-circle"
           | "alert-triangle"
           | "arrow-right"
           | "arrow-up-right"
+          | "award"
           | "bar-chart-3"
           | "bell"
           | "book-open"
+          | "book"
+          | "bookmark"
+          | "bot"
           | "box"
+          | "brain"
+          | "briefcase"
+          | "building-2"
           | "calendar"
+          | "camera"
           | "check-circle"
           | "check"
           | "circle-help"
+          | "clipboard"
           | "clock"
           | "cloud"
           | "code"
@@ -4215,48 +4673,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | "crown"
           | "database"
           | "dollar-sign"
+          | "download"
           | "external-link"
+          | "eye"
           | "file-text"
+          | "filter"
+          | "flag"
           | "flame"
+          | "folder"
           | "gift"
           | "globe"
           | "graduation-cap"
           | "handshake"
           | "heart"
+          | "house"
           | "image"
           | "info"
           | "key"
+          | "laptop"
           | "layers"
+          | "layout-grid"
           | "lightbulb"
           | "link"
+          | "list"
           | "lock"
           | "mail"
           | "map-pin"
+          | "map"
           | "megaphone"
+          | "menu"
           | "message-circle"
+          | "mic"
           | "minus"
+          | "monitor"
           | "music"
+          | "network"
           | "package"
           | "palette"
+          | "pencil"
           | "phone"
           | "pie-chart"
+          | "play-circle"
+          | "play"
           | "plus"
+          | "refresh-cw"
           | "rocket"
+          | "save"
+          | "search"
           | "send"
           | "server"
           | "settings"
+          | "share-2"
           | "shield-check"
           | "shield"
+          | "simple-icons:github"
+          | "simple-icons:linkedin"
+          | "simple-icons:x"
+          | "smartphone"
           | "sparkles"
           | "star"
           | "tag"
           | "target"
           | "terminal"
+          | "thumbs-up"
           | "timer"
           | "trending-down"
           | "trending-up"
           | "trophy"
+          | "upload"
           | "user"
+          | "users-round"
           | "users"
           | "video"
           | "wallet"
@@ -4479,18 +4965,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -4500,48 +4996,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -5103,18 +5627,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -5124,48 +5658,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -5308,18 +5870,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -5329,48 +5901,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -5473,18 +6073,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -5494,48 +6104,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -5869,18 +6507,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -5890,48 +6538,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -6465,18 +7141,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -6486,48 +7172,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -7089,18 +7803,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -7110,48 +7834,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -7294,18 +8046,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -7315,48 +8077,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -7459,18 +8249,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -7480,48 +8280,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -7855,18 +8683,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -7876,48 +8714,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -8816,18 +9682,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
         items: Array<{
           _key: string;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -8837,48 +9713,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -9021,18 +9925,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -9042,48 +9956,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -9180,18 +10122,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           change: string | null;
           trend: "down" | "neutral" | "up" | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -9201,48 +10153,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -9571,18 +10551,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -9592,48 +10582,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -10151,18 +11169,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
         icon:
+          | "activity"
           | "alert-circle"
           | "alert-triangle"
           | "arrow-right"
           | "arrow-up-right"
+          | "award"
           | "bar-chart-3"
           | "bell"
           | "book-open"
+          | "book"
+          | "bookmark"
+          | "bot"
           | "box"
+          | "brain"
+          | "briefcase"
+          | "building-2"
           | "calendar"
+          | "camera"
           | "check-circle"
           | "check"
           | "circle-help"
+          | "clipboard"
           | "clock"
           | "cloud"
           | "code"
@@ -10172,48 +11200,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
           | "crown"
           | "database"
           | "dollar-sign"
+          | "download"
           | "external-link"
+          | "eye"
           | "file-text"
+          | "filter"
+          | "flag"
           | "flame"
+          | "folder"
           | "gift"
           | "globe"
           | "graduation-cap"
           | "handshake"
           | "heart"
+          | "house"
           | "image"
           | "info"
           | "key"
+          | "laptop"
           | "layers"
+          | "layout-grid"
           | "lightbulb"
           | "link"
+          | "list"
           | "lock"
           | "mail"
           | "map-pin"
+          | "map"
           | "megaphone"
+          | "menu"
           | "message-circle"
+          | "mic"
           | "minus"
+          | "monitor"
           | "music"
+          | "network"
           | "package"
           | "palette"
+          | "pencil"
           | "phone"
           | "pie-chart"
+          | "play-circle"
+          | "play"
           | "plus"
+          | "refresh-cw"
           | "rocket"
+          | "save"
+          | "search"
           | "send"
           | "server"
           | "settings"
+          | "share-2"
           | "shield-check"
           | "shield"
+          | "simple-icons:github"
+          | "simple-icons:linkedin"
+          | "simple-icons:x"
+          | "smartphone"
           | "sparkles"
           | "star"
           | "tag"
           | "target"
           | "terminal"
+          | "thumbs-up"
           | "timer"
           | "trending-down"
           | "trending-up"
           | "trophy"
+          | "upload"
           | "user"
+          | "users-round"
           | "users"
           | "video"
           | "wallet"
@@ -10436,18 +11492,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -10457,48 +11523,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -11060,18 +12154,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -11081,48 +12185,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -11265,18 +12397,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -11286,48 +12428,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -11430,18 +12600,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -11451,48 +12631,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -11826,18 +13034,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -11847,48 +13065,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -12422,18 +13668,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -12443,48 +13699,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -13046,18 +14330,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -13067,48 +14361,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -13251,18 +14573,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -13272,48 +14604,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -13416,18 +14776,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -13437,48 +14807,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -13812,18 +15210,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -13833,48 +15241,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -14773,18 +16209,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
         items: Array<{
           _key: string;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -14794,48 +16240,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -14978,18 +16452,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -14999,48 +16483,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -15137,18 +16649,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           change: string | null;
           trend: "down" | "neutral" | "up" | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -15158,48 +16680,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -15528,18 +17078,28 @@ export type LISTING_PAGE_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -15549,48 +17109,76 @@ export type LISTING_PAGE_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -16067,247 +17655,21 @@ export type LISTING_PAGE_QUERY_RESULT = {
 } | null;
 
 // Source: ../astro-app/src/lib/sanity.ts
-// Variable: SPONSOR_BY_EMAIL_QUERY
-// Query: *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current}
-export type SPONSOR_BY_EMAIL_QUERY_RESULT = {
+// Variable: PORTAL_PAGE_QUERY
+// Query: *[_type == "portalPage" && _id == $id][0]{  _id, route, title, description,  headerBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    },    _type == "columnsBlock" => {      variant,      leftBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      rightBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      reverseOnMobile,      verticalAlign    }},  footerBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    },    _type == "columnsBlock" => {      variant,      leftBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      rightBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      reverseOnMobile,      verticalAlign    }},  dashboardCards[]{ title, description, iconName, route, enabled }}
+export type PORTAL_PAGE_QUERY_RESULT = {
   _id: string;
-  name: string | null;
-  slug: string | null;
-} | null;
-
-// Source: ../astro-app/src/lib/sanity.ts
-// Variable: SPONSOR_PORTAL_QUERY
-// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, industry, featured,  contactEmail, allowedEmails,  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {    _id, title, "slug": slug.current,    status, semester, technologyTags,    team[]{ _key, name, role },    content  }}
-export type SPONSOR_PORTAL_QUERY_RESULT = {
-  _id: string;
-  name: string | null;
-  slug: string | null;
-  logo: {
-    asset: {
-      _id: string;
-      url: string | null;
-      metadata: {
-        lqip: string | null;
-        dimensions: SanityImageDimensions | null;
-      } | null;
-    } | null;
-    alt: string | null;
-    hotspot: SanityImageHotspot | null;
-    crop: SanityImageCrop | null;
-  } | null;
-  tier: "bronze" | "gold" | "platinum" | "silver" | null;
+  route:
+    | "dashboard"
+    | "denied"
+    | "events"
+    | "login"
+    | "progress"
+    | "sponsorship"
+    | null;
+  title: string | null;
   description: string | null;
-  website: string | null;
-  industry: string | null;
-  featured: boolean | null;
-  contactEmail: string | null;
-  allowedEmails: Array<string> | null;
-  projects: Array<{
-    _id: string;
-    title: string | null;
-    slug: string | null;
-    status: "active" | "archived" | "completed" | null;
-    semester: string | null;
-    technologyTags: Array<
-      | "5G Technology"
-      | "802.1X Authentication"
-      | "AI/ML"
-      | "Angular"
-      | "Astro"
-      | "AWS"
-      | "Azure ML"
-      | "Big Data"
-      | "Blockchain"
-      | "Cisco Packet Tracer"
-      | "Cloud Computing"
-      | "Computer Vision"
-      | "CSS"
-      | "Custom Theme"
-      | "Data Analytics"
-      | "Data Science"
-      | "Data Visualization"
-      | "Distributed Systems"
-      | "DNS Security"
-      | "Docker"
-      | "Edge Computing"
-      | "EdTech"
-      | "Elementor"
-      | "Ethereum"
-      | "Figma"
-      | "Firebase"
-      | "FormSite"
-      | "Gamification"
-      | "Git"
-      | "GraphQL"
-      | "Healthcare IoT"
-      | "HTML"
-      | "IoT"
-      | "Java"
-      | "JavaScript"
-      | "Kubernetes"
-      | "Machine Learning"
-      | "MongoDB"
-      | "MySQL"
-      | "Network Security"
-      | "Next.js"
-      | "NLP"
-      | "Node.js"
-      | "Optimization"
-      | "PHP"
-      | "PostgreSQL"
-      | "Proof-of-Stake"
-      | "Publishing"
-      | "Python"
-      | "RADIUS Server"
-      | "React"
-      | "REST API"
-      | "Sentiment Analysis"
-      | "Smart Contracts"
-      | "Smart Slider 3"
-      | "Social Impact"
-      | "Storybook"
-      | "Sustainability"
-      | "Tailwind CSS"
-      | "TypeScript"
-      | "Video Processing"
-      | "VLAN Configuration"
-      | "Vue.js"
-      | "Web Development"
-      | "WebRTC"
-      | "WordPress"
-      | "Workforce Analytics"
-      | "Zero Trust Architecture"
-    > | null;
-    team: Array<{
-      _key: string;
-      name: string | null;
-      role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
-    }> | null;
-    content: PortableText | null;
-  }>;
-} | null;
-
-// Source: ../astro-app/src/lib/sanity.ts
-// Variable: SPONSOR_PROJECTS_API_QUERY
-// Query: *[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {  _id, title, "slug": slug.current,  status, semester, technologyTags,  team[]{ _key, name, role },  content}
-export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
-  _id: string;
-  title: string | null;
-  slug: string | null;
-  status: "active" | "archived" | "completed" | null;
-  semester: string | null;
-  technologyTags: Array<
-    | "5G Technology"
-    | "802.1X Authentication"
-    | "AI/ML"
-    | "Angular"
-    | "Astro"
-    | "AWS"
-    | "Azure ML"
-    | "Big Data"
-    | "Blockchain"
-    | "Cisco Packet Tracer"
-    | "Cloud Computing"
-    | "Computer Vision"
-    | "CSS"
-    | "Custom Theme"
-    | "Data Analytics"
-    | "Data Science"
-    | "Data Visualization"
-    | "Distributed Systems"
-    | "DNS Security"
-    | "Docker"
-    | "Edge Computing"
-    | "EdTech"
-    | "Elementor"
-    | "Ethereum"
-    | "Figma"
-    | "Firebase"
-    | "FormSite"
-    | "Gamification"
-    | "Git"
-    | "GraphQL"
-    | "Healthcare IoT"
-    | "HTML"
-    | "IoT"
-    | "Java"
-    | "JavaScript"
-    | "Kubernetes"
-    | "Machine Learning"
-    | "MongoDB"
-    | "MySQL"
-    | "Network Security"
-    | "Next.js"
-    | "NLP"
-    | "Node.js"
-    | "Optimization"
-    | "PHP"
-    | "PostgreSQL"
-    | "Proof-of-Stake"
-    | "Publishing"
-    | "Python"
-    | "RADIUS Server"
-    | "React"
-    | "REST API"
-    | "Sentiment Analysis"
-    | "Smart Contracts"
-    | "Smart Slider 3"
-    | "Social Impact"
-    | "Storybook"
-    | "Sustainability"
-    | "Tailwind CSS"
-    | "TypeScript"
-    | "Video Processing"
-    | "VLAN Configuration"
-    | "Vue.js"
-    | "Web Development"
-    | "WebRTC"
-    | "WordPress"
-    | "Workforce Analytics"
-    | "Zero Trust Architecture"
-  > | null;
-  team: Array<{
-    _key: string;
-    name: string | null;
-    role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
-  }> | null;
-  content: PortableText | null;
-}>;
-
-// Source: ../astro-app/src/lib/sanity.ts
-// Variable: SPONSOR_PROJECTS_QUERY
-// Query: *[_type == "project" && sponsor._ref in  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id  && ($site == "" || site == $site)] | order(title asc) {  _id, title, "slug": slug.current, status}
-export type SPONSOR_PROJECTS_QUERY_RESULT = Array<{
-  _id: string;
-  title: string | null;
-  slug: string | null;
-  status: "active" | "archived" | "completed" | null;
-}>;
-
-// Source: ../astro-app/src/lib/sanity.ts
-// Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  seo {    metaTitle,    metaDescription,    noIndex,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    },    _type == "columnsBlock" => {      variant,      leftBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      rightBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      reverseOnMobile,      verticalAlign    }}}
-export type PAGE_BY_SLUG_QUERY_RESULT = {
-  _id: string;
-  title: string | null;
-  slug: string | null;
-  seo: {
-    metaTitle: string | null;
-    metaDescription: string | null;
-    noIndex: boolean | null;
-    ogImage: {
-      asset: {
-        _id: string;
-        url: string | null;
-        metadata: {
-          lqip: string | null;
-          dimensions: SanityImageDimensions | null;
-        } | null;
-      } | null;
-      alt: string | null;
-    } | null;
-  } | null;
-  blocks: Array<
+  headerBlocks: Array<
     | {
         _type: "accordion";
         _key: string;
@@ -16351,18 +17713,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         maxWidth: "default" | "full" | "narrow" | null;
         variant: "floating" | "inline" | null;
         icon:
+          | "activity"
           | "alert-circle"
           | "alert-triangle"
           | "arrow-right"
           | "arrow-up-right"
+          | "award"
           | "bar-chart-3"
           | "bell"
           | "book-open"
+          | "book"
+          | "bookmark"
+          | "bot"
           | "box"
+          | "brain"
+          | "briefcase"
+          | "building-2"
           | "calendar"
+          | "camera"
           | "check-circle"
           | "check"
           | "circle-help"
+          | "clipboard"
           | "clock"
           | "cloud"
           | "code"
@@ -16372,48 +17744,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           | "crown"
           | "database"
           | "dollar-sign"
+          | "download"
           | "external-link"
+          | "eye"
           | "file-text"
+          | "filter"
+          | "flag"
           | "flame"
+          | "folder"
           | "gift"
           | "globe"
           | "graduation-cap"
           | "handshake"
           | "heart"
+          | "house"
           | "image"
           | "info"
           | "key"
+          | "laptop"
           | "layers"
+          | "layout-grid"
           | "lightbulb"
           | "link"
+          | "list"
           | "lock"
           | "mail"
           | "map-pin"
+          | "map"
           | "megaphone"
+          | "menu"
           | "message-circle"
+          | "mic"
           | "minus"
+          | "monitor"
           | "music"
+          | "network"
           | "package"
           | "palette"
+          | "pencil"
           | "phone"
           | "pie-chart"
+          | "play-circle"
+          | "play"
           | "plus"
+          | "refresh-cw"
           | "rocket"
+          | "save"
+          | "search"
           | "send"
           | "server"
           | "settings"
+          | "share-2"
           | "shield-check"
           | "shield"
+          | "simple-icons:github"
+          | "simple-icons:linkedin"
+          | "simple-icons:x"
+          | "smartphone"
           | "sparkles"
           | "star"
           | "tag"
           | "target"
           | "terminal"
+          | "thumbs-up"
           | "timer"
           | "trending-down"
           | "trending-up"
           | "trophy"
+          | "upload"
           | "user"
+          | "users-round"
           | "users"
           | "video"
           | "wallet"
@@ -16636,18 +18036,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -16657,48 +18067,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -17260,18 +18698,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -17281,48 +18729,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -17465,18 +18941,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -17486,48 +18972,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -17630,18 +19144,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -17651,48 +19175,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -18026,18 +19578,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -18047,48 +19609,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -18622,18 +20212,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               maxWidth: "default" | "full" | "narrow" | null;
               variant: "floating" | "inline" | null;
               icon:
+                | "activity"
                 | "alert-circle"
                 | "alert-triangle"
                 | "arrow-right"
                 | "arrow-up-right"
+                | "award"
                 | "bar-chart-3"
                 | "bell"
                 | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
                 | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
                 | "calendar"
+                | "camera"
                 | "check-circle"
                 | "check"
                 | "circle-help"
+                | "clipboard"
                 | "clock"
                 | "cloud"
                 | "code"
@@ -18643,48 +20243,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 | "crown"
                 | "database"
                 | "dollar-sign"
+                | "download"
                 | "external-link"
+                | "eye"
                 | "file-text"
+                | "filter"
+                | "flag"
                 | "flame"
+                | "folder"
                 | "gift"
                 | "globe"
                 | "graduation-cap"
                 | "handshake"
                 | "heart"
+                | "house"
                 | "image"
                 | "info"
                 | "key"
+                | "laptop"
                 | "layers"
+                | "layout-grid"
                 | "lightbulb"
                 | "link"
+                | "list"
                 | "lock"
                 | "mail"
                 | "map-pin"
+                | "map"
                 | "megaphone"
+                | "menu"
                 | "message-circle"
+                | "mic"
                 | "minus"
+                | "monitor"
                 | "music"
+                | "network"
                 | "package"
                 | "palette"
+                | "pencil"
                 | "phone"
                 | "pie-chart"
+                | "play-circle"
+                | "play"
                 | "plus"
+                | "refresh-cw"
                 | "rocket"
+                | "save"
+                | "search"
                 | "send"
                 | "server"
                 | "settings"
+                | "share-2"
                 | "shield-check"
                 | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
                 | "sparkles"
                 | "star"
                 | "tag"
                 | "target"
                 | "terminal"
+                | "thumbs-up"
                 | "timer"
                 | "trending-down"
                 | "trending-up"
                 | "trophy"
+                | "upload"
                 | "user"
+                | "users-round"
                 | "users"
                 | "video"
                 | "wallet"
@@ -19246,18 +20874,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
               items: Array<{
                 _key: string;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -19267,48 +20905,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -19451,18 +21117,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -19472,48 +21148,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -19616,18 +21320,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 change: string | null;
                 trend: "down" | "neutral" | "up" | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -19637,48 +21351,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -20012,18 +21754,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                 title: string | null;
                 description: string | null;
                 icon:
+                  | "activity"
                   | "alert-circle"
                   | "alert-triangle"
                   | "arrow-right"
                   | "arrow-up-right"
+                  | "award"
                   | "bar-chart-3"
                   | "bell"
                   | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
                   | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
                   | "calendar"
+                  | "camera"
                   | "check-circle"
                   | "check"
                   | "circle-help"
+                  | "clipboard"
                   | "clock"
                   | "cloud"
                   | "code"
@@ -20033,48 +21785,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
                   | "crown"
                   | "database"
                   | "dollar-sign"
+                  | "download"
                   | "external-link"
+                  | "eye"
                   | "file-text"
+                  | "filter"
+                  | "flag"
                   | "flame"
+                  | "folder"
                   | "gift"
                   | "globe"
                   | "graduation-cap"
                   | "handshake"
                   | "heart"
+                  | "house"
                   | "image"
                   | "info"
                   | "key"
+                  | "laptop"
                   | "layers"
+                  | "layout-grid"
                   | "lightbulb"
                   | "link"
+                  | "list"
                   | "lock"
                   | "mail"
                   | "map-pin"
+                  | "map"
                   | "megaphone"
+                  | "menu"
                   | "message-circle"
+                  | "mic"
                   | "minus"
+                  | "monitor"
                   | "music"
+                  | "network"
                   | "package"
                   | "palette"
+                  | "pencil"
                   | "phone"
                   | "pie-chart"
+                  | "play-circle"
+                  | "play"
                   | "plus"
+                  | "refresh-cw"
                   | "rocket"
+                  | "save"
+                  | "search"
                   | "send"
                   | "server"
                   | "settings"
+                  | "share-2"
                   | "shield-check"
                   | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
                   | "sparkles"
                   | "star"
                   | "tag"
                   | "target"
                   | "terminal"
+                  | "thumbs-up"
                   | "timer"
                   | "trending-down"
                   | "trending-up"
                   | "trophy"
+                  | "upload"
                   | "user"
+                  | "users-round"
                   | "users"
                   | "video"
                   | "wallet"
@@ -20973,18 +22753,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
         items: Array<{
           _key: string;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -20994,48 +22784,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -21178,18 +22996,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -21199,48 +23027,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -21337,18 +23193,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           change: string | null;
           trend: "down" | "neutral" | "up" | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -21358,48 +23224,76 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -21728,18 +23622,28 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
           title: string | null;
           description: string | null;
           icon:
+            | "activity"
             | "alert-circle"
             | "alert-triangle"
             | "arrow-right"
             | "arrow-up-right"
+            | "award"
             | "bar-chart-3"
             | "bell"
             | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
             | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
             | "calendar"
+            | "camera"
             | "check-circle"
             | "check"
             | "circle-help"
+            | "clipboard"
             | "clock"
             | "cloud"
             | "code"
@@ -21749,48 +23653,13380 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
             | "crown"
             | "database"
             | "dollar-sign"
+            | "download"
             | "external-link"
+            | "eye"
             | "file-text"
+            | "filter"
+            | "flag"
             | "flame"
+            | "folder"
             | "gift"
             | "globe"
             | "graduation-cap"
             | "handshake"
             | "heart"
+            | "house"
             | "image"
             | "info"
             | "key"
+            | "laptop"
             | "layers"
+            | "layout-grid"
             | "lightbulb"
             | "link"
+            | "list"
             | "lock"
             | "mail"
             | "map-pin"
+            | "map"
             | "megaphone"
+            | "menu"
             | "message-circle"
+            | "mic"
             | "minus"
+            | "monitor"
             | "music"
+            | "network"
             | "package"
             | "palette"
+            | "pencil"
             | "phone"
             | "pie-chart"
+            | "play-circle"
+            | "play"
             | "plus"
+            | "refresh-cw"
             | "rocket"
+            | "save"
+            | "search"
             | "send"
             | "server"
             | "settings"
+            | "share-2"
             | "shield-check"
             | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
             | "sparkles"
             | "star"
             | "tag"
             | "target"
             | "terminal"
+            | "thumbs-up"
             | "timer"
             | "trending-down"
             | "trending-up"
             | "trophy"
+            | "upload"
             | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "sponsorCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-tier" | "default" | "showcase" | null;
+        heading: string | null;
+        displayMode: "all" | "featured" | "manual" | null;
+        sponsors: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "sponsorshipTiers";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "default" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          benefits: Array<string> | null;
+          highlighted: boolean | null;
+          ctaButton: {
+            text: string | null;
+            url: string | null;
+            variant: "default" | "ghost" | "outline" | "secondary" | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "sponsorSteps";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "split" | "spread" | "steps" | null;
+        heading: string | null;
+        subheading: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          list: Array<string> | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "statsRow";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "grid" | "split" | "spread" | "ticker" | null;
+        heading: string | null;
+        stats: Array<{
+          _key: string;
+          value: string | null;
+          label: string | null;
+          description: string | null;
+        }> | null;
+      }
+    | {
+        _type: "tabsBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "default" | "pills" | "underline" | null;
+        heading: string | null;
+        tabs: Array<{
+          _key: string;
+          label: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
+        _type: "teamGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid-compact" | "grid" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          name: string | null;
+          role: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          links: Array<{
+            _key: string;
+            label: string | null;
+            href: string | null;
+          }> | null;
+        }> | null;
+      }
+    | {
+        _type: "testimonials";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight"
+          | null;
+        heading: string | null;
+        testimonialSource:
+          | "all"
+          | "byProject"
+          | "industry"
+          | "manual"
+          | "student"
+          | null;
+        testimonials: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "textWithImage";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split"
+          | null;
+        heading: string | null;
+        content: Array<
+          | {
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+              listItem?: "bullet" | "number";
+              markDefs: Array<
+                | {
+                    reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
+                    _type: "internalLink";
+                    _key: string;
+                  }
+                | {
+                    href?: string;
+                    _type: "link";
+                    _key: string;
+                  }
+              > | null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }
+          | {
+              tone?: "info" | "success" | "warning";
+              text?: string;
+              _type: "callout";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt: string | null;
+              caption: string | null;
+              _type: "image";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              _key: string;
+              _type: "videoEmbed";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
+              spacing?: "default" | "large" | "none" | "small";
+              maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
+              markDefs: null;
+            }
+        > | null;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+        imagePosition: "left" | "right" | null;
+      }
+    | {
+        _type: "timeline";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "engineering" | "horizontal" | "split" | "vertical" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          date: string | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+        }> | null;
+        links: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "videoEmbed";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "full-width" | "split-asymmetric" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        youtubeUrl: string | null;
+        posterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+      }
+  > | null;
+  footerBlocks: Array<
+    | {
+        _type: "accordion";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "bordered" | "default" | "separated" | "technical" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
+        _type: "announcementBar";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "floating" | "inline" | null;
+        icon:
+          | "activity"
+          | "alert-circle"
+          | "alert-triangle"
+          | "arrow-right"
+          | "arrow-up-right"
+          | "award"
+          | "bar-chart-3"
+          | "bell"
+          | "book-open"
+          | "book"
+          | "bookmark"
+          | "bot"
+          | "box"
+          | "brain"
+          | "briefcase"
+          | "building-2"
+          | "calendar"
+          | "camera"
+          | "check-circle"
+          | "check"
+          | "circle-help"
+          | "clipboard"
+          | "clock"
+          | "cloud"
+          | "code"
+          | "compass"
+          | "cpu"
+          | "credit-card"
+          | "crown"
+          | "database"
+          | "dollar-sign"
+          | "download"
+          | "external-link"
+          | "eye"
+          | "file-text"
+          | "filter"
+          | "flag"
+          | "flame"
+          | "folder"
+          | "gift"
+          | "globe"
+          | "graduation-cap"
+          | "handshake"
+          | "heart"
+          | "house"
+          | "image"
+          | "info"
+          | "key"
+          | "laptop"
+          | "layers"
+          | "layout-grid"
+          | "lightbulb"
+          | "link"
+          | "list"
+          | "lock"
+          | "mail"
+          | "map-pin"
+          | "map"
+          | "megaphone"
+          | "menu"
+          | "message-circle"
+          | "mic"
+          | "minus"
+          | "monitor"
+          | "music"
+          | "network"
+          | "package"
+          | "palette"
+          | "pencil"
+          | "phone"
+          | "pie-chart"
+          | "play-circle"
+          | "play"
+          | "plus"
+          | "refresh-cw"
+          | "rocket"
+          | "save"
+          | "search"
+          | "send"
+          | "server"
+          | "settings"
+          | "share-2"
+          | "shield-check"
+          | "shield"
+          | "simple-icons:github"
+          | "simple-icons:linkedin"
+          | "simple-icons:x"
+          | "smartphone"
+          | "sparkles"
+          | "star"
+          | "tag"
+          | "target"
+          | "terminal"
+          | "thumbs-up"
+          | "timer"
+          | "trending-down"
+          | "trending-up"
+          | "trophy"
+          | "upload"
+          | "user"
+          | "users-round"
+          | "users"
+          | "video"
+          | "wallet"
+          | "wifi"
+          | "wrench"
+          | "x"
+          | "zap"
+          | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+        dismissible: boolean | null;
+      }
+    | {
+        _type: "articleList";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "grid"
+          | "list"
+          | "magazine"
+          | "split-featured"
+          | null;
+        heading: string | null;
+        description: string | null;
+        contentType: "all" | "by-category" | null;
+        categories: Array<{
+          _id: string;
+        }> | null;
+        limit: number | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+        showNewsletterCta: boolean | null;
+      }
+    | {
+        _type: "beforeAfter";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "side-by-side" | "stacked" | "toggle" | null;
+        heading: string | null;
+        beforeImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        afterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        beforeLabel: string | null;
+        afterLabel: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "cardGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "grid-2"
+          | "grid-3"
+          | "grid-4"
+          | "masonry"
+          | null;
+        heading: string | null;
+        description: string | null;
+        cards: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+          badge: string | null;
+        }> | null;
+      }
+    | {
+        _type: "columnsBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "equal"
+          | "sidebar-left"
+          | "sidebar-right"
+          | "wide-left"
+          | "wide-right"
+          | null;
+        leftBlocks: Array<
+          | {
+              _type: "accordion";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "bordered"
+                | "default"
+                | "separated"
+                | "technical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "announcementBar";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "floating" | "inline" | null;
+              icon:
+                | "activity"
+                | "alert-circle"
+                | "alert-triangle"
+                | "arrow-right"
+                | "arrow-up-right"
+                | "award"
+                | "bar-chart-3"
+                | "bell"
+                | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
+                | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
+                | "calendar"
+                | "camera"
+                | "check-circle"
+                | "check"
+                | "circle-help"
+                | "clipboard"
+                | "clock"
+                | "cloud"
+                | "code"
+                | "compass"
+                | "cpu"
+                | "credit-card"
+                | "crown"
+                | "database"
+                | "dollar-sign"
+                | "download"
+                | "external-link"
+                | "eye"
+                | "file-text"
+                | "filter"
+                | "flag"
+                | "flame"
+                | "folder"
+                | "gift"
+                | "globe"
+                | "graduation-cap"
+                | "handshake"
+                | "heart"
+                | "house"
+                | "image"
+                | "info"
+                | "key"
+                | "laptop"
+                | "layers"
+                | "layout-grid"
+                | "lightbulb"
+                | "link"
+                | "list"
+                | "lock"
+                | "mail"
+                | "map-pin"
+                | "map"
+                | "megaphone"
+                | "menu"
+                | "message-circle"
+                | "mic"
+                | "minus"
+                | "monitor"
+                | "music"
+                | "network"
+                | "package"
+                | "palette"
+                | "pencil"
+                | "phone"
+                | "pie-chart"
+                | "play-circle"
+                | "play"
+                | "plus"
+                | "refresh-cw"
+                | "rocket"
+                | "save"
+                | "search"
+                | "send"
+                | "server"
+                | "settings"
+                | "share-2"
+                | "shield-check"
+                | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
+                | "sparkles"
+                | "star"
+                | "tag"
+                | "target"
+                | "terminal"
+                | "thumbs-up"
+                | "timer"
+                | "trending-down"
+                | "trending-up"
+                | "trophy"
+                | "upload"
+                | "user"
+                | "users-round"
+                | "users"
+                | "video"
+                | "wallet"
+                | "wifi"
+                | "wrench"
+                | "x"
+                | "zap"
+                | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+              dismissible: boolean | null;
+            }
+          | {
+              _type: "articleList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "list"
+                | "magazine"
+                | "split-featured"
+                | null;
+              heading: string | null;
+              description: string | null;
+              contentType: "all" | "by-category" | null;
+              categories: Array<{
+                _id: string;
+              }> | null;
+              limit: number | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              showNewsletterCta: boolean | null;
+            }
+          | {
+              _type: "beforeAfter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "side-by-side" | "stacked" | "toggle" | null;
+              heading: string | null;
+              beforeImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              afterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              beforeLabel: string | null;
+              afterLabel: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "cardGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid-2"
+                | "grid-3"
+                | "grid-4"
+                | "masonry"
+                | null;
+              heading: string | null;
+              description: string | null;
+              cards: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+                badge: string | null;
+              }> | null;
+            }
+          | {
+              _type: "comparisonTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "specification" | "stacked" | "table" | null;
+              heading: string | null;
+              description: string | null;
+              options: Array<{
+                _key: string;
+                title: string | null;
+                highlighted: boolean | null;
+              }> | null;
+              criteria: Array<{
+                _key: string;
+                feature: string | null;
+                values: Array<string> | null;
+                isHeader: boolean | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "contactForm";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split-image" | "split" | "stacked" | null;
+              heading: string | null;
+              description: string | null;
+              successMessage: string | null;
+              form: {
+                _id: string;
+                title: string | null;
+                fields: Array<{
+                  _key: string;
+                  name: string | null;
+                  label: string | null;
+                  type:
+                    | "checkbox"
+                    | "color"
+                    | "date"
+                    | "datetime-local"
+                    | "email"
+                    | "file"
+                    | "hidden"
+                    | "number"
+                    | "radio"
+                    | "range"
+                    | "select"
+                    | "tel"
+                    | "text"
+                    | "textarea"
+                    | "time"
+                    | "url"
+                    | null;
+                  required: boolean | null;
+                  choices: Array<{
+                    _key: string;
+                    label: string | null;
+                    value: string | null;
+                  }> | null;
+                  options: {
+                    placeholder: string | null;
+                    defaultValue: string | null;
+                  } | null;
+                }> | null;
+                submitButton: {
+                  text: string | null;
+                } | null;
+              } | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+            }
+          | {
+              _type: "countdownTimer";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "hero" | "inline" | null;
+              heading: string | null;
+              description: string | null;
+              targetDate: string | null;
+              completedMessage: string | null;
+            }
+          | {
+              _type: "ctaBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "data-cta"
+                | "overlay"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              description: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "divider";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "labeled" | "line" | "short" | null;
+              label: string | null;
+            }
+          | {
+              _type: "embedBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "contained" | "default" | "full-width" | null;
+              heading: string | null;
+              embedUrl: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "eventList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "list" | "timeline" | null;
+              heading: string | null;
+              eventStatus: "all" | "past" | "upcoming" | null;
+              limit: number | null;
+            }
+          | {
+              _type: "faqSection";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "narrow"
+                | "split"
+                | "spread-header"
+                | "stacked"
+                | "technical"
+                | null;
+              heading: string | null;
+              items: Array<{
+                _key: string;
+                question: string | null;
+                answer: Array<
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>;
+                        text?: string;
+                        _type: "span";
+                        _key: string;
+                      }>;
+                      style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                      listItem?: "bullet" | "number";
+                      markDefs: Array<
+                        | {
+                            reference:
+                              | {
+                                  _type: "article";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "event";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "page";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "project";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "sponsor";
+                                  slug: string | null;
+                                }
+                              | null;
+                            _type: "internalLink";
+                            _key: string;
+                          }
+                        | {
+                            href?: string;
+                            _type: "link";
+                            _key: string;
+                          }
+                      > | null;
+                      level?: number;
+                      _type: "block";
+                      _key: string;
+                    }
+                  | {
+                      tone?: "info" | "success" | "warning";
+                      text?: string;
+                      _type: "callout";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      asset: {
+                        _id: string;
+                        url: string | null;
+                        metadata: {
+                          lqip: string | null;
+                          dimensions: SanityImageDimensions | null;
+                        } | null;
+                      } | null;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt: string | null;
+                      caption: string | null;
+                      _type: "image";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      caption?: string;
+                      rows?: Array<{
+                        isHeader?: boolean;
+                        cells?: Array<string>;
+                        _type: "tableRow";
+                        _key: string;
+                      }>;
+                      _type: "table";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      _key: string;
+                      _type: "videoEmbed";
+                      backgroundVariant?:
+                        | "blueprint"
+                        | "dark"
+                        | "hatched-light"
+                        | "hatched"
+                        | "light"
+                        | "mono"
+                        | "primary"
+                        | "stripe"
+                        | "white";
+                      spacing?: "default" | "large" | "none" | "small";
+                      maxWidth?: "default" | "full" | "narrow";
+                      alignment?: "center" | "left" | "right";
+                      variant?: "full-width" | "split-asymmetric" | "split";
+                      heading?: string;
+                      description?: string;
+                      youtubeUrl?: string;
+                      posterImage?: {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot?: SanityImageHotspot;
+                        crop?: SanityImageCrop;
+                        alt?: string;
+                        _type: "image";
+                      };
+                      markDefs: null;
+                    }
+                > | null;
+              }> | null;
+            }
+          | {
+              _type: "featureGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "grid-centered"
+                | "grid"
+                | "horizontal-cards"
+                | "numbered-brutalist"
+                | "sidebar-grid"
+                | "stacked"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
+              columns: 2 | 3 | 4 | null;
+            }
+          | {
+              _type: "heroBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "overlay"
+                | "split-asymmetric"
+                | "split-bleed"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              subheading: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              alignment: "center" | "left" | "right" | null;
+            }
+          | {
+              _type: "imageGallery";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "masonry" | "single" | null;
+              heading: string | null;
+              description: string | null;
+              images: Array<{
+                _key: string;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                caption: string | null;
+                featured: boolean | null;
+                year: number | null;
+                category:
+                  | "ai-ml"
+                  | "data-viz"
+                  | "iot"
+                  | "mobile"
+                  | "other"
+                  | "web-apps"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "linkCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "icon-list" | "list" | null;
+              heading: string | null;
+              description: string | null;
+              links: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                url: string | null;
+              }> | null;
+            }
+          | {
+              _type: "logoCloud";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "flex-wrap"
+                | "grid-prominent"
+                | "grid"
+                | "marquee"
+                | "tiered"
+                | null;
+              heading: string | null;
+              autoPopulate: boolean | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "mapBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "default" | "full-width" | "split" | null;
+              heading: string | null;
+              address: string | null;
+              coordinates: {
+                lat: number | null;
+                lng: number | null;
+              } | null;
+              caption: string | null;
+              contactInfo: {
+                phone: string | null;
+                email: string | null;
+                hours: string | null;
+              } | null;
+            }
+          | {
+              _type: "metricsDashboard";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-grid"
+                | "card"
+                | "grid"
+                | "row"
+                | "terminal"
+                | null;
+              heading: string | null;
+              description: string | null;
+              metrics: Array<{
+                _key: string;
+                label: string | null;
+                value: string | null;
+                change: string | null;
+                trend: "down" | "neutral" | "up" | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "newsletter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "inline" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              inputPlaceholder: string | null;
+              submitButtonLabel: string | null;
+              privacyDisclaimerText: string | null;
+            }
+          | {
+              _type: "pricingTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "comparison"
+                | "featured"
+                | "simple"
+                | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                interval: string | null;
+                description: string | null;
+                features: Array<string> | null;
+                highlighted: boolean | null;
+                ctaText: string | null;
+                ctaUrl: string | null;
+              }> | null;
+            }
+          | {
+              _type: "productShowcase";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "detail" | "featured" | "grid" | null;
+              heading: string | null;
+              description: string | null;
+              products: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                price: string | null;
+                badge: string | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "projectCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "blueprint" | "case-study" | "default" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              projects: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "pullquote";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+              quote: string | null;
+              attribution: string | null;
+              role: string | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+            }
+          | {
+              _type: "richText";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+            }
+          | {
+              _type: "serviceCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "alternating"
+                | "grid"
+                | "icon-grid"
+                | "list"
+                | "specification"
+                | null;
+              heading: string | null;
+              description: string | null;
+              services: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist-tier" | "default" | "showcase" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "sponsorshipTiers";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                benefits: Array<string> | null;
+                highlighted: boolean | null;
+                ctaButton: {
+                  text: string | null;
+                  url: string | null;
+                  variant: "default" | "ghost" | "outline" | "secondary" | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorSteps";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split" | "spread" | "steps" | null;
+              heading: string | null;
+              subheading: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                list: Array<string> | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "statsRow";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "split"
+                | "spread"
+                | "ticker"
+                | null;
+              heading: string | null;
+              stats: Array<{
+                _key: string;
+                value: string | null;
+                label: string | null;
+                description: string | null;
+              }> | null;
+            }
+          | {
+              _type: "tabsBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | "pills" | "underline" | null;
+              heading: string | null;
+              tabs: Array<{
+                _key: string;
+                label: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "teamGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid-compact" | "grid" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                name: string | null;
+                role: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                links: Array<{
+                  _key: string;
+                  label: string | null;
+                  href: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _type: "testimonials";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-quote"
+                | "carousel"
+                | "grid"
+                | "marquee"
+                | "masonry"
+                | "split"
+                | "spotlight"
+                | null;
+              heading: string | null;
+              testimonialSource:
+                | "all"
+                | "byProject"
+                | "industry"
+                | "manual"
+                | "student"
+                | null;
+              testimonials: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "textWithImage";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "floating"
+                | "reversed"
+                | "split-asymmetric"
+                | "split"
+                | null;
+              heading: string | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+              imagePosition: "left" | "right" | null;
+            }
+          | {
+              _type: "timeline";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "engineering"
+                | "horizontal"
+                | "split"
+                | "vertical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                date: string | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "videoEmbed";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "full-width" | "split-asymmetric" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              youtubeUrl: string | null;
+              posterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+            }
+        > | null;
+        rightBlocks: Array<
+          | {
+              _type: "accordion";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "bordered"
+                | "default"
+                | "separated"
+                | "technical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "announcementBar";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "floating" | "inline" | null;
+              icon:
+                | "activity"
+                | "alert-circle"
+                | "alert-triangle"
+                | "arrow-right"
+                | "arrow-up-right"
+                | "award"
+                | "bar-chart-3"
+                | "bell"
+                | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
+                | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
+                | "calendar"
+                | "camera"
+                | "check-circle"
+                | "check"
+                | "circle-help"
+                | "clipboard"
+                | "clock"
+                | "cloud"
+                | "code"
+                | "compass"
+                | "cpu"
+                | "credit-card"
+                | "crown"
+                | "database"
+                | "dollar-sign"
+                | "download"
+                | "external-link"
+                | "eye"
+                | "file-text"
+                | "filter"
+                | "flag"
+                | "flame"
+                | "folder"
+                | "gift"
+                | "globe"
+                | "graduation-cap"
+                | "handshake"
+                | "heart"
+                | "house"
+                | "image"
+                | "info"
+                | "key"
+                | "laptop"
+                | "layers"
+                | "layout-grid"
+                | "lightbulb"
+                | "link"
+                | "list"
+                | "lock"
+                | "mail"
+                | "map-pin"
+                | "map"
+                | "megaphone"
+                | "menu"
+                | "message-circle"
+                | "mic"
+                | "minus"
+                | "monitor"
+                | "music"
+                | "network"
+                | "package"
+                | "palette"
+                | "pencil"
+                | "phone"
+                | "pie-chart"
+                | "play-circle"
+                | "play"
+                | "plus"
+                | "refresh-cw"
+                | "rocket"
+                | "save"
+                | "search"
+                | "send"
+                | "server"
+                | "settings"
+                | "share-2"
+                | "shield-check"
+                | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
+                | "sparkles"
+                | "star"
+                | "tag"
+                | "target"
+                | "terminal"
+                | "thumbs-up"
+                | "timer"
+                | "trending-down"
+                | "trending-up"
+                | "trophy"
+                | "upload"
+                | "user"
+                | "users-round"
+                | "users"
+                | "video"
+                | "wallet"
+                | "wifi"
+                | "wrench"
+                | "x"
+                | "zap"
+                | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+              dismissible: boolean | null;
+            }
+          | {
+              _type: "articleList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "list"
+                | "magazine"
+                | "split-featured"
+                | null;
+              heading: string | null;
+              description: string | null;
+              contentType: "all" | "by-category" | null;
+              categories: Array<{
+                _id: string;
+              }> | null;
+              limit: number | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              showNewsletterCta: boolean | null;
+            }
+          | {
+              _type: "beforeAfter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "side-by-side" | "stacked" | "toggle" | null;
+              heading: string | null;
+              beforeImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              afterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              beforeLabel: string | null;
+              afterLabel: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "cardGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid-2"
+                | "grid-3"
+                | "grid-4"
+                | "masonry"
+                | null;
+              heading: string | null;
+              description: string | null;
+              cards: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+                badge: string | null;
+              }> | null;
+            }
+          | {
+              _type: "comparisonTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "specification" | "stacked" | "table" | null;
+              heading: string | null;
+              description: string | null;
+              options: Array<{
+                _key: string;
+                title: string | null;
+                highlighted: boolean | null;
+              }> | null;
+              criteria: Array<{
+                _key: string;
+                feature: string | null;
+                values: Array<string> | null;
+                isHeader: boolean | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "contactForm";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split-image" | "split" | "stacked" | null;
+              heading: string | null;
+              description: string | null;
+              successMessage: string | null;
+              form: {
+                _id: string;
+                title: string | null;
+                fields: Array<{
+                  _key: string;
+                  name: string | null;
+                  label: string | null;
+                  type:
+                    | "checkbox"
+                    | "color"
+                    | "date"
+                    | "datetime-local"
+                    | "email"
+                    | "file"
+                    | "hidden"
+                    | "number"
+                    | "radio"
+                    | "range"
+                    | "select"
+                    | "tel"
+                    | "text"
+                    | "textarea"
+                    | "time"
+                    | "url"
+                    | null;
+                  required: boolean | null;
+                  choices: Array<{
+                    _key: string;
+                    label: string | null;
+                    value: string | null;
+                  }> | null;
+                  options: {
+                    placeholder: string | null;
+                    defaultValue: string | null;
+                  } | null;
+                }> | null;
+                submitButton: {
+                  text: string | null;
+                } | null;
+              } | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+            }
+          | {
+              _type: "countdownTimer";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "hero" | "inline" | null;
+              heading: string | null;
+              description: string | null;
+              targetDate: string | null;
+              completedMessage: string | null;
+            }
+          | {
+              _type: "ctaBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "data-cta"
+                | "overlay"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              description: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "divider";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "labeled" | "line" | "short" | null;
+              label: string | null;
+            }
+          | {
+              _type: "embedBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "contained" | "default" | "full-width" | null;
+              heading: string | null;
+              embedUrl: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "eventList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "list" | "timeline" | null;
+              heading: string | null;
+              eventStatus: "all" | "past" | "upcoming" | null;
+              limit: number | null;
+            }
+          | {
+              _type: "faqSection";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "narrow"
+                | "split"
+                | "spread-header"
+                | "stacked"
+                | "technical"
+                | null;
+              heading: string | null;
+              items: Array<{
+                _key: string;
+                question: string | null;
+                answer: Array<
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>;
+                        text?: string;
+                        _type: "span";
+                        _key: string;
+                      }>;
+                      style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                      listItem?: "bullet" | "number";
+                      markDefs: Array<
+                        | {
+                            reference:
+                              | {
+                                  _type: "article";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "event";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "page";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "project";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "sponsor";
+                                  slug: string | null;
+                                }
+                              | null;
+                            _type: "internalLink";
+                            _key: string;
+                          }
+                        | {
+                            href?: string;
+                            _type: "link";
+                            _key: string;
+                          }
+                      > | null;
+                      level?: number;
+                      _type: "block";
+                      _key: string;
+                    }
+                  | {
+                      tone?: "info" | "success" | "warning";
+                      text?: string;
+                      _type: "callout";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      asset: {
+                        _id: string;
+                        url: string | null;
+                        metadata: {
+                          lqip: string | null;
+                          dimensions: SanityImageDimensions | null;
+                        } | null;
+                      } | null;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt: string | null;
+                      caption: string | null;
+                      _type: "image";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      caption?: string;
+                      rows?: Array<{
+                        isHeader?: boolean;
+                        cells?: Array<string>;
+                        _type: "tableRow";
+                        _key: string;
+                      }>;
+                      _type: "table";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      _key: string;
+                      _type: "videoEmbed";
+                      backgroundVariant?:
+                        | "blueprint"
+                        | "dark"
+                        | "hatched-light"
+                        | "hatched"
+                        | "light"
+                        | "mono"
+                        | "primary"
+                        | "stripe"
+                        | "white";
+                      spacing?: "default" | "large" | "none" | "small";
+                      maxWidth?: "default" | "full" | "narrow";
+                      alignment?: "center" | "left" | "right";
+                      variant?: "full-width" | "split-asymmetric" | "split";
+                      heading?: string;
+                      description?: string;
+                      youtubeUrl?: string;
+                      posterImage?: {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot?: SanityImageHotspot;
+                        crop?: SanityImageCrop;
+                        alt?: string;
+                        _type: "image";
+                      };
+                      markDefs: null;
+                    }
+                > | null;
+              }> | null;
+            }
+          | {
+              _type: "featureGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "grid-centered"
+                | "grid"
+                | "horizontal-cards"
+                | "numbered-brutalist"
+                | "sidebar-grid"
+                | "stacked"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
+              columns: 2 | 3 | 4 | null;
+            }
+          | {
+              _type: "heroBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "overlay"
+                | "split-asymmetric"
+                | "split-bleed"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              subheading: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              alignment: "center" | "left" | "right" | null;
+            }
+          | {
+              _type: "imageGallery";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "masonry" | "single" | null;
+              heading: string | null;
+              description: string | null;
+              images: Array<{
+                _key: string;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                caption: string | null;
+                featured: boolean | null;
+                year: number | null;
+                category:
+                  | "ai-ml"
+                  | "data-viz"
+                  | "iot"
+                  | "mobile"
+                  | "other"
+                  | "web-apps"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "linkCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "icon-list" | "list" | null;
+              heading: string | null;
+              description: string | null;
+              links: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                url: string | null;
+              }> | null;
+            }
+          | {
+              _type: "logoCloud";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "flex-wrap"
+                | "grid-prominent"
+                | "grid"
+                | "marquee"
+                | "tiered"
+                | null;
+              heading: string | null;
+              autoPopulate: boolean | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "mapBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "default" | "full-width" | "split" | null;
+              heading: string | null;
+              address: string | null;
+              coordinates: {
+                lat: number | null;
+                lng: number | null;
+              } | null;
+              caption: string | null;
+              contactInfo: {
+                phone: string | null;
+                email: string | null;
+                hours: string | null;
+              } | null;
+            }
+          | {
+              _type: "metricsDashboard";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-grid"
+                | "card"
+                | "grid"
+                | "row"
+                | "terminal"
+                | null;
+              heading: string | null;
+              description: string | null;
+              metrics: Array<{
+                _key: string;
+                label: string | null;
+                value: string | null;
+                change: string | null;
+                trend: "down" | "neutral" | "up" | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "newsletter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "inline" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              inputPlaceholder: string | null;
+              submitButtonLabel: string | null;
+              privacyDisclaimerText: string | null;
+            }
+          | {
+              _type: "pricingTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "comparison"
+                | "featured"
+                | "simple"
+                | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                interval: string | null;
+                description: string | null;
+                features: Array<string> | null;
+                highlighted: boolean | null;
+                ctaText: string | null;
+                ctaUrl: string | null;
+              }> | null;
+            }
+          | {
+              _type: "productShowcase";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "detail" | "featured" | "grid" | null;
+              heading: string | null;
+              description: string | null;
+              products: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                price: string | null;
+                badge: string | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "projectCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "blueprint" | "case-study" | "default" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              projects: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "pullquote";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+              quote: string | null;
+              attribution: string | null;
+              role: string | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+            }
+          | {
+              _type: "richText";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+            }
+          | {
+              _type: "serviceCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "alternating"
+                | "grid"
+                | "icon-grid"
+                | "list"
+                | "specification"
+                | null;
+              heading: string | null;
+              description: string | null;
+              services: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist-tier" | "default" | "showcase" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "sponsorshipTiers";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                benefits: Array<string> | null;
+                highlighted: boolean | null;
+                ctaButton: {
+                  text: string | null;
+                  url: string | null;
+                  variant: "default" | "ghost" | "outline" | "secondary" | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorSteps";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split" | "spread" | "steps" | null;
+              heading: string | null;
+              subheading: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                list: Array<string> | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "statsRow";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "split"
+                | "spread"
+                | "ticker"
+                | null;
+              heading: string | null;
+              stats: Array<{
+                _key: string;
+                value: string | null;
+                label: string | null;
+                description: string | null;
+              }> | null;
+            }
+          | {
+              _type: "tabsBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | "pills" | "underline" | null;
+              heading: string | null;
+              tabs: Array<{
+                _key: string;
+                label: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "teamGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid-compact" | "grid" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                name: string | null;
+                role: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                links: Array<{
+                  _key: string;
+                  label: string | null;
+                  href: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _type: "testimonials";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-quote"
+                | "carousel"
+                | "grid"
+                | "marquee"
+                | "masonry"
+                | "split"
+                | "spotlight"
+                | null;
+              heading: string | null;
+              testimonialSource:
+                | "all"
+                | "byProject"
+                | "industry"
+                | "manual"
+                | "student"
+                | null;
+              testimonials: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "textWithImage";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "floating"
+                | "reversed"
+                | "split-asymmetric"
+                | "split"
+                | null;
+              heading: string | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+              imagePosition: "left" | "right" | null;
+            }
+          | {
+              _type: "timeline";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "engineering"
+                | "horizontal"
+                | "split"
+                | "vertical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                date: string | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "videoEmbed";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "full-width" | "split-asymmetric" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              youtubeUrl: string | null;
+              posterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+            }
+        > | null;
+        reverseOnMobile: boolean | null;
+        verticalAlign: "center" | "stretch" | "top" | null;
+      }
+    | {
+        _type: "comparisonTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "specification" | "stacked" | "table" | null;
+        heading: string | null;
+        description: string | null;
+        options: Array<{
+          _key: string;
+          title: string | null;
+          highlighted: boolean | null;
+        }> | null;
+        criteria: Array<{
+          _key: string;
+          feature: string | null;
+          values: Array<string> | null;
+          isHeader: boolean | null;
+        }> | null;
+        links: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "contactForm";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "split-image" | "split" | "stacked" | null;
+        heading: string | null;
+        description: string | null;
+        successMessage: string | null;
+        form: {
+          _id: string;
+          title: string | null;
+          fields: Array<{
+            _key: string;
+            name: string | null;
+            label: string | null;
+            type:
+              | "checkbox"
+              | "color"
+              | "date"
+              | "datetime-local"
+              | "email"
+              | "file"
+              | "hidden"
+              | "number"
+              | "radio"
+              | "range"
+              | "select"
+              | "tel"
+              | "text"
+              | "textarea"
+              | "time"
+              | "url"
+              | null;
+            required: boolean | null;
+            choices: Array<{
+              _key: string;
+              label: string | null;
+              value: string | null;
+            }> | null;
+            options: {
+              placeholder: string | null;
+              defaultValue: string | null;
+            } | null;
+          }> | null;
+          submitButton: {
+            text: string | null;
+          } | null;
+        } | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+      }
+    | {
+        _type: "countdownTimer";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "hero" | "inline" | null;
+        heading: string | null;
+        description: string | null;
+        targetDate: string | null;
+        completedMessage: string | null;
+      }
+    | {
+        _type: "ctaBanner";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread"
+          | null;
+        heading: string | null;
+        description: string | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "divider";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "labeled" | "line" | "short" | null;
+        label: string | null;
+      }
+    | {
+        _type: "embedBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "contained" | "default" | "full-width" | null;
+        heading: string | null;
+        embedUrl: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "eventList";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "list" | "timeline" | null;
+        heading: string | null;
+        eventStatus: "all" | "past" | "upcoming" | null;
+        limit: number | null;
+      }
+    | {
+        _type: "faqSection";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical"
+          | null;
+        heading: string | null;
+        items: Array<{
+          _key: string;
+          question: string | null;
+          answer: Array<
+            | {
+                children?: Array<{
+                  marks?: Array<string>;
+                  text?: string;
+                  _type: "span";
+                  _key: string;
+                }>;
+                style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                listItem?: "bullet" | "number";
+                markDefs: Array<
+                  | {
+                      reference:
+                        | {
+                            _type: "article";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "event";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "page";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "project";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "sponsor";
+                            slug: string | null;
+                          }
+                        | null;
+                      _type: "internalLink";
+                      _key: string;
+                    }
+                  | {
+                      href?: string;
+                      _type: "link";
+                      _key: string;
+                    }
+                > | null;
+                level?: number;
+                _type: "block";
+                _key: string;
+              }
+            | {
+                tone?: "info" | "success" | "warning";
+                text?: string;
+                _type: "callout";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt: string | null;
+                caption: string | null;
+                _type: "image";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                caption?: string;
+                rows?: Array<{
+                  isHeader?: boolean;
+                  cells?: Array<string>;
+                  _type: "tableRow";
+                  _key: string;
+                }>;
+                _type: "table";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                _key: string;
+                _type: "videoEmbed";
+                backgroundVariant?:
+                  | "blueprint"
+                  | "dark"
+                  | "hatched-light"
+                  | "hatched"
+                  | "light"
+                  | "mono"
+                  | "primary"
+                  | "stripe"
+                  | "white";
+                spacing?: "default" | "large" | "none" | "small";
+                maxWidth?: "default" | "full" | "narrow";
+                alignment?: "center" | "left" | "right";
+                variant?: "full-width" | "split-asymmetric" | "split";
+                heading?: string;
+                description?: string;
+                youtubeUrl?: string;
+                posterImage?: {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot?: SanityImageHotspot;
+                  crop?: SanityImageCrop;
+                  alt?: string;
+                  _type: "image";
+                };
+                markDefs: null;
+              }
+          > | null;
+        }> | null;
+      }
+    | {
+        _type: "featureGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "numbered-brutalist"
+          | "sidebar-grid"
+          | "stacked"
+          | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+          } | null;
+        }> | null;
+        columns: 2 | 3 | 4 | null;
+      }
+    | {
+        _type: "heroBanner";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "overlay"
+          | "split-asymmetric"
+          | "split-bleed"
+          | "split"
+          | "spread"
+          | null;
+        heading: string | null;
+        subheading: string | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+        alignment: "center" | "left" | "right" | null;
+      }
+    | {
+        _type: "imageGallery";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "masonry" | "single" | null;
+        heading: string | null;
+        description: string | null;
+        images: Array<{
+          _key: string;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          caption: string | null;
+          featured: boolean | null;
+          year: number | null;
+          category:
+            | "ai-ml"
+            | "data-viz"
+            | "iot"
+            | "mobile"
+            | "other"
+            | "web-apps"
+            | null;
+        }> | null;
+      }
+    | {
+        _type: "linkCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "icon-list" | "list" | null;
+        heading: string | null;
+        description: string | null;
+        links: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          url: string | null;
+        }> | null;
+      }
+    | {
+        _type: "logoCloud";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered"
+          | null;
+        heading: string | null;
+        autoPopulate: boolean | null;
+        sponsors: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "mapBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "default" | "full-width" | "split" | null;
+        heading: string | null;
+        address: string | null;
+        coordinates: {
+          lat: number | null;
+          lng: number | null;
+        } | null;
+        caption: string | null;
+        contactInfo: {
+          phone: string | null;
+          email: string | null;
+          hours: string | null;
+        } | null;
+      }
+    | {
+        _type: "metricsDashboard";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
+        heading: string | null;
+        description: string | null;
+        metrics: Array<{
+          _key: string;
+          label: string | null;
+          value: string | null;
+          change: string | null;
+          trend: "down" | "neutral" | "up" | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+        }> | null;
+      }
+    | {
+        _type: "newsletter";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "inline" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        inputPlaceholder: string | null;
+        submitButtonLabel: string | null;
+        privacyDisclaimerText: string | null;
+      }
+    | {
+        _type: "pricingTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "comparison" | "featured" | "simple" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          interval: string | null;
+          description: string | null;
+          features: Array<string> | null;
+          highlighted: boolean | null;
+          ctaText: string | null;
+          ctaUrl: string | null;
+        }> | null;
+      }
+    | {
+        _type: "productShowcase";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "detail" | "featured" | "grid" | null;
+        heading: string | null;
+        description: string | null;
+        products: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          price: string | null;
+          badge: string | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "projectCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "blueprint" | "case-study" | "default" | null;
+        heading: string | null;
+        displayMode: "all" | "featured" | "manual" | null;
+        projects: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "pullquote";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+        quote: string | null;
+        attribution: string | null;
+        role: string | null;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+      }
+    | {
+        _type: "richText";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+        content: Array<
+          | {
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+              listItem?: "bullet" | "number";
+              markDefs: Array<
+                | {
+                    reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
+                    _type: "internalLink";
+                    _key: string;
+                  }
+                | {
+                    href?: string;
+                    _type: "link";
+                    _key: string;
+                  }
+              > | null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }
+          | {
+              tone?: "info" | "success" | "warning";
+              text?: string;
+              _type: "callout";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt: string | null;
+              caption: string | null;
+              _type: "image";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              _key: string;
+              _type: "videoEmbed";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
+              spacing?: "default" | "large" | "none" | "small";
+              maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
+              markDefs: null;
+            }
+        > | null;
+      }
+    | {
+        _type: "serviceCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification"
+          | null;
+        heading: string | null;
+        description: string | null;
+        services: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "sponsorCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-tier" | "default" | "showcase" | null;
+        heading: string | null;
+        displayMode: "all" | "featured" | "manual" | null;
+        sponsors: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "sponsorshipTiers";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "default" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          benefits: Array<string> | null;
+          highlighted: boolean | null;
+          ctaButton: {
+            text: string | null;
+            url: string | null;
+            variant: "default" | "ghost" | "outline" | "secondary" | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "sponsorSteps";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "split" | "spread" | "steps" | null;
+        heading: string | null;
+        subheading: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          list: Array<string> | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "statsRow";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "grid" | "split" | "spread" | "ticker" | null;
+        heading: string | null;
+        stats: Array<{
+          _key: string;
+          value: string | null;
+          label: string | null;
+          description: string | null;
+        }> | null;
+      }
+    | {
+        _type: "tabsBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "default" | "pills" | "underline" | null;
+        heading: string | null;
+        tabs: Array<{
+          _key: string;
+          label: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
+        _type: "teamGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid-compact" | "grid" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          name: string | null;
+          role: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          links: Array<{
+            _key: string;
+            label: string | null;
+            href: string | null;
+          }> | null;
+        }> | null;
+      }
+    | {
+        _type: "testimonials";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist-quote"
+          | "carousel"
+          | "grid"
+          | "marquee"
+          | "masonry"
+          | "split"
+          | "spotlight"
+          | null;
+        heading: string | null;
+        testimonialSource:
+          | "all"
+          | "byProject"
+          | "industry"
+          | "manual"
+          | "student"
+          | null;
+        testimonials: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "textWithImage";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "floating"
+          | "reversed"
+          | "split-asymmetric"
+          | "split"
+          | null;
+        heading: string | null;
+        content: Array<
+          | {
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+              listItem?: "bullet" | "number";
+              markDefs: Array<
+                | {
+                    reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
+                    _type: "internalLink";
+                    _key: string;
+                  }
+                | {
+                    href?: string;
+                    _type: "link";
+                    _key: string;
+                  }
+              > | null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }
+          | {
+              tone?: "info" | "success" | "warning";
+              text?: string;
+              _type: "callout";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt: string | null;
+              caption: string | null;
+              _type: "image";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              _key: string;
+              _type: "videoEmbed";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
+              spacing?: "default" | "large" | "none" | "small";
+              maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
+              markDefs: null;
+            }
+        > | null;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+        imagePosition: "left" | "right" | null;
+      }
+    | {
+        _type: "timeline";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "engineering" | "horizontal" | "split" | "vertical" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          date: string | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+        }> | null;
+        links: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "videoEmbed";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "full-width" | "split-asymmetric" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        youtubeUrl: string | null;
+        posterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        } | null;
+      }
+  > | null;
+  dashboardCards: Array<{
+    title: string | null;
+    description: string | null;
+    iconName: string | null;
+    route: string | null;
+    enabled: boolean | null;
+  }> | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_BY_EMAIL_QUERY
+// Query: *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current}
+export type SPONSOR_BY_EMAIL_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  slug: string | null;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_PORTAL_QUERY
+// Query: *[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id, name, "slug": slug.current,  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },  tier, description, website, industry, featured,  contactEmail, allowedEmails,  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {    _id, title, "slug": slug.current,    status, semester, technologyTags,    team[]{ _key, name, role },    content  }}
+export type SPONSOR_PORTAL_QUERY_RESULT = {
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  logo: {
+    asset: {
+      _id: string;
+      url: string | null;
+      metadata: {
+        lqip: string | null;
+        dimensions: SanityImageDimensions | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
+  tier: "bronze" | "gold" | "platinum" | "silver" | null;
+  description: string | null;
+  website: string | null;
+  industry: string | null;
+  featured: boolean | null;
+  contactEmail: string | null;
+  allowedEmails: Array<string> | null;
+  projects: Array<{
+    _id: string;
+    title: string | null;
+    slug: string | null;
+    status: "active" | "archived" | "completed" | null;
+    semester: string | null;
+    technologyTags: Array<
+      | "5G Technology"
+      | "802.1X Authentication"
+      | "AI/ML"
+      | "Angular"
+      | "Astro"
+      | "AWS"
+      | "Azure ML"
+      | "Big Data"
+      | "Blockchain"
+      | "Cisco Packet Tracer"
+      | "Cloud Computing"
+      | "Computer Vision"
+      | "CSS"
+      | "Custom Theme"
+      | "Data Analytics"
+      | "Data Science"
+      | "Data Visualization"
+      | "Distributed Systems"
+      | "DNS Security"
+      | "Docker"
+      | "Edge Computing"
+      | "EdTech"
+      | "Elementor"
+      | "Ethereum"
+      | "Figma"
+      | "Firebase"
+      | "FormSite"
+      | "Gamification"
+      | "Git"
+      | "GraphQL"
+      | "Healthcare IoT"
+      | "HTML"
+      | "IoT"
+      | "Java"
+      | "JavaScript"
+      | "Kubernetes"
+      | "Machine Learning"
+      | "MongoDB"
+      | "MySQL"
+      | "Network Security"
+      | "Next.js"
+      | "NLP"
+      | "Node.js"
+      | "Optimization"
+      | "PHP"
+      | "PostgreSQL"
+      | "Proof-of-Stake"
+      | "Publishing"
+      | "Python"
+      | "RADIUS Server"
+      | "React"
+      | "REST API"
+      | "Sentiment Analysis"
+      | "Smart Contracts"
+      | "Smart Slider 3"
+      | "Social Impact"
+      | "Storybook"
+      | "Sustainability"
+      | "Tailwind CSS"
+      | "TypeScript"
+      | "Video Processing"
+      | "VLAN Configuration"
+      | "Vue.js"
+      | "Web Development"
+      | "WebRTC"
+      | "WordPress"
+      | "Workforce Analytics"
+      | "Zero Trust Architecture"
+    > | null;
+    team: Array<{
+      _key: string;
+      name: string | null;
+      role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
+    }> | null;
+    content: PortableText | null;
+  }>;
+} | null;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_PROJECTS_API_QUERY
+// Query: *[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {  _id, title, "slug": slug.current,  status, semester, technologyTags,  team[]{ _key, name, role },  content}
+export type SPONSOR_PROJECTS_API_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  status: "active" | "archived" | "completed" | null;
+  semester: string | null;
+  technologyTags: Array<
+    | "5G Technology"
+    | "802.1X Authentication"
+    | "AI/ML"
+    | "Angular"
+    | "Astro"
+    | "AWS"
+    | "Azure ML"
+    | "Big Data"
+    | "Blockchain"
+    | "Cisco Packet Tracer"
+    | "Cloud Computing"
+    | "Computer Vision"
+    | "CSS"
+    | "Custom Theme"
+    | "Data Analytics"
+    | "Data Science"
+    | "Data Visualization"
+    | "Distributed Systems"
+    | "DNS Security"
+    | "Docker"
+    | "Edge Computing"
+    | "EdTech"
+    | "Elementor"
+    | "Ethereum"
+    | "Figma"
+    | "Firebase"
+    | "FormSite"
+    | "Gamification"
+    | "Git"
+    | "GraphQL"
+    | "Healthcare IoT"
+    | "HTML"
+    | "IoT"
+    | "Java"
+    | "JavaScript"
+    | "Kubernetes"
+    | "Machine Learning"
+    | "MongoDB"
+    | "MySQL"
+    | "Network Security"
+    | "Next.js"
+    | "NLP"
+    | "Node.js"
+    | "Optimization"
+    | "PHP"
+    | "PostgreSQL"
+    | "Proof-of-Stake"
+    | "Publishing"
+    | "Python"
+    | "RADIUS Server"
+    | "React"
+    | "REST API"
+    | "Sentiment Analysis"
+    | "Smart Contracts"
+    | "Smart Slider 3"
+    | "Social Impact"
+    | "Storybook"
+    | "Sustainability"
+    | "Tailwind CSS"
+    | "TypeScript"
+    | "Video Processing"
+    | "VLAN Configuration"
+    | "Vue.js"
+    | "Web Development"
+    | "WebRTC"
+    | "WordPress"
+    | "Workforce Analytics"
+    | "Zero Trust Architecture"
+  > | null;
+  team: Array<{
+    _key: string;
+    name: string | null;
+    role: "designer" | "developer" | "lead" | "qa" | "researcher" | null;
+  }> | null;
+  content: PortableText | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: SPONSOR_PROJECTS_QUERY
+// Query: *[_type == "project" && sponsor._ref in  *[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)]._id  && ($site == "" || site == $site)] | order(title asc) {  _id, title, "slug": slug.current, status}
+export type SPONSOR_PROJECTS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  status: "active" | "archived" | "completed" | null;
+}>;
+
+// Source: ../astro-app/src/lib/sanity.ts
+// Variable: PAGE_BY_SLUG_QUERY
+// Query: *[_type == "page" && slug.current == $slug && ($site == "" || site == $site)][0]{  _id,  title,  "slug": slug.current,  seo {    metaTitle,    metaDescription,    noIndex,    ogImage { asset->{ _id, url, metadata { lqip, dimensions } }, alt }  },  blocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    },    _type == "columnsBlock" => {      variant,      leftBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      rightBlocks[]{    _type,    _key,    backgroundVariant,    spacing,    maxWidth,    variant,    _type == "heroBanner" => {      heading,      subheading,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant },      alignment    },    _type == "featureGrid" => {      heading,      description,      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },      columns    },    _type == "ctaBanner" => {      heading,      description,      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },      ctaButtons[]{ _key, text, url, variant }    },    _type == "statsRow" => {      heading,      stats[]{ _key, value, label, description }    },    _type == "textWithImage" => {      heading,      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }},      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },      imagePosition    },    _type == "logoCloud" => {      heading,      autoPopulate,      sponsors[]->{ _id }    },    _type == "sponsorSteps" => {      heading,      subheading,      items[]{ _key, title, description, list },      ctaButtons[]{ _key, text, url, variant }    },    _type == "richText" => {      content[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }}    },    _type == "faqSection" => {      heading,      items[]{ _key, question, answer[]{  ...,  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },  markDefs[]{    ...,    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }  }} }    },    _type == "contactForm" => {      heading,      description,      successMessage,      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "sponsorCards" => {      heading,      displayMode,      sponsors[]->{ _id }    },    _type == "projectCards" => {      heading,      displayMode,      projects[]->{ _id }    },    _type == "testimonials" => {      heading,      testimonialSource,      testimonials[]->{ _id }    },    _type == "eventList" => {      heading,      eventStatus,      limit    },    _type == "teamGrid" => {      heading,      description,      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }    },    _type == "imageGallery" => {      heading,      description,      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }    },    _type == "articleList" => {      heading,      description,      contentType,      categories[]->{ _id },      limit,      ctaButtons[]{ _key, text, url, variant },      showNewsletterCta    },    _type == "comparisonTable" => {      heading,      description,      options[]{ _key, title, highlighted },      criteria[]{ _key, feature, values, isHeader },      links[]{ _key, text, url, variant }    },    _type == "timeline" => {      heading,      description,      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },      links[]{ _key, text, url, variant }    },    _type == "pullquote" => {      quote,      attribution,      role,      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }    },    _type == "divider" => {      label    },    _type == "announcementBar" => {      icon,      text,      link{ label, href },      dismissible    },    _type == "sponsorshipTiers" => {      heading,      description,      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }    },    _type == "videoEmbed" => {      heading,      description,      youtubeUrl,      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }    },    _type == "pricingTable" => {      heading,      description,      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }    },    _type == "serviceCards" => {      heading,      description,      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }    },    _type == "productShowcase" => {      heading,      description,      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }    },    _type == "linkCards" => {      heading,      description,      links[]{ _key, title, description, icon, url }    },    _type == "newsletter" => {      heading,      description,      inputPlaceholder,      submitButtonLabel,      privacyDisclaimerText    },    _type == "accordion" => {      heading,      description,      items[]{ _key, title, content }    },    _type == "tabsBlock" => {      heading,      tabs[]{ _key, label, content }    },    _type == "embedBlock" => {      heading,      embedUrl,      caption    },    _type == "mapBlock" => {      heading,      address,      coordinates{ lat, lng },      caption,      contactInfo{ phone, email, hours }    },    _type == "countdownTimer" => {      heading,      description,      targetDate,      completedMessage    },    _type == "metricsDashboard" => {      heading,      description,      metrics[]{ _key, label, value, change, trend, icon }    },    _type == "cardGrid" => {      heading,      description,      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }    },    _type == "beforeAfter" => {      heading,      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },      beforeLabel,      afterLabel,      caption    }},      reverseOnMobile,      verticalAlign    }}}
+export type PAGE_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string | null;
+  slug: string | null;
+  seo: {
+    metaTitle: string | null;
+    metaDescription: string | null;
+    noIndex: boolean | null;
+    ogImage: {
+      asset: {
+        _id: string;
+        url: string | null;
+        metadata: {
+          lqip: string | null;
+          dimensions: SanityImageDimensions | null;
+        } | null;
+      } | null;
+      alt: string | null;
+    } | null;
+  } | null;
+  blocks: Array<
+    | {
+        _type: "accordion";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "bordered" | "default" | "separated" | "technical" | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          title: string | null;
+          content: string | null;
+        }> | null;
+      }
+    | {
+        _type: "announcementBar";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "floating" | "inline" | null;
+        icon:
+          | "activity"
+          | "alert-circle"
+          | "alert-triangle"
+          | "arrow-right"
+          | "arrow-up-right"
+          | "award"
+          | "bar-chart-3"
+          | "bell"
+          | "book-open"
+          | "book"
+          | "bookmark"
+          | "bot"
+          | "box"
+          | "brain"
+          | "briefcase"
+          | "building-2"
+          | "calendar"
+          | "camera"
+          | "check-circle"
+          | "check"
+          | "circle-help"
+          | "clipboard"
+          | "clock"
+          | "cloud"
+          | "code"
+          | "compass"
+          | "cpu"
+          | "credit-card"
+          | "crown"
+          | "database"
+          | "dollar-sign"
+          | "download"
+          | "external-link"
+          | "eye"
+          | "file-text"
+          | "filter"
+          | "flag"
+          | "flame"
+          | "folder"
+          | "gift"
+          | "globe"
+          | "graduation-cap"
+          | "handshake"
+          | "heart"
+          | "house"
+          | "image"
+          | "info"
+          | "key"
+          | "laptop"
+          | "layers"
+          | "layout-grid"
+          | "lightbulb"
+          | "link"
+          | "list"
+          | "lock"
+          | "mail"
+          | "map-pin"
+          | "map"
+          | "megaphone"
+          | "menu"
+          | "message-circle"
+          | "mic"
+          | "minus"
+          | "monitor"
+          | "music"
+          | "network"
+          | "package"
+          | "palette"
+          | "pencil"
+          | "phone"
+          | "pie-chart"
+          | "play-circle"
+          | "play"
+          | "plus"
+          | "refresh-cw"
+          | "rocket"
+          | "save"
+          | "search"
+          | "send"
+          | "server"
+          | "settings"
+          | "share-2"
+          | "shield-check"
+          | "shield"
+          | "simple-icons:github"
+          | "simple-icons:linkedin"
+          | "simple-icons:x"
+          | "smartphone"
+          | "sparkles"
+          | "star"
+          | "tag"
+          | "target"
+          | "terminal"
+          | "thumbs-up"
+          | "timer"
+          | "trending-down"
+          | "trending-up"
+          | "trophy"
+          | "upload"
+          | "user"
+          | "users-round"
+          | "users"
+          | "video"
+          | "wallet"
+          | "wifi"
+          | "wrench"
+          | "x"
+          | "zap"
+          | null;
+        text: string | null;
+        link: {
+          label: string | null;
+          href: string | null;
+        } | null;
+        dismissible: boolean | null;
+      }
+    | {
+        _type: "articleList";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "grid"
+          | "list"
+          | "magazine"
+          | "split-featured"
+          | null;
+        heading: string | null;
+        description: string | null;
+        contentType: "all" | "by-category" | null;
+        categories: Array<{
+          _id: string;
+        }> | null;
+        limit: number | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+        showNewsletterCta: boolean | null;
+      }
+    | {
+        _type: "beforeAfter";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "side-by-side" | "stacked" | "toggle" | null;
+        heading: string | null;
+        beforeImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        afterImage: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        beforeLabel: string | null;
+        afterLabel: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "cardGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "grid-2"
+          | "grid-3"
+          | "grid-4"
+          | "masonry"
+          | null;
+        heading: string | null;
+        description: string | null;
+        cards: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+          badge: string | null;
+        }> | null;
+      }
+    | {
+        _type: "columnsBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "equal"
+          | "sidebar-left"
+          | "sidebar-right"
+          | "wide-left"
+          | "wide-right"
+          | null;
+        leftBlocks: Array<
+          | {
+              _type: "accordion";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "bordered"
+                | "default"
+                | "separated"
+                | "technical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "announcementBar";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "floating" | "inline" | null;
+              icon:
+                | "activity"
+                | "alert-circle"
+                | "alert-triangle"
+                | "arrow-right"
+                | "arrow-up-right"
+                | "award"
+                | "bar-chart-3"
+                | "bell"
+                | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
+                | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
+                | "calendar"
+                | "camera"
+                | "check-circle"
+                | "check"
+                | "circle-help"
+                | "clipboard"
+                | "clock"
+                | "cloud"
+                | "code"
+                | "compass"
+                | "cpu"
+                | "credit-card"
+                | "crown"
+                | "database"
+                | "dollar-sign"
+                | "download"
+                | "external-link"
+                | "eye"
+                | "file-text"
+                | "filter"
+                | "flag"
+                | "flame"
+                | "folder"
+                | "gift"
+                | "globe"
+                | "graduation-cap"
+                | "handshake"
+                | "heart"
+                | "house"
+                | "image"
+                | "info"
+                | "key"
+                | "laptop"
+                | "layers"
+                | "layout-grid"
+                | "lightbulb"
+                | "link"
+                | "list"
+                | "lock"
+                | "mail"
+                | "map-pin"
+                | "map"
+                | "megaphone"
+                | "menu"
+                | "message-circle"
+                | "mic"
+                | "minus"
+                | "monitor"
+                | "music"
+                | "network"
+                | "package"
+                | "palette"
+                | "pencil"
+                | "phone"
+                | "pie-chart"
+                | "play-circle"
+                | "play"
+                | "plus"
+                | "refresh-cw"
+                | "rocket"
+                | "save"
+                | "search"
+                | "send"
+                | "server"
+                | "settings"
+                | "share-2"
+                | "shield-check"
+                | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
+                | "sparkles"
+                | "star"
+                | "tag"
+                | "target"
+                | "terminal"
+                | "thumbs-up"
+                | "timer"
+                | "trending-down"
+                | "trending-up"
+                | "trophy"
+                | "upload"
+                | "user"
+                | "users-round"
+                | "users"
+                | "video"
+                | "wallet"
+                | "wifi"
+                | "wrench"
+                | "x"
+                | "zap"
+                | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+              dismissible: boolean | null;
+            }
+          | {
+              _type: "articleList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "list"
+                | "magazine"
+                | "split-featured"
+                | null;
+              heading: string | null;
+              description: string | null;
+              contentType: "all" | "by-category" | null;
+              categories: Array<{
+                _id: string;
+              }> | null;
+              limit: number | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              showNewsletterCta: boolean | null;
+            }
+          | {
+              _type: "beforeAfter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "side-by-side" | "stacked" | "toggle" | null;
+              heading: string | null;
+              beforeImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              afterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              beforeLabel: string | null;
+              afterLabel: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "cardGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid-2"
+                | "grid-3"
+                | "grid-4"
+                | "masonry"
+                | null;
+              heading: string | null;
+              description: string | null;
+              cards: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+                badge: string | null;
+              }> | null;
+            }
+          | {
+              _type: "comparisonTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "specification" | "stacked" | "table" | null;
+              heading: string | null;
+              description: string | null;
+              options: Array<{
+                _key: string;
+                title: string | null;
+                highlighted: boolean | null;
+              }> | null;
+              criteria: Array<{
+                _key: string;
+                feature: string | null;
+                values: Array<string> | null;
+                isHeader: boolean | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "contactForm";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split-image" | "split" | "stacked" | null;
+              heading: string | null;
+              description: string | null;
+              successMessage: string | null;
+              form: {
+                _id: string;
+                title: string | null;
+                fields: Array<{
+                  _key: string;
+                  name: string | null;
+                  label: string | null;
+                  type:
+                    | "checkbox"
+                    | "color"
+                    | "date"
+                    | "datetime-local"
+                    | "email"
+                    | "file"
+                    | "hidden"
+                    | "number"
+                    | "radio"
+                    | "range"
+                    | "select"
+                    | "tel"
+                    | "text"
+                    | "textarea"
+                    | "time"
+                    | "url"
+                    | null;
+                  required: boolean | null;
+                  choices: Array<{
+                    _key: string;
+                    label: string | null;
+                    value: string | null;
+                  }> | null;
+                  options: {
+                    placeholder: string | null;
+                    defaultValue: string | null;
+                  } | null;
+                }> | null;
+                submitButton: {
+                  text: string | null;
+                } | null;
+              } | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+            }
+          | {
+              _type: "countdownTimer";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "hero" | "inline" | null;
+              heading: string | null;
+              description: string | null;
+              targetDate: string | null;
+              completedMessage: string | null;
+            }
+          | {
+              _type: "ctaBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "data-cta"
+                | "overlay"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              description: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "divider";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "labeled" | "line" | "short" | null;
+              label: string | null;
+            }
+          | {
+              _type: "embedBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "contained" | "default" | "full-width" | null;
+              heading: string | null;
+              embedUrl: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "eventList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "list" | "timeline" | null;
+              heading: string | null;
+              eventStatus: "all" | "past" | "upcoming" | null;
+              limit: number | null;
+            }
+          | {
+              _type: "faqSection";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "narrow"
+                | "split"
+                | "spread-header"
+                | "stacked"
+                | "technical"
+                | null;
+              heading: string | null;
+              items: Array<{
+                _key: string;
+                question: string | null;
+                answer: Array<
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>;
+                        text?: string;
+                        _type: "span";
+                        _key: string;
+                      }>;
+                      style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                      listItem?: "bullet" | "number";
+                      markDefs: Array<
+                        | {
+                            reference:
+                              | {
+                                  _type: "article";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "event";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "page";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "project";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "sponsor";
+                                  slug: string | null;
+                                }
+                              | null;
+                            _type: "internalLink";
+                            _key: string;
+                          }
+                        | {
+                            href?: string;
+                            _type: "link";
+                            _key: string;
+                          }
+                      > | null;
+                      level?: number;
+                      _type: "block";
+                      _key: string;
+                    }
+                  | {
+                      tone?: "info" | "success" | "warning";
+                      text?: string;
+                      _type: "callout";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      asset: {
+                        _id: string;
+                        url: string | null;
+                        metadata: {
+                          lqip: string | null;
+                          dimensions: SanityImageDimensions | null;
+                        } | null;
+                      } | null;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt: string | null;
+                      caption: string | null;
+                      _type: "image";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      caption?: string;
+                      rows?: Array<{
+                        isHeader?: boolean;
+                        cells?: Array<string>;
+                        _type: "tableRow";
+                        _key: string;
+                      }>;
+                      _type: "table";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      _key: string;
+                      _type: "videoEmbed";
+                      backgroundVariant?:
+                        | "blueprint"
+                        | "dark"
+                        | "hatched-light"
+                        | "hatched"
+                        | "light"
+                        | "mono"
+                        | "primary"
+                        | "stripe"
+                        | "white";
+                      spacing?: "default" | "large" | "none" | "small";
+                      maxWidth?: "default" | "full" | "narrow";
+                      alignment?: "center" | "left" | "right";
+                      variant?: "full-width" | "split-asymmetric" | "split";
+                      heading?: string;
+                      description?: string;
+                      youtubeUrl?: string;
+                      posterImage?: {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot?: SanityImageHotspot;
+                        crop?: SanityImageCrop;
+                        alt?: string;
+                        _type: "image";
+                      };
+                      markDefs: null;
+                    }
+                > | null;
+              }> | null;
+            }
+          | {
+              _type: "featureGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "grid-centered"
+                | "grid"
+                | "horizontal-cards"
+                | "numbered-brutalist"
+                | "sidebar-grid"
+                | "stacked"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
+              columns: 2 | 3 | 4 | null;
+            }
+          | {
+              _type: "heroBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "overlay"
+                | "split-asymmetric"
+                | "split-bleed"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              subheading: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              alignment: "center" | "left" | "right" | null;
+            }
+          | {
+              _type: "imageGallery";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "masonry" | "single" | null;
+              heading: string | null;
+              description: string | null;
+              images: Array<{
+                _key: string;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                caption: string | null;
+                featured: boolean | null;
+                year: number | null;
+                category:
+                  | "ai-ml"
+                  | "data-viz"
+                  | "iot"
+                  | "mobile"
+                  | "other"
+                  | "web-apps"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "linkCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "icon-list" | "list" | null;
+              heading: string | null;
+              description: string | null;
+              links: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                url: string | null;
+              }> | null;
+            }
+          | {
+              _type: "logoCloud";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "flex-wrap"
+                | "grid-prominent"
+                | "grid"
+                | "marquee"
+                | "tiered"
+                | null;
+              heading: string | null;
+              autoPopulate: boolean | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "mapBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "default" | "full-width" | "split" | null;
+              heading: string | null;
+              address: string | null;
+              coordinates: {
+                lat: number | null;
+                lng: number | null;
+              } | null;
+              caption: string | null;
+              contactInfo: {
+                phone: string | null;
+                email: string | null;
+                hours: string | null;
+              } | null;
+            }
+          | {
+              _type: "metricsDashboard";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-grid"
+                | "card"
+                | "grid"
+                | "row"
+                | "terminal"
+                | null;
+              heading: string | null;
+              description: string | null;
+              metrics: Array<{
+                _key: string;
+                label: string | null;
+                value: string | null;
+                change: string | null;
+                trend: "down" | "neutral" | "up" | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "newsletter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "inline" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              inputPlaceholder: string | null;
+              submitButtonLabel: string | null;
+              privacyDisclaimerText: string | null;
+            }
+          | {
+              _type: "pricingTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "comparison"
+                | "featured"
+                | "simple"
+                | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                interval: string | null;
+                description: string | null;
+                features: Array<string> | null;
+                highlighted: boolean | null;
+                ctaText: string | null;
+                ctaUrl: string | null;
+              }> | null;
+            }
+          | {
+              _type: "productShowcase";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "detail" | "featured" | "grid" | null;
+              heading: string | null;
+              description: string | null;
+              products: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                price: string | null;
+                badge: string | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "projectCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "blueprint" | "case-study" | "default" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              projects: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "pullquote";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+              quote: string | null;
+              attribution: string | null;
+              role: string | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+            }
+          | {
+              _type: "richText";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+            }
+          | {
+              _type: "serviceCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "alternating"
+                | "grid"
+                | "icon-grid"
+                | "list"
+                | "specification"
+                | null;
+              heading: string | null;
+              description: string | null;
+              services: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist-tier" | "default" | "showcase" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "sponsorshipTiers";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                benefits: Array<string> | null;
+                highlighted: boolean | null;
+                ctaButton: {
+                  text: string | null;
+                  url: string | null;
+                  variant: "default" | "ghost" | "outline" | "secondary" | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorSteps";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split" | "spread" | "steps" | null;
+              heading: string | null;
+              subheading: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                list: Array<string> | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "statsRow";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "split"
+                | "spread"
+                | "ticker"
+                | null;
+              heading: string | null;
+              stats: Array<{
+                _key: string;
+                value: string | null;
+                label: string | null;
+                description: string | null;
+              }> | null;
+            }
+          | {
+              _type: "tabsBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | "pills" | "underline" | null;
+              heading: string | null;
+              tabs: Array<{
+                _key: string;
+                label: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "teamGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid-compact" | "grid" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                name: string | null;
+                role: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                links: Array<{
+                  _key: string;
+                  label: string | null;
+                  href: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _type: "testimonials";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-quote"
+                | "carousel"
+                | "grid"
+                | "marquee"
+                | "masonry"
+                | "split"
+                | "spotlight"
+                | null;
+              heading: string | null;
+              testimonialSource:
+                | "all"
+                | "byProject"
+                | "industry"
+                | "manual"
+                | "student"
+                | null;
+              testimonials: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "textWithImage";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "floating"
+                | "reversed"
+                | "split-asymmetric"
+                | "split"
+                | null;
+              heading: string | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+              imagePosition: "left" | "right" | null;
+            }
+          | {
+              _type: "timeline";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "engineering"
+                | "horizontal"
+                | "split"
+                | "vertical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                date: string | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "videoEmbed";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "full-width" | "split-asymmetric" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              youtubeUrl: string | null;
+              posterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+            }
+        > | null;
+        rightBlocks: Array<
+          | {
+              _type: "accordion";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "bordered"
+                | "default"
+                | "separated"
+                | "technical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "announcementBar";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "floating" | "inline" | null;
+              icon:
+                | "activity"
+                | "alert-circle"
+                | "alert-triangle"
+                | "arrow-right"
+                | "arrow-up-right"
+                | "award"
+                | "bar-chart-3"
+                | "bell"
+                | "book-open"
+                | "book"
+                | "bookmark"
+                | "bot"
+                | "box"
+                | "brain"
+                | "briefcase"
+                | "building-2"
+                | "calendar"
+                | "camera"
+                | "check-circle"
+                | "check"
+                | "circle-help"
+                | "clipboard"
+                | "clock"
+                | "cloud"
+                | "code"
+                | "compass"
+                | "cpu"
+                | "credit-card"
+                | "crown"
+                | "database"
+                | "dollar-sign"
+                | "download"
+                | "external-link"
+                | "eye"
+                | "file-text"
+                | "filter"
+                | "flag"
+                | "flame"
+                | "folder"
+                | "gift"
+                | "globe"
+                | "graduation-cap"
+                | "handshake"
+                | "heart"
+                | "house"
+                | "image"
+                | "info"
+                | "key"
+                | "laptop"
+                | "layers"
+                | "layout-grid"
+                | "lightbulb"
+                | "link"
+                | "list"
+                | "lock"
+                | "mail"
+                | "map-pin"
+                | "map"
+                | "megaphone"
+                | "menu"
+                | "message-circle"
+                | "mic"
+                | "minus"
+                | "monitor"
+                | "music"
+                | "network"
+                | "package"
+                | "palette"
+                | "pencil"
+                | "phone"
+                | "pie-chart"
+                | "play-circle"
+                | "play"
+                | "plus"
+                | "refresh-cw"
+                | "rocket"
+                | "save"
+                | "search"
+                | "send"
+                | "server"
+                | "settings"
+                | "share-2"
+                | "shield-check"
+                | "shield"
+                | "simple-icons:github"
+                | "simple-icons:linkedin"
+                | "simple-icons:x"
+                | "smartphone"
+                | "sparkles"
+                | "star"
+                | "tag"
+                | "target"
+                | "terminal"
+                | "thumbs-up"
+                | "timer"
+                | "trending-down"
+                | "trending-up"
+                | "trophy"
+                | "upload"
+                | "user"
+                | "users-round"
+                | "users"
+                | "video"
+                | "wallet"
+                | "wifi"
+                | "wrench"
+                | "x"
+                | "zap"
+                | null;
+              text: string | null;
+              link: {
+                label: string | null;
+                href: string | null;
+              } | null;
+              dismissible: boolean | null;
+            }
+          | {
+              _type: "articleList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "list"
+                | "magazine"
+                | "split-featured"
+                | null;
+              heading: string | null;
+              description: string | null;
+              contentType: "all" | "by-category" | null;
+              categories: Array<{
+                _id: string;
+              }> | null;
+              limit: number | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              showNewsletterCta: boolean | null;
+            }
+          | {
+              _type: "beforeAfter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "side-by-side" | "stacked" | "toggle" | null;
+              heading: string | null;
+              beforeImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              afterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+              beforeLabel: string | null;
+              afterLabel: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "cardGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid-2"
+                | "grid-3"
+                | "grid-4"
+                | "masonry"
+                | null;
+              heading: string | null;
+              description: string | null;
+              cards: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+                badge: string | null;
+              }> | null;
+            }
+          | {
+              _type: "comparisonTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "specification" | "stacked" | "table" | null;
+              heading: string | null;
+              description: string | null;
+              options: Array<{
+                _key: string;
+                title: string | null;
+                highlighted: boolean | null;
+              }> | null;
+              criteria: Array<{
+                _key: string;
+                feature: string | null;
+                values: Array<string> | null;
+                isHeader: boolean | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "contactForm";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split-image" | "split" | "stacked" | null;
+              heading: string | null;
+              description: string | null;
+              successMessage: string | null;
+              form: {
+                _id: string;
+                title: string | null;
+                fields: Array<{
+                  _key: string;
+                  name: string | null;
+                  label: string | null;
+                  type:
+                    | "checkbox"
+                    | "color"
+                    | "date"
+                    | "datetime-local"
+                    | "email"
+                    | "file"
+                    | "hidden"
+                    | "number"
+                    | "radio"
+                    | "range"
+                    | "select"
+                    | "tel"
+                    | "text"
+                    | "textarea"
+                    | "time"
+                    | "url"
+                    | null;
+                  required: boolean | null;
+                  choices: Array<{
+                    _key: string;
+                    label: string | null;
+                    value: string | null;
+                  }> | null;
+                  options: {
+                    placeholder: string | null;
+                    defaultValue: string | null;
+                  } | null;
+                }> | null;
+                submitButton: {
+                  text: string | null;
+                } | null;
+              } | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+            }
+          | {
+              _type: "countdownTimer";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "hero" | "inline" | null;
+              heading: string | null;
+              description: string | null;
+              targetDate: string | null;
+              completedMessage: string | null;
+            }
+          | {
+              _type: "ctaBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "data-cta"
+                | "overlay"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              description: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "divider";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "labeled" | "line" | "short" | null;
+              label: string | null;
+            }
+          | {
+              _type: "embedBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "contained" | "default" | "full-width" | null;
+              heading: string | null;
+              embedUrl: string | null;
+              caption: string | null;
+            }
+          | {
+              _type: "eventList";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "list" | "timeline" | null;
+              heading: string | null;
+              eventStatus: "all" | "past" | "upcoming" | null;
+              limit: number | null;
+            }
+          | {
+              _type: "faqSection";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "narrow"
+                | "split"
+                | "spread-header"
+                | "stacked"
+                | "technical"
+                | null;
+              heading: string | null;
+              items: Array<{
+                _key: string;
+                question: string | null;
+                answer: Array<
+                  | {
+                      children?: Array<{
+                        marks?: Array<string>;
+                        text?: string;
+                        _type: "span";
+                        _key: string;
+                      }>;
+                      style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                      listItem?: "bullet" | "number";
+                      markDefs: Array<
+                        | {
+                            reference:
+                              | {
+                                  _type: "article";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "event";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "page";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "project";
+                                  slug: string | null;
+                                }
+                              | {
+                                  _type: "sponsor";
+                                  slug: string | null;
+                                }
+                              | null;
+                            _type: "internalLink";
+                            _key: string;
+                          }
+                        | {
+                            href?: string;
+                            _type: "link";
+                            _key: string;
+                          }
+                      > | null;
+                      level?: number;
+                      _type: "block";
+                      _key: string;
+                    }
+                  | {
+                      tone?: "info" | "success" | "warning";
+                      text?: string;
+                      _type: "callout";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      asset: {
+                        _id: string;
+                        url: string | null;
+                        metadata: {
+                          lqip: string | null;
+                          dimensions: SanityImageDimensions | null;
+                        } | null;
+                      } | null;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt: string | null;
+                      caption: string | null;
+                      _type: "image";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      caption?: string;
+                      rows?: Array<{
+                        isHeader?: boolean;
+                        cells?: Array<string>;
+                        _type: "tableRow";
+                        _key: string;
+                      }>;
+                      _type: "table";
+                      _key: string;
+                      markDefs: null;
+                    }
+                  | {
+                      _key: string;
+                      _type: "videoEmbed";
+                      backgroundVariant?:
+                        | "blueprint"
+                        | "dark"
+                        | "hatched-light"
+                        | "hatched"
+                        | "light"
+                        | "mono"
+                        | "primary"
+                        | "stripe"
+                        | "white";
+                      spacing?: "default" | "large" | "none" | "small";
+                      maxWidth?: "default" | "full" | "narrow";
+                      alignment?: "center" | "left" | "right";
+                      variant?: "full-width" | "split-asymmetric" | "split";
+                      heading?: string;
+                      description?: string;
+                      youtubeUrl?: string;
+                      posterImage?: {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot?: SanityImageHotspot;
+                        crop?: SanityImageCrop;
+                        alt?: string;
+                        _type: "image";
+                      };
+                      markDefs: null;
+                    }
+                > | null;
+              }> | null;
+            }
+          | {
+              _type: "featureGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "grid-centered"
+                | "grid"
+                | "horizontal-cards"
+                | "numbered-brutalist"
+                | "sidebar-grid"
+                | "stacked"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                } | null;
+              }> | null;
+              columns: 2 | 3 | 4 | null;
+            }
+          | {
+              _type: "heroBanner";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "centered"
+                | "overlay"
+                | "split-asymmetric"
+                | "split-bleed"
+                | "split"
+                | "spread"
+                | null;
+              heading: string | null;
+              subheading: string | null;
+              backgroundImages: Array<{
+                _key: string;
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+              alignment: "center" | "left" | "right" | null;
+            }
+          | {
+              _type: "imageGallery";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "masonry" | "single" | null;
+              heading: string | null;
+              description: string | null;
+              images: Array<{
+                _key: string;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                caption: string | null;
+                featured: boolean | null;
+                year: number | null;
+                category:
+                  | "ai-ml"
+                  | "data-viz"
+                  | "iot"
+                  | "mobile"
+                  | "other"
+                  | "web-apps"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "linkCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid" | "icon-list" | "list" | null;
+              heading: string | null;
+              description: string | null;
+              links: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                url: string | null;
+              }> | null;
+            }
+          | {
+              _type: "logoCloud";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "flex-wrap"
+                | "grid-prominent"
+                | "grid"
+                | "marquee"
+                | "tiered"
+                | null;
+              heading: string | null;
+              autoPopulate: boolean | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "mapBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "default" | "full-width" | "split" | null;
+              heading: string | null;
+              address: string | null;
+              coordinates: {
+                lat: number | null;
+                lng: number | null;
+              } | null;
+              caption: string | null;
+              contactInfo: {
+                phone: string | null;
+                email: string | null;
+                hours: string | null;
+              } | null;
+            }
+          | {
+              _type: "metricsDashboard";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-grid"
+                | "card"
+                | "grid"
+                | "row"
+                | "terminal"
+                | null;
+              heading: string | null;
+              description: string | null;
+              metrics: Array<{
+                _key: string;
+                label: string | null;
+                value: string | null;
+                change: string | null;
+                trend: "down" | "neutral" | "up" | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+              }> | null;
+            }
+          | {
+              _type: "newsletter";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "banner" | "brutalist" | "inline" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              inputPlaceholder: string | null;
+              submitButtonLabel: string | null;
+              privacyDisclaimerText: string | null;
+            }
+          | {
+              _type: "pricingTable";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "comparison"
+                | "featured"
+                | "simple"
+                | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                interval: string | null;
+                description: string | null;
+                features: Array<string> | null;
+                highlighted: boolean | null;
+                ctaText: string | null;
+                ctaUrl: string | null;
+              }> | null;
+            }
+          | {
+              _type: "productShowcase";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "detail" | "featured" | "grid" | null;
+              heading: string | null;
+              description: string | null;
+              products: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                price: string | null;
+                badge: string | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "projectCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "blueprint" | "case-study" | "default" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              projects: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "pullquote";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+              quote: string | null;
+              attribution: string | null;
+              role: string | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              } | null;
+            }
+          | {
+              _type: "richText";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+            }
+          | {
+              _type: "serviceCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "alternating"
+                | "grid"
+                | "icon-grid"
+                | "list"
+                | "specification"
+                | null;
+              heading: string | null;
+              description: string | null;
+              services: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                icon:
+                  | "activity"
+                  | "alert-circle"
+                  | "alert-triangle"
+                  | "arrow-right"
+                  | "arrow-up-right"
+                  | "award"
+                  | "bar-chart-3"
+                  | "bell"
+                  | "book-open"
+                  | "book"
+                  | "bookmark"
+                  | "bot"
+                  | "box"
+                  | "brain"
+                  | "briefcase"
+                  | "building-2"
+                  | "calendar"
+                  | "camera"
+                  | "check-circle"
+                  | "check"
+                  | "circle-help"
+                  | "clipboard"
+                  | "clock"
+                  | "cloud"
+                  | "code"
+                  | "compass"
+                  | "cpu"
+                  | "credit-card"
+                  | "crown"
+                  | "database"
+                  | "dollar-sign"
+                  | "download"
+                  | "external-link"
+                  | "eye"
+                  | "file-text"
+                  | "filter"
+                  | "flag"
+                  | "flame"
+                  | "folder"
+                  | "gift"
+                  | "globe"
+                  | "graduation-cap"
+                  | "handshake"
+                  | "heart"
+                  | "house"
+                  | "image"
+                  | "info"
+                  | "key"
+                  | "laptop"
+                  | "layers"
+                  | "layout-grid"
+                  | "lightbulb"
+                  | "link"
+                  | "list"
+                  | "lock"
+                  | "mail"
+                  | "map-pin"
+                  | "map"
+                  | "megaphone"
+                  | "menu"
+                  | "message-circle"
+                  | "mic"
+                  | "minus"
+                  | "monitor"
+                  | "music"
+                  | "network"
+                  | "package"
+                  | "palette"
+                  | "pencil"
+                  | "phone"
+                  | "pie-chart"
+                  | "play-circle"
+                  | "play"
+                  | "plus"
+                  | "refresh-cw"
+                  | "rocket"
+                  | "save"
+                  | "search"
+                  | "send"
+                  | "server"
+                  | "settings"
+                  | "share-2"
+                  | "shield-check"
+                  | "shield"
+                  | "simple-icons:github"
+                  | "simple-icons:linkedin"
+                  | "simple-icons:x"
+                  | "smartphone"
+                  | "sparkles"
+                  | "star"
+                  | "tag"
+                  | "target"
+                  | "terminal"
+                  | "thumbs-up"
+                  | "timer"
+                  | "trending-down"
+                  | "trending-up"
+                  | "trophy"
+                  | "upload"
+                  | "user"
+                  | "users-round"
+                  | "users"
+                  | "video"
+                  | "wallet"
+                  | "wifi"
+                  | "wrench"
+                  | "x"
+                  | "zap"
+                  | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                link: {
+                  label: string | null;
+                  href: string | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorCards";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist-tier" | "default" | "showcase" | null;
+              heading: string | null;
+              displayMode: "all" | "featured" | "manual" | null;
+              sponsors: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "sponsorshipTiers";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | null;
+              heading: string | null;
+              description: string | null;
+              tiers: Array<{
+                _key: string;
+                name: string | null;
+                price: string | null;
+                benefits: Array<string> | null;
+                highlighted: boolean | null;
+                ctaButton: {
+                  text: string | null;
+                  url: string | null;
+                  variant: "default" | "ghost" | "outline" | "secondary" | null;
+                } | null;
+              }> | null;
+            }
+          | {
+              _type: "sponsorSteps";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "split" | "spread" | "steps" | null;
+              heading: string | null;
+              subheading: string | null;
+              items: Array<{
+                _key: string;
+                title: string | null;
+                description: string | null;
+                list: Array<string> | null;
+              }> | null;
+              ctaButtons: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "statsRow";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "grid"
+                | "split"
+                | "spread"
+                | "ticker"
+                | null;
+              heading: string | null;
+              stats: Array<{
+                _key: string;
+                value: string | null;
+                label: string | null;
+                description: string | null;
+              }> | null;
+            }
+          | {
+              _type: "tabsBlock";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "brutalist" | "default" | "pills" | "underline" | null;
+              heading: string | null;
+              tabs: Array<{
+                _key: string;
+                label: string | null;
+                content: string | null;
+              }> | null;
+            }
+          | {
+              _type: "teamGrid";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "grid-compact" | "grid" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                name: string | null;
+                role: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+                links: Array<{
+                  _key: string;
+                  label: string | null;
+                  href: string | null;
+                }> | null;
+              }> | null;
+            }
+          | {
+              _type: "testimonials";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist-quote"
+                | "carousel"
+                | "grid"
+                | "marquee"
+                | "masonry"
+                | "split"
+                | "spotlight"
+                | null;
+              heading: string | null;
+              testimonialSource:
+                | "all"
+                | "byProject"
+                | "industry"
+                | "manual"
+                | "student"
+                | null;
+              testimonials: Array<{
+                _id: string;
+              }> | null;
+            }
+          | {
+              _type: "textWithImage";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "brutalist"
+                | "floating"
+                | "reversed"
+                | "split-asymmetric"
+                | "split"
+                | null;
+              heading: string | null;
+              content: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          reference:
+                            | {
+                                _type: "article";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "event";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "page";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "project";
+                                slug: string | null;
+                              }
+                            | {
+                                _type: "sponsor";
+                                slug: string | null;
+                              }
+                            | null;
+                          _type: "internalLink";
+                          _key: string;
+                        }
+                      | {
+                          href?: string;
+                          _type: "link";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    tone?: "info" | "success" | "warning";
+                    text?: string;
+                    _type: "callout";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    asset: {
+                      _id: string;
+                      url: string | null;
+                      metadata: {
+                        lqip: string | null;
+                        dimensions: SanityImageDimensions | null;
+                      } | null;
+                    } | null;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    alt: string | null;
+                    caption: string | null;
+                    _type: "image";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    caption?: string;
+                    rows?: Array<{
+                      isHeader?: boolean;
+                      cells?: Array<string>;
+                      _type: "tableRow";
+                      _key: string;
+                    }>;
+                    _type: "table";
+                    _key: string;
+                    markDefs: null;
+                  }
+                | {
+                    _key: string;
+                    _type: "videoEmbed";
+                    backgroundVariant?:
+                      | "blueprint"
+                      | "dark"
+                      | "hatched-light"
+                      | "hatched"
+                      | "light"
+                      | "mono"
+                      | "primary"
+                      | "stripe"
+                      | "white";
+                    spacing?: "default" | "large" | "none" | "small";
+                    maxWidth?: "default" | "full" | "narrow";
+                    alignment?: "center" | "left" | "right";
+                    variant?: "full-width" | "split-asymmetric" | "split";
+                    heading?: string;
+                    description?: string;
+                    youtubeUrl?: string;
+                    posterImage?: {
+                      asset?: SanityImageAssetReference;
+                      media?: unknown;
+                      hotspot?: SanityImageHotspot;
+                      crop?: SanityImageCrop;
+                      alt?: string;
+                      _type: "image";
+                    };
+                    markDefs: null;
+                  }
+              > | null;
+              image: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+              imagePosition: "left" | "right" | null;
+            }
+          | {
+              _type: "timeline";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant:
+                | "engineering"
+                | "horizontal"
+                | "split"
+                | "vertical"
+                | null;
+              heading: string | null;
+              description: string | null;
+              items: Array<{
+                _key: string;
+                date: string | null;
+                title: string | null;
+                description: string | null;
+                image: {
+                  asset: {
+                    _id: string;
+                    url: string | null;
+                    metadata: {
+                      lqip: string | null;
+                      dimensions: SanityImageDimensions | null;
+                    } | null;
+                  } | null;
+                  alt: string | null;
+                  hotspot: SanityImageHotspot | null;
+                  crop: SanityImageCrop | null;
+                } | null;
+              }> | null;
+              links: Array<{
+                _key: string;
+                text: string | null;
+                url: string | null;
+                variant: "default" | "ghost" | "outline" | "secondary" | null;
+              }> | null;
+            }
+          | {
+              _type: "videoEmbed";
+              _key: string;
+              backgroundVariant:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white"
+                | null;
+              spacing: "default" | "large" | "none" | "small" | null;
+              maxWidth: "default" | "full" | "narrow" | null;
+              variant: "full-width" | "split-asymmetric" | "split" | null;
+              heading: string | null;
+              description: string | null;
+              youtubeUrl: string | null;
+              posterImage: {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+              } | null;
+            }
+        > | null;
+        reverseOnMobile: boolean | null;
+        verticalAlign: "center" | "stretch" | "top" | null;
+      }
+    | {
+        _type: "comparisonTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "specification" | "stacked" | "table" | null;
+        heading: string | null;
+        description: string | null;
+        options: Array<{
+          _key: string;
+          title: string | null;
+          highlighted: boolean | null;
+        }> | null;
+        criteria: Array<{
+          _key: string;
+          feature: string | null;
+          values: Array<string> | null;
+          isHeader: boolean | null;
+        }> | null;
+        links: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "contactForm";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "split-image" | "split" | "stacked" | null;
+        heading: string | null;
+        description: string | null;
+        successMessage: string | null;
+        form: {
+          _id: string;
+          title: string | null;
+          fields: Array<{
+            _key: string;
+            name: string | null;
+            label: string | null;
+            type:
+              | "checkbox"
+              | "color"
+              | "date"
+              | "datetime-local"
+              | "email"
+              | "file"
+              | "hidden"
+              | "number"
+              | "radio"
+              | "range"
+              | "select"
+              | "tel"
+              | "text"
+              | "textarea"
+              | "time"
+              | "url"
+              | null;
+            required: boolean | null;
+            choices: Array<{
+              _key: string;
+              label: string | null;
+              value: string | null;
+            }> | null;
+            options: {
+              placeholder: string | null;
+              defaultValue: string | null;
+            } | null;
+          }> | null;
+          submitButton: {
+            text: string | null;
+          } | null;
+        } | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+      }
+    | {
+        _type: "countdownTimer";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "hero" | "inline" | null;
+        heading: string | null;
+        description: string | null;
+        targetDate: string | null;
+        completedMessage: string | null;
+      }
+    | {
+        _type: "ctaBanner";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "data-cta"
+          | "overlay"
+          | "split"
+          | "spread"
+          | null;
+        heading: string | null;
+        description: string | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+      }
+    | {
+        _type: "divider";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "labeled" | "line" | "short" | null;
+        label: string | null;
+      }
+    | {
+        _type: "embedBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "contained" | "default" | "full-width" | null;
+        heading: string | null;
+        embedUrl: string | null;
+        caption: string | null;
+      }
+    | {
+        _type: "eventList";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "list" | "timeline" | null;
+        heading: string | null;
+        eventStatus: "all" | "past" | "upcoming" | null;
+        limit: number | null;
+      }
+    | {
+        _type: "faqSection";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "narrow"
+          | "split"
+          | "spread-header"
+          | "stacked"
+          | "technical"
+          | null;
+        heading: string | null;
+        items: Array<{
+          _key: string;
+          question: string | null;
+          answer: Array<
+            | {
+                children?: Array<{
+                  marks?: Array<string>;
+                  text?: string;
+                  _type: "span";
+                  _key: string;
+                }>;
+                style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+                listItem?: "bullet" | "number";
+                markDefs: Array<
+                  | {
+                      reference:
+                        | {
+                            _type: "article";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "event";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "page";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "project";
+                            slug: string | null;
+                          }
+                        | {
+                            _type: "sponsor";
+                            slug: string | null;
+                          }
+                        | null;
+                      _type: "internalLink";
+                      _key: string;
+                    }
+                  | {
+                      href?: string;
+                      _type: "link";
+                      _key: string;
+                    }
+                > | null;
+                level?: number;
+                _type: "block";
+                _key: string;
+              }
+            | {
+                tone?: "info" | "success" | "warning";
+                text?: string;
+                _type: "callout";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                asset: {
+                  _id: string;
+                  url: string | null;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: SanityImageDimensions | null;
+                  } | null;
+                } | null;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt: string | null;
+                caption: string | null;
+                _type: "image";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                caption?: string;
+                rows?: Array<{
+                  isHeader?: boolean;
+                  cells?: Array<string>;
+                  _type: "tableRow";
+                  _key: string;
+                }>;
+                _type: "table";
+                _key: string;
+                markDefs: null;
+              }
+            | {
+                _key: string;
+                _type: "videoEmbed";
+                backgroundVariant?:
+                  | "blueprint"
+                  | "dark"
+                  | "hatched-light"
+                  | "hatched"
+                  | "light"
+                  | "mono"
+                  | "primary"
+                  | "stripe"
+                  | "white";
+                spacing?: "default" | "large" | "none" | "small";
+                maxWidth?: "default" | "full" | "narrow";
+                alignment?: "center" | "left" | "right";
+                variant?: "full-width" | "split-asymmetric" | "split";
+                heading?: string;
+                description?: string;
+                youtubeUrl?: string;
+                posterImage?: {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot?: SanityImageHotspot;
+                  crop?: SanityImageCrop;
+                  alt?: string;
+                  _type: "image";
+                };
+                markDefs: null;
+              }
+          > | null;
+        }> | null;
+      }
+    | {
+        _type: "featureGrid";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "grid-centered"
+          | "grid"
+          | "horizontal-cards"
+          | "numbered-brutalist"
+          | "sidebar-grid"
+          | "stacked"
+          | null;
+        heading: string | null;
+        description: string | null;
+        items: Array<{
+          _key: string;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+          } | null;
+        }> | null;
+        columns: 2 | 3 | 4 | null;
+      }
+    | {
+        _type: "heroBanner";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "brutalist"
+          | "centered"
+          | "overlay"
+          | "split-asymmetric"
+          | "split-bleed"
+          | "split"
+          | "spread"
+          | null;
+        heading: string | null;
+        subheading: string | null;
+        backgroundImages: Array<{
+          _key: string;
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+        }> | null;
+        ctaButtons: Array<{
+          _key: string;
+          text: string | null;
+          url: string | null;
+          variant: "default" | "ghost" | "outline" | "secondary" | null;
+        }> | null;
+        alignment: "center" | "left" | "right" | null;
+      }
+    | {
+        _type: "imageGallery";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "masonry" | "single" | null;
+        heading: string | null;
+        description: string | null;
+        images: Array<{
+          _key: string;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          caption: string | null;
+          featured: boolean | null;
+          year: number | null;
+          category:
+            | "ai-ml"
+            | "data-viz"
+            | "iot"
+            | "mobile"
+            | "other"
+            | "web-apps"
+            | null;
+        }> | null;
+      }
+    | {
+        _type: "linkCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "grid" | "icon-list" | "list" | null;
+        heading: string | null;
+        description: string | null;
+        links: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+          url: string | null;
+        }> | null;
+      }
+    | {
+        _type: "logoCloud";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "flex-wrap"
+          | "grid-prominent"
+          | "grid"
+          | "marquee"
+          | "tiered"
+          | null;
+        heading: string | null;
+        autoPopulate: boolean | null;
+        sponsors: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "mapBlock";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "default" | "full-width" | "split" | null;
+        heading: string | null;
+        address: string | null;
+        coordinates: {
+          lat: number | null;
+          lng: number | null;
+        } | null;
+        caption: string | null;
+        contactInfo: {
+          phone: string | null;
+          email: string | null;
+          hours: string | null;
+        } | null;
+      }
+    | {
+        _type: "metricsDashboard";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist-grid" | "card" | "grid" | "row" | "terminal" | null;
+        heading: string | null;
+        description: string | null;
+        metrics: Array<{
+          _key: string;
+          label: string | null;
+          value: string | null;
+          change: string | null;
+          trend: "down" | "neutral" | "up" | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
+            | "users"
+            | "video"
+            | "wallet"
+            | "wifi"
+            | "wrench"
+            | "x"
+            | "zap"
+            | null;
+        }> | null;
+      }
+    | {
+        _type: "newsletter";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "banner" | "brutalist" | "inline" | "split" | null;
+        heading: string | null;
+        description: string | null;
+        inputPlaceholder: string | null;
+        submitButtonLabel: string | null;
+        privacyDisclaimerText: string | null;
+      }
+    | {
+        _type: "pricingTable";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "comparison" | "featured" | "simple" | null;
+        heading: string | null;
+        description: string | null;
+        tiers: Array<{
+          _key: string;
+          name: string | null;
+          price: string | null;
+          interval: string | null;
+          description: string | null;
+          features: Array<string> | null;
+          highlighted: boolean | null;
+          ctaText: string | null;
+          ctaUrl: string | null;
+        }> | null;
+      }
+    | {
+        _type: "productShowcase";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "detail" | "featured" | "grid" | null;
+        heading: string | null;
+        description: string | null;
+        products: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          image: {
+            asset: {
+              _id: string;
+              url: string | null;
+              metadata: {
+                lqip: string | null;
+                dimensions: SanityImageDimensions | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          } | null;
+          price: string | null;
+          badge: string | null;
+          link: {
+            label: string | null;
+            href: string | null;
+          } | null;
+        }> | null;
+      }
+    | {
+        _type: "projectCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "blueprint" | "case-study" | "default" | null;
+        heading: string | null;
+        displayMode: "all" | "featured" | "manual" | null;
+        projects: Array<{
+          _id: string;
+        }> | null;
+      }
+    | {
+        _type: "pullquote";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "brutalist" | "centered" | "sidebar" | "split" | null;
+        quote: string | null;
+        attribution: string | null;
+        role: string | null;
+        image: {
+          asset: {
+            _id: string;
+            url: string | null;
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+      }
+    | {
+        _type: "richText";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant: "highlighted" | "prose" | "sidebar" | "standard" | null;
+        content: Array<
+          | {
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+              listItem?: "bullet" | "number";
+              markDefs: Array<
+                | {
+                    reference:
+                      | {
+                          _type: "article";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "event";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "page";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "project";
+                          slug: string | null;
+                        }
+                      | {
+                          _type: "sponsor";
+                          slug: string | null;
+                        }
+                      | null;
+                    _type: "internalLink";
+                    _key: string;
+                  }
+                | {
+                    href?: string;
+                    _type: "link";
+                    _key: string;
+                  }
+              > | null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }
+          | {
+              tone?: "info" | "success" | "warning";
+              text?: string;
+              _type: "callout";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              asset: {
+                _id: string;
+                url: string | null;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: SanityImageDimensions | null;
+                } | null;
+              } | null;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              alt: string | null;
+              caption: string | null;
+              _type: "image";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              caption?: string;
+              rows?: Array<{
+                isHeader?: boolean;
+                cells?: Array<string>;
+                _type: "tableRow";
+                _key: string;
+              }>;
+              _type: "table";
+              _key: string;
+              markDefs: null;
+            }
+          | {
+              _key: string;
+              _type: "videoEmbed";
+              backgroundVariant?:
+                | "blueprint"
+                | "dark"
+                | "hatched-light"
+                | "hatched"
+                | "light"
+                | "mono"
+                | "primary"
+                | "stripe"
+                | "white";
+              spacing?: "default" | "large" | "none" | "small";
+              maxWidth?: "default" | "full" | "narrow";
+              alignment?: "center" | "left" | "right";
+              variant?: "full-width" | "split-asymmetric" | "split";
+              heading?: string;
+              description?: string;
+              youtubeUrl?: string;
+              posterImage?: {
+                asset?: SanityImageAssetReference;
+                media?: unknown;
+                hotspot?: SanityImageHotspot;
+                crop?: SanityImageCrop;
+                alt?: string;
+                _type: "image";
+              };
+              markDefs: null;
+            }
+        > | null;
+      }
+    | {
+        _type: "serviceCards";
+        _key: string;
+        backgroundVariant:
+          | "blueprint"
+          | "dark"
+          | "hatched-light"
+          | "hatched"
+          | "light"
+          | "mono"
+          | "primary"
+          | "stripe"
+          | "white"
+          | null;
+        spacing: "default" | "large" | "none" | "small" | null;
+        maxWidth: "default" | "full" | "narrow" | null;
+        variant:
+          | "alternating"
+          | "grid"
+          | "icon-grid"
+          | "list"
+          | "specification"
+          | null;
+        heading: string | null;
+        description: string | null;
+        services: Array<{
+          _key: string;
+          title: string | null;
+          description: string | null;
+          icon:
+            | "activity"
+            | "alert-circle"
+            | "alert-triangle"
+            | "arrow-right"
+            | "arrow-up-right"
+            | "award"
+            | "bar-chart-3"
+            | "bell"
+            | "book-open"
+            | "book"
+            | "bookmark"
+            | "bot"
+            | "box"
+            | "brain"
+            | "briefcase"
+            | "building-2"
+            | "calendar"
+            | "camera"
+            | "check-circle"
+            | "check"
+            | "circle-help"
+            | "clipboard"
+            | "clock"
+            | "cloud"
+            | "code"
+            | "compass"
+            | "cpu"
+            | "credit-card"
+            | "crown"
+            | "database"
+            | "dollar-sign"
+            | "download"
+            | "external-link"
+            | "eye"
+            | "file-text"
+            | "filter"
+            | "flag"
+            | "flame"
+            | "folder"
+            | "gift"
+            | "globe"
+            | "graduation-cap"
+            | "handshake"
+            | "heart"
+            | "house"
+            | "image"
+            | "info"
+            | "key"
+            | "laptop"
+            | "layers"
+            | "layout-grid"
+            | "lightbulb"
+            | "link"
+            | "list"
+            | "lock"
+            | "mail"
+            | "map-pin"
+            | "map"
+            | "megaphone"
+            | "menu"
+            | "message-circle"
+            | "mic"
+            | "minus"
+            | "monitor"
+            | "music"
+            | "network"
+            | "package"
+            | "palette"
+            | "pencil"
+            | "phone"
+            | "pie-chart"
+            | "play-circle"
+            | "play"
+            | "plus"
+            | "refresh-cw"
+            | "rocket"
+            | "save"
+            | "search"
+            | "send"
+            | "server"
+            | "settings"
+            | "share-2"
+            | "shield-check"
+            | "shield"
+            | "simple-icons:github"
+            | "simple-icons:linkedin"
+            | "simple-icons:x"
+            | "smartphone"
+            | "sparkles"
+            | "star"
+            | "tag"
+            | "target"
+            | "terminal"
+            | "thumbs-up"
+            | "timer"
+            | "trending-down"
+            | "trending-up"
+            | "trophy"
+            | "upload"
+            | "user"
+            | "users-round"
             | "users"
             | "video"
             | "wallet"
@@ -22294,6 +37530,7 @@ declare module "@sanity/client" {
     '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_AUTHOR_SLUGS_QUERY_RESULT;
     '*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  role, bio, credentials,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  sameAs,\n  socialLinks[]{ _key, platform, url },\n  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){\n    _id, title, "slug": slug.current,\n    excerpt,\n    featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n    author->{ name, "slug": slug.current },\n    publishedAt,\n    category->{ _id, title, "slug": slug.current }\n  }\n}': AUTHOR_BY_SLUG_QUERY_RESULT;
     '*[_type == "listingPage" && _id == $id][0]{\n  _id, route, title, description,\n  seo{ metaTitle, metaDescription, noIndex, ogImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n  headerBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    },\n    _type == "columnsBlock" => {\n      variant,\n      leftBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      rightBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      reverseOnMobile,\n      verticalAlign\n    }},\n  footerBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    },\n    _type == "columnsBlock" => {\n      variant,\n      leftBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      rightBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      reverseOnMobile,\n      verticalAlign\n    }}\n}': LISTING_PAGE_QUERY_RESULT;
+    '*[_type == "portalPage" && _id == $id][0]{\n  _id, route, title, description,\n  headerBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    },\n    _type == "columnsBlock" => {\n      variant,\n      leftBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      rightBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      reverseOnMobile,\n      verticalAlign\n    }},\n  footerBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    },\n    _type == "columnsBlock" => {\n      variant,\n      leftBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      rightBlocks[]{\n    _type,\n    _key,\n    backgroundVariant,\n    spacing,\n    maxWidth,\n    variant,\n    _type == "heroBanner" => {\n      heading,\n      subheading,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant },\n      alignment\n    },\n    _type == "featureGrid" => {\n      heading,\n      description,\n      items[]{ _key, icon, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt } },\n      columns\n    },\n    _type == "ctaBanner" => {\n      heading,\n      description,\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "statsRow" => {\n      heading,\n      stats[]{ _key, value, label, description }\n    },\n    _type == "textWithImage" => {\n      heading,\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n},\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n      imagePosition\n    },\n    _type == "logoCloud" => {\n      heading,\n      autoPopulate,\n      sponsors[]->{ _id }\n    },\n    _type == "sponsorSteps" => {\n      heading,\n      subheading,\n      items[]{ _key, title, description, list },\n      ctaButtons[]{ _key, text, url, variant }\n    },\n    _type == "richText" => {\n      content[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n}\n    },\n    _type == "faqSection" => {\n      heading,\n      items[]{ _key, question, answer[]{\n  ...,\n  _type == "image" => { asset->{ _id, url, metadata { lqip, dimensions } }, alt, caption },\n  markDefs[]{\n    ...,\n    _type == "internalLink" => { ..., reference->{ _type, "slug": slug.current } }\n  }\n} }\n    },\n    _type == "contactForm" => {\n      heading,\n      description,\n      successMessage,\n      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },\n      backgroundImages[]{ _key, asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "sponsorCards" => {\n      heading,\n      displayMode,\n      sponsors[]->{ _id }\n    },\n    _type == "projectCards" => {\n      heading,\n      displayMode,\n      projects[]->{ _id }\n    },\n    _type == "testimonials" => {\n      heading,\n      testimonialSource,\n      testimonials[]->{ _id }\n    },\n    _type == "eventList" => {\n      heading,\n      eventStatus,\n      limit\n    },\n    _type == "teamGrid" => {\n      heading,\n      description,\n      items[]{ _key, name, role, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, links[]{ _key, label, href } }\n    },\n    _type == "imageGallery" => {\n      heading,\n      description,\n      images[]{ _key, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, caption, featured, year, category }\n    },\n    _type == "articleList" => {\n      heading,\n      description,\n      contentType,\n      categories[]->{ _id },\n      limit,\n      ctaButtons[]{ _key, text, url, variant },\n      showNewsletterCta\n    },\n    _type == "comparisonTable" => {\n      heading,\n      description,\n      options[]{ _key, title, highlighted },\n      criteria[]{ _key, feature, values, isHeader },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "timeline" => {\n      heading,\n      description,\n      items[]{ _key, date, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop } },\n      links[]{ _key, text, url, variant }\n    },\n    _type == "pullquote" => {\n      quote,\n      attribution,\n      role,\n      image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }\n    },\n    _type == "divider" => {\n      label\n    },\n    _type == "announcementBar" => {\n      icon,\n      text,\n      link{ label, href },\n      dismissible\n    },\n    _type == "sponsorshipTiers" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }\n    },\n    _type == "videoEmbed" => {\n      heading,\n      description,\n      youtubeUrl,\n      posterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n    },\n    _type == "pricingTable" => {\n      heading,\n      description,\n      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }\n    },\n    _type == "serviceCards" => {\n      heading,\n      description,\n      services[]{ _key, title, description, icon, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href } }\n    },\n    _type == "productShowcase" => {\n      heading,\n      description,\n      products[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, price, badge, link{ label, href } }\n    },\n    _type == "linkCards" => {\n      heading,\n      description,\n      links[]{ _key, title, description, icon, url }\n    },\n    _type == "newsletter" => {\n      heading,\n      description,\n      inputPlaceholder,\n      submitButtonLabel,\n      privacyDisclaimerText\n    },\n    _type == "accordion" => {\n      heading,\n      description,\n      items[]{ _key, title, content }\n    },\n    _type == "tabsBlock" => {\n      heading,\n      tabs[]{ _key, label, content }\n    },\n    _type == "embedBlock" => {\n      heading,\n      embedUrl,\n      caption\n    },\n    _type == "mapBlock" => {\n      heading,\n      address,\n      coordinates{ lat, lng },\n      caption,\n      contactInfo{ phone, email, hours }\n    },\n    _type == "countdownTimer" => {\n      heading,\n      description,\n      targetDate,\n      completedMessage\n    },\n    _type == "metricsDashboard" => {\n      heading,\n      description,\n      metrics[]{ _key, label, value, change, trend, icon }\n    },\n    _type == "cardGrid" => {\n      heading,\n      description,\n      cards[]{ _key, title, description, image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop }, link{ label, href }, badge }\n    },\n    _type == "beforeAfter" => {\n      heading,\n      beforeImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      afterImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n      beforeLabel,\n      afterLabel,\n      caption\n    }},\n      reverseOnMobile,\n      verticalAlign\n    }},\n  dashboardCards[]{ title, description, iconName, route, enabled }\n}': PORTAL_PAGE_QUERY_RESULT;
     '*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails) && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current\n}': SPONSOR_BY_EMAIL_QUERY_RESULT;
     '*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  logo{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  tier, description, website, industry, featured,\n  contactEmail, allowedEmails,\n  "projects": *[_type == "project" && sponsor._ref == ^._id && ($site == "" || site == $site)] | order(title asc) {\n    _id, title, "slug": slug.current,\n    status, semester, technologyTags,\n    team[]{ _key, name, role },\n    content\n  }\n}': SPONSOR_PORTAL_QUERY_RESULT;
     '*[_type == "project" && sponsor._ref == $sponsorId && ($site == "" || site == $site)] | order(title asc) {\n  _id, title, "slug": slug.current,\n  status, semester, technologyTags,\n  team[]{ _key, name, role },\n  content\n}': SPONSOR_PROJECTS_API_QUERY_RESULT;

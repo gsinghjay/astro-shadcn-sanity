@@ -5,13 +5,20 @@
  * Located at /portal/denied — whitelisted in middleware (skips auth check).
  */
 export const prerender = false;
+
+import BlockRenderer from "@/components/BlockRenderer.astro";
+import { getPortalPage } from "@/lib/sanity";
+
+const portalPage = await getPortalPage('denied');
+const pageTitle = portalPage?.title ?? 'Access Denied';
+const pageDescription = portalPage?.description ?? 'Your email address is not authorized to access the Sponsor Portal. If you believe this is an error, please contact your program administrator.';
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Access Denied — Sponsor Portal</title>
+    <title>{pageTitle} — Sponsor Portal</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -43,10 +50,18 @@ export const prerender = false;
     </style>
   </head>
   <body>
-    <div class="card">
-      <h1>Access Denied</h1>
-      <p>Your email address is not authorized to access the Sponsor Portal. If you believe this is an error, please contact your program administrator.</p>
-      <a href="/portal/login" id="retry-link">Try a different account</a>
+    <div class="flex flex-col gap-6 w-full max-w-[420px]">
+      {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 && (
+        <BlockRenderer blocks={portalPage.headerBlocks} />
+      )}
+      <div class="card">
+        <h1>{pageTitle}</h1>
+        <p>{pageDescription}</p>
+        <a href="/portal/login" id="retry-link">Try a different account</a>
+      </div>
+      {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+        <BlockRenderer blocks={portalPage.footerBlocks} />
+      )}
     </div>
 
     <script>

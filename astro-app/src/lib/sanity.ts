@@ -23,6 +23,7 @@ import type {
   ALL_AUTHORS_QUERY_RESULT,
   AUTHOR_BY_SLUG_QUERY_RESULT,
   LISTING_PAGE_QUERY_RESULT,
+  PORTAL_PAGE_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -1054,6 +1055,38 @@ export function resetAllCaches(): void {
   _articleCategoriesCache = null;
   _authorsCache = null;
   _listingPageCache.clear();
+  _portalPageCache.clear();
+}
+
+// ---------------------------------------------------------------------------
+// Portal Page queries (Story 22.9)
+// ---------------------------------------------------------------------------
+
+export const PORTAL_PAGE_QUERY = defineQuery(groq`*[_type == "portalPage" && _id == $id][0]{
+  _id, route, title, description,
+  headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  footerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  dashboardCards[]{ title, description, iconName, route, enabled }
+}`);
+
+function getPortalPageId(route: string): string {
+  return isMultiSite ? `portalPage-${route}-${SITE_ID}` : `portalPage-${route}`;
+}
+
+const _portalPageCache = new Map<string, PORTAL_PAGE_QUERY_RESULT | null>();
+
+export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _portalPageCache.has(route)) {
+    return _portalPageCache.get(route)!;
+  }
+  const id = getPortalPageId(route);
+  const { result } = await loadQuery<PORTAL_PAGE_QUERY_RESULT>({
+    query: PORTAL_PAGE_QUERY,
+    params: { id },
+  });
+  const value = result ?? null;
+  _portalPageCache.set(route, value);
+  return value;
 }
 
 // ---------------------------------------------------------------------------
