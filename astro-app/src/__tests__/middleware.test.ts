@@ -26,7 +26,8 @@ const mockKvPut = vi.fn().mockResolvedValue(undefined);
 const mockKvDelete = vi.fn().mockResolvedValue(undefined);
 const mockCheckLimit = vi.fn();
 const mockD1Run = vi.fn().mockResolvedValue({});
-const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run });
+const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
+const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
 const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
 
 const mockEnv = {
@@ -74,7 +75,8 @@ describe('middleware — unified auth routing', () => {
     mockCheckLimit.mockReset();
     mockCheckSponsorWhitelist.mockReset().mockResolvedValue(false);
     mockD1Run.mockReset().mockResolvedValue({});
-    mockD1Bind.mockReset().mockReturnValue({ run: mockD1Run });
+    mockD1First.mockReset().mockResolvedValue({ agreement_accepted_at: null });
+    mockD1Bind.mockReset().mockReturnValue({ run: mockD1Run, first: mockD1First });
     mockD1Prepare.mockReset().mockReturnValue({ bind: mockD1Bind });
   });
 

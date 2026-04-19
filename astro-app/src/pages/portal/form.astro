@@ -14,12 +14,12 @@ const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
   params: { email: user?.email ?? '', ...getSiteParams() },
 });
 
-const portalPage = await getPortalPage('sponsorship');
-const pageTitle = portalPage?.title ?? 'My Sponsorship';
-const pageDescription = portalPage?.description ?? 'Sponsorship tier, agreements, expectations, and program contact information.';
+const portalPage = await getPortalPage('form');
+const pageTitle = portalPage?.title ?? 'Form';
+const pageDescription = portalPage?.description ?? null;
 ---
 
-<PortalLayout title={pageTitle} activeNav="/portal/sponsorship" sponsorSlug={sponsor?.slug}>
+<PortalLayout title={pageTitle} activeNav="/portal/form" sponsorSlug={sponsor?.slug}>
   <div class="flex flex-col gap-8">
     <Breadcrumb items={[
       { label: 'Portal', href: '/portal/' },
@@ -33,11 +33,11 @@ const pageDescription = portalPage?.description ?? 'Sponsorship tier, agreements
     {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 ? (
       <BlockRenderer blocks={portalPage.headerBlocks} />
     ) : (
-      <p class="text-muted-foreground">Content coming soon. Check back later.</p>
+      <p class="text-muted-foreground">No content yet. Add blocks in Studio → Portal Pages → Form.</p>
+    )}
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
     )}
   </div>
-
-  {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
-    <BlockRenderer blocks={portalPage.footerBlocks} />
-  )}
 </PortalLayout>

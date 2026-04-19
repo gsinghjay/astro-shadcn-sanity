@@ -38,6 +38,8 @@ import {author} from './documents/author'
 import {listingPage} from './documents/listing-page'
 // Document schemas — portal pages (Story 22.9)
 import {portalPage} from './documents/portal-page'
+// Document schemas — sponsor agreement (singleton)
+import {sponsorAgreement} from './documents/sponsor-agreement'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -123,6 +125,8 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   listingPage,
   // Documents — portal pages (Story 22.9)
   portalPage,
+  // Documents — sponsor agreement (singleton)
+  sponsorAgreement,
   // Blocks — homepage
   heroBanner,
   featureGrid,

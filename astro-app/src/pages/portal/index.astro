@@ -41,25 +41,35 @@ const defaultCards = [
     href: "/portal/events",
   },
   {
-    title: "My Sponsorship",
-    description: "Sponsorship tier, agreements, expectations, and program contact information",
+    title: "Agreement",
+    description: "Review and acknowledge the sponsor agreement, expectations, and program contact information",
     icon: "lucide:handshake",
-    href: "/portal/sponsorship",
+    href: "/portal/agreement",
+  },
+  {
+    title: "Form",
+    description: "Submit the sponsor intake form to share your project details, contacts, and preferences",
+    icon: "lucide:clipboard-list",
+    href: "/portal/form",
   },
 ];
 
 const cards = (portalPage?.dashboardCards && portalPage.dashboardCards.length > 0)
   ? portalPage.dashboardCards.map((card) => {
-      const cleanRoute = stegaClean(card.route) ?? '';
-      const cleanIcon = stegaClean(card.iconName);
+      const cleanRoute = (stegaClean(card.route) ?? '').trim();
+      const cleanIcon = stegaClean(card.iconName)?.trim();
+      const needsSlug = cleanRoute.includes('{sponsorSlug}');
+      const hasSlug = Boolean(sponsor?.slug);
+      const resolvedHref = needsSlug
+        ? cleanRoute.replaceAll('{sponsorSlug}', sponsor?.slug ?? '')
+        : cleanRoute;
+      const disabled = card.enabled === false || !resolvedHref || (needsSlug && !hasSlug);
       return {
         title: card.title ?? '',
         description: card.description ?? '',
         icon: cleanIcon ? `lucide:${cleanIcon}` : 'lucide:file',
-        href: cleanRoute.includes('{sponsorSlug}')
-          ? cleanRoute.replace('{sponsorSlug}', sponsor?.slug ?? '')
-          : cleanRoute || '#',
-        disabled: card.enabled === false,
+        href: disabled ? undefined : resolvedHref,
+        disabled,
       };
     })
   : defaultCards;

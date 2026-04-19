@@ -25,6 +25,7 @@ export default getViteConfig({
     globals: true,
     include: [
       "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
       "../tests/integration/**/*.test.ts",
     ],
     exclude: ["node_modules", "dist", ".astro"],

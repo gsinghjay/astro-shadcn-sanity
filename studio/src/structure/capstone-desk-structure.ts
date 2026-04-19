@@ -1,4 +1,4 @@
-import {CogIcon, DashboardIcon, DocumentsIcon, EnvelopeIcon} from '@sanity/icons'
+import {CogIcon, DashboardIcon, DocumentsIcon, DocumentTextIcon, EnvelopeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
 import {CAPSTONE_SINGLETON_TYPES} from '../constants'
 
@@ -105,12 +105,20 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
                     .initialValueTemplate('portalPage-progress'),
                 ),
               S.listItem()
-                .title('Sponsorship')
+                .title('Agreement')
                 .child(
                   S.document()
                     .schemaType('portalPage')
-                    .documentId('portalPage-sponsorship')
-                    .initialValueTemplate('portalPage-sponsorship'),
+                    .documentId('portalPage-agreement')
+                    .initialValueTemplate('portalPage-agreement'),
+                ),
+              S.listItem()
+                .title('Form')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-form')
+                    .initialValueTemplate('portalPage-form'),
                 ),
               S.listItem()
                 .title('Login')
@@ -129,6 +137,17 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
                     .initialValueTemplate('portalPage-denied'),
                 ),
             ]),
+        ),
+      // Singleton: Sponsor Agreement (one PDF + copy per workspace)
+      S.listItem()
+        .title('Sponsor Agreement')
+        .icon(DocumentTextIcon)
+        .id('sponsorAgreement')
+        .child(
+          S.document()
+            .schemaType('sponsorAgreement')
+            .documentId('sponsorAgreement')
+            .initialValueTemplate('sponsorAgreement'),
         ),
       S.listItem()
         .title('Submissions')

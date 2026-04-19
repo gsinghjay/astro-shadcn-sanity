@@ -57,7 +57,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
             !SITE_AWARE_TYPES.includes(t.schemaType) &&
             t.schemaType !== 'siteSettings' &&
             t.schemaType !== 'listingPage' &&
-            t.schemaType !== 'portalPage',
+            t.schemaType !== 'portalPage' &&
+            t.schemaType !== 'sponsorAgreement',
         )
         const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
           id: `${type}-${opts.siteId}`,
@@ -72,13 +73,19 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: 'listingPage',
           value: {route},
         }))
-        const portalTemplates = ['dashboard', 'events', 'progress', 'sponsorship', 'login', 'denied'].map((route) => ({
+        const portalTemplates = ['dashboard', 'events', 'progress', 'agreement', 'form', 'login', 'denied'].map((route) => ({
           id: `portalPage-${route}-${opts.siteId}`,
           title: `Portal Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
           schemaType: 'portalPage',
           value: {route},
         }))
-        return [...filtered, ...siteTemplates, ...listingTemplates, ...portalTemplates]
+        const sponsorAgreementTemplate = {
+          id: `sponsorAgreement-${opts.siteId}`,
+          title: `Sponsor Agreement — ${opts.title}`,
+          schemaType: 'sponsorAgreement',
+          value: {},
+        }
+        return [...filtered, ...siteTemplates, ...listingTemplates, ...portalTemplates, sponsorAgreementTemplate]
       },
     },
     document: {
@@ -87,6 +94,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           context.schemaType === 'siteSettings' ||
           context.schemaType === 'listingPage' ||
           context.schemaType === 'portalPage' ||
+          context.schemaType === 'sponsorAgreement' ||
           context.documentId === `siteSettings-${opts.siteId}`
         ) {
           return input.filter(
@@ -103,7 +111,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
             t.templateId !== 'siteSettings' &&
             t.templateId !== 'submission' &&
             t.templateId !== 'listingPage' &&
-            t.templateId !== 'portalPage',
+            t.templateId !== 'portalPage' &&
+            t.templateId !== 'sponsorAgreement',
         ),
     },
   }
@@ -152,9 +161,12 @@ export default defineConfig([
           {id: 'portalPage-dashboard', schemaType: 'portalPage', title: 'Portal Page (Dashboard)', value: {route: 'dashboard'}},
           {id: 'portalPage-events', schemaType: 'portalPage', title: 'Portal Page (Events)', value: {route: 'events'}},
           {id: 'portalPage-progress', schemaType: 'portalPage', title: 'Portal Page (Progress)', value: {route: 'progress'}},
-          {id: 'portalPage-sponsorship', schemaType: 'portalPage', title: 'Portal Page (Sponsorship)', value: {route: 'sponsorship'}},
+          {id: 'portalPage-agreement', schemaType: 'portalPage', title: 'Portal Page (Agreement)', value: {route: 'agreement'}},
+          {id: 'portalPage-form', schemaType: 'portalPage', title: 'Portal Page (Form)', value: {route: 'form'}},
           {id: 'portalPage-login', schemaType: 'portalPage', title: 'Portal Page (Login)', value: {route: 'login'}},
           {id: 'portalPage-denied', schemaType: 'portalPage', title: 'Portal Page (Denied)', value: {route: 'denied'}},
+          // Sponsor Agreement singleton (one per workspace)
+          {id: 'sponsorAgreement', schemaType: 'sponsorAgreement', title: 'Sponsor Agreement', value: {}},
         ]
       },
     },
