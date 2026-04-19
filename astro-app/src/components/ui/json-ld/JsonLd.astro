@@ -7,9 +7,9 @@ interface Props {
 
 const { schema } = Astro.props;
 const cleaned = stegaClean(schema);
-const withContext = Array.isArray(cleaned)
+const output = Array.isArray(cleaned)
   ? cleaned.map(s => ({ '@context': 'https://schema.org', ...s }))
   : { '@context': 'https://schema.org', ...cleaned };
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(withContext)} />
+<script type="application/ld+json" set:html={JSON.stringify(output)} />

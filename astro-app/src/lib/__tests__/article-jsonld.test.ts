@@ -167,6 +167,15 @@ describe('buildArticleJsonLd — required fields', () => {
     const result = buildArticleJsonLd(articleDetailFull, siteSettingsFull, url);
     expect(result.mainEntityOfPage).toBe(url);
   });
+
+  test('breadcrumb @id references the page with #breadcrumb fragment', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      TEST_URL,
+    );
+    expect(result.breadcrumb).toEqual({ '@id': `${TEST_URL}#breadcrumb` });
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -554,10 +563,9 @@ describe('articles/[slug].astro integration', () => {
     );
   });
 
-  test('imports JsonLd from @/components/ui/json-ld', () => {
-    expect(content).toMatch(
-      /import\s+\{\s*JsonLd\s*\}\s+from\s+['"]@\/components\/ui\/json-ld['"]/,
-    );
+  test('imports buildPageGraph from @/lib/page-jsonld', () => {
+    expect(content).toContain('buildPageGraph');
+    expect(content).toContain("from '@/lib/page-jsonld'");
   });
 
   test('imports getSiteSettings from @/lib/sanity', () => {
@@ -571,15 +579,10 @@ describe('articles/[slug].astro integration', () => {
     );
   });
 
-  test('<JsonLd schema={articleJsonLd} /> appears inside <Fragment slot="head">', () => {
-    const fragmentOpen = content.indexOf('<Fragment slot="head">');
-    const fragmentClose = content.indexOf('</Fragment>', fragmentOpen);
-    const jsonLdTag = content.indexOf('<JsonLd schema={articleJsonLd}');
-    expect(fragmentOpen).toBeGreaterThan(-1);
-    expect(fragmentClose).toBeGreaterThan(-1);
-    expect(jsonLdTag).toBeGreaterThan(-1);
-    expect(jsonLdTag).toBeGreaterThan(fragmentOpen);
-    expect(jsonLdTag).toBeLessThan(fragmentClose);
+  test('emits structured data via structured-data slot', () => {
+    expect(content).toContain('slot="structured-data"');
+    expect(content).toContain('application/ld+json');
+    expect(content).toContain('pageGraph');
   });
 });
 
@@ -867,5 +870,16 @@ describe('buildArticleJsonLd — canonical URL stripping (CR P6)', () => {
     );
     const author = result.author as Record<string, unknown>;
     expect(author.url).toBe('https://example.com/authors/alex-singh');
+  });
+
+  test('breadcrumb @id uses canonical URL (stripped query/fragment)', () => {
+    const result = buildArticleJsonLd(
+      articleDetailFull,
+      siteSettingsFull,
+      'https://example.com/articles/foo?preview=1#top',
+    );
+    expect(result.breadcrumb).toEqual({
+      '@id': 'https://example.com/articles/foo#breadcrumb',
+    });
   });
 });

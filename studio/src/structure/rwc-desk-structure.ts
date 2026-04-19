@@ -1,5 +1,6 @@
 import {
   CogIcon,
+  DashboardIcon,
   DocumentIcon,
   DocumentsIcon,
   CreditCardIcon,
@@ -53,6 +54,27 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
                         .documentId(`listingPage-${route}-${siteId}`)
                         .initialValueTemplate(`listingPage-${route}-${siteId}`),
                     ),
+                ),
+              ),
+          ),
+        // Singleton group: Portal Pages (Story 22.9)
+        S.listItem()
+          .title('Portal Pages')
+          .icon(DashboardIcon)
+          .child(
+            S.list()
+              .title('Portal Pages')
+              .items(
+                ['dashboard', 'events', 'progress', 'sponsorship', 'login', 'denied'].map(
+                  (route) =>
+                    S.listItem()
+                      .title(route.charAt(0).toUpperCase() + route.slice(1))
+                      .child(
+                        S.document()
+                          .schemaType('portalPage')
+                          .documentId(`portalPage-${route}-${siteId}`)
+                          .initialValueTemplate(`portalPage-${route}-${siteId}`),
+                      ),
                 ),
               ),
           ),

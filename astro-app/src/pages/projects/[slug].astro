@@ -12,6 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const projects = await sanityClient.fetch<ALL_PROJECT_SLUGS_QUERY_RESULT>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
@@ -47,16 +50,22 @@ const logoUrl = sponsor?.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: spo
 const team = project.team ?? [];
 const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' },
+  { label: project.title ?? 'Project' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout title={project.title ?? 'Project'} seo={project.seo ?? (project.outcome ? { metaDescription: project.outcome } : undefined)} ogType="article" template="detail">
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Projects', href: '/projects' },
-        { label: project.title ?? 'Project' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="flex items-center gap-4">

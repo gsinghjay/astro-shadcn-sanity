@@ -1,127 +1,125 @@
 # Project Overview
 
-## Executive Summary
-- Name: ywcc-capstone-template (YWCC Industry Capstone)
-- Version: 1.11.0
-- Repository type: Monorepo (npm workspaces + standalone parts)
-- Primary language: TypeScript (with Python for discord-bot)
-- Description: YWCC Capstone Websites — Astro + Sanity monorepo for the YWCC Industry Capstone Spring 2026 program
-- Purpose: Block-based CMS website with page builder, sponsor portal, student portal, event calendar, project showcase
-- Multi-site: Supports 3 site variants (Capstone red, RWC US blue, RWC International green)
+**Project:** ywcc-capstone-template
+**Version:** 1.18.0
+**Repository:** https://github.com/gsinghjay/astro-shadcn-sanity
+**Branch documented:** `preview`
+**Generated:** 2026-04-15
 
-## Project Parts
+## Executive summary
 
-| Part | Path | Type | Framework | Version |
-|------|------|------|-----------|---------|
-| astro-app | astro-app/ | Web Frontend | Astro 5.17 + React 19 + Tailwind 4 | 0.0.1 |
-| studio | studio/ | CMS Admin | Sanity Studio v5.14 | 1.0.0 |
-| rate-limiter-worker | rate-limiter-worker/ | Backend Worker | Cloudflare Worker (TypeScript) | 1.0.0 |
-| discord-bot | discord-bot/ | Backend | Python FastAPI + discord.py | 0.1.0 |
+The YWCC Industry Capstone platform is a multi-site, content-driven marketing site plus authenticated sponsor/student portal for NJIT's Ying Wu College of Computing capstone program. A single Astro 5 frontend serves three branded variants (capstone, RWC US, RWC International) from one Sanity Content Lake schema, with Better Auth for sign-in and a small fleet of Cloudflare Workers for rate limiting and scheduled email/Discord reminders.
 
-## Technology Stack Summary
+The codebase is a **npm monorepo** containing six parts: an Astro frontend, a Sanity Studio, and four backends (one production TS Worker, one production cron Worker, one scaffolded Python Worker, and one scaffolded Discord bot).
 
-### Frontend (astro-app)
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Framework | Astro | ^5.17.1 |
-| UI Library | React | ^19.2.4 |
-| Styling | Tailwind CSS | ^4.1.18 |
-| Language | TypeScript | ^5.9.3 |
-| Build Tool | Vite | ^7.3.1 |
-| Typography | @tailwindcss/typography | ^0.5.19 |
-| Animations | tw-animate-css | ^1.4.0 |
-| Icons | @iconify-json/lucide + simple-icons | ^1.2.89 |
-| Component Variants | class-variance-authority | ^0.7.1 |
-| Class Merging | clsx + tailwind-merge | ^2.1.1 / ^3.4.0 |
-| Auth | better-auth | ^1.5.0 |
-| Database ORM | drizzle-orm | ^0.45.1 |
-| State Mgmt | nanostores + @preact/signals | ^1.1.0 / ^2.8.1 |
-| Calendar | @schedule-x/calendar + react | ^4.2.0 |
-| Email | resend | ^6.9.3 |
-| Date/Time | temporal-polyfill | ^0.3.0 |
-| Portable Text | astro-portabletext + @portabletext/to-html | ^0.10.0 / ^5.0.1 |
+## At a glance
 
-### CMS (studio)
-| Category | Technology | Version |
-|----------|-----------|---------|
-| CMS | Sanity | ^5.14.1 |
-| Integration | @sanity/astro | ^3.2.11 |
-| Visual Editing | @sanity/visual-editing | ^5.2.1 |
-| Image URLs | @sanity/image-url | ^1.2.0 |
-| GROQ | groq | ^5.8.1 |
-| Plugin | @sanity/form-toolkit | ^2.2.3 |
+| Attribute | Value |
+|---|---|
+| Repository type | monorepo (npm workspaces: `astro-app`, `studio`, `platform-api`) + standalone parts |
+| Primary languages | TypeScript, Python |
+| Frontend | Astro 5.18.1 (SSG + per-route SSR), React 19.2, Tailwind 4.1 |
+| CMS | Sanity Studio 5.20 (3 workspaces) |
+| Auth | Better Auth 1.5 (Google OAuth, GitHub OAuth, Resend Magic Link) |
+| Database | Cloudflare D1 (`ywcc-capstone-portal`) via Drizzle ORM |
+| Edge storage | Cloudflare KV (`SESSION_CACHE`), Durable Objects (`RATE_LIMITER`) |
+| Deployment | Cloudflare Pages (astro-app) + Workers; Sanity hosted Studio |
+| Testing | Vitest (75 test files), Playwright (19 specs × 5 browsers), Storybook (187 stories), Lighthouse CI, Pa11y CI |
+| Release | semantic-release on `main` (conventional commits) |
+| Current version | 1.18.0 (7 releases since last docs scan) |
 
-### Deployment
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Adapter | @astrojs/cloudflare | ^12.6.12 |
-| CLI | wrangler | ^4.63.0 |
-| Worker Name | ywcc-capstone | - |
-| Compat Date | 2025-12-01 | - |
-| Compat Flags | nodejs_compat, disable_nodejs_process_v2 | - |
-| Output Mode | static (with per-route SSR) | - |
-| Database | Cloudflare D1 (SQLite) | - |
-| KV | SESSION_CACHE (session caching) | - |
-| Durable Objects | SlidingWindowRateLimiter | - |
-| Auth | Better Auth (Google OAuth, GitHub OAuth, Magic Link) | - |
+## Parts
 
-### Testing
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Unit/Component | Vitest | ^3.2.1 |
-| Coverage | @vitest/coverage-v8 | ^3.2.1 |
-| E2E | Playwright | ^1.58.2 |
-| Accessibility | @axe-core/playwright | ^4.11.1 |
-| Visual | Storybook | ^10.2.7 |
-| Storybook Framework | storybook-astro | ^0.1.0 |
-| Visual Regression | Chromatic | ^15.1.1 |
-| Performance | @lhci/cli (Lighthouse CI) | ^0.15.1 |
+| Part | Path | Type | Status | Framework |
+|---|---|---|---|---|
+| astro-app | `astro-app/` | Web (SSG + SSR) | Production (3 Pages projects: `ywcc-capstone`, `rwc-us`, `rwc-intl`) | Astro 5.18 + React 19 + Tailwind 4 |
+| studio | `studio/` | CMS | Production (Sanity hosted, 3 workspaces, deploy hooks wired to Pages) | Sanity Studio 5.20 |
+| rate-limiter-worker | `rate-limiter-worker/` | Edge service | Production (Worker `rate-limiter-worker`) | TS Cloudflare Worker + Durable Object |
+| event-reminders-worker | `event-reminders-worker/` | Cron service | Production (Worker `ywcc-event-reminders`) | TS Cloudflare Worker (daily 09:00 UTC) |
+| platform-api | `platform-api/` | API (scaffold) | Scaffolding (not deployed) | FastAPI on Python Cloudflare Worker |
+| discord-bot | `discord-bot/discord-bot/` | Bot (scaffold) | Scaffolding (Python in repo); production bot runs as Worker `capstone-bot` + `capstone-ask-worker` (RAG) | Python FastAPI in repo; TS Workers in prod |
 
-### Tooling
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Linting | ESLint | ^9.38.0 |
-| Formatting | Prettier | ^3.6.2 |
-| Concurrency | concurrently | ^9.1.0 |
-| Release | semantic-release (conventional commits) | - |
-| Node (CI) | 22 (most workflows), 24 (release) | - |
-| Node (Docker) | 24-slim | - |
-| UI Scaffolding | shadcn | ^4.0.0 |
+## Key metrics
 
-## Architecture Summary
-- Output: Static-first (`output: "static"`) with per-route SSR via Cloudflare Workers
-- Public pages: Prerendered at build time (SSG) — 8 routes
-- Portal/Auth pages: Server-rendered at request time (SSR) — 9 routes
-- API endpoints: 5 server-side endpoints for auth, portal data, health checks
-- Content: All content from Sanity CMS via GROQ API (no Astro content collections)
-- Auth: Better Auth with Google OAuth, GitHub OAuth, Magic Link (Resend email)
-- Database: Cloudflare D1 (SQLite) via Drizzle ORM for auth sessions
-- Rate Limiting: Per-IP sliding window via Cloudflare Durable Objects
-- Visual Editing: Sanity Presentation tool with stega encoding
-- Live Content: Sanity Live Content API with sync tags for real-time updates
-- Multi-site: 3 variants via env vars (PUBLIC_SITE_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_DATASET)
+| Surface | Count |
+|---|---|
+| Public routes (SSG) | 22 pages + 3 APIs |
+| Authenticated routes (SSR) | 8 pages + 6 APIs |
+| Custom Sanity blocks | 38 |
+| UI primitive families | 40 |
+| Sanity document types | 11 |
+| Sanity object types | 23 |
+| GROQ `defineQuery` exports | 30 |
+| D1 tables (via Drizzle) | 7 |
+| D1 SQL migrations | 7 |
+| Sanity migrations | 3 |
+| Storybook stories | 187 |
+| Vitest unit/component test files | 75 |
+| Playwright E2E specs | 19 (×5 browser projects) |
+| GitHub Actions workflows | 6 |
+| Docker Compose services | 5 |
+| Wiki pages | 33 |
+| BMad implementation artifacts | 189 |
 
-## Key Metrics (as of scan date 2026-03-11)
-- Routes: 20 total (8 SSG, 9 SSR, 5 API)
-- Layouts: 8 (3 main + 5 templates)
-- Block Components: 115+ (generic UI blocks) + 23 custom Sanity blocks
-- UI Primitive Families: 39
-- Schema Types: 51 (7 documents, 14 objects, 25 blocks, 5 helpers)
-- GROQ Queries: 15+ (all using defineQuery)
-- Lib Utilities: 14 files
-- Test Files: 58 unit/component + 14 E2E + 22 integration = 94 total
-- Storybook Stories: 120+
-- GitHub Actions Workflows: 6
-- Docker Services: 5 (main + 2 RWC variants + studio + storybook)
-- Environment Variables: 30+ public + 8+ server secrets
+## Tech stack summary
 
-## Links
-- [Architecture](./architecture.md)
-- [Source Tree Analysis](./source-tree-analysis.md)
-- [Component Inventory](./component-inventory.md)
-- [Data Models](./data-models.md)
-- [Development Guide](./development-guide.md)
-- [Integration Architecture](./integration-architecture.md)
+### Frontend
+Astro 5.18 SSG (Cloudflare adapter), React 19.2 islands, Tailwind 4.1 with container queries + 12-column grid, shadcn/ui (new-york style), Iconify (lucide, simple-icons), `@sanity/astro` 3.2 with visual editing, `@sanity/visual-editing` 5.2, Portable Text via `astro-portabletext`, Better Auth 1.5, Drizzle ORM 0.45 on D1, nanostores 1.1, `@schedule-x/react` for calendar, Resend 6.9 for email, Astro Fonts API (self-hosted Inter via Fontsource).
 
----
-*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*
+### CMS
+Sanity Studio 5.20, plugins: structureTool, presentationTool, visionTool, sanity-plugin-media, @sanity/form-toolkit. Three workspaces (capstone, rwc-us, rwc-intl) sharing schemas with site-aware filtering.
+
+### Backend workers
+- `rate-limiter-worker`: TS CF Worker + Durable Object with SQLite sliding window (SQL-backed state, RPC interface `checkLimit`).
+- `event-reminders-worker`: TS CF Worker, `0 9 * * *` cron, queries Sanity for upcoming events, sends per-subscriber Resend emails + Discord webhook embeds, writes to shared D1.
+- `platform-api`: Python 3.12 on CF Python Workers (workers-py ASGI bridge), FastAPI + httpx + pydantic. Scaffold only.
+- `discord-bot`: Python 3.11 FastAPI + discord.py. Registers `/ping`, `/project-status`, `/upcoming-events`, `/sponsor-info` slash commands. Scaffold only.
+
+### Deployment & ops
+Cloudflare Pages (astro-app), Cloudflare Workers (each backend), Sanity hosted Studio, GitHub Pages (Storybook), Chromatic (visual regression). Semantic-release for versioning.
+
+## Repository structure
+
+```
+astro-shadcn-sanity/
+├── astro-app/           # Astro frontend workspace
+├── studio/              # Sanity Studio workspace
+├── platform-api/        # Python CF Worker workspace (scaffold)
+├── rate-limiter-worker/ # Standalone TS Worker (prod)
+├── event-reminders-worker/ # Standalone TS Worker (prod cron)
+├── discord-bot/         # Standalone Python bot (scaffold)
+├── tests/               # Root Playwright E2E suite
+├── scripts/             # Figma capture utilities
+├── rules/               # Sanity agent rules (.mdc)
+├── wiki/                # Human-authored wiki (33 md)
+├── docs/                # This folder
+└── _bmad-output/        # BMad planning artifacts
+```
+
+See [source-tree-analysis.md](./source-tree-analysis.md) for the full annotated tree.
+
+## Recent highlights (2026-03 → 2026-04, versions 1.12 → 1.18)
+
+- **Typed environment:** migrated to `astro:env` schema (Story 5.13) — compile-time typed `PUBLIC_*` + server-only vars.
+- **Self-hosted fonts:** Astro Fonts API + Fontsource Inter (PR #639).
+- **Layout system:** 12-column grid + container queries (Story 17.8), new `ColumnsBlock` page-builder block (Story 21.10).
+- **Articles pipeline:** article detail pages with Article/NewsArticle JSON-LD (Story 19.6), newsletter CTA + articleList wiring (19.7), category archive pages (19.10).
+- **Authors:** author listing + detail pages with Person JSON-LD (Stories 20.2, 20.3).
+- **Gallery:** dedicated `/gallery` page with PhotoSwipe, Swiss-design filters, CMS listing page (Stories 22.3–22.5).
+- **Listing pages:** CMS-editable singleton listing-page documents for articles, authors, events, gallery, projects, sponsors (Story 21.0).
+- **Sorting:** `/projects` sorting controls (Story 4.6).
+- **Sponsor logos:** new `logoSquare`, `logoHorizontal` fields; consistent crop across all surfaces.
+- **Multi-workspace fix:** schema now deploys to all three workspaces (`rwc-us`, `rwc-intl` as well as `capstone`) — previously capstone-only (PR #8bcf552).
+- **CI depth:** Lighthouse CI + Pa11y CI over every built `/demo/` page, asserting performance and accessibility thresholds.
+
+## Who this documentation is for
+
+- **New contributors:** start with the [development guide](./development-guide.md) and the [wiki](../wiki/).
+- **Brownfield PRD authors:** use [architecture.md](./architecture.md), [data-models.md](./data-models.md), and [integration-architecture.md](./integration-architecture.md) as inputs.
+- **Feature implementers:** cross-reference the [component inventory](./component-inventory.md) and the block list in [source-tree-analysis.md](./source-tree-analysis.md).
+- **Operations / on-call:** read [cloudflare-guide.md](./cloudflare-guide.md), [rate-limiting-with-durable-objects.md](./rate-limiting-with-durable-objects.md), and [auth-consolidation-strategy.md](./auth-consolidation-strategy.md).
+
+## Non-goals
+
+- This repo is **not** a generic website template — branding, content models, and flows are tightly coupled to YWCC's capstone program and sponsor workflow.
+- The `platform-api` and `discord-bot` parts are scaffolds. They are documented, but are not required to run or deploy the site.

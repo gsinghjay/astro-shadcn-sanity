@@ -1,248 +1,193 @@
 # Component Inventory
 
-*Generated: 2026-03-11 | Scan Level: deep*
+**Project:** ywcc-capstone-template v1.18.0
+**Scope:** `astro-app/src/components/**`
+**Generated:** 2026-04-15
+**Total component files (incl. stories & tests):** ~681
 
-## Summary
-
-| Category | Count | Location |
-|----------|-------|----------|
-| Custom Sanity Blocks | 23 | src/components/blocks/custom/ |
-| Generic UI Blocks | 115+ | src/components/blocks/ |
-| UI Primitive Families | 39 | src/components/ui/ |
-| Top-Level Components | 15 | src/components/ |
-| Portal Components (React) | 8 | src/components/portal/ |
-| Storybook Stories | 120+ | *.stories.ts files |
-| **Total Component Files** | **508+** | |
-
----
-
-## Custom Sanity Block Components
-
-These components render page builder blocks from Sanity content. Each maps to a schema block type.
-
-| Component | Schema Type | Variants | Story | Test |
-|-----------|------------|----------|-------|------|
-| HeroBanner.astro | heroBanner | centered, split, split-asymmetric, overlay, spread | 2.1 | Yes |
-| FeatureGrid.astro | featureGrid | - | 2.1 | Yes |
-| CtaBanner.astro | ctaBanner | centered, split, spread, overlay | 2.1 | Yes |
-| StatsRow.astro | statsRow | - | 2.1 | Yes |
-| TextWithImage.astro | textWithImage | - | 2.1 | Yes |
-| LogoCloud.astro | logoCloud | - | 2.1 | Yes |
-| SponsorSteps.astro | sponsorSteps | - | 2.1 | Yes |
-| RichText.astro | richText | - | 2.1b | Yes |
-| FaqSection.astro | faqSection | - | 2.1b | Yes |
-| ContactForm.astro | contactForm | - | 2.1b | Yes |
-| SponsorCards.astro | sponsorCards | - | 2.14 | Yes |
-| Testimonials.astro | testimonials | - | 2.1b | Yes |
-| EventList.astro | eventList | - | 2.1b | Yes |
-| ProjectCards.astro | projectCards | - | 2.16 | Yes |
-| TeamGrid.astro | teamGrid | grid, grid-compact, split | 2.9 | Yes |
-| ImageGallery.astro | imageGallery | grid, masonry, single | 2.9 | Yes |
-| ArticleList.astro | articleList | grid, split-featured, list | 2.9 | Yes |
-| ComparisonTable.astro | comparisonTable | table, stacked | 2.10 | Yes |
-| Timeline.astro | timeline | vertical, split, horizontal | 2.10 | Yes |
-| Pullquote.astro | pullquote | centered, split, sidebar | 2.10 | Yes |
-| Divider.astro | divider | line, short, labeled | 2.11 | Yes |
-| AnnouncementBar.astro | announcementBar | inline, floating | 2.11 | Yes |
-| SponsorshipTiers.astro | sponsorshipTiers | - | 2.17 | Yes |
-
-### Block Dispatch Flow
+## Hierarchy overview
 
 ```
-Page data (Sanity) → BlockRenderer.astro → block-registry.ts → CustomBlock.astro
-                           │                      │
-                           ▼                      ▼
-                     BlockWrapper.astro    import.meta.glob()
-                     (spacing, bg,        auto-discovers all
-                      maxWidth)           blocks/custom/*.astro
+src/components/
+├── BlockRenderer.astro         # _type dispatcher (one case per block)
+├── BlockWrapper.astro          # spacing / background / maxWidth / alignment shell
+├── blocks/custom/              # 38 Sanity-backed custom blocks
+├── ui/                         # 40 primitive families (shadcn + custom)
+├── portable-text/              # 6 Portable Text components (+ index.ts resolver)
+├── portal/                     # React islands for sponsor portal
+├── react/                      # Other React islands (calendar, filter bars)
+└── concepts/                   # Design-review scratchpads (some promoted to prod)
 ```
 
----
+## 1. Custom Sanity blocks (38)
 
-## Generic UI Block Variants
+Every block corresponds 1:1 to a schema block type in `studio/src/schemaTypes/blocks/**`. All are rendered via `<BlockRenderer block={block} />` and wrapped in `<BlockWrapper>`.
 
-Pre-built layout variants from fulldev-ui registry. Used as visual templates that custom blocks can reference.
+### Layout & structure
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `ColumnsBlock.astro` | `columnsBlock` | **NEW (Story 21.10)** 12-column responsive wrapper; variants: equal, wide-left, wide-right, sidebar. Supports nested blocks inside each column. |
+| `Divider.astro` | `divider` | Horizontal rule with variants. |
+| `AnnouncementBar.astro` | `announcementBar` | Banner with dismiss. |
 
-| Category | Count | Files |
-|----------|-------|-------|
-| Hero sections | 14 | hero-1.astro through hero-14.astro |
-| CTA sections | 8 | cta-1.astro through cta-8.astro |
-| Services | 7 | services-1.astro through services-7.astro |
-| Features | 6 | features-1.astro through features-6.astro |
-| Content | 6 | content-1.astro through content-6.astro |
-| Reviews | 5 | reviews-1.astro through reviews-5.astro |
-| Products | 5 | products-1.astro through products-5.astro |
-| FAQs | 4 | faqs-1.astro through faqs-4.astro |
-| Videos | 4 | videos-1.astro through videos-4.astro |
-| Articles | 4+2 | articles-1..4.astro + article-1..2.astro |
-| Stats | 3 | stats-1.astro through stats-3.astro |
-| Steps | 3 | steps-1.astro through steps-3.astro |
-| Footers | 3 | footer-1.astro through footer-3.astro |
-| Headers | 3 | header-1.astro through header-3.astro |
-| Logos | 3 | logos-1.astro through logos-3.astro |
-| Pricing | 3 | pricings-1.astro through pricings-3.astro |
-| Video (single) | 3 | video-1.astro through video-3.astro |
-| Contact | 3 | contact-1.astro through contact-3.astro |
-| Images | 2 | images-1.astro, images-2.astro |
-| Banners | 2 | banner-1.astro, banner-2.astro |
-| Links | 2 | links-1.astro, links-2.astro |
-| Table | 1 | table-1.astro |
-| Block utilities | 4 | blocks-1..4.astro |
-| Product (single) | 1 | product-1.astro |
-| **Total** | **115+** | |
+### Hero & marketing
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `HeroBanner.astro` | `heroBanner` | Variants: default, centered (semi-transparent glass card — PR #647), split, minimal. Supports CTA buttons, background images w/ LQIP. |
+| `CtaBanner.astro` | `ctaBanner` | Call-to-action section with background image. |
+| `TextWithImage.astro` | `textWithImage` | Two-column content + image, reversible. |
+| `LogoCloud.astro` | `logoCloud` | Sponsor/partner logo grid with consistent crop. |
+| `SponsorshipTiers.astro` | `sponsorshipTiers` | Tier display with tier object references. |
 
----
+### Content display
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `FeatureGrid.astro` | `featureGrid` | Feature cards with icons (iconify-lucide), columns, description (PR #f0de7bf). |
+| `StatsRow.astro` | `statsRow` | Stat counters with animations. |
+| `Testimonials.astro` | `testimonials` | Variants: grid, split, carousel. `testimonialSource` field controls fetch. |
+| `TeamGrid.astro` | `teamGrid` | Team member cards with social links. |
+| `ImageGallery.astro` | `imageGallery` | **NEW (Story 22.4)** Masonry/grid/single variants + PhotoSwipe lightbox + featured/year/category filters. |
+| `ArticleList.astro` | `articleList` | Variants: default, brutalist, magazine. `contentType` controls source (articles or static). Supports newsletter CTA (Story 19.7). |
+| `EventList.astro` | `eventList` | `eventStatus` filter (upcoming/past/all); calendar or card layout. |
 
-## UI Primitive Families (39)
+### Forms & interaction
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `ContactForm.astro` | `contactForm` | Full-height variant; Turnstile-ready; submits to the form endpoint configured in the block (form submissions are captured as `submission` documents in Sanity). |
+| `Newsletter.astro` | `newsletter` | Email signup → Resend via `/api/subscribe`. |
+| `Accordion.astro` | `accordion` | shadcn accordion wrapped with block metadata. |
+| `TabsBlock.astro` | `tabsBlock` | shadcn tabs w/ Sanity-driven children. |
+| `FaqSection.astro` | `faqSection` | Accordion-based Q&A. |
 
-shadcn-style composable primitives. Each family has an index.ts barrel export and optional sub-components.
+### Commerce & pricing
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `PricingTable.astro` | `pricingTable` | Pricing tiers with CTA buttons. |
+| `ProductShowcase.astro` | `productShowcase` | Product cards with images. |
+| `ServiceCards.astro` | `serviceCards` | Alternating service layout (PR #49b5f00 alternation fix). |
 
-| Family | Key Sub-Components | Purpose |
-|--------|-------------------|---------|
-| accordion | accordion, accordion-item, accordion-content | Expandable sections |
-| alert | alert-title, alert-description | Status messages |
-| auto-form | auto-form | Dynamic form generation |
-| avatar | avatar-image | Profile pictures |
-| badge | badge | Labels and tags |
-| banner | banner-close, banner-content, banner-title, banner-description | Dismissible banners |
-| button | button | CTAs (default, secondary, outline, ghost) |
-| checkbox | checkbox | Form checkbox input |
-| collapsible | collapsible, collapsible-trigger, collapsible-content | Toggle panels |
-| empty | empty-header, empty-title, empty-description, empty-content | Empty/zero states |
-| field | field, field-set, field-group, field-label, field-title, field-legend, field-description, field-content, field-error, field-separator | Form field layouts |
-| footer | footer-content, footer-copyright, footer-menu, footer-group, footer-group-label, footer-menu-item, footer-menu-link, footer-actions, footer-split, footer-grid, footer-spread, footer-description | Footer structure |
-| header | header-content, header-actions | Header structure |
-| icon | icon | Lucide SVG icon system |
-| image | image | Responsive images |
-| input | input | Text input |
-| item | item, item-group, item-content, item-media, item-title, item-description, item-actions | List/grid items |
-| label | label | Form labels |
-| list | list, list-item | Ordered/unordered lists |
-| logo | logo, logo-image, logo-text | Brand logos |
-| marquee | marquee, marquee-content | Scrolling content |
-| native-carousel | native-carousel, native-carousel-content, native-carousel-previous | Image carousel |
-| native-select | native-select, native-select-option, native-select-optgroup | Dropdown |
-| navigation-menu | navigation structure | Primary nav |
-| price | price | Pricing display |
-| radio-group | radio-group | Radio inputs |
-| rating | rating | Star ratings |
-| section | section-provider, section-content, section-split, section-spread, section-grid, section-masonry, section-actions | **Core layout container** |
-| separator | separator | Visual dividers |
-| sheet | sheet-header, sheet-footer, sheet-title, sheet-description, sheet-trigger | Modal/drawer |
-| sidebar | sidebar | Navigation sidebar |
-| skeleton | skeleton | Loading placeholders |
-| spinner | spinner | Loading indicator |
-| table | table | Data tables |
-| tabs | tabs | Tab navigation |
-| textarea | textarea | Multi-line text input |
-| theme-toggle | theme-toggle | Dark/light mode switch |
-| tile | tile, tile-content, tile-split, tile-spread, tile-title, tile-description, tile-actions | Grid tiles |
-| video | video | Video player |
+### Data & editorial
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `ComparisonTable.astro` | `comparisonTable` | `options` (columns) × `criteria` (rows); supports iconography. |
+| `Timeline.astro` | `timeline` | Vertical timeline with timelineEntry objects. |
+| `Pullquote.astro` | `pullquote` | Quote with avatar (PR #49b5f00 avatar fix). |
+| `BeforeAfter.astro` | `beforeAfter` | Slider compare. |
 
-### Section Primitive (Critical)
+### Media & embeds
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `VideoEmbed.astro` | `videoEmbed` | YouTube-first (field renamed to `youtubeUrl` in Story 18.6). |
+| `EmbedBlock.astro` | `embedBlock` | Generic iframe embed. |
+| `MapBlock.astro` | `mapBlock` | Map coordinates / iframe. |
+| `CountdownTimer.astro` | `countdownTimer` | Countdown to event date. |
 
-The `section` family is the core layout primitive. All page content is wrapped in Section components:
+### Social & cross-link
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `SponsorCards.astro` | `sponsorCards` | Sponsor mini-cards. |
+| `SponsorSteps.astro` | `sponsorSteps` | Partnering steps grid. |
+| `ProjectCards.astro` | `projectCards` | Project preview cards. |
+| `RichText.astro` | `richText` | Portable Text passthrough. |
 
-```astro
-<Section>
-  <SectionContent>
-    <!-- Content here -->
-  </SectionContent>
-</Section>
-```
+### Essentials
+| Component | Schema `_type` | Notes |
+|---|---|---|
+| `LinkCards.astro` | `linkCards` | Card grid of links. |
+| `MetricsDashboard.astro` | `metricsDashboard` | KPI tiles. |
+| `CardGrid.astro` | `cardGrid` | Generic card grid with item children. |
 
-**Important:** Each `<Section>` adds 48-64px vertical padding. Do NOT stack multiple Sections for content that should appear together — use a single Section with natural gap spacing.
+## 2. UI primitive families (`components/ui/` — 40)
 
----
+Mostly shadcn new-york with custom additions.
 
-## Top-Level Application Components (15)
+### shadcn-origin (stock)
+accordion, alert, avatar, badge, button, checkbox, collapsible, empty, field, input, item, label, list, navigation-menu, radio-group, select (→ native-select), sheet, sidebar, skeleton, spinner, table, tabs, textarea.
 
-| Component | Type | Purpose | Test |
-|-----------|------|---------|------|
-| BlockRenderer.astro | Astro | Block type dispatcher (page builder core) | Yes |
-| BlockWrapper.astro | Astro | Block spacing/styling wrapper | Yes |
-| block.astro | Astro | Block utilities | No |
-| Breadcrumb.astro | Astro | Navigation breadcrumbs | Yes |
-| BreadcrumbItem.astro | Astro | Individual breadcrumb | No |
-| EventCard.astro | Astro | Event card display | Yes |
-| Footer.astro | Astro | Site-wide footer | No |
-| Header.astro | Astro | Site-wide header (GTM tests only) | Partial |
-| ProjectCard.astro | Astro | Project card display | Yes |
-| SanityImage.astro | Astro | Optimized Sanity image (urlFor + LQIP) | Yes |
-| SanityLiveUpdater.astro | Astro | Live content subscription | No |
-| SanityPageContent.astro | Astro | Dynamic page renderer | No |
-| SponsorCard.astro | Astro | Sponsor card display | Yes |
-| TestimonialCard.astro | Astro | Testimonial display | No |
-| VariantLayout.astro | Astro | Layout variant dispatcher | Yes |
+### Custom / extended
+- **`section/**`** (12-column grid system — Story 17.8) — sub-components: `Section.astro`, `SectionActions.astro`, `SectionContent.astro`, `SectionGrid.astro`, `SectionMasonry.astro`, `SectionMedia.astro`, `SectionProse.astro`, `SectionProvider.astro`, `SectionSplit.astro`, `SectionSpread.astro`. Provides consistent spacing tokens (xs/sm/md/lg/xl) and container-query breakpoints.
+- **`json-ld/`** — JSON-LD injector for Article / Person / Organization schema. Consumed by `/articles/[slug]`, `/authors/[slug]`, catch-all pages.
+- **`video/`** — YouTube + Vimeo embed helpers using lazy-loaded iframes.
+- **`marquee/`** — horizontal scrolling ticker.
+- **`native-carousel/`** — CSS scroll-snap carousel (no JS dependency).
+- **`logo/`** — logo component that auto-selects light/dark and plain/default variant.
+- **`rating/`** — star rating display.
+- **`price/`** — price formatter with locale/currency support.
+- **`tile/`** — media tile with hover state.
+- **`icon/`** — iconify-lucide + simple-icons wrapper.
+- **`image/`** — Sanity image with LQIP blur-up + `fetchpriority` + responsive srcset.
+- **`banner/`** — in-content banner.
+- **`footer/`** — site footer with nav columns.
+- **`header/`** — site header with nested nav dropdowns + hamburger (PR #f16cae2 breakpoint fix + accessibility improvements).
+- **`theme-toggle/`** — unused in production (dark mode currently disabled per PR #6bfb656).
+- **`auto-form/`** — shadcn auto-form with Zod schema binding.
+- **`separator/`** — shadcn separator.
 
----
+## 3. Portable Text components (`components/portable-text/` — 6)
 
-## Portal Components (React)
+Dispatched by the resolver map in `components/portable-text/index.ts`. Consumed by every `<RichText>` block and the catch-all Portable Text renderer.
 
-Hydrated React islands for the authenticated sponsor/student portal.
+| Component | Used for |
+|---|---|
+| `PortableTextCallout.astro` | Callout / note / warning blocks |
+| `PortableTextImage.astro` | Inline images with caption + LQIP |
+| `PortableTextInternalLink.astro` | Cross-doc references (`reference` type) |
+| `PortableTextLink.astro` | External links with `target="_blank"` rules |
+| `PortableTextTable.astro` | Tabular data rendered from blocks |
+| `PortableTextVideoEmbed.astro` | Inline video embed |
 
-| Component | Hydration | Purpose |
-|-----------|-----------|---------|
-| PortalCard.tsx | client:load | Card with icon, title, badge |
-| PortalIcon.tsx | (child) | Lucide icon renderer |
-| PortalSkeleton.tsx | (child) | Animated loading placeholders |
-| SponsorProjects.tsx | client:load | Projects list panel |
-| PortalCalendar.tsx | client:visible | Schedule-X event calendar |
-| EventDetailPopover.tsx | client:load | Event details overlay |
-| types.ts | - | PortalUser, PortalNavItem types |
+## 4. Portal components (React)
 
-**Architecture Rule:** No direct Sanity fetching in React components. Fetch in `.astro` frontmatter or API endpoints, pass as props.
+- `PortalCard.tsx` — dashboard metric card.
+- `SponsorProjects.tsx` — project list for `/portal/[sponsorSlug]`.
+- Additional helpers (form controls, list filters) used by `/portal/events` and `/portal/progress`.
 
----
+## 5. React islands (`components/react/`)
 
-## Design System
+- `calendar-brutalist.tsx` — Schedule X calendar for `/portal/events` and `/events` (Brutalist theme).
+- Related filter bars and date pickers.
 
-### Theme Tokens
+## 6. Concept / story components (`components/concepts/`)
 
-| Token | Light | Dark |
-|-------|-------|------|
-| Primary | Swiss red #e30613 | Same |
-| Background | white | neutral-950 |
-| Foreground | neutral-950 | neutral-50 |
-| Card | white | neutral-900 |
-| Muted | neutral-100 | neutral-800 |
-| Border | neutral-200 | neutral-800 |
+Design-review concepts; some promoted to production:
 
-### Multi-Site Themes
+- `ProjectPageHeader` (promoted to `/projects`).
+- `ProjectCardCompact` variants (used in `/projects` — Story 4.6).
+- `ProjectFilterBar` — sort + filter controls on `/projects` (Story 4.6).
+- `ProjectGridDense`, `ProjectEmptyState` — shared grid + fallback.
 
-| Theme | Primary Color | Data Attribute |
-|-------|---------------|----------------|
-| Red (Capstone) | #e30613 | default |
-| Blue (RWC US) | #2563eb | [data-site-theme="blue"] |
-| Green (RWC Intl) | #059669 | [data-site-theme="green"] |
+## 7. Top-level components
 
-### Typography
+- `BlockRenderer.astro` — switches on `_type`, returns the matching block component. Single source of dispatch.
+- `BlockWrapper.astro` — applies `background`, `spacing` (pt/pb), `maxWidth`, `alignment`, `id` anchor, `hiddenByVariant` flag. Enforces dark-bg contrast rules (PR #38b8610).
 
-- Sans: Helvetica Neue
-- Mono: Courier New
-- Headings: letter-spacing -0.03em, line-height 1.05
-- Body: letter-spacing -0.01em, line-height 1.5
+## Rendering pipeline (the contract)
 
----
+1. A `page` document's `body[]` array holds block objects, each with a `_type`.
+2. SSG page renders `{page.body.map(b => <BlockRenderer block={b} />)}`.
+3. `BlockRenderer` dispatches by `_type` to one of the 38 `blocks/custom/*.astro` components.
+4. Each block returns `<BlockWrapper {...block._meta}>…</BlockWrapper>`.
+5. `BlockWrapper` applies the universal spacing/background/alignment + `gap-16` between direct children.
 
-## Test Coverage
+**Critical rule** (from `CLAUDE.md`): detail pages (sponsor / project / event) use a **single** `<Section>` with one `<SectionContent>`. Stacking multiple `<Section>` elements doubles vertical padding — this has been a recurring bug, fixed in PRs #270 (sponsors) and #275 (events).
 
-### Components With Tests (42)
+## Storybook (187 stories)
 
-All 23 custom Sanity blocks have dedicated test files plus 19 additional component tests covering BlockRenderer, BlockWrapper, Breadcrumb, Header, SanityImage, EventCard, ProjectCard, SponsorCard, VariantLayout, and events page.
+Stories live next to components: `src/components/**/*.stories.{ts,tsx,mdx}`.
+Config: `.storybook/main.ts` with Storybook 10.2.7, builder-vite, addon-docs, storybook-astro 0.1.0, and a custom `lucide-static` SVG stub plugin (bypasses `import.meta.env` crash in SSR contexts).
+Deployed to GitHub Pages via `.github/workflows/deploy-storybook.yml`.
+Visual regression via Chromatic.
 
-### Components Without Tests
+## Testing
 
-- Footer.astro
-- SanityPageContent.astro
-- SanityLiveUpdater.astro
-- BreadcrumbItem.astro
-- block.astro
-- TestimonialCard.astro
+- Component / render tests: `astro-app/src/components/**/__tests__/*.test.ts` (Vitest).
+- Block coverage: `BlockRenderer.test.ts`, `BlockWrapper.test.ts`.
+- E2E visual checks: `tests/e2e/*.spec.ts` (Playwright) — see [development-guide.md](./development-guide.md).
 
-### Test Fixtures (16+)
+## Notable component changes since 2026-03
 
-Pre-built Sanity content fixtures for each block type, used across component tests.
-
----
-*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*
+- **Added:** ColumnsBlock (21.10), ImageGallery w/ PhotoSwipe (22.4), `section/*` grid sub-components (17.8), category archive layouts (19.10), author detail layouts (20.2, 20.3), ProjectFilterBar + variants (4.6).
+- **Refactored:** articleList to reuse ArticleCard + brutalist/magazine variants (1.16.0), testimonials split + carousel fixes (PR #49b5f00), contact form image bleed (PR #f0de7bf), feature grid columns/description (PR #f0de7bf), pullquote avatar (PR #49b5f00), service cards alternation (PR #49b5f00), outline button hover on dark CTAs (PR #5613cbc), hero centered glass-card transparency (PR #c442934).
+- **Schema renames** reflected in blocks (Story 18.6): videoUrl → youtubeUrl, source → contentType, filterBy → eventStatus, comparisonTable columns/rows → options/criteria, newsletter *Text → *Label.
+- **Accessibility + nav:** header nav dropdowns (PR #bca74af, PR #f16cae2), mobile nav parent clickable, hamburger breakpoint lowered.
+- **Sponsor logos:** square + horizontal variants applied consistently across LogoCloud, SponsorCards, SponsorSteps, sponsor detail pages.

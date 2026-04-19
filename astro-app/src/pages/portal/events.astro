@@ -3,9 +3,12 @@ export const prerender = false;
 
 import PortalLayout from "@/layouts/PortalLayout.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
+import BlockRenderer from "@/components/BlockRenderer.astro";
 import PortalCalendar from "@/components/portal/PortalCalendar";
-import { loadQuery, ALL_EVENTS_QUERY, SPONSOR_BY_EMAIL_QUERY, getSiteParams } from "@/lib/sanity";
+import { loadQuery, ALL_EVENTS_QUERY, SPONSOR_BY_EMAIL_QUERY, getSiteParams, getPortalPage } from "@/lib/sanity";
 import type { ALL_EVENTS_QUERY_RESULT, SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
+import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-jsonld";
+import { buildPageGraph } from "@/lib/page-jsonld";
 
 const user = Astro.locals.user;
 
@@ -20,27 +23,42 @@ const { result: events } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({
   query: ALL_EVENTS_QUERY,
   params: getSiteParams(),
 });
+
+const portalPage = await getPortalPage('events');
+const pageTitle = portalPage?.title ?? 'Events & Schedule';
+const pageDescription = portalPage?.description ?? 'View upcoming showcases, workshops, and networking events.';
+
+const breadcrumbItems = [
+  { label: "Portal", href: "/portal/" },
+  { label: "Events" },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
-<PortalLayout title="Events" activeNav="/portal/events" sponsorSlug={sponsor?.slug}>
+<PortalLayout title={pageTitle} activeNav="/portal/events" sponsorSlug={sponsor?.slug}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <div class="flex flex-col gap-6">
-    <Breadcrumb
-      items={[
-        { label: "Portal", href: "/portal/" },
-        { label: "Events" },
-      ]}
-    />
+    <Breadcrumb items={breadcrumbItems} />
+
+    {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.headerBlocks} />
+    )}
 
     <div class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold tracking-tight uppercase">Events & Schedule</h1>
+      <h1 class="text-2xl font-bold tracking-tight uppercase">{pageTitle}</h1>
       <p class="text-muted-foreground">
-        View upcoming showcases, workshops, and networking events.
+        {pageDescription}
       </p>
     </div>
 
     <div class="portal-events-calendar min-h-[600px]">
       <PortalCalendar client:load events={JSON.stringify(events ?? [])} />
     </div>
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
+    )}
   </div>
 </PortalLayout>
 
