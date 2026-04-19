@@ -1063,13 +1063,18 @@ export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RE
     return _portalPageCache.get(route)!;
   }
   const id = getPortalPageId(route);
-  const { result } = await loadQuery<PORTAL_PAGE_QUERY_RESULT>({
-    query: PORTAL_PAGE_QUERY,
-    params: { id },
-  });
-  const value = result ?? null;
-  _portalPageCache.set(route, value);
-  return value;
+  try {
+    const { result } = await loadQuery<PORTAL_PAGE_QUERY_RESULT>({
+      query: PORTAL_PAGE_QUERY,
+      params: { id },
+    });
+    const value = result ?? null;
+    _portalPageCache.set(route, value);
+    return value;
+  } catch (err) {
+    console.error(`getPortalPage('${route}') failed; falling back to null`, err);
+    return null;
+  }
 }
 
 /**

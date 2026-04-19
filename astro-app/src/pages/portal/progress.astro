@@ -159,7 +159,7 @@ const pageDescription = portalPage?.description ?? 'Track development activity f
 
 const breadcrumbItems = [
   { label: 'Portal', href: '/portal/' },
-  { label: pageTitle },
+  { label: stegaClean(pageTitle) ?? pageTitle },
 ];
 const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
 const pageGraph = buildPageGraph(breadcrumbJsonLd);
@@ -176,9 +176,9 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
 
     <div class="flex flex-col gap-2">
       <h1 class="text-2xl font-bold tracking-tight">{pageTitle}</h1>
-      <p class="text-muted-foreground">
-        {pageDescription}
-      </p>
+      {pageDescription && (
+        <p class="text-muted-foreground">{pageDescription}</p>
+      )}
     </div>
 
     {/* State: no GitHub account linked */}

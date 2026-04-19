@@ -50,16 +50,20 @@ const defaultCards = [
 
 const cards = (portalPage?.dashboardCards && portalPage.dashboardCards.length > 0)
   ? portalPage.dashboardCards.map((card) => {
-      const cleanRoute = stegaClean(card.route) ?? '';
-      const cleanIcon = stegaClean(card.iconName);
+      const cleanRoute = (stegaClean(card.route) ?? '').trim();
+      const cleanIcon = stegaClean(card.iconName)?.trim();
+      const needsSlug = cleanRoute.includes('{sponsorSlug}');
+      const hasSlug = Boolean(sponsor?.slug);
+      const resolvedHref = needsSlug
+        ? cleanRoute.replaceAll('{sponsorSlug}', sponsor?.slug ?? '')
+        : cleanRoute;
+      const disabled = card.enabled === false || !resolvedHref || (needsSlug && !hasSlug);
       return {
         title: card.title ?? '',
         description: card.description ?? '',
         icon: cleanIcon ? `lucide:${cleanIcon}` : 'lucide:file',
-        href: cleanRoute.includes('{sponsorSlug}')
-          ? cleanRoute.replace('{sponsorSlug}', sponsor?.slug ?? '')
-          : cleanRoute || '#',
-        disabled: card.enabled === false,
+        href: disabled ? undefined : resolvedHref,
+        disabled,
       };
     })
   : defaultCards;

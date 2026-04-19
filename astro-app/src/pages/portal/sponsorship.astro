@@ -35,9 +35,9 @@ const pageDescription = portalPage?.description ?? 'Sponsorship tier, agreements
     ) : (
       <p class="text-muted-foreground">Content coming soon. Check back later.</p>
     )}
-  </div>
 
-  {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
-    <BlockRenderer blocks={portalPage.footerBlocks} />
-  )}
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
+    )}
+  </div>
 </PortalLayout>
