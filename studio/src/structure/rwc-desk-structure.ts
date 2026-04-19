@@ -3,6 +3,7 @@ import {
   DashboardIcon,
   DocumentIcon,
   DocumentsIcon,
+  DocumentTextIcon,
   CreditCardIcon,
   ProjectsIcon,
   CommentIcon,
@@ -65,7 +66,7 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
             S.list()
               .title('Portal Pages')
               .items(
-                ['dashboard', 'events', 'progress', 'sponsorship', 'login', 'denied'].map(
+                ['dashboard', 'events', 'progress', 'agreement', 'form', 'login', 'denied'].map(
                   (route) =>
                     S.listItem()
                       .title(route.charAt(0).toUpperCase() + route.slice(1))
@@ -77,6 +78,17 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
                       ),
                 ),
               ),
+          ),
+        // Singleton: Sponsor Agreement (site-scoped)
+        S.listItem()
+          .title('Sponsor Agreement')
+          .icon(DocumentTextIcon)
+          .id(`sponsorAgreement-${siteId}`)
+          .child(
+            S.document()
+              .schemaType('sponsorAgreement')
+              .documentId(`sponsorAgreement-${siteId}`)
+              .initialValueTemplate(`sponsorAgreement-${siteId}`),
           ),
         S.divider(),
         ...SITE_AWARE_TYPES.map((type) => {
