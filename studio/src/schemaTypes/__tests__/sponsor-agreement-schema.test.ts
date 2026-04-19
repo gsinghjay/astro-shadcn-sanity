@@ -16,7 +16,9 @@ interface SchemaField {
 interface ValidationRule {
   required: () => ValidationRule
   max: (n: number) => ValidationRule
+  custom: (fn: unknown) => ValidationRule
   calls: string[]
+  customFn?: unknown
 }
 
 function createRuleProxy(): ValidationRule {
@@ -29,6 +31,11 @@ function createRuleProxy(): ValidationRule {
     },
     max(n: number) {
       calls.push(`max:${n}`)
+      return proxy
+    },
+    custom(fn: unknown) {
+      calls.push('custom')
+      proxy.customFn = fn
       return proxy
     },
   }
@@ -103,8 +110,60 @@ describe('Sponsor agreement schema: pdfFile field', () => {
     expect(field!.options?.accept).toBe('application/pdf')
   })
 
-  test('pdfFile is required', () => {
-    expect(recordValidation('pdfFile')).toEqual(['required'])
+  test('pdfFile is required and runs a custom mimeType + size validator', () => {
+    expect(recordValidation('pdfFile')).toEqual(['required', 'custom'])
+  })
+
+  test('pdfFile custom validator rejects non-PDF mime types', async () => {
+    const field = findField('pdfFile')
+    const rule = createRuleProxy()
+    field!.validation!(rule)
+    const validator = rule.customFn as (
+      value: unknown,
+      ctx: {getClient: () => {getDocument: (ref: string) => Promise<unknown>}},
+    ) => Promise<true | string>
+    const ctx = {
+      getClient: () => ({
+        getDocument: async () => ({mimeType: 'application/zip', size: 100}),
+      }),
+    }
+    const result = await validator({asset: {_ref: 'asset-1'}}, ctx)
+    expect(typeof result).toBe('string')
+    expect(result).toMatch(/PDF/)
+  })
+
+  test('pdfFile custom validator rejects PDFs over 10 MB', async () => {
+    const field = findField('pdfFile')
+    const rule = createRuleProxy()
+    field!.validation!(rule)
+    const validator = rule.customFn as (
+      value: unknown,
+      ctx: {getClient: () => {getDocument: (ref: string) => Promise<unknown>}},
+    ) => Promise<true | string>
+    const ctx = {
+      getClient: () => ({
+        getDocument: async () => ({mimeType: 'application/pdf', size: 11 * 1024 * 1024}),
+      }),
+    }
+    const result = await validator({asset: {_ref: 'asset-1'}}, ctx)
+    expect(typeof result).toBe('string')
+    expect(result).toMatch(/10 MB/)
+  })
+
+  test('pdfFile custom validator passes for valid PDF under size cap', async () => {
+    const field = findField('pdfFile')
+    const rule = createRuleProxy()
+    field!.validation!(rule)
+    const validator = rule.customFn as (
+      value: unknown,
+      ctx: {getClient: () => {getDocument: (ref: string) => Promise<unknown>}},
+    ) => Promise<true | string>
+    const ctx = {
+      getClient: () => ({
+        getDocument: async () => ({mimeType: 'application/pdf', size: 1 * 1024 * 1024}),
+      }),
+    }
+    expect(await validator({asset: {_ref: 'asset-1'}}, ctx)).toBe(true)
   })
 })
 

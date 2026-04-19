@@ -50,7 +50,7 @@ function createMockContext(pathname: string, headers?: Record<string, string>) {
   };
 }
 
-const mockNext = vi.fn(() => new Response('ok', { status: 200 }));
+const mockNext = vi.fn(async () => new Response('ok', { status: 200 }));
 const sessionCookie = 'better-auth.session_token=tok; Path=/';
 
 describe('middleware — sponsor agreement gate', () => {
@@ -85,7 +85,7 @@ describe('middleware — sponsor agreement gate', () => {
 
     expect(ctx.locals.user?.role).toBe('sponsor');
     expect(ctx.locals.requiresAgreement).toBe(true);
-    expect(mockD1Prepare).toHaveBeenCalledWith('SELECT agreement_accepted_at FROM user WHERE email = ?');
+    expect(mockD1Prepare).toHaveBeenCalledWith('SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?');
     expect(mockD1Bind).toHaveBeenCalledWith('s@co.com');
   });
 
@@ -113,7 +113,7 @@ describe('middleware — sponsor agreement gate', () => {
 
     expect(ctx.locals.requiresAgreement).toBe(false);
     expect(mockD1Prepare).not.toHaveBeenCalledWith(
-      'SELECT agreement_accepted_at FROM user WHERE email = ?',
+      'SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?',
     );
   });
 
@@ -124,17 +124,37 @@ describe('middleware — sponsor agreement gate', () => {
     expect(ctx.locals.requiresAgreement).toBeUndefined();
   });
 
-  it('agreement accept endpoint itself is never gated', async () => {
+  it('agreement accept endpoint runs through middleware (populates locals.user) but skips the gate', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
       session: { id: 's1', token: 'tok' },
     });
-    // /api/portal/* is not matched by the portal or student prefix, so middleware returns early.
     const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
     await onRequest(ctx as never, mockNext);
 
-    expect(ctx.locals.requiresAgreement).toBeUndefined();
+    expect(ctx.locals.user?.role).toBe('sponsor');
+    expect(ctx.locals.requiresAgreement).toBe(false);
     expect(mockNext).toHaveBeenCalled();
+  });
+
+  it('portal API route returns 401 JSON (not redirect) when no session present', async () => {
+    mockGetSession.mockResolvedValue(null);
+    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const res = (await onRequest(ctx as never, mockNext)) as Response;
+    expect(res.status).toBe(401);
+    expect(res.headers.get('content-type')).toContain('application/json');
+  });
+
+  it('portal API route returns 403 JSON (not redirect) when non-sponsor hits it', async () => {
+    mockGetSession.mockResolvedValue({
+      user: { id: '2', email: 'stu@co.com', name: 'Student', role: 'student' },
+      session: { id: 's2', token: 'tok' },
+    });
+    mockCheckSponsorWhitelist.mockResolvedValue(false);
+    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const res = (await onRequest(ctx as never, mockNext)) as Response;
+    expect(res.status).toBe(403);
+    expect(res.headers.get('content-type')).toContain('application/json');
   });
 
   it('dev mode bypass sets requiresAgreement=false without DB lookup', async () => {
@@ -161,7 +181,7 @@ describe('middleware — sponsor agreement gate', () => {
 
     expect(ctx.locals.requiresAgreement).toBe(false);
     expect(mockD1Prepare).not.toHaveBeenCalledWith(
-      'SELECT agreement_accepted_at FROM user WHERE email = ?',
+      'SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?',
     );
   });
 
@@ -179,7 +199,7 @@ describe('middleware — sponsor agreement gate', () => {
     await onRequest(ctx as never, mockNext);
 
     expect(ctx.locals.requiresAgreement).toBe(true);
-    expect(mockD1Prepare).toHaveBeenCalledWith('SELECT agreement_accepted_at FROM user WHERE email = ?');
+    expect(mockD1Prepare).toHaveBeenCalledWith('SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?');
     expect(mockKvPut).toHaveBeenCalledWith(
       'tok',
       expect.stringContaining('"agreementAcceptedAt":null'),
@@ -187,7 +207,7 @@ describe('middleware — sponsor agreement gate', () => {
     );
   });
 
-  it('D1 lookup failure fails open (flag stays true — safe default blocks access)', async () => {
+  it('D1 lookup failure fails closed (flag stays true — blocks portal access on outage)', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
       session: { id: 's1', token: 'tok' },

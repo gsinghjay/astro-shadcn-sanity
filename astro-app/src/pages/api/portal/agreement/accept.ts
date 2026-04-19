@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { extractSessionToken } from '@/middleware';
+import { extractSessionToken, normalizeEmail } from '@/middleware';
 
 export const prerender = false;
 
@@ -9,10 +9,22 @@ const json = (body: Record<string, unknown>, status: number) =>
     headers: { 'content-type': 'application/json' },
   });
 
-export const POST: APIRoute = async ({ request, locals, url }) => {
-  // Same-origin CSRF check — mirrors Better Auth's pattern for state-changing endpoints
+/** Same-origin check for state-changing endpoints. Falls back to Referer when Origin is absent
+ *  (older Safari, some privacy extensions strip Origin on same-origin POSTs). */
+function isSameOrigin(request: Request, expectedOrigin: string): boolean {
   const origin = request.headers.get('origin');
-  if (!origin || origin !== url.origin) {
+  if (origin) return origin === expectedOrigin;
+  const referer = request.headers.get('referer');
+  if (!referer) return false;
+  try {
+    return new URL(referer).origin === expectedOrigin;
+  } catch {
+    return false;
+  }
+}
+
+export const POST: APIRoute = async ({ request, locals, url }) => {
+  if (!isSameOrigin(request, url.origin)) {
     return json({ error: 'forbidden_origin' }, 403);
   }
 
@@ -23,22 +35,54 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   const env = locals.runtime?.env;
   if (!env?.PORTAL_DB) return json({ error: 'service_unavailable' }, 503);
 
+  const email = normalizeEmail(user.email);
   const acceptedAt = Date.now();
-  const result = await env.PORTAL_DB
-    .prepare('UPDATE user SET agreement_accepted_at = ? WHERE email = ? AND agreement_accepted_at IS NULL')
-    .bind(acceptedAt, user.email)
-    .run();
 
-  if (!result.meta?.changes) {
+  // Read existing acceptance state first so we can distinguish three outcomes:
+  //   row missing      → 404 user_not_found
+  //   already accepted → 409 already_accepted
+  //   accepted now     → 200
+  const existing = await env.PORTAL_DB
+    .prepare('SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?')
+    .bind(email)
+    .first<{ agreement_accepted_at: number | null }>();
+
+  if (!existing) return json({ error: 'user_not_found' }, 404);
+  if (existing.agreement_accepted_at != null) {
     return json({ error: 'already_accepted' }, 409);
   }
 
-  // Invalidate KV session cache so the next request reflects acceptance
+  await env.PORTAL_DB
+    .prepare('UPDATE user SET agreement_accepted_at = ? WHERE LOWER(email) = ?')
+    .bind(acceptedAt, email)
+    .run();
+
+  // Refresh KV session cache with the new acceptance timestamp. Writing rather than deleting
+  // means a propagation delay or write failure leaves a stale-but-still-correct entry, never a
+  // stale "unaccepted" entry that re-prompts the modal.
   const sessionToken = extractSessionToken(request.headers.get('cookie'));
   if (sessionToken && env.SESSION_CACHE) {
-    await env.SESSION_CACHE.delete(sessionToken).catch((e: unknown) =>
-      console.error('[agreement/accept] KV delete failed:', e),
-    );
+    try {
+      const cached = await env.SESSION_CACHE.get<{
+        email: string;
+        name: string;
+        role: string;
+        agreementAcceptedAt?: number | null;
+      }>(sessionToken, { type: 'json' });
+      if (cached) {
+        await env.SESSION_CACHE.put(
+          sessionToken,
+          JSON.stringify({ ...cached, agreementAcceptedAt: acceptedAt }),
+          { expirationTtl: 300 },
+        );
+      } else {
+        await env.SESSION_CACHE.delete(sessionToken);
+      }
+    } catch (e) {
+      console.error('[agreement/accept] KV refresh failed:', e);
+      // Fall through — the D1 write succeeded, the modal will re-prompt up to 5 min until
+      // KV TTL expires. Log so ops can correlate user reports.
+    }
   }
 
   return json({ acceptedAt }, 200);

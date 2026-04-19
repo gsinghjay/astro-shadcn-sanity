@@ -1094,26 +1094,27 @@ export const SPONSOR_AGREEMENT_QUERY = defineQuery(groq`*[_type == "sponsorAgree
 }`);
 
 function getSponsorAgreementId(): string {
-  return isMultiSite ? `sponsorAgreement-${SITE_ID}` : 'sponsorAgreement';
+  // Single agreement document for the capstone workspace. RWC workspaces don't expose a portal,
+  // so a site-scoped variant is intentionally not constructed here.
+  return 'sponsorAgreement';
 }
 
-// Sentinel-undefined ("never fetched") vs null ("fetched, missing") lets us
-// cache the null state correctly — mirrors _siteSettingsCache's approach.
-let _sponsorAgreementCache: SPONSOR_AGREEMENT_QUERY_RESULT | null | undefined = undefined;
-
+/**
+ * Fetch the sponsor agreement singleton.
+ *
+ * No module-level cache: agreement fetches happen only for unaccepted sponsors on portal
+ * navigation (rare path), and the Sanity client is configured with `useCdn: true` outside of
+ * visual editing, so the API CDN already provides ~60s edge caching. This avoids the
+ * stale-cache trap where editor publishes never reach the Worker isolate.
+ */
 export async function getSponsorAgreement(): Promise<SPONSOR_AGREEMENT_QUERY_RESULT | null> {
-  if (!visualEditingEnabled && _sponsorAgreementCache !== undefined) {
-    return _sponsorAgreementCache;
-  }
   const id = getSponsorAgreementId();
   try {
     const { result } = await loadQuery<SPONSOR_AGREEMENT_QUERY_RESULT>({
       query: SPONSOR_AGREEMENT_QUERY,
       params: { id },
     });
-    const value = result ?? null;
-    _sponsorAgreementCache = value;
-    return value;
+    return result ?? null;
   } catch (err) {
     console.error('getSponsorAgreement failed; falling back to null', err);
     return null;
@@ -1135,7 +1136,6 @@ export function resetAllCaches(): void {
   _authorsCache = null;
   _listingPageCache.clear();
   _portalPageCache.clear();
-  _sponsorAgreementCache = undefined;
 }
 
 // ---------------------------------------------------------------------------

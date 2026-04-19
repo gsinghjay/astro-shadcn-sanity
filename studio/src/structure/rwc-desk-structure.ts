@@ -1,9 +1,7 @@
 import {
   CogIcon,
-  DashboardIcon,
   DocumentIcon,
   DocumentsIcon,
-  DocumentTextIcon,
   CreditCardIcon,
   ProjectsIcon,
   CommentIcon,
@@ -58,38 +56,8 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
                 ),
               ),
           ),
-        // Singleton group: Portal Pages (Story 22.9)
-        S.listItem()
-          .title('Portal Pages')
-          .icon(DashboardIcon)
-          .child(
-            S.list()
-              .title('Portal Pages')
-              .items(
-                ['dashboard', 'events', 'progress', 'agreement', 'form', 'login', 'denied'].map(
-                  (route) =>
-                    S.listItem()
-                      .title(route.charAt(0).toUpperCase() + route.slice(1))
-                      .child(
-                        S.document()
-                          .schemaType('portalPage')
-                          .documentId(`portalPage-${route}-${siteId}`)
-                          .initialValueTemplate(`portalPage-${route}-${siteId}`),
-                      ),
-                ),
-              ),
-          ),
-        // Singleton: Sponsor Agreement (site-scoped)
-        S.listItem()
-          .title('Sponsor Agreement')
-          .icon(DocumentTextIcon)
-          .id(`sponsorAgreement-${siteId}`)
-          .child(
-            S.document()
-              .schemaType('sponsorAgreement')
-              .documentId(`sponsorAgreement-${siteId}`)
-              .initialValueTemplate(`sponsorAgreement-${siteId}`),
-          ),
+        // Portal pages and the sponsor agreement are intentionally NOT exposed in RWC
+        // workspaces. The portal is capstone-only; RWC sites ship a marketing surface.
         S.divider(),
         ...SITE_AWARE_TYPES.map((type) => {
           const meta = TYPE_META[type] || {

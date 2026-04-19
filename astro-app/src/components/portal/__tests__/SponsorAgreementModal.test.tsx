@@ -6,12 +6,17 @@ import { createRoot, type Root } from 'react-dom/client';
 // Silence React 19's "testing environment not configured for act(...)" warning
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-// Mock the viewer to skip loading the pdfjs worker in jsdom
-vi.mock('../SponsorAgreementViewer', () => ({
-  default: ({ pdfUrl }: { pdfUrl: string }) => (
-    <div data-testid="agreement-viewer-mock">viewer: {pdfUrl}</div>
-  ),
-}));
+// Mock the viewer to skip loading the pdfjs worker in jsdom.
+// Synchronously fires onReady so the modal treats the PDF as loaded.
+vi.mock('../SponsorAgreementViewer', () => {
+  return {
+    default: ({ pdfUrl, onReady }: { pdfUrl: string; onReady?: (n: number) => void }) => {
+      // Fire on first render so tests don't need to await pdfjs
+      if (onReady) onReady(3);
+      return <div data-testid="agreement-viewer-mock">viewer: {pdfUrl}</div>;
+    },
+  };
+});
 
 // Mock better-auth/client so the sign-out button import resolves in jsdom
 vi.mock('better-auth/client', () => ({

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -13,29 +13,57 @@ interface Props {
   pdfUrl: string;
   maxHeight?: string;
   className?: string;
+  /** Fires when the PDF reports its page count. Empty/corrupt PDFs report 0 — caller should
+   *  use this to keep the accept checkbox/button disabled. */
+  onReady?: (numPages: number) => void;
 }
+
+const DEFAULT_WIDTH = 800;
 
 export default function SponsorAgreementViewer({
   pdfUrl,
   maxHeight = '70vh',
   className = '',
+  onReady,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [width, setWidth] = useState<number | undefined>(undefined);
+  // Default width keeps pages legible before/without ResizeObserver (older browsers).
+  const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
   const [reloadKey, setReloadKey] = useState(0);
 
+  // Debounced ResizeObserver: avoid thrashing pdfjs on every resize tick.
   useEffect(() => {
-    if (!containerRef.current) return;
     const el = containerRef.current;
+    if (!el) return;
+    if (typeof ResizeObserver === 'undefined') return;
+    let pending: ReturnType<typeof setTimeout> | null = null;
     const observer = new ResizeObserver((entries) => {
       const w = entries[0]?.contentRect.width;
-      if (w && w > 0) setWidth(w);
+      if (!w || w <= 0) return;
+      if (pending) clearTimeout(pending);
+      pending = setTimeout(() => setWidth(w), 100);
     });
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      if (pending) clearTimeout(pending);
+      observer.disconnect();
+    };
   }, []);
+
+  // Memoize the page list so an unrelated parent re-render doesn't reset every page.
+  const pages = useMemo(() => {
+    if (!numPages) return null;
+    return Array.from({ length: numPages }, (_, i) => (
+      <Page
+        key={`page-${i + 1}`}
+        pageNumber={i + 1}
+        width={width}
+        className="mb-2"
+      />
+    ));
+  }, [numPages, width]);
 
   return (
     <div
@@ -51,6 +79,7 @@ export default function SponsorAgreementViewer({
             type="button"
             onClick={() => {
               setLoadError(null);
+              setNumPages(null);
               setReloadKey((k) => k + 1);
             }}
             className="text-sm underline"
@@ -62,21 +91,15 @@ export default function SponsorAgreementViewer({
         <Document
           key={reloadKey}
           file={pdfUrl}
-          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+          onLoadSuccess={({ numPages: n }) => {
+            setNumPages(n);
+            onReady?.(n);
+            if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
+          }}
           onLoadError={() => setLoadError('Could not load PDF. Try refreshing.')}
           loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
         >
-          {numPages &&
-            Array.from({ length: numPages }, (_, i) => (
-              <Page
-                key={`page-${i + 1}`}
-                pageNumber={i + 1}
-                width={width}
-                className="mb-2"
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-              />
-            ))}
+          {pages}
         </Document>
       )}
     </div>

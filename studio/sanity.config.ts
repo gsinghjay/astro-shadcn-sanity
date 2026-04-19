@@ -73,19 +73,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: 'listingPage',
           value: {route},
         }))
-        const portalTemplates = ['dashboard', 'events', 'progress', 'agreement', 'form', 'login', 'denied'].map((route) => ({
-          id: `portalPage-${route}-${opts.siteId}`,
-          title: `Portal Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
-          schemaType: 'portalPage',
-          value: {route},
-        }))
-        const sponsorAgreementTemplate = {
-          id: `sponsorAgreement-${opts.siteId}`,
-          title: `Sponsor Agreement — ${opts.title}`,
-          schemaType: 'sponsorAgreement',
-          value: {},
-        }
-        return [...filtered, ...siteTemplates, ...listingTemplates, ...portalTemplates, sponsorAgreementTemplate]
+        // portalPage and sponsorAgreement are capstone-only — no RWC templates emitted.
+        return [...filtered, ...siteTemplates, ...listingTemplates]
       },
     },
     document: {

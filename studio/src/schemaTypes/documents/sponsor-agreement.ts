@@ -35,8 +35,25 @@ export const sponsorAgreement = defineType({
       title: 'Agreement PDF',
       type: 'file',
       options: {accept: 'application/pdf'},
-      description: 'Uploaded agreement rendered via pdfjs-dist in the modal and sponsorship page.',
-      validation: (Rule) => Rule.required(),
+      description: 'Uploaded agreement rendered via pdfjs-dist in the modal and sponsorship page. Must be PDF, max 10 MB.',
+      validation: (Rule) =>
+        Rule.required().custom(async (value, context) => {
+          if (!value?.asset?._ref) return true
+          const ref = value.asset._ref as string
+          const asset = await context
+            .getClient({apiVersion: '2024-01-01'})
+            .getDocument(ref)
+          if (!asset) return true
+          const mime = (asset as {mimeType?: string}).mimeType
+          const size = (asset as {size?: number}).size
+          if (mime && mime !== 'application/pdf') {
+            return `File must be a PDF (got "${mime}"). The browser accept hint can be bypassed.`
+          }
+          if (size && size > 10 * 1024 * 1024) {
+            return `PDF is ${(size / 1024 / 1024).toFixed(1)} MB; max 10 MB. Large PDFs slow the modal for every unaccepted sponsor.`
+          }
+          return true
+        }),
     }),
     defineField({
       name: 'checkboxLabel',

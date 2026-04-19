@@ -53,23 +53,22 @@ describe("SPONSOR_AGREEMENT_QUERY and getSponsorAgreement()", () => {
     errSpy.mockRestore();
   });
 
-  it("caches the null fetched state — second call makes no network request", async () => {
+  it("does not cache between calls — every call hits Sanity (CDN handles edge caching)", async () => {
     const { sanityClient: client } = await import("sanity:client");
     const mod = await import("@/lib/sanity");
 
-    vi.mocked(client.fetch).mockResolvedValueOnce({ result: null, syncTags: [] } as never);
+    vi.mocked(client.fetch).mockResolvedValue({ result: null, syncTags: [] } as never);
 
     const first = await mod.getSponsorAgreement();
     expect(first).toBeNull();
     expect(client.fetch).toHaveBeenCalledOnce();
 
-    vi.mocked(client.fetch).mockClear();
     const second = await mod.getSponsorAgreement();
     expect(second).toBeNull();
-    expect(client.fetch).not.toHaveBeenCalled();
+    expect(client.fetch).toHaveBeenCalledTimes(2);
   });
 
-  it("returns document and caches it on success", async () => {
+  it("returns document fetched from Sanity (no module cache)", async () => {
     const { sanityClient: client } = await import("sanity:client");
     const mod = await import("@/lib/sanity");
 
@@ -82,7 +81,7 @@ describe("SPONSOR_AGREEMENT_QUERY and getSponsorAgreement()", () => {
       acceptButtonText: "Accept & Continue",
       bodyContent: null,
     };
-    vi.mocked(client.fetch).mockResolvedValueOnce({ result: doc, syncTags: [] } as never);
+    vi.mocked(client.fetch).mockResolvedValue({ result: doc, syncTags: [] } as never);
 
     const first = await mod.getSponsorAgreement();
     expect(first).toEqual(doc);
@@ -92,13 +91,12 @@ describe("SPONSOR_AGREEMENT_QUERY and getSponsorAgreement()", () => {
       expect.objectContaining({ filterResponse: false, perspective: "published" }),
     );
 
-    vi.mocked(client.fetch).mockClear();
     const second = await mod.getSponsorAgreement();
     expect(second).toEqual(doc);
-    expect(client.fetch).not.toHaveBeenCalled();
+    expect(client.fetch).toHaveBeenCalledTimes(2);
   });
 
-  it("uses site-scoped ID when DATASET is rwc", async () => {
+  it("always uses the un-suffixed singleton ID — agreement is capstone-only, RWC has no portal", async () => {
     vi.resetModules();
     vi.doMock("astro:env/client", () => ({
       PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
@@ -116,7 +114,7 @@ describe("SPONSOR_AGREEMENT_QUERY and getSponsorAgreement()", () => {
     await mod.getSponsorAgreement();
     expect(client.fetch).toHaveBeenCalledWith(
       expect.any(String),
-      { id: "sponsorAgreement-rwc-us" },
+      { id: "sponsorAgreement" },
       expect.any(Object),
     );
   });
