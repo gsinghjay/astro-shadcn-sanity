@@ -24,6 +24,7 @@ import type {
   AUTHOR_BY_SLUG_QUERY_RESULT,
   LISTING_PAGE_QUERY_RESULT,
   PORTAL_PAGE_QUERY_RESULT,
+  SPONSOR_AGREEMENT_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -225,6 +226,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     _type == "embedBlock" => {
       heading,
       embedUrl,
+      rawEmbedCode,
       caption
     },
     _type == "mapBlock" => {
@@ -1077,6 +1079,47 @@ export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RE
   }
 }
 
+// ---------------------------------------------------------------------------
+// Sponsor Agreement query (singleton — one doc per workspace)
+// ---------------------------------------------------------------------------
+
+export const SPONSOR_AGREEMENT_QUERY = defineQuery(groq`*[_type == "sponsorAgreement" && _id == $id][0]{
+  _id,
+  title,
+  intro[]${PORTABLE_TEXT_PROJECTION},
+  pdfFile{ asset->{ _id, url, originalFilename, size, mimeType } },
+  checkboxLabel,
+  acceptButtonText,
+  bodyContent[]${PORTABLE_TEXT_PROJECTION}
+}`);
+
+function getSponsorAgreementId(): string {
+  return isMultiSite ? `sponsorAgreement-${SITE_ID}` : 'sponsorAgreement';
+}
+
+// Sentinel-undefined ("never fetched") vs null ("fetched, missing") lets us
+// cache the null state correctly — mirrors _siteSettingsCache's approach.
+let _sponsorAgreementCache: SPONSOR_AGREEMENT_QUERY_RESULT | null | undefined = undefined;
+
+export async function getSponsorAgreement(): Promise<SPONSOR_AGREEMENT_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _sponsorAgreementCache !== undefined) {
+    return _sponsorAgreementCache;
+  }
+  const id = getSponsorAgreementId();
+  try {
+    const { result } = await loadQuery<SPONSOR_AGREEMENT_QUERY_RESULT>({
+      query: SPONSOR_AGREEMENT_QUERY,
+      params: { id },
+    });
+    const value = result ?? null;
+    _sponsorAgreementCache = value;
+    return value;
+  } catch (err) {
+    console.error('getSponsorAgreement failed; falling back to null', err);
+    return null;
+  }
+}
+
 /**
  * Reset all module-level caches. Useful for testing and SSR scenarios
  * where stale data could persist across requests.
@@ -1092,6 +1135,7 @@ export function resetAllCaches(): void {
   _authorsCache = null;
   _listingPageCache.clear();
   _portalPageCache.clear();
+  _sponsorAgreementCache = undefined;
 }
 
 // ---------------------------------------------------------------------------

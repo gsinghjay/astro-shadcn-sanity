@@ -44,12 +44,12 @@ describe('Portal page schema: route field', () => {
     expect(field!.readOnly).toBe(true)
   })
 
-  test('route field has radio layout with 6 options', () => {
+  test('route field has radio layout with 7 options (agreement + form)', () => {
     const field = findField('route')
     expect(field!.options?.layout).toBe('radio')
-    expect(field!.options?.list).toHaveLength(6)
+    expect(field!.options?.list).toHaveLength(7)
     const values = field!.options?.list?.map((o) => o.value)
-    expect(values).toEqual(['dashboard', 'events', 'progress', 'sponsorship', 'login', 'denied'])
+    expect(values).toEqual(['dashboard', 'events', 'progress', 'agreement', 'form', 'login', 'denied'])
   })
 
   test('route field has description', () => {

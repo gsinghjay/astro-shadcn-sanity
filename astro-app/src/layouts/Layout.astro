@@ -77,10 +77,11 @@ const cspConnectSrc = [
   "https://*.sanity.io",
   "wss://*.sanity.io",
   "https://cloudflareinsights.com",
+  "https://*.formsite.com",
   ...(aiSearchWorkerOrigin ? [aiSearchWorkerOrigin] : []),
 ].join(" ");
 
-const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com";
+const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://*.formsite.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com https://*.formsite.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com https://*.formsite.com";
 
 const hasStructuredData = Astro.slots.has('structured-data');
 const fallbackOrgJsonLd = hasStructuredData ? null : buildPageGraph(await buildOrgJsonLd(Astro.url.origin));
