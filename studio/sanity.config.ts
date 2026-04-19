@@ -5,7 +5,7 @@ import {visionTool} from '@sanity/vision'
 import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
 import {media} from 'sanity-plugin-media'
-import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
+import {createWorkspaceSchemaTypes} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
 import {resolve} from './src/presentation/resolve'
@@ -50,7 +50,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
       formSchema({}),
     ],
     schema: {
-      types: createSchemaTypesForWorkspace('rwc'),
+      types: createWorkspaceSchemaTypes('rwc'),
       templates: (prev) => {
         const filtered = prev.filter(
           (t) =>
@@ -132,7 +132,7 @@ export default defineConfig([
       formSchema({}),
     ],
     schema: {
-      types: createSchemaTypesForWorkspace('production'),
+      types: createWorkspaceSchemaTypes('production'),
       templates: (prev) => {
         const filtered = prev.filter(
           (t) => !CAPSTONE_SINGLETON_TYPES.has(t.schemaType),
