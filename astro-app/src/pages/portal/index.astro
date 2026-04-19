@@ -6,6 +6,7 @@ import PortalCard from "@/components/portal/PortalCard";
 import PortalSkeleton from "@/components/portal/PortalSkeleton";
 import BlockRenderer from "@/components/BlockRenderer.astro";
 import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams, getPortalPage } from "@/lib/sanity";
+import { stegaClean } from "@sanity/client/stega";
 import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
 
 const user = Astro.locals.user;
@@ -48,15 +49,19 @@ const defaultCards = [
 ];
 
 const cards = (portalPage?.dashboardCards && portalPage.dashboardCards.length > 0)
-  ? portalPage.dashboardCards.map((card) => ({
-      title: card.title ?? '',
-      description: card.description ?? '',
-      icon: card.iconName ? `lucide:${card.iconName}` : 'lucide:file',
-      href: card.route?.includes('{sponsorSlug}')
-        ? card.route.replace('{sponsorSlug}', sponsor?.slug ?? '')
-        : card.route ?? '#',
-      disabled: card.enabled === false,
-    }))
+  ? portalPage.dashboardCards.map((card) => {
+      const cleanRoute = stegaClean(card.route) ?? '';
+      const cleanIcon = stegaClean(card.iconName);
+      return {
+        title: card.title ?? '',
+        description: card.description ?? '',
+        icon: cleanIcon ? `lucide:${cleanIcon}` : 'lucide:file',
+        href: cleanRoute.includes('{sponsorSlug}')
+          ? cleanRoute.replace('{sponsorSlug}', sponsor?.slug ?? '')
+          : cleanRoute || '#',
+        disabled: card.enabled === false,
+      };
+    })
   : defaultCards;
 ---
 

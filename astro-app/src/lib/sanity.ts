@@ -1041,23 +1041,6 @@ export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_
   return value;
 }
 
-/**
- * Reset all module-level caches. Useful for testing and SSR scenarios
- * where stale data could persist across requests.
- */
-export function resetAllCaches(): void {
-  _siteSettingsCache = null;
-  _sponsorsCache = null;
-  _projectsCache = null;
-  _testimonialsCache = null;
-  _eventsCache = null;
-  _articlesCache = null;
-  _articleCategoriesCache = null;
-  _authorsCache = null;
-  _listingPageCache.clear();
-  _portalPageCache.clear();
-}
-
 // ---------------------------------------------------------------------------
 // Portal Page queries (Story 22.9)
 // ---------------------------------------------------------------------------
@@ -1066,7 +1049,7 @@ export const PORTAL_PAGE_QUERY = defineQuery(groq`*[_type == "portalPage" && _id
   _id, route, title, description,
   headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
   footerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
-  dashboardCards[]{ title, description, iconName, route, enabled }
+  dashboardCards[]{ _key, title, description, iconName, route, enabled }
 }`);
 
 function getPortalPageId(route: string): string {
@@ -1087,6 +1070,23 @@ export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RE
   const value = result ?? null;
   _portalPageCache.set(route, value);
   return value;
+}
+
+/**
+ * Reset all module-level caches. Useful for testing and SSR scenarios
+ * where stale data could persist across requests.
+ */
+export function resetAllCaches(): void {
+  _siteSettingsCache = null;
+  _sponsorsCache = null;
+  _projectsCache = null;
+  _testimonialsCache = null;
+  _eventsCache = null;
+  _articlesCache = null;
+  _articleCategoriesCache = null;
+  _authorsCache = null;
+  _listingPageCache.clear();
+  _portalPageCache.clear();
 }
 
 // ---------------------------------------------------------------------------
