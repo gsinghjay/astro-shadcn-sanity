@@ -1,293 +1,236 @@
 # Data Models
 
-*Generated: 2026-03-11 | Scan Level: deep*
+**Project:** ywcc-capstone-template v1.18.0
+**Generated:** 2026-04-15
 
-## Overview
+The system maintains data in **two** authoritative stores. Every schema change requires a migration in the appropriate layer — never cross the boundary with raw SQL into Sanity, or with GROQ into D1.
 
-This project uses two data stores:
-1. **Sanity Content Lake** — Structured content (pages, sponsors, projects, events, testimonials)
-2. **Cloudflare D1** — Authentication data (users, sessions, accounts, verification tokens)
+| Store | Technology | Purpose | Source of truth |
+|---|---|---|---|
+| Sanity Content Lake | Sanity 5.20 (3 workspaces) | Editorial content (pages, articles, sponsors, projects, events, authors, listing pages, settings) | `studio/src/schemaTypes/**`, committed, deployed with `npx sanity schema deploy` |
+| Cloudflare D1 | SQLite (`ywcc-capstone-portal`) via Drizzle ORM | Auth + operational data (users, sessions, subscribers, reminder log, project → GitHub links) | `astro-app/src/lib/drizzle-schema.ts` + `astro-app/migrations/*.sql` |
 
----
-
-## Sanity Content Lake
-
-### Document Types (7)
-
-#### page
-The core page builder document. Each page has a template and an array of content blocks.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| title | string | Yes | Page title |
-| slug | slug | Yes | URL path (source: title) |
-| site | string | Conditional | rwc-us or rwc-intl (hidden on production dataset) |
-| template | string | No | default, fullWidth, landing, sidebar, twoColumn |
-| seo | seo (object) | No | Meta title, description, OG image |
-| blocks | array | No | 23 block types supported |
-
-**Block/template compatibility:** Certain blocks warn when used in constrained templates (sidebar, twoColumn).
-
-#### siteSettings (Singleton)
-Global site configuration — one document per workspace.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| siteName | string | Yes | Site display name |
-| site | string | Conditional | Multi-site field |
-| siteDescription | text | No | Site description |
-| logo | image (with alt) | Yes | Primary logo |
-| logoLight | image (with alt) | No | Light variant logo |
-| ctaButton | button (object) | No | Header CTA |
-| navigationItems | array of link | No | Main nav with dropdown children |
-| footerContent | object | No | text, copyrightText |
-| socialLinks | array | No | platform + url pairs |
-| contactInfo | object | No | address, email, phone |
-| footerLinks | array of link | No | Footer navigation |
-| resourceLinks | array of link | No | Resource links |
-| programLinks | array of link | No | Program links |
-| currentSemester | string | No | e.g., "Fall 2026" |
-
-#### sponsor
-Industry sponsors with tier-based classification and portal access whitelist.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| name | string | Yes | Sponsor name |
-| slug | slug | Yes | URL path |
-| site | string | Conditional | Multi-site field |
-| logo | image (with alt) | Yes | Sponsor logo |
-| description | text | No | About the sponsor |
-| website | url | No | External website |
-| contactEmail | string | No | Primary contact (email validated) |
-| allowedEmails | array of string | No | Portal whitelist (email validated) |
-| industry | string | No | Industry sector |
-| tier | string | No | platinum, gold, silver, bronze |
-| hidden | boolean | No | Default: false |
-| featured | boolean | No | Default: false |
-| seo | seo (object) | No | SEO metadata |
-
-#### project
-Capstone projects linked to sponsors with technology tags.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| title | string | Yes | Project title |
-| slug | slug | Yes | URL path |
-| site | string | Conditional | Multi-site field |
-| sponsor | reference → sponsor | No | Associated sponsor |
-| status | string | Yes | active, completed, archived (default: active) |
-| featured | boolean | No | Default: false |
-| semester | string | No | Academic semester |
-| content | portableText | No | Rich text description |
-| outcome | text | No | Outcome & Impact |
-| team | array of objects | No | name + role per member |
-| mentor | object | No | name, title, department |
-| technologyTags | array of string | No | 70+ predefined technology options |
-| seo | seo (object) | No | SEO metadata |
-
-#### testimonial
-Quotes from industry partners and students.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| name | string | Yes | Person's name |
-| site | string | Conditional | Multi-site field |
-| quote | text | Yes | Testimonial text |
-| role | string | No | Job title / role |
-| organization | string | No | Company / school |
-| type | string | No | industry or student |
-| photo | image (with alt) | No | Person's photo |
-| project | reference → project | No | Related project |
-
-#### event
-Calendar events with categories and date ranges.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| title | string | Yes | Event title |
-| slug | slug | Yes | URL path |
-| site | string | Conditional | Multi-site field |
-| date | datetime | Yes | Start date/time |
-| endDate | datetime | No | End date (validated: must be after start) |
-| location | string | No | Venue |
-| description | text | No | Event description |
-| isAllDay | boolean | No | Default: false |
-| category | string | No | workshop, lecture, social, competition, other |
-| eventType | string | No | showcase, networking, workshop |
-| status | string | No | upcoming, past (default: upcoming) |
-| seo | seo (object) | No | SEO metadata |
-
-#### submission (Read-Only)
-Contact form submissions stored in Sanity.
-
-| Field | Type | Required | Notes |
-|-------|------|----------|-------|
-| name | string | Yes | Submitter name |
-| email | string | Yes | Submitter email |
-| organization | string | No | Organization |
-| message | text | Yes | Message content |
-| form | reference → form | No | Source form |
-| submittedAt | datetime | Yes | Submission timestamp |
-
-### Object Types (14)
-
-| Object | Fields | Used In |
-|--------|--------|---------|
-| seo | metaTitle (max 60), metaDescription (max 160), ogImage | page, sponsor, project, event |
-| button | text, url (validated), variant (default/secondary/outline/ghost) | ctaBanner, heroBanner, sponsorSteps, sponsorshipTiers |
-| link | label, href (validated), external (boolean) | siteSettings nav, footer |
-| portableText | blocks (h2-h4, blockquote), marks (strong/em/code/underline), annotations (link, internalLink→page/sponsor/project/event), lists (bullet/number), image (with alt+caption), callout (tone+text) | project.content, richText, faqItem.answer, textWithImage |
-| faqItem | question, answer (portableText) | faqSection |
-| featureItem | icon, image, title, description | featureGrid |
-| statItem | value, label, description | statsRow |
-| stepItem | title, description, list (bullet points) | sponsorSteps |
-| teamMember | name, role, image (with alt), links[] | teamGrid |
-| galleryImage | image (with alt), caption | imageGallery |
-| comparisonColumn | title, highlighted (boolean) | comparisonTable |
-| comparisonRow | feature, values[], isHeader (boolean) | comparisonTable |
-| timelineEntry | date, title, description, image (with alt) | timeline |
-| block-base | backgroundVariant, spacing, maxWidth (shared via defineBlock) | All blocks |
-
-### Block Types (25)
-
-| Block | Variants | Key Fields | Display Mode |
-|-------|----------|------------|--------------|
-| heroBanner | centered, split, split-asymmetric, overlay, spread | heading, subheading, backgroundImages, ctaButtons, alignment | - |
-| featureGrid | - | heading, items[] (featureItem), columns (2/3/4) | - |
-| ctaBanner | centered, split, spread, overlay | heading, description, backgroundImages, ctaButtons | - |
-| statsRow | - | heading, stats[] (statItem) | - |
-| textWithImage | - | heading, content (PT), image, imagePosition (left/right) | - |
-| logoCloud | - | heading, autoPopulate, sponsors[] | all / manual |
-| sponsorSteps | - | heading, subheading, items[] (stepItem), ctaButtons | - |
-| richText | - | content (portableText) | - |
-| faqSection | - | heading, items[] (faqItem) | - |
-| contactForm | - | heading, description, successMessage, form (ref) | - |
-| sponsorCards | - | heading, displayMode, sponsors[] | all / featured / manual |
-| testimonials | - | heading, displayMode, testimonials[] | all / industry / student / byProject / manual |
-| eventList | - | heading, filterBy, limit (1-50) | all / upcoming / past |
-| projectCards | - | heading, displayMode, projects[] | all / featured / manual |
-| teamGrid | grid, grid-compact, split | heading, description, items[] (teamMember) | - |
-| imageGallery | grid, masonry, single | heading, description, images[], columns | - |
-| articleList | grid, split-featured, list | heading, description, source, limit (1-20), links | all / blog / news |
-| comparisonTable | table, stacked | heading, description, columns[], rows[], links | - |
-| timeline | vertical, split, horizontal | heading, description, items[] (timelineEntry), links | - |
-| pullquote | centered, split, sidebar | quote, attribution, role, image | - |
-| divider | line, short, labeled | label | - |
-| announcementBar | inline, floating | icon, text, link, dismissible | - |
-| sponsorshipTiers | - | heading, description, tiers[] (name, price, benefits, highlighted, ctaButton) | - |
-
-### Reference Graph
-
-```
-project ──sponsor──► sponsor
-testimonial ──project──► project
-logoCloud ──sponsors[]──► sponsor (when autoPopulate=false)
-sponsorCards ──sponsors[]──► sponsor (when displayMode=manual)
-projectCards ──projects[]──► project (when displayMode=manual)
-testimonials ──testimonials[]──► testimonial (when displayMode=manual)
-contactForm ──form──► form (external type)
-portableText ──internalLink──► page | sponsor | project | event
-```
+Generated types land at `astro-app/src/sanity.types.ts` (22,303 lines) for Sanity and are inferred from Drizzle for D1.
 
 ---
 
-## Cloudflare D1 (Auth Database)
+## Part 1 — Sanity Content Lake
 
-Database: `ywcc-capstone-portal` (ID: 76887418-c356-46d8-983b-fa6e395d8b16)
-ORM: Drizzle (schema in `astro-app/src/lib/drizzle-schema.ts`)
+**Workspaces:** capstone (dataset: `capstone`), rwc-us + rwc-intl (dataset: `rwc`). App ID `zi1cig2o607y1js5cfoyird6`.
 
-### Tables
+**Site-aware filtering:** types flagged `site-aware` expose a required `site` field in RWC workspaces and hide it in capstone. Uniqueness checks are scoped per site via `siteScopedIsUnique` (see `studio/src/schemaTypes/fields/site-field.ts`).
 
-#### user
-| Column | Type | Constraints | Notes |
-|--------|------|-------------|-------|
-| id | text | PK | UUID |
-| name | text | NOT NULL | Display name |
-| email | text | NOT NULL, UNIQUE | Login email |
-| emailVerified | integer | NOT NULL | Boolean (0/1) |
-| image | text | | Profile image URL |
-| role | text | | "sponsor" or "student" |
-| createdAt | integer | NOT NULL | Unix timestamp |
-| updatedAt | integer | NOT NULL | Unix timestamp |
+### Document types (11)
 
-#### session
-| Column | Type | Constraints | Notes |
-|--------|------|-------------|-------|
-| id | text | PK | Session ID |
-| userId | text | NOT NULL, FK→user | Owner |
-| token | text | NOT NULL, UNIQUE | Session token (cookie value) |
-| expiresAt | integer | NOT NULL | Expiry timestamp |
-| ipAddress | text | | Client IP |
-| userAgent | text | | Browser UA |
-| createdAt | integer | NOT NULL | Creation time |
-| updatedAt | integer | NOT NULL | Last activity |
+| Type | Site-aware | Singleton | Fields (summary) |
+|---|---|---|---|
+| `page` | ✅ | ❌ | `title`, `slug`, `site`, `body[]` (38 block types), `seo` (seo object) |
+| `sponsor` | ✅ | ❌ | `name`, `slug`, `site`, `logo`, `logoSquare` *(new)*, `logoHorizontal` *(new)*, `tier`, `description` (portable text), `website`, `contacts[]` (email-based whitelist), `featured`, `seo` |
+| `project` | ✅ | ❌ | `title`, `slug`, `site`, `sponsor` (ref), `description`, `teamMembers[]`, `semester`, `year`, `status`, `techStack[]`, `featuredImage`, `body[]`, `seo` |
+| `event` | ✅ | ❌ | `title`, `slug`, `site`, `date`, `endDate`, `location`, `rsvpUrl`, `status` (upcoming/past), `description`, `body[]`, `seo` |
+| `testimonial` | ✅ | ❌ | `quote`, `author`, `role`, `site`, `avatar` |
+| `article` | ✅ | ❌ | `title`, `slug`, `site`, `excerpt`, `featuredImage`, `body` (portable text), `author` (ref to `author`), `publishedAt`, `updatedAt`, `category` (ref), `tags[]`, `relatedArticles[]`, `seo` |
+| `article-category` | ❌ | ❌ | `title`, `slug`, `description` |
+| `author` | ✅ | ❌ | `name`, `slug`, `site`, `role`, `bio`, `credentials[]`, `image`, `sameAs[]` (for Person JSON-LD), `socialLinks[]` (`{platform, url}`) |
+| `listing-page` | ✅ | per-site/route | `route` (enum: articles/authors/events/gallery/projects/sponsors), `title`, `description`, `seo`, `headerBlocks[]`, `footerBlocks[]`. One per route per site. IDs: capstone `listingPage-{route}`; RWC `listingPage-{route}-{siteId}`. |
+| `site-settings` | ✅ | per-site | Singleton per workspace. IDs: `siteSettings` (capstone) or `siteSettings-{siteId}` (RWC). Holds nav, footer, global SEO, social links. |
+| `submission` | ❌ | ❌ | Read-only contact-form capture. Fields depend on form config but typically include name, email, message, timestamp, page of origin. |
 
-#### account
-| Column | Type | Constraints | Notes |
-|--------|------|-------------|-------|
-| id | text | PK | Account ID |
-| userId | text | NOT NULL, FK→user | Owner |
-| accountId | text | NOT NULL | Provider's user ID |
-| providerId | text | NOT NULL | google, github, email |
-| accessToken | text | | OAuth access token |
-| refreshToken | text | | OAuth refresh token |
-| accessTokenExpiresAt | integer | | Token expiry |
-| refreshTokenExpiresAt | integer | | Refresh expiry |
-| scope | text | | OAuth scopes |
-| idToken | text | | OIDC ID token |
-| password | text | | Hashed (magic link) |
-| createdAt | integer | NOT NULL | Creation time |
-| updatedAt | integer | NOT NULL | Last update |
+### Object types (23)
 
-#### verification
-| Column | Type | Constraints | Notes |
-|--------|------|-------------|-------|
-| id | text | PK | Verification ID |
-| identifier | text | NOT NULL | Email address |
-| value | text | NOT NULL | Token value |
-| expiresAt | integer | NOT NULL | Token expiry |
-| createdAt | integer | | Creation time |
-| updatedAt | integer | | Last update |
+Reusable building blocks referenced by document types and blocks.
+
+| Type | Purpose |
+|---|---|
+| `portable-text` | Rich text with embedded image, link, blockquote, callout, internal link, table, videoEmbed variants |
+| `seo` | Per-doc SEO (title, description, keywords, ogImage, canonical, robots, structured data overrides) |
+| `button`, `link` | CTA button + internal/external link primitives |
+| `feature-item`, `service-item`, `product-item` | Content card items consumed by featureGrid / serviceCards / productShowcase |
+| `stat-item`, `step-item`, `faq-item` | Stats row counters, steps, FAQ Q&A |
+| `pricing-tier`, `sponsorship-tier-item`, `metric-item` | Pricing + sponsorship + KPI items |
+| `link-card-item`, `card-grid-item` | Generic linked cards |
+| `team-member` | Team grid member (name, role, photo, social) |
+| `gallery-image` | Image with metadata (featured, year, category, alt) consumed by imageGallery |
+| `timeline-entry` | Timeline milestone |
+| `accordion-item`, `tab-item` | Accordion / tabs content |
+| `comparison-row`, `comparison-column` | Comparison table cells |
+| `block-base` | Shared shell: `_meta` (spacing, background, maxWidth, alignment, id, hiddenByVariant) |
+
+### Block types (38) — referenced from `page.body`, `article.body`, `event.body`
+
+See [component-inventory.md](./component-inventory.md) for the matching Astro components. Block schemas live under `studio/src/schemaTypes/blocks/**`.
+
+Layout: `columnsBlock`, `divider`, `announcementBar`.
+Hero/marketing: `heroBanner`, `ctaBanner`, `textWithImage`, `logoCloud`, `sponsorshipTiers`.
+Content: `featureGrid`, `statsRow`, `testimonials`, `teamGrid`, `imageGallery`, `articleList`, `eventList`.
+Forms: `contactForm`, `newsletter`, `accordion`, `tabsBlock`, `faqSection`.
+Commerce: `pricingTable`, `productShowcase`, `serviceCards`.
+Editorial: `comparisonTable`, `timeline`, `pullquote`, `beforeAfter`.
+Media: `videoEmbed`, `embedBlock`, `mapBlock`, `countdownTimer`.
+Social: `sponsorCards`, `sponsorSteps`, `projectCards`, `richText`.
+Essentials: `linkCards`, `metricsDashboard`, `cardGrid`.
 
 ### Relationships
 
+- `article.author` → `author` (ref, same site).
+- `article.category` → `article-category` (ref).
+- `article.relatedArticles[]` → `article` (refs, same site).
+- `project.sponsor` → `sponsor` (ref, same site).
+- Every block that renders other docs (articleList, sponsorCards, projectCards, eventList) takes either an explicit `items[]` array of refs or a query-driven `source`/`contentType` discriminator.
+
+### Migrations (`studio/migrations/`)
+
+1. **`add-item-types.mjs`** (Story 7.10) — Adds `_type` to array items that were previously inline objects: `featureGrid.items → featureItem`, `statsRow.stats → statItem`, `sponsorSteps.items → stepItem`.
+2. **`rename-18-6-fields.mjs`** (Story 18.6) — Field renames: `testimonials.displayMode → testimonialSource`, `eventList.filterBy → eventStatus`, `articleList.source → contentType`, `articleList.links → ctaButtons`, `videoEmbed.videoUrl → youtubeUrl`, `newsletter.placeholderText → inputPlaceholder` + `buttonText → submitButtonLabel` + `disclaimer → privacyDisclaimerText`, `comparisonTable.columns/rows → options/criteria`. Supports `--dry-run`.
+3. **`rename-18-7-richtext-variants.mjs`** (Story 18.7) — Portable Text variant renames.
+
+Run with `npx sanity migration run <name> --dry-run` first, then `--no-dry-run --confirm`.
+
+### GROQ queries (30 `defineQuery` exports in `astro-app/src/lib/sanity.ts`)
+
+Site settings: `SITE_SETTINGS_QUERY`.
+Pages: `PAGE_BY_SLUG_QUERY`, `ALL_PAGES_SLUGS_QUERY` (for `getStaticPaths`).
+Articles: `ALL_ARTICLES_QUERY`, `ARTICLE_BY_SLUG_QUERY`, `ALL_ARTICLE_CATEGORIES_QUERY`, `ARTICLE_CATEGORY_BY_SLUG_QUERY`, `ARTICLES_BY_CATEGORY_QUERY`.
+Authors: `ALL_AUTHORS_QUERY`, `AUTHOR_BY_SLUG_QUERY`.
+Sponsors: `ALL_SPONSORS_QUERY`, `SPONSOR_BY_SLUG_QUERY`, `SPONSOR_PORTAL_QUERY` (portal-only fields incl. contacts), `SPONSOR_WHITELIST_QUERY` (email → role escalation).
+Projects: `ALL_PROJECTS_QUERY`, `PROJECT_BY_SLUG_QUERY`, `SPONSOR_PROJECTS_QUERY`.
+Events: `ALL_EVENTS_QUERY`, `EVENT_BY_SLUG_QUERY`.
+Testimonials: `ALL_TESTIMONIALS_QUERY`.
+Listing pages: `LISTING_PAGE_QUERY`.
+Gallery: gallery slug + detail queries (via `imageGallery` block projection).
+
+All queries use shared projection fragments (`INNER_BLOCK_FIELDS_PROJECTION`, `BLOCK_FIELDS_PROJECTION`) that include `asset.metadata.lqip` for blur-up placeholders.
+
+### Type generation
+
 ```
-user ◄──1:N──► session (userId FK)
-user ◄──1:N──► account (userId FK)
-verification (standalone, linked by identifier=email)
+studio/schema.json (17,861 lines, committed)
+    ↓ npx sanity typegen generate
+astro-app/src/sanity.types.ts (22,303 lines, committed)
+    ↓ imported by src/lib/sanity.ts and every page
+<component props typed as QueryResult<typeof QUERY>>
 ```
+
+Required cadence: run `npm run typegen` whenever schemas or query fragments change. CI's `astro check` step fails on drift.
 
 ---
 
-## GROQ Queries
+## Part 2 — Cloudflare D1 (`ywcc-capstone-portal`)
 
-All queries use `defineQuery()` and are defined in `astro-app/src/lib/sanity.ts`.
+- **Database ID:** `76887418-c356-46d8-983b-fa6e395d8b16`
+- **Binding name:** `PORTAL_DB` (from `astro-app/wrangler.jsonc`); `DB` in `event-reminders-worker`.
+- **ORM:** Drizzle 0.45.1 (`astro-app/src/lib/db.ts`, `drizzle-schema.ts`).
+- **Migrations:** `astro-app/migrations/0000_*.sql` … `0006_*.sql`. The astro-app workspace is the single source of truth; other workers only read.
 
-| Query | Purpose | Key Projections |
-|-------|---------|-----------------|
-| SITE_SETTINGS_QUERY | Global site config | Full siteSettings with nav, footer, social |
-| ALL_PAGE_SLUGS_QUERY | Static path generation | slug.current array |
-| PAGE_BY_SLUG_QUERY | Page builder content | Page with all blocks expanded |
-| ALL_SPONSORS_QUERY | Sponsors listing | All sponsor fields |
-| ALL_SPONSOR_SLUGS_QUERY | Static path generation | slug.current array |
-| SPONSOR_BY_SLUG_QUERY | Sponsor detail | Full sponsor with projects |
-| ALL_PROJECTS_QUERY | Projects listing | All project fields with sponsor ref |
-| ALL_PROJECT_SLUGS_QUERY | Static path generation | slug.current array |
-| PROJECT_BY_SLUG_QUERY | Project detail | Full project with sponsor |
-| ALL_TESTIMONIALS_QUERY | Testimonials listing | All testimonial fields |
-| ALL_EVENTS_QUERY | Events listing | All event fields |
-| ALL_EVENT_SLUGS_QUERY | Static path generation | slug.current array |
-| EVENT_BY_SLUG_QUERY | Event detail | Full event data |
+### Tables
 
-### Block Resolver Functions
+#### `user` (Better Auth)
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | Better Auth user ID |
+| `email` | text unique | Lowercased |
+| `name` | text | Display name |
+| `role` | text | `student` or `sponsor`. Default `student`; escalated by middleware via `SPONSOR_WHITELIST_QUERY`. Added in `0002_add_user_role.sql`; backfilled in `0003_backfill_sponsor_roles.sql`. |
+| `emailVerified` | boolean | |
+| `image` | text | |
+| `createdAt`, `updatedAt` | timestamps | |
 
-| Function | Purpose |
-|----------|---------|
-| resolveBlockSponsors() | Fetches sponsors for logoCloud/sponsorCards blocks |
-| resolveBlockProjects() | Fetches projects for projectCards blocks |
-| resolveBlockTestimonials() | Fetches testimonials for testimonials blocks |
-| resolveBlockEvents() | Fetches events for eventList blocks |
+#### `session`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | |
+| `token` | text unique | Session token (also the cookie value) |
+| `userId` | text FK → `user.id` | Indexed (`session_userId_idx`) |
+| `expiresAt` | timestamp | |
+| `ipAddress`, `userAgent` | text | |
+| `createdAt`, `updatedAt` | timestamps | |
+
+Cached in KV `SESSION_CACHE` for fast-path lookup; D1 is authoritative.
+
+#### `account`
+OAuth + credential linkages.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | |
+| `userId` | text FK → `user.id` | Indexed (`account_userId_idx`) |
+| `providerId` | text | `google`, `github`, `email` (Magic Link) |
+| `accountId` | text | Provider's user id |
+| `accessToken`, `refreshToken`, `idToken` | text | Encrypted where applicable |
+| `accessTokenExpiresAt`, `refreshTokenExpiresAt` | timestamps | |
+| `scope` | text | OAuth scopes granted |
+| `password` | text | Only for password-based (unused) |
+
+#### `verification`
+Email / password reset tokens (Better Auth default).
+
+#### `subscribers`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | |
+| `email` | text unique | |
+| `source` | text | Where they subscribed (e.g., `article-19.7`, `footer`) |
+| `createdAt` | timestamp | |
+
+Writes from `/api/subscribe`. Read by `event-reminders-worker` to decide who gets reminders.
+
+#### `sent_reminders`
+Idempotency log to prevent duplicate reminder emails.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | |
+| `eventId` | text | Sanity event `_id` |
+| `subscriberId` | text | FK → `subscribers.id` (optional if reminder is Discord-only) |
+| `tier` | text | `30d`, `7d`, `1d` |
+| `sentAt` | timestamp | |
+
+Unique constraint: (`eventId`, `subscriberId`, `tier`).
+
+#### `project_github_repos`
+Sponsor self-serve project → GitHub repository links.
+
+| Column | Type | Notes |
+|---|---|---|
+| `id` | text PK | |
+| `userId` | text FK → `user.id` | Indexed (`idx_github_repos_user`) |
+| `projectId` | text | Sanity `project._id` |
+| `repoFullName` | text | e.g. `gsinghjay/some-repo` |
+| `repoUrl` | text | Canonical URL |
+| `createdAt`, `updatedAt` | timestamps | |
+
+Unique constraint: `uq_github_repos_user_project` on (`userId`, `projectId`). Populated via `/portal/api/github/links` (POST/DELETE).
+
+### Migration history
+
+| Migration | Purpose |
+|---|---|
+| `0000_init.sql` | Better Auth core tables (`user`, `account`, `session`, `verification`) |
+| `0001_student_auth.sql` | Student auth additions |
+| `0002_add_user_role.sql` | Adds `role` column to `user` |
+| `0003_backfill_sponsor_roles.sql` | Data migration: existing emails matching sponsor whitelist → `role=sponsor` |
+| `0004_create_subscribers.sql` | Newsletter subscribers |
+| `0005_create_sent_reminders.sql` | Event reminder idempotency log |
+| `0006_create_project_github_repos.sql` | Project → GitHub repo links |
+
+### Query patterns
+
+- **Read-first, cache-second:** Middleware reads KV then D1 for session validation.
+- **Write-through:** Writes go to D1 directly; KV cache is populated lazily on next read.
+- **Joins for `/portal/api/projects`:** Drizzle joins `user` → `project_github_repos` with Sanity-sourced project metadata.
 
 ---
-*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*
+
+## Cross-store linkage
+
+- `user.email` ↔ `sponsor.contacts[].email` — defines role escalation (Sanity side authoritative).
+- `user.role` ↔ route access — middleware enforces `/portal/**` for `sponsor`, `/student` for `student`.
+- `project_github_repos.projectId` ↔ Sanity `project._id` — not a hard FK (Sanity data can be deleted), so the Portal UI must gracefully degrade when a project no longer exists.
+- `sent_reminders.eventId` ↔ Sanity `event._id` — same caveat.
+
+## Known gaps
+
+- No cleanup policy for orphaned `project_github_repos` rows when a Sanity project is deleted.
+- `submission` doc type is write-only (submissions accumulate); no archival or export tooling.
+- TypeGen does not yet run as a pre-commit hook — relies on developers running `npm run typegen` before pushing.
+- `event-reminders-worker` and `astro-app` both read the same D1; a coordinated migration process is required to avoid one worker outpacing the other.

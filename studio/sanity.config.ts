@@ -56,7 +56,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           (t) =>
             !SITE_AWARE_TYPES.includes(t.schemaType) &&
             t.schemaType !== 'siteSettings' &&
-            t.schemaType !== 'listingPage',
+            t.schemaType !== 'listingPage' &&
+            t.schemaType !== 'portalPage',
         )
         const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
           id: `${type}-${opts.siteId}`,
@@ -71,7 +72,13 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: 'listingPage',
           value: {route},
         }))
-        return [...filtered, ...siteTemplates, ...listingTemplates]
+        const portalTemplates = ['dashboard', 'events', 'progress', 'sponsorship', 'login', 'denied'].map((route) => ({
+          id: `portalPage-${route}-${opts.siteId}`,
+          title: `Portal Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
+          schemaType: 'portalPage',
+          value: {route},
+        }))
+        return [...filtered, ...siteTemplates, ...listingTemplates, ...portalTemplates]
       },
     },
     document: {
@@ -79,6 +86,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         if (
           context.schemaType === 'siteSettings' ||
           context.schemaType === 'listingPage' ||
+          context.schemaType === 'portalPage' ||
           context.documentId === `siteSettings-${opts.siteId}`
         ) {
           return input.filter(
@@ -94,7 +102,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           (t) =>
             t.templateId !== 'siteSettings' &&
             t.templateId !== 'submission' &&
-            t.templateId !== 'listingPage',
+            t.templateId !== 'listingPage' &&
+            t.templateId !== 'portalPage',
         ),
     },
   }
@@ -139,6 +148,13 @@ export default defineConfig([
           {id: 'listingPage-gallery', schemaType: 'listingPage', title: 'Listing Page (Gallery)', value: {route: 'gallery'}},
           {id: 'listingPage-projects', schemaType: 'listingPage', title: 'Listing Page (Projects)', value: {route: 'projects'}},
           {id: 'listingPage-sponsors', schemaType: 'listingPage', title: 'Listing Page (Sponsors)', value: {route: 'sponsors'}},
+          // Portal page singletons (Story 22.9)
+          {id: 'portalPage-dashboard', schemaType: 'portalPage', title: 'Portal Page (Dashboard)', value: {route: 'dashboard'}},
+          {id: 'portalPage-events', schemaType: 'portalPage', title: 'Portal Page (Events)', value: {route: 'events'}},
+          {id: 'portalPage-progress', schemaType: 'portalPage', title: 'Portal Page (Progress)', value: {route: 'progress'}},
+          {id: 'portalPage-sponsorship', schemaType: 'portalPage', title: 'Portal Page (Sponsorship)', value: {route: 'sponsorship'}},
+          {id: 'portalPage-login', schemaType: 'portalPage', title: 'Portal Page (Login)', value: {route: 'login'}},
+          {id: 'portalPage-denied', schemaType: 'portalPage', title: 'Portal Page (Denied)', value: {route: 'denied'}},
         ]
       },
     },

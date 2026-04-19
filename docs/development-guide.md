@@ -1,286 +1,261 @@
 # Development Guide
 
-*Generated: 2026-03-11 | Scan Level: deep*
+**Project:** ywcc-capstone-template v1.18.0
+**Generated:** 2026-04-15
 
 ## Prerequisites
 
-- **Node.js:** 22+ (CI uses 22, release uses 24)
-- **npm:** 10+ (npm workspaces)
-- **Python:** 3.11+ (discord-bot only)
-- **Docker:** Optional (for containerized development)
+| Tool | Version | Notes |
+|---|---|---|
+| Node.js | 22 (CI minimum), 24 recommended for release workflow | Install via `nvm`/`fnm`. `docker-compose` uses 20/24-slim base images. |
+| npm | ≥ 10 (ships with Node 22) | The repo uses npm workspaces (no pnpm / yarn). |
+| Python | 3.12 | Only needed for `platform-api` and `discord-bot`. |
+| uv | latest | Python package manager used by `platform-api` (`uv run pywrangler dev`). |
+| wrangler | ^4.63 | Cloudflare CLI — installed as a root dependency. |
+| Sanity CLI | ^3 (bundled in `studio/node_modules/.bin/sanity`) | Accessed via `npx sanity …` from `studio/`. |
+| Docker | latest | Optional — root `Dockerfile` + `docker-compose.yml` provide reproducible dev containers. |
 
-## Quick Start
+## First-time setup
 
 ```bash
-# Clone and install
+# From the repo root
 git clone https://github.com/gsinghjay/astro-shadcn-sanity.git
 cd astro-shadcn-sanity
+
+# Install all workspace deps (astro-app, studio, platform-api)
 npm install
 
-# Set up environment variables
+# Populate local env files (see "Environment" below)
 cp astro-app/.env.example astro-app/.env
-cp studio/.env.example studio/.env
-# Edit .env files with your Sanity project ID and tokens
+cp studio/.env.example studio/.env          # if present
 
-# Run all services
-npm run dev                          # Astro (4321) + Studio (3333)
-npm run dev:storybook                # + Storybook (6006)
+# Deploy the Sanity schema to Content Lake (required for MCP tools + queries)
+cd studio && npx sanity schema deploy && cd ..
+
+# Generate TypeScript types from schema
+npm run typegen
+
+# Apply local D1 migrations (astro-app dev uses a local SQLite file via wrangler)
+npx wrangler d1 migrations apply PORTAL_DB --local  # run from astro-app/
 ```
 
-## Environment Variables
+## Running locally
 
-### astro-app/.env
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| PUBLIC_SANITY_STUDIO_PROJECT_ID | Yes | Sanity project ID |
-| PUBLIC_SANITY_STUDIO_DATASET | Yes | Dataset: "production" |
-| PUBLIC_SANITY_DATASET | No | Multi-site dataset override |
-| PUBLIC_SITE_ID | No | Site: capstone, rwc-us, rwc-intl |
-| PUBLIC_SITE_THEME | No | Theme: red, blue, green |
-| PUBLIC_SANITY_VISUAL_EDITING_ENABLED | No | Enable draft previews |
-| PUBLIC_SANITY_LIVE_CONTENT_ENABLED | No | Enable live updates |
-| SANITY_API_READ_TOKEN | No | For visual editing (server-side) |
-| PUBLIC_GTM_ID | No | Google Tag Manager ID |
-| PUBLIC_SANITY_STUDIO_URL | No | Studio URL |
-| PUBLIC_SITE_URL | No | Canonical site URL |
-| PUBLIC_TURNSTILE_SITE_KEY | No | Bot protection |
-
-**Server-side secrets** (set in wrangler secret or .dev.vars):
-- TURNSTILE_SECRET_KEY
-- DISCORD_WEBHOOK_URL
-- SANITY_API_WRITE_TOKEN
-- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
-- GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
-- BETTER_AUTH_SECRET / BETTER_AUTH_URL
-- RESEND_API_KEY / RESEND_FROM_EMAIL
-
-### studio/.env
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| SANITY_STUDIO_PROJECT_ID | Yes | Sanity project ID |
-| SANITY_STUDIO_DATASET | Yes | Dataset: "production" |
-| SANITY_STUDIO_STUDIO_HOST | No | Custom studio hostname |
-| SANITY_STUDIO_PREVIEW_ORIGIN | No | Preview URL (default: localhost:4321) |
-
-## Development Commands
-
-### Root Level
-```bash
-npm run dev                    # Astro + Studio concurrent
-npm run dev:storybook          # Astro + Studio + Storybook
-npm run test                   # Unit tests + E2E tests (full suite)
-npm run test:unit              # Vitest unit + component + integration
-npm run test:e2e               # Playwright E2E (builds first, all browsers)
-npm run test:chromium           # Playwright Chromium only (fast feedback)
-npm run test:headed             # Playwright with browser UI visible
-npm run test:ui                 # Playwright interactive UI mode
-npm run storybook               # Storybook dev server
-npm run typegen                 # Extract schema + generate TypeScript types
-npm run deploy:rate-limiter     # Deploy rate limiter worker
-```
-
-### Astro App (astro-app/)
-```bash
-npm run dev -w astro-app       # Astro dev server (port 4321)
-npm run build -w astro-app     # astro check && astro build
-npm run preview -w astro-app   # Wrangler Pages local preview
-npm run test:unit -w astro-app # Vitest run
-npm run test:unit:watch -w astro-app  # Vitest watch mode
-npm run test:unit:coverage -w astro-app  # Vitest with v8 coverage
-npm run storybook -w astro-app # Storybook dev (port 6006)
-npm run build-storybook -w astro-app  # Build static Storybook
-```
-
-### Studio (studio/)
-```bash
-npm run dev -w studio          # Sanity Studio dev server
-npm run build -w studio        # Build Studio for deployment
-npm run deploy -w studio       # Deploy Studio to Sanity hosting
-npm run typegen -w studio      # Extract schema + generate types
-npx sanity schema deploy       # Deploy schema to Content Lake (run from studio/)
-```
-
-### Rate Limiter Worker (rate-limiter-worker/)
-```bash
-cd rate-limiter-worker
-npm run dev                    # Wrangler dev server
-npm run deploy                 # Deploy to Cloudflare
-npm test                       # Vitest with Cloudflare pool
-```
-
-## Docker Development
+### Both Astro + Studio together
 
 ```bash
-# Standard development (Astro + Studio)
-docker compose up astro-app studio
-
-# With Storybook
-docker compose --profile storybook up
-
-# With RWC variants
-docker compose --profile rwc up
-
-# All services
-docker compose --profile storybook --profile rwc up
+npm run dev                  # concurrently runs astro-app (:4321) + studio (:3333)
+npm run dev:storybook        # also launches Storybook (:6006)
 ```
 
-| Service | Port | Profile |
-|---------|------|---------|
-| astro-app | 4321 | default |
-| studio | 3333 | default |
-| astro-rwc-us | 4322 | rwc |
-| astro-rwc-intl | 4323 | rwc |
-| storybook | 6006 | storybook |
+### Individually
 
-## Common Development Tasks
-
-### Adding a New Page Builder Block
-
-1. **Define schema** in `studio/src/schemaTypes/blocks/my-block.ts`
-   - Use `defineBlock()` helper for consistent structure
-   - Add variants if needed via `defineBlock({ variants: [...] })`
-2. **Register schema** in `studio/src/schemaTypes/index.ts`
-3. **Add to page schema** in `studio/src/schemaTypes/documents/page.ts` blocks array
-4. **Deploy schema**: `cd studio && npx sanity schema deploy`
-5. **Generate types**: `npm run typegen`
-6. **Create component** in `astro-app/src/components/blocks/custom/MyBlock.astro`
-   - Auto-discovered by `block-registry.ts` via `import.meta.glob()`
-7. **Add type adapter** in `astro-app/src/lib/types.ts` if needed
-8. **Add GROQ resolver** in `astro-app/src/lib/sanity.ts` if block fetches references
-9. **Write tests**: Component test + fixture in `__tests__/`
-10. **Create story**: `MyBlock.stories.ts` for Storybook
-
-### Adding a New Document Type
-
-1. Define schema in `studio/src/schemaTypes/documents/`
-2. Register in `studio/src/schemaTypes/index.ts`
-3. Add desk structure entry
-4. Deploy schema + generate types
-5. Add GROQ queries in `astro-app/src/lib/sanity.ts`
-6. Create page route in `astro-app/src/pages/`
-7. Create card/detail components
-
-### Modifying Sanity Schema
-
-1. Edit schema file in `studio/src/schemaTypes/`
-2. Deploy: `cd studio && npx sanity schema deploy`
-3. Regenerate types: `npm run typegen`
-4. Update GROQ queries if field names changed
-5. Update components to use new fields
-6. Update test fixtures
-
-### Working with Portal (SSR)
-
-- Portal pages use `prerender = false` for SSR
-- Middleware populates `Astro.locals.user` automatically
-- Fetch data in `.astro` frontmatter, pass to React islands as props
-- Never import Sanity client in React `.tsx` files
-- Use API endpoints (`/portal/api/*`) for client-side data fetching
-- Dev mode auto-mocks auth (dev@example.com as sponsor)
-
-## Testing Strategy
-
-### Unit & Component Tests (Vitest)
 ```bash
-npm run test:unit              # Run all
-npm run test:unit:watch        # Watch mode
-npm run test:unit:coverage     # With coverage report
-npx vitest run path/to/test    # Single file
+npm run dev -w astro-app     # Astro only (:4321)
+npm run dev -w studio        # Studio only (:3333)
+npm run storybook -w astro-app
 ```
 
-- Component tests use Astro Container API
-- Fixtures in `src/components/__tests__/__fixtures__/`
-- Mocks in `src/lib/__tests__/__mocks__/`
-- Coverage output: `test-results/unit-coverage/`
+### Docker
 
-### E2E Tests (Playwright)
 ```bash
-npm run test:chromium          # Fast: Chromium only
-npm run test:e2e               # Full: all 5 browsers (builds first)
-npm run test:headed            # With visible browser
-npm run test:ui                # Interactive Playwright UI
+docker compose up astro-app studio                       # default capstone variant
+docker compose --profile rwc up astro-rwc-us astro-rwc-intl   # RWC multi-site
+docker compose --profile storybook up storybook          # Storybook
 ```
 
-- Tests in `tests/e2e/` and `tests/integration/`
-- 5 browser projects: chromium, firefox, webkit, mobile-chrome, mobile-safari
-- Pre-test: builds Astro app + starts preview server
-- Fixtures provide network monitoring + a11y helpers
-- CI: serial execution with retries, artifacts on failure
+Ports: astro-app `4321`, studio `3333`, storybook `6006`, rwc-us `4322`, rwc-intl `4323`.
 
-### Visual Testing (Storybook)
+## Environment variables
+
+`astro-app/astro.config.mjs` defines a typed `astro:env` schema. Every client-side read is type-checked; server-only secrets never leak to the browser.
+
+### Client public (bundled into HTML)
+- `PUBLIC_GTM_ID` — optional GTM container ID.
+- `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` — bool, toggles `@sanity/visual-editing` overlay.
+- `PUBLIC_SANITY_LIVE_CONTENT_ENABLED` — bool, opt-in to Live Content API subscriptions.
+- `PUBLIC_SITE_URL` — default `http://localhost:4321`.
+- `PUBLIC_SANITY_STUDIO_URL` — default `http://localhost:3333`.
+- `PUBLIC_SANITY_DATASET` — default `production`.
+- `PUBLIC_SITE_ID` — default `capstone`. Set to `rwc-us` / `rwc-intl` for RWC variants.
+- `PUBLIC_SITE_THEME` — enum `red` (default) / `blue` / `green`.
+
+### Server public (runtime)
+- `PUBLIC_SANITY_STUDIO_PROJECT_ID` — **required**. Currently `49nk9b0w`.
+- `PUBLIC_SANITY_STUDIO_DATASET` — defaults to `production`.
+
+### Server secret (Cloudflare Pages / Workers dashboard)
+- `SANITY_API_READ_TOKEN` — optional Sanity read token (used for draft previews).
+- `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` — Better Auth signing secret + canonical URL.
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+- `RESEND_API_KEY`, `RESEND_FROM_EMAIL` — Magic Link + newsletter.
+- `TURNSTILE_SECRET_KEY` — optional bot protection on contact forms.
+- `DISCORD_WEBHOOK_URL` — optional admin notifications.
+
+For Workers, set secrets via `npx wrangler secret put KEY` from each worker directory. For Pages, use the Cloudflare dashboard. **Never commit a real `.env` or hard-code tokens in code.**
+
+### Worker-specific env
+
+| Worker | Required secrets |
+|---|---|
+| event-reminders-worker | `SANITY_API_TOKEN`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `DISCORD_WEBHOOK_URL` |
+| rate-limiter-worker | none |
+| platform-api | `sanity_api_read_token` (inferred), optional `sanity_api_write_token` |
+| discord-bot | `DISCORD_PUBLIC_KEY`, `DISCORD_APPLICATION_ID`, `DISCORD_TOKEN`, `SANITY_PROJECT_ID`, `SANITY_DATASET` |
+
+## Build
+
 ```bash
-npm run storybook              # Dev server (port 6006)
-npm run build-storybook -w astro-app  # Static build
+npm run build -w astro-app        # astro check && astro build → astro-app/dist/
+npm run build -w studio           # studio/dist/
+npm run build-storybook -w astro-app   # astro-app/storybook-static/
 ```
 
-- 120+ stories covering UI primitives, blocks, portal components
-- Deployed to GitHub Pages on push to main
-- Chromatic available for visual regression
+`astro check` enforces TypeScript types, including Sanity TypeGen output. A failing `check` fails the build.
 
-## Code Conventions
+## Testing
 
-### File Naming
-- Components: PascalCase (`.astro`, `.tsx`)
-- Utilities: kebab-case (`.ts`)
-- Tests: `ComponentName.test.ts`
-- Stories: `ComponentName.stories.ts`
-- Fixtures: `kebab-case.ts`
-- Schema: kebab-case (e.g., `hero-banner.ts`)
+### Unit & component (Vitest)
 
-### Imports
-- Use `defineQuery()` for all GROQ queries
-- Use `urlFor()` from `lib/image.ts` for Sanity images (never raw `asset.url`)
-- Use `cn()` from `lib/utils.ts` for Tailwind class merging
-
-### Architecture Rules
-- Public pages: SSG only (no `prerender = false`)
-- Portal pages: SSR required (`prerender = false`)
-- React components: No Sanity client imports
-- Images: Always use LQIP blur placeholders + CDN resizing
-- Layout: Single `<Section>` per content area (avoid stacking Sections)
-
-## CI/CD Pipeline
-
-### Pull Request to preview
-- **ci.yml:** Unit tests + Lighthouse CI
-- Branch must target `preview` (enforced by workflow)
-
-### Merge to main
-- **release.yml:** Semantic-release (changelog, tag, GitHub release)
-- **sync-preview.yml:** Auto-merge main → preview + Discord notification
-- **deploy-storybook.yml:** Build + deploy Storybook to GitHub Pages
-
-### Branch Strategy
-```
-feature → preview → main
-```
-- `preview` gates `main` (enforced by workflows)
-- Auto-sync back after release
-- Conventional commits required for semantic-release
-
-## Deployment
-
-### Astro App (Cloudflare Pages)
 ```bash
-npm run deploy -w astro-app    # Build + deploy to Cloudflare Pages
+npm run test:unit                 # runs astro-app unit tests
+npm run test:unit:watch
+npm run test:unit:coverage        # v8 coverage → test-results/unit-coverage/
+npx vitest run                    # direct invocation from astro-app/
 ```
 
-### Studio (Sanity Hosting)
+Test layout:
+- `astro-app/src/**/__tests__/**/*.test.ts` — co-located with source.
+- `tests/integration/**/*.test.ts` — integration tests (mounted via vitest config alias).
+- `rate-limiter-worker/test/rate-limiter.test.ts`
+- `event-reminders-worker/src/__tests__/index.test.ts`
+- `platform-api/tests/test_*.py` — pytest (`uv run pytest`).
+
+### E2E (Playwright)
+
 ```bash
-npm run deploy -w studio       # Deploy to Sanity hosting
+npm run test:e2e                  # all projects (chromium, firefox, webkit, mobile-chrome, mobile-safari)
+npm run test:chromium             # chromium only — fast feedback
+npm run test:headed               # headed chromium
+npm run test:ui                   # Playwright UI mode
 ```
 
-### Rate Limiter (Cloudflare Worker)
+Config: `playwright.config.ts`. Base URL `http://localhost:4321` (overridable via `BASE_URL`). The runner auto-builds astro-app and serves `dist/` unless a dev server is already running.
+
+19 specs cover: navigation, cookie-consent, articles (+category), sponsors, projects, gallery, dynamic-pages, error-pages, homepage, pages, site-settings, portal (auth, progress, events), events-calendar, smoke (a11y), seo-structured-data, gtm-datalayer.
+
+### Accessibility (Pa11y)
+
 ```bash
-npm run deploy:rate-limiter    # Deploy via wrangler
+# Local (requires astro-app build + preview running on :4321)
+npm run build -w astro-app && npm run preview -w astro-app &
+npx pa11y-ci --config .pa11yci.cjs
 ```
 
-### Schema
+### Performance (Lighthouse CI)
+
 ```bash
-cd studio && npx sanity schema deploy  # Required before MCP tools work with new types
+npx lhci autorun
 ```
 
----
-*Generated: 2026-03-11 | Scan Level: deep | Mode: full_rescan*
+Reports archived to `.lhci/`. Thresholds enforced in CI via `ci.yml` (continue-on-error for noise, LCP/perf asserted).
+
+### Visual regression (Chromatic)
+
+```bash
+npm run storybook -w astro-app
+npx chromatic --project-token=$CHROMATIC_PROJECT_TOKEN
+```
+
+## Schema & TypeGen workflow
+
+Any schema change requires **two** steps:
+
+```bash
+# 1. Edit files under studio/src/schemaTypes/**
+# 2. From the repo root: regenerate TypeScript types
+npm run typegen
+
+# 3. If schema types changed, deploy to Content Lake (required for MCP tools):
+cd studio && npx sanity schema deploy && cd ..
+```
+
+The deploy extracts from `studio/schema.json` (17,861 lines committed). Output lands at `astro-app/src/sanity.types.ts` (~22k lines). Visual Editing and MCP content tools both depend on the deployed schema.
+
+## Migrations
+
+### D1 (astro-app)
+
+SQL files live at `astro-app/migrations/0000_*.sql` … `0006_*.sql`. Apply:
+
+```bash
+cd astro-app
+npx wrangler d1 migrations apply PORTAL_DB --local         # local dev
+npx wrangler d1 migrations apply PORTAL_DB --remote        # production (requires CF creds)
+```
+
+### Sanity content
+
+Content migrations live at `studio/migrations/*.mjs`. Run with `--dry-run` first:
+
+```bash
+cd studio
+npx sanity migration run rename-18-6-fields --dry-run
+npx sanity migration run rename-18-6-fields --no-dry-run --confirm
+```
+
+## Branching & commit conventions
+
+- Default branch: `main`. Pre-release: `preview`.
+- PRs target `preview`; `release.yml` merges `main` back into `preview` automatically after each release.
+- Conventional Commits required (enforced by `@semantic-release/commit-analyzer` on `main`). Types: `feat`, `fix`, `perf`, `docs`, `chore`, `ci`, `test`, `refactor`.
+- Breaking changes use `feat!:` or a `BREAKING CHANGE:` footer.
+- No Husky / pre-commit hooks; CI is the enforcement gate.
+
+## Formatting & linting
+
+- `astro-app/.prettierrc` — singleQuote, trailingComma `all`, arrowParens `avoid`, tabWidth 2, printWidth 120.
+- `astro-app/.eslintrc` — minimal; rely on `astro check` for type enforcement.
+- No root-level config; each workspace owns its rules.
+
+## Common tasks
+
+| Task | Command |
+|---|---|
+| Add a new shadcn component | From `astro-app/`: `npx shadcn@latest add <name>` |
+| Add a new Sanity block | See `rules/sanity-page-builder.mdc`; edit `studio/src/schemaTypes/blocks/<block>.ts`, add matching `astro-app/src/components/blocks/custom/<Block>.astro`, wire dispatch in `BlockRenderer.astro` and projection in `lib/sanity.ts` |
+| Add a new page route | Create `astro-app/src/pages/<path>.astro`; for SSR add `export const prerender = false` |
+| Deploy astro-app | Cloudflare Pages deploys on push to `main` (Pages Git integration) |
+| Deploy a worker | From worker directory: `npm run deploy` or `npx wrangler deploy` |
+| Deploy Sanity Studio | From `studio/`: `npx sanity deploy` |
+| Tail a Worker's logs | `npx wrangler tail <worker-name>` |
+| Seed demo content | See `astro-app/scripts/seed-demo-audit.md` |
+| Capture Figma frames for Storybook | `node scripts/figma-capture/figma-capture.mjs` |
+
+## Debugging
+
+- **Astro SSR 500s on Pages:** check `wrangler tail`; most are missing secrets or D1 migrations not applied.
+- **Sanity queries returning null:** confirm schema is deployed to the *correct* workspace (`npx sanity schema deploy` from `studio/`); TypeGen alone is not enough.
+- **Visual editing blank overlay:** `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` must be `true`, and the Studio origin must be whitelisted in `sanity.config.ts` `presentationTool` config.
+- **Rate limiter 429s in dev:** the middleware fails open if the DO binding is missing locally; if you are seeing unexpected 429s, clear the DO with `npx wrangler d1 execute … DROP TABLE requests`.
+- **Portal redirects to /portal/denied:** check `SPONSOR_WHITELIST_QUERY` results — the email must match a sponsor doc's `contacts[].email`. In dev, `middleware.ts` injects a mock sponsor when `import.meta.env.DEV` is true.
+- **Storybook fails with lucide crash:** the `.storybook/main.ts` ships a custom `lucide-static` stub plugin; if it misfires, ensure `tsconfig.json` `moduleResolution` is `bundler`.
+
+## Observability
+
+- **Cloudflare Workers/Pages logs:** `npx wrangler tail <name>` or CF dashboard → Observability.
+- **rate-limiter-worker** has `observability.enabled = true` in `wrangler.toml`.
+- **event-reminders-worker** logs per cron invocation; failures surface in CF dashboard.
+- **Sentry / RUM:** not currently wired.
+- **GTM / GA4:** `PUBLIC_GTM_ID` injects GTM; see `docs/gtm-analytics-strategy.md`.
+
+## Useful references
+
+- `docs/cloudflare-guide.md` — comprehensive CF setup (Pages, Workers, D1, KV, DO).
+- `docs/rate-limiting-with-durable-objects.md` — rate-limiter deep dive.
+- `docs/image-optimization-strategy.md` — LQIP + `fetchpriority` rules.
+- `docs/auth-consolidation-strategy.md` — Better Auth rollout plan.
+- `docs/team/github-issues-and-projects-guide.md` — issue + project-board workflow.
+- `_bmad-output/project-context.md` — implementation rules the AI agents enforce.
+- `wiki/**` — long-form topic guides.

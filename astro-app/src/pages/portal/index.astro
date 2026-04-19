@@ -4,7 +4,9 @@ export const prerender = false;
 import PortalLayout from "@/layouts/PortalLayout.astro";
 import PortalCard from "@/components/portal/PortalCard";
 import PortalSkeleton from "@/components/portal/PortalSkeleton";
-import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams } from "@/lib/sanity";
+import BlockRenderer from "@/components/BlockRenderer.astro";
+import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams, getPortalPage } from "@/lib/sanity";
+import { stegaClean } from "@sanity/client/stega";
 import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
 
 const user = Astro.locals.user;
@@ -15,45 +17,63 @@ const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
   params: { email: user?.email ?? '', ...getSiteParams() },
 });
 
-const cards = [
+const portalPage = await getPortalPage('dashboard');
+const pageTitle = portalPage?.title ?? 'Welcome to the Sponsor Portal';
+
+const defaultCards = [
   {
     title: "My Projects",
     description: "View your sponsored capstone projects, student teams, and technologies used",
     icon: "lucide:folder",
     href: sponsor?.slug ? `/portal/${sponsor.slug}` : undefined,
     disabled: !sponsor?.slug,
-    story: "9.2",
   },
   {
     title: "Project Progress",
     description: "Connect your GitHub repos and track issues, PRs, releases, and development activity",
     icon: "lucide:git-pull-request",
     href: "/portal/progress",
-    story: "9.4",
   },
   {
     title: "Events & Schedule",
     description: "View the interactive calendar of showcases, workshops, and networking events",
     icon: "lucide:calendar",
     href: "/portal/events",
-    story: "9.3",
   },
   {
     title: "My Sponsorship",
     description: "Sponsorship tier, agreements, expectations, and program contact information",
     icon: "lucide:handshake",
     href: "/portal/sponsorship",
-    disabled: true,
-    story: "9.4",
   },
 ];
+
+const cards = (portalPage?.dashboardCards && portalPage.dashboardCards.length > 0)
+  ? portalPage.dashboardCards.map((card) => {
+      const cleanRoute = stegaClean(card.route) ?? '';
+      const cleanIcon = stegaClean(card.iconName);
+      return {
+        title: card.title ?? '',
+        description: card.description ?? '',
+        icon: cleanIcon ? `lucide:${cleanIcon}` : 'lucide:file',
+        href: cleanRoute.includes('{sponsorSlug}')
+          ? cleanRoute.replace('{sponsorSlug}', sponsor?.slug ?? '')
+          : cleanRoute || '#',
+        disabled: card.enabled === false,
+      };
+    })
+  : defaultCards;
 ---
 
 <PortalLayout title="Sponsor Portal" activeNav="/portal/" sponsorSlug={sponsor?.slug}>
   <div class="flex flex-col gap-8">
+    {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.headerBlocks} />
+    )}
+
     {/* Welcome heading */}
     <div class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold tracking-tight">Welcome to the Sponsor Portal</h1>
+      <h1 class="text-2xl font-bold tracking-tight">{pageTitle}</h1>
       <p class="text-muted-foreground">
         Signed in as <strong>{user?.email ?? "unknown"}</strong>
       </p>
@@ -74,6 +94,10 @@ const cards = [
         </PortalCard>
       ))}
     </div>
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
+    )}
   </div>
 </PortalLayout>
 
