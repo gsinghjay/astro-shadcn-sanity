@@ -13,6 +13,7 @@ export const portalPage = defineType({
       const routeLabel = subtitle
         ? `/portal/${subtitle === 'dashboard' ? '' : subtitle} — ${subtitle.charAt(0).toUpperCase() + subtitle.slice(1)}`
         : 'Unconfigured'
+      // note: 'form' route added post-22.9 — renders blocks-only at /portal/form, sidebar shows "Agreement"
       return {title: title || routeLabel, subtitle: routeLabel}
     },
   },
@@ -28,7 +29,8 @@ export const portalPage = defineType({
           {title: 'Dashboard', value: 'dashboard'},
           {title: 'Events', value: 'events'},
           {title: 'Progress', value: 'progress'},
-          {title: 'Sponsorship', value: 'sponsorship'},
+          {title: 'Agreement', value: 'agreement'},
+          {title: 'Form', value: 'form'},
           {title: 'Login', value: 'login'},
           {title: 'Access Denied', value: 'denied'},
         ],

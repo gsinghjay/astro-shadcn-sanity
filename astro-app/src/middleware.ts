@@ -7,6 +7,17 @@ const RATE_LIMIT_MAX_REQUESTS = 100;
 /** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
 const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
 
+/** Endpoint that handles agreement acceptance — must remain reachable while the gate is active */
+const AGREEMENT_ACCEPT_PATH = "/api/portal/agreement/accept";
+
+/** Shape stored in SESSION_CACHE. `agreementAcceptedAt === undefined` means the cache predates the field. */
+type CachedSession = {
+  email: string;
+  name: string;
+  role: string;
+  agreementAcceptedAt?: number | null;
+};
+
 /** Better Auth session user shape including custom additionalFields */
 interface SessionUser {
   id: string;
@@ -31,13 +42,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Dev mode bypass — both roles (also skips rate limiting)
+  // Dev mode bypass — both roles (also skips rate limiting and the agreement gate)
   if (import.meta.env.DEV) {
     if (isPortal) {
       context.locals.user = { email: "dev@example.com", name: "Dev Sponsor", role: "sponsor" };
     } else {
       context.locals.user = { email: "dev-student@example.com", name: "Dev Student", role: "student" };
     }
+    context.locals.requiresAgreement = false;
     return next();
   }
 
@@ -82,11 +94,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const kvCache = runtimeEnv?.SESSION_CACHE;
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
-    let userData: { email: string; name: string; role: string } | null = null;
+    let userData: CachedSession | null = null;
 
     // KV cache check — skip D1 if session is cached
     if (kvCache && sessionToken) {
-      const cached = await kvCache.get<{ email: string; name: string; role: string }>(sessionToken, { type: "json" });
+      const cached = await kvCache.get<CachedSession>(sessionToken, { type: "json" });
       if (cached) {
         userData = cached;
       }
@@ -123,7 +135,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
         // Cache session in KV (fire-and-forget, 5-min TTL)
         if (kvCache) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
       }
     }
@@ -143,7 +155,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         userData.role = "sponsor";
         // Persist escalated role to KV cache (fire-and-forget)
         if (kvCache && sessionToken) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
         // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
         if (runtimeEnv?.PORTAL_DB) {
@@ -172,6 +184,34 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return new Response("Forbidden", { status: 403 });
     }
 
+    // Sponsor Agreement gate — sponsors must accept the CMS agreement once before using the portal
+    const skipsAgreementPath =
+      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
+    if (userData.role === "sponsor" && !skipsAgreementPath) {
+      let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
+      if (userData.agreementAcceptedAt === undefined && runtimeEnv?.PORTAL_DB) {
+        try {
+          const row = await runtimeEnv.PORTAL_DB
+            .prepare("SELECT agreement_accepted_at FROM user WHERE email = ?")
+            .bind(userData.email)
+            .first<{ agreement_accepted_at: number | null }>();
+          agreementAcceptedAt = row?.agreement_accepted_at ?? null;
+          userData.agreementAcceptedAt = agreementAcceptedAt;
+          if (kvCache && sessionToken) {
+            kvCache
+              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .catch((e: unknown) => console.error("[middleware] KV cache write failed:", e));
+          }
+        } catch (e) {
+          console.error("[middleware] agreement lookup failed, failing open:", e);
+          agreementAcceptedAt = null;
+        }
+      }
+      context.locals.requiresAgreement = agreementAcceptedAt === null;
+    } else {
+      context.locals.requiresAgreement = false;
+    }
+
     context.locals.user = { email: userData.email, name: userData.name, role: userData.role as 'sponsor' | 'student' };
     return next();
   } catch (error) {
@@ -183,7 +223,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 /** Extract Better Auth session token from Cookie header.
  *  Handles both standard and __Secure- prefixed cookie names
  *  (the latter is used when `advanced.useSecureCookies` is enabled). */
-function extractSessionToken(cookie: string | null): string | null {
+export function extractSessionToken(cookie: string | null): string | null {
   if (!cookie) return null;
   const match = cookie.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/);
   return match?.[1] ?? null;
