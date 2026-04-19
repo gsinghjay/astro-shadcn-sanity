@@ -225,6 +225,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     _type == "embedBlock" => {
       heading,
       embedUrl,
+      rawEmbedCode,
       caption
     },
     _type == "mapBlock" => {
