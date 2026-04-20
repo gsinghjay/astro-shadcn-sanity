@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.idea/
+.env
+.env.*
+.dev.vars
+.dev.vars.*
