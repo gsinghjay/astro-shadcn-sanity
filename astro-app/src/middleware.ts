@@ -7,6 +7,23 @@ const RATE_LIMIT_MAX_REQUESTS = 100;
 /** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
 const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
 
+/** Endpoint that handles agreement acceptance — must remain reachable while the gate is active */
+const AGREEMENT_ACCEPT_PATH = "/api/portal/agreement/accept";
+
+const jsonError = (status: number, error: string) =>
+  new Response(JSON.stringify({ error }), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
+
+/** Shape stored in SESSION_CACHE. `agreementAcceptedAt === undefined` means the cache predates the field. */
+type CachedSession = {
+  email: string;
+  name: string;
+  role: string;
+  agreementAcceptedAt?: number | null;
+};
+
 /** Better Auth session user shape including custom additionalFields */
 interface SessionUser {
   id: string;
@@ -17,7 +34,9 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  const isPortal = pathname.startsWith("/portal/") || pathname === "/portal";
+  const isPortalApi = pathname.startsWith("/api/portal/");
+  const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
+  const isPortal = isPortalPage || isPortalApi;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
   // Branch 1: Public routes — zero auth overhead
@@ -31,15 +50,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
-  // Dev mode bypass — both roles (also skips rate limiting)
+  // Dev mode bypass — both roles (also skips rate limiting and the agreement gate)
   if (import.meta.env.DEV) {
     if (isPortal) {
       context.locals.user = { email: "dev@example.com", name: "Dev Sponsor", role: "sponsor" };
     } else {
       context.locals.user = { email: "dev-student@example.com", name: "Dev Student", role: "student" };
     }
+    context.locals.requiresAgreement = false;
     return next();
   }
+
+  // Email comparisons are case-insensitive: Better Auth lowercases on signup, but D1 has no
+  // case-folding constraint so a sponsor whose row was inserted with a different case would
+  // be locked out of the agreement gate. `normalizeEmail()` is the single point of truth.
 
   // Lazy-load auth dependencies — avoids MiddlewareCantBeLoaded errors when
   // better-auth/drizzle-orm/resend aren't installed (e.g., Docker dev with stale volumes)
@@ -82,11 +106,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const kvCache = runtimeEnv?.SESSION_CACHE;
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
-    let userData: { email: string; name: string; role: string } | null = null;
+    let userData: CachedSession | null = null;
 
     // KV cache check — skip D1 if session is cached
     if (kvCache && sessionToken) {
-      const cached = await kvCache.get<{ email: string; name: string; role: string }>(sessionToken, { type: "json" });
+      const cached = await kvCache.get<CachedSession>(sessionToken, { type: "json" });
       if (cached) {
         userData = cached;
       }
@@ -116,21 +140,22 @@ export const onRequest = defineMiddleware(async (context, next) => {
       if (session?.user) {
         const sessionUser = session.user as SessionUser;
         userData = {
-          email: sessionUser.email,
+          email: normalizeEmail(sessionUser.email),
           name: sessionUser.name ?? "",
           role: sessionUser.role ?? "student",
         };
 
         // Cache session in KV (fire-and-forget, 5-min TTL)
         if (kvCache) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
       }
     }
 
-    // No session → redirect to appropriate login page
+    // No session → 401 JSON for API routes, redirect for pages
     if (!userData) {
-      const loginUrl = isPortal
+      if (isPortalApi) return jsonError(401, "unauthorized");
+      const loginUrl = isPortalPage
         ? `/portal/login?redirect=${encodeURIComponent(pathname)}`
         : `/auth/login?redirect=${encodeURIComponent(pathname)}`;
       return context.redirect(loginUrl);
@@ -143,20 +168,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
         userData.role = "sponsor";
         // Persist escalated role to KV cache (fire-and-forget)
         if (kvCache && sessionToken) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e) => console.error('[middleware] KV cache write failed:', e));
+          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
         // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
         if (runtimeEnv?.PORTAL_DB) {
-          runtimeEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE email = ?')
+          runtimeEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE LOWER(email) = ?')
             .bind('sponsor', userData.email)
             .run()
             .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
         }
       } else {
-        // AC 10: destroy session before redirecting to denied page
+        // Non-sponsor on portal: 403 JSON for API, denied-page redirect for pages
         if (kvCache && sessionToken) {
           kvCache.delete(sessionToken).catch((e: unknown) => console.error('[middleware] KV cache delete failed:', e));
         }
+        if (isPortalApi) return jsonError(403, "forbidden");
         return new Response(null, {
           status: 302,
           headers: {
@@ -172,6 +198,37 @@ export const onRequest = defineMiddleware(async (context, next) => {
       return new Response("Forbidden", { status: 403 });
     }
 
+    // Sponsor Agreement gate — sponsors must accept the CMS agreement once before using the portal.
+    // The accept endpoint itself must remain reachable so the modal can submit acceptance.
+    const skipsAgreementPath =
+      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
+    if (userData.role === "sponsor" && !skipsAgreementPath) {
+      let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
+      if (userData.agreementAcceptedAt === undefined && runtimeEnv?.PORTAL_DB) {
+        try {
+          const row = await runtimeEnv.PORTAL_DB
+            .prepare("SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?")
+            .bind(userData.email)
+            .first<{ agreement_accepted_at: number | null }>();
+          agreementAcceptedAt = row?.agreement_accepted_at ?? null;
+          userData.agreementAcceptedAt = agreementAcceptedAt;
+          if (kvCache && sessionToken) {
+            kvCache
+              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .catch((e: unknown) => console.error("[middleware] KV cache write failed:", e));
+          }
+        } catch (e) {
+          // Fail closed: keep agreementAcceptedAt = null so requiresAgreement stays true.
+          // A D1 outage blocks portal access rather than letting unaccepted sponsors through.
+          console.error("[middleware] agreement lookup failed, failing closed:", e);
+          agreementAcceptedAt = null;
+        }
+      }
+      context.locals.requiresAgreement = agreementAcceptedAt === null;
+    } else {
+      context.locals.requiresAgreement = false;
+    }
+
     context.locals.user = { email: userData.email, name: userData.name, role: userData.role as 'sponsor' | 'student' };
     return next();
   } catch (error) {
@@ -183,8 +240,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
 /** Extract Better Auth session token from Cookie header.
  *  Handles both standard and __Secure- prefixed cookie names
  *  (the latter is used when `advanced.useSecureCookies` is enabled). */
-function extractSessionToken(cookie: string | null): string | null {
+export function extractSessionToken(cookie: string | null): string | null {
   if (!cookie) return null;
   const match = cookie.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/);
   return match?.[1] ?? null;
+}
+
+/** Lowercase a user email so D1 lookups and KV cache keys are case-insensitive. */
+export function normalizeEmail(email: string): string {
+  return email.toLowerCase();
 }

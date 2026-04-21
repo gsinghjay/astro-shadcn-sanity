@@ -198,6 +198,7 @@ export function buildArticleJsonLd(
     ...(cleanPublishedAt ? { datePublished: cleanPublishedAt } : {}),
     ...(dateModified ? { dateModified } : {}),
     mainEntityOfPage: canonicalPageUrl,
+    breadcrumb: { '@id': `${canonicalPageUrl}#breadcrumb` },
     ...(author ? { author } : {}),
     publisher,
   };

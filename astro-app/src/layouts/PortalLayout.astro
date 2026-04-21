@@ -23,6 +23,9 @@ import {
 } from "@/components/ui/sheet";
 import type { PortalNavItem } from "@/components/portal/types";
 import type { SeoProps } from "@/lib/types";
+import { getSponsorAgreement } from "@/lib/sanity";
+import { stegaClean } from "@sanity/client/stega";
+import SponsorAgreementModal from "@/components/portal/SponsorAgreementModal";
 
 interface Props {
   title?: string;
@@ -34,6 +37,17 @@ interface Props {
 const { title = "Sponsor Portal", seo, activeNav, sponsorSlug } = Astro.props;
 const user = Astro.locals.user;
 const currentPath = activeNav ?? Astro.url.pathname;
+
+// Sponsor Agreement Gate — middleware flags this; we fetch the CMS agreement only when needed.
+const requiresAgreement = Astro.locals.requiresAgreement === true;
+const agreement = requiresAgreement ? await getSponsorAgreement() : null;
+// pdfUrl is a URL used in attributes/logic → stegaClean is required.
+const agreementPdfUrl = agreement?.pdfFile?.asset?.url ? stegaClean(agreement.pdfFile.asset.url) : null;
+// Title / checkboxLabel / buttonText are rendered as text → preserve stega markers so
+// visual editing's "hover to open in Studio" overlay can attach to them.
+const agreementTitle = agreement?.title ?? 'Sponsor Agreement';
+const agreementCheckboxLabel = agreement?.checkboxLabel ?? 'I have read and accept the sponsor agreement';
+const agreementButtonText = agreement?.acceptButtonText ?? 'Accept & Continue';
 
 const isActive = (href: string) =>
   currentPath === href || (href !== "/portal/" && currentPath.startsWith(href));
@@ -57,10 +71,14 @@ const navItems: PortalNavItem[] = [
     icon: "lucide:calendar",
   },
   {
-    href: "/portal/sponsorship",
-    label: "My Sponsorship",
+    href: "/portal/agreement",
+    label: "Agreement",
     icon: "lucide:handshake",
-    disabled: true,
+  },
+  {
+    href: "/portal/form",
+    label: "Form",
+    icon: "lucide:clipboard-list",
   },
 ];
 
@@ -69,6 +87,7 @@ const avatarLetter = email.charAt(0).toUpperCase();
 ---
 
 <Layout title={title} seo={seo} template="portal">
+  <slot name="structured-data" slot="structured-data" />
   <Fragment slot="default">
     <meta slot="head" name="robots" content="noindex" />
 
@@ -200,6 +219,17 @@ const avatarLetter = email.charAt(0).toUpperCase();
         <slot />
       </div>
     </div>
+
+    {requiresAgreement && (
+      <SponsorAgreementModal
+        client:only="react"
+        title={agreementTitle}
+        intro={agreement?.intro ?? null}
+        pdfUrl={agreementPdfUrl}
+        checkboxLabel={agreementCheckboxLabel}
+        acceptButtonText={agreementButtonText}
+      />
+    )}
   </Fragment>
 </Layout>
 

@@ -14,6 +14,9 @@ import {
   getSiteParams,
 } from '@/lib/sanity';
 import type { ALL_ARTICLE_CATEGORY_SLUGS_QUERY_RESULT } from '@/sanity.types';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Use the generated GROQ result type so the slug-list shape stays in
@@ -53,19 +56,25 @@ const [articles, categories] = await Promise.all([
 // Meta description fallback for category pages with no description set.
 const metaDescription =
   category.description ?? `Browse articles in the ${categoryTitle} category`;
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Articles', href: '/articles' },
+  { label: categoryTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout
   title={categoryTitle}
   seo={{ metaDescription }}
 >
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Articles', href: '/articles' },
-        { label: categoryTitle },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <ArticleCategoryChips categories={categories} currentCategorySlug={category.slug} />
 

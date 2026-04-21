@@ -23,6 +23,8 @@ import type {
   ALL_AUTHORS_QUERY_RESULT,
   AUTHOR_BY_SLUG_QUERY_RESULT,
   LISTING_PAGE_QUERY_RESULT,
+  PORTAL_PAGE_QUERY_RESULT,
+  SPONSOR_AGREEMENT_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -224,6 +226,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     _type == "embedBlock" => {
       heading,
       embedUrl,
+      rawEmbedCode,
       caption
     },
     _type == "mapBlock" => {
@@ -1040,6 +1043,84 @@ export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_
   return value;
 }
 
+// ---------------------------------------------------------------------------
+// Portal Page queries (Story 22.9)
+// ---------------------------------------------------------------------------
+
+export const PORTAL_PAGE_QUERY = defineQuery(groq`*[_type == "portalPage" && _id == $id][0]{
+  _id, route, title, description,
+  headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  footerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  dashboardCards[]{ _key, title, description, iconName, route, enabled }
+}`);
+
+function getPortalPageId(route: string): string {
+  return isMultiSite ? `portalPage-${route}-${SITE_ID}` : `portalPage-${route}`;
+}
+
+const _portalPageCache = new Map<string, PORTAL_PAGE_QUERY_RESULT | null>();
+
+export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _portalPageCache.has(route)) {
+    return _portalPageCache.get(route)!;
+  }
+  const id = getPortalPageId(route);
+  try {
+    const { result } = await loadQuery<PORTAL_PAGE_QUERY_RESULT>({
+      query: PORTAL_PAGE_QUERY,
+      params: { id },
+    });
+    const value = result ?? null;
+    _portalPageCache.set(route, value);
+    return value;
+  } catch (err) {
+    console.error(`getPortalPage('${route}') failed; falling back to null`, err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sponsor Agreement query (singleton — one doc per workspace)
+// ---------------------------------------------------------------------------
+
+export const SPONSOR_AGREEMENT_QUERY = defineQuery(groq`*[_type == "sponsorAgreement" && _id == $id][0]{
+  _id,
+  title,
+  intro[]${PORTABLE_TEXT_PROJECTION},
+  pdfFile{ asset->{ _id, url, originalFilename, size, mimeType } },
+  checkboxLabel,
+  acceptButtonText,
+  bodyContent[]${PORTABLE_TEXT_PROJECTION}
+}`);
+
+function getSponsorAgreementId(): string {
+  // Single agreement document for the capstone workspace. RWC workspaces don't expose a portal,
+  // so a site-scoped variant is intentionally not constructed here.
+  return 'sponsorAgreement';
+}
+
+/**
+ * Fetch the sponsor agreement singleton.
+ *
+ * No module-level cache: agreement fetches happen only for unaccepted sponsors on portal
+ * navigation (rare path), and the Sanity client is configured with `useCdn: true` outside of
+ * visual editing, so the API CDN already provides ~60s edge caching. This avoids the
+ * stale-cache trap where editor publishes never reach the Worker isolate.
+ */
+export async function getSponsorAgreement(): Promise<SPONSOR_AGREEMENT_QUERY_RESULT | null> {
+  const id = getSponsorAgreementId();
+  try {
+    const { result } = await loadQuery<SPONSOR_AGREEMENT_QUERY_RESULT>({
+      query: SPONSOR_AGREEMENT_QUERY,
+      params: { id },
+    });
+    return result ?? null;
+  } catch (err) {
+    console.error('getSponsorAgreement failed; falling back to null', err);
+    return null;
+  }
+}
+
 /**
  * Reset all module-level caches. Useful for testing and SSR scenarios
  * where stale data could persist across requests.
@@ -1054,6 +1135,7 @@ export function resetAllCaches(): void {
   _articleCategoriesCache = null;
   _authorsCache = null;
   _listingPageCache.clear();
+  _portalPageCache.clear();
 }
 
 // ---------------------------------------------------------------------------

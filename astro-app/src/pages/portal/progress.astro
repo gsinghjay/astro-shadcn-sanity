@@ -3,6 +3,9 @@ export const prerender = false;
 
 import PortalLayout from '@/layouts/PortalLayout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
 import GitHubDashboard from '@/components/portal/GitHubDashboard';
 import RepoLinker from '@/components/portal/RepoLinker';
 import { getDrizzle } from '@/lib/db';
@@ -26,6 +29,7 @@ import {
   SPONSOR_BY_EMAIL_QUERY,
   getSiteParams,
   getSponsorProjects,
+  getPortalPage,
 } from '@/lib/sanity';
 import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from '@/sanity.types';
 
@@ -148,22 +152,33 @@ const serializedLinks = links.map(l => ({
   ...l,
   linkedAt: l.linkedAt instanceof Date ? l.linkedAt.toISOString() : String(l.linkedAt),
 }));
+
+const portalPage = await getPortalPage('progress');
+const pageTitle = portalPage?.title ?? 'Project Progress';
+const pageDescription = portalPage?.description ?? 'Track development activity for your sponsored projects via GitHub.';
+
+const breadcrumbItems = [
+  { label: 'Portal', href: '/portal/' },
+  { label: stegaClean(pageTitle) ?? pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
-<PortalLayout title="Project Progress" activeNav="/portal/progress" sponsorSlug={sponsor?.slug}>
+<PortalLayout title={pageTitle} activeNav="/portal/progress" sponsorSlug={sponsor?.slug}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <div class="flex flex-col gap-6">
-    <Breadcrumb
-      items={[
-        { label: 'Portal', href: '/portal/' },
-        { label: 'Project Progress' },
-      ]}
-    />
+    <Breadcrumb items={breadcrumbItems} />
+
+    {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.headerBlocks} />
+    )}
 
     <div class="flex flex-col gap-2">
-      <h1 class="text-2xl font-bold tracking-tight">Project Progress</h1>
-      <p class="text-muted-foreground">
-        Track development activity for your sponsored projects via GitHub.
-      </p>
+      <h1 class="text-2xl font-bold tracking-tight">{pageTitle}</h1>
+      {pageDescription && (
+        <p class="text-muted-foreground">{pageDescription}</p>
+      )}
     </div>
 
     {/* State: no GitHub account linked */}
@@ -246,6 +261,10 @@ const serializedLinks = links.map(l => ({
           reposEndpoint="/portal/api/github/repos"
         />
       </>
+    )}
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
     )}
   </div>
 </PortalLayout>

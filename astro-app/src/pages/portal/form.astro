@@ -1,0 +1,43 @@
+---
+export const prerender = false;
+
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams, getPortalPage } from '@/lib/sanity';
+import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from '@/sanity.types';
+
+const user = Astro.locals.user;
+
+const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
+  query: SPONSOR_BY_EMAIL_QUERY,
+  params: { email: user?.email ?? '', ...getSiteParams() },
+});
+
+const portalPage = await getPortalPage('form');
+const pageTitle = portalPage?.title ?? 'Form';
+const pageDescription = portalPage?.description ?? null;
+---
+
+<PortalLayout title={pageTitle} activeNav="/portal/form" sponsorSlug={sponsor?.slug}>
+  <div class="flex flex-col gap-8">
+    <Breadcrumb items={[
+      { label: 'Portal', href: '/portal/' },
+      { label: pageTitle },
+    ]} />
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-bold tracking-tight uppercase">{pageTitle}</h1>
+      {pageDescription && <p class="text-muted-foreground">{pageDescription}</p>}
+    </div>
+
+    {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 ? (
+      <BlockRenderer blocks={portalPage.headerBlocks} />
+    ) : (
+      <p class="text-muted-foreground">No content yet. Add blocks in Studio → Portal Pages → Form.</p>
+    )}
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
+    )}
+  </div>
+</PortalLayout>

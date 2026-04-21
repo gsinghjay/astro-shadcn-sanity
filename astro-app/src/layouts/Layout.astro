@@ -12,6 +12,8 @@ import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
 import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
 import type { SeoProps } from "@/lib/types";
+import { buildOrgJsonLd } from "@/lib/org-jsonld";
+import { buildPageGraph } from "@/lib/page-jsonld";
 
 interface Props {
   title?: string;
@@ -75,19 +77,14 @@ const cspConnectSrc = [
   "https://*.sanity.io",
   "wss://*.sanity.io",
   "https://cloudflareinsights.com",
+  "https://*.formsite.com",
   ...(aiSearchWorkerOrigin ? [aiSearchWorkerOrigin] : []),
 ].join(" ");
 
-const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com";
+const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://*.formsite.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com https://*.formsite.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com https://*.formsite.com";
 
-const orgJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  "@id": `${Astro.url.origin}/#organization`,
-  "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
-  "url": Astro.url.origin,
-  ...(cleanDescription && { "description": cleanDescription }),
-};
+const hasStructuredData = Astro.slots.has('structured-data');
+const fallbackOrgJsonLd = hasStructuredData ? null : buildPageGraph(await buildOrgJsonLd(Astro.url.origin));
 ---
 
 <!doctype html>
@@ -122,7 +119,7 @@ const orgJsonLd = {
       http-equiv="Content-Security-Policy"
       content={cspContent}
     />
-    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    {hasStructuredData ? <slot name="structured-data" /> : <script type="application/ld+json" set:html={JSON.stringify(fallbackOrgJsonLd)} />}
     {preloadImage && !preloadImageSrcset && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     {preloadImageSrcset && <link rel="preload" as="image" imagesrcset={preloadImageSrcset} imagesizes={preloadImageSizes || '100vw'} fetchpriority="high" />}
     <title>{fullTitle}</title>

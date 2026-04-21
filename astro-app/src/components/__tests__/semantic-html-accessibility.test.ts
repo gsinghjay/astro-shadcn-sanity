@@ -507,6 +507,71 @@ describe('AC8: EmbedBlock Iframe Title', () => {
     });
     expect(html).toContain('title="Embedded content"');
   });
+
+  test('renders rawEmbedCode via set:html and omits iframe', async () => {
+    const container = await AstroContainer.create();
+    const rawEmbedCode = '<script src="https://example.com/embed.js"></script><div id="form-anchor"></div>';
+    const html = await container.renderToString(EmbedBlock, {
+      props: {
+        _type: 'embedBlock' as const,
+        _key: 'eb-raw-1',
+        backgroundVariant: null,
+        spacing: null,
+        maxWidth: null,
+        heading: 'Form Embed',
+        embedUrl: null,
+        rawEmbedCode,
+        caption: null,
+        variant: 'default',
+      },
+    });
+    expect(html).toContain('https://example.com/embed.js');
+    expect(html).toContain('id="form-anchor"');
+    expect(html).not.toMatch(/<iframe[^>]*src="https:\/\/example\.com\/embed\.js"/);
+  });
+
+  test('rawEmbedCode takes precedence when both embedUrl and rawEmbedCode are set', async () => {
+    const container = await AstroContainer.create();
+    const rawEmbedCode = '<div class="raw-wins">hello</div>';
+    const html = await container.renderToString(EmbedBlock, {
+      props: {
+        _type: 'embedBlock' as const,
+        _key: 'eb-raw-2',
+        backgroundVariant: null,
+        spacing: null,
+        maxWidth: null,
+        heading: null,
+        embedUrl: 'https://www.youtube.com/embed/test',
+        rawEmbedCode,
+        caption: null,
+        variant: 'contained',
+      },
+    });
+    expect(html).toContain('class="raw-wins"');
+    expect(html).not.toContain('src="https://www.youtube.com/embed/test"');
+  });
+
+  test('rawEmbedCode renders in all three variants', async () => {
+    const container = await AstroContainer.create();
+    const rawEmbedCode = '<div class="variant-probe">probe</div>';
+    for (const variant of ['default', 'contained', 'full-width'] as const) {
+      const html = await container.renderToString(EmbedBlock, {
+        props: {
+          _type: 'embedBlock' as const,
+          _key: `eb-raw-${variant}`,
+          backgroundVariant: null,
+          spacing: null,
+          maxWidth: null,
+          heading: null,
+          embedUrl: null,
+          rawEmbedCode,
+          caption: null,
+          variant,
+        },
+      });
+      expect(html).toContain('class="variant-probe"');
+    }
+  });
 });
 
 // ─── AC #9: CardGrid Masonry Image Dimensions ──────────────────────────────

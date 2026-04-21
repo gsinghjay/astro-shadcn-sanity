@@ -1,1 +1,95 @@
-{"workflow_version":"1.2.0","scan_method":"parallel_agent_team","agent_count":9,"timestamps":{"started":"2026-03-11T00:00:00Z","last_updated":"2026-03-11T00:15:00Z","completed":"2026-03-11T00:15:00Z"},"previous_scan":{"date":"2026-02-20T06:21:00Z","version":"2.0.0"},"mode":"full_rescan","scan_level":"deep","project_root":"/home/jay/github/astro-shadcn-sanity","project_knowledge":"/home/jay/github/astro-shadcn-sanity/docs","project_classification":{"name":"ywcc-capstone-template","version":"1.11.0","type":"monorepo","package_manager":"npm workspaces","language":"TypeScript","parts":[{"part_id":"astro-app","name":"app","version":"0.0.1","type":"web","framework":"Astro 5.17 SSG + React 19 + Tailwind 4","display_name":"Astro Frontend (SSG + selective SSR)"},{"part_id":"studio","name":"ywcc-capstone-studio","version":"1.0.0","type":"web","framework":"Sanity Studio v5.14","display_name":"Sanity CMS Studio"},{"part_id":"rate-limiter-worker","name":"rate-limiter-worker","version":"1.0.0","type":"backend","framework":"Cloudflare Worker (TypeScript)","display_name":"Rate Limiter Worker"},{"part_id":"discord-bot","name":"my-fastapi-app","version":"0.1.0","type":"backend","framework":"Python FastAPI + discord.py","display_name":"Discord Bot + FastAPI"}]},"technology_stack":{"frontend":{"astro":"^5.17.1","react":"^19.2.4","typescript":"^5.9.3","vite":"^7.3.1","tailwindcss":"^4.1.18","tailwind_typography":"^0.5.19","tw_animate_css":"^1.4.0","better_auth":"^1.5.0","drizzle_orm":"^0.45.1","nanostores":"^1.1.0","preact_signals":"^2.8.1","schedule_x":"^4.2.0","resend":"^6.9.3","temporal_polyfill":"^0.3.0"},"cms":{"sanity":"^5.14.1","sanity_astro":"^3.2.11","sanity_visual_editing":"^5.2.1","sanity_image_url":"^1.2.0","groq":"^5.8.1","sanity_form_toolkit":"^2.2.3"},"ui":{"shadcn":"^4.0.0","class_variance_authority":"^0.7.1","clsx":"^2.1.1","tailwind_merge":"^3.4.0","iconify_lucide":"^1.2.89","iconify_simple_icons":"^1.2.69","portable_text_html":"^5.0.1","astro_portabletext":"^0.10.0"},"deployment":{"cloudflare_adapter":"^12.6.12","wrangler":"^4.63.0","worker_name":"ywcc-capstone","compatibility_date":"2025-12-01","output_mode":"static with per-route SSR","d1_database":"ywcc-capstone-portal","kv_namespace":"SESSION_CACHE","durable_objects":"SlidingWindowRateLimiter","auth":"Better Auth (Google OAuth, GitHub OAuth, Magic Link via Resend)"},"testing":{"vitest":"^3.2.1","vitest_coverage_v8":"^3.2.1","playwright":"^1.58.2","axe_core_playwright":"^4.11.1","storybook":"^10.2.7","storybook_astro":"^0.1.0","chromatic":"^15.1.1","lighthouse_ci":"^0.15.1"},"tooling":{"eslint":"^9.38.0","prettier":"^3.6.2","concurrently":"^9.1.0","semantic_release":"conventional commits","node_ci":"22 (most), 24 (release)","node_docker":"24-slim"}},"frontend":{"pages":{"total":20,"static_ssg":8,"ssr":9,"api":5,"routes":[{"route":"/","rendering":"SSG"},{"route":"/[...slug]","rendering":"SSG"},{"route":"/sponsors","rendering":"SSG"},{"route":"/sponsors/[slug]","rendering":"SSG"},{"route":"/projects","rendering":"SSG"},{"route":"/projects/[slug]","rendering":"SSG"},{"route":"/events","rendering":"SSG"},{"route":"/events/[slug]","rendering":"SSG"},{"route":"/portal","rendering":"SSR"},{"route":"/portal/login","rendering":"SSR"},{"route":"/portal/denied","rendering":"SSR"},{"route":"/portal/[sponsorSlug]","rendering":"SSR"},{"route":"/portal/events","rendering":"SSR"},{"route":"/student","rendering":"SSR"},{"route":"/auth/login","rendering":"SSR"},{"route":"/api/auth/[...all]","rendering":"SSR"},{"route":"/portal/api/me","rendering":"SSR"},{"route":"/portal/api/projects","rendering":"SSR"},{"route":"/portal/api/events","rendering":"SSR"},{"route":"/portal/api/db-health","rendering":"SSR"}]},"layouts":{"total":8},"components":{"total_files":508,"custom_blocks":23,"ui_blocks_generic":115,"ui_primitive_families":39,"top_level_components":15,"portal_components":8},"lib_utilities":{"total_files":14},"storybook_stories":120,"middleware":"Auth + rate limiting + sponsor escalation"},"sanity":{"schema":{"total_types":51,"document_types":7,"object_types":14,"block_types":25},"workspaces":["capstone (production)","rwc (rwc dataset)"],"groq_queries":15,"typegen_output":"astro-app/src/sanity.types.ts","visual_editing":true,"live_content":true},"testing":{"total_test_files":94,"unit_component":58,"e2e":14,"integration":22,"browser_matrix":5,"storybook_stories":120},"infrastructure":{"ci_cd_workflows":6,"docker_services":5,"rate_limiter":"Durable Object with SQLite sliding window"},"changes_since_last_scan":{"previous_scan_date":"2026-02-20","notable_changes":["Version: 1.7.0 → 1.11.0 (4 releases)","Schema types: 27 → 51 (added teamMember, galleryImage, comparisonColumn/Row, timelineEntry objects + projectCards, teamGrid, imageGallery, articleList, comparisonTable, timeline, pullquote, divider, announcementBar, sponsorshipTiers blocks)","New document type: submission (read-only contact form data)","Pages: 9 → 20 routes (portal expansion: login, denied, sponsorSlug, events, student, auth, API endpoints)","New dependencies: better-auth, drizzle-orm, nanostores, @preact/signals, @schedule-x/*, resend, temporal-polyfill, lucide-static","Cloudflare bindings: Added D1 (PORTAL_DB), KV (SESSION_CACHE), DO (RATE_LIMITER)","New part: rate-limiter-worker (Durable Object)","discord-bot changed: Java/Maven → Python/FastAPI","Middleware: expanded from CF Access JWT to Better Auth + KV cache + DO rate limiting + sponsor escalation","Portal: full SSR portal with sponsor dashboard, events calendar, projects API","Auth: Better Auth with Google OAuth, GitHub OAuth, Magic Link (Resend)","Multi-workspace Studio: added rwc workspace with site-aware filtering","Docker: added RWC variant services (rwc-us:4322, rwc-intl:4323)","Test files: 48 → 94 (new block tests, portal tests, auth tests, calendar tests)","Storybook: upgraded to v10.2.7, 120+ stories","New CI workflow: sanity-deploy removed from list (may have been renamed)","Sanity: upgraded from v5.10 to v5.14"]},"findings_summary":{"project_classification":"Monorepo (npm workspaces + standalone), 4 parts, TypeScript/Python, v1.11.0","technology_stack":"Astro 5.17 + Sanity 5.14 + Tailwind 4.1 + React 19.2 + Better Auth + Drizzle + Schedule-X + Storybook 10.2 + Vitest 3.2 + Playwright 1.58","components":"508+ total: 23 custom blocks, 115+ UI block variants, 39 UI primitive families, 15 top-level, 8 portal (React)","schemas":"51 types: 7 documents, 14 objects, 25 blocks (multi-workspace, site-aware)","queries":"15+ GROQ queries (all defineQuery), 4 block resolvers, module-level caching","tests":"94 test files: 58 unit/component, 14 E2E (×5 browsers), 22 integration","stories":"120+ Storybook stories","infrastructure":"6 GitHub Actions, 5 Docker services, D1+KV+DO bindings, rate limiter worker","deployment":"Cloudflare Pages (static + SSR Worker), Sanity hosted Studio, GitHub Pages (Storybook)","auth":"Better Auth: Google OAuth, GitHub OAuth, Magic Link (Resend), D1 sessions, KV cache, sponsor whitelist escalation","key_recommendations":["Consider astro:env for type-safe env vars","Add MPA View Transitions for polish","Clean up orphan post document in Content Lake","Remove stale sanity-template-astro-clean workspace schema","Add pre-commit hooks / lint CI enforcement","Add E2E tests for student portal","Implement discord-bot source code"]},"outputs_generated":["project-scan-report.json","index.md","project-overview.md","architecture.md","source-tree-analysis.md","component-inventory.md","data-models.md","development-guide.md","integration-architecture.md"],"documentation_workflow":{"method":"parallel_agent_team","scan_agents":3,"writer_agents":6,"total_agents_used":9,"docs_generated":8},"completed_steps":[{"step":"step_1","status":"completed","timestamp":"2026-03-11T00:01:00Z","summary":"Classified as monorepo with 4 parts"},{"step":"step_2-4","status":"completed","timestamp":"2026-03-11T00:05:00Z","summary":"Parallel deep scan: astro-app, studio, infrastructure"},{"step":"step_5-9","status":"completed","timestamp":"2026-03-11T00:12:00Z","summary":"Parallel doc generation: 6 agents wrote 8 documents"},{"step":"step_10","status":"completed","timestamp":"2026-03-11T00:14:00Z","summary":"Master index generated with all links"},{"step":"step_11-12","status":"completed","timestamp":"2026-03-11T00:15:00Z","summary":"Validation and finalization complete"}],"resume_instructions":"Workflow completed successfully. All documentation generated and indexed."}
+{
+  "workflow_version": "1.2.0",
+  "scan_method": "parallel_agent_team",
+  "agent_count": 5,
+  "timestamps": {
+    "started": "2026-04-15T00:00:00Z",
+    "last_updated": "2026-04-15T20:12:00Z",
+    "completed": "2026-04-15T20:12:00Z"
+  },
+  "previous_scan": {
+    "date": "2026-03-11T00:15:00Z",
+    "version": "1.2.0",
+    "project_version": "1.11.0"
+  },
+  "mode": "full_rescan",
+  "scan_level": "exhaustive",
+  "project_root": "/home/jay/github/astro-shadcn-sanity",
+  "project_knowledge": "/home/jay/github/astro-shadcn-sanity/docs",
+  "project_classification": {
+    "name": "ywcc-capstone-template",
+    "version": "1.18.0",
+    "type": "monorepo",
+    "package_manager": "npm workspaces (+ uv for Python)",
+    "language": "TypeScript + Python",
+    "branch": "preview",
+    "parts": [
+      { "part_id": "astro-app", "project_type_id": "web", "framework": "Astro 5.18 SSG + React 19 + Tailwind 4", "display_name": "Astro Frontend (SSG + per-route SSR)", "status": "production" },
+      { "part_id": "studio", "project_type_id": "web", "framework": "Sanity Studio v5.20 (3 workspaces)", "display_name": "Sanity CMS Studio", "status": "production" },
+      { "part_id": "rate-limiter-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker + Durable Object", "display_name": "Rate Limiter Worker", "status": "production" },
+      { "part_id": "event-reminders-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker (cron)", "display_name": "Event Reminders Worker", "status": "production" },
+      { "part_id": "platform-api", "project_type_id": "backend", "framework": "FastAPI + Python Cloudflare Worker", "display_name": "Platform API", "status": "scaffolding" },
+      { "part_id": "discord-bot", "project_type_id": "backend", "framework": "Python FastAPI + discord.py", "display_name": "Discord Bot", "status": "scaffolding" }
+    ]
+  },
+  "key_metrics": {
+    "routes": { "total": 34, "ssg_pages": 22, "ssr_pages": 8, "api_endpoints": 12 },
+    "sanity": { "documents": 11, "objects": 23, "blocks": 38, "workspaces": 3, "schema_json_lines": 17861, "groq_queries": 30, "migrations": 3 },
+    "astro_components": { "total_files": 681, "custom_blocks": 38, "ui_primitive_families": 40, "portable_text": 6, "stories": 187 },
+    "d1": { "tables": 7, "migrations": 7, "database_name": "ywcc-capstone-portal", "database_id": "76887418-c356-46d8-983b-fa6e395d8b16" },
+    "testing": { "vitest_files": 75, "e2e_specs": 19, "browsers": 5, "storybook_stories": 187 },
+    "infrastructure": { "github_workflows": 6, "docker_services": 5, "wiki_pages": 33 }
+  },
+  "outputs_generated": [
+    "project-scan-report.json",
+    "index.md",
+    "project-overview.md",
+    "architecture.md",
+    "source-tree-analysis.md",
+    "component-inventory.md",
+    "data-models.md",
+    "api-contracts.md",
+    "development-guide.md",
+    "integration-architecture.md"
+  ],
+  "documentation_workflow": {
+    "method": "parallel_agent_team",
+    "scan_agents": 5,
+    "writer_agents": 0,
+    "direct_writes": 9,
+    "total_agents_used": 5,
+    "docs_generated": 10
+  },
+  "completed_steps": [
+    { "step": "step_1", "status": "completed", "timestamp": "2026-04-15T00:00:00Z", "summary": "Classified as monorepo with 6 parts (3 workspaces + 3 standalone)" },
+    { "step": "step_2-4", "status": "completed", "timestamp": "2026-04-15T00:10:00Z", "summary": "Parallel exhaustive scan: astro-app, studio, backends, infra, existing docs via 5 agents" },
+    { "step": "step_5-9", "status": "completed", "timestamp": "2026-04-15T20:11:00Z", "summary": "9 docs written directly (source-tree, architecture, project-overview, component-inventory, data-models, api-contracts, development-guide, integration-architecture) from consolidated scan summary" },
+    { "step": "step_10", "status": "completed", "timestamp": "2026-04-15T20:12:00Z", "summary": "Master index.md generated with links to all new + existing docs" },
+    { "step": "step_11-12", "status": "completed", "timestamp": "2026-04-15T20:12:00Z", "summary": "Validation: no 'To be generated' markers; one stray TBD corrected in component-inventory.md" }
+  ],
+  "findings_summary": {
+    "project_classification": "Monorepo v1.18.0 (7 releases since prior scan). 6 parts, npm workspaces (astro-app, studio, platform-api) + standalone Cloudflare workers (rate-limiter, event-reminders) + standalone Python discord-bot.",
+    "technology_stack": "Astro 5.18 + Sanity 5.20 + Tailwind 4.1 + React 19.2 + Better Auth 1.5 + Drizzle 0.45 (D1) + nanostores + @schedule-x + Resend + Astro Fonts API + astro:env + Storybook 10.2 + Vitest 3.2 + Playwright 1.58",
+    "new_parts_since_last_scan": "event-reminders-worker (production cron), platform-api (scaffold), discord-bot relocated to nested path",
+    "notable_features_since_last_scan": "astro:env typed schema (5.13); Astro Fonts API self-hosted Inter (22.5); 12-column grid + container queries (17.8); ColumnsBlock (21.10); ImageGallery + PhotoSwipe (22.4); author listing/detail + Person JSON-LD (20.2-20.3); Article JSON-LD (19.6); category archive pages (19.10); newsletter CTA (19.7); listing-page singleton documents (21.0); /projects sorting controls (4.6); sponsor logoSquare/logoHorizontal; Lighthouse+Pa11y CI over /demo/; schema deploy fixed for all 3 workspaces",
+    "key_risks": [
+      "platform-api has placeholder KV/D1 IDs in wrangler.jsonc and is not wired to astro-app",
+      "discord-bot/ Python scaffold diverges from the production bot (Workers 'capstone-bot' + 'capstone-ask-worker')",
+      "Single D1 shared between astro-app and event-reminders-worker — migrations must stay coordinated",
+      "No Husky / pre-commit hooks; CI is the only enforcement gate"
+    ],
+    "deploy_hooks_verified_2026_04_15": {
+      "ywcc-capstone": { "hook_id": "f6e2c5c6-8951-455c-b48b-6afcbbc82bbb", "name": "sanity-content-update-capstone", "branch": "main" },
+      "rwc-us": { "hook_id": "bca5ddca-d7d0-4742-9308-e405aa38122f", "name": "sanity-content-update-rwc-us", "branch": "main" },
+      "rwc-intl": { "hook_id": "8edab80c-19c0-4b68-8ca2-5bba8586646c", "name": "sanity-content-update-rwc-intl", "branch": "main" }
+    },
+    "production_workers_verified_2026_04_15": [
+      { "name": "rate-limiter-worker", "bindings": ["RATE_LIMITER (DO)"], "observability": true },
+      { "name": "ywcc-event-reminders", "bindings": ["DB (D1)", "SANITY_*", "RESEND_*"] },
+      { "name": "capstone-bot", "bindings": ["ASK_WORKER (service)", "KV", "DISCORD_* secrets", "SANITY_PROJECT_ID"] },
+      { "name": "capstone-ask-worker", "bindings": [], "notes": "RAG answerer hitting AI Search index bf002610-921a-4047-9298-cc2d2668451a" },
+      { "name": "little-dawn-0015-nlweb", "bindings": ["AI", "ASSETS", "MCP_OBJECT (DO)", "RAG_ID", "RATE_LIMITER (ratelimit)"] }
+    ]
+  },
+  "resume_instructions": "Workflow completed successfully. All documentation generated and indexed."
+}

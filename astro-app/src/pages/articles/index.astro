@@ -9,6 +9,9 @@ import { Badge } from '@/components/ui/badge';
 import { getAllArticles, getAllArticleCategories, getListingPage } from '@/lib/sanity';
 import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 const [articles, categories, listingPage] = await Promise.all([
   getAllArticles(),
@@ -19,6 +22,14 @@ const [articles, categories, listingPage] = await Promise.all([
 const pageTitle = listingPage?.title ?? 'Articles';
 const pageDescription = listingPage?.description ?? null;
 const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse articles, blog posts, and news from the program.' };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 
 const featuredArticle = articles[0] ?? null;
 const remainingArticles = articles.slice(1);
@@ -40,16 +51,14 @@ function heroSrcset(article: Article): string | undefined {
 ---
 
 <Layout title={pageTitle} seo={pageSeo}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} />
   )}
 
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: pageTitle },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageTitle}</h1>
       {pageDescription && (

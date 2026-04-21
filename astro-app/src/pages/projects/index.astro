@@ -7,6 +7,9 @@ import { stegaClean } from '@sanity/client/stega';
 import { Section, SectionContent } from '@/components/ui/section';
 import ProjectCardEnhanced from '@/components/ProjectCardEnhanced.astro';
 import ProjectFilterBar from '@/components/ProjectFilterBar.astro';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 import ProjectPageHeader from '@/components/ProjectPageHeader.astro';
 import ProjectEmptyState from '@/components/ProjectEmptyState.astro';
 
@@ -21,19 +24,25 @@ const pageTitle = listingPage?.title ?? 'Projects';
 const pageH1 = listingPage?.title ?? 'Capstone Projects';
 const pageDescription = listingPage?.description ?? null;
 const pageSeo = listingPage?.seo ?? { metaDescription: 'Explore capstone projects where YWCC students solve real industry problems with sponsor organizations.' };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <SidebarLayout title={pageTitle} seo={pageSeo}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} slot="header" />
   )}
 
   <Section slot="header">
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: pageTitle },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <ProjectPageHeader
         title={pageH1}

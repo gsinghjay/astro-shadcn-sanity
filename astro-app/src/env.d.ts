@@ -49,5 +49,7 @@ type Runtime = import("@astrojs/cloudflare").Runtime<{
 declare namespace App {
   interface Locals extends Runtime {
     user?: { email: string; role: 'sponsor' | 'student'; name?: string };
+    /** Sponsor Agreement Gate — true when a sponsor must accept the CMS agreement before proceeding */
+    requiresAgreement?: boolean;
   }
 }

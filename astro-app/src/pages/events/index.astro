@@ -7,6 +7,9 @@ import { Section, SectionContent } from '@/components/ui/section';
 import { getAllEvents, getListingPage } from '@/lib/sanity';
 import CalendarViewToggle from '@/components/react/CalendarViewToggle';
 import EventCalendarIsland from '@/components/react/EventCalendarIsland';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 const [events, listingPage] = await Promise.all([
   getAllEvents(),
@@ -16,19 +19,25 @@ const [events, listingPage] = await Promise.all([
 const pageTitle = listingPage?.title ?? 'Events';
 const pageDescription = listingPage?.description ?? null;
 const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse upcoming and past events from the YWCC Industry Capstone program.' };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout title={pageTitle} seo={pageSeo}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} />
   )}
 
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: pageTitle },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageTitle}</h1>

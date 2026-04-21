@@ -5,7 +5,7 @@ import {visionTool} from '@sanity/vision'
 import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
 import {formSchema} from '@sanity/form-toolkit/form-schema'
 import {media} from 'sanity-plugin-media'
-import {createSchemaTypesForWorkspace} from './src/schemaTypes/workspace-utils'
+import {createWorkspaceSchemaTypes} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
 import {resolve} from './src/presentation/resolve'
@@ -50,13 +50,15 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
       formSchema({}),
     ],
     schema: {
-      types: createSchemaTypesForWorkspace('rwc'),
+      types: createWorkspaceSchemaTypes('rwc'),
       templates: (prev) => {
         const filtered = prev.filter(
           (t) =>
             !SITE_AWARE_TYPES.includes(t.schemaType) &&
             t.schemaType !== 'siteSettings' &&
-            t.schemaType !== 'listingPage',
+            t.schemaType !== 'listingPage' &&
+            t.schemaType !== 'portalPage' &&
+            t.schemaType !== 'sponsorAgreement',
         )
         const siteTemplates = SITE_AWARE_TYPES.map((type) => ({
           id: `${type}-${opts.siteId}`,
@@ -71,6 +73,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           schemaType: 'listingPage',
           value: {route},
         }))
+        // portalPage and sponsorAgreement are capstone-only — no RWC templates emitted.
         return [...filtered, ...siteTemplates, ...listingTemplates]
       },
     },
@@ -79,6 +82,8 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
         if (
           context.schemaType === 'siteSettings' ||
           context.schemaType === 'listingPage' ||
+          context.schemaType === 'portalPage' ||
+          context.schemaType === 'sponsorAgreement' ||
           context.documentId === `siteSettings-${opts.siteId}`
         ) {
           return input.filter(
@@ -94,7 +99,9 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           (t) =>
             t.templateId !== 'siteSettings' &&
             t.templateId !== 'submission' &&
-            t.templateId !== 'listingPage',
+            t.templateId !== 'listingPage' &&
+            t.templateId !== 'portalPage' &&
+            t.templateId !== 'sponsorAgreement',
         ),
     },
   }
@@ -125,7 +132,7 @@ export default defineConfig([
       formSchema({}),
     ],
     schema: {
-      types: createSchemaTypesForWorkspace('production'),
+      types: createWorkspaceSchemaTypes('production'),
       templates: (prev) => {
         const filtered = prev.filter(
           (t) => !CAPSTONE_SINGLETON_TYPES.has(t.schemaType),
@@ -139,6 +146,16 @@ export default defineConfig([
           {id: 'listingPage-gallery', schemaType: 'listingPage', title: 'Listing Page (Gallery)', value: {route: 'gallery'}},
           {id: 'listingPage-projects', schemaType: 'listingPage', title: 'Listing Page (Projects)', value: {route: 'projects'}},
           {id: 'listingPage-sponsors', schemaType: 'listingPage', title: 'Listing Page (Sponsors)', value: {route: 'sponsors'}},
+          // Portal page singletons (Story 22.9)
+          {id: 'portalPage-dashboard', schemaType: 'portalPage', title: 'Portal Page (Dashboard)', value: {route: 'dashboard'}},
+          {id: 'portalPage-events', schemaType: 'portalPage', title: 'Portal Page (Events)', value: {route: 'events'}},
+          {id: 'portalPage-progress', schemaType: 'portalPage', title: 'Portal Page (Progress)', value: {route: 'progress'}},
+          {id: 'portalPage-agreement', schemaType: 'portalPage', title: 'Portal Page (Agreement)', value: {route: 'agreement'}},
+          {id: 'portalPage-form', schemaType: 'portalPage', title: 'Portal Page (Form)', value: {route: 'form'}},
+          {id: 'portalPage-login', schemaType: 'portalPage', title: 'Portal Page (Login)', value: {route: 'login'}},
+          {id: 'portalPage-denied', schemaType: 'portalPage', title: 'Portal Page (Denied)', value: {route: 'denied'}},
+          // Sponsor Agreement singleton (one per workspace)
+          {id: 'sponsorAgreement', schemaType: 'sponsorAgreement', title: 'Sponsor Agreement', value: {}},
         ]
       },
     },

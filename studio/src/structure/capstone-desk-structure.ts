@@ -1,4 +1,4 @@
-import {CogIcon, DocumentsIcon, EnvelopeIcon} from '@sanity/icons'
+import {CogIcon, DashboardIcon, DocumentsIcon, DocumentTextIcon, EnvelopeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
 import {CAPSTONE_SINGLETON_TYPES} from '../constants'
 
@@ -71,6 +71,83 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
                     .initialValueTemplate('listingPage-authors'),
                 ),
             ]),
+        ),
+      // Singleton group: Portal Pages (Story 22.9)
+      S.listItem()
+        .title('Portal Pages')
+        .icon(DashboardIcon)
+        .child(
+          S.list()
+            .title('Portal Pages')
+            .items([
+              S.listItem()
+                .title('Dashboard')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-dashboard')
+                    .initialValueTemplate('portalPage-dashboard'),
+                ),
+              S.listItem()
+                .title('Events')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-events')
+                    .initialValueTemplate('portalPage-events'),
+                ),
+              S.listItem()
+                .title('Progress')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-progress')
+                    .initialValueTemplate('portalPage-progress'),
+                ),
+              S.listItem()
+                .title('Agreement')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-agreement')
+                    .initialValueTemplate('portalPage-agreement'),
+                ),
+              S.listItem()
+                .title('Form')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-form')
+                    .initialValueTemplate('portalPage-form'),
+                ),
+              S.listItem()
+                .title('Login')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-login')
+                    .initialValueTemplate('portalPage-login'),
+                ),
+              S.listItem()
+                .title('Access Denied')
+                .child(
+                  S.document()
+                    .schemaType('portalPage')
+                    .documentId('portalPage-denied')
+                    .initialValueTemplate('portalPage-denied'),
+                ),
+            ]),
+        ),
+      // Singleton: Sponsor Agreement (one PDF + copy per workspace)
+      S.listItem()
+        .title('Sponsor Agreement')
+        .icon(DocumentTextIcon)
+        .id('sponsorAgreement')
+        .child(
+          S.document()
+            .schemaType('sponsorAgreement')
+            .documentId('sponsorAgreement')
+            .initialValueTemplate('sponsorAgreement'),
         ),
       S.listItem()
         .title('Submissions')

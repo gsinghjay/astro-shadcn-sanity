@@ -25,9 +25,12 @@ export default getViteConfig({
     globals: true,
     include: [
       "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
       "../tests/integration/**/*.test.ts",
     ],
     exclude: ["node_modules", "dist", ".astro"],
+    // React component tests use jsdom; non-component tests stay in node.
+    environmentMatchGlobs: [["**/*.test.tsx", "jsdom"]],
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts", "src/scripts/**/*.ts"],
