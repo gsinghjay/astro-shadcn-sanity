@@ -74,6 +74,8 @@ def main():
                     "description": "Your question",
                     "type": 3,  # STRING
                     "required": True,
+                    "min_length": 5,
+                    "max_length": 500,
                 }
             ],
         }
