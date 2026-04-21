@@ -3,15 +3,21 @@ import type { GetStaticPaths } from 'astro';
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import { sanityClient, ALL_SPONSOR_SLUGS_QUERY, getSponsorBySlug, getSiteParams } from '@/lib/sanity';
+import type { ALL_SPONSOR_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Icon } from '@/components/ui/icon';
 import { Section, SectionContent } from '@/components/ui/section';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const sponsors = await sanityClient.fetch<Array<{ slug: string }>>(ALL_SPONSOR_SLUGS_QUERY, getSiteParams());
-  return sponsors.map((s) => ({ params: { slug: s.slug } }));
+  const sponsors = await sanityClient.fetch<ALL_SPONSOR_SLUGS_QUERY_RESULT>(ALL_SPONSOR_SLUGS_QUERY, getSiteParams());
+  return sponsors
+    .filter((s): s is { slug: string } => typeof s.slug === 'string' && s.slug.length > 0)
+    .map((s) => ({ params: { slug: s.slug } }));
 };
 
 const { slug } = Astro.params;
@@ -27,11 +33,14 @@ const tierStyles: Record<string, { border: string; badge: string }> = {
 
 const tier = tierStyles[stegaClean(sponsor.tier) || 'silver'];
 
-const logoUrl = safeUrlFor(sponsor.logo)?.width(200).height(200).url() ?? null;
+// Prefer horizontal variant for detail pages, fall back to primary logo
+const detailLogo = sponsor.logoHorizontal?.asset ? sponsor.logoHorizontal : sponsor.logo;
+// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
+const logoUrl = detailLogo ? safeUrlFor({ asset: detailLogo.asset, alt: detailLogo.alt })?.width(200).fit('max').url() ?? null : null;
+const logoAlt = detailLogo?.alt || `${sponsor.name} logo`;
 const projects = sponsor.projects ?? [];
 
 const sponsorJsonLd = {
-  "@context": "https://schema.org",
   "@type": "Organization",
   "@id": Astro.url.href,
   "name": stegaClean(sponsor.name),
@@ -39,25 +48,30 @@ const sponsorJsonLd = {
   ...(sponsor.description && { "description": stegaClean(sponsor.description) }),
   ...(logoUrl && { "logo": logoUrl }),
 };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Sponsors', href: '/sponsors' },
+  { label: sponsor.name ?? 'Sponsor' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, sponsorJsonLd);
 ---
 
 <Layout title={sponsor.name ?? 'Sponsor'} seo={sponsor.seo ?? (sponsor.description ? { metaDescription: sponsor.description } : undefined)} template="detail">
-  <script type="application/ld+json" set:html={JSON.stringify(sponsorJsonLd)} />
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Sponsors', href: '/sponsors' },
-        { label: sponsor.name ?? 'Sponsor' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
         {logoUrl && (
           <div class="w-[200px] h-[200px] bg-muted flex items-center justify-center flex-shrink-0 border border-border overflow-hidden">
             <img
               src={logoUrl}
-              alt={sponsor.logo?.alt || `${sponsor.name} logo`}
-              class="w-full h-full object-cover"
+              alt={logoAlt}
+              class="w-full h-full object-contain p-2"
               width="200"
               height="200"
               loading="eager"
@@ -122,7 +136,7 @@ const sponsorJsonLd = {
         </div>
       )}
 
-      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-sponsors">
+      <a href="/sponsors" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-sponsors">
         &larr; Back to Sponsors
       </a>
     </SectionContent>

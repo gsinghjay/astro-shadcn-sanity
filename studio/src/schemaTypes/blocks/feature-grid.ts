@@ -26,6 +26,13 @@ export const featureGrid = defineBlock({
       validation: (Rule) => Rule.max(150),
     }),
     defineField({
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      rows: 3,
+      validation: (Rule) => Rule.max(500),
+    }),
+    defineField({
       name: 'items',
       title: 'Items',
       type: 'array',

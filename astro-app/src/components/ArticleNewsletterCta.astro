@@ -1,0 +1,99 @@
+---
+/**
+ * ArticleNewsletterCta — static, non-schema Astro component (Story 19.7)
+ *
+ * Two use cases:
+ *  - `article-body` variant — rendered inside the article detail page's existing
+ *    <SectionContent> after the PortableText body. Large, centered, h2-level.
+ *  - `compact` variant — rendered inside the ArticleList block after the cards
+ *    and before ctaButtons. Tighter spacing, left-aligned, h3-level.
+ *
+ * Why a plain <div> wrapper instead of <Section>:
+ *  - Both consumers live INSIDE an existing <Section> / <SectionContent> context.
+ *    Wrapping this component in another <Section> would stack 48–64px of padding
+ *    on top of the parent section's padding and create a ~112px gap — a recurring
+ *    bug fixed in PRs #270 and #275 (see CLAUDE.md detail-page layout rule).
+ *
+ * Why no submit handler:
+ *  - Backend wiring is Story 18.8 scope. The form uses `onsubmit="return false;"`
+ *    to match the existing Newsletter.astro pattern (visually complete, not yet
+ *    submittable). The `required` attribute is intentionally omitted to keep
+ *    browser default validation from triggering on a non-functional form.
+ */
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+interface Props {
+  variant?: 'article-body' | 'compact';
+  heading?: string;
+  description?: string;
+  inputPlaceholder?: string;
+  submitButtonLabel?: string;
+  privacyDisclaimerText?: string;
+}
+
+const {
+  variant: rawVariant,
+  heading = 'Stay updated',
+  description = 'Subscribe for new articles delivered to your inbox.',
+  inputPlaceholder = 'Enter your email',
+  submitButtonLabel = 'Subscribe',
+  privacyDisclaimerText,
+} = Astro.props;
+
+// Don't use a destructured default for `variant` — TypeScript's flow analysis
+// narrows the destructured binding to the default literal ('article-body'),
+// which makes the second {variant === 'compact'} JSX branch appear unreachable
+// (ts7027). Binding the fallback to a separately-typed const keeps the
+// variant type as the full union for both JSX checks.
+//
+// Use an explicit allow-list (not `?? 'article-body'`): nullish coalescing only
+// catches null/undefined, so an unexpected runtime value like '' or 'compac'
+// would slip through and BOTH JSX branches would evaluate false, rendering
+// nothing. The explicit check guarantees one branch always wins.
+const variant: 'article-body' | 'compact' = rawVariant === 'compact' ? 'compact' : 'article-body';
+---
+
+{variant === 'article-body' && (
+  <div class="border-t pt-8 mt-4 flex flex-col items-center gap-4 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
+    {description && (
+      <p class="text-base leading-relaxed text-muted-foreground max-w-2xl">{description}</p>
+    )}
+    <form
+      class="flex w-full max-w-md gap-2"
+      onsubmit="return false;"
+      data-gtm-category="newsletter"
+      data-gtm-action="subscribe"
+      data-gtm-label="article-body"
+    >
+      <Input type="email" name="email" autocomplete="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
+      <Button type="submit">{submitButtonLabel}</Button>
+    </form>
+    {privacyDisclaimerText && (
+      <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+    )}
+  </div>
+)}
+
+{variant === 'compact' && (
+  <div class="flex flex-col items-start gap-3 border-t pt-6 mt-8">
+    <h3 class="text-xl md:text-2xl font-semibold tracking-[-0.02em]">{heading}</h3>
+    {description && (
+      <p class="text-sm text-muted-foreground max-w-xl">{description}</p>
+    )}
+    <form
+      class="flex w-full max-w-sm gap-2"
+      onsubmit="return false;"
+      data-gtm-category="newsletter"
+      data-gtm-action="subscribe"
+      data-gtm-label="article-list-block"
+    >
+      <Input type="email" name="email" autocomplete="email" placeholder={inputPlaceholder} class="flex-1" aria-label="Email address" />
+      <Button type="submit">{submitButtonLabel}</Button>
+    </form>
+    {privacyDisclaimerText && (
+      <p class="text-xs text-muted-foreground">{privacyDisclaimerText}</p>
+    )}
+  </div>
+)}

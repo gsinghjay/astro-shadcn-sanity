@@ -25,34 +25,44 @@ export function defineBlock(config: DefineBlockConfig) {
     ? [
         defineField({
           name: 'variant',
-          title: 'Variant',
+          title: 'Block Variant',
           description: 'Choose a layout variant for this block',
           type: 'string',
           fieldset: 'layout',
           options: {
             list: config.variants.map((v) => ({title: v.title, value: v.name})),
-            layout: 'radio',
           },
           initialValue: config.variants[0]?.name,
         }),
       ]
     : []
 
-  // Apply hiddenByVariant to block-specific fields
+  // Apply hiddenByVariant to fields
   // Composes with any existing hidden function on the field instead of replacing it
+  function withHiddenByVariant(
+    fields: ReturnType<typeof defineField>[],
+    hiddenMap: Record<string, string[]>,
+  ): ReturnType<typeof defineField>[] {
+    return fields.map((field) => {
+      const fieldName = (field as {name: string}).name
+      const hiddenVariants = hiddenMap[fieldName]
+      if (!hiddenVariants) return field
+      const existingHidden = (field as {hidden?: (ctx: {parent?: {variant?: string}}) => boolean})
+        .hidden
+      return {
+        ...field,
+        hidden: ({parent}: {parent?: {variant?: string}}) =>
+          (existingHidden ? existingHidden({parent}) : false) ||
+          hiddenVariants.includes(parent?.variant ?? ''),
+      }
+    })
+  }
+
+  const processedBaseFields = config.hiddenByVariant
+    ? withHiddenByVariant(blockBaseFields, config.hiddenByVariant)
+    : blockBaseFields
   const blockFields = config.hiddenByVariant
-    ? config.fields.map((field) => {
-        const fieldName = (field as {name: string}).name
-        const hiddenVariants = config.hiddenByVariant![fieldName]
-        if (!hiddenVariants) return field
-        const existingHidden = (field as {hidden?: (ctx: {parent?: {variant?: string}}) => boolean}).hidden
-        return {
-          ...field,
-          hidden: ({parent}: {parent?: {variant?: string}}) =>
-            (existingHidden ? existingHidden({parent}) : false) ||
-            hiddenVariants.includes(parent?.variant ?? ''),
-        }
-      })
+    ? withHiddenByVariant(config.fields, config.hiddenByVariant)
     : config.fields
 
   return defineType({
@@ -60,10 +70,15 @@ export function defineBlock(config: DefineBlockConfig) {
     title: config.title,
     type: 'object',
     fieldsets: [
-      {name: 'layout', title: 'Layout Options', options: {collapsible: true, collapsed: true}},
+      {
+        name: 'layout',
+        title: 'Layout Options',
+        description: 'Controls visual layout, background, spacing, and width',
+        options: {collapsible: true, collapsed: true},
+      },
       ...(config.fieldsets ?? []),
     ],
-    fields: [...blockBaseFields, ...variantFields, ...blockFields],
+    fields: [...processedBaseFields, ...variantFields, ...blockFields],
     preview: {
       select: selectFields,
       prepare(selection) {

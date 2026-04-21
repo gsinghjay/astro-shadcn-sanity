@@ -1,0 +1,142 @@
+---
+import type { Project } from '@/lib/sanity';
+import { Badge } from '@/components/ui/badge';
+import { stegaClean } from '@sanity/client/stega';
+import { safeUrlFor } from '@/lib/image';
+
+function portableTextExcerpt(content: Project['content'], maxLength = 150): string {
+  if (!content) return '';
+  const text = content
+    .filter((block) => 'children' in block && block.children)
+    .map((block) => ('children' in block ? block.children : [])?.map((child) => ('text' in child ? child.text : '')).join('') ?? '')
+    .join(' ');
+  return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+}
+
+const statusBarColors: Record<string, string> = {
+  active: 'bg-green-700',
+  completed: 'bg-primary',
+  archived: 'bg-muted-foreground',
+};
+
+const statusLabelStyles: Record<string, string> = {
+  active: 'border-green-700 text-green-700',
+  completed: 'border-primary text-primary',
+  archived: 'border-border text-muted-foreground',
+};
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const slug = stegaClean(project.slug);
+const status = stegaClean(project.status) || 'active';
+const sponsor = project.sponsor;
+const sponsorSlug = sponsor ? stegaClean(sponsor.slug) : null;
+// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
+const logoUrl = sponsor?.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: sponsor.logo.alt })?.width(64).fit('max').url() ?? null : null;
+const excerpt = portableTextExcerpt(project.content);
+const techs = project.technologyTags ?? [];
+const industry = sponsor?.industry ? stegaClean(sponsor.industry) : '';
+
+const maxVisibleTags = 3;
+const visibleTags = techs.slice(0, maxVisibleTags);
+const remainingCount = techs.length - maxVisibleTags;
+---
+
+<div
+  data-project-card
+  data-tech-tags={techs.map(t => stegaClean(t)).join(',')}
+  data-industry={industry}
+  data-sort-title={stegaClean(project.title ?? '').toLowerCase()}
+  data-sort-date={project._createdAt ?? ''}
+>
+  <a
+    href={`/projects/${slug}`}
+    class="block no-underline text-inherit group"
+    data-gtm-category="project"
+    data-gtm-label={stegaClean(project.title)}
+  >
+    <div class="border border-border bg-card overflow-hidden transition-colors duration-150 hover:border-foreground h-full flex flex-col">
+      {/* Status accent bar */}
+      <div class={`h-1 w-full ${statusBarColors[status] || statusBarColors.active}`} />
+
+      <div class="p-6 flex flex-col flex-1 gap-4">
+        {/* Header: title + status label */}
+        <div class="flex items-start justify-between gap-3">
+          <h3 class="text-lg font-[750] tracking-[-0.03em] leading-[1.05] group-hover:text-primary transition-colors">
+            {project.title}
+          </h3>
+          <span class={`label-caps shrink-0 border px-2 py-0.5 ${statusLabelStyles[status] || statusLabelStyles.active}`}>
+            {status}
+          </span>
+        </div>
+
+        {/* Sponsor area */}
+        {sponsor && (
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-16 bg-muted flex items-center justify-center shrink-0 border border-border overflow-hidden">
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt={sponsor.logo?.alt || `${stegaClean(sponsor.name)} logo`}
+                  class="w-full h-full object-contain p-1"
+                  loading="lazy"
+                />
+              ) : (
+                <span class="text-xl font-[750] text-muted-foreground">
+                  {stegaClean(sponsor.name) ? stegaClean(sponsor.name).split(' ').filter(Boolean).map((w) => w[0]).join('').slice(0, 2) : '?'}
+                </span>
+              )}
+            </div>
+            <div class="flex flex-col">
+              {sponsorSlug && !sponsor.hidden ? (
+                <a
+                  href={`/sponsors/${sponsorSlug}`}
+                  class="text-sm font-[750] tracking-[-0.01em] text-primary hover:text-primary/80 no-underline"
+                  data-gtm-category="sponsor"
+                  data-gtm-action="detail"
+                  data-gtm-label={stegaClean(sponsor.name)}
+                >
+                  {sponsor.name}
+                </a>
+              ) : (
+                <span class="text-sm font-[750] tracking-[-0.01em]">{sponsor.name}</span>
+              )}
+              {industry && (
+                <span class="label-caps text-muted-foreground mt-1">{industry}</span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Excerpt */}
+        {excerpt && (
+          <p class="text-sm text-muted-foreground leading-[1.5] tracking-[-0.01em] line-clamp-3">
+            {excerpt}
+          </p>
+        )}
+
+        {/* Semester */}
+        {project.semester && (
+          <p class="label-caps text-muted-foreground">{project.semester}</p>
+        )}
+
+        {/* Tags with truncation */}
+        {techs.length > 0 && (
+          <div class="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-border">
+            {visibleTags.map((tag) => (
+              <Badge variant="outline" class="label-caps px-2 py-0.5">{tag}</Badge>
+            ))}
+            {remainingCount > 0 && (
+              <span class="label-caps bg-muted px-2 py-0.5 text-muted-foreground">
+                +{remainingCount} more
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </a>
+</div>

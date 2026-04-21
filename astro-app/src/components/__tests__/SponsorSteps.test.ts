@@ -55,14 +55,14 @@ describe('SponsorSteps', () => {
     expect(html).toBeDefined();
   });
 
-  test('steps variant keeps connecting-line classes', async () => {
+  test('steps variant uses responsive grid layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
       props: { ...sponsorStepsFull, variant: 'steps' },
     });
 
-    expect(html).toContain('bg-border');
-    expect(html).toContain('h-px flex-1');
+    expect(html).toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
+    expect(html).not.toContain('h-px flex-1');
   });
 
   test('split variant renders grid and omits connecting-line classes', async () => {
@@ -71,17 +71,17 @@ describe('SponsorSteps', () => {
       props: { ...sponsorStepsFull, variant: 'split' },
     });
 
-    expect(html).toContain('sm:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]');
+    expect(html).toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
     expect(html).not.toContain('h-px flex-1');
   });
 
-  test('spread variant renders spread container classes', async () => {
+  test('spread variant uses responsive grid layout', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(SponsorSteps, {
       props: { ...sponsorStepsFull, variant: 'spread' },
     });
 
-    expect(html).toContain('@5xl:justify-between');
+    expect(html).toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
   });
 
   test('unknown variant falls back to steps layout', async () => {
@@ -90,6 +90,6 @@ describe('SponsorSteps', () => {
       props: { ...sponsorStepsFull, variant: 'legacy-variant' },
     });
 
-    expect(html).toContain('bg-border');
+    expect(html).toContain('grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3');
   });
 });

@@ -2,11 +2,12 @@
 import type { ArticleListBlock } from '@/lib/types';
 import type { Article } from '@/lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { Section, SectionContent, SectionActions, SectionGrid, SectionSplit } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ArticleCard from '@/components/ArticleCard.astro';
+import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 interface Props extends ArticleListBlock {
   articles?: Article[];
@@ -14,8 +15,11 @@ interface Props extends ArticleListBlock {
   id?: string;
 }
 
-const { heading, description, ctaButtons, variant: rawVariant, articles: rawArticles = [] } = Astro.props;
+const { heading, description, ctaButtons, variant: rawVariant, articles: rawArticles = [], showNewsletterCta } = Astro.props;
 const variant = stegaClean(rawVariant) ?? 'grid';
+// stegaClean booleans defensively — drafts perspective can surface stringified
+// values and null. Strict `=== true` handles null/undefined/'false' correctly.
+const cleanShowCta = stegaClean(showNewsletterCta) === true;
 
 // Drop articles without a valid slug — they have no detail page to link to.
 // The GROQ query applies `defined(slug.current)`, but typegen widens slug to
@@ -85,6 +89,7 @@ const remainingArticles = articles.slice(1);
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       </SectionContent>
     )}
+    {cleanShowCta && <ArticleNewsletterCta variant="compact" />}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -136,7 +141,7 @@ const remainingArticles = articles.slice(1);
                       height={180}
                       loading="lazy"
                       class="w-full h-full object-cover"
-                      style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                      style={lqipStyle(lqip)}
                     />
                   </a>
                 )}
@@ -174,6 +179,7 @@ const remainingArticles = articles.slice(1);
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       </SectionContent>
     )}
+    {cleanShowCta && <ArticleNewsletterCta variant="compact" />}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -237,6 +243,7 @@ const remainingArticles = articles.slice(1);
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       )}
     </SectionContent>
+    {cleanShowCta && <ArticleNewsletterCta variant="compact" />}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -272,7 +279,7 @@ const remainingArticles = articles.slice(1);
           const href = articleHref(article);
           const formattedDate = formatDate(article.publishedAt);
           return (
-            <article class="border-brutal border-foreground bg-background">
+            <article class="border-brutal border-foreground bg-background text-foreground">
               <div class="h-1 bg-primary"></div>
               {img && (
                 <a href={href} class="block aspect-video overflow-hidden">
@@ -285,7 +292,7 @@ const remainingArticles = articles.slice(1);
                     height={360}
                     loading="lazy"
                     class="w-full h-full object-cover"
-                    style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                    style={lqipStyle(lqip)}
                   />
                 </a>
               )}
@@ -330,6 +337,7 @@ const remainingArticles = articles.slice(1);
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       </SectionContent>
     )}
+    {cleanShowCta && <ArticleNewsletterCta variant="compact" />}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (
@@ -445,8 +453,8 @@ const remainingArticles = articles.slice(1);
           <SectionGrid
             class={
               remainingArticles.length === 2
-                ? 'grid-cols-1 md:grid-cols-2'
-                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                ? 'grid-cols-1 @2xl:grid-cols-2'
+                : 'grid-cols-1 @2xl:grid-cols-2 @5xl:grid-cols-3'
             }
           >
             {remainingArticles.map((article) => <ArticleCard article={article} />)}
@@ -458,6 +466,7 @@ const remainingArticles = articles.slice(1);
         <p class="text-muted-foreground text-center py-8">No articles to display.</p>
       </SectionContent>
     )}
+    {cleanShowCta && <ArticleNewsletterCta variant="compact" />}
     {ctaButtons && ctaButtons.length > 0 && (
       <SectionActions>
         {ctaButtons.map((link, i) => (

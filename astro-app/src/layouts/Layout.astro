@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import CookieConsent from "../components/CookieConsent.astro";
@@ -9,7 +10,10 @@ import SanityLiveUpdater from "../components/SanityLiveUpdater.astro";
 import { getSiteSettings, getSyncTags } from "../lib/sanity";
 import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
 import type { SeoProps } from "@/lib/types";
+import { buildOrgJsonLd } from "@/lib/org-jsonld";
+import { buildPageGraph } from "@/lib/page-jsonld";
 
 interface Props {
   title?: string;
@@ -39,11 +43,8 @@ const cleanDescription = stegaClean(
   seo?.metaDescription ?? defaultDescription
 );
 
-const visualEditingEnabled =
-  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
-
-// Fallback to process.env for Cloudflare Pages git integration builds (no .env file)
-const gtmId = import.meta.env.PUBLIC_GTM_ID || process.env.PUBLIC_GTM_ID;
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const gtmId = PUBLIC_GTM_ID;
 
 const fullTitle = cleanSeoTitle
   ? cleanSeoTitle
@@ -56,10 +57,8 @@ const ogImageUrl = seo?.ogImage?.asset
   ? urlFor(seo.ogImage as Parameters<typeof urlFor>[0]).width(1200).height(630).url()
   : null;
 
-const siteTheme = import.meta.env.PUBLIC_SITE_THEME || 'red';
-
-const liveContentEnabled =
-  import.meta.env.PUBLIC_SANITY_LIVE_CONTENT_ENABLED === "true";
+const siteTheme = PUBLIC_SITE_THEME;
+const liveContentEnabled = PUBLIC_SANITY_LIVE_CONTENT_ENABLED;
 
 const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
 
@@ -78,24 +77,20 @@ const cspConnectSrc = [
   "https://*.sanity.io",
   "wss://*.sanity.io",
   "https://cloudflareinsights.com",
+  "https://*.formsite.com",
   ...(aiSearchWorkerOrigin ? [aiSearchWorkerOrigin] : []),
 ].join(" ");
 
-const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com";
+const cspContent = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://challenges.cloudflare.com https://static.cloudflareinsights.com https://*.formsite.com; img-src 'self' https://cdn.sanity.io https://placehold.co https://www.googletagmanager.com https://avatars.githubusercontent.com https://i.ytimg.com https://*.formsite.com data:; style-src 'self' 'unsafe-inline'; connect-src " + cspConnectSrc + "; font-src 'self'; frame-src 'self' https://www.googletagmanager.com https://challenges.cloudflare.com https://www.youtube-nocookie.com https://*.formsite.com";
 
-const orgJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "EducationalOrganization",
-  "@id": `${Astro.url.origin}/#organization`,
-  "name": stegaClean(siteSettings?.siteName) ?? "YWCC Industry Capstone",
-  "url": Astro.url.origin,
-  ...(cleanDescription && { "description": cleanDescription }),
-};
+const hasStructuredData = Astro.slots.has('structured-data');
+const fallbackOrgJsonLd = hasStructuredData ? null : buildPageGraph(await buildOrgJsonLd(Astro.url.origin));
 ---
 
 <!doctype html>
 <html lang="en" data-site-theme={siteTheme}>
   <head>
+    <Font cssVariable="--font-inter" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
@@ -124,7 +119,7 @@ const orgJsonLd = {
       http-equiv="Content-Security-Policy"
       content={cspContent}
     />
-    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+    {hasStructuredData ? <slot name="structured-data" /> : <script type="application/ld+json" set:html={JSON.stringify(fallbackOrgJsonLd)} />}
     {preloadImage && !preloadImageSrcset && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     {preloadImageSrcset && <link rel="preload" as="image" imagesrcset={preloadImageSrcset} imagesizes={preloadImageSizes || '100vw'} fetchpriority="high" />}
     <title>{fullTitle}</title>

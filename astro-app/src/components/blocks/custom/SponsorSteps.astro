@@ -11,7 +11,6 @@ import {
   SectionProse,
   SectionSplit,
   SectionGrid,
-  SectionSpread,
 } from '@/components/ui/section';
 import {
   Tile,
@@ -71,18 +70,15 @@ const howToJsonLd = (items ?? []).length > 0 ? {
           ))
         }
       </SectionActions>
-      <SectionSplit class="gap-8">
+      <SectionGrid>
         {
           (items ?? []).map(({ title, description, list }, i) => (
-            <Tile class="items-stretch gap-4">
-              <div class="flex items-center gap-3">
-                <TileMedia variant="icon" class="size-10 text-base font-semibold">{i + 1}</TileMedia>
-                <div class="h-px flex-1 bg-border"></div>
-              </div>
-              <TileContent class="p-0">
-                <TileTitle class="not-first:mt-2">{title}</TileTitle>
+            <Tile>
+              <TileMedia variant="icon">{i + 1}</TileMedia>
+              <TileContent>
+                <TileTitle>{title}</TileTitle>
                 <TileDescription>{description}</TileDescription>
-                <List class="text-foreground not-first:mt-4">
+                <List class="text-foreground [[data-bg-theme=dark]_&]:text-background">
                   {list?.map((item) => (
                     <ListItem>
                       <CircleCheck />
@@ -94,7 +90,7 @@ const howToJsonLd = (items ?? []).length > 0 ? {
             </Tile>
           ))
         }
-      </SectionSplit>
+      </SectionGrid>
     </SectionContent>
   </Section>
 )}
@@ -133,7 +129,7 @@ const howToJsonLd = (items ?? []).length > 0 ? {
               <TileContent>
                 <TileTitle>{title}</TileTitle>
                 <TileDescription>{description}</TileDescription>
-                <List class="text-foreground">
+                <List class="text-foreground [[data-bg-theme=dark]_&]:text-background">
                   {list?.map((item) => (
                     <ListItem>
                       <CircleCheck />
@@ -175,7 +171,7 @@ const howToJsonLd = (items ?? []).length > 0 ? {
         }
       </SectionActions>
     </SectionContent>
-    <SectionSpread>
+    <SectionGrid>
       {
         (items ?? []).map(({ title, description, list }, i) => (
           <Tile>
@@ -183,7 +179,7 @@ const howToJsonLd = (items ?? []).length > 0 ? {
             <TileContent>
               <TileTitle>{title}</TileTitle>
               <TileDescription>{description}</TileDescription>
-              <List class="text-foreground">
+              <List class="text-foreground [[data-bg-theme=dark]_&]:text-background">
                 {list?.map((item) => (
                   <ListItem>
                     <CircleCheck />
@@ -195,6 +191,6 @@ const howToJsonLd = (items ?? []).length > 0 ? {
           </Tile>
         ))
       }
-    </SectionSpread>
+    </SectionGrid>
   </Section>
 )}

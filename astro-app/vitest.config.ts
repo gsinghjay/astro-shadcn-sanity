@@ -10,15 +10,27 @@ export default getViteConfig({
         import.meta.dirname,
         "./src/lib/__tests__/__mocks__/sanity-client.ts",
       ),
+      "astro:env/client": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-client.ts",
+      ),
+      "astro:env/server": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-server.ts",
+      ),
     },
   },
+  /* @ts-expect-error — getViteConfig types don't include test but Vitest reads it */
   test: {
     globals: true,
     include: [
       "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
       "../tests/integration/**/*.test.ts",
     ],
     exclude: ["node_modules", "dist", ".astro"],
+    // React component tests use jsdom; non-component tests stay in node.
+    environmentMatchGlobs: [["**/*.test.tsx", "jsdom"]],
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts", "src/scripts/**/*.ts"],

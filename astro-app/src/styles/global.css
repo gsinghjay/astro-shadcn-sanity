@@ -2,12 +2,12 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Dark mode disabled — light-only theme */
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-inter, 'Helvetica Neue', Helvetica, Arial, sans-serif);
+  --font-display: var(--font-inter, 'Helvetica Neue', Helvetica, Arial, sans-serif);
   --font-mono: 'Courier New', Courier, monospace;
   --font-size-2xs: 0.625rem;
 
@@ -179,10 +179,15 @@
 }
 
 :root {
-  /* Gutter system — single source of truth for edge/container padding.
+  /* 12-column grid tokens */
+  --grid-columns: 12;
+  --grid-gutter: 24px;
+  --grid-margin: var(--grid-gutter);
+  --grid-max-width: var(--breakpoint-xl);
+
+  /* Gutter system — edge/container padding for floating variants.
      Responsive: 16px (mobile) → 24px (sm 640px) → 32px (lg 1024px).
-     Referenced by section, header, footer, banner via var(--gutter, 24px)
-     and by templates via px-(--gutter). */
+     Referenced by section, header, footer, banner floating variant width calc. */
   --gutter: 1rem;
   --radius: 0;
   --background: #ffffff;
@@ -196,11 +201,11 @@
   --secondary: #f7f7f7;
   --secondary-foreground: #222222;
   --muted: #f7f7f7;
-  --muted-foreground: #6b6b6b;
+  --muted-foreground: #525252;
   --accent: #f7f7f7;
   --accent-foreground: #222222;
   --destructive: #990000;
-  --border: #e5e5e5;
+  --border: #d4d4d4;
   --input: #d4d4d4;
   --ring: #cc0000;
   --chart-1: #cc0000;
@@ -214,29 +219,26 @@
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f7f7f7;
   --sidebar-accent-foreground: #222222;
-  --sidebar-border: #e5e5e5;
+  --sidebar-border: #d4d4d4;
   --sidebar-ring: #cc0000;
 }
 
-.dark {
-  --background: #0a0a0a;
-  --foreground: #f7f7f7;
-  --card: #171717;
-  --card-foreground: #f7f7f7;
-  --popover: #171717;
-  --popover-foreground: #f7f7f7;
-  --primary: #cc0000;
-  --primary-foreground: #ffffff;
-  --secondary: #262626;
-  --secondary-foreground: #f7f7f7;
-  --muted: #262626;
+/* .dark theme removed — light-only */
+
+/* Dark-background block overrides (Story 21-9)
+   When BlockWrapper applies a dark background variant, flip CSS custom
+   properties so muted-text, borders, and cards remain readable. */
+[data-bg-theme="dark"] {
   --muted-foreground: #a3a3a3;
-  --accent: #262626;
-  --accent-foreground: #f7f7f7;
-  --destructive: #990000;
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
-  --ring: #cc0000;
+  --card: #171717;
+  --card-foreground: #f7f7f7;
+  --muted: #262626;
+  --accent: #262626;
+  --accent-foreground: #f7f7f7;
+  --secondary: #262626;
+  --secondary-foreground: #f7f7f7;
 }
 
 /* Per-site theme overrides (Story 15-4)
@@ -260,17 +262,7 @@
   --sidebar-ring: #059669;
 }
 
-.dark[data-site-theme="blue"] {
-  --primary: #2563eb;
-  --ring: #2563eb;
-  --destructive: #1e40af;
-}
-
-.dark[data-site-theme="green"] {
-  --primary: #059669;
-  --ring: #059669;
-  --destructive: #047857;
-}
+/* .dark site theme overrides removed — light-only */
 
 @media (min-width: 640px) {
   :root {
@@ -280,9 +272,35 @@
 
 @media (min-width: 1024px) {
   :root {
+    --grid-gutter: 32px;
     --gutter: 2rem;
   }
 }
+
+/* === 12-COLUMN GRID SYSTEM === *
+ * Formal grid foundation for Swiss design discipline.
+ * All layouts expressed as column spans of this 12-column grid.
+ *
+ * Tokens:
+ *   --grid-columns   Number of columns (12)
+ *   --grid-gutter    Gap between columns (24px mobile, 32px desktop)
+ *   --grid-margin    Outer page margin (= gutter)
+ *   --grid-max-width Maximum content width (1280px from Tailwind v4)
+ *
+ * Column Span Reference (12-column grid):
+ *   Full width:    col-span-12  (12/12)
+ *   Major content: col-span-8   (8/12) — prose, main content
+ *   Minor sidebar: col-span-4   (4/12) — sidebar, aside
+ *   Two-thirds:    col-span-8   (8/12) — split major
+ *   One-third:     col-span-4   (4/12) — split minor
+ *   Half:          col-span-6   (6/12) — equal split
+ *   Quarter:       col-span-3   (3/12) — card grids (4-up)
+ *   Third:         col-span-4   (4/12) — card grids (3-up)
+ *   Sixth:         col-span-2   (2/12) — icon grids, logo clouds
+ *
+ * Tailwind v4 provides grid-cols-12 and col-span-* natively.
+ * Container queries (@lg:, @3xl:, @5xl:) used for internal layout.
+ */
 
 @layer base {
   * {

@@ -1,0 +1,15 @@
+---
+import StoryContainer from './StoryContainer.astro';
+import ProjectEmptyState from './ProjectEmptyState.astro';
+
+interface Props {
+  variant: 'filtered' | 'empty';
+  activeFilterCount?: number;
+}
+
+const props = Astro.props;
+---
+
+<StoryContainer maxWidth="full">
+  <ProjectEmptyState {...props} />
+</StoryContainer>

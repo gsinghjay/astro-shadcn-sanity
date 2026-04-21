@@ -26,7 +26,8 @@ const mockKvPut = vi.fn().mockResolvedValue(undefined);
 const mockKvDelete = vi.fn().mockResolvedValue(undefined);
 const mockCheckLimit = vi.fn();
 const mockD1Run = vi.fn().mockResolvedValue({});
-const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run });
+const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
+const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
 const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
 
 const mockEnv = {
@@ -58,7 +59,7 @@ function createMockContext(pathname: string, options?: { headers?: Record<string
   };
 }
 
-const mockNext = vi.fn(() => new Response('ok', { status: 200 }));
+const mockNext = vi.fn(async () => new Response('ok', { status: 200 }));
 
 describe('middleware — unified auth routing', () => {
   beforeEach(() => {
@@ -74,7 +75,8 @@ describe('middleware — unified auth routing', () => {
     mockCheckLimit.mockReset();
     mockCheckSponsorWhitelist.mockReset().mockResolvedValue(false);
     mockD1Run.mockReset().mockResolvedValue({});
-    mockD1Bind.mockReset().mockReturnValue({ run: mockD1Run });
+    mockD1First.mockReset().mockResolvedValue({ agreement_accepted_at: null });
+    mockD1Bind.mockReset().mockReturnValue({ run: mockD1Run, first: mockD1First });
     mockD1Prepare.mockReset().mockReturnValue({ bind: mockD1Bind });
   });
 
@@ -175,7 +177,7 @@ describe('middleware — unified auth routing', () => {
       mockGetSession.mockResolvedValue(null);
       const ctx = createMockContext('/portal/dashboard');
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(302);
       expect(result.headers.get('Location')).toBe('/portal/login?redirect=%2Fportal%2Fdashboard');
@@ -190,7 +192,7 @@ describe('middleware — unified auth routing', () => {
       mockCheckSponsorWhitelist.mockResolvedValue(false);
       const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie } });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(302);
       expect(result.headers.get('Location')).toBe('/portal/denied');
@@ -243,7 +245,7 @@ describe('middleware — unified auth routing', () => {
 
       await onRequest(ctx as any, mockNext);
 
-      expect(mockD1Prepare).toHaveBeenCalledWith('UPDATE user SET role = ? WHERE email = ?');
+      expect(mockD1Prepare).toHaveBeenCalledWith('UPDATE user SET role = ? WHERE LOWER(email) = ?');
       expect(mockD1Bind).toHaveBeenCalledWith('sponsor', 'new-sponsor@company.com');
       expect(mockD1Run).toHaveBeenCalled();
     });
@@ -316,7 +318,7 @@ describe('middleware — unified auth routing', () => {
       mockGetSession.mockResolvedValue(null);
       const ctx = createMockContext('/student/dashboard');
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(302);
       expect(result.headers.get('Location')).toBe('/auth/login?redirect=%2Fstudent%2Fdashboard');
@@ -330,7 +332,7 @@ describe('middleware — unified auth routing', () => {
       });
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: studentCookie } });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(403);
       const text = await result.text();
@@ -342,7 +344,7 @@ describe('middleware — unified auth routing', () => {
       mockGetSession.mockRejectedValue(new Error('D1_ERROR: database unavailable'));
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: studentCookie } });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(503);
       const text = await result.text();
@@ -381,7 +383,7 @@ describe('middleware — unified auth routing', () => {
         overrides: { runtime: { env: undefined as any } } as any,
       });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(503);
       expect(mockNext).not.toHaveBeenCalled();
@@ -496,7 +498,7 @@ describe('middleware — unified auth routing', () => {
       mockGetSession.mockResolvedValue(null);
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(302);
       expect(mockKvPut).not.toHaveBeenCalled();
@@ -506,7 +508,7 @@ describe('middleware — unified auth routing', () => {
       mockKvGet.mockRejectedValue(new Error('KV unavailable'));
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(503);
       const text = await result.text();
@@ -542,7 +544,7 @@ describe('middleware — unified auth routing', () => {
         headers: { 'CF-Connecting-IP': '1.2.3.4' },
       });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(429);
       expect(result.headers.get('Retry-After')).toBe('30');
@@ -604,7 +606,7 @@ describe('middleware — unified auth routing', () => {
         headers: { 'CF-Connecting-IP': '5.6.7.8' },
       });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(429);
       expect(result.headers.get('Retry-After')).toBe('5');
@@ -654,7 +656,7 @@ describe('middleware — unified auth routing', () => {
         headers: { 'CF-Connecting-IP': '1.2.3.4' },
       });
 
-      const result = await onRequest(ctx as any, mockNext);
+      const result = (await onRequest(ctx as any, mockNext)) as Response;
 
       expect(result.status).toBe(429);
       expect(result.headers.get('Retry-After')).toBe('2');

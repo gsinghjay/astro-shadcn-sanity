@@ -1,0 +1,54 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ImageGallery from '@/components/blocks/custom/ImageGallery.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { Section, SectionContent } from '@/components/ui/section';
+import { getPage, getListingPage } from '@/lib/sanity';
+import type { ImageGalleryBlock } from '@/lib/types';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
+
+const [page, listingPage] = await Promise.all([
+  getPage('gallery'),
+  getListingPage('gallery'),
+]);
+
+if (!page) {
+  return Astro.redirect('/404');
+}
+
+const pageTitle = listingPage?.title ?? page.title ?? 'Gallery';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? page.seo ?? { metaDescription: 'Browse photos from the YWCC Industry Capstone program.' };
+
+const galleryBlock = (page.blocks ?? []).find(b => b._type === 'imageGallery') as ImageGalleryBlock | undefined;
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
+---
+
+<Layout title={pageTitle} seo={pageSeo}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} />
+  )}
+
+  <Section>
+    <SectionContent>
+      <Breadcrumb items={breadcrumbItems} />
+
+      {galleryBlock && <ImageGallery {...galleryBlock} bare />}
+    </SectionContent>
+  </Section>
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} />
+  )}
+</Layout>

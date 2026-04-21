@@ -2,30 +2,54 @@
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import EventCard from '@/components/EventCard.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
 import { Section, SectionContent } from '@/components/ui/section';
-import { getAllEvents } from '@/lib/sanity';
+import { getAllEvents, getListingPage } from '@/lib/sanity';
 import CalendarViewToggle from '@/components/react/CalendarViewToggle';
 import EventCalendarIsland from '@/components/react/EventCalendarIsland';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
-const events = await getAllEvents();
+const [events, listingPage] = await Promise.all([
+  getAllEvents(),
+  getListingPage('events'),
+]);
+
+const pageTitle = listingPage?.title ?? 'Events';
+const pageDescription = listingPage?.description ?? null;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse upcoming and past events from the YWCC Industry Capstone program.' };
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: pageTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
-<Layout title="Events" seo={{ metaDescription: 'Browse upcoming and past events from the YWCC Industry Capstone program.' }}>
+<Layout title={pageTitle} seo={pageSeo}>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.headerBlocks} />
+  )}
+
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Events' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">Events</h1>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{pageTitle}</h1>
         <CalendarViewToggle client:idle />
       </div>
+      {pageDescription && (
+        <p class="text-lg text-muted-foreground">{pageDescription}</p>
+      )}
 
       <div id="events-list">
         {events.length > 0 ? (
-          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div class="grid gap-6 @2xl:grid-cols-2 @5xl:grid-cols-3">
             {events.map((e) => (
               <EventCard event={e} />
             ))}
@@ -38,6 +62,10 @@ const events = await getAllEvents();
       <EventCalendarIsland client:idle events={JSON.stringify(events)} />
     </SectionContent>
   </Section>
+
+  {listingPage?.footerBlocks && listingPage.footerBlocks.length > 0 && (
+    <BlockRenderer blocks={listingPage.footerBlocks} />
+  )}
 </Layout>
 
 <script>

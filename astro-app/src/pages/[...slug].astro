@@ -4,18 +4,23 @@ import Layout from '@/layouts/Layout.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import SanityPageContent from '@/components/SanityPageContent.astro';
 import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getAllArticles, prefetchPages, getSiteParams } from '@/lib/sanity';
+import type { ALL_PAGE_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { urlFor } from '@/lib/image';
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
 
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
 
-const visualEditingEnabled = import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true';
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
 
 // getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const pages = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PAGE_SLUGS_QUERY, getSiteParams());
+  const pages = await sanityClient.fetch<ALL_PAGE_SLUGS_QUERY_RESULT>(ALL_PAGE_SLUGS_QUERY, getSiteParams());
+  // Exclude slugs that have dedicated page routes (e.g., /gallery/index.astro)
+  const DEDICATED_ROUTES = new Set(['gallery']);
+  const validPages = pages.filter((p): p is { slug: string } => typeof p.slug === 'string' && p.slug.length > 0 && !DEDICATED_ROUTES.has(p.slug));
   // Pre-fetch all pages in parallel batches to populate the cache
-  await prefetchPages(pages.map(p => p.slug));
-  return pages.map((page) => ({
+  await prefetchPages(validPages.map(p => p.slug));
+  return validPages.map((page) => ({
     params: { slug: page.slug },
   }));
 };
@@ -65,7 +70,7 @@ const preloadSrcset = heroImage?.asset
 >
   {visualEditingEnabled ? (
     <SanityPageContent server:defer slug={slug as string}>
-      <div slot="fallback" class="mx-auto max-w-7xl px-(--gutter) py-12">
+      <div slot="fallback" class="mx-auto max-w-(--grid-max-width) px-(--grid-margin) py-12">
         <div class="animate-pulse space-y-8">
           <div class="h-10 bg-muted rounded w-2/5"></div>
           <div class="h-64 bg-muted rounded"></div>

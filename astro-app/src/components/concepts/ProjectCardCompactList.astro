@@ -1,0 +1,31 @@
+---
+/**
+ * ProjectCardCompactList — wrapper that renders multiple ProjectCardCompact
+ * in a vertical list inside a story container.
+ */
+import StoryContainer from './StoryContainer.astro';
+import ProjectCardCompact from './ProjectCardCompact.astro';
+
+interface CompactProject {
+  title: string;
+  slug: string;
+  status: 'active' | 'completed' | 'archived';
+  sponsorName: string | null;
+  semester: string;
+  tagCount: number;
+}
+
+interface Props {
+  projects: CompactProject[];
+}
+
+const { projects } = Astro.props;
+---
+
+<StoryContainer maxWidth="xl">
+  <div class="border-t border-border">
+    {projects.map((project) => (
+      <ProjectCardCompact {...project} />
+    ))}
+  </div>
+</StoryContainer>

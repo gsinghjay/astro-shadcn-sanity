@@ -34,6 +34,12 @@ import {articleCategory} from './documents/article-category'
 import {article} from './documents/article'
 // Document schemas — authors (Story 20.1)
 import {author} from './documents/author'
+// Document schemas — listing pages (Story 21.0)
+import {listingPage} from './documents/listing-page'
+// Document schemas — portal pages (Story 22.9)
+import {portalPage} from './documents/portal-page'
+// Document schemas — sponsor agreement (singleton)
+import {sponsorAgreement} from './documents/sponsor-agreement'
 
 // Block schemas — homepage (Story 2.1)
 import {heroBanner} from './blocks/hero-banner'
@@ -86,6 +92,8 @@ import {countdownTimer} from './blocks/countdown-timer'
 import {metricsDashboard} from './blocks/metrics-dashboard'
 import {cardGrid} from './blocks/card-grid'
 import {beforeAfter} from './blocks/before-after'
+// Block schemas — layout (Story 21.10)
+import {columnsBlock} from './blocks/columns-block'
 
 
 export const schemaTypes: SchemaTypeDefinition[] = [
@@ -113,6 +121,12 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   article,
   // Documents — authors (Story 20.1)
   author,
+  // Documents — listing pages (Story 21.0)
+  listingPage,
+  // Documents — portal pages (Story 22.9)
+  portalPage,
+  // Documents — sponsor agreement (singleton)
+  sponsorAgreement,
   // Blocks — homepage
   heroBanner,
   featureGrid,
@@ -172,4 +186,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   metricsDashboard,
   cardGrid,
   beforeAfter,
+  // Blocks — layout (Story 21.10)
+  columnsBlock,
 ]

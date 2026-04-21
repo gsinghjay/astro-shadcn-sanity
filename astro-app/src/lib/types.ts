@@ -59,6 +59,13 @@ export type CountdownTimerBlock = Extract<PageBlock, { _type: 'countdownTimer' }
 export type MetricsDashboardBlock = Extract<PageBlock, { _type: 'metricsDashboard' }>;
 export type CardGridBlock = Extract<PageBlock, { _type: 'cardGrid' }>;
 export type BeforeAfterBlock = Extract<PageBlock, { _type: 'beforeAfter' }>;
+// Layout blocks (Story 21.10)
+export type ColumnsBlockBlock = Extract<PageBlock, { _type: 'columnsBlock' }>;
+
+// Inner block type — the narrower union used by columnsBlock sub-arrays.
+// Excludes columnsBlock itself (prevents infinite nesting).
+type InnerPageBlocks = NonNullable<ColumnsBlockBlock['leftBlocks']>;
+export type InnerPageBlock = InnerPageBlocks[number];
 
 // ---------------------------------------------------------------------------
 // Layout types — shared across Layout, SidebarLayout, PortalLayout

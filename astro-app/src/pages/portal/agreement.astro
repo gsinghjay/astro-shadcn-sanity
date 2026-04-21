@@ -1,0 +1,73 @@
+---
+export const prerender = false;
+
+import PortalLayout from '@/layouts/PortalLayout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+import { loadQuery, SPONSOR_BY_EMAIL_QUERY, getSiteParams, getPortalPage, getSponsorAgreement } from '@/lib/sanity';
+import type { SPONSOR_BY_EMAIL_QUERY_RESULT } from '@/sanity.types';
+import { PortableText } from 'astro-portabletext';
+import SponsorAgreementViewer from '@/components/portal/SponsorAgreementViewer';
+import { stegaClean } from '@sanity/client/stega';
+
+const user = Astro.locals.user;
+
+const { result: sponsor } = await loadQuery<SPONSOR_BY_EMAIL_QUERY_RESULT>({
+  query: SPONSOR_BY_EMAIL_QUERY,
+  params: { email: user?.email ?? '', ...getSiteParams() },
+});
+
+const portalPage = await getPortalPage('agreement');
+const pageTitle = portalPage?.title ?? 'Agreement';
+const pageDescription = portalPage?.description ?? 'Review and acknowledge the sponsor agreement, expectations, and program contact information.';
+
+const agreement = await getSponsorAgreement();
+// URL → stegaClean (used in href + passed to react-pdf).
+const agreementPdfUrl = agreement?.pdfFile?.asset?.url ? stegaClean(agreement.pdfFile.asset.url) : null;
+// Filename rendered as text → preserve stega so visual editing overlay works.
+const agreementFilename = agreement?.pdfFile?.asset?.originalFilename ?? 'sponsor-agreement.pdf';
+const hasAgreementBody = Boolean(agreement?.bodyContent && agreement.bodyContent.length > 0);
+---
+
+<PortalLayout title={pageTitle} activeNav="/portal/agreement" sponsorSlug={sponsor?.slug}>
+  <div class="flex flex-col gap-8">
+    <Breadcrumb items={[
+      { label: 'Portal', href: '/portal/' },
+      { label: pageTitle },
+    ]} />
+    <div class="flex flex-col gap-2">
+      <h1 class="text-2xl font-bold tracking-tight uppercase">{pageTitle}</h1>
+      {pageDescription && <p class="text-muted-foreground">{pageDescription}</p>}
+    </div>
+
+    {hasAgreementBody && agreement?.bodyContent && (
+      <div class="prose max-w-none">
+        <PortableText value={agreement.bodyContent} />
+      </div>
+    )}
+
+    {agreementPdfUrl && (
+      <div class="flex flex-col gap-3">
+        <SponsorAgreementViewer client:only="react" pdfUrl={agreementPdfUrl} />
+        <a
+          href={agreementPdfUrl}
+          target="_blank"
+          rel="noopener"
+          class="text-sm text-muted-foreground underline hover:text-foreground"
+        >
+          Download PDF ({agreementFilename})
+        </a>
+      </div>
+    )}
+
+    {portalPage?.headerBlocks && portalPage.headerBlocks.length > 0 ? (
+      <BlockRenderer blocks={portalPage.headerBlocks} />
+    ) : !agreementPdfUrl && !hasAgreementBody ? (
+      <p class="text-muted-foreground">Content coming soon. Check back later.</p>
+    ) : null}
+
+    {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
+      <BlockRenderer blocks={portalPage.footerBlocks} />
+    )}
+  </div>
+</PortalLayout>

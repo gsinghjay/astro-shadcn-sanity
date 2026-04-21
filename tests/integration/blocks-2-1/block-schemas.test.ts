@@ -26,7 +26,7 @@ import { featureItem } from '../../../studio/src/schemaTypes/objects/feature-ite
 import { statItem } from '../../../studio/src/schemaTypes/objects/stat-item'
 
 // Helper to extract block-specific fields (skip the 3 base fields)
-const BASE_FIELD_NAMES = ['backgroundVariant', 'spacing', 'maxWidth']
+const BASE_FIELD_NAMES = ['backgroundVariant', 'spacing', 'maxWidth', 'alignment']
 
 function getFields(schema: any): any[] {
   return schema.fields ?? []
@@ -67,8 +67,8 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(fieldNames).toContain('subheading')
       expect(fieldNames).toContain('backgroundImages')
       expect(fieldNames).toContain('ctaButtons')
-      expect(fieldNames).toContain('alignment')
-      expect(fieldNames).toHaveLength(6)
+      // alignment is now a block-base field, not block-specific
+      expect(fieldNames).toHaveLength(5)
     })
 
     test('[P0] 2.1-INT-003 — heroBanner heading is required string', () => {
@@ -103,12 +103,13 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       expect(memberTypes).toContain('button')
     })
 
-    test('[P1] 2.1-INT-006 — heroBanner alignment has options [left, center, right] and initialValue center', () => {
+    test('[P1] 2.1-INT-006 — heroBanner alignment (from block-base) has options left/center/right and initialValue left', () => {
       const alignment = findField(heroBanner, 'alignment')
       expect(alignment).toBeDefined()
       expect(alignment.type).toBe('string')
-      expect(alignment.options?.list).toEqual(['left', 'center', 'right'])
-      expect(alignment.initialValue).toBe('center')
+      const values = alignment.options?.list.map((o: any) => o.value)
+      expect(values).toEqual(['left', 'center', 'right'])
+      expect(alignment.initialValue).toBe('left')
     })
   })
 
@@ -125,9 +126,10 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
       const fieldNames = getBlockFields(featureGrid).map((f: any) => f.name)
       expect(fieldNames).toContain('variant')
       expect(fieldNames).toContain('heading')
+      expect(fieldNames).toContain('description')
       expect(fieldNames).toContain('items')
       expect(fieldNames).toContain('columns')
-      expect(fieldNames).toHaveLength(4)
+      expect(fieldNames).toHaveLength(5)
     })
 
     test('[P1] 2.1-INT-009 — featureGrid items is array of featureItem with icon, image, title, description', () => {
@@ -374,11 +376,12 @@ describe('Story 2-1: Homepage Block Schemas (ATDD)', () => {
   // ---------------------------------------------------------------------------
   describe('AC1: Base Field Inheritance', () => {
     for (const { schema, name } of HOMEPAGE_BLOCKS) {
-      test(`[P0] 2.1-INT-032-${name} — ${name} has base fields (backgroundVariant, spacing, maxWidth)`, () => {
+      test(`[P0] 2.1-INT-032-${name} — ${name} has base fields (backgroundVariant, spacing, maxWidth, alignment)`, () => {
         const fieldNames = getFields(schema).map((f: any) => f.name)
         expect(fieldNames).toContain('backgroundVariant')
         expect(fieldNames).toContain('spacing')
         expect(fieldNames).toContain('maxWidth')
+        expect(fieldNames).toContain('alignment')
       })
     }
   })

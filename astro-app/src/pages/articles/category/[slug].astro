@@ -1,0 +1,116 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '@/layouts/Layout.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import ArticleCard from '@/components/ArticleCard.astro';
+import ArticleCategoryChips from '@/components/ArticleCategoryChips.astro';
+import { Section, SectionContent, SectionGrid } from '@/components/ui/section';
+import {
+  sanityClient,
+  ALL_ARTICLE_CATEGORY_SLUGS_QUERY,
+  getArticleCategoryBySlug,
+  getArticlesByCategory,
+  getAllArticleCategories,
+  getSiteParams,
+} from '@/lib/sanity';
+import type { ALL_ARTICLE_CATEGORY_SLUGS_QUERY_RESULT } from '@/sanity.types';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Use the generated GROQ result type so the slug-list shape stays in
+  // lockstep with `ALL_ARTICLE_CATEGORY_SLUGS_QUERY`.
+  const slugs = await sanityClient.fetch<ALL_ARTICLE_CATEGORY_SLUGS_QUERY_RESULT>(
+    ALL_ARTICLE_CATEGORY_SLUGS_QUERY,
+    getSiteParams(),
+  );
+  return slugs
+    .filter((s): s is { slug: string } => typeof s.slug === 'string' && s.slug.length > 0)
+    .map((s) => ({ params: { slug: s.slug } }));
+};
+
+// `Astro.params.slug` is `string | number | undefined` in the type system
+// (Astro widens single-segment dynamic params). Guard for missing values and
+// coerce to string so we never pass `undefined` / a number into the fetch
+// helper. Coercion is safe because numeric segments stringify back to the
+// same characters Astro matched against the file route.
+const slugParam = Astro.params.slug;
+if (slugParam === undefined || slugParam === null || slugParam === '') {
+  return Astro.redirect('/404');
+}
+const slug = String(slugParam);
+const category = await getArticleCategoryBySlug(slug);
+if (!category) return Astro.redirect('/404');
+
+// Title fallback: matches the breadcrumb + meta-description fallbacks below.
+// `category.title` is typed as `string | null` per the GROQ result type.
+const categoryTitle = category.title ?? 'Category';
+
+// Independent fetches — run in parallel.
+const [articles, categories] = await Promise.all([
+  getArticlesByCategory(category._id),
+  getAllArticleCategories(),
+]);
+
+// Meta description fallback for category pages with no description set.
+const metaDescription =
+  category.description ?? `Browse articles in the ${categoryTitle} category`;
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Articles', href: '/articles' },
+  { label: categoryTitle },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
+---
+
+<Layout
+  title={categoryTitle}
+  seo={{ metaDescription }}
+>
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <Section>
+    <SectionContent>
+      <Breadcrumb items={breadcrumbItems} />
+
+      <ArticleCategoryChips categories={categories} currentCategorySlug={category.slug} />
+
+      <h1 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">
+        {categoryTitle}
+      </h1>
+
+      {category.description && (
+        <p class="text-lg text-muted-foreground leading-relaxed max-w-3xl">
+          {category.description}
+        </p>
+      )}
+    </SectionContent>
+
+    {articles.length > 0 ? (
+      <SectionGrid size="lg">
+        {articles.map((article) => (
+          <ArticleCard article={article} />
+        ))}
+      </SectionGrid>
+    ) : (
+      <SectionContent>
+        <p class="text-muted-foreground text-center py-8">No articles in this category yet.</p>
+      </SectionContent>
+    )}
+
+    <SectionContent>
+      <a
+        href="/articles"
+        class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm"
+        data-gtm-category="navigation"
+        data-gtm-action="back"
+        data-gtm-label="back-to-articles"
+      >
+        &larr; Back to Articles
+      </a>
+    </SectionContent>
+  </Section>
+</Layout>

@@ -45,13 +45,13 @@ function groupByTier(list: Sponsor[]) {
       </div>
     )}
 
-    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-px bg-border list-none">
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-px list-none">
       {sponsors?.map((sponsor) => {
-        const logoUrl = safeUrlFor(sponsor.logo)?.width(120).height(40).fit('max').url() ?? null;
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(120).url() ?? null;
         const content = (
           <div class="bg-muted p-6 flex items-center justify-center h-24">
             {logoUrl ? (
-              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-10 max-w-[120px] opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="w-[120px] h-10 object-contain opacity-60 hover:opacity-100 transition-opacity" width="120" height="40" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground text-center leading-tight tracking-tight">{sponsor.name}</span>
             )}
@@ -87,11 +87,11 @@ function groupByTier(list: Sponsor[]) {
           <Marquee>
             <MarqueeContent direction={direction} pauseOnHover>
               {sponsors.map((sponsor) => {
-                const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(160).url() ?? null;
                 const item = (
                   <div class="flex items-center justify-center px-8 h-20">
                     {logoUrl ? (
-                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-14 max-w-[160px] opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class="w-[160px] h-14 object-contain opacity-70 hover:opacity-100 transition-opacity invert" width="160" height="60" loading="lazy" />
                     ) : (
                       <span class="text-base font-bold text-background/70 whitespace-nowrap">{sponsor.name}</span>
                     )}
@@ -126,12 +126,11 @@ function groupByTier(list: Sponsor[]) {
               {group.sponsors.map((sponsor) => {
                 const isPlatinum = stegaClean(sponsor.tier) === 'platinum';
                 const w = isPlatinum ? 160 : 120;
-                const h = isPlatinum ? 60 : 40;
-                const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+                const logoUrl = safeUrlFor(sponsor.logo)?.width(w).url() ?? null;
                 const item = (
                   <div class:list={["flex items-center justify-center", isPlatinum ? 'h-20' : 'h-14']}>
                     {logoUrl ? (
-                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-14 max-w-[160px]' : 'max-h-10 max-w-[120px]']} width={w} height={h} loading="lazy" />
+                      <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["object-contain opacity-70 hover:opacity-100 transition-opacity", isPlatinum ? 'w-[160px] h-14' : 'w-[120px] h-10']} width={w} loading="lazy" />
                     ) : (
                       <span class:list={["font-bold text-muted-foreground", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
                     )}
@@ -162,11 +161,11 @@ function groupByTier(list: Sponsor[]) {
     )}
     <ul class="flex flex-wrap justify-center gap-8 px-8 list-none">
       {sponsors?.map((sponsor) => {
-        const logoUrl = safeUrlFor(sponsor.logo)?.width(160).height(60).fit('max').url() ?? null;
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(160).url() ?? null;
         const content = (
           <div class="flex items-center justify-center h-20 px-4">
             {logoUrl ? (
-              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="max-h-12 max-w-[160px] opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class="w-[160px] h-12 object-contain opacity-60 hover:opacity-100 transition-opacity" width="160" height="60" loading="lazy" />
             ) : (
               <span class="text-sm font-bold text-muted-foreground whitespace-nowrap">{sponsor.name}</span>
             )}
@@ -191,14 +190,13 @@ function groupByTier(list: Sponsor[]) {
         <h2 class="text-4xl md:text-5xl font-bold tracking-[-0.03em] leading-[1.05]">{heading}</h2>
       </SectionContent>
     )}
-    <ul class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-px bg-border mx-auto max-w-6xl list-none">
+    <ul class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-px list-none">
       {(sponsors ?? []).map((sponsor) => {
         const tier = stegaClean(sponsor.tier) || 'silver';
         const isPlatinum = tier === 'platinum';
         const isGold = tier === 'gold';
         const w = isPlatinum ? 200 : isGold ? 160 : 120;
-        const h = isPlatinum ? 80 : isGold ? 60 : 40;
-        const logoUrl = safeUrlFor(sponsor.logo)?.width(w).height(h).fit('max').url() ?? null;
+        const logoUrl = safeUrlFor(sponsor.logo)?.width(w).url() ?? null;
         const content = (
           <div class:list={[
             "bg-background p-6 flex items-center justify-center",
@@ -207,7 +205,7 @@ function groupByTier(list: Sponsor[]) {
             !isPlatinum && !isGold && 'h-20',
           ]}>
             {logoUrl ? (
-              <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'max-h-16 max-w-[200px]' : isGold ? 'max-h-12 max-w-[160px]' : 'max-h-8 max-w-[120px]']} width={w} height={h} loading="lazy" />
+              <img src={logoUrl} alt={stegaClean(sponsor.name)} class:list={["object-contain opacity-60 hover:opacity-100 transition-opacity", isPlatinum ? 'w-[200px] h-16' : isGold ? 'w-[160px] h-12' : 'w-[120px] h-8']} width={w} loading="lazy" />
             ) : (
               <span class:list={["font-bold text-muted-foreground text-center leading-tight", isPlatinum ? 'text-lg' : 'text-sm']}>{sponsor.name}</span>
             )}

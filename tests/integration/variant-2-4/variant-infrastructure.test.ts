@@ -2,7 +2,7 @@
  * Story 2-4: Variant Infrastructure — defineBlock variant support (AC1, AC5, AC6)
  *
  * Tests that defineBlock accepts optional variants config and produces
- * a variant field in the layout fieldset with radio layout.
+ * a variant field in the layout fieldset with dropdown layout.
  *
  * @story 2-4
  * @phase RED → GREEN
@@ -57,7 +57,7 @@ describe('Story 2-4: Variant Infrastructure', () => {
       expect(fieldNames).toContain('variant')
     })
 
-    test('2.4-INT-003 — variant field has radio layout', () => {
+    test('2.4-INT-003 — variant field uses dropdown (no explicit layout)', () => {
       const result = defineBlock({
         name: 'testBlock',
         title: 'Test Block',
@@ -70,7 +70,7 @@ describe('Story 2-4: Variant Infrastructure', () => {
 
       const variantField = (result as BlockSchema).fields.find((f: any) => f.name === 'variant')
       expect(variantField).toBeDefined()
-      expect(variantField.options.layout).toBe('radio')
+      expect(variantField.options.layout).toBeUndefined()
     })
 
     test('2.4-INT-004 — variant field lists all provided variants', () => {

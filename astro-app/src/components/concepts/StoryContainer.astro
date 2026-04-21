@@ -1,0 +1,24 @@
+---
+/**
+ * StoryContainer — constrains card stories to a realistic max-width.
+ * Used only by Storybook stories, not production code.
+ */
+
+interface Props {
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+}
+
+const widthMap: Record<string, string> = {
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+  full: 'max-w-full',
+};
+
+const { maxWidth = 'lg' } = Astro.props;
+---
+
+<div class={`w-full ${widthMap[maxWidth] || widthMap.lg} mx-auto p-6`}>
+  <slot />
+</div>

@@ -111,7 +111,9 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
     })
 
     test('[P0] 5.8-INT-001 — Layout.astro reads PUBLIC_GTM_ID from env', () => {
-      expect(layoutContent).toContain('import.meta.env.PUBLIC_GTM_ID')
+      // Migrated from import.meta.env to astro:env/client typed import
+      expect(layoutContent).toContain('PUBLIC_GTM_ID')
+      expect(layoutContent).toContain('astro:env/client')
     })
 
     test('[P0] 5.8-INT-002 — GTM container script is in CookieConsent component (consent-gated, Story 5.16)', () => {
@@ -287,8 +289,9 @@ describe('Story 5-8: Migrate GA4 to GTM — astro.config.mjs', () => {
     expect(configContent).toContain('PUBLIC_GTM_ID')
   })
 
-  test('[P0] 5.8-INT-011 — astro.config.mjs passes PUBLIC_GTM_ID through Vite define', () => {
-    expect(configContent).toContain('"import.meta.env.PUBLIC_GTM_ID"')
+  test('[P0] 5.8-INT-011 — astro.config.mjs declares PUBLIC_GTM_ID in env.schema', () => {
+    // Migrated from vite.define to astro:env schema declaration
+    expect(configContent).toContain('PUBLIC_GTM_ID: envField.string(')
   })
 
   test('[P0] 5.8-INT-012 — astro.config.mjs does NOT reference old PUBLIC_GA_MEASUREMENT_ID', () => {

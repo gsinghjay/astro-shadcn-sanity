@@ -2,6 +2,8 @@ import { sanityClient } from "sanity:client";
 import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
 import { stegaClean } from "@sanity/client/stega";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_SANITY_DATASET, PUBLIC_SITE_ID } from "astro:env/client";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -15,6 +17,14 @@ import type {
   SPONSOR_PROJECTS_QUERY_RESULT,
   ALL_ARTICLES_QUERY_RESULT,
   ARTICLE_BY_SLUG_QUERY_RESULT,
+  ALL_ARTICLE_CATEGORIES_QUERY_RESULT,
+  ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT,
+  ARTICLES_BY_CATEGORY_QUERY_RESULT,
+  ALL_AUTHORS_QUERY_RESULT,
+  AUTHOR_BY_SLUG_QUERY_RESULT,
+  LISTING_PAGE_QUERY_RESULT,
+  PORTAL_PAGE_QUERY_RESULT,
+  SPONSOR_AGREEMENT_QUERY_RESULT,
 } from "@/sanity.types";
 
 export { sanityClient, groq };
@@ -30,17 +40,245 @@ const PORTABLE_TEXT_PROJECTION = `{
   }
 }`;
 
-const visualEditingEnabled =
-  import.meta.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED === "true";
-const token = import.meta.env.SANITY_API_READ_TOKEN;
+/**
+ * Shared per-type block field projections.
+ * Used by both PAGE_BY_SLUG_QUERY and LISTING_PAGE_QUERY to ensure
+ * consistent data resolution (images, portable text, references).
+ *
+ * Split into INNER (all blocks except columnsBlock) and full (adds columnsBlock
+ * which references INNER for its sub-arrays). This avoids circular const init.
+ */
+const INNER_BLOCK_FIELDS_PROJECTION = `
+    _type,
+    _key,
+    backgroundVariant,
+    spacing,
+    maxWidth,
+    variant,
+    _type == "heroBanner" => {
+      heading,
+      subheading,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
+      ctaButtons[]{ _key, text, url, variant },
+      alignment
+    },
+    _type == "featureGrid" => {
+      heading,
+      description,
+      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
+      columns
+    },
+    _type == "ctaBanner" => {
+      heading,
+      description,
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
+      ctaButtons[]{ _key, text, url, variant }
+    },
+    _type == "statsRow" => {
+      heading,
+      stats[]{ _key, value, label, description }
+    },
+    _type == "textWithImage" => {
+      heading,
+      content[]${PORTABLE_TEXT_PROJECTION},
+      image{ ${IMAGE_PROJECTION}, alt },
+      imagePosition
+    },
+    _type == "logoCloud" => {
+      heading,
+      autoPopulate,
+      sponsors[]->{ _id }
+    },
+    _type == "sponsorSteps" => {
+      heading,
+      subheading,
+      items[]{ _key, title, description, list },
+      ctaButtons[]{ _key, text, url, variant }
+    },
+    _type == "richText" => {
+      content[]${PORTABLE_TEXT_PROJECTION}
+    },
+    _type == "faqSection" => {
+      heading,
+      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
+    },
+    _type == "contactForm" => {
+      heading,
+      description,
+      successMessage,
+      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
+      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
+    },
+    _type == "sponsorCards" => {
+      heading,
+      displayMode,
+      sponsors[]->{ _id }
+    },
+    _type == "projectCards" => {
+      heading,
+      displayMode,
+      projects[]->{ _id }
+    },
+    _type == "testimonials" => {
+      heading,
+      testimonialSource,
+      testimonials[]->{ _id }
+    },
+    _type == "eventList" => {
+      heading,
+      eventStatus,
+      limit
+    },
+    _type == "teamGrid" => {
+      heading,
+      description,
+      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
+    },
+    _type == "imageGallery" => {
+      heading,
+      description,
+      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption, featured, year, category }
+    },
+    _type == "articleList" => {
+      heading,
+      description,
+      contentType,
+      categories[]->{ _id },
+      limit,
+      ctaButtons[]{ _key, text, url, variant },
+      showNewsletterCta
+    },
+    _type == "comparisonTable" => {
+      heading,
+      description,
+      options[]{ _key, title, highlighted },
+      criteria[]{ _key, feature, values, isHeader },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "timeline" => {
+      heading,
+      description,
+      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
+      links[]{ _key, text, url, variant }
+    },
+    _type == "pullquote" => {
+      quote,
+      attribution,
+      role,
+      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
+    },
+    _type == "divider" => {
+      label
+    },
+    _type == "announcementBar" => {
+      icon,
+      text,
+      link{ label, href },
+      dismissible
+    },
+    _type == "sponsorshipTiers" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
+    },
+    _type == "videoEmbed" => {
+      heading,
+      description,
+      youtubeUrl,
+      posterImage{ ${IMAGE_PROJECTION}, alt }
+    },
+    _type == "pricingTable" => {
+      heading,
+      description,
+      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
+    },
+    _type == "serviceCards" => {
+      heading,
+      description,
+      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
+    },
+    _type == "productShowcase" => {
+      heading,
+      description,
+      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
+    },
+    _type == "linkCards" => {
+      heading,
+      description,
+      links[]{ _key, title, description, icon, url }
+    },
+    _type == "newsletter" => {
+      heading,
+      description,
+      inputPlaceholder,
+      submitButtonLabel,
+      privacyDisclaimerText
+    },
+    _type == "accordion" => {
+      heading,
+      description,
+      items[]{ _key, title, content }
+    },
+    _type == "tabsBlock" => {
+      heading,
+      tabs[]{ _key, label, content }
+    },
+    _type == "embedBlock" => {
+      heading,
+      embedUrl,
+      rawEmbedCode,
+      caption
+    },
+    _type == "mapBlock" => {
+      heading,
+      address,
+      coordinates{ lat, lng },
+      caption,
+      contactInfo{ phone, email, hours }
+    },
+    _type == "countdownTimer" => {
+      heading,
+      description,
+      targetDate,
+      completedMessage
+    },
+    _type == "metricsDashboard" => {
+      heading,
+      description,
+      metrics[]{ _key, label, value, change, trend, icon }
+    },
+    _type == "cardGrid" => {
+      heading,
+      description,
+      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
+    },
+    _type == "beforeAfter" => {
+      heading,
+      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+      beforeLabel,
+      afterLabel,
+      caption
+    }`;
+
+const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
+    _type == "columnsBlock" => {
+      variant,
+      leftBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
+      rightBlocks[]{${INNER_BLOCK_FIELDS_PROJECTION}},
+      reverseOnMobile,
+      verticalAlign
+    }`;
+
+const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+const token = SANITY_API_READ_TOKEN;
 
 /**
- * Multi-site context constants — resolved at build time via Vite's
- * static replacement of `import.meta.env` values.
+ * Multi-site context constants — resolved at build time via astro:env schema.
  * Each CF Pages build is isolated (one site = one set of env vars).
  */
-const DATASET = import.meta.env.PUBLIC_SANITY_DATASET || 'production';
-const SITE_ID = import.meta.env.PUBLIC_SITE_ID || 'capstone';
+const DATASET = PUBLIC_SANITY_DATASET;
+const SITE_ID = PUBLIC_SITE_ID;
 const isMultiSite = DATASET === 'rwc';
 
 /**
@@ -91,6 +329,12 @@ export type SanityEvent = ALL_EVENTS_QUERY_RESULT[number];
  * Array element type extracted for use in component props and helper functions.
  */
 export type Article = ALL_ARTICLES_QUERY_RESULT[number];
+
+/**
+ * Author type — derived from the generated ALL_AUTHORS_QUERY_RESULT.
+ * Array element type extracted for use in component props and helper functions.
+ */
+export type Author = ALL_AUTHORS_QUERY_RESULT[number];
 
 /**
  * RelatedArticle type — narrower projection from the detail query's relatedArticles[]->.
@@ -208,6 +452,8 @@ export const ALL_PAGE_SLUGS_QUERY = defineQuery(groq`*[_type == "page" && define
 export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidden != true && ($site == "" || site == $site)] | order(name asc){
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  logoSquare{ ${IMAGE_PROJECTION}, alt },
+  logoHorizontal{ ${IMAGE_PROJECTION}, alt },
   tier, description, website, featured
 }`);
 
@@ -241,6 +487,8 @@ export const ALL_SPONSOR_SLUGS_QUERY = defineQuery(groq`*[_type == "sponsor" && 
 export const SPONSOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "sponsor" && slug.current == $slug && ($site == "" || site == $site)][0]{
   _id, name, "slug": slug.current,
   logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  logoSquare{ ${IMAGE_PROJECTION}, alt },
+  logoHorizontal{ ${IMAGE_PROJECTION}, alt },
   tier, description, website, featured, industry,
   seo { metaTitle, metaDescription, noIndex, ogImage { ${IMAGE_PROJECTION}, alt } },
   "projects": *[_type == "project" && references(^._id) && ($site == "" || site == $site)]{ _id, title, "slug": slug.current }
@@ -304,7 +552,7 @@ export function resolveBlockProjects(
  * GROQ query: fetch all projects with resolved sponsor references.
  */
 export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($site == "" || site == $site)] | order(title asc){
-  _id, title, "slug": slug.current,
+  _id, _createdAt, title, "slug": slug.current,
   content,
   sponsor->{ _id, name, "slug": slug.current, logo{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, industry, hidden },
   technologyTags,
@@ -596,6 +844,301 @@ export async function getArticleBySlug(slug: string): Promise<ARTICLE_BY_SLUG_QU
 }
 
 // ---------------------------------------------------------------------------
+// Article category queries (Story 19.10)
+// ---------------------------------------------------------------------------
+
+/**
+ * Shared category-detail projection. The chip-row query intentionally
+ * narrows this with its own field list (description is unused there).
+ */
+const ARTICLE_CATEGORY_PROJECTION = `_id, title, "slug": slug.current, description`;
+
+/**
+ * GROQ query: fetch all article categories (for chip row + build-time caching).
+ * Ordered alphabetically by title. `description` is intentionally NOT projected
+ * here — the chip row never reads it. The full projection lives on
+ * ARTICLE_CATEGORY_BY_SLUG_QUERY.
+ */
+export const ALL_ARTICLE_CATEGORIES_QUERY = defineQuery(groq`*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)] | order(title asc){
+  _id, title, "slug": slug.current
+}`);
+
+/**
+ * GROQ query: fetch all article category slugs for static path generation.
+ */
+export const ALL_ARTICLE_CATEGORY_SLUGS_QUERY = defineQuery(groq`*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single article category by slug.
+ */
+export const ARTICLE_CATEGORY_BY_SLUG_QUERY = defineQuery(groq`*[_type == "articleCategory" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  ${ARTICLE_CATEGORY_PROJECTION}
+}`);
+
+/**
+ * GROQ query: fetch all articles for a given category id.
+ * Projection MATCHES ALL_ARTICLES_QUERY field-for-field so the result type
+ * is structurally assignable to Article[] and <ArticleCard> can reuse it
+ * without `as any` casts.
+ */
+export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(groq`*[_type == "article" && defined(slug.current) && category._ref == $categoryId && ($site == "" || site == $site)] | order(publishedAt desc){
+  _id, title, "slug": slug.current,
+  excerpt,
+  featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+  author->{ name, "slug": slug.current },
+  publishedAt,
+  category->{ _id, title, "slug": slug.current }
+}`);
+
+/**
+ * Fetch all article categories from Sanity.
+ * Result is cached for the duration of the build (module-level memoization),
+ * mirroring getAllArticles(). Cache is bypassed when visual editing is active.
+ */
+let _articleCategoriesCache: ALL_ARTICLE_CATEGORIES_QUERY_RESULT | null = null;
+
+export async function getAllArticleCategories(): Promise<ALL_ARTICLE_CATEGORIES_QUERY_RESULT> {
+  if (!visualEditingEnabled && _articleCategoriesCache) return _articleCategoriesCache;
+  const { result } = await loadQuery<ALL_ARTICLE_CATEGORIES_QUERY_RESULT>({
+    query: ALL_ARTICLE_CATEGORIES_QUERY,
+    params: getSiteParams(),
+  });
+  _articleCategoriesCache = result ?? [];
+  return _articleCategoriesCache;
+}
+
+/**
+ * Fetch a single article category by slug (uncached — per-request).
+ */
+export async function getArticleCategoryBySlug(
+  slug: string,
+): Promise<ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT>({
+    query: ARTICLE_CATEGORY_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+/**
+ * Fetch all articles for a given category id (uncached — per-request).
+ * Returns [] when no articles match so callers can render the empty state.
+ */
+export async function getArticlesByCategory(
+  categoryId: string,
+): Promise<ARTICLES_BY_CATEGORY_QUERY_RESULT> {
+  const { result } = await loadQuery<ARTICLES_BY_CATEGORY_QUERY_RESULT>({
+    query: ARTICLES_BY_CATEGORY_QUERY,
+    params: { categoryId, ...getSiteParams() },
+  });
+  return result ?? [];
+}
+
+// ---------------------------------------------------------------------------
+// Author queries (Story 20.2)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch all authors for build-time caching.
+ * Ordered by name ascending (alphabetical).
+ */
+export const ALL_AUTHORS_QUERY = defineQuery(groq`*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){
+  _id, name, "slug": slug.current,
+  role, bio,
+  image{ ${IMAGE_PROJECTION}, alt }
+}`);
+
+/**
+ * GROQ query: fetch all author slugs for static path generation.
+ */
+export const ALL_AUTHOR_SLUGS_QUERY = defineQuery(groq`*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }`);
+
+/**
+ * GROQ query: fetch a single author by slug with full fields.
+ * Includes reverse reference query for articles by this author.
+ * Articles projection matches ALL_ARTICLES_QUERY field-for-field so ArticleCard
+ * can render them without type casting.
+ */
+export const AUTHOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{
+  _id, name, "slug": slug.current,
+  role, bio, credentials,
+  image{ ${IMAGE_PROJECTION}, alt },
+  sameAs,
+  socialLinks[]{ _key, platform, url },
+  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){
+    _id, title, "slug": slug.current,
+    excerpt,
+    featuredImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
+    author->{ name, "slug": slug.current },
+    publishedAt,
+    category->{ _id, title, "slug": slug.current }
+  }
+}`);
+
+/**
+ * Fetch all authors from Sanity.
+ * Result is cached for the duration of the build (module-level memoization).
+ */
+let _authorsCache: ALL_AUTHORS_QUERY_RESULT | null = null;
+
+export async function getAllAuthors(): Promise<ALL_AUTHORS_QUERY_RESULT> {
+  if (!visualEditingEnabled && _authorsCache) return _authorsCache;
+  const { result } = await loadQuery<ALL_AUTHORS_QUERY_RESULT>({ query: ALL_AUTHORS_QUERY, params: getSiteParams() });
+  _authorsCache = result ?? [];
+  return _authorsCache;
+}
+
+/**
+ * Fetch a single author by slug from Sanity.
+ */
+export async function getAuthorBySlug(slug: string): Promise<AUTHOR_BY_SLUG_QUERY_RESULT> {
+  const { result } = await loadQuery<AUTHOR_BY_SLUG_QUERY_RESULT>({
+    query: AUTHOR_BY_SLUG_QUERY,
+    params: { slug, ...getSiteParams() },
+  });
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Listing Page queries (Story 21.0)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch a singleton listing page document by its fixed ID.
+ * Projects all fields including block expansions for header/footer composition.
+ */
+export const LISTING_PAGE_QUERY = defineQuery(groq`*[_type == "listingPage" && _id == $id][0]{
+  _id, route, title, description,
+  seo{ metaTitle, metaDescription, noIndex, ogImage{ ${IMAGE_PROJECTION}, alt } },
+  headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  footerBlocks[]{${BLOCK_FIELDS_PROJECTION}}
+}`);
+
+/**
+ * Returns the listing page document ID for a given route.
+ * Multi-site aware: appends site ID for RWC workspaces.
+ */
+function getListingPageId(route: string): string {
+  return isMultiSite ? `listingPage-${route}-${SITE_ID}` : `listingPage-${route}`;
+}
+
+/**
+ * Fetch a listing page singleton from Sanity.
+ * Returns null when document doesn't exist — pages MUST work without singletons.
+ * Uses a Map cache (keyed by route) since there are 5 distinct documents.
+ */
+const _listingPageCache = new Map<string, LISTING_PAGE_QUERY_RESULT | null>();
+
+export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _listingPageCache.has(route)) {
+    return _listingPageCache.get(route)!;
+  }
+  const id = getListingPageId(route);
+  const { result } = await loadQuery<LISTING_PAGE_QUERY_RESULT>({
+    query: LISTING_PAGE_QUERY,
+    params: { id },
+  });
+  const value = result ?? null;
+  _listingPageCache.set(route, value);
+  return value;
+}
+
+// ---------------------------------------------------------------------------
+// Portal Page queries (Story 22.9)
+// ---------------------------------------------------------------------------
+
+export const PORTAL_PAGE_QUERY = defineQuery(groq`*[_type == "portalPage" && _id == $id][0]{
+  _id, route, title, description,
+  headerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  footerBlocks[]{${BLOCK_FIELDS_PROJECTION}},
+  dashboardCards[]{ _key, title, description, iconName, route, enabled }
+}`);
+
+function getPortalPageId(route: string): string {
+  return isMultiSite ? `portalPage-${route}-${SITE_ID}` : `portalPage-${route}`;
+}
+
+const _portalPageCache = new Map<string, PORTAL_PAGE_QUERY_RESULT | null>();
+
+export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RESULT | null> {
+  if (!visualEditingEnabled && _portalPageCache.has(route)) {
+    return _portalPageCache.get(route)!;
+  }
+  const id = getPortalPageId(route);
+  try {
+    const { result } = await loadQuery<PORTAL_PAGE_QUERY_RESULT>({
+      query: PORTAL_PAGE_QUERY,
+      params: { id },
+    });
+    const value = result ?? null;
+    _portalPageCache.set(route, value);
+    return value;
+  } catch (err) {
+    console.error(`getPortalPage('${route}') failed; falling back to null`, err);
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Sponsor Agreement query (singleton — one doc per workspace)
+// ---------------------------------------------------------------------------
+
+export const SPONSOR_AGREEMENT_QUERY = defineQuery(groq`*[_type == "sponsorAgreement" && _id == $id][0]{
+  _id,
+  title,
+  intro[]${PORTABLE_TEXT_PROJECTION},
+  pdfFile{ asset->{ _id, url, originalFilename, size, mimeType } },
+  checkboxLabel,
+  acceptButtonText,
+  bodyContent[]${PORTABLE_TEXT_PROJECTION}
+}`);
+
+function getSponsorAgreementId(): string {
+  // Single agreement document for the capstone workspace. RWC workspaces don't expose a portal,
+  // so a site-scoped variant is intentionally not constructed here.
+  return 'sponsorAgreement';
+}
+
+/**
+ * Fetch the sponsor agreement singleton.
+ *
+ * No module-level cache: agreement fetches happen only for unaccepted sponsors on portal
+ * navigation (rare path), and the Sanity client is configured with `useCdn: true` outside of
+ * visual editing, so the API CDN already provides ~60s edge caching. This avoids the
+ * stale-cache trap where editor publishes never reach the Worker isolate.
+ */
+export async function getSponsorAgreement(): Promise<SPONSOR_AGREEMENT_QUERY_RESULT | null> {
+  const id = getSponsorAgreementId();
+  try {
+    const { result } = await loadQuery<SPONSOR_AGREEMENT_QUERY_RESULT>({
+      query: SPONSOR_AGREEMENT_QUERY,
+      params: { id },
+    });
+    return result ?? null;
+  } catch (err) {
+    console.error('getSponsorAgreement failed; falling back to null', err);
+    return null;
+  }
+}
+
+/**
+ * Reset all module-level caches. Useful for testing and SSR scenarios
+ * where stale data could persist across requests.
+ */
+export function resetAllCaches(): void {
+  _siteSettingsCache = null;
+  _sponsorsCache = null;
+  _projectsCache = null;
+  _testimonialsCache = null;
+  _eventsCache = null;
+  _articlesCache = null;
+  _articleCategoriesCache = null;
+  _authorsCache = null;
+  _listingPageCache.clear();
+  _portalPageCache.clear();
+}
+
+// ---------------------------------------------------------------------------
 // Portal queries (Story 9.2)
 // ---------------------------------------------------------------------------
 
@@ -674,216 +1217,7 @@ export const PAGE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "page" && slug.cur
     noIndex,
     ogImage { ${IMAGE_PROJECTION}, alt }
   },
-  blocks[]{
-    _type,
-    _key,
-    backgroundVariant,
-    spacing,
-    maxWidth,
-    variant,
-    _type == "heroBanner" => {
-      heading,
-      subheading,
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
-      ctaButtons[]{ _key, text, url, variant },
-      alignment
-    },
-    _type == "featureGrid" => {
-      heading,
-      items[]{ _key, icon, title, description, image{ ${IMAGE_PROJECTION}, alt } },
-      columns
-    },
-    _type == "ctaBanner" => {
-      heading,
-      description,
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt },
-      ctaButtons[]{ _key, text, url, variant }
-    },
-    _type == "statsRow" => {
-      heading,
-      stats[]{ _key, value, label, description }
-    },
-    _type == "textWithImage" => {
-      heading,
-      content[]${PORTABLE_TEXT_PROJECTION},
-      image{ ${IMAGE_PROJECTION}, alt },
-      imagePosition
-    },
-    _type == "logoCloud" => {
-      heading,
-      autoPopulate,
-      sponsors[]->{ _id }
-    },
-    _type == "sponsorSteps" => {
-      heading,
-      subheading,
-      items[]{ _key, title, description, list },
-      ctaButtons[]{ _key, text, url, variant }
-    },
-    _type == "richText" => {
-      content[]${PORTABLE_TEXT_PROJECTION}
-    },
-    _type == "faqSection" => {
-      heading,
-      items[]{ _key, question, answer[]${PORTABLE_TEXT_PROJECTION} }
-    },
-    _type == "contactForm" => {
-      heading,
-      description,
-      successMessage,
-      form->{ _id, title, fields[]{ _key, name, label, type, required, choices[]{ _key, label, value }, options { placeholder, defaultValue } }, submitButton { text } },
-      backgroundImages[]{ _key, ${IMAGE_PROJECTION}, alt }
-    },
-    _type == "sponsorCards" => {
-      heading,
-      displayMode,
-      sponsors[]->{ _id }
-    },
-    _type == "projectCards" => {
-      heading,
-      displayMode,
-      projects[]->{ _id }
-    },
-    _type == "testimonials" => {
-      heading,
-      testimonialSource,
-      testimonials[]->{ _id }
-    },
-    _type == "eventList" => {
-      heading,
-      eventStatus,
-      limit
-    },
-    _type == "teamGrid" => {
-      heading,
-      description,
-      items[]{ _key, name, role, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, links[]{ _key, label, href } }
-    },
-    _type == "imageGallery" => {
-      heading,
-      description,
-      images[]{ _key, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, caption }
-    },
-    _type == "articleList" => {
-      heading,
-      description,
-      contentType,
-      categories[]->{ _id },
-      limit,
-      ctaButtons[]{ _key, text, url, variant }
-    },
-    _type == "comparisonTable" => {
-      heading,
-      description,
-      options[]{ _key, title, highlighted },
-      criteria[]{ _key, feature, values, isHeader },
-      links[]{ _key, text, url, variant }
-    },
-    _type == "timeline" => {
-      heading,
-      description,
-      items[]{ _key, date, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop } },
-      links[]{ _key, text, url, variant }
-    },
-    _type == "pullquote" => {
-      quote,
-      attribution,
-      role,
-      image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }
-    },
-    _type == "divider" => {
-      label
-    },
-    _type == "announcementBar" => {
-      icon,
-      text,
-      link{ label, href },
-      dismissible
-    },
-    _type == "sponsorshipTiers" => {
-      heading,
-      description,
-      tiers[]{ _key, name, price, benefits[], highlighted, ctaButton{ text, url, variant } }
-    },
-    _type == "videoEmbed" => {
-      heading,
-      description,
-      youtubeUrl,
-      posterImage{ ${IMAGE_PROJECTION}, alt }
-    },
-    _type == "pricingTable" => {
-      heading,
-      description,
-      tiers[]{ _key, name, price, interval, description, features, highlighted, ctaText, ctaUrl }
-    },
-    _type == "serviceCards" => {
-      heading,
-      description,
-      services[]{ _key, title, description, icon, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href } }
-    },
-    _type == "productShowcase" => {
-      heading,
-      description,
-      products[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, price, badge, link{ label, href } }
-    },
-    _type == "linkCards" => {
-      heading,
-      description,
-      links[]{ _key, title, description, icon, url }
-    },
-    _type == "newsletter" => {
-      heading,
-      description,
-      inputPlaceholder,
-      submitButtonLabel,
-      privacyDisclaimerText
-    },
-    _type == "accordion" => {
-      heading,
-      description,
-      items[]{ _key, title, content }
-    },
-    _type == "tabsBlock" => {
-      heading,
-      tabs[]{ _key, label, content }
-    },
-    _type == "embedBlock" => {
-      heading,
-      embedUrl,
-      caption
-    },
-    _type == "mapBlock" => {
-      heading,
-      address,
-      coordinates{ lat, lng },
-      caption,
-      contactInfo{ phone, email, hours }
-    },
-    _type == "countdownTimer" => {
-      heading,
-      description,
-      targetDate,
-      completedMessage
-    },
-    _type == "metricsDashboard" => {
-      heading,
-      description,
-      metrics[]{ _key, label, value, change, trend, icon }
-    },
-    _type == "cardGrid" => {
-      heading,
-      description,
-      cards[]{ _key, title, description, image{ ${IMAGE_PROJECTION}, alt, hotspot, crop }, link{ label, href }, badge }
-    },
-    _type == "beforeAfter" => {
-      heading,
-      beforeImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
-      afterImage{ ${IMAGE_PROJECTION}, alt, hotspot, crop },
-      beforeLabel,
-      afterLabel,
-      caption
-    }
-  }
+  blocks[]{${BLOCK_FIELDS_PROJECTION}}
 }`);
 
 /**

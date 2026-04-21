@@ -5,16 +5,22 @@ import Breadcrumb from '@/components/Breadcrumb.astro';
 import TestimonialCard from '@/components/TestimonialCard.astro';
 import type { Testimonial } from '@/lib/sanity';
 import { sanityClient, ALL_PROJECT_SLUGS_QUERY, getProjectBySlug, getSiteParams } from '@/lib/sanity';
+import type { ALL_PROJECT_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { safeUrlFor } from '@/lib/image';
 import { stegaClean } from '@sanity/client/stega';
 import { Badge } from '@/components/ui/badge';
 import { Section, SectionContent } from '@/components/ui/section';
 import { PortableText } from 'astro-portabletext';
 import { portableTextComponents } from '@/components/portable-text';
+import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
+import { buildPageGraph } from '@/lib/page-jsonld';
+import { buildOrgJsonLd } from '@/lib/org-jsonld';
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const projects = await sanityClient.fetch<Array<{ slug: string }>>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
-  return projects.map((p) => ({ params: { slug: p.slug } }));
+  const projects = await sanityClient.fetch<ALL_PROJECT_SLUGS_QUERY_RESULT>(ALL_PROJECT_SLUGS_QUERY, getSiteParams());
+  return projects
+    .filter((p): p is { slug: string } => typeof p.slug === 'string' && p.slug.length > 0)
+    .map((p) => ({ params: { slug: p.slug } }));
 };
 
 const { slug } = Astro.params;
@@ -39,20 +45,27 @@ const sponsor = project.sponsor;
 const cleanTier = stegaClean(sponsor?.tier) || 'silver';
 const sponsorSlug = sponsor ? stegaClean(sponsor.slug) : null;
 
-const logoUrl = safeUrlFor(sponsor?.logo)?.width(200).height(200).url() ?? null;
+// Strip crop/hotspot and use single dimension so Sanity preserves aspect ratio
+const logoUrl = sponsor?.logo ? safeUrlFor({ asset: sponsor.logo.asset, alt: sponsor.logo.alt })?.width(200).fit('max').url() ?? null : null;
 const team = project.team ?? [];
 const techs = project.technologyTags ?? [];
 const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Projects', href: '/projects' },
+  { label: project.title ?? 'Project' },
+];
+const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbItems, Astro.url.origin, Astro.url.pathname);
+const orgJsonLd = await buildOrgJsonLd(Astro.url.origin);
+const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout title={project.title ?? 'Project'} seo={project.seo ?? (project.outcome ? { metaDescription: project.outcome } : undefined)} ogType="article" template="detail">
+  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
   <Section>
     <SectionContent>
-      <Breadcrumb baseUrl={Astro.url.origin} items={[
-        { label: 'Home', href: '/' },
-        { label: 'Projects', href: '/projects' },
-        { label: project.title ?? 'Project' },
-      ]} />
+      <Breadcrumb items={breadcrumbItems} />
 
       <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div class="flex items-center gap-4">
@@ -76,7 +89,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
                 <img
                   src={logoUrl}
                   alt={sponsor.logo?.alt || `${sponsor.name} logo`}
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-contain p-2"
                   width="200"
                   height="200"
                   loading="lazy"
@@ -180,7 +193,7 @@ const testimonials = (project.testimonials ?? []) as unknown as Testimonial[];
       )}
 
       <!-- Back to Projects -->
-      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-label="back-to-projects">
+      <a href="/projects" class="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm" data-gtm-category="navigation" data-gtm-action="back" data-gtm-label="back-to-projects">
         &larr; Back to Projects
       </a>
     </SectionContent>

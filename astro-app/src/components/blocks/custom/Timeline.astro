@@ -3,7 +3,7 @@ import type { TimelineBlock } from '@/lib/types';
 import { Section, SectionContent, SectionActions } from '@/components/ui/section';
 import { Button } from '@/components/ui/button';
 import { stegaClean } from '@sanity/client/stega';
-import { safeUrlFor } from '@/lib/image';
+import { safeUrlFor, lqipStyle } from '@/lib/image';
 import { JsonLd } from '@/components/ui/json-ld';
 
 interface Props extends TimelineBlock {
@@ -64,7 +64,7 @@ const timelineJsonLd = entries.length > 0 ? {
                     class="mt-3 rounded"
                     loading="lazy"
                     decoding="async"
-                    style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                    style={lqipStyle(lqip)}
                   />
                 )}
               </div>
@@ -127,7 +127,7 @@ const timelineJsonLd = entries.length > 0 ? {
                         class="mt-3 rounded ml-auto"
                         loading="lazy"
                         decoding="async"
-                        style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                        style={lqipStyle(lqip)}
                       />
                     )}
                   </div>
@@ -153,7 +153,7 @@ const timelineJsonLd = entries.length > 0 ? {
                         class="mt-3 rounded"
                         loading="lazy"
                         decoding="async"
-                        style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                        style={lqipStyle(lqip)}
                       />
                     )}
                   </div>
@@ -209,7 +209,7 @@ const timelineJsonLd = entries.length > 0 ? {
                       class="mt-2 rounded"
                       loading="lazy"
                       decoding="async"
-                      style={lqip ? `background-image: url(${lqip}); background-size: cover;` : undefined}
+                      style={lqipStyle(lqip)}
                     />
                   )}
                 </div>
