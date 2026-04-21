@@ -363,7 +363,10 @@ async def interactions(request: Request):
                     to_js(
                         {
                             "method": "POST",
-                            "headers": {"Content-Type": "application/json"},
+                            "headers": {
+                                "Content-Type": "application/json",
+                                "X-Bot-Secret": get_env_value(request, "BOT_SECRET"),
+                            },
                             "body": payload,
                         },
                         dict_converter=Object.fromEntries,

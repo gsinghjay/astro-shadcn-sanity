@@ -6,6 +6,11 @@ export default {
       return new Response("Method not allowed", { status: 405 });
     }
 
+     // Verify shared secret
+    const secret = request.headers.get("X-Bot-Secret");
+    if (!secret || secret !== env.BOT_SECRET) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     const { question, application_id, token } = await request.json();
 
     ctx.waitUntil(handleAsk(question, application_id, token, env));
