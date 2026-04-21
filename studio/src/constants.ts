@@ -7,4 +7,15 @@ export const CAPSTONE_SINGLETON_TYPES = new Set([
 ])
 
 /** Document types that have the site field (from Story 15.1) */
-export const SITE_AWARE_TYPES = ['page', 'sponsor', 'project', 'testimonial', 'event']
+export const SITE_AWARE_TYPES = [
+  'page',
+  'sponsor',
+  'project',
+  'testimonial',
+  'event',
+  'article',
+  'articleCategory',
+  'author',
+  'form',
+  'submission',
+]
