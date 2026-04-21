@@ -1,3 +1,28 @@
+## [1.19.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.18.0...v1.19.0) (2026-04-21)
+
+### Features
+
+* **chatbubble:** Swiss-design upgrade + code review patches (story 5.18) ([30fbe23](https://github.com/gsinghjay/astro-shadcn-sanity/commit/30fbe23ef3e1b2045f82dd2709b8bab069f3e923))
+* **embed-block:** add raw embed code support for script-based widgets ([ee57349](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ee57349ae945f35d225821e9d2b63a4261e1f49c))
+* **portal:** add portalPage singleton schema for CMS-editable portal pages ([6c48ba4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6c48ba4391448d4926ed37f6e1c26e039060f0e2))
+* **portal:** sponsor agreement gate + rename sponsorship to agreement + /portal/form ([c29b563](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c29b563789444edffec6cc272d2e835bc11a5070))
+* **seo:** consolidate JSON-LD into single [@graph](https://github.com/graph) per page ([12f2590](https://github.com/gsinghjay/astro-shadcn-sanity/commit/12f2590e114dab74ae29db3ba9f7db5e0e8dd01e))
+
+### Bug Fixes
+
+* **csp:** allowlist *.formsite.com for raw embed code support ([7a9b594](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7a9b594863efb3cfed546c148d20683d764c3a45))
+* **portal:** apply sponsor agreement code review patches + backfill migration ([5e793df](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5e793df8649fe0e4d24b96c8bb9ae60b2267d6c1))
+* **portal:** apply story 22.9 code review patches ([1f33223](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1f33223e47a8d0479ed771279f1220549eb9003a))
+* **portal:** code review fixes for portal page singletons ([29c94ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/29c94cab4c81537ea2d64becd56cee40fbd19969))
+* **seo:** avoid input mutation in buildPageGraph ([5dc1982](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5dc19821928c9cb6ffa73b4f241bb8f9581ed469))
+* **seo:** code review fixes for JSON-LD structured data ([f7e9916](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f7e9916d653cd1da5eb833d937b398a6ec979600))
+* **studio:** reach RWC workspace parity with Capstone desk + per-site forms ([80ead26](https://github.com/gsinghjay/astro-shadcn-sanity/commit/80ead26852d216a102ae92ae7fab4b9de038ef8d))
+
+### Miscellaneous
+
+* documentation updates ([a024a95](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a024a95beeb094eef310490e50f405be8992504f))
+* **studio:** bump sanity and @sanity/vision to ^5.21.0 ([5cc068e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5cc068e28cfcf767b8b9a07a8f0cf342f949eb35))
+
 ## [1.18.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.17.0...v1.18.0) (2026-04-15)
 
 ### Features
