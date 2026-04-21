@@ -19,6 +19,17 @@ describe('VideoEmbed (shared component) — facade pattern', () => {
     expect(html).toContain('aspect-video');
   });
 
+  test('renders facade for YouTube Shorts URL', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(VideoEmbed, {
+      props: { url: 'https://www.youtube.com/shorts/AbCdEf12345' },
+    });
+
+    expect(html).toContain('data-youtube-facade="AbCdEf12345"');
+    expect(html).toContain('https://i.ytimg.com/vi/AbCdEf12345/hqdefault.jpg');
+    expect(html).not.toContain('<iframe');
+  });
+
   test('does not render when URL is invalid', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(VideoEmbed, {
@@ -165,5 +176,20 @@ describe('VideoEmbed (block component)', () => {
 
     expect(html).toContain('Default Variant');
     expect(html).toContain('data-youtube-facade');
+  });
+
+  test('renders Shorts URL facade via shared VideoEmbed component', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(BlockVideoEmbed, {
+      props: {
+        _type: 'videoEmbed' as const,
+        _key: 'test-key',
+        youtubeUrl: 'https://www.youtube.com/shorts/AbCdEf12345',
+      },
+    });
+
+    expect(html).toContain('data-youtube-facade="AbCdEf12345"');
+    expect(html).toContain('https://i.ytimg.com/vi/AbCdEf12345/hqdefault.jpg');
+    expect(html).not.toContain('<iframe');
   });
 });
