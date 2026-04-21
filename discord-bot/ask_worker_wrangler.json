@@ -1,0 +1,5 @@
+{
+  "name": "capstone-ask-worker",
+  "main": "src/ask_worker.js",
+  "compatibility_date": "2026-02-09"
+}
