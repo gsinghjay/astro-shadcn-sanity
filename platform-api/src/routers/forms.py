@@ -39,18 +39,22 @@ async def submit_form(request: Request, body: FormSubmission, settings = Depends
 @router.get("/submissions", response_model=List[SubmissionListItem])
 async def list_submissions(
     site: str = Query("capstone", description="Target site/workspace"),
+    status: str = Query("submitted", description="Submission status filter (use 'all' for no filter)"),
     limit: int = Query(20, ge=1, le=100, description="Max records to return"),
     sanity: SanityClient = Depends(get_sanity),
     _admin: bool = Depends(verify_admin_api_key) # Protect route
 ):
     """Admin-only endpoint to list recent submissions."""
     dataset, _ = resolve_dataset(site)
+    
+    # GROQ query now filters by status (unless status='all') and selects 'status'
     query = """
-    *[_type == 'submission'] | order(submittedAt desc)[0...$limit] { 
-        _id, name, email, organization, submittedAt 
+    *[_type == 'submission' && ($status == 'all' || status == $status)] | order(submittedAt desc)[0...$limit] { 
+        _id, name, email, organization, submittedAt, status 
     }
     """
-    return await sanity.query(query, dataset, {"limit": limit})
+    
+    return await sanity.query(query, dataset, {"limit": limit, "status": status})
 
 async def is_rate_limited(ip: str, kv) -> bool:
         key = f"rate:forms:{ip}"
