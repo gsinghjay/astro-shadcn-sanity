@@ -14,7 +14,7 @@ router = APIRouter(prefix="/forms", tags=["forms"])
 
 @router.post("/submit", response_model=SubmissionResponse)
 async def submit_form(request: Request, body: FormSubmission, settings = Depends(get_settings), sanity = Depends(get_sanity)):
-    client_ip = request.headers.get("CF-Connecting-IP", "unknown")
+    client_ip = request.headers.get("CF-Connecting-IP", "127.0.0.1")
 
     # Rate limit
     if await is_rate_limited(client_ip, settings.kv):
