@@ -30,10 +30,9 @@ async def submit_form(request: Request, body: FormSubmission, settings: WorkerSe
     # Discord notification (fire-and-forget)
     # FIXME currently this has been removed, maybe replaced with settings.kv.get("discord-webhook:{channel}") from 12.6
     webhook_url = settings.optional_secrets.get("discord_webhook_url") 
-    try:
-        await notify_discord(body, webhook_url)
-    except Exception:
-        pass  # Don't block submission on Discord failure
+
+    # Fire and forget to Discord
+    await notify_discord(body, webhook_url)
 
     return SubmissionResponse(id=doc_id)
 
