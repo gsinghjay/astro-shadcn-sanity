@@ -116,7 +116,9 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
     # if body.form_id:
     #     doc["form"] = {"_type": "reference", "_ref": body.form_id}
 
+    dataset, _ = resolve_dataset(body.site)
+
     # Submissions are global, default to production dataset
-    await sanity.mutate([{"create": doc}], dataset="production", write_token=write_token)
+    await sanity.mutate([{"create": doc}], dataset=dataset, write_token=write_token)
     
     return doc_id
