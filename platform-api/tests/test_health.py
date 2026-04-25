@@ -1,4 +1,4 @@
-"""Tests for the ``GET /api/v1/platform/health`` endpoint.
+"""Tests for the ``GET /api/v1/health`` endpoint.
 
 These tests verify that the health check correctly probes each Cloudflare
 service binding and reports accurate status without leaking sensitive
