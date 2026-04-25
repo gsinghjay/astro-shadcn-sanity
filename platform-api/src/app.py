@@ -28,6 +28,7 @@ from fastapi.responses import JSONResponse
 
 from routers.health import router as health_router
 from routers.content import router as content_router
+from routers.forms import router as form_router
 
 app = FastAPI(
     title="Platform API",
@@ -59,6 +60,7 @@ app.add_middleware(
 # Register routers
 app.include_router(health_router, prefix="/api/v1/platform")
 app.include_router(content_router, prefix="/api/v1")
+app.include_router(form_router, prefix="/api/v1")
 
 
 @app.exception_handler(Exception)
