@@ -1,4 +1,4 @@
-"""Tests for the ``GET /api/v1/platform/health`` endpoint.
+"""Tests for the ``GET /api/v1/health`` endpoint.
 
 These tests verify that the health check correctly probes each Cloudflare
 service binding and reports accurate status without leaking sensitive
@@ -26,7 +26,7 @@ from models.settings import WorkerSettings
 
 def test_health_returns_ok(client):
     """Health check returns ``"ok"`` when all bindings are working."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     assert response.status_code == 200
 
     data = response.json()
@@ -45,7 +45,7 @@ def test_health_checks_kv(client, mock_settings):
     """KV probe reports ``"ok"`` with latency and no value leakage."""
     mock_settings.kv._store["config:version"] = "1.0.0"
 
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     assert response.status_code == 200
 
     kv = response.json()["checks"]["kv"]
@@ -58,7 +58,7 @@ def test_health_checks_kv(client, mock_settings):
 
 def test_health_checks_d1(client):
     """D1 probe reports ``"ok"`` with latency after executing ``SELECT 1``."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     d1 = response.json()["checks"]["d1"]
     assert d1["status"] == "ok"
     assert d1["latency_ms"] is not None
@@ -66,7 +66,7 @@ def test_health_checks_d1(client):
 
 def test_health_checks_ai(client):
     """AI probe confirms the Workers AI binding exists."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     ai = response.json()["checks"]["ai"]
     assert ai["status"] == "ok"
     assert ai["message"] == "binding available"
@@ -74,7 +74,7 @@ def test_health_checks_ai(client):
 
 def test_health_checks_env_vars(client):
     """Env vars probe reports count only, not names or values."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     env_vars = response.json()["checks"]["env_vars"]
     assert env_vars["status"] == "ok"
     assert "configured" in env_vars["message"]
@@ -84,7 +84,7 @@ def test_health_checks_env_vars(client):
 
 def test_health_checks_required_secrets(client):
     """Secrets probe confirms required secrets are set without leaking values."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     secrets = response.json()["checks"]["secrets"]
     assert secrets["status"] == "ok"
     assert "configured" in secrets["message"]
@@ -95,11 +95,11 @@ def test_health_checks_required_secrets(client):
 
 def test_health_checks_optional_secrets(client):
     """Optional secrets probe reports count only, not secret names."""
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     optional = response.json()["checks"]["optional_secrets"]
     assert optional["status"] == "ok"
     # Should show count only, no secret names
-    assert "0 of 7" in optional["message"]
+    assert "0 of 9" in optional["message"]
     # Must never leak secret names
     assert "discord_bot_token" not in optional["message"]
 
@@ -111,7 +111,7 @@ def test_health_degraded_when_kv_fails(client, mock_settings):
 
     mock_settings.kv.get = failing_get
 
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     data = response.json()
     assert data["status"] == "degraded"
     assert data["checks"]["kv"]["status"] == "error"
@@ -122,7 +122,7 @@ def test_health_degraded_when_secret_missing(client, mock_settings):
     """Overall status becomes ``"degraded"`` when a required secret is missing."""
     mock_settings.api_key = None
 
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     data = response.json()
     assert data["status"] == "degraded"
     assert data["checks"]["secrets"]["status"] == "degraded"
@@ -135,7 +135,7 @@ def test_health_kv_not_configured(client, mock_settings):
     """KV probe reports ``"not_configured"`` when binding is None."""
     mock_settings.kv = None
 
-    response = client.get("/api/v1/platform/health")
+    response = client.get("/api/v1/health")
     kv = response.json()["checks"]["kv"]
     assert kv["status"] == "not_configured"
 
