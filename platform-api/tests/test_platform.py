@@ -40,7 +40,21 @@ def client(monkeypatch):
             if "deploy_hooks" in url:
                 return MockResponse({}, 200)
             if "graphql" in url:
-                return MockResponse({"data": {"viewer": {"accounts": [{"workersInvocationsAdaptive": [{"sum": {"requests": 10}, "dimensions": {"datetime": "2026-01-01"}}]}]}}})
+                # Updated to match Analytics Engine shape!
+                return MockResponse({
+                    "data": {
+                        "viewer": {
+                            "accounts": [{
+                                "analyticsEngineEventsAdaptiveGroups": [
+                                    {
+                                        "sum": {"double1": 10}, 
+                                        "dimensions": {"datetimeHour": "2026-01-01T00:00:00Z"}
+                                    }
+                                ]
+                            }]
+                        }
+                    }
+                })
             return MockResponse({})
 
     # Patch the HTTP client across the router and service
@@ -100,9 +114,9 @@ def test_health_aggregate(client):
     assert "discord" in data["checks"]
 
 def test_analytics(client):
-    response = client.get("/api/v1/platform/analytics?metric=requests&period=24h", headers={"X-Admin-API-Key": "test-admin-key"})
+    response = client.get("/api/v1/platform/analytics?metric=form_submissions&period=24h", headers={"X-Admin-API-Key": "test-admin-key"})
     assert response.status_code == 200
     data = response.json()
-    assert data["metric"] == "requests"
+    assert data["metric"] == "form_submissions"
     assert len(data["data"]) == 1
     assert data["data"][0]["value"] == 10
