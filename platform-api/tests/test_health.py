@@ -99,7 +99,7 @@ def test_health_checks_optional_secrets(client):
     optional = response.json()["checks"]["optional_secrets"]
     assert optional["status"] == "ok"
     # Should show count only, no secret names
-    assert "0 of 7" in optional["message"]
+    assert "0 of 9" in optional["message"]
     # Must never leak secret names
     assert "discord_bot_token" not in optional["message"]
 
