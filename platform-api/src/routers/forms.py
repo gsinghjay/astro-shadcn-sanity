@@ -13,11 +13,11 @@ import uuid
 router = APIRouter(prefix="/forms", tags=["forms"])
 
 @router.post("/submit", response_model=SubmissionResponse)
-async def submit_form(request: Request, body: FormSubmission, settings = Depends(get_settings), sanity = Depends(get_sanity)):
+async def submit_form(request: Request, body: FormSubmission, settings: WorkerSettings = Depends(get_settings), sanity = Depends(get_sanity)):
     client_ip = request.headers.get("CF-Connecting-IP", "unknown")
 
     # Rate limit
-    if await is_rate_limited(client_ip, settings.kv):
+    if await check_and_increment_rate_limit(client_ip, settings.kv):
         raise HTTPException(429, "Rate limit exceeded — max 5 submissions per hour")
 
     # Turnstile
@@ -28,12 +28,13 @@ async def submit_form(request: Request, body: FormSubmission, settings = Depends
     doc_id = await create_submission(body, settings, sanity)
 
     # Discord notification (fire-and-forget)
+    # FIXME currently this has been removed, maybe replaced with settings.kv.get("discord-webhook:{channel}") from 12.6
+    webhook_url = settings.optional_secrets.get("discord_webhook_url") 
     try:
-        await notify_discord(body, settings)
+        await notify_discord(body, webhook_url)
     except Exception:
         pass  # Don't block submission on Discord failure
 
-    await increment_rate_limit(client_ip, settings.kv)
     return SubmissionResponse(id=doc_id)
 
 @router.get("/submissions", response_model=List[SubmissionListItem])
@@ -56,15 +57,20 @@ async def list_submissions(
     
     return await sanity.query(query, dataset, {"limit": limit, "status": status})
 
-async def is_rate_limited(ip: str, kv) -> bool:
-        key = f"rate:forms:{ip}"
-        count = int(await kv.get(key) or "0")
-        return count >= 5
+RATE_LIMIT_MAX = 5
+RATE_LIMIT_WINDOW_SECS = 3600
 
-async def increment_rate_limit(ip: str, kv):
+async def check_and_increment_rate_limit(ip: str, kv) -> bool:
+    """Increment first, then check; preserve original TTL on subsequent puts."""
     key = f"rate:forms:{ip}"
-    count = int(await kv.get(key) or "0")
-    await kv.put(key, str(count + 1), expirationTtl=3600)
+    raw = await kv.get(key)
+    count = int(raw or "0") + 1
+    # Only set TTL on first write so the window doesn't slide on every hit.
+    if raw is None:
+        await kv.put(key, str(count), expirationTtl=RATE_LIMIT_WINDOW_SECS)
+    else:
+        await kv.put(key, str(count))
+    return count > RATE_LIMIT_MAX
 
 async def notify_discord(body: FormSubmission, webhook_url: str | None):
     if not webhook_url:
@@ -100,7 +106,9 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
         "_type": "submission",
         "name": body.name,
         "email": body.email,
+        "organization": body.organization,
         "message": body.message,
+        "formType": body.form_type,
         "status": "submitted",
         "submittedAt": datetime.now(timezone.utc).isoformat()
     }
