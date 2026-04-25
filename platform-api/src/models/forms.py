@@ -1,25 +1,28 @@
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Any
 
-class FormSubmission(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
-    
-    name: str = Field(min_length=1, max_length=200)
-    email: str = Field(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
-    message: str = Field(min_length=10, max_length=5000)
-    organization: str | None = None
-    turnstile_token: str = Field(alias="cf-turnstile-response")
-    form_type: str = "contact"
+from pydantic import BaseModel, Field
 
-class SubmissionResponse(BaseModel):
-    id: str
-    status: str = "submitted"
-    message: str = "Form submitted successfully"
 
-class SubmissionListItem(BaseModel):
-    id: str = Field(alias="_id")
-    name: str
-    email: str
-    organization: str | None = None
-    submitted_at: str = Field(alias="submittedAt")
-    status: str
-    form_type: str | None = Field(default="contact", alias="formType")
+class DeployStatus(BaseModel):
+    site: str = Field(examples=["capstone"])
+    status: str = Field(
+        examples=["active"],
+        description='One of: "active", "building", "failed", "unknown".',
+    )
+    url: str | None = Field(default=None, examples=["https://capstone.pages.dev"])
+    created_on: str | None = Field(default=None, examples=["2026-04-24T22:00:00Z"])
+    environment: str = Field(default="production", examples=["production"])
+
+
+class RebuildResponse(BaseModel):
+    site: str = Field(examples=["capstone"])
+    triggered: bool = Field(examples=[True])
+    message: str = Field(examples=["Rebuild deploy hook triggered."])
+
+
+class AnalyticsResponse(BaseModel):
+    metric: str = Field(examples=["requests"])
+    period: str = Field(examples=["24h"])
+    data: list[dict[str, Any]] = Field(
+        examples=[[{"datetime": "2026-04-24T00:00:00Z", "value": 1234}]]
+    )
