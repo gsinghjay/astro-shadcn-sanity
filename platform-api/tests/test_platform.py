@@ -92,7 +92,7 @@ def test_rebuild_invalid_site(client):
     assert response.status_code == 400
 
 def test_health_aggregate(client):
-    response = client.get("/api/v1/platform/health-aggregate")
+    response = client.get("/api/v1/platform/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
