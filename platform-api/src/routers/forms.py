@@ -66,8 +66,7 @@ async def increment_rate_limit(ip: str, kv):
     count = int(await kv.get(key) or "0")
     await kv.put(key, str(count + 1), expirationTtl=3600)
 
-async def notify_discord(body: FormSubmission, settings: WorkerSettings): # , webhook_url: str | None):
-    webhook_url = settings.optional_secrets.get("discord_webhook_url")
+async def notify_discord(body: FormSubmission, webhook_url: str | None):
     if not webhook_url:
         return
         

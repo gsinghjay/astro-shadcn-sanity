@@ -48,7 +48,7 @@ async def rebuild(
             message="Rebuild triggered" if success else f"Rebuild failed: {resp.status_code}"
         )
 
-@router.get("/health-aggregate")
+@router.get("/health")
 async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
     """Unauthenticated aggregated health check across all external services."""
     checks = {}

@@ -44,19 +44,14 @@ def client(monkeypatch):
         mock = MagicMock(spec=WorkerSettings)
         mock.required_secrets = {
             "admin_api_key": "test-admin-key",
-            "ADMIN_API_KEY": "test-admin-key"
         }
         mock.optional_secrets = {
-            "SANITY_API_WRITE_TOKEN": "test-write-token",
             "sanity_api_write_token": "test-write-token",
-            "TURNSTILE_SECRET_KEY": "test-turnstile-secret",
             "turnstile_secret_key": "test-turnstile-secret",
-            "DISCORD_WEBHOOK_URL": "http://fake-discord.url",
             "discord_webhook_url": "http://fake-discord.url"
         }
         mock.env_vars = {
             "sanity_project_id": "test",
-            "SANITY_PROJECT_ID": "test"
         }
         mock.kv = mock_kv
         return mock
