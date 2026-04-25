@@ -26,6 +26,11 @@ async def deploy_status(
         environment=data.get("environment", "production")
     )
 
+DEPLOY_HOOKS = {
+    "capstone": "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/{hook_id}",
+    "rwc": "", # TODO add/change URLS as needed
+}
+
 @router.post("/rebuild", response_model=RebuildResponse)
 async def rebuild(
     site: str = Query(..., description="Target site to rebuild"), 
@@ -33,15 +38,14 @@ async def rebuild(
     _ = Depends(verify_admin_api_key)
 ):
     # Lookup hook securely from secrets (e.g., CF_DEPLOY_HOOK_CAPSTONE)
-    hook_key = f"CF_DEPLOY_HOOK_{site.upper().replace('-', '_')}"
-    hook_url = settings.optional_secrets.get(hook_key) or settings.optional_secrets.get(hook_key.lower())
+    hook_url = DEPLOY_HOOKS.get(site)
     
     if not hook_url:
-        raise HTTPException(400, f"Deploy hook not configured for site: {site}")
+        raise HTTPException(500, f"Deploy hook not configured for site: {site}")
         
     async with get_client() as client:
         resp = await client.post(hook_url)
-        success = resp.status_code == 200
+        success = 200 <= resp.status_code < 300
         return RebuildResponse(
             site=site, 
             triggered=success, 
@@ -63,9 +67,11 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
 
     async def check_sanity():
         pid = settings.env_vars.get("sanity_project_id")
-        if not pid: raise ValueError("No Sanity Project ID")
+        dataset = (settings.env_vars.get("sanity_dataset_capstone") or settings.env_vars.get("sanity_dataset_rwc"))
+        if not pid or dataset: 
+            raise ValueError("No Sanity Project ID or Dataset")
         async with get_client(timeout=4.0) as client:
-            resp = await client.get(f"https://{pid}.api.sanity.io/v2024-01-01/data/query/production?query=*[_type=='page'][0]")
+            resp = await client.get(f"https://{pid}.api.sanity.io/v2024-01-01/data/query/{dataset}?query=*[_type=='page'][0]")
             resp.raise_for_status()
 
     async def check_discord():
