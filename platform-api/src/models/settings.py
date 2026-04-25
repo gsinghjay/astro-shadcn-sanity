@@ -85,6 +85,7 @@ class WorkerSettings(BaseModel):
     discord_public_key: str | None = None
     discord_webhook_url: str | None = None
     cf_api_token: str | None = None
+    cf_account_id: str | None = None
     turnstile_secret_key: str | None = None
 
     # --- Bindings (Cloudflare service objects) ---
@@ -127,6 +128,7 @@ class WorkerSettings(BaseModel):
             "discord_public_key": self.discord_public_key,
             "discord_webhook_url": self.discord_webhook_url,
             "cf_api_token": self.cf_api_token,
+            "cf_account_id": self.cf_account_id,
             "turnstile_secret_key": self.turnstile_secret_key,
         }
 
@@ -235,6 +237,7 @@ class WorkerSettings(BaseModel):
             discord_webhook_url=_get("DISCORD_WEBHOOK_URL"),
             discord_public_key=_get("DISCORD_PUBLIC_KEY"),
             cf_api_token=_get("CF_API_TOKEN"),
+            cf_account_id=_get("CF_ACCOUNT_ID"),
             turnstile_secret_key=_get("TURNSTILE_SECRET_KEY"),
             # Bindings
             kv=_get_binding("API_KV"),
