@@ -6,6 +6,7 @@ class FormSubmission(BaseModel):
         name: str = Field(min_length=1, max_length=200)
         email: str = Field(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
         message: str = Field(min_length=10, max_length=5000)
+        organization: str | None = None
         turnstile_token: str = Field(alias="cf-turnstile-response")
         form_type: str = "contact"
 
