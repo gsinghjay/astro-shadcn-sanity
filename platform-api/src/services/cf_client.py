@@ -2,6 +2,8 @@ import json
 from fastapi import HTTPException
 from services.http_client import get_client
 
+from datetime import datetime, timedelta, timezone
+
 SITE_TO_CF_PROJECT = {
     "capstone": "ywcc-capstone",
     "rwc-us": "rwc-us",
@@ -46,26 +48,53 @@ async def get_deploy_status(site: str, settings) -> dict:
     return result
 
 async def get_cf_analytics(metric: str, period: str, settings) -> list:
-    """Queries Cloudflare's GraphQL Analytics API."""
-    account_id = settings.optional_secrets.get("cf_account_id")
+    """Queries Cloudflare's GraphQL Analytics API for custom Analytics Engine metrics."""
+    
+    account_id = settings.optional_secrets.get("cf_account_id") # WARNING! this is currently not implemented
     cf_api_token = settings.optional_secrets.get("cf_api_token")
 
     if not account_id or not cf_api_token:
         raise HTTPException(500, "Cloudflare credentials not configured")
 
-    # Basic GraphQL query for Workers Invocations (example metric)
+    # AC4: Restrict to specific metrics
+    allowed_metrics = {"chatbot_queries", "form_submissions", "webhook_events"}
+    if metric not in allowed_metrics:
+        raise HTTPException(400, f"Invalid metric. Allowed: {', '.join(allowed_metrics)}")
+
+    # Calculate the start date based on the period
+    now = datetime.now(timezone.utc)
+    if period == "24h":
+        start_dt = now - timedelta(days=1)
+    elif period == "7d":
+        start_dt = now - timedelta(days=7)
+    elif period == "30d":
+        start_dt = now - timedelta(days=30)
+    else:
+        raise HTTPException(400, "Invalid period. Allowed: 24h, 7d, 30d")
+
+    datetime_geq = start_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    # GraphQL query for Analytics Engine (Groups by Hour)
     query = """
-    query {
+    {
       viewer {
         accounts(filter: {accountTag: "%s"}) {
-          workersInvocationsAdaptive(limit: 10, orderBy: [datetime_DESC]) {
-            sum { requests }
-            dimensions { datetime }
+          analyticsEngineEventsAdaptiveGroups(
+            filter: { datetime_geq: "%s", blob1: "%s" }
+            limit: 1000
+            orderBy: [datetimeHour_ASC]
+          ) {
+            dimensions {
+              datetimeHour
+            }
+            sum {
+              double1
+            }
           }
         }
       }
     }
-    """ % account_id
+    """ % (account_id, datetime_geq, metric)
 
     async with get_client() as client:
         resp = await client.post(
@@ -73,11 +102,14 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
             headers={"Authorization": f"Bearer {cf_api_token}"},
             json={"query": query}
         )
+        
         if resp.status_code != 200:
-            raise HTTPException(502, "Cloudflare GraphQL API error")
+            raise HTTPException(502, f"Cloudflare GraphQL API error: {resp.status_code}")
             
         try:
-            data = resp.json()["data"]["viewer"]["accounts"][0]["workersInvocationsAdaptive"]
-            return [{"datetime": d["dimensions"]["datetime"], "value": d["sum"]["requests"]} for d in data]
+            # Parse the deeply nested GraphQL response
+            data = resp.json()["data"]["viewer"]["accounts"][0]["analyticsEngineEventsAdaptiveGroups"]
+            # Map it to a clean timeseries list
+            return [{"datetime": d["dimensions"]["datetimeHour"], "value": d["sum"]["double1"]} for d in data]
         except (KeyError, IndexError):
             return []
