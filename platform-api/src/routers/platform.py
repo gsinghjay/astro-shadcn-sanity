@@ -1,5 +1,6 @@
 # src/routers/platform.py
 import asyncio
+from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from models.platform import DeployStatus, RebuildResponse, AnalyticsResponse
 from models.settings import WorkerSettings
@@ -44,8 +45,16 @@ async def rebuild(
     settings: WorkerSettings = Depends(get_settings),
     _ = Depends(verify_admin_api_key)
 ):
-    # Lookup hook securely from secrets (e.g., CF_DEPLOY_HOOK_CAPSTONE)
-    hook_key = f"cf_deploy_hook_{site}"
+    # Import SITE_TO_CF_PROJECT for validation
+    from services.cf_client import SITE_TO_CF_PROJECT
+
+    # Validate the incoming site against known sites
+    if site not in SITE_TO_CF_PROJECT:
+        raise HTTPException(400, f"Unknown site: {site}")
+
+    # Normalize site name (replace hyphens with underscores for secret lookup)
+    normalized_site = site.replace("-", "_")
+    hook_key = f"cf_deploy_hook_{normalized_site}"
     hook_url = settings.optional_secrets.get(hook_key)
 
     if not hook_url:
@@ -109,7 +118,7 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
 
 @router.get("/analytics", response_model=AnalyticsResponse)
 async def analytics(
-    metric: str = Query("requests", description="Metric to fetch"),
+    metric: Literal["chatbot_queries", "form_submissions", "webhook_events"] = Query("chatbot_queries", description="Metric to fetch"),
     period: str = Query("24h", description="Time period"),
     settings: WorkerSettings = Depends(get_settings),
     _ = Depends(verify_admin_api_key)

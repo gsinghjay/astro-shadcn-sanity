@@ -1,8 +1,11 @@
 import json
+import logging
 from fastapi import HTTPException
 from services.http_client import get_client
 
 from datetime import datetime, timedelta, timezone
+
+logger = logging.getLogger(__name__)
 
 SITE_TO_CF_PROJECT = {
     "capstone": "ywcc-capstone",
@@ -43,7 +46,7 @@ async def get_deploy_status(site: str, settings) -> dict:
 
     # Cache the result in KV
     if settings.kv and result:
-        await settings.kv.put(cache_key, json.dumps(result), expirationTtl=30)
+        await settings.kv.put(cache_key, json.dumps(result), {"expirationTtl": 60})
         
     return result
 
@@ -113,13 +116,24 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
             raise HTTPException(502, f"Cloudflare GraphQL API error: {resp.status_code}")
 
         try:
+            # Parse the GraphQL response
+            response_json = resp.json()
+
+            # Check for GraphQL errors first
+            if "errors" in response_json:
+                error_details = response_json["errors"]
+                logger.error("GraphQL errors from Cloudflare Analytics API: %s", error_details)
+                raise HTTPException(502, f"GraphQL errors from Cloudflare Analytics API: {error_details}")
+
+            # Only proceed if data exists and is non-null
+            if not response_json.get("data"):
+                raise HTTPException(502, "Missing data in Cloudflare Analytics API response")
+
             # Parse the deeply nested GraphQL response
-            data = resp.json()["data"]["viewer"]["accounts"][0]["analyticsEngineEventsAdaptiveGroups"]
+            data = response_json["data"]["viewer"]["accounts"][0]["analyticsEngineEventsAdaptiveGroups"]
             # Map it to a clean timeseries list
             return [{"datetime": d["dimensions"]["datetimeHour"], "value": d["sum"]["double1"]} for d in data]
         except (KeyError, IndexError) as e:
             # Log the full response and exception for debugging
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error(f"Failed to parse Cloudflare Analytics response: {e}, status={resp.status_code}, body={resp.text}")
-            raise HTTPException(502, "Malformed response from Cloudflare Analytics API")
+            logger.exception("Failed to parse Cloudflare Analytics response, status=%s", resp.status_code)
+            raise HTTPException(502, "Malformed response from Cloudflare Analytics API") from e

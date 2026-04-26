@@ -62,9 +62,12 @@ async def send_notification(
     # 4. Send (Sync or Async)
     if body.async_mode:
         # Fire-and-forget: Return 202 immediately, send in background
-        # TODO: Replace asyncio.create_task with ctx.waitUntil for Cloudflare Workers
-        # In Workers, asyncio tasks will be terminated when response returns.
-        # Proper fix: wire request.scope["ctx"] and use ctx.waitUntil(post_webhook(...))
+        # TODO: Before deploying to Cloudflare Workers, open a follow-up issue to track:
+        # - Affected symbols: post_webhook, body.async_mode, webhook_url, embed, JSONResponse
+        # - Runtime change required: wire request.scope["ctx"] -> ctx and replace
+        #   asyncio.create_task with ctx.waitUntil(post_webhook(webhook_url, embed))
+        # - Alternative: consider Cloudflare Queues handoff for async notifications
+        # Currently using asyncio.create_task which will be killed on Workers when response returns.
         asyncio.create_task(post_webhook(webhook_url, embed))
         return JSONResponse(
             status_code=202,

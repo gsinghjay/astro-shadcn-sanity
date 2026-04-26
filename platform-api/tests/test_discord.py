@@ -114,7 +114,18 @@ def test_async_mode(client, monkeypatch):
     assert webhook_calls[0]["url"] == "http://fake-discord.url"
     assert webhook_calls[0]["embed"]["title"] == "Async Alert"
 
-def test_with_fields(client):
+def test_with_fields(client, monkeypatch):
+    # Track invocations of the webhook dispatcher
+    webhook_calls = []
+
+    async def tracking_post_webhook(url, embed):
+        webhook_calls.append({"url": url, "embed": embed})
+        if url != "http://fake-discord.url":
+            raise AssertionError("Invalid Webhook URL hit")
+        return True
+
+    monkeypatch.setattr("routers.discord.post_webhook", tracking_post_webhook)
+
     payload = {
         "channel": "announcements",
         "title": "Test with Fields",
@@ -126,3 +137,11 @@ def test_with_fields(client):
     }
     response = client.post("/api/v1/discord/notify", json=payload)
     assert response.status_code == 200
+
+    # Verify that the embed was sent with the fields
+    assert len(webhook_calls) == 1
+    embed = webhook_calls[0]["embed"]
+    assert "fields" in embed
+    assert len(embed["fields"]) == 2
+    assert embed["fields"][0]["name"] == "Status"
+    assert embed["fields"][0]["value"] == "Online"

@@ -12,8 +12,12 @@ async def post_webhook(webhook_url: str, embed: dict):
     """
     # Parse and validate webhook host
     parsed = urlparse(webhook_url)
-    if parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
-        raise HTTPException(400, f"Invalid webhook host: {parsed.hostname}")
+    if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
+        raise HTTPException(500, f"Invalid webhook host: {parsed.hostname}")
+    if parsed.scheme != "https":
+        raise HTTPException(500, f"Invalid webhook scheme: {parsed.scheme}")
+    if not parsed.path.startswith("/api/webhooks/"):
+        raise HTTPException(500, f"Invalid webhook path: {parsed.path}")
 
     async with get_client() as client:
         resp = await client.post(
@@ -30,7 +34,7 @@ async def post_webhook(webhook_url: str, embed: dict):
                 detail=f"Discord rate limited, retry after {retry_after}s",
                 headers={"Retry-After": retry_after}
             )
-        elif resp.status_code >= 300:
+        if resp.status_code >= 300:
             # Translate other non-2xx to 502 with sanitized upstream info
             raise HTTPException(
                 status_code=502,
