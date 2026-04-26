@@ -71,8 +71,9 @@ VALID_PAYLOAD = {
     "site": "capstone",
     "name": "Jane Doe",
     "email": "jane@example.com",
-    "message": "This is a test message that is long enough.",
-    "cf-turnstile-response": "1x0000000000000000000000000000000AA"
+    "message": "this is a test message", 
+    "organization": "Acme",
+    "form_type": "contact"
 }
 
 def test_successful_submission(client, monkeypatch):
