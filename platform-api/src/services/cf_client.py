@@ -18,7 +18,7 @@ async def get_deploy_status(site: str, settings) -> dict:
     if not project_name:
         raise HTTPException(400, f"Unknown site: {site}")
 
-    # Check KV cache first (30s TTL)
+    # Check KV cache first (60s TTL)
     cache_key = f"deploy-status:{site}"
     if settings.kv:
         cached = await settings.kv.get(cache_key)
@@ -41,8 +41,15 @@ async def get_deploy_status(site: str, settings) -> dict:
         if resp.status_code != 200:
             raise HTTPException(502, f"Cloudflare API error: {resp.status_code}")
 
-        deployments = resp.json().get("result", [])
-        result = deployments[0] if deployments else {}
+        response_json = resp.json()
+        if "result" not in response_json:
+            raise HTTPException(502, "Malformed response from Cloudflare: missing 'result' key")
+
+        deployments = response_json["result"]
+        if not deployments:
+            return {"status": "no_deployments"}
+
+        result = deployments[0]
 
     # Cache the result in KV
     if settings.kv and result:
@@ -129,8 +136,21 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
             if not response_json.get("data"):
                 raise HTTPException(502, "Missing data in Cloudflare Analytics API response")
 
+            # Validate nested structure before accessing
+            if "viewer" not in response_json["data"]:
+                raise HTTPException(502, "Missing 'viewer' in Cloudflare Analytics API response")
+            if "accounts" not in response_json["data"]["viewer"]:
+                raise HTTPException(502, "Missing 'accounts' in Cloudflare Analytics API response")
+
+            accounts = response_json["data"]["viewer"]["accounts"]
+            if not accounts or len(accounts) == 0:
+                raise HTTPException(
+                    502,
+                    f"No accounts found for account_id={account_id}. Check credentials/scope. Response: {response_json}"
+                )
+
             # Parse the deeply nested GraphQL response
-            data = response_json["data"]["viewer"]["accounts"][0]["analyticsEngineEventsAdaptiveGroups"]
+            data = accounts[0]["analyticsEngineEventsAdaptiveGroups"]
             # Map it to a clean timeseries list
             return [{"datetime": d["dimensions"]["datetimeHour"], "value": d["sum"]["double1"]} for d in data]
         except (KeyError, IndexError) as e:

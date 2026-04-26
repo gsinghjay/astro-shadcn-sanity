@@ -58,11 +58,11 @@ async def rebuild(
     hook_url = settings.optional_secrets.get(hook_key)
 
     if not hook_url:
-        raise HTTPException(400, f"Deploy hook not configured for site: {site}")
+        raise HTTPException(500, f"Deploy hook not configured for site: {site}")
 
     # Validate that the hook URL doesn't contain placeholder tokens
     if "{hook_id}" in hook_url or not hook_url.startswith("https://"):
-        raise HTTPException(400, f"Invalid deploy hook URL for site: {site}")
+        raise HTTPException(500, f"Invalid deploy hook URL for site: {site}")
 
     async with get_client() as client:
         resp = await client.post(hook_url)
@@ -96,12 +96,21 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
             resp.raise_for_status()
 
     async def check_discord():
+        from urllib.parse import urlparse
+        from services.discord_client import ALLOWED_WEBHOOK_HOSTS
+
         webhook = settings.optional_secrets.get("discord_webhook_url")
         if not webhook:
-            raise ValueError("No Discord Webhook")
-        async with get_client(timeout=4.0) as client:
-            resp = await client.get(webhook)
-            resp.raise_for_status()
+            raise ValueError("not_configured")
+
+        # Validate webhook URL locally without making a network request
+        parsed = urlparse(webhook)
+        if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
+            raise ValueError("invalid_webhook")
+        if parsed.scheme != "https":
+            raise ValueError("invalid_webhook")
+        if not parsed.path.startswith("/api/webhooks/"):
+            raise ValueError("invalid_webhook")
 
     # Run network probes concurrently
     await asyncio.gather(

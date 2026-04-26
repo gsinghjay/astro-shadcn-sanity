@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
+import json
+import time
 
 from models.settings import WorkerSettings
 from models.discord import DiscordNotification, NotificationResult, COLOR_PRESETS
@@ -18,15 +20,35 @@ async def check_and_increment_channel_rate(channel: str, kv, limit: int = 30) ->
     """
     if not kv:
         return False
+
+    window_seconds = 60
     key = f"rate:discord:{channel}"
     raw = await kv.get(key)
-    count = int(raw or "0") + 1
-    # Only set TTL on first write so the window doesn't slide on every hit.
+    now = int(time.time())
+
     if raw is None:
-        await kv.put(key, str(count), expirationTtl=60)
+        # First write: initialize count and timestamp
+        data = {"count": 1, "started_at": now}
+        await kv.put(key, json.dumps(data), {"expirationTtl": window_seconds})
+        return False
     else:
-        await kv.put(key, str(count))
-    return count > limit
+        # Subsequent writes: increment count and preserve TTL
+        data = json.loads(raw)
+        count = data.get("count", 0) + 1
+        started_at = data.get("started_at", now)
+
+        # Calculate remaining TTL
+        remaining_ttl = window_seconds - (now - started_at)
+
+        if remaining_ttl <= 0:
+            # Window has expired, start a fresh window
+            data = {"count": 1, "started_at": now}
+            await kv.put(key, json.dumps(data), {"expirationTtl": window_seconds})
+            return False
+        else:
+            data["count"] = count
+            await kv.put(key, json.dumps(data), {"expirationTtl": remaining_ttl})
+            return count > limit
 
 
 # --- Endpoints ---

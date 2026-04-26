@@ -109,11 +109,11 @@ def test_rate_limiting(client):
     assert "Rate limit exceeded" in response.json()["detail"]
 
 def test_validation_errors(client):
-    payload = {**VALID_PAYLOAD, "name": ""}
+    payload = {**VALID_PAYLOAD, "cf-turnstile-response": "1x0000000000000000000000000000000AA", "name": ""}
     response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 422
 
-    payload = {**VALID_PAYLOAD, "email": "not-an-email"}
+    payload = {**VALID_PAYLOAD, "cf-turnstile-response": "1x0000000000000000000000000000000AA", "email": "not-an-email"}
     response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 422
 

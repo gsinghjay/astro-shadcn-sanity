@@ -10,6 +10,10 @@ from utils.dataset import resolve_dataset
 from urllib.parse import urlparse
 import logging
 import uuid
+import json
+import time
+import asyncio
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +57,7 @@ async def list_submissions(
     end_index = offset + limit
     query = """
     *[_type == 'submission'] | order(submittedAt desc)[$offset...$end] {
-        _id, name, email, organization, submittedAt
+        _id, name, email, organization, submittedAt, status, formType
     }
     """
 
@@ -64,9 +68,6 @@ RATE_LIMIT_WINDOW_SECS = 3600
 
 async def check_and_increment_rate_limit(composite_key: str, kv) -> bool:
     """Increment first, then check; preserve original TTL on subsequent puts."""
-    import json
-    import time
-
     key = f"rate:forms:{composite_key}"
     raw = await kv.get(key)
     now = int(time.time())
@@ -74,21 +75,27 @@ async def check_and_increment_rate_limit(composite_key: str, kv) -> bool:
     if raw is None:
         # First write: initialize count and timestamp
         data = {"count": 1, "started_at": now}
-        await kv.put(key, json.dumps(data), expirationTtl=RATE_LIMIT_WINDOW_SECS)
-        return 1 > RATE_LIMIT_MAX
+        await kv.put(key, json.dumps(data), {"expirationTtl": RATE_LIMIT_WINDOW_SECS})
+        return False
     else:
         # Subsequent writes: increment count and preserve TTL
         data = json.loads(raw)
         count = data.get("count", 0) + 1
         started_at = data.get("started_at", now)
-        data["count"] = count
 
         # Calculate remaining TTL
         remaining_ttl = RATE_LIMIT_WINDOW_SECS - (now - started_at)
-        if remaining_ttl > 0:
-            await kv.put(key, json.dumps(data), expirationTtl=remaining_ttl)
 
-        return count > RATE_LIMIT_MAX
+        if remaining_ttl <= 0:
+            # Window has expired, start a fresh window
+            data = {"count": 1, "started_at": now}
+            await kv.put(key, json.dumps(data), {"expirationTtl": RATE_LIMIT_WINDOW_SECS})
+            return False
+        else:
+            # Window still active, increment and preserve TTL
+            data["count"] = count
+            await kv.put(key, json.dumps(data), {"expirationTtl": remaining_ttl})
+            return count > RATE_LIMIT_MAX
 
 async def notify_discord(body: FormSubmission, settings: WorkerSettings):
     # Look up webhook URL from KV using a configurable key per site
@@ -114,26 +121,14 @@ async def notify_discord(body: FormSubmission, settings: WorkerSettings):
 
     try:
         async with get_client(timeout=5.0) as client:
-            resp = await client.post(webhook_url, json={"embeds": [embed]}, timeout=5.0)
+            resp = await client.post(webhook_url, json={"embeds": [embed]})
             resp.raise_for_status()
-    except Exception as e:
+    except (httpx.HTTPError, asyncio.TimeoutError) as e:
         # Log the exception with context, but don't break submission flow
-        import httpx
-        if isinstance(e, httpx.HTTPStatusError):
-            logger.exception(
-                "Discord notification failed for webhook host %s, request_id=%s",
-                webhook_host, request_id
-            )
-        elif isinstance(e, httpx.HTTPError):
-            logger.exception(
-                "Discord notification failed for webhook host %s, request_id=%s",
-                webhook_host, request_id
-            )
-        else:
-            logger.exception(
-                "Discord notification failed for webhook host %s, request_id=%s",
-                webhook_host, request_id
-            )
+        logger.exception(
+            "Discord notification failed for webhook host %s, request_id=%s",
+            webhook_host, request_id
+        )
 
 async def create_submission(body: FormSubmission, settings: WorkerSettings, sanity: SanityClient) -> str:
     """Creates a new submission document in Sanity."""
@@ -149,7 +144,9 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
         "email": body.email,
         "organization": body.organization,
         "message": body.message,
-        "submittedAt": datetime.now(timezone.utc).isoformat()
+        "submittedAt": datetime.now(timezone.utc).isoformat(),
+        "status": "submitted",
+        "formType": body.form_type
     }
     
     # unsure if the form ID is required to be returned
