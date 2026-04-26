@@ -52,6 +52,7 @@ npx wrangler kv key put "${ARGS[@]}" \
     "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
 # Discord webhook channels - only write if environment variables are set
+# add these into "vars" in wrangler.jsonc
 if [[ -n "${DISCORD_WEBHOOK_ANNOUNCEMENTS:-}" ]]; then
     echo "Setting discord-webhook:announcements..."
     npx wrangler kv key put "${ARGS[@]}" \
