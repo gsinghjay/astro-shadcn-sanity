@@ -1,6 +1,5 @@
-import asyncio
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from fastapi.responses import JSONResponse
 
 from models.settings import WorkerSettings
@@ -35,6 +34,7 @@ async def check_and_increment_channel_rate(channel: str, kv, limit: int = 30) ->
 @router.post("/notify", response_model=NotificationResult)
 async def send_notification(
     body: DiscordNotification, 
+    background_tasks: BackgroundTasks,
     settings: WorkerSettings = Depends(get_settings)
 ):
     if not settings.kv:
@@ -62,13 +62,7 @@ async def send_notification(
     # 4. Send (Sync or Async)
     if body.async_mode:
         # Fire-and-forget: Return 202 immediately, send in background
-        # TODO: Before deploying to Cloudflare Workers, open a follow-up issue to track:
-        # - Affected symbols: post_webhook, body.async_mode, webhook_url, embed, JSONResponse
-        # - Runtime change required: wire request.scope["ctx"] -> ctx and replace
-        #   asyncio.create_task with ctx.waitUntil(post_webhook(webhook_url, embed))
-        # - Alternative: consider Cloudflare Queues handoff for async notifications
-        # Currently using asyncio.create_task which will be killed on Workers when response returns.
-        asyncio.create_task(post_webhook(webhook_url, embed))
+        background_tasks.add_task(post_webhook, webhook_url, embed)
         return JSONResponse(
             status_code=202,
             content={"channel": body.channel, "sent": True, "message": "Queued"}
