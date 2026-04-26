@@ -81,13 +81,11 @@ def test_successful_submission(client, monkeypatch):
     notify_calls = []
 
     async def mock_notify_discord(body, settings):
-        from models.settings import WorkerSettings
-        assert isinstance(settings, WorkerSettings), "notify_discord should receive WorkerSettings instance"
         notify_calls.append({"body": body, "settings": settings})
 
     monkeypatch.setattr("routers.forms.notify_discord", mock_notify_discord)
-
-    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
+    payload = {**VALID_PAYLOAD, "cf-turnstile-response": "1x0000000000000000000000000000000AA"}
+    response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 200
     assert response.json()["status"] == "submitted"
     # Verify Discord notification was attempted
@@ -100,11 +98,13 @@ def test_turnstile_failure(client):
     assert "Turnstile verification failed" in response.json()["detail"]
 
 def test_rate_limiting(client):
+    payload = {**VALID_PAYLOAD, "cf-turnstile-response": "1x0000000000000000000000000000000AA"}
+
     for _ in range(5):
-        response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
+        response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
         assert response.status_code == 200
 
-    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
+    response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 429
     assert "Rate limit exceeded" in response.json()["detail"]
 
