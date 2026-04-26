@@ -21,7 +21,6 @@ Test categories:
     - **General** — Swagger UI accessibility, 404 for undefined routes.
 """
 
-from models.settings import WorkerSettings
 
 
 def test_health_returns_ok(client):

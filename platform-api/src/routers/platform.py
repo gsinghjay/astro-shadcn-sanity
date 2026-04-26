@@ -11,44 +11,56 @@ router = APIRouter(prefix="/platform", tags=["Platform"])
 
 @router.get("/deploy-status", response_model=DeployStatus)
 async def deploy_status(
-    site: str = Query(..., description="Target site (e.g., capstone)"), 
+    site: str = Query(..., description="Target site (e.g., capstone)"),
     settings: WorkerSettings = Depends(get_settings)
 ):
     data = await get_deploy_status(site, settings)
     if not data:
         return DeployStatus(site=site, status="unknown")
-        
+
+    # Map Cloudflare Pages status to our model
+    cf_status = data.get("latest_stage", {}).get("status", "unknown")
+    status_map = {
+        "success": "active",
+        "active": "active",
+        "building": "building",
+        "failure": "failed",
+        "failed": "failed",
+        "canceled": "failed",
+    }
+    normalized_status = status_map.get(cf_status, "unknown")
+
     return DeployStatus(
         site=site,
-        status=data.get("latest_stage", {}).get("status", "unknown"),
+        status=normalized_status,
         url=data.get("url"),
         created_on=data.get("created_on"),
         environment=data.get("environment", "production")
     )
 
-DEPLOY_HOOKS = {
-    "capstone": "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/{hook_id}",
-    "rwc": "", # TODO add/change URLS as needed
-}
-
 @router.post("/rebuild", response_model=RebuildResponse)
 async def rebuild(
-    site: str = Query(..., description="Target site to rebuild"), 
-    settings: WorkerSettings = Depends(get_settings), 
+    site: str = Query(..., description="Target site to rebuild"),
+    settings: WorkerSettings = Depends(get_settings),
     _ = Depends(verify_admin_api_key)
 ):
     # Lookup hook securely from secrets (e.g., CF_DEPLOY_HOOK_CAPSTONE)
-    hook_url = DEPLOY_HOOKS.get(site)
-    
+    hook_key = f"cf_deploy_hook_{site}"
+    hook_url = settings.optional_secrets.get(hook_key)
+
     if not hook_url:
-        raise HTTPException(500, f"Deploy hook not configured for site: {site}")
-        
+        raise HTTPException(400, f"Deploy hook not configured for site: {site}")
+
+    # Validate that the hook URL doesn't contain placeholder tokens
+    if "{hook_id}" in hook_url or not hook_url.startswith("https://"):
+        raise HTTPException(400, f"Invalid deploy hook URL for site: {site}")
+
     async with get_client() as client:
         resp = await client.post(hook_url)
         success = 200 <= resp.status_code < 300
         return RebuildResponse(
-            site=site, 
-            triggered=success, 
+            site=site,
+            triggered=success,
             message="Rebuild triggered" if success else f"Rebuild failed: {resp.status_code}"
         )
 
@@ -68,7 +80,7 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
     async def check_sanity():
         pid = settings.env_vars.get("sanity_project_id")
         dataset = (settings.env_vars.get("sanity_dataset_capstone") or settings.env_vars.get("sanity_dataset_rwc"))
-        if not pid or dataset: 
+        if not pid or not dataset:
             raise ValueError("No Sanity Project ID or Dataset")
         async with get_client(timeout=4.0) as client:
             resp = await client.get(f"https://{pid}.api.sanity.io/v2024-01-01/data/query/{dataset}?query=*[_type=='page'][0]")
@@ -76,7 +88,8 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
 
     async def check_discord():
         webhook = settings.optional_secrets.get("discord_webhook_url")
-        if not webhook: raise ValueError("No Discord Webhook")
+        if not webhook:
+            raise ValueError("No Discord Webhook")
         async with get_client(timeout=4.0) as client:
             resp = await client.get(webhook)
             resp.raise_for_status()
@@ -91,7 +104,7 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
     checks["kv"] = "ok" if settings.kv else "not_configured"
     checks["d1"] = "ok" if settings.db else "not_configured"
 
-    status = "degraded" if any("error" in v for v in checks.values()) else "ok"
+    status = "degraded" if any("error" in v or "not_configured" in v for v in checks.values()) else "ok"
     return {"status": status, "checks": checks}
 
 @router.get("/analytics", response_model=AnalyticsResponse)

@@ -68,39 +68,52 @@ def client(monkeypatch):
 
 # Use the exact Pydantic alias for the Turnstile token
 VALID_PAYLOAD = {
+    "site": "capstone",
     "name": "Jane Doe",
     "email": "jane@example.com",
     "message": "This is a test message that is long enough.",
     "cf-turnstile-response": "1x0000000000000000000000000000000AA"
 }
 
-def test_successful_submission(client):
-    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD)
+def test_successful_submission(client, monkeypatch):
+    # Track notify_discord invocations to ensure it receives WorkerSettings
+    notify_calls = []
+
+    async def mock_notify_discord(body, settings):
+        from models.settings import WorkerSettings
+        assert isinstance(settings, WorkerSettings), "notify_discord should receive WorkerSettings instance"
+        notify_calls.append({"body": body, "settings": settings})
+
+    monkeypatch.setattr("routers.forms.notify_discord", mock_notify_discord)
+
+    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 200
     assert response.json()["status"] == "submitted"
+    # Verify Discord notification was attempted
+    assert len(notify_calls) == 1
 
 def test_turnstile_failure(client):
     payload = {**VALID_PAYLOAD, "cf-turnstile-response": "2x0000000000000000000000000000000AA"}
-    response = client.post("/api/v1/forms/submit", json=payload)
+    response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 400
     assert "Turnstile verification failed" in response.json()["detail"]
 
 def test_rate_limiting(client):
     for _ in range(5):
-        response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD)
+        response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
         assert response.status_code == 200
 
-    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD)
+    response = client.post("/api/v1/forms/submit", json=VALID_PAYLOAD, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 429
     assert "Rate limit exceeded" in response.json()["detail"]
 
 def test_validation_errors(client):
     payload = {**VALID_PAYLOAD, "name": ""}
-    response = client.post("/api/v1/forms/submit", json=payload)
-    assert response.status_code == 422 
-    
+    response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
+    assert response.status_code == 422
+
     payload = {**VALID_PAYLOAD, "email": "not-an-email"}
-    response = client.post("/api/v1/forms/submit", json=payload)
+    response = client.post("/api/v1/forms/submit", json=payload, headers={"CF-Connecting-IP": "1.2.3.4"})
     assert response.status_code == 422
 
 def test_list_submissions_requires_auth(client):

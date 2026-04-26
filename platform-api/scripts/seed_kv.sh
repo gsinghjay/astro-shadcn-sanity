@@ -29,7 +29,12 @@ fi
 # Build args array to avoid word-splitting issues with ENVIRONMENT
 ARGS=(--namespace-id="$KV_NAMESPACE_ID")
 if [[ -n "$ENVIRONMENT" ]]; then
-    ARGS+=($ENVIRONMENT)
+    # Append environment tokens as distinct, quoted array elements
+    if [[ "$ENVIRONMENT" == "--preview" ]]; then
+        ARGS+=(--preview)
+    else
+        ARGS+=(--env "production")
+    fi
 fi
 
 # --- Seed values ---
@@ -46,10 +51,31 @@ echo "Setting webhooks:general..."
 npx wrangler kv key put "${ARGS[@]}" \
     "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
+# Discord webhook channels - only write if environment variables are set
+if [[ -n "${DISCORD_WEBHOOK_ANNOUNCEMENTS:-}" ]]; then
+    echo "Setting discord-webhook:announcements..."
+    npx wrangler kv key put "${ARGS[@]}" \
+        "discord-webhook:announcements" "\"$DISCORD_WEBHOOK_ANNOUNCEMENTS\""
+fi
+
+if [[ -n "${DISCORD_WEBHOOK_BOT_AUDIT:-}" ]]; then
+    echo "Setting discord-webhook:bot-audit..."
+    npx wrangler kv key put "${ARGS[@]}" \
+        "discord-webhook:bot-audit" "\"$DISCORD_WEBHOOK_BOT_AUDIT\""
+fi
+
+if [[ -n "${DISCORD_WEBHOOK_EVENTS:-}" ]]; then
+    echo "Setting discord-webhook:events..."
+    npx wrangler kv key put "${ARGS[@]}" \
+        "discord-webhook:events" "\"$DISCORD_WEBHOOK_EVENTS\""
+fi
+
+if [[ -n "${DISCORD_WEBHOOK_FORM_SUBMISSIONS:-}" ]]; then
+    echo "Setting discord-webhook:form-submissions..."
+    npx wrangler kv key put "${ARGS[@]}" \
+        "discord-webhook:form-submissions" "\"$DISCORD_WEBHOOK_FORM_SUBMISSIONS\""
+fi
+
 echo ""
 echo ">>> KV seeding complete!"
 echo ">>> Verify with: npx wrangler kv key get --namespace-id=$KV_NAMESPACE_ID $ENVIRONMENT \"config:version\""
-
-npx wrangler kv key put --binding API_KV "discord-webhook:announcements" "https://discord.com/api/webhooks/..."
-npx wrangler kv key put --binding API_KV "discord-webhook:bot-audit" "https://discord.com/api/webhooks/..."
-npx wrangler kv key put --binding API_KV "discord-webhook:events" "https://discord.com/api/webhooks/..."

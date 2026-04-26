@@ -23,9 +23,9 @@ def client(monkeypatch):
     # Mock the discord client so it never makes real HTTP requests
     async def fake_post_webhook(url, embed):
         if url != "http://fake-discord.url":
-            raise Exception("Invalid Webhook URL hit")
+            raise AssertionError("Invalid Webhook URL hit")
         return True
-        
+
     monkeypatch.setattr("routers.discord.post_webhook", fake_post_webhook)
 
     mock_kv = MockKV()
@@ -84,7 +84,18 @@ def test_rate_limiting(client):
     assert response.status_code == 429
     assert "Rate limit" in response.json()["detail"]
 
-def test_async_mode(client):
+def test_async_mode(client, monkeypatch):
+    # Track invocations of the webhook dispatcher
+    webhook_calls = []
+
+    async def tracking_post_webhook(url, embed):
+        webhook_calls.append({"url": url, "embed": embed})
+        if url != "http://fake-discord.url":
+            raise AssertionError("Invalid Webhook URL hit")
+        return True
+
+    monkeypatch.setattr("routers.discord.post_webhook", tracking_post_webhook)
+
     # We use the python variable name 'async_mode' or the alias 'async'
     payload = {
         "channel": "announcements",
@@ -96,6 +107,12 @@ def test_async_mode(client):
     assert response.status_code == 202
     data = response.json()
     assert data["message"] == "Queued"
+
+    # The TestClient (anyio-backed) drains background tasks before returning the response,
+    # so webhook_calls should already be populated.
+    assert len(webhook_calls) == 1
+    assert webhook_calls[0]["url"] == "http://fake-discord.url"
+    assert webhook_calls[0]["embed"]["title"] == "Async Alert"
 
 def test_with_fields(client):
     payload = {

@@ -1,11 +1,10 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional
 
 COLOR_PRESETS = {
-    "green": 0x2ECC71, 
-    "red": 0xE74C3C, 
+    "green": 0x2ECC71,
+    "red": 0xE74C3C,
     "gold": 0xF1C40F,
-    "blue": 0x3498DB, 
+    "blue": 0x3498DB,
     "purple": 0x9B59B6,
 }
 
@@ -21,7 +20,7 @@ class DiscordNotification(BaseModel):
     title: str
     message: str
     color: str = "blue"
-    fields: Optional[List[EmbedField]] = None
+    fields: list[EmbedField] | None = None
     async_mode: bool = Field(default=False, alias="async")
 
 class NotificationResult(BaseModel):

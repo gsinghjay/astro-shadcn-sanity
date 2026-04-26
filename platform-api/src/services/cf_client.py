@@ -49,8 +49,8 @@ async def get_deploy_status(site: str, settings) -> dict:
 
 async def get_cf_analytics(metric: str, period: str, settings) -> list:
     """Queries Cloudflare's GraphQL Analytics API for custom Analytics Engine metrics."""
-    
-    account_id = settings.optional_secrets.get("cf_account_id") # WARNING! this is currently not implemented
+
+    account_id = settings.optional_secrets.get("cf_account_id")
     cf_api_token = settings.optional_secrets.get("cf_api_token")
 
     if not account_id or not cf_api_token:
@@ -74,13 +74,13 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
 
     datetime_geq = start_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # GraphQL query for Analytics Engine (Groups by Hour)
+    # GraphQL query for Analytics Engine (Groups by Hour) - using variables for safety
     query = """
-    {
+    query GetAnalytics($accountTag: String!, $since: String!, $metric: String!) {
       viewer {
-        accounts(filter: {accountTag: "%s"}) {
+        accounts(filter: {accountTag: $accountTag}) {
           analyticsEngineEventsAdaptiveGroups(
-            filter: { datetime_geq: "%s", blob1: "%s" }
+            filter: { datetime_geq: $since, blob1: $metric }
             limit: 1000
             orderBy: [datetimeHour_ASC]
           ) {
@@ -94,22 +94,32 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
         }
       }
     }
-    """ % (account_id, datetime_geq, metric)
+    """
+
+    variables = {
+        "accountTag": account_id,
+        "since": datetime_geq,
+        "metric": metric
+    }
 
     async with get_client() as client:
         resp = await client.post(
             "https://api.cloudflare.com/client/v4/graphql",
             headers={"Authorization": f"Bearer {cf_api_token}"},
-            json={"query": query}
+            json={"query": query, "variables": variables}
         )
         
         if resp.status_code != 200:
             raise HTTPException(502, f"Cloudflare GraphQL API error: {resp.status_code}")
-            
+
         try:
             # Parse the deeply nested GraphQL response
             data = resp.json()["data"]["viewer"]["accounts"][0]["analyticsEngineEventsAdaptiveGroups"]
             # Map it to a clean timeseries list
             return [{"datetime": d["dimensions"]["datetimeHour"], "value": d["sum"]["double1"]} for d in data]
-        except (KeyError, IndexError):
-            return []
+        except (KeyError, IndexError) as e:
+            # Log the full response and exception for debugging
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to parse Cloudflare Analytics response: {e}, status={resp.status_code}, body={resp.text}")
+            raise HTTPException(502, "Malformed response from Cloudflare Analytics API")

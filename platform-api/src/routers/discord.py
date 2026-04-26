@@ -12,20 +12,22 @@ router = APIRouter(prefix="/discord", tags=["Discord"])
 
 # --- Helpers ---
 
-async def is_channel_rate_limited(channel: str, kv) -> bool:
+async def check_and_increment_channel_rate(channel: str, kv, limit: int = 30) -> bool:
+    """Atomically check and increment rate limit counter.
+
+    Returns True if rate limit is exceeded (deny request), False otherwise.
+    """
     if not kv:
         return False
     key = f"rate:discord:{channel}"
-    count = int(await kv.get(key) or "0")
-    return count >= 30
-
-async def increment_channel_rate(channel: str, kv):
-    if not kv:
-        return
-    key = f"rate:discord:{channel}"
-    count = int(await kv.get(key) or "0")
-    # Store in KV with a 60-second expiration
-    await kv.put(key, str(count + 1), expirationTtl=60)
+    raw = await kv.get(key)
+    count = int(raw or "0") + 1
+    # Only set TTL on first write so the window doesn't slide on every hit.
+    if raw is None:
+        await kv.put(key, str(count), expirationTtl=60)
+    else:
+        await kv.put(key, str(count))
+    return count > limit
 
 
 # --- Endpoints ---
@@ -43,8 +45,8 @@ async def send_notification(
     if not webhook_url:
         raise HTTPException(400, f"Unknown channel: {body.channel}")
 
-    # 2. Rate limit (Max 30 per minute per channel)
-    if await is_channel_rate_limited(body.channel, settings.kv):
+    # 2. Rate limit (Max 30 per minute per channel) - check and increment atomically before sending
+    if await check_and_increment_channel_rate(body.channel, settings.kv, limit=30):
         raise HTTPException(429, "Rate limit: max 30 notifications per minute per channel")
 
     # 3. Build Embed
@@ -60,15 +62,16 @@ async def send_notification(
     # 4. Send (Sync or Async)
     if body.async_mode:
         # Fire-and-forget: Return 202 immediately, send in background
+        # TODO: Replace asyncio.create_task with ctx.waitUntil for Cloudflare Workers
+        # In Workers, asyncio tasks will be terminated when response returns.
+        # Proper fix: wire request.scope["ctx"] and use ctx.waitUntil(post_webhook(...))
         asyncio.create_task(post_webhook(webhook_url, embed))
-        await increment_channel_rate(body.channel, settings.kv)
         return JSONResponse(
-            status_code=202, 
+            status_code=202,
             content={"channel": body.channel, "sent": True, "message": "Queued"}
         )
 
     # Synchronous send
     await post_webhook(webhook_url, embed)
-    await increment_channel_rate(body.channel, settings.kv)
-    
+
     return NotificationResult(channel=body.channel, sent=True)

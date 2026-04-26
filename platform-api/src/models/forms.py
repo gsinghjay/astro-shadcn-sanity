@@ -1,11 +1,11 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 class FormSubmission(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
-    
+
     site: str = Field(description="Site of origin for database selection")
     name: str = Field(min_length=1, max_length=200)
-    email: str = Field(pattern=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    email: EmailStr
     message: str = Field(min_length=10, max_length=5000)
     organization: str | None = None
     turnstile_token: str = Field(alias="cf-turnstile-response")
@@ -19,8 +19,8 @@ class SubmissionResponse(BaseModel):
 class SubmissionListItem(BaseModel):
     id: str = Field(alias="_id")
     name: str
-    email: str
+    email: EmailStr
     organization: str | None = None
     submitted_at: str = Field(alias="submittedAt")
     status: str
-    form_type: str | None = Field(default="contact", alias="formType")
+    form_type: str = Field(default="contact", alias="formType")
