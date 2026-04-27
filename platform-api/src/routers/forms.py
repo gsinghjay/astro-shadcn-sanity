@@ -51,17 +51,21 @@ async def list_submissions(
     admin_ok: bool = Depends(verify_admin_api_key)  # Protect route
 ):
     """Admin-only endpoint to list recent submissions."""
-    dataset, _ = resolve_dataset(site)
+    dataset, site_filter = resolve_dataset(site)
 
     # GROQ query to fetch submissions with pagination using parameters
+    site_predicate = "&& site == $site" if site_filter else ""
     end_index = offset + limit
-    query = """
-    *[_type == 'submission'] | order(submittedAt desc)[$offset...$end] {
-        _id, name, email, organization, submittedAt, status, formType
-    }
+    query = f"""
+    *[_type == 'submission' {site_predicate}] | order(submittedAt desc)[$offset...$end] {{
+        _id, name, email, organization, submittedAt, status, formType, site
+    }}
     """
+    params = {"offset": offset, "end": end_index}
+    if site_filter:
+        params["site"] = site_filter
 
-    return await sanity.query(query, dataset, {"offset": offset, "end": end_index})
+    return await sanity.query(query, dataset, params)
 
 RATE_LIMIT_MAX = 5
 RATE_LIMIT_WINDOW_SECS = 3600
@@ -146,7 +150,8 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
         "message": body.message,
         "submittedAt": datetime.now(timezone.utc).isoformat(),
         "status": "submitted",
-        "formType": body.form_type
+        "formType": body.form_type,
+        "site": body.site
     }
     
     # unsure if the form ID is required to be returned
