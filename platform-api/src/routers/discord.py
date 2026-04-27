@@ -42,9 +42,9 @@ async def send_notification(
         raise HTTPException(400, f"Unknown channel: {body.channel}")
 
     # 2. Rate limit (Max 30 per minute per channel) - check and increment atomically before sending
-    await increment_channel_rate(body.channel, settings.kv)
     if await is_channel_rate_limited(body.channel, settings.kv):
         raise HTTPException(429, "Rate limit: max 30 notifications per minute per channel")
+    await increment_channel_rate(body.channel, settings.kv)
 
     # 3. Build Embed
     embed = {
