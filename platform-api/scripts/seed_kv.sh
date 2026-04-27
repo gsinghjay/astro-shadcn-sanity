@@ -29,12 +29,7 @@ fi
 # Build args array to avoid word-splitting issues with ENVIRONMENT
 ARGS=(--namespace-id="$KV_NAMESPACE_ID")
 if [[ -n "$ENVIRONMENT" ]]; then
-    # Append environment tokens as distinct, quoted array elements
-    if [[ "$ENVIRONMENT" == "--preview" ]]; then
-        ARGS+=(--preview)
-    else
-        ARGS+=(--env "production")
-    fi
+    ARGS+=($ENVIRONMENT)
 fi
 
 # --- Seed values ---
@@ -51,31 +46,21 @@ echo "Setting webhooks:general..."
 npx wrangler kv key put "${ARGS[@]}" \
     "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
-# Discord webhook channels - only write if environment variables are set
-# add these into "vars" in wrangler.jsonc
-if [[ -n "${DISCORD_WEBHOOK_ANNOUNCEMENTS:-}" ]]; then
-    echo "Setting discord-webhook:announcements..."
-    npx wrangler kv key put "${ARGS[@]}" \
-        "discord-webhook:announcements" "\"$DISCORD_WEBHOOK_ANNOUNCEMENTS\""
-fi
+echo "Setting discord-webhooks:announcements"
+npx wrangler kv key put "${ARGS[@]}" \
+    "discord-webhooks:announcements" '""'
 
-if [[ -n "${DISCORD_WEBHOOK_BOT_AUDIT:-}" ]]; then
-    echo "Setting discord-webhook:bot-audit..."
-    npx wrangler kv key put "${ARGS[@]}" \
-        "discord-webhook:bot-audit" "\"$DISCORD_WEBHOOK_BOT_AUDIT\""
-fi
+echo "Setting discord-webhooks:events"
+npx wrangler kv key put "${ARGS[@]}" \
+    "discord-webhooks:events" '""'
 
-if [[ -n "${DISCORD_WEBHOOK_EVENTS:-}" ]]; then
-    echo "Setting discord-webhook:events..."
-    npx wrangler kv key put "${ARGS[@]}" \
-        "discord-webhook:events" "\"$DISCORD_WEBHOOK_EVENTS\""
-fi
+echo "Setting discord-webhooks:bot-audit"
+npx wrangler kv key put "${ARGS[@]}" \
+    "discord-webhooks:bot-audit" '""'
 
-if [[ -n "${DISCORD_WEBHOOK_FORM_SUBMISSIONS:-}" ]]; then
-    echo "Setting discord-webhook:form-submissions..."
-    npx wrangler kv key put "${ARGS[@]}" \
-        "discord-webhook:form-submissions" "\"$DISCORD_WEBHOOK_FORM_SUBMISSIONS\""
-fi
+echo "Setting discord-webhooks:form-submissions"
+npx wrangler kv key put "${ARGS[@]}" \
+    "discord-webhooks:form-submissions" '"https://discord.com/api/webhooks/1498016849554837637/5sdq9SvxbRZOTTSwcAjpWXN9R4X7wPpFl4TNW3-QDucPiOc38WJenh0IpgAgVVHoegdd"'
 
 echo ""
 echo ">>> KV seeding complete!"
