@@ -44,23 +44,23 @@ npx wrangler kv key put "${ARGS[@]}" \
 # Example: webhook mapping for Discord notifications
 echo "Setting webhooks:general..."
 npx wrangler kv key put "${ARGS[@]}" \
-    "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
+    "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL?wait=true"'
 
-echo "Setting discord-webhooks:announcements"
+echo "Setting discord-webhook:announcements"
 npx wrangler kv key put "${ARGS[@]}" \
-    "discord-webhooks:announcements" '""'
+    "discord-webhook:announcements" '""'
 
-echo "Setting discord-webhooks:events"
+echo "Setting discord-webhook:events"
 npx wrangler kv key put "${ARGS[@]}" \
-    "discord-webhooks:events" '""'
+    "discord-webhook:events" '""'
 
-echo "Setting discord-webhooks:bot-audit"
+echo "Setting discord-webhook:bot-audit"
 npx wrangler kv key put "${ARGS[@]}" \
-    "discord-webhooks:bot-audit" '""'
+    "discord-webhook:bot-audit" '""'
 
-echo "Setting discord-webhooks:form-submissions"
+echo "Setting discord-webhook:form-submissions"
 npx wrangler kv key put "${ARGS[@]}" \
-    "discord-webhooks:form-submissions" '"https://discord.com/api/webhooks/1498016849554837637/5sdq9SvxbRZOTTSwcAjpWXN9R4X7wPpFl4TNW3-QDucPiOc38WJenh0IpgAgVVHoegdd"'
+    "discord-webhook:form-submissions" '"https://discord.com/api/webhooks/1498016849554837637/5sdq9SvxbRZOTTSwcAjpWXN9R4X7wPpFl4TNW3-QDucPiOc38WJenh0IpgAgVVHoegdd?wait=true"'
 
 echo ""
 echo ">>> KV seeding complete!"
