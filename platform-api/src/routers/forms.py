@@ -27,8 +27,10 @@ async def submit_form(request: Request, body: FormSubmission, background_tasks: 
 
     # Rate limit - use composite key to mitigate distributed abuse
     rate_limit_key = f"{client_ip}:{body.email}:{body.site}"
-    if await check_and_increment_rate_limit(rate_limit_key, settings.kv):
+
+    if await is_rate_limited(rate_limit_key, settings.kv):
         raise HTTPException(429, "Rate limit exceeded — max 5 submissions per hour")
+    await increment_rate_limit(rate_limit_key, settings.kv)
 
     # Turnstile
     if not await verify_turnstile(body.turnstile_token, client_ip, settings.optional_secrets.get("turnstile_secret_key")):
@@ -67,39 +69,15 @@ async def list_submissions(
 
     return await sanity.query(query, dataset, params)
 
-RATE_LIMIT_MAX = 5
-RATE_LIMIT_WINDOW_SECS = 3600
+async def is_rate_limited(ip: str, kv) -> bool:
+    key = f"rate:forms:{ip}"
+    count = int(await kv.get(key) or "0")
+    return count >= 5
 
-async def check_and_increment_rate_limit(composite_key: str, kv) -> bool:
-    """Increment first, then check; preserve original TTL on subsequent puts."""
-    key = f"rate:forms:{composite_key}"
-    raw = await kv.get(key)
-    now = int(time.time())
-
-    if raw is None:
-        # First write: initialize count and timestamp
-        data = {"count": 1, "started_at": now}
-        await kv.put(key, json.dumps(data), {"expirationTtl": RATE_LIMIT_WINDOW_SECS})
-        return False
-    else:
-        # Subsequent writes: increment count and preserve TTL
-        data = json.loads(raw)
-        count = data.get("count", 0) + 1
-        started_at = data.get("started_at", now)
-
-        # Calculate remaining TTL
-        remaining_ttl = RATE_LIMIT_WINDOW_SECS - (now - started_at)
-
-        if remaining_ttl <= 0:
-            # Window has expired, start a fresh window
-            data = {"count": 1, "started_at": now}
-            await kv.put(key, json.dumps(data), {"expirationTtl": RATE_LIMIT_WINDOW_SECS})
-            return False
-        else:
-            # Window still active, increment and preserve TTL
-            data["count"] = count
-            await kv.put(key, json.dumps(data), {"expirationTtl": remaining_ttl})
-            return count > RATE_LIMIT_MAX
+async def increment_rate_limit(ip: str, kv):
+    key = f"rate:forms:{ip}"
+    count = int(await kv.get(key) or "0")
+    await kv.put(key, str(count + 1), expirationTtl=3600)
 
 async def notify_discord(body: FormSubmission, settings: WorkerSettings):
     # Look up webhook URL from KV using a configurable key per site
