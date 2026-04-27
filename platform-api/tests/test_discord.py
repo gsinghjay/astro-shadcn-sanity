@@ -84,6 +84,43 @@ def test_rate_limiting(client):
     assert response.status_code == 429
     assert "Rate limit" in response.json()["detail"]
 
+def test_time_to_live(client, monkeypatch):
+    """Verify that the rate-limit window resets after the 60-second TTL expires."""
+    import time as _time
+
+    base_time = int(_time.time())
+    current_time = [base_time]  # Mutable container so the closure can update it
+
+    def fake_time():
+        return current_time[0]
+
+    # Patch time.time as used inside the discord router
+    monkeypatch.setattr("routers.discord.time.time", fake_time)
+
+    payload = {
+        "channel": "announcements",
+        "title": "TTL Test",
+        "message": "Testing window expiry",
+    }
+
+    # Fill up the rate limit: 30 requests should all succeed
+    for _ in range(30):
+        response = client.post("/api/v1/discord/notify", json=payload)
+        assert response.status_code == 200
+
+    # 31st request must be rejected
+    response = client.post("/api/v1/discord/notify", json=payload)
+    assert response.status_code == 429
+    assert "Rate limit" in response.json()["detail"]
+
+    # Advance the clock past the 60-second window
+    current_time[0] = base_time + 61
+
+    # After expiry, a fresh window should open → request succeeds
+    response = client.post("/api/v1/discord/notify", json=payload)
+    assert response.status_code == 200, "Request should succeed after TTL window resets"
+    assert response.json()["sent"] is True
+
 def test_async_mode(client, monkeypatch):
     # Track invocations of the webhook dispatcher
     webhook_calls = []
