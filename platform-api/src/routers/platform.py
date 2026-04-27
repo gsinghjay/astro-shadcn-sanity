@@ -18,6 +18,8 @@ async def deploy_status(
     data = await get_deploy_status(site, settings)
     if not data:
         return DeployStatus(site=site, status="unknown")
+    if data.get("status") == "no_deployments":
+        return DeployStatus(site = site, status = "unknown")
 
     # Map Cloudflare Pages status to our model
     cf_status = data.get("latest_stage", {}).get("status", "unknown")
