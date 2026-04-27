@@ -130,7 +130,7 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
             if "errors" in response_json:
                 error_details = response_json["errors"]
                 logger.error("GraphQL errors from Cloudflare Analytics API: %s", error_details)
-                raise HTTPException(502, f"GraphQL errors from Cloudflare Analytics API: {error_details}")
+                raise HTTPException(502, f"GraphQL errors from Cloudflare Analytics API")
 
             # Only proceed if data exists and is non-null
             if not response_json.get("data"):
@@ -144,9 +144,10 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
 
             accounts = response_json["data"]["viewer"]["accounts"]
             if not accounts or len(accounts) == 0:
+                logger.error(f"No accounts found for account_id: {account_id}. Response {response_json}")
                 raise HTTPException(
                     502,
-                    f"No accounts found for account_id={account_id}. Check credentials/scope. Response: {response_json}"
+                    f"No accounts found for provided account id. Check credentials/scope"
                 )
 
             # Parse the deeply nested GraphQL response
