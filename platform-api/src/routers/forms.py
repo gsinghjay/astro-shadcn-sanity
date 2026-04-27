@@ -48,7 +48,7 @@ async def list_submissions(
     limit: int = Query(20, ge=1, le=100, description="Max records to return"),
     offset: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     sanity: SanityClient = Depends(get_sanity),
-    admin_ok: bool = Depends(verify_admin_api_key)  # Protect route
+    _ = Depends(verify_admin_api_key)  # Protect route
 ):
     """Admin-only endpoint to list recent submissions."""
     dataset, site_filter = resolve_dataset(site)
@@ -127,7 +127,7 @@ async def notify_discord(body: FormSubmission, settings: WorkerSettings):
         async with get_client(timeout=5.0) as client:
             resp = await client.post(webhook_url, json={"embeds": [embed]})
             resp.raise_for_status()
-    except (httpx.HTTPError, asyncio.TimeoutError) as e:
+    except (httpx.HTTPError, asyncio.TimeoutError):
         # Log the exception with context, but don't break submission flow
         logger.exception(
             "Discord notification failed for webhook host %s, request_id=%s",
@@ -153,10 +153,6 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
         "formType": body.form_type,
         "site": body.site
     }
-    
-    # unsure if the form ID is required to be returned
-    # if body.form_id:
-    #     doc["form"] = {"_type": "reference", "_ref": body.form_id}
 
     dataset, _ = resolve_dataset(body.site)
 

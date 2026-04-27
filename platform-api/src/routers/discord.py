@@ -31,31 +31,31 @@ async def check_and_increment_channel_rate(channel: str, kv, limit: int = 30) ->
         data = {"count": 1, "started_at": now}
         await kv.put(key, json.dumps(data), expirationTtl = window_seconds)
         return False
-    else:
-        # Subsequent writes: increment count and preserve TTL
-        data = json.loads(raw)
-        count = data.get("count", 0) + 1
-        started_at = data.get("started_at", now)
 
-        # Calculate remaining TTL
-        remaining_ttl = window_seconds - (now - started_at)
+    # Subsequent writes: increment count and preserve TTL
+    data = json.loads(raw)
+    count = data.get("count", 0) + 1
+    started_at = data.get("started_at", now)
 
-        if remaining_ttl <= 0:
-            # Window has expired, start a fresh window
-            data = {"count": 1, "started_at": now}
-            await kv.put(key, json.dumps(data), expirationTtl = window_seconds)
-            return False
-        else:
-            data["count"] = count
-            await kv.put(key, json.dumps(data), expirationTtl = window_seconds)
-            return count > limit
+    # Calculate remaining TTL
+    remaining_ttl = window_seconds - (now - started_at)
+
+    if remaining_ttl <= 0:
+        # Window has expired, start a fresh window
+        data = {"count": 1, "started_at": now}
+        await kv.put(key, json.dumps(data), expirationTtl = window_seconds)
+        return False
+
+    data["count"] = count
+    await kv.put(key, json.dumps(data), expirationTtl = remaining_ttl)
+    return count > limit
 
 
 # --- Endpoints ---
 
-@router.post("/notify", response_model=NotificationResult)
+@router.post("/notify", response_model=NotificationResult, responses={202: {"model": NotificationResult, "description": "Queued (async)"}})
 async def send_notification(
-    body: DiscordNotification, 
+    body: DiscordNotification,
     background_tasks: BackgroundTasks,
     settings: WorkerSettings = Depends(get_settings)
 ):
@@ -85,9 +85,10 @@ async def send_notification(
     if body.async_mode:
         # Fire-and-forget: Return 202 immediately, send in background
         background_tasks.add_task(post_webhook, webhook_url, embed)
+        result = NotificationResult(channel=body.channel, sent=True, message="Queued")
         return JSONResponse(
             status_code=202,
-            content={"channel": body.channel, "sent": True, "message": "Queued"}
+            content=result.model_dump()
         )
 
     # Synchronous send

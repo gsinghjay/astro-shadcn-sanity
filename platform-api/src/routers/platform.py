@@ -18,6 +18,7 @@ async def deploy_status(
     data = await get_deploy_status(site, settings)
     if not data:
         return DeployStatus(site=site, status="unknown")
+    # Explicitly map "no_deployments" sentinel to "unknown" status before the cf_status mapping below
     if data.get("status") == "no_deployments":
         return DeployStatus(site = site, status = "unknown")
 
@@ -86,7 +87,11 @@ async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
             await asyncio.wait_for(coroutine, timeout=5.0)
             checks[name] = "ok"
         except Exception as e:
-            checks[name] = f"error: {str(e)}"
+            # Map exceptions to fixed labels; log detailed error server-side
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error("Health probe failed for %s: %s", name, str(e), exc_info=True)
+            checks[name] = "error"
 
     async def check_sanity():
         pid = settings.env_vars.get("sanity_project_id")

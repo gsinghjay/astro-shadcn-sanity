@@ -87,6 +87,8 @@ def test_rate_limiting(client):
 def test_time_to_live(client, monkeypatch):
     """Verify that the rate-limit window resets after the 60-second TTL expires."""
     import time as _time
+    import types
+    import routers.discord as rd
 
     base_time = int(_time.time())
     current_time = [base_time]  # Mutable container so the closure can update it
@@ -94,8 +96,9 @@ def test_time_to_live(client, monkeypatch):
     def fake_time():
         return current_time[0]
 
-    # Patch time.time as used inside the discord router
-    monkeypatch.setattr("routers.discord.time.time", fake_time)
+    # Patch the time module reference inside the discord router
+    fake_time_module = types.SimpleNamespace(time=fake_time)
+    monkeypatch.setattr(rd, "time", fake_time_module)
 
     payload = {
         "channel": "announcements",

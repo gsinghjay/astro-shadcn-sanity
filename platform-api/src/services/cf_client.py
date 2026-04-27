@@ -39,7 +39,9 @@ async def get_deploy_status(site: str, settings) -> dict:
             params={"per_page": 1},
         )
         if resp.status_code != 200:
-            raise HTTPException(502, f"Cloudflare API error: {resp.status_code}")
+            error_snippet = resp.text[:512]
+            logger.error("Cloudflare API error %s: %s", resp.status_code, error_snippet)
+            raise HTTPException(502, f"Cloudflare API error {resp.status_code}: {error_snippet}")
 
         response_json = resp.json()
         if "result" not in response_json:
@@ -47,7 +49,11 @@ async def get_deploy_status(site: str, settings) -> dict:
 
         deployments = response_json["result"]
         if not deployments:
-            return {"status": "no_deployments"}
+            sentinel = {"status": "no_deployments"}
+            # Cache the sentinel to avoid repeated upstream calls
+            if settings.kv:
+                await settings.kv.put(cache_key, json.dumps(sentinel), {"expirationTtl": 60})
+            return sentinel
 
         result = deployments[0]
 
@@ -130,7 +136,7 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
             if "errors" in response_json:
                 error_details = response_json["errors"]
                 logger.error("GraphQL errors from Cloudflare Analytics API: %s", error_details)
-                raise HTTPException(502, f"GraphQL errors from Cloudflare Analytics API")
+                raise HTTPException(502, "GraphQL errors from Cloudflare Analytics API")
 
             # Only proceed if data exists and is non-null
             if not response_json.get("data"):
@@ -144,10 +150,10 @@ async def get_cf_analytics(metric: str, period: str, settings) -> list:
 
             accounts = response_json["data"]["viewer"]["accounts"]
             if not accounts or len(accounts) == 0:
-                logger.error(f"No accounts found for account_id: {account_id}. Response {response_json}")
+                logger.error("No accounts found for account_id: %s. Response: %s", account_id, response_json)
                 raise HTTPException(
                     502,
-                    f"No accounts found for provided account id. Check credentials/scope"
+                    "No accounts found for provided account id. Check credentials/scope"
                 )
 
             # Parse the deeply nested GraphQL response

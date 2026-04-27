@@ -22,6 +22,6 @@ class SubmissionListItem(BaseModel):
     email: EmailStr
     organization: str | None = None
     submitted_at: str = Field(alias="submittedAt")
-    status: str
+    status: str = ""
     form_type: str = Field(default="contact", alias="formType")
     site: str | None = None
