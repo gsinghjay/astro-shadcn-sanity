@@ -11,6 +11,9 @@ async def post_webhook(webhook_url: str, embed: dict):
     Validates the webhook destination and handles upstream errors properly.
     """
     # Parse and validate webhook host
+    if "wait=true" not in webhook_url:
+        raise HTTPException(500, "Webhook incorrectly configured (missing wait=true query param)")
+
     parsed = urlparse(webhook_url)
     if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
         raise HTTPException(500, f"Invalid webhook host: {parsed.hostname}")
