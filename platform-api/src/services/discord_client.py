@@ -11,6 +11,7 @@ async def post_webhook(webhook_url: str, embed: dict):
     Validates the webhook destination and handles upstream errors properly.
     """
     # Parse and validate webhook host
+    webhook_url = webhook_url.strip('"')
     if "wait=true" not in webhook_url:
         raise HTTPException(500, "Webhook incorrectly configured (missing wait=true query param)")
 

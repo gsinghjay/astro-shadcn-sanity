@@ -37,7 +37,6 @@ async def send_notification(
 
     # 1. Get webhook URL from KV
     webhook_url = await settings.kv.get(f"discord-webhook:{body.channel}")
-    webhook_url = webhook_url[1:-1]
     if not webhook_url:
         raise HTTPException(400, f"Unknown channel: {body.channel}")
 
