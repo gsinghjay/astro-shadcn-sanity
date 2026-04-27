@@ -13,42 +13,15 @@ router = APIRouter(prefix="/discord", tags=["Discord"])
 
 # --- Helpers ---
 
-async def check_and_increment_channel_rate(channel: str, kv, limit: int = 30) -> bool:
-    """Atomically check and increment rate limit counter.
-
-    Returns True if rate limit is exceeded (deny request), False otherwise.
-    """
-    if not kv:
-        return False
-
-    window_seconds = 60
+async def is_channel_rate_limited(channel: str, kv) -> bool:
     key = f"rate:discord:{channel}"
-    raw = await kv.get(key)
-    now = int(time.time())
+    count = int(await kv.get(key) or "0")
+    return count >= 30
 
-    if raw is None:
-        # First write: initialize count and timestamp
-        data = {"count": 1, "started_at": now}
-        await kv.put(key, json.dumps(data), {"expirationTtl": window_seconds})
-        return False
-
-    # Subsequent writes: increment count and preserve TTL
-    data = json.loads(raw)
-    count = data.get("count", 0) + 1
-    started_at = data.get("started_at", now)
-
-    # Calculate remaining TTL
-    remaining_ttl = window_seconds - (now - started_at)
-
-    if remaining_ttl <= 0:
-        # Window has expired, start a fresh window
-        data = {"count": 1, "started_at": now}
-        await kv.put(key, json.dumps(data), {"expirationTtl": window_seconds})
-        return False
-
-    data["count"] = count
-    await kv.put(key, json.dumps(data), {"expirationTtl": remaining_ttl})
-    return count > limit
+async def increment_channel_rate(channel: str, kv):
+    key = f"rate:discord:{channel}"
+    count = int(await kv.get(key) or "0")
+    await kv.put(key, str(count + 1), expirationTtl=60)
 
 
 # --- Endpoints ---
@@ -64,11 +37,13 @@ async def send_notification(
 
     # 1. Get webhook URL from KV
     webhook_url = await settings.kv.get(f"discord-webhook:{body.channel}")
+    webhook_url = webhook_url[1:-1]
     if not webhook_url:
         raise HTTPException(400, f"Unknown channel: {body.channel}")
 
     # 2. Rate limit (Max 30 per minute per channel) - check and increment atomically before sending
-    if await check_and_increment_channel_rate(body.channel, settings.kv, limit=30):
+    await increment_channel_rate(body.channel, settings.kv)
+    if await is_channel_rate_limited(body.channel, settings.kv):
         raise HTTPException(429, "Rate limit: max 30 notifications per minute per channel")
 
     # 3. Build Embed
