@@ -1,19 +1,14 @@
 from fastapi import HTTPException, Depends, Request, APIRouter, Query, BackgroundTasks
 from models.forms import SubmissionResponse, FormSubmission, SubmissionListItem
 from models.settings import WorkerSettings
-from services.http_client import get_client
+from models.discord import DiscordNotification, EmbedField
+from routers.discord import send_notification
 from services.sanity_client import SanityClient
 from services.turnstile import verify_turnstile
 from dependencies import get_settings, verify_admin_api_key, get_sanity
 from datetime import datetime, timezone
 from utils.dataset import resolve_dataset
-from urllib.parse import urlparse
-import logging
-import uuid
-import json
-import time
-import asyncio
-import httpx
+import logging, uuid, asyncio, httpx
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +34,8 @@ async def submit_form(request: Request, body: FormSubmission, background_tasks: 
     # Create Sanity submission document
     doc_id = await create_submission(body, settings, sanity)
 
-    # Discord notification (fire-and-forget via background task)
-    background_tasks.add_task(notify_discord, body, settings)
+    # Discord notification
+    await notify_discord(body, settings, background_tasks)
 
     return SubmissionResponse(id=doc_id)
 
@@ -79,38 +74,35 @@ async def increment_rate_limit(ip: str, kv):
     count = int(await kv.get(key) or "0")
     await kv.put(key, str(count + 1), expirationTtl=3600)
 
-async def notify_discord(body: FormSubmission, settings: WorkerSettings):
+async def notify_discord(body: FormSubmission, settings: WorkerSettings, background_tasks: BackgroundTasks):
     # Look up webhook URL from KV using a configurable key per site
     webhook_key = "discord-webhook:form-submissions"
     webhook_url = await settings.kv.get(webhook_key) if settings.kv else None
     if not webhook_url:
         return
-
-    embed = {
-        "title": "New Form Submission",
-        "color": 0x0066cc,  # Blue
-        "fields": [
-            {"name": "Name", "value": body.name, "inline": True},
-            {"name": "Email", "value": body.email, "inline": True},
-            {"name": "Organization", "value": body.organization or "N/A", "inline": True},
-            {"name": "Message", "value": body.message[:1024]}  # Discord limit is 1024
+    
+    embed = DiscordNotification(
+        channel = "form-submissions",
+        title = "New Form Submission",
+        message = "A new form submission has been added to sanity",
+        color = "blue",
+        fields = [
+            EmbedField(name = "Name", value = body.name),
+            EmbedField(name = "Email", value = body.email),
+            EmbedField(name = "Organization", value = body.organization or "N/A"),
+            EmbedField(name = "Message", value = body.message[:1024]) # discord imposes 1024 char limit
         ],
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
-
-    webhook_host = urlparse(webhook_url).hostname if webhook_url else "unknown"
-    request_id = uuid.uuid4().hex[:8]
+        async_mode = True
+    )
 
     try:
-        async with get_client(timeout=5.0) as client:
-            resp = await client.post(webhook_url, json={"embeds": [embed]})
-            resp.raise_for_status()
+        await send_notification(embed, background_tasks, settings)
     except (httpx.HTTPError, asyncio.TimeoutError):
         # Log the exception with context, but don't break submission flow
         logger.exception(
-            "Discord notification failed for webhook host %s, request_id=%s",
-            webhook_host, request_id
+            "Discord notification failed for webhook"
         )
+        raise
 
 async def create_submission(body: FormSubmission, settings: WorkerSettings, sanity: SanityClient) -> str:
     """Creates a new submission document in Sanity."""
