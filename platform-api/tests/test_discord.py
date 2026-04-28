@@ -1,5 +1,5 @@
 # tests/test_discord.py
-import pytest
+import pytest, time
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock
 
@@ -7,22 +7,36 @@ from app import app
 from dependencies import get_settings
 from models.settings import WorkerSettings
 
+import pytest, time
+
 class MockKV:
     def __init__(self):
-        # Pre-seed our mock KV with one known channel
-        self.store = {"discord-webhook:announcements": "http://fake-discord.url"}
+        self.store = {"discord-webhook:announcements": ("http://fake-discord.url?wait=true", None)}
+        self.custom_time = None 
+        
+    def now(self):
+        return self.custom_time if self.custom_time is not None else time.time()
         
     async def get(self, key):
-        return self.store.get(key)
+        entry = self.store.get(key)
+        if not entry:
+            return None
+        
+        if entry[1] is not None and entry[1] <= self.now():
+            del self.store[key]
+            return None
+        
+        return entry[0]
         
     async def put(self, key, value, expirationTtl=None):
-        self.store[key] = value
+        expires = self.now() + expirationTtl if expirationTtl else None
+        self.store[key] = (value, expires)
 
 @pytest.fixture
 def client(monkeypatch):
     # Mock the discord client so it never makes real HTTP requests
     async def fake_post_webhook(url, embed):
-        if url != "http://fake-discord.url":
+        if url != "http://fake-discord.url?wait=true":
             raise AssertionError("Invalid Webhook URL hit")
         return True
 
@@ -84,21 +98,17 @@ def test_rate_limiting(client):
     assert response.status_code == 429
     assert "Rate limit" in response.json()["detail"]
 
-def test_time_to_live(client, monkeypatch):
+def test_time_to_live(client):
     """Verify that the rate-limit window resets after the 60-second TTL expires."""
-    import time as _time
-    import types
-    import routers.discord as rd
-
-    base_time = int(_time.time())
-    current_time = [base_time]  # Mutable container so the closure can update it
-
-    def fake_time():
-        return current_time[0]
-
-    # Patch the time module reference inside the discord router
-    fake_time_module = types.SimpleNamespace(time=fake_time)
-    monkeypatch.setattr(rd, "time", fake_time_module)
+    import time
+    
+    # Grab the KV store instance from our mocked settings
+    settings = app.dependency_overrides[get_settings]()
+    mock_kv = settings.kv
+    
+    # Lock the KV's clock to a specific time
+    base_time = time.time()
+    mock_kv.custom_time = base_time
 
     payload = {
         "channel": "announcements",
@@ -116,10 +126,10 @@ def test_time_to_live(client, monkeypatch):
     assert response.status_code == 429
     assert "Rate limit" in response.json()["detail"]
 
-    # Advance the clock past the 60-second window
-    current_time[0] = base_time + 61
+    # Fast-forward the KV clock by 61 seconds
+    mock_kv.custom_time = base_time + 61
 
-    # After expiry, a fresh window should open → request succeeds
+    # After expiry, MockKV will delete the key → request succeeds!
     response = client.post("/api/v1/discord/notify", json=payload)
     assert response.status_code == 200, "Request should succeed after TTL window resets"
     assert response.json()["sent"] is True
@@ -130,7 +140,7 @@ def test_async_mode(client, monkeypatch):
 
     async def tracking_post_webhook(url, embed):
         webhook_calls.append({"url": url, "embed": embed})
-        if url != "http://fake-discord.url":
+        if url != "http://fake-discord.url?wait=true":
             raise AssertionError("Invalid Webhook URL hit")
         return True
 
@@ -151,7 +161,7 @@ def test_async_mode(client, monkeypatch):
     # The TestClient (anyio-backed) drains background tasks before returning the response,
     # so webhook_calls should already be populated.
     assert len(webhook_calls) == 1
-    assert webhook_calls[0]["url"] == "http://fake-discord.url"
+    assert webhook_calls[0]["url"] == "http://fake-discord.url?wait=true"
     assert webhook_calls[0]["embed"]["title"] == "Async Alert"
 
 def test_with_fields(client, monkeypatch):
@@ -160,7 +170,7 @@ def test_with_fields(client, monkeypatch):
 
     async def tracking_post_webhook(url, embed):
         webhook_calls.append({"url": url, "embed": embed})
-        if url != "http://fake-discord.url":
+        if url != "http://fake-discord.url?wait=true":
             raise AssertionError("Invalid Webhook URL hit")
         return True
 
