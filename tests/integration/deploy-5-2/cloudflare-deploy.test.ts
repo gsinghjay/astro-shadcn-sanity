@@ -30,10 +30,12 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(configContent).toContain('enabled: true')
     })
 
-    test('[P0] 5.2-INT-004 — output defaults to static', () => {
-      // Output is conditionally set: isVisualEditing ? "server" : "static"
-      expect(configContent).toContain('"static"')
-      expect(configContent).toMatch(/output:/)
+    test('[P0] 5.2-INT-004 — output is server so Astro Actions deploy on the Worker', () => {
+      // Switched from "static" to "server" so /_actions/* mounts on the
+      // Cloudflare Worker. Marketing pages opt back into static via
+      // `export const prerender = true`.
+      expect(configContent).toContain('"server"')
+      expect(configContent).toMatch(/output:\s*"server"/)
     })
 
     test('[P0] 5.2-INT-005 — site property reads PUBLIC_SITE_URL env var', () => {

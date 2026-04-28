@@ -19,7 +19,7 @@ const studioUrl = `${studioUrlBase.replace(/\/$/, "")}${studioWorkspace}`;
 const visualEditingEnabled = env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || "";
 
 export default defineConfig({
-  output: "static",
+  output: "server",
   site: siteUrl,
   env: {
     schema: {

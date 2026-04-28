@@ -3,6 +3,8 @@ import type { APIContext } from 'astro';
 import { stegaClean } from '@sanity/client/stega';
 import { getAllArticles, getSiteSettings } from '@/lib/sanity';
 
+export const prerender = true;
+
 const DEFAULT_TITLE = 'YWCC Industry Capstone';
 const DEFAULT_DESCRIPTION =
   'Latest articles, news, and updates from the YWCC Industry Capstone program.';
