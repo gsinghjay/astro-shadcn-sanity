@@ -3,6 +3,8 @@ import { getAllEvents, type SanityEvent } from '@/lib/sanity';
 import { generateIcsString } from '@/lib/ical';
 import { stegaClean } from '@sanity/client/stega';
 
+export const prerender = true;
+
 export const getStaticPaths: GetStaticPaths = async () => {
   const events = await getAllEvents();
   return events

@@ -27,6 +27,7 @@ export default getViteConfig({
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",
       "../tests/integration/**/*.test.ts",
+      "../studio/src/tools/__tests__/**/*.test.tsx",
     ],
     exclude: ["node_modules", "dist", ".astro"],
     // React component tests use jsdom; non-component tests stay in node.

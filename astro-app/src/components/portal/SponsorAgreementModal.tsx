@@ -45,6 +45,7 @@ export default function SponsorAgreementModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pdfReady, setPdfReady] = useState(false);
+  const [scrolledToEnd, setScrolledToEnd] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const acceptBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -88,9 +89,10 @@ export default function SponsorAgreementModal({
 
   const isConfigured = Boolean(pdfUrl);
   const onPdfReady = useCallback((numPages: number) => setPdfReady(numPages > 0), []);
+  const onScrolledToEnd = useCallback(() => setScrolledToEnd(true), []);
 
   async function onAccept() {
-    if (!accepted || submitting || !pdfReady) return;
+    if (!accepted || submitting || !pdfReady || !scrolledToEnd) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -137,11 +139,26 @@ export default function SponsorAgreementModal({
         </div>
 
         {isConfigured && pdfUrl ? (
-          <SponsorAgreementViewer pdfUrl={pdfUrl} maxHeight="60vh" onReady={onPdfReady} />
+          <SponsorAgreementViewer
+            pdfUrl={pdfUrl}
+            maxHeight="60vh"
+            onReady={onPdfReady}
+            onScrolledToEnd={onScrolledToEnd}
+          />
         ) : (
           <div className="border bg-muted/30 p-6 text-sm text-muted-foreground">
             Sponsor agreement is not yet configured. Please contact your program administrator.
           </div>
+        )}
+
+        {isConfigured && pdfReady && !scrolledToEnd && (
+          <p
+            id="agreement-scroll-hint"
+            className="text-xs text-muted-foreground"
+            data-testid="agreement-scroll-hint"
+          >
+            Scroll to the end of the agreement to enable acceptance.
+          </p>
         )}
 
         {isConfigured && (
@@ -150,7 +167,8 @@ export default function SponsorAgreementModal({
               type="checkbox"
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
-              disabled={!pdfReady}
+              disabled={!pdfReady || !scrolledToEnd}
+              aria-describedby={pdfReady && !scrolledToEnd ? 'agreement-scroll-hint' : undefined}
               className="mt-1 size-4 shrink-0 border-input disabled:opacity-50"
               data-testid="agreement-checkbox"
             />
@@ -179,7 +197,7 @@ export default function SponsorAgreementModal({
               ref={acceptBtnRef}
               type="button"
               onClick={onAccept}
-              disabled={!accepted || submitting || !pdfReady}
+              disabled={!accepted || submitting || !pdfReady || !scrolledToEnd}
               data-testid="agreement-accept"
               className="bg-primary text-primary-foreground px-6 py-2 text-sm font-semibold uppercase tracking-wide transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >

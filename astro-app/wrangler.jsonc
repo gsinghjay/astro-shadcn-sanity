@@ -15,6 +15,9 @@
   "vars": {
     // GitHub OAuth, Resend API key, and Google OAuth secrets are set via the CF Pages dashboard.
     // Local dev bypasses auth via the `import.meta.env.DEV` check in middleware.
+    // STUDIO_ORIGIN is the allowlisted Studio host for the admin acceptances endpoint
+    // (CORS + Origin check). STUDIO_ADMIN_TOKEN is set via `wrangler secret put`.
+    "STUDIO_ORIGIN": "https://capstone.sanity.studio"
   },
   "d1_databases": [
     {

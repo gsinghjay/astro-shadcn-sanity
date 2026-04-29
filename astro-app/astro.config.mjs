@@ -19,7 +19,7 @@ const studioUrl = `${studioUrlBase.replace(/\/$/, "")}${studioWorkspace}`;
 const visualEditingEnabled = env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || process.env.PUBLIC_SANITY_VISUAL_EDITING_ENABLED || "";
 
 export default defineConfig({
-  output: "static",
+  output: "server",
   site: siteUrl,
   env: {
     schema: {
@@ -82,6 +82,17 @@ export default defineConfig({
       SANITY_API_READ_TOKEN: envField.string({
         context: "server",
         access: "secret",
+        optional: true,
+      }),
+      STUDIO_ADMIN_TOKEN: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+        startsWith: "sat_",
+      }),
+      STUDIO_ORIGIN: envField.string({
+        context: "server",
+        access: "public",
         optional: true,
       }),
     },
