@@ -15,8 +15,8 @@ module.exports = {
     },
     assert: {
       assertions: {
-        'categories:performance': ['warn', { minScore: 0.89 }],
-        'largest-contentful-paint': ['warn', { maxNumericValue: 2000 }],
+        'categories:performance': ['error', { minScore: 0.89 }],
+        'largest-contentful-paint': ['error', { maxNumericValue: 2000 }],
       },
     },
     upload: {

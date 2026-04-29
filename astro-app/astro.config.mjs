@@ -122,7 +122,7 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: !visualEditingEnabled,
+      useCdn: visualEditingEnabled !== 'true',
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,
