@@ -1,5 +1,5 @@
-import {defineConfig, type WorkspaceOptions} from 'sanity'
-import {structureTool} from 'sanity/structure'
+import {defineConfig, type WorkspaceOptions, type PluginOptions} from 'sanity'
+import {structureTool, type StructureResolver} from 'sanity/structure'
 import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {RocketIcon, EarthAmericasIcon, EarthGlobeIcon} from '@sanity/icons'
@@ -8,15 +8,52 @@ import {media} from 'sanity-plugin-media'
 import {createWorkspaceSchemaTypes} from './src/schemaTypes/workspace-utils'
 import {capstoneDeskStructure} from './src/structure/capstone-desk-structure'
 import {createRwcDeskStructure} from './src/structure/rwc-desk-structure'
-import {resolve} from './src/presentation/resolve'
+import {createResolve} from './src/presentation/resolve'
 import {
   CAPSTONE_SINGLETON_TYPES,
+  LISTING_PAGE_ROUTES,
   SITE_AWARE_TYPES,
 } from './src/constants'
+// Capstone-only — depends on `sponsorAgreement` document type, which RWC datasets do not ship.
 import {sponsorAcceptancesTool} from './src/tools/SponsorAcceptancesTool'
 
-// Environment variables for project configuration
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '<your project ID>'
+// Environment variables for project configuration. Fail fast on missing
+// SANITY_STUDIO_PROJECT_ID — a placeholder fallback silently breaks every
+// Studio request and is impossible to diagnose from the resulting 404s.
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID
+if (!projectId) {
+  throw new Error(
+    'SANITY_STUDIO_PROJECT_ID is required — set it in studio/.env or your deploy environment.',
+  )
+}
+
+interface CommonPluginsOptions {
+  structure: StructureResolver
+  previewOrigin: string
+  resolve: ReturnType<typeof createResolve>
+}
+
+/**
+ * Shared plugin set for every workspace. Capstone and RWC differ only in
+ * `structure`, `previewOrigin`, and Presentation `resolve` — every other
+ * plugin is identical, so changes (e.g. adding a new studio plugin) only
+ * need to land here.
+ */
+function commonPlugins(opts: CommonPluginsOptions): PluginOptions[] {
+  return [
+    structureTool({structure: opts.structure}),
+    presentationTool({
+      resolve: opts.resolve,
+      previewUrl: {
+        origin: opts.previewOrigin,
+        preview: '/',
+      },
+    }),
+    visionTool(),
+    media(),
+    formSchema({}),
+  ]
+}
 
 interface RwcWorkspaceOptions {
   name: string
@@ -37,20 +74,11 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
     icon: opts.icon,
     projectId: opts.projectId,
     dataset: 'rwc',
-    plugins: [
-      structureTool({structure: createRwcDeskStructure(opts.siteId, opts.title)}),
-      presentationTool({
-        resolve,
-        previewUrl: {
-          origin: opts.originEnv || opts.defaultOrigin,
-          preview: '/',
-        },
-      }),
-      visionTool(),
-      media(),
-      formSchema({}),
-    ],
-    tools: (prev) => [...prev, sponsorAcceptancesTool()],
+    plugins: commonPlugins({
+      structure: createRwcDeskStructure(opts.siteId, opts.title),
+      previewOrigin: opts.originEnv || opts.defaultOrigin,
+      resolve: createResolve(opts.siteId),
+    }),
     schema: {
       types: createWorkspaceSchemaTypes('rwc'),
       templates: (prev) => {
@@ -69,7 +97,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
           value: {site: opts.siteId},
         }))
         // Listing page singletons — pre-populate route for each (Story 21.0)
-        const listingTemplates = ['articles', 'authors', 'events', 'gallery', 'projects', 'sponsors'].map((route) => ({
+        const listingTemplates = LISTING_PAGE_ROUTES.map((route) => ({
           id: `listingPage-${route}-${opts.siteId}`,
           title: `Listing Page (${route.charAt(0).toUpperCase() + route.slice(1)}) — ${opts.title}`,
           schemaType: 'listingPage',
@@ -118,21 +146,12 @@ export default defineConfig([
     icon: RocketIcon,
     projectId,
     dataset: 'production',
-    plugins: [
-      structureTool({structure: capstoneDeskStructure}),
-      presentationTool({
-        resolve,
-        previewUrl: {
-          origin:
-            process.env.SANITY_STUDIO_PREVIEW_ORIGIN ||
-            'http://localhost:4321',
-          preview: '/',
-        },
-      }),
-      visionTool(),
-      media(),
-      formSchema({}),
-    ],
+    plugins: commonPlugins({
+      structure: capstoneDeskStructure,
+      previewOrigin:
+        process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:4321',
+      resolve: createResolve(undefined),
+    }),
     tools: (prev) => [...prev, sponsorAcceptancesTool()],
     schema: {
       types: createWorkspaceSchemaTypes('production'),
@@ -143,12 +162,12 @@ export default defineConfig([
         return [
           ...filtered,
           // Listing page singletons — pre-populate route for each (Story 21.0)
-          {id: 'listingPage-articles', schemaType: 'listingPage', title: 'Listing Page (Articles)', value: {route: 'articles'}},
-          {id: 'listingPage-authors', schemaType: 'listingPage', title: 'Listing Page (Authors)', value: {route: 'authors'}},
-          {id: 'listingPage-events', schemaType: 'listingPage', title: 'Listing Page (Events)', value: {route: 'events'}},
-          {id: 'listingPage-gallery', schemaType: 'listingPage', title: 'Listing Page (Gallery)', value: {route: 'gallery'}},
-          {id: 'listingPage-projects', schemaType: 'listingPage', title: 'Listing Page (Projects)', value: {route: 'projects'}},
-          {id: 'listingPage-sponsors', schemaType: 'listingPage', title: 'Listing Page (Sponsors)', value: {route: 'sponsors'}},
+          ...LISTING_PAGE_ROUTES.map((route) => ({
+            id: `listingPage-${route}`,
+            schemaType: 'listingPage',
+            title: `Listing Page (${route.charAt(0).toUpperCase() + route.slice(1)})`,
+            value: {route},
+          })),
           // Portal page singletons (Story 22.9)
           {id: 'portalPage-dashboard', schemaType: 'portalPage', title: 'Portal Page (Dashboard)', value: {route: 'dashboard'}},
           {id: 'portalPage-events', schemaType: 'portalPage', title: 'Portal Page (Events)', value: {route: 'events'}},
