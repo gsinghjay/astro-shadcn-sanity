@@ -12,8 +12,14 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {IntentLink, useClient} from 'sanity'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {defineQuery} from 'groq'
+import {useClient} from 'sanity'
+import {IntentLink} from 'sanity/router'
+
+const SPONSORS_BY_EMAIL_QUERY = defineQuery(
+  `*[_type=="sponsor" && lower(contactEmail) in $emails]{ _id, contactEmail, name }`,
+)
 
 type FilterMode = 'all' | 'true' | 'false'
 
@@ -27,7 +33,7 @@ interface Acceptance {
 interface SponsorDoc {
   _id: string
   contactEmail: string
-  title: string
+  name: string
 }
 
 interface ToolConfig {
@@ -73,7 +79,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
   const [sponsors, setSponsors] = useState<Record<string, SponsorDoc>>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const reloadCounter = useRef(0)
+  const [reloadKey, setReloadKey] = useState(0)
 
   // Debounce search at 200ms
   useEffect(() => {
@@ -104,10 +110,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
 
         const emails = body.acceptances.map((a) => a.email.toLowerCase())
         if (emails.length) {
-          const docs = await client.fetch<SponsorDoc[]>(
-            `*[_type=="sponsor" && lower(contactEmail) in $emails]{ _id, contactEmail, title }`,
-            {emails},
-          )
+          const docs = await client.fetch<SponsorDoc[]>(SPONSORS_BY_EMAIL_QUERY, {emails})
           setSponsors(
             Object.fromEntries(docs.map((d) => [d.contactEmail.toLowerCase(), d])),
           )
@@ -128,7 +131,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
     const controller = new AbortController()
     load(controller)
     return () => controller.abort()
-  }, [load, reloadCounter])
+  }, [load, reloadKey])
 
   const visible = useMemo(() => {
     if (!data) return []
@@ -141,8 +144,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
   }, [data, debouncedSearch])
 
   const handleRefresh = () => {
-    reloadCounter.current += 1
-    load()
+    setReloadKey((k) => k + 1)
   }
 
   return (
@@ -289,7 +291,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
                           params={{id: doc._id, type: 'sponsor'}}
                           data-testid="acceptances-sponsor-link"
                         >
-                          {doc.title || 'Open'}
+                          {doc.name || 'Open'}
                         </IntentLink>
                       ) : (
                         <Text size={1} muted>—</Text>

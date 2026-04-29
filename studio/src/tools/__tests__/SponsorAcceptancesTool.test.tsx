@@ -10,15 +10,16 @@ const {mockClientFetch} = vi.hoisted(() => ({mockClientFetch: vi.fn()}))
 
 vi.mock('sanity', () => {
   const stableClient = {fetch: mockClientFetch}
-  return {
-    useClient: () => stableClient,
-    IntentLink: ({children, ...rest}: {children: React.ReactNode}) => (
-      <a data-testid="acceptances-sponsor-link" {...rest}>
-        {children}
-      </a>
-    ),
-  }
+  return {useClient: () => stableClient}
 })
+
+vi.mock('sanity/router', () => ({
+  IntentLink: ({children, ...rest}: {children: React.ReactNode}) => (
+    <a data-testid="acceptances-sponsor-link" {...rest}>
+      {children}
+    </a>
+  ),
+}))
 
 import {SponsorAcceptancesView, sponsorAcceptancesTool} from '../SponsorAcceptancesTool'
 
@@ -199,7 +200,7 @@ describe('<SponsorAcceptancesView />', () => {
       }),
     )
     mockClientFetch.mockResolvedValue([
-      {_id: 'sponsor-1', contactEmail: 'alice@example.com', title: 'Acme Co'},
+      {_id: 'sponsor-1', contactEmail: 'alice@example.com', name: 'Acme Co'},
     ])
     render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
     await flush()
