@@ -19,3 +19,22 @@ export const SITE_AWARE_TYPES = [
   'form',
   'submission',
 ]
+
+/**
+ * Single source of truth for listing-page singleton routes (Story 21.0).
+ * Consumed by:
+ *   - Capstone listing-page templates (`sanity.config.ts`)
+ *   - RWC listing-page templates (`sanity.config.ts` → `createRwcWorkspace`)
+ *   - Capstone desk structure (`structure/capstone-desk-structure.ts`)
+ *   - RWC desk structure   (`structure/rwc-desk-structure.ts`)
+ */
+export const LISTING_PAGE_ROUTES = [
+  'articles',
+  'authors',
+  'events',
+  'gallery',
+  'projects',
+  'sponsors',
+] as const
+
+export type ListingPageRoute = (typeof LISTING_PAGE_ROUTES)[number]
