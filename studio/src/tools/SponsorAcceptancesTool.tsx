@@ -12,7 +12,7 @@ import {
   Text,
   TextInput,
 } from '@sanity/ui'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {defineQuery} from 'groq'
 import {useClient} from 'sanity'
 import {IntentLink} from 'sanity/router'
@@ -80,6 +80,9 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [reloadKey, setReloadKey] = useState(0)
+  // Stamp each load() call so a stale fetch (e.g. slow Sanity client.fetch that the
+  // AbortController doesn't propagate to) can't overwrite newer data.
+  const requestIdRef = useRef(0)
 
   // Debounce search at 200ms
   useEffect(() => {
@@ -97,6 +100,8 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         setData(null)
         return
       }
+      const requestId = ++requestIdRef.current
+      const isStale = () => requestId !== requestIdRef.current
       setLoading(true)
       setError(null)
       try {
@@ -104,13 +109,18 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
           headers: {authorization: `Bearer ${token}`},
           signal: controller?.signal,
         })
+        if (isStale()) return
         if (!res.ok) throw new Error(`API ${res.status}`)
         const body = (await res.json()) as {acceptances: Acceptance[]}
+        if (isStale()) return
         setData(body.acceptances)
 
-        const emails = body.acceptances.map((a) => a.email.toLowerCase())
+        const emails = body.acceptances
+          .map((a) => a.email.toLowerCase())
+          .filter((e) => e.length > 0)
         if (emails.length) {
           const docs = await client.fetch<SponsorDoc[]>(SPONSORS_BY_EMAIL_QUERY, {emails})
+          if (isStale()) return
           setSponsors(
             Object.fromEntries(docs.map((d) => [d.contactEmail.toLowerCase(), d])),
           )
@@ -119,9 +129,10 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         }
       } catch (e: unknown) {
         if ((e as Error).name === 'AbortError') return
+        if (isStale()) return
         setError((e as Error).message ?? 'Unknown error')
       } finally {
-        setLoading(false)
+        if (!isStale()) setLoading(false)
       }
     },
     [apiUrl, token, filter, client],
@@ -157,7 +168,8 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
             </Heading>
             <Text muted size={1}>
               Read-only audit of sponsor agreement acceptance. Source of truth: D1 (
-              <code>user.agreement_accepted_at</code>).
+              <code>user.agreement_accepted_at</code>). Data is capstone-scoped — RWC
+              workspaces show the same shared rows (RWC has no portal sponsors).
             </Text>
           </Stack>
           <Button
@@ -215,9 +227,14 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
 
         {!loading && !error && visible.length === 0 && (
           <Card padding={4} radius={2} border tone="transparent" data-testid="acceptances-empty">
-            <Text muted size={1}>
-              No sponsors match the current filter.
-            </Text>
+            <Stack space={3}>
+              <Text muted size={1}>
+                No sponsors match the current filter.
+              </Text>
+              <Box>
+                <Button text="Refresh" mode="ghost" onClick={handleRefresh} />
+              </Box>
+            </Stack>
           </Card>
         )}
 

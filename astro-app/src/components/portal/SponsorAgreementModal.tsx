@@ -92,7 +92,7 @@ export default function SponsorAgreementModal({
   const onScrolledToEnd = useCallback(() => setScrolledToEnd(true), []);
 
   async function onAccept() {
-    if (!accepted || submitting || !pdfReady) return;
+    if (!accepted || submitting || !pdfReady || !scrolledToEnd) return;
     setSubmitting(true);
     setError(null);
     try {
@@ -153,6 +153,7 @@ export default function SponsorAgreementModal({
 
         {isConfigured && pdfReady && !scrolledToEnd && (
           <p
+            id="agreement-scroll-hint"
             className="text-xs text-muted-foreground"
             data-testid="agreement-scroll-hint"
           >
@@ -167,6 +168,7 @@ export default function SponsorAgreementModal({
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
               disabled={!pdfReady || !scrolledToEnd}
+              aria-describedby={pdfReady && !scrolledToEnd ? 'agreement-scroll-hint' : undefined}
               className="mt-1 size-4 shrink-0 border-input disabled:opacity-50"
               data-testid="agreement-checkbox"
             />
@@ -195,7 +197,7 @@ export default function SponsorAgreementModal({
               ref={acceptBtnRef}
               type="button"
               onClick={onAccept}
-              disabled={!accepted || submitting || !pdfReady}
+              disabled={!accepted || submitting || !pdfReady || !scrolledToEnd}
               data-testid="agreement-accept"
               className="bg-primary text-primary-foreground px-6 py-2 text-sm font-semibold uppercase tracking-wide transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >

@@ -44,8 +44,12 @@ function json(body: Record<string, unknown>, status: number, extraHeaders: Recor
 
 export const OPTIONS: APIRoute = ({ request, locals }) => {
   const env = (locals.runtime?.env ?? {}) as AdminEnv;
+  // Fail-closed when env is missing so misconfiguration is observable rather than masked as CORS.
+  if (!env.STUDIO_ORIGIN) {
+    return new Response(null, { status: 503 });
+  }
   const origin = request.headers.get('origin');
-  if (!env.STUDIO_ORIGIN || origin !== env.STUDIO_ORIGIN) {
+  if (origin !== env.STUDIO_ORIGIN) {
     return new Response(null, { status: 403 });
   }
   return new Response(null, { status: 204, headers: corsHeaders(env.STUDIO_ORIGIN) });
@@ -53,11 +57,16 @@ export const OPTIONS: APIRoute = ({ request, locals }) => {
 
 export const GET: APIRoute = async ({ request, locals, url }) => {
   const env = (locals.runtime?.env ?? {}) as AdminEnv;
+  const origin = request.headers.get('origin');
+  // Echo CORS on error responses when origin matches, so the Studio caller can read the body
+  // (browsers block cross-origin reads without Access-Control-Allow-Origin).
+  const errorCors =
+    env.STUDIO_ORIGIN && origin === env.STUDIO_ORIGIN ? corsHeaders(env.STUDIO_ORIGIN) : {};
+
   if (!env.STUDIO_ADMIN_TOKEN || !env.STUDIO_ORIGIN || !env.PORTAL_DB) {
-    return json({ error: 'service_unavailable' }, 503);
+    return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 
-  const origin = request.headers.get('origin');
   if (origin !== env.STUDIO_ORIGIN) {
     return json({ error: 'forbidden_origin' }, 403);
   }
@@ -65,7 +74,7 @@ export const GET: APIRoute = async ({ request, locals, url }) => {
   const auth = request.headers.get('authorization') ?? '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   if (!token || !constantTimeEqual(token, env.STUDIO_ADMIN_TOKEN)) {
-    return json({ error: 'unauthorized' }, 401);
+    return json({ error: 'unauthorized' }, 401, errorCors);
   }
 
   const filter = url.searchParams.get('accepted'); // true | false | all | null
@@ -97,7 +106,7 @@ export const GET: APIRoute = async ({ request, locals, url }) => {
     );
   } catch (e) {
     console.error('[admin/acceptances] D1 error:', e);
-    return json({ error: 'service_unavailable' }, 503);
+    return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 };
 

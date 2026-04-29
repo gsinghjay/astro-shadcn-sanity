@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -38,6 +38,7 @@ export default function SponsorAgreementViewer({
   const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
   const [reloadKey, setReloadKey] = useState(0);
   const [scrolledToEnd, setScrolledToEnd] = useState(false);
+  const [renderedPages, setRenderedPages] = useState(0);
   const hasFiredRef = useRef(false);
 
   // Debounced ResizeObserver: avoid thrashing pdfjs on every resize tick.
@@ -75,11 +76,14 @@ export default function SponsorAgreementViewer({
     return () => el.removeEventListener('scroll', onScroll);
   }, [onScrolledToEnd]);
 
-  // Short-PDF auto-fire: once pages render and width settles, if the entire content fits
-  // in the viewport (no scroll possible), fire onScrolledToEnd immediately.
+  // Short-PDF auto-fire: once ALL pages have rendered (not just `onLoadSuccess`) and width has
+  // settled, measure scrollHeight. Without waiting for `onRenderSuccess`, the rAF tick can run
+  // while pages are still laying out, making `scrollHeight <= clientHeight` falsely true and
+  // bypassing the scroll gate on multi-page PDFs.
   useEffect(() => {
     const el = containerRef.current;
     if (!el || !numPages || hasFiredRef.current || !onScrolledToEnd) return;
+    if (renderedPages < numPages) return;
     const id = requestAnimationFrame(() => {
       if (!el || hasFiredRef.current) return;
       if (el.scrollHeight <= el.clientHeight + SCROLL_TOLERANCE_PX) {
@@ -89,7 +93,23 @@ export default function SponsorAgreementViewer({
       }
     });
     return () => cancelAnimationFrame(id);
-  }, [numPages, width, onScrolledToEnd]);
+  }, [numPages, renderedPages, width, onScrolledToEnd]);
+
+  const onPageRendered = useCallback(() => setRenderedPages((n) => n + 1), []);
+
+  const onDocumentLoadSuccess = useCallback(
+    ({ numPages: n }: { numPages: number }) => {
+      setRenderedPages(0);
+      setNumPages(n);
+      onReady?.(n);
+      if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
+    },
+    [onReady],
+  );
+  const onDocumentLoadError = useCallback(
+    () => setLoadError('Could not load PDF. Try refreshing.'),
+    [],
+  );
 
   // Memoize the page list so an unrelated parent re-render doesn't reset every page.
   const pages = useMemo(() => {
@@ -100,9 +120,10 @@ export default function SponsorAgreementViewer({
         pageNumber={i + 1}
         width={width}
         className="mb-2"
+        onRenderSuccess={onPageRendered}
       />
     ));
-  }, [numPages, width]);
+  }, [numPages, width, onPageRendered]);
 
   return (
     <div className={`relative ${className}`}>
@@ -120,6 +141,7 @@ export default function SponsorAgreementViewer({
               onClick={() => {
                 setLoadError(null);
                 setNumPages(null);
+                setRenderedPages(0);
                 hasFiredRef.current = false;
                 setScrolledToEnd(false);
                 setReloadKey((k) => k + 1);
@@ -133,12 +155,8 @@ export default function SponsorAgreementViewer({
           <Document
             key={reloadKey}
             file={pdfUrl}
-            onLoadSuccess={({ numPages: n }) => {
-              setNumPages(n);
-              onReady?.(n);
-              if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
-            }}
-            onLoadError={() => setLoadError('Could not load PDF. Try refreshing.')}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
             loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
           >
             {pages}

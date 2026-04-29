@@ -63,6 +63,8 @@ describe('GET /api/portal/admin/acceptances', () => {
     const res = await GET(ctx as never);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'unauthorized' });
+    // Error responses must echo CORS so the Studio caller can read the body.
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
   it('returns 401 when bearer token does not match', async () => {
@@ -122,12 +124,16 @@ describe('GET /api/portal/admin/acceptances', () => {
     const body = await res.json();
     expect(body).toEqual({ error: 'service_unavailable' });
     expect(JSON.stringify(body)).not.toContain('table user');
+    // 503 from D1 catch must still echo CORS (origin matched at top of handler).
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
   it('returns 503 when STUDIO_ADMIN_TOKEN env is missing (fail closed)', async () => {
     const ctx = buildCtx({ env: buildEnv({ STUDIO_ADMIN_TOKEN: undefined }) });
     const res = await GET(ctx as never);
     expect(res.status).toBe(503);
+    // Even when env is missing, if origin matches we still echo CORS so Studio sees the body.
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 });
 
@@ -146,6 +152,15 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     const ctx = buildCtx({ method: 'OPTIONS', origin: 'https://evil.example' });
     const res = await OPTIONS(ctx as never);
     expect(res.status).toBe(403);
+  });
+
+  it('returns 503 (fail closed) when STUDIO_ORIGIN env is missing', async () => {
+    const ctx = buildCtx({
+      method: 'OPTIONS',
+      env: buildEnv({ STUDIO_ORIGIN: undefined }),
+    });
+    const res = await OPTIONS(ctx as never);
+    expect(res.status).toBe(503);
   });
 });
 

@@ -33,8 +33,17 @@ vi.mock('react-pdf', () => ({
     }, [onLoadSuccess, onLoadError]);
     return <div data-testid="pdf-document">{children}</div>;
   },
-  Page: ({ pageNumber }: { pageNumber: number }) => {
+  Page: ({
+    pageNumber,
+    onRenderSuccess,
+  }: {
+    pageNumber: number;
+    onRenderSuccess?: () => void;
+  }) => {
     pageMock(pageNumber);
+    React.useEffect(() => {
+      onRenderSuccess?.();
+    }, [onRenderSuccess]);
     return <div data-testid="pdf-page" data-page={pageNumber} style={{ height: 600 }} />;
   },
 }));
