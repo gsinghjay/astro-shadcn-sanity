@@ -11,8 +11,8 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.12.18",
+    "@cloudflare/vitest-pool-workers": "^0.15.1",
     "vitest": "~3.2.0",
-    "wrangler": "^4.63.0"
+    "wrangler": "^4.86.0"
   }
 }
