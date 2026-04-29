@@ -1,0 +1,157 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: heroBanner. 7 variants: centered, split, split-asymmetric, overlay, spread, split-bleed, brutalist. hiddenByVariant: alignment hidden in split/split-asymmetric/split-bleed/spread; backgroundImages hidden in brutalist. AC6 #31: one instance has no ctaButtons AND no backgroundImages.",
+  "_id": "demo-audit-hero-banner",
+  "_type": "page",
+  "title": "Demo — Hero Banner",
+  "slug": {"_type": "slug", "current": "demo/hero-banner"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: hero-banner"},
+  "blocks": [
+    {
+      "_key": "hb-centered",
+      "_type": "heroBanner",
+      "variant": "centered",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Centered hero — alignment visible",
+      "subheading": "Tests centered variant with alignment field rendered (center) and one background image.",
+      "backgroundImages": [
+        {
+          "_key": "bg-centered-1",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"},
+          "alt": "Brown OG banner background for centered hero"
+        }
+      ],
+      "ctaButtons": [
+        {"_key": "cta-centered-1", "_type": "button", "text": "Get Started", "url": "/projects", "variant": "default"},
+        {"_key": "cta-centered-2", "_type": "button", "text": "Learn More", "url": "/sponsors", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "hb-split",
+      "_type": "heroBanner",
+      "variant": "split",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split hero — alignment hidden by variant",
+      "subheading": "alignment=left is set but ignored because split is in hiddenByVariant.alignment. Includes one background image.",
+      "backgroundImages": [
+        {
+          "_key": "bg-split-1",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"},
+          "alt": "Blue OG banner background for split hero"
+        }
+      ],
+      "ctaButtons": [
+        {"_key": "cta-split-1", "_type": "button", "text": "View Projects", "url": "/projects", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "hb-split-asymmetric",
+      "_type": "heroBanner",
+      "variant": "split-asymmetric",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "wide",
+      "alignment": "right",
+      "heading": "Split Asymmetric — alignment hidden",
+      "subheading": "alignment=right is set but hidden by variant rule. Dark background with bleed image.",
+      "backgroundImages": [
+        {
+          "_key": "bg-split-asym-1",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"},
+          "alt": "Navy OG banner background for split-asymmetric hero"
+        }
+      ],
+      "ctaButtons": [
+        {"_key": "cta-split-asym-1", "_type": "button", "text": "Explore", "url": "/events", "variant": "secondary"},
+        {"_key": "cta-split-asym-2", "_type": "button", "text": "Contact", "url": "mailto:capstone@njit.edu", "variant": "ghost"}
+      ]
+    },
+    {
+      "_key": "hb-overlay",
+      "_type": "heroBanner",
+      "variant": "overlay",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Overlay hero — alignment visible",
+      "subheading": "Tests overlay variant with multiple background images (2) for carousel/stack rendering.",
+      "backgroundImages": [
+        {
+          "_key": "bg-overlay-1",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"},
+          "alt": "Large landscape hero background image"
+        },
+        {
+          "_key": "bg-overlay-2",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"},
+          "alt": "Navy OG banner secondary overlay image"
+        }
+      ],
+      "ctaButtons": [
+        {"_key": "cta-overlay-1", "_type": "button", "text": "Watch Demo", "url": "https://example.com/demo", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "hb-spread",
+      "_type": "heroBanner",
+      "variant": "spread",
+      "backgroundVariant": "hatched",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Spread hero — alignment hidden",
+      "subheading": "alignment=center is set but hidden by variant rule. Hatched background with image.",
+      "backgroundImages": [
+        {
+          "_key": "bg-spread-1",
+          "_type": "image",
+          "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"},
+          "alt": "Brown OG banner background for spread hero"
+        }
+      ],
+      "ctaButtons": [
+        {"_key": "cta-spread-1", "_type": "button", "text": "Read Story", "url": "/projects", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "hb-split-bleed-no-content",
+      "_type": "heroBanner",
+      "variant": "split-bleed",
+      "backgroundVariant": "blueprint",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Split Bleed — no CTAs, no background images (AC6 #31)",
+      "subheading": "Edge case: empty ctaButtons AND empty backgroundImages. alignment=left is hidden by variant. Exercises the minimal-content rendering path."
+    },
+    {
+      "_key": "hb-brutalist",
+      "_type": "heroBanner",
+      "variant": "brutalist",
+      "backgroundVariant": "mono",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Brutalist hero — backgroundImages hidden",
+      "subheading": "Tests brutalist variant: backgroundImages are hidden by variant rule. alignment=center is visible. Five CTAs to hit the max-5 upper bound.",
+      "ctaButtons": [
+        {"_key": "cta-brut-1", "_type": "button", "text": "Default", "url": "/", "variant": "default"},
+        {"_key": "cta-brut-2", "_type": "button", "text": "Secondary", "url": "/projects", "variant": "secondary"},
+        {"_key": "cta-brut-3", "_type": "button", "text": "Outline", "url": "/sponsors", "variant": "outline"},
+        {"_key": "cta-brut-4", "_type": "button", "text": "Ghost", "url": "/events", "variant": "ghost"},
+        {"_key": "cta-brut-5", "_type": "button", "text": "Call", "url": "tel:+15555550123", "variant": "default"}
+      ]
+    }
+  ]
+}

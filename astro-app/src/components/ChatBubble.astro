@@ -327,6 +327,16 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
     }
   }
 
+  // Truth source for "is the panel currently visible?" The vendor renders
+  // `.chat-window` unconditionally and toggles `.expanded` class on open/
+  // close (see @cloudflare/ai-search-snippet `toggleChat`/`closeChat`). The
+  // pre-fix observer watched aria-expanded/data-open/open, none of which the
+  // vendor mutates — so clicking the vendor X never resynced our trigger and
+  // it stayed stuck at aria-expanded="true", blocking reopen.
+  function isPanelOpen(root: ShadowRoot | null | undefined): boolean {
+    return !!root?.querySelector(".chat-window.expanded");
+  }
+
   function wireExternalTrigger(wrapper: HTMLElement): void {
     const trigger = wrapper.querySelector<HTMLButtonElement>(
       "[data-chat-bubble-external-trigger]",
@@ -340,12 +350,12 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
         root?.querySelector<HTMLButtonElement>(".bubble-button") ??
         root?.querySelector<HTMLButtonElement>("button");
       if (!shadowBtn) return;
-      // If aria-expanded is already "true", the panel is open — clicking the
-      // vendor button would close it. Refocus the panel instead.
-      const wasOpen = trigger.getAttribute("aria-expanded") === "true";
-      if (wasOpen) {
+      // Read open state from the actual shadow DOM, not from our cached
+      // aria-expanded attribute. If panel is open, refocus instead of
+      // toggling closed; otherwise click the (hidden) vendor button to open.
+      if (isPanelOpen(root)) {
         const focusable = root?.querySelector<HTMLElement>(
-          'input, textarea, [contenteditable="true"], button',
+          'input, textarea, [contenteditable="true"], button:not(.bubble-button)',
         );
         focusable?.focus();
         return;
@@ -354,14 +364,15 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
       trigger.setAttribute("aria-expanded", "true");
     });
 
-    // Sync aria-expanded back to the trigger when the vendor closes the panel
-    // (Esc, backdrop click, vendor close button). Observe shadow-root state.
+    // Sync aria-expanded back to the trigger on every relevant shadow DOM
+    // change (vendor X close, Esc, backdrop click, minimize). The vendor
+    // toggles `.expanded`/`.minimized`/`.hidden` classes — watch class
+    // attribute on the subtree, then re-derive truth from `isPanelOpen`.
     const syncState = () => {
-      const root = bubble.shadowRoot;
-      const open = root?.querySelector(
-        '[aria-expanded="true"], [role="dialog"][open], [data-open="true"]',
+      trigger.setAttribute(
+        "aria-expanded",
+        isPanelOpen(bubble.shadowRoot) ? "true" : "false",
       );
-      trigger.setAttribute("aria-expanded", open ? "true" : "false");
     };
     customElements
       .whenDefined("chat-bubble-snippet")
@@ -372,8 +383,11 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
         observer.observe(root, {
           subtree: true,
           attributes: true,
-          attributeFilter: ["aria-expanded", "data-open", "open"],
+          attributeFilter: ["class"],
         });
+        // Initial sync in case the panel is already in some state when we
+        // attach (e.g. autoOpen ran before this observer wired up).
+        syncState();
       })
       .catch(() => {});
   }

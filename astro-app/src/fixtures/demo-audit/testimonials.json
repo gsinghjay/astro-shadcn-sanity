@@ -1,0 +1,93 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: testimonials. 7 variants: grid, masonry, split, carousel, marquee, brutalist-quote, spotlight. hiddenByVariant: testimonialSource hidden in carousel/marquee. Enum testimonialSource (all/industry/student/byProject/manual) all 5 covered. AC6 #34: manual mode with testimonial refs + carousel + marquee all present.",
+  "_id": "demo-audit-testimonials",
+  "_type": "page",
+  "title": "Demo — Testimonials",
+  "slug": {"_type": "slug", "current": "demo/testimonials"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: testimonials"},
+  "blocks": [
+    {
+      "_key": "t-grid-all",
+      "_type": "testimonials",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Grid variant — source: all",
+      "testimonialSource": "all"
+    },
+    {
+      "_key": "t-masonry-industry",
+      "_type": "testimonials",
+      "variant": "masonry",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Masonry variant — source: industry",
+      "testimonialSource": "industry"
+    },
+    {
+      "_key": "t-split-student",
+      "_type": "testimonials",
+      "variant": "split",
+      "backgroundVariant": "hatched-light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split variant — source: student",
+      "testimonialSource": "student"
+    },
+    {
+      "_key": "t-carousel-hidden-source",
+      "_type": "testimonials",
+      "variant": "carousel",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Carousel variant — testimonialSource hidden by variant",
+      "testimonialSource": "industry"
+    },
+    {
+      "_key": "t-marquee-hidden-source",
+      "_type": "testimonials",
+      "variant": "marquee",
+      "backgroundVariant": "primary",
+      "spacing": "small",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Marquee variant — testimonialSource hidden by variant",
+      "testimonialSource": "student"
+    },
+    {
+      "_key": "t-brutalist-byproject",
+      "_type": "testimonials",
+      "variant": "brutalist-quote",
+      "backgroundVariant": "mono",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Brutalist Quote variant — source: byProject",
+      "testimonialSource": "byProject"
+    },
+    {
+      "_key": "t-spotlight-manual",
+      "_type": "testimonials",
+      "variant": "spotlight",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Spotlight variant — source: manual (explicit refs)",
+      "testimonialSource": "manual",
+      "testimonials": [
+        {"_key": "tm-1", "_type": "reference", "_ref": "d1c870e0-7537-4b03-af20-c0e8142a89ac"},
+        {"_key": "tm-2", "_type": "reference", "_ref": "e55e86d3-0401-47fc-8aeb-9a943352a3db"},
+        {"_key": "tm-3", "_type": "reference", "_ref": "a4e5d85c-1b09-4ce3-bb9c-02e246a10f68"},
+        {"_key": "tm-4", "_type": "reference", "_ref": "f661cd69-4cdc-444d-88df-dab09a93b0d4"}
+      ]
+    }
+  ]
+}
