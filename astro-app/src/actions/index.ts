@@ -57,7 +57,15 @@ export const server = {
             : undefined,
           submittedAt: new Date().toISOString(),
         });
-      } catch {
+      } catch (err) {
+        console.error('[submitForm] Sanity write failed:', {
+          message: (err as Error)?.message,
+          name: (err as Error)?.name,
+          hasWriteToken: Boolean(env.SANITY_API_WRITE_TOKEN),
+          projectId: import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID,
+          dataset: import.meta.env.PUBLIC_SANITY_STUDIO_DATASET,
+          formId: input.form_id || '(none)',
+        });
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Submission failed',
