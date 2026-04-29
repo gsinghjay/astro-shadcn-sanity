@@ -1,3 +1,19 @@
+## [1.20.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.19.0...v1.20.0) (2026-04-29)
+
+### Features
+
+* **portal:** sponsor acceptances Studio tool + scroll-to-accept gate ([c6ec470](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c6ec470de9b9f9430215ad053d8db2ea8d648116))
+
+### Bug Fixes
+
+* **forms:** switch to output:server so Astro Actions deploy as Worker routes ([d7e2417](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d7e2417b056b65bdf3a378e5d155352351ae1252))
+* **portal:** address code-review findings on acceptances tool + scroll gate ([2f448bc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2f448bc24e64eff2882dbf2a4527000c7f490b64))
+* **studio:** post-review fixes for sponsor acceptances tool ([9b96718](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9b9671801b09316d33d237aa3021120c835a4af2))
+
+### Tests
+
+* **deploy:** update 5.2-INT-004 to assert output:server ([977c688](https://github.com/gsinghjay/astro-shadcn-sanity/commit/977c688ad622bff5b1d040c30581c071e5e68e5b))
+
 ## [1.19.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.18.0...v1.19.0) (2026-04-21)
 
 ### Features
