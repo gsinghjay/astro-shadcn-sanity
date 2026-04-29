@@ -7,13 +7,40 @@ import { createRoot, type Root } from 'react-dom/client';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 // Mock the viewer to skip loading the pdfjs worker in jsdom.
-// Synchronously fires onReady so the modal treats the PDF as loaded.
+// Default: synchronously fires onReady (3 pages) AND onScrolledToEnd so existing tests
+// that don't care about the scroll gate work without modification.
+// Tests that exercise the scroll gate flip `viewerMockState.fireScrolledToEnd = false`.
+const { viewerMockState } = vi.hoisted(() => ({
+  viewerMockState: { fireScrolledToEnd: true },
+}));
+
 vi.mock('../SponsorAgreementViewer', () => {
   return {
-    default: ({ pdfUrl, onReady }: { pdfUrl: string; onReady?: (n: number) => void }) => {
-      // Fire on first render so tests don't need to await pdfjs
+    default: ({
+      pdfUrl,
+      onReady,
+      onScrolledToEnd,
+    }: {
+      pdfUrl: string;
+      onReady?: (n: number) => void;
+      onScrolledToEnd?: () => void;
+    }) => {
       if (onReady) onReady(3);
-      return <div data-testid="agreement-viewer-mock">viewer: {pdfUrl}</div>;
+      if (onScrolledToEnd && viewerMockState.fireScrolledToEnd) onScrolledToEnd();
+      return (
+        <div data-testid="agreement-viewer-mock">
+          viewer: {pdfUrl}
+          {onScrolledToEnd && (
+            <button
+              type="button"
+              data-testid="mock-trigger-scroll-end"
+              onClick={() => onScrolledToEnd()}
+            >
+              fire-scroll-end
+            </button>
+          )}
+        </div>
+      );
     },
   };
 });
@@ -71,6 +98,7 @@ const BASE_PROPS = {
 describe('SponsorAgreementModal', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
+    viewerMockState.fireScrolledToEnd = true;
     // @ts-expect-error jsdom - assign reload spy
     window.location = { ...window.location, reload: vi.fn(), origin: 'http://localhost' };
   });
@@ -171,5 +199,37 @@ describe('SponsorAgreementModal', () => {
     expect(document.body.style.overflow).toBe('hidden');
     unmount();
     expect(document.body.style.overflow).toBe('');
+  });
+
+  describe('scroll-to-accept gate', () => {
+    it('checkbox is disabled when pdfReady=true and scrolledToEnd=false', () => {
+      viewerMockState.fireScrolledToEnd = false;
+      render(<SponsorAgreementModal {...BASE_PROPS} />);
+      const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
+      expect(cb.disabled).toBe(true);
+    });
+
+    it('checkbox becomes enabled after the viewer fires onScrolledToEnd', async () => {
+      viewerMockState.fireScrolledToEnd = false;
+      render(<SponsorAgreementModal {...BASE_PROPS} />);
+      const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
+      expect(cb.disabled).toBe(true);
+
+      const trigger = container.querySelector('[data-testid="mock-trigger-scroll-end"]');
+      await click(trigger);
+
+      expect(cb.disabled).toBe(false);
+    });
+
+    it('hint text is visible when !scrolledToEnd, hidden when scrolledToEnd', async () => {
+      viewerMockState.fireScrolledToEnd = false;
+      render(<SponsorAgreementModal {...BASE_PROPS} />);
+      expect(container.querySelector('[data-testid="agreement-scroll-hint"]')).toBeTruthy();
+
+      const trigger = container.querySelector('[data-testid="mock-trigger-scroll-end"]');
+      await click(trigger);
+
+      expect(container.querySelector('[data-testid="agreement-scroll-hint"]')).toBeNull();
+    });
   });
 });

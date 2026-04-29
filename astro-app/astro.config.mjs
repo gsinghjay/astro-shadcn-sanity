@@ -84,6 +84,17 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      STUDIO_ADMIN_TOKEN: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+        startsWith: "sat_",
+      }),
+      STUDIO_ORIGIN: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
     },
     validateSecrets: true,
   },

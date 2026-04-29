@@ -13,6 +13,7 @@ import {
   CAPSTONE_SINGLETON_TYPES,
   SITE_AWARE_TYPES,
 } from './src/constants'
+import {sponsorAcceptancesTool} from './src/tools/SponsorAcceptancesTool'
 
 // Environment variables for project configuration
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || '<your project ID>'
@@ -49,6 +50,7 @@ function createRwcWorkspace(opts: RwcWorkspaceOptions): WorkspaceOptions {
       media(),
       formSchema({}),
     ],
+    tools: (prev) => [...prev, sponsorAcceptancesTool()],
     schema: {
       types: createWorkspaceSchemaTypes('rwc'),
       templates: (prev) => {
@@ -131,6 +133,7 @@ export default defineConfig([
       media(),
       formSchema({}),
     ],
+    tools: (prev) => [...prev, sponsorAcceptancesTool()],
     schema: {
       types: createWorkspaceSchemaTypes('production'),
       templates: (prev) => {

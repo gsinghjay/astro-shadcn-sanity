@@ -16,15 +16,20 @@ interface Props {
   /** Fires when the PDF reports its page count. Empty/corrupt PDFs report 0 — caller should
    *  use this to keep the accept checkbox/button disabled. */
   onReady?: (numPages: number) => void;
+  /** Fires once per mount when the user has scrolled to the end of the agreement (8px tolerance).
+   *  Short PDFs that fit entirely in the viewport fire this immediately after `onReady`. */
+  onScrolledToEnd?: () => void;
 }
 
 const DEFAULT_WIDTH = 800;
+const SCROLL_TOLERANCE_PX = 8;
 
 export default function SponsorAgreementViewer({
   pdfUrl,
   maxHeight = '70vh',
   className = '',
   onReady,
+  onScrolledToEnd,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -32,6 +37,8 @@ export default function SponsorAgreementViewer({
   // Default width keeps pages legible before/without ResizeObserver (older browsers).
   const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
   const [reloadKey, setReloadKey] = useState(0);
+  const [scrolledToEnd, setScrolledToEnd] = useState(false);
+  const hasFiredRef = useRef(false);
 
   // Debounced ResizeObserver: avoid thrashing pdfjs on every resize tick.
   useEffect(() => {
@@ -52,6 +59,38 @@ export default function SponsorAgreementViewer({
     };
   }, []);
 
+  // Scroll listener: fire onScrolledToEnd once when within 8px of the bottom.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !onScrolledToEnd) return;
+    const onScroll = () => {
+      if (hasFiredRef.current) return;
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - SCROLL_TOLERANCE_PX) {
+        hasFiredRef.current = true;
+        setScrolledToEnd(true);
+        onScrolledToEnd();
+      }
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [onScrolledToEnd]);
+
+  // Short-PDF auto-fire: once pages render and width settles, if the entire content fits
+  // in the viewport (no scroll possible), fire onScrolledToEnd immediately.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !numPages || hasFiredRef.current || !onScrolledToEnd) return;
+    const id = requestAnimationFrame(() => {
+      if (!el || hasFiredRef.current) return;
+      if (el.scrollHeight <= el.clientHeight + SCROLL_TOLERANCE_PX) {
+        hasFiredRef.current = true;
+        setScrolledToEnd(true);
+        onScrolledToEnd();
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [numPages, width, onScrolledToEnd]);
+
   // Memoize the page list so an unrelated parent re-render doesn't reset every page.
   const pages = useMemo(() => {
     if (!numPages) return null;
@@ -66,41 +105,67 @@ export default function SponsorAgreementViewer({
   }, [numPages, width]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`border bg-muted/30 overflow-y-auto ${className}`}
-      style={{ maxHeight }}
-      data-testid="agreement-viewer"
-    >
-      {loadError ? (
-        <div className="flex flex-col items-center gap-3 p-8 text-center">
-          <p className="text-sm text-muted-foreground">{loadError}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setLoadError(null);
-              setNumPages(null);
-              setReloadKey((k) => k + 1);
+    <div className={`relative ${className}`}>
+      <div
+        ref={containerRef}
+        className="border bg-muted/30 overflow-y-auto"
+        style={{ maxHeight }}
+        data-testid="agreement-viewer"
+      >
+        {loadError ? (
+          <div className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-sm text-muted-foreground">{loadError}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoadError(null);
+                setNumPages(null);
+                hasFiredRef.current = false;
+                setScrolledToEnd(false);
+                setReloadKey((k) => k + 1);
+              }}
+              className="text-sm underline"
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <Document
+            key={reloadKey}
+            file={pdfUrl}
+            onLoadSuccess={({ numPages: n }) => {
+              setNumPages(n);
+              onReady?.(n);
+              if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
             }}
-            className="text-sm underline"
+            onLoadError={() => setLoadError('Could not load PDF. Try refreshing.')}
+            loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
           >
-            Try again
-          </button>
-        </div>
-      ) : (
-        <Document
-          key={reloadKey}
-          file={pdfUrl}
-          onLoadSuccess={({ numPages: n }) => {
-            setNumPages(n);
-            onReady?.(n);
-            if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
-          }}
-          onLoadError={() => setLoadError('Could not load PDF. Try refreshing.')}
-          loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
+            {pages}
+          </Document>
+        )}
+      </div>
+      {!loadError && numPages != null && !scrolledToEnd && onScrolledToEnd && (
+        <span
+          aria-hidden="true"
+          data-testid="agreement-scroll-indicator"
+          className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1 border bg-background/90 px-2 py-1 text-xs text-muted-foreground shadow"
         >
-          {pages}
-        </Document>
+          Keep scrolling
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </span>
       )}
     </div>
   );
