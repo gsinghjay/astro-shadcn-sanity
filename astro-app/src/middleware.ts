@@ -34,12 +34,16 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  const isPortalApi = pathname.startsWith("/api/portal/");
+  // Admin endpoints under /api/portal/admin/* authenticate via STUDIO_ADMIN_TOKEN
+  // (cross-origin Studio caller, no session cookie). Skip the session gate so the
+  // route handler can run its own bearer/origin checks and emit CORS headers.
+  const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
+  const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
   const isPortal = isPortalPage || isPortalApi;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
-  // Branch 1: Public routes — zero auth overhead
+  // Branch 1: Public routes (and admin API) — zero auth overhead
   if (!isPortal && !isStudent) {
     return next();
   }
