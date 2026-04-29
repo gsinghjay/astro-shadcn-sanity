@@ -42,11 +42,11 @@ jobs:
         run: npx --yes http-server astro-app/dist -p 4321 --silent &
       - name: Wait for server
         run: npx --yes wait-on http://localhost:4321
-      - name: Run Lighthouse CI (/demo/ pages)
+      - name: Run Lighthouse CI (sitemap URL set)
         run: npx lhci autorun
         continue-on-error: true
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-      - name: Run Pa11y CI (/demo/ pages)
+      - name: Run Pa11y CI (sitemap URL set)
         run: npx --yes pa11y-ci --config .pa11yci.cjs
         continue-on-error: true

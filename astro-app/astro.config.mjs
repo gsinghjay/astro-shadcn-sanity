@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
+import llms from "astro-llms-md";
 
 const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
 
@@ -121,7 +122,7 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: !visualEditingEnabled,
+      useCdn: visualEditingEnabled !== 'true',
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,
@@ -135,5 +136,24 @@ export default defineConfig({
         !page.includes('/student/') &&
         !page.includes('/demo/'),
     }),
+    // Gate astro-llms-md on visual editing OFF: stega-encoded HTML leaks
+    // private-use Unicode markers into the .md/.txt output otherwise.
+    ...(visualEditingEnabled === 'true'
+      ? []
+      : [
+          llms({
+            siteUrl,
+            contentSelector: 'main',
+            titleSelector: 'h1',
+            exclude: [
+              '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
+              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+            ],
+            generateIndividualMd: true,
+            generateLlmsTxt: true,
+            generateLlmsFullTxt: true,
+            verbose: false,
+          }),
+        ]),
   ],
 });
