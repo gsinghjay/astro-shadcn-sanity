@@ -1,12 +1,33 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { GET, OPTIONS, ALL } from '../acceptances';
-
-const mockD1All = vi.fn();
-const mockD1Prepare = vi.fn().mockReturnValue({ all: mockD1All });
-
 const TOKEN = 'sat_test_token_value';
 const ORIGIN = 'https://capstone.sanity.studio';
+
+// Adapter v13: acceptances.ts reads bindings via `cloudflare:workers`, not
+// `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
+// them in before the route module loads. `mockEnv` is the live env object —
+// tests mutate it (or buildEnv overrides) by calling `setEnv` between cases.
+const { mockD1All, mockD1Prepare, mockEnv, defaultEnv } = vi.hoisted(() => {
+  const mockD1All = vi.fn();
+  const mockD1Prepare = vi.fn().mockReturnValue({ all: mockD1All });
+  const defaultEnv: Record<string, unknown> = {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    STUDIO_ADMIN_TOKEN: 'sat_test_token_value',
+    STUDIO_ORIGIN: 'https://capstone.sanity.studio',
+  };
+  const mockEnv: Record<string, unknown> = { ...defaultEnv };
+  return { mockD1All, mockD1Prepare, mockEnv, defaultEnv };
+});
+
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+
+const { GET, OPTIONS, ALL } = await import('../acceptances');
+
+/** Replace the live cloudflare:workers env object's keys with new values for one test. */
+function setEnv(next: Record<string, unknown>): void {
+  for (const k of Object.keys(mockEnv)) delete mockEnv[k];
+  Object.assign(mockEnv, next);
+}
 
 function buildEnv(overrides: Record<string, unknown> = {}) {
   return {
@@ -34,15 +55,23 @@ function buildCtx(opts: {
   // explicit null = omit header
   const search = opts.search ?? '';
   const url = new URL(`https://app.example.com/api/portal/admin/acceptances${search}`);
+  // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
+  // `opts.env === null` simulates "no bindings present" by emptying mockEnv.
+  // `opts.env` overrides replace the live env for this call.
+  if (opts.env === null) {
+    setEnv({});
+  } else if (opts.env !== undefined) {
+    setEnv(opts.env);
+  } else {
+    setEnv(buildEnv());
+  }
   return {
     url,
     request: new Request(url.toString(), {
       method: opts.method ?? 'GET',
       headers,
     }),
-    locals: {
-      runtime: opts.env === null ? undefined : { env: opts.env ?? buildEnv() },
-    } as unknown,
+    locals: {} as unknown,
   };
 }
 

@@ -4,12 +4,60 @@ vi.mock('astro:middleware', () => ({
   defineMiddleware: (fn: unknown) => fn,
 }));
 
-const { mockGetDrizzle, mockCreateAuth, mockGetSession, mockCheckSponsorWhitelist } = vi.hoisted(() => {
+const {
+  mockGetDrizzle,
+  mockCreateAuth,
+  mockGetSession,
+  mockCheckSponsorWhitelist,
+  mockKvGet,
+  mockKvPut,
+  mockKvDelete,
+  mockD1Run,
+  mockD1First,
+  mockD1Bind,
+  mockD1Prepare,
+  mockEnv,
+} = vi.hoisted(() => {
   const mockGetSession = vi.fn();
   const mockGetDrizzle = vi.fn().mockReturnValue({ __drizzle: true });
   const mockCreateAuth = vi.fn().mockReturnValue({ api: { getSession: mockGetSession } });
   const mockCheckSponsorWhitelist = vi.fn().mockResolvedValue(false);
-  return { mockGetDrizzle, mockCreateAuth, mockGetSession, mockCheckSponsorWhitelist };
+  const mockKvGet = vi.fn();
+  const mockKvPut = vi.fn().mockResolvedValue(undefined);
+  const mockKvDelete = vi.fn().mockResolvedValue(undefined);
+  const mockD1Run = vi.fn().mockResolvedValue({});
+  const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
+  const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
+  const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
+  // Adapter v13 reads bindings via `import { env } from "cloudflare:workers"`,
+  // not `locals.runtime.env`. This object is the single source of truth: the
+  // mocked module returns it AND tests mutate it through beforeEach.
+  const mockEnv: Record<string, unknown> = {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    GOOGLE_CLIENT_ID: 'g',
+    GOOGLE_CLIENT_SECRET: 'gs',
+    GITHUB_CLIENT_ID: 'gh',
+    GITHUB_CLIENT_SECRET: 'ghs',
+    BETTER_AUTH_SECRET: 'sec',
+    BETTER_AUTH_URL: 'http://localhost:4321',
+    RESEND_API_KEY: 'rs',
+    SESSION_CACHE: undefined,
+    RATE_LIMITER: undefined,
+  };
+  return {
+    mockGetDrizzle,
+    mockCreateAuth,
+    mockGetSession,
+    mockCheckSponsorWhitelist,
+    mockKvGet,
+    mockKvPut,
+    mockKvDelete,
+    mockD1Run,
+    mockD1First,
+    mockD1Bind,
+    mockD1Prepare,
+    mockEnv,
+  };
 });
 
 vi.mock('@/lib/db', () => ({ getDrizzle: mockGetDrizzle }));
@@ -17,35 +65,15 @@ vi.mock('@/lib/auth-config', () => ({
   createAuth: mockCreateAuth,
   checkSponsorWhitelist: mockCheckSponsorWhitelist,
 }));
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 
 import { onRequest } from '../middleware';
-
-const mockKvGet = vi.fn();
-const mockKvPut = vi.fn().mockResolvedValue(undefined);
-const mockKvDelete = vi.fn().mockResolvedValue(undefined);
-const mockD1Run = vi.fn().mockResolvedValue({});
-const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
-const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
-const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
-
-const mockEnv = {
-  PORTAL_DB: { prepare: mockD1Prepare } as unknown,
-  GOOGLE_CLIENT_ID: 'g',
-  GOOGLE_CLIENT_SECRET: 'gs',
-  GITHUB_CLIENT_ID: 'gh',
-  GITHUB_CLIENT_SECRET: 'ghs',
-  BETTER_AUTH_SECRET: 'sec',
-  BETTER_AUTH_URL: 'http://localhost:4321',
-  RESEND_API_KEY: 'rs',
-  SESSION_CACHE: undefined as unknown,
-  RATE_LIMITER: undefined as unknown,
-};
 
 function createMockContext(pathname: string, headers?: Record<string, string>) {
   return {
     url: new URL(`http://localhost:4321${pathname}`),
     request: new Request(`http://localhost:4321${pathname}`, { headers }),
-    locals: { runtime: { env: mockEnv } } as unknown as App.Locals,
+    locals: {} as unknown as App.Locals,
     redirect: vi.fn((url: string) => new Response(null, { status: 302, headers: { Location: url } })),
   };
 }

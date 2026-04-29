@@ -1,14 +1,42 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { POST, ALL } from '../accept';
+// Adapter v13: accept.ts reads bindings via `cloudflare:workers`, not
+// `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
+// them in before the route module loads. setEnv() rewrites the live env
+// object's keys for one test (instead of swapping the object — the import is
+// already bound to the original reference).
+const {
+  mockD1Run,
+  mockD1First,
+  mockD1Bind,
+  mockD1Prepare,
+  mockKvGet,
+  mockKvPut,
+  mockKvDelete,
+  mockEnv,
+} = vi.hoisted(() => {
+  const mockD1Run = vi.fn();
+  const mockD1First = vi.fn();
+  const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
+  const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
+  const mockKvGet = vi.fn();
+  const mockKvPut = vi.fn().mockResolvedValue(undefined);
+  const mockKvDelete = vi.fn().mockResolvedValue(undefined);
+  const mockEnv: Record<string, unknown> = {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    SESSION_CACHE: { get: mockKvGet, put: mockKvPut, delete: mockKvDelete },
+  };
+  return { mockD1Run, mockD1First, mockD1Bind, mockD1Prepare, mockKvGet, mockKvPut, mockKvDelete, mockEnv };
+});
 
-const mockD1Run = vi.fn();
-const mockD1First = vi.fn();
-const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
-const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
-const mockKvGet = vi.fn();
-const mockKvPut = vi.fn().mockResolvedValue(undefined);
-const mockKvDelete = vi.fn().mockResolvedValue(undefined);
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+
+const { POST, ALL } = await import('../accept');
+
+function setEnv(next: Record<string, unknown>): void {
+  for (const k of Object.keys(mockEnv)) delete mockEnv[k];
+  Object.assign(mockEnv, next);
+}
 
 function buildEnv(overrides: Partial<{ PORTAL_DB: unknown; SESSION_CACHE: unknown }> = {}) {
   return {
@@ -35,6 +63,14 @@ function buildCtx(opts: {
   if (opts.referer) headers.referer = opts.referer;
   if (opts.cookie) headers.cookie = opts.cookie;
 
+  // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
+  if (opts.env === null) {
+    setEnv({});
+  } else if (opts.env !== undefined) {
+    setEnv(opts.env);
+  } else {
+    setEnv(buildEnv());
+  }
   return {
     url: new URL(`${origin}${pathname}`),
     request: new Request(`${origin}${pathname}`, {
@@ -43,7 +79,6 @@ function buildCtx(opts: {
     }),
     locals: {
       user: opts.user === undefined ? { email: 's@co.com', role: 'sponsor' } : opts.user,
-      runtime: opts.env === null ? undefined : { env: opts.env ?? buildEnv() },
     } as unknown,
   };
 }
