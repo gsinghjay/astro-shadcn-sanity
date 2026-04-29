@@ -11,7 +11,7 @@
     "astro": "astro",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "deploy:capstone": "CLOUDFLARE_ENV=capstone astro build && wrangler deploy",
+    "deploy:capstone": "CLOUDFLARE_ENV=capstone astro build && wrangler deploy --env capstone",
     "deploy:rwc-us": "CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy --env rwc_us",
     "deploy:rwc-intl": "CLOUDFLARE_ENV=rwc_intl astro build && wrangler deploy --env rwc_intl",
     "test:unit": "vitest run",

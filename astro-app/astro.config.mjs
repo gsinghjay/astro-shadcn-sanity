@@ -24,7 +24,9 @@ const wranglerVars = (() => {
       (_m, str) => str ?? "",
     );
     const cfg = JSON.parse(stripped);
-    const block = cfEnv === "capstone" ? cfg : cfg.env?.[cfEnv];
+    // Capstone vars now live in cfg.env.capstone after the env-block refactor;
+    // fall back to top-level cfg for backward compat.
+    const block = cfg.env?.[cfEnv] ?? (cfEnv === "capstone" ? cfg : null);
     return block?.vars ?? {};
   } catch (err) {
     console.warn(`[astro.config] Failed to read wrangler.jsonc for CLOUDFLARE_ENV=${cfEnv}:`, err.message);

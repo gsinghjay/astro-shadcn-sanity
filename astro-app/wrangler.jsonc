@@ -8,69 +8,127 @@
 //
 // Astro 6 builds env-specific artifacts: CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy --env rwc_us.
 {
-  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
-  "name": "ywcc-capstone",
-  "main": "@astrojs/cloudflare/entrypoints/server",
-  "compatibility_date": "2025-12-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "assets": {
-    "directory": "./dist",
-    "binding": "ASSETS"
-  },
-  "observability": {
-    "enabled": true,
-    "logs": { "enabled": true, "head_sampling_rate": 1 }
-  },
-  "vars": {
-    // STUDIO_ORIGIN allowlists the Studio host for the admin acceptances endpoint
-    // (CORS + Origin check). STUDIO_ADMIN_TOKEN remains a dashboard-managed secret.
-    "STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
-  },
-  "d1_databases": [
-    {
-      "binding": "PORTAL_DB",
-      "database_name": "ywcc-capstone-portal",
-      "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
-    }
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "SESSION_CACHE",
-      "id": "f78af5695075451c9d3d7887368e90dc"
-    }
-  ],
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "RATE_LIMITER",
-        "class_name": "SlidingWindowRateLimiter",
-        "script_name": "rate-limiter-worker"
-      }
-    ]
-  },
-  "env": {
-    "rwc_us": {
-      "name": "rwc-us",
-      "vars": {},
-      "observability": { "enabled": true, "logs": { "enabled": true, "head_sampling_rate": 1 } }
-      // Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
-    },
-    "rwc_intl": {
-      "name": "rwc-intl",
-      "vars": {
-        "PUBLIC_GTM_ID": "GTM-NS9N926Q",
-        "PUBLIC_SANITY_DATASET": "rwc",
-        "PUBLIC_SANITY_STUDIO_DATASET": "rwc",
-        "PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
-        "PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
-        "PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
-        "PUBLIC_SITE_ID": "rwc-intl",
-        "PUBLIC_SITE_THEME": "green",
-        "PUBLIC_SITE_URL": "https://rwc-intl.js426.workers.dev",
-        "PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
-      },
-      "observability": { "enabled": true, "logs": { "enabled": true, "head_sampling_rate": 1 } }
-      // Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
-    }
-  }
+	"$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
+	"name": "ywcc-capstone",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2025-12-01",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		}
+	},
+	"env": {
+		"capstone": {
+			"name": "ywcc-capstone",
+			"vars": {
+				// Capstone production Worker — STAGING phase (workers.dev only, no custom domain).
+				// At cutover (>= 2026-05-03) flip BETTER_AUTH_URL + PUBLIC_SITE_URL to
+				// https://ywcccapstone1.com and swap GITHUB_CLIENT_ID back to the prod
+				// GitHub OAuth App (Ov23liFtOiWIyCqJXJMi). Secrets (BETTER_AUTH_SECRET,
+				// GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, RESEND_API_KEY,
+				// SANITY_API_READ_TOKEN, SANITY_API_WRITE_TOKEN, STUDIO_ADMIN_TOKEN,
+				// TURNSTILE_SECRET_KEY) remain dashboard-managed via
+				// `wrangler secret put <NAME> --env capstone`.
+				"BETTER_AUTH_URL": "https://ywcc-capstone.js426.workers.dev",
+				"GITHUB_CLIENT_ID": "Ov23li8R7jigMPatjOml",
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "capstone",
+				"PUBLIC_SITE_THEME": "red",
+				"PUBLIC_SITE_URL": "https://ywcc-capstone.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn",
+				"RESEND_FROM_EMAIL": "YWCC Capstone <noreply@intraphase.com>",
+				"STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
+			},
+			"d1_databases": [
+				{
+					"binding": "PORTAL_DB",
+					"database_name": "ywcc-capstone-portal",
+					"database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "SESSION_CACHE",
+					"id": "f78af5695075451c9d3d7887368e90dc"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "RATE_LIMITER",
+						"class_name": "SlidingWindowRateLimiter",
+						"script_name": "rate-limiter-worker"
+					}
+				]
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+		},
+		"rwc_us": {
+			"name": "rwc-us",
+			"vars": {
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "rwc-us",
+				"PUBLIC_SITE_THEME": "blue",
+				"PUBLIC_SITE_URL": "https://rwc-us.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+		},
+		"rwc_intl": {
+			"name": "rwc-intl",
+			"vars": {
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "rwc-intl",
+				"PUBLIC_SITE_THEME": "green",
+				"PUBLIC_SITE_URL": "https://rwc-intl.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+		}
+	}
 }
