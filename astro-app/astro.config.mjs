@@ -99,21 +99,40 @@ export default defineConfig({
     },
     validateSecrets: true,
   },
-  experimental: {
-    fonts: [
+  fonts: [
+    {
+      provider: fontProviders.fontsource(),
+      name: "Inter",
+      cssVariable: "--font-inter",
+      weights: ["100 900"],
+      styles: ["normal", "italic"],
+      fallbacks: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+    },
+  ],
+  adapter: cloudflare({
+    // Adapter v13 default is 'cloudflare-binding' (Images runtime binding).
+    // Pin to 'compile' to preserve current behavior — Sanity images bypass
+    // <Image> already, so adopting the binding is a separate spike.
+    imageService: 'compile',
+  }),
+  vite: {
+    plugins: [
+      tailwindcss(),
+      // Pre-compile CJS-only deps so they work in the workerd dev environment introduced
+      // by adapter v13. picomatch is reachable via @astrojs/react and uses bare `require`.
       {
-        provider: fontProviders.fontsource(),
-        name: "Inter",
-        cssVariable: "--font-inter",
-        weights: ["100 900"],
-        styles: ["normal", "italic"],
-        fallbacks: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        name: "optimize-cjs-for-workerd",
+        configEnvironment(environment) {
+          if (environment !== "client") {
+            return {
+              optimizeDeps: {
+                include: ["picomatch", "@astrojs/react > picomatch"],
+              },
+            };
+          }
+        },
       },
     ],
-  },
-  adapter: cloudflare({ platformProxy: { enabled: true } }),
-  vite: {
-    plugins: [tailwindcss()],
     ssr: {
       noExternal: ["nanostores", "@nanostores/react"],
     },

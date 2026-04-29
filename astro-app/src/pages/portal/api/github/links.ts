@@ -18,7 +18,7 @@ export const GET: APIRoute = async ({ locals }) => {
     });
   }
 
-  const db = getDrizzle(locals);
+  const db = getDrizzle();
   const links = await db
     .select()
     .from(projectGithubRepos)
@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   }
 
-  const db = getDrizzle(locals);
+  const db = getDrizzle();
 
   // Check if a link already exists for this project
   const existing = await db
@@ -148,7 +148,7 @@ export const DELETE: APIRoute = async ({ request, locals }) => {
     });
   }
 
-  const db = getDrizzle(locals);
+  const db = getDrizzle();
   await db
     .delete(projectGithubRepos)
     .where(

@@ -1,7 +1,10 @@
 // All blocks — auto-discovered via import.meta.glob
 // Custom blocks: PascalCase filename → camelCase _type (e.g. HeroBanner.astro → heroBanner)
 // UI blocks: kebab-case filename used directly as _type (e.g. hero-1.astro → hero-1)
-import type { AstroComponentFactory } from 'astro/runtime/server/render/astro/factory';
+//
+// AstroComponentFactory's internal import path moved between Astro 5 → 6; we no longer
+// import the type — the registry only needs the default export's runtime shape.
+type AstroComponentFactory = (...args: unknown[]) => unknown;
 
 const allBlocks: Record<string, AstroComponentFactory> = {};
 

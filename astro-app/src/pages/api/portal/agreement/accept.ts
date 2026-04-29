@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { extractSessionToken, normalizeEmail } from '@/middleware';
 
 export const prerender = false;
@@ -23,7 +24,8 @@ function isSameOrigin(request: Request, expectedOrigin: string): boolean {
   }
 }
 
-export const POST: APIRoute = async ({ request, locals, url }) => {
+export const POST: APIRoute = async ({ request, locals, url }) => {  // eslint-disable-line @typescript-eslint/no-unused-vars
+  // `locals` retained for `locals.user` (set by middleware); env now imported from cloudflare:workers.
   if (!isSameOrigin(request, url.origin)) {
     return json({ error: 'forbidden_origin' }, 403);
   }
@@ -32,7 +34,6 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   if (!user) return json({ error: 'unauthorized' }, 401);
   if (user.role !== 'sponsor') return json({ error: 'forbidden' }, 403);
 
-  const env = locals.runtime?.env;
   if (!env?.PORTAL_DB) return json({ error: 'service_unavailable' }, 503);
 
   const email = normalizeEmail(user.email);

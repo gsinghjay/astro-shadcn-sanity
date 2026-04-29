@@ -1,23 +1,30 @@
 // astro-app/wrangler.jsonc
 //
-// LOCAL DEV ONLY. This file is for `wrangler pages dev` and is NOT the source
-// of truth for production. Per-project env vars and secrets are managed in the
-// CF Pages dashboard for each project:
-//   - ywcc-capstone  (dataset: production, site: capstone, theme: red)
-//   - rwc-us         (dataset: rwc, site: rwc-us, theme: blue)
-//   - rwc-intl       (dataset: rwc, site: rwc-intl, theme: green)
+// Workers + Static Assets config (post-Pages migration, Astro 6 / @astrojs/cloudflare v13).
+// Per-environment vars/secrets remain managed in the CF dashboard for each Worker:
+//   - ywcc-capstone  (env=capstone, dataset=production, theme=red, custom domain=ywcccapstone1.com)
+//   - rwc-us         (env=rwc_us,    dataset=rwc,        theme=blue,  *.workers.dev)
+//   - rwc-intl       (env=rwc_intl,  dataset=rwc,        theme=green, *.workers.dev)
+//
+// Astro 6 builds env-specific artifacts: CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy --env rwc_us.
 {
   "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
   "name": "ywcc-capstone",
+  "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2025-12-01",
-  "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
-  "pages_build_output_dir": "./dist",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 }
+  },
   "vars": {
-    // GitHub OAuth, Resend API key, and Google OAuth secrets are set via the CF Pages dashboard.
-    // Local dev bypasses auth via the `import.meta.env.DEV` check in middleware.
-    // STUDIO_ORIGIN is the allowlisted Studio host for the admin acceptances endpoint
-    // (CORS + Origin check). STUDIO_ADMIN_TOKEN is set via `wrangler secret put`.
-    "STUDIO_ORIGIN": "https://capstone.sanity.studio"
+    // STUDIO_ORIGIN allowlists the Studio host for the admin acceptances endpoint
+    // (CORS + Origin check). STUDIO_ADMIN_TOKEN remains a dashboard-managed secret.
+    "STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
   },
   "d1_databases": [
     {
@@ -26,16 +33,12 @@
       "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
     }
   ],
-  // KV session cache for student auth (optional — middleware degrades gracefully without it).
-  // Replace "id" with your actual namespace ID from: wrangler kv namespace create SESSION_CACHE
   "kv_namespaces": [
     {
       "binding": "SESSION_CACHE",
       "id": "f78af5695075451c9d3d7887368e90dc"
     }
   ],
-  // Durable Object rate limiter — hosted in a separate worker (Pages can't export DO classes).
-  // The rate-limiter-worker must be deployed before the main app.
   "durable_objects": {
     "bindings": [
       {
@@ -44,5 +47,18 @@
         "script_name": "rate-limiter-worker"
       }
     ]
+  },
+  "env": {
+    "rwc_us": {
+      "name": "rwc-us",
+      "vars": {},
+      "observability": { "enabled": true, "logs": { "enabled": true, "head_sampling_rate": 1 } }
+      // Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+    },
+    "rwc_intl": {
+      "name": "rwc-intl",
+      "vars": {},
+      "observability": { "enabled": true, "logs": { "enabled": true, "head_sampling_rate": 1 } }
+    }
   }
 }

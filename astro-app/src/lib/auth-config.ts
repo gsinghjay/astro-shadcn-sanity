@@ -70,7 +70,7 @@ export async function checkSponsorWhitelist(email: string): Promise<boolean> {
  * Creates a Better Auth instance bound to the request's D1 database.
  * Must be called per-request since D1 binding comes from the runtime env.
  *
- * @param options.db - Shared Drizzle instance from getDrizzle(locals)
+ * @param options.db - Shared Drizzle instance from getDrizzle()
  * @param options.env - Auth-specific environment variables
  */
 export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
