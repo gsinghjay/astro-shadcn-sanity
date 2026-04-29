@@ -1,0 +1,83 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: comparisonTable. 3 variants: table, stacked, specification. options min 2 max 5 — includes max=5 instance per AC6 #29. criteria min 1.",
+  "_id": "demo-audit-comparison-table",
+  "_type": "page",
+  "title": "Demo — Comparison Table",
+  "slug": {"_type": "slug", "current": "demo/comparison-table"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: comparison-table"},
+  "blocks": [
+    {
+      "_key": "ct-table-2options",
+      "_type": "comparisonTable",
+      "variant": "table",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Table variant — 2 options (min)",
+      "description": "Minimum options bound (Rule.min(2)).",
+      "options": [
+        {"_key": "opt-starter", "_type": "comparisonColumn", "title": "Starter", "highlighted": false},
+        {"_key": "opt-pro", "_type": "comparisonColumn", "title": "Pro", "highlighted": true}
+      ],
+      "criteria": [
+        {"_key": "row-1", "_type": "comparisonRow", "feature": "Projects", "values": ["1", "Unlimited"], "isHeader": false},
+        {"_key": "row-2", "_type": "comparisonRow", "feature": "Team seats", "values": ["3", "20"], "isHeader": false},
+        {"_key": "row-3", "_type": "comparisonRow", "feature": "Support", "values": ["Community", "24/7 priority"], "isHeader": false}
+      ]
+    },
+    {
+      "_key": "ct-stacked-3options-1criterion",
+      "_type": "comparisonTable",
+      "variant": "stacked",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Stacked variant — 3 options, 1 criterion (min)",
+      "description": "Exercises criteria min=1.",
+      "options": [
+        {"_key": "o-a", "_type": "comparisonColumn", "title": "Option A"},
+        {"_key": "o-b", "_type": "comparisonColumn", "title": "Option B", "highlighted": true},
+        {"_key": "o-c", "_type": "comparisonColumn", "title": "Option C"}
+      ],
+      "criteria": [
+        {"_key": "r-1", "_type": "comparisonRow", "feature": "Key capability", "values": ["Basic", "Advanced", "Expert"], "isHeader": false}
+      ],
+      "links": [
+        {"_key": "ct-link-1", "_type": "button", "text": "Compare all", "url": "/compare", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "ct-specification-5options-max",
+      "_type": "comparisonTable",
+      "variant": "specification",
+      "backgroundVariant": "blueprint",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Specification variant — 5 options (max AC6 #29)",
+      "description": "Exercises options upper bound (Rule.max(5)).",
+      "options": [
+        {"_key": "sp-1", "_type": "comparisonColumn", "title": "Bronze"},
+        {"_key": "sp-2", "_type": "comparisonColumn", "title": "Silver"},
+        {"_key": "sp-3", "_type": "comparisonColumn", "title": "Gold", "highlighted": true},
+        {"_key": "sp-4", "_type": "comparisonColumn", "title": "Platinum"},
+        {"_key": "sp-5", "_type": "comparisonColumn", "title": "Diamond"}
+      ],
+      "criteria": [
+        {"_key": "hdr-access", "_type": "comparisonRow", "feature": "Access", "values": [], "isHeader": true},
+        {"_key": "spec-1", "_type": "comparisonRow", "feature": "Project views", "values": ["10", "50", "Unlimited", "Unlimited", "Unlimited"]},
+        {"_key": "spec-2", "_type": "comparisonRow", "feature": "Demo day seats", "values": ["2", "5", "10", "20", "50"]},
+        {"_key": "hdr-perks", "_type": "comparisonRow", "feature": "Perks", "values": [], "isHeader": true},
+        {"_key": "spec-3", "_type": "comparisonRow", "feature": "Logo placement", "values": ["Basic", "Standard", "Premium", "Premium+", "Hero"]},
+        {"_key": "spec-4", "_type": "comparisonRow", "feature": "Keynote slot", "values": ["No", "No", "Yes", "Yes", "Yes"]},
+        {"_key": "spec-5", "_type": "comparisonRow", "feature": "Naming rights", "values": ["No", "No", "No", "Partial", "Full"]}
+      ],
+      "links": [
+        {"_key": "ct-link-spec-1", "_type": "button", "text": "Talk to us", "url": "/contact", "variant": "default"},
+        {"_key": "ct-link-spec-2", "_type": "button", "text": "Download PDF", "url": "/sponsor-deck.pdf", "variant": "outline"}
+      ]
+    }
+  ]
+}
