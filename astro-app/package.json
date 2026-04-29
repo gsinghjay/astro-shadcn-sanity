@@ -14,6 +14,8 @@
     "deploy:capstone": "CLOUDFLARE_ENV=capstone astro build && wrangler deploy",
     "deploy:rwc-us": "CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy",
     "deploy:rwc-intl": "CLOUDFLARE_ENV=rwc_intl astro build && wrangler deploy",
+    "deploy:rwc-us-preview": "CLOUDFLARE_ENV=rwc_us_preview astro build && wrangler deploy",
+    "deploy:rwc-intl-preview": "CLOUDFLARE_ENV=rwc_intl_preview astro build && wrangler deploy",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage"

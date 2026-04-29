@@ -138,6 +138,52 @@
 				}
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+		},
+		"rwc_us_preview": {
+			"name": "rwc-us-preview",
+			"vars": {
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "rwc-us",
+				"PUBLIC_SITE_THEME": "blue",
+				"PUBLIC_SITE_URL": "https://rwc-us-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
+		},
+		"rwc_intl_preview": {
+			"name": "rwc-intl-preview",
+			"vars": {
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "rwc-intl",
+				"PUBLIC_SITE_THEME": "green",
+				"PUBLIC_SITE_URL": "https://rwc-intl-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
 		}
 	}
 }
