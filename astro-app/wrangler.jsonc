@@ -6,15 +6,24 @@
 //   - rwc-us         (env=rwc_us,    dataset=rwc,        theme=blue,  *.workers.dev)
 //   - rwc-intl       (env=rwc_intl,  dataset=rwc,        theme=green, *.workers.dev)
 //
-// Astro 6 builds env-specific artifacts: CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy --env rwc_us.
+// Astro 6 + @cloudflare/vite-plugin bakes env at build time and writes
+// dist/server/wrangler.json (auto-located by wrangler via .wrangler/deploy/config.json),
+// so the deploy command is: CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy
+// (the legacy `--env <name>` flag is no longer applicable — the Vite plugin owns env selection).
 {
 	"$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
 	"name": "ywcc-capstone",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"compatibility_date": "2025-12-01",
+	// disable_nodejs_process_v2 works around Astro #15434 / #14511 — Astro 6 +
+	// @astrojs/cloudflare v13 + nodejs_compat + middleware emits SSR responses
+	// as async iterables that workerd stringifies to literal "[object Object]".
+	// Remove once compatibility_date >= 2026-02-19 (replace with
+	// fetch_iterable_type_support) or upstream patch lands.
 	"compatibility_flags": [
 		"nodejs_compat",
-		"global_fetch_strictly_public"
+		"global_fetch_strictly_public",
+		"disable_nodejs_process_v2"
 	],
 	"assets": {
 		"directory": "./dist",
