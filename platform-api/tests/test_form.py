@@ -80,8 +80,8 @@ def test_successful_submission(client, monkeypatch):
     # Track notify_discord invocations to ensure it receives WorkerSettings
     notify_calls = []
 
-    async def mock_notify_discord(body, settings):
-        notify_calls.append({"body": body, "settings": settings})
+    async def mock_notify_discord(body, background_tasks, settings):
+        notify_calls.append({"body": body, "background_tasks": background_tasks, "settings": settings})
 
     monkeypatch.setattr("routers.forms.notify_discord", mock_notify_discord)
     payload = {**VALID_PAYLOAD, "cf-turnstile-response": "1x0000000000000000000000000000000AA"}
