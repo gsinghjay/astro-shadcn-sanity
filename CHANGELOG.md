@@ -1,3 +1,9 @@
+## [1.20.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.0...v1.20.1) (2026-04-29)
+
+### Bug Fixes
+
+* **portal:** bypass session middleware for /api/portal/admin/* + log Sanity write errors ([acb4e6f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/acb4e6f8cde375e3f83215b41c9ff06306091f4d))
+
 ## [1.20.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.19.0...v1.20.0) (2026-04-29)
 
 ### Features
