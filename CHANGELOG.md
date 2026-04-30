@@ -1,3 +1,73 @@
+## [2.0.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.1...v2.0.0) (2026-04-30)
+
+### ⚠ BREAKING CHANGES
+
+* **infra:** refactors required by adapter v13:
+
+- 9 sites convert `Astro.locals.runtime.env` → `import { env } from
+  'cloudflare:workers'` (middleware, actions, lib/db, all portal/api
+  routes). Removed 'locals' parameter from getDb / getDrizzle.
+- wrangler.jsonc replaces `pages_build_output_dir` with
+  `assets.directory + binding=ASSETS` and `main:
+  '@astrojs/cloudflare/entrypoints/server'` (the new unified adapter
+  entry, not a build-output path).
+- env.d.ts drops the `Runtime<>` ambient and references
+  wrangler-generated worker-configuration.d.ts. Cloudflare.Env is
+  augmented with dashboard-managed secrets (Better Auth / Resend /
+  OAuth / Studio admin) and the RATE_LIMITER cross-script DO RPC type.
+- Per-env deploys now use CLOUDFLARE_ENV build-time var, not
+  `wrangler deploy --env`. New scripts: deploy:capstone /
+  deploy:rwc-us / deploy:rwc-intl.
+- experimental.fonts → root-level fonts (graduated in v6).
+- adapter pinned to imageService:'compile' (v13 default
+  cloudflare-binding deferred — Sanity images bypass <Image> already).
+- Vite plugin pre-compiles picomatch (CJS via @astrojs/react) so it
+  works in the new workerd dev runtime.
+- block-registry drops the Astro 5 internal type import path.
+- tsconfig excludes test files from astro check (vitest globals
+  drift); db.test rewritten against mocked cloudflare:workers env.
+
+Verified: `astro build` succeeds (10.2 MB / 2.8 MB gz, 239 assets,
+59 modules), `wrangler deploy --dry-run` resolves all bindings
+(RATE_LIMITER, SESSION_CACHE, PORTAL_DB, ASSETS, STUDIO_ORIGIN).
+Pre-existing TypeGen / fixture drift errors in astro check are out
+of scope for this commit.
+
+NOT YET DONE (follow-ups):
+- Phased deploy: rwc-intl → rwc-us → ywcc-capstone (custom domain
+  cutover + Better Auth callback URL update).
+- Pa11y / LHCI gates already green via sitemap-driven URL set.
+- CLAUDE.md + project-context.md doc updates.
+- Audit endpoints with file extension trailing slashes (Astro 6
+  rejects /sitemap.xml/ etc).
+
+### Features
+
+* **infra:** add rwc-us-preview + rwc-intl-preview Workers (story 15.10 AC 3-5) ([fc72939](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fc7293993ec8f19312967a8bda820334a9d09945))
+* **infra:** cutover capstone to www.ywcccapstone1.com + add capstone-preview Worker (story 15.10) ([509df13](https://github.com/gsinghjay/astro-shadcn-sanity/commit/509df13969fdb480d8263e6423906392ae79460f))
+* **infra:** migrate to Astro 6 + Cloudflare Workers static-assets ([f687f66](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f687f661a1a774e3a2d38a8bb12a79bbb9e586a7))
+* **seo:** add astro-llms-md + sitemap-driven LHCI/Pa11y scope ([321526c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/321526c1649918c6e9988fd041a2cbb1403d78b8))
+
+### Bug Fixes
+
+* **chat-bubble:** restore reopen after vendor X close (Story 5.18) ([b230b76](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b230b76c0f1739558264b305408eab526ed3b61d))
+* **ci:** tighten LHCI gating and useCdn coercion after Story 5.19 ([d1b3e04](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d1b3e045a60b51fdc4c5d01a9dbec8ab4b69b3db))
+* **infra:** refactor Capstone into [env.capstone] block + fix wrangler-vars lookup ([9d36cef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9d36cefb85c3fa5c8cc52ed184a55ac19fc5bbc4))
+* **infra:** unblock SSR portal pages on Workers (astro[#15434](https://github.com/gsinghjay/astro-shadcn-sanity/issues/15434) workaround) ([39874ce](https://github.com/gsinghjay/astro-shadcn-sanity/commit/39874ce7e21c8f325fecb4a606dd08c880df69fc)), closes [astro#15917](https://github.com/gsinghjay/astro/issues/15917) [astro#16040](https://github.com/gsinghjay/astro/issues/16040)
+* **infra:** wire wrangler.jsonc env vars into Astro 6 build ([d70ee9a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d70ee9a2373dcee652ba91ab6370ec8b9ab12c04))
+* **studio:** site-aware Presentation resolver + workspace tooling cleanup (Story 15.9) ([bd9281c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bd9281c9c1bc9e409a49a176ae31448ea8f6c766))
+
+### Miscellaneous
+
+* **ci:** pin Node to 22 for CF Pages build cache compatibility ([081b139](https://github.com/gsinghjay/astro-shadcn-sanity/commit/081b1390c213d5be793acac54d64497b21aed4c8))
+* gitignore .lhci report dumps and check in demo-audit assets ([b809c5a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b809c5aa6d1b5f113ad712252219fc4b227016cb))
+* project files ([c0ea28a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c0ea28ad3be45f1e80731b72e8e1b24b94187c03))
+* **studio:** auto-bump @sanity/vision + sanity to 5.23.0 ([565bf78](https://github.com/gsinghjay/astro-shadcn-sanity/commit/565bf78bd6c43097fdfbda47e432912ded145673))
+
+### Tests
+
+* **infra:** green unit suite under Astro 6 + @astrojs/cloudflare v13 ([3bafec6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3bafec631a522993e71cd55299274dc39ce88553))
+
 ## [1.20.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.0...v1.20.1) (2026-04-29)
 
 ### Bug Fixes
