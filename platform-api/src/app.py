@@ -31,6 +31,7 @@ from routers.content import router as content_router
 from routers.forms import router as form_router
 from routers.platform import router as platform_router
 from routers.discord import router as discord_router
+from routers.auth import router as auth_router
 
 app = FastAPI(
     title="Platform API",
@@ -59,12 +60,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# CONVENIENT GLOBAL VARIABLES
+API_V1 = "/api/v1"
+
 # Register routers
-app.include_router(health_router, prefix="/api/v1/platform")
-app.include_router(content_router, prefix="/api/v1")
-app.include_router(form_router, prefix="/api/v1")
-app.include_router(platform_router, prefix="/api/v1")
-app.include_router(discord_router, prefix="/api/v1")
+app.include_router(health_router, prefix=f"{API_V1}/platform")
+app.include_router(content_router, prefix=API_V1)
+app.include_router(form_router, prefix=API_V1)
+app.include_router(platform_router, prefix=API_V1)
+app.include_router(discord_router, prefix=API_V1)
+app.include_router(auth_router, prefix=API_V1)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
