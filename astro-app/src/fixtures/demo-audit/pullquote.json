@@ -1,0 +1,73 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: pullquote. Variants: centered, split, sidebar, brutalist. hiddenByVariant: image hidden in sidebar. Quote max 500 — long-text edge case on brutalist instance.",
+  "_id": "demo-audit-pullquote",
+  "_type": "page",
+  "title": "Demo — Pullquote",
+  "slug": {"_type": "slug", "current": "demo/pullquote"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: pullquote"},
+  "blocks": [
+    {
+      "_key": "pq-centered",
+      "_type": "pullquote",
+      "variant": "centered",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "quote": "Short quote with image attached. Tests centered variant with image rendering.",
+      "attribution": "Jane Engineer",
+      "role": "Principal Architect",
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"},
+        "alt": "Portrait placeholder for Jane Engineer"
+      }
+    },
+    {
+      "_key": "pq-split",
+      "_type": "pullquote",
+      "variant": "split",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "quote": "Split variant shows the quote alongside an image in a 2-column layout.",
+      "attribution": "John Developer",
+      "role": "Senior Engineer",
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"},
+        "alt": "Portrait placeholder for John Developer"
+      }
+    },
+    {
+      "_key": "pq-sidebar",
+      "_type": "pullquote",
+      "variant": "sidebar",
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "quote": "Sidebar variant hides the image field — tests hiddenByVariant rule. Image ignored even if set.",
+      "attribution": "Anonymous",
+      "role": null,
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"},
+        "alt": "Should not render because sidebar hides image"
+      }
+    },
+    {
+      "_key": "pq-brutalist-long",
+      "_type": "pullquote",
+      "variant": "brutalist",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "quote": "Long-text overflow edge case (AC6 #30). This pullquote stresses the 500-character maximum to audit typography, line-height, word-break, and any truncation behavior the brutalist variant applies. Real capstone content quotes are often verbose when students describe technical tradeoffs, architectural decisions, or methodology takeaways. This sentence exists to eat characters deliberately and land near the upper bound of 500 so layout stays honest.",
+      "attribution": "Capstone 2026 Cohort",
+      "role": "Graduating Engineers"
+    }
+  ]
+}

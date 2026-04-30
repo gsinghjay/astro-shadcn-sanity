@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 
 export const prerender = false;
 
@@ -7,8 +8,7 @@ const MAX_SUBSCRIPTIONS_PER_HOUR = 10;
 const jsonResponse = (body: { success: boolean; error?: string }, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-export const POST: APIRoute = async ({ request, locals }) => {
-  const { env } = locals.runtime;
+export const POST: APIRoute = async ({ request }) => {
   let body: { email?: string; discord_user_id?: string; remind_days_before?: number };
   try {
     body = await request.json();
@@ -53,8 +53,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   return jsonResponse({ success: true }, 200);
 };
 
-export const DELETE: APIRoute = async ({ request, locals }) => {
-  const { env } = locals.runtime;
+export const DELETE: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const email = url.searchParams.get('email')?.trim() ?? '';
   if (!email) {

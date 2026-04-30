@@ -1,0 +1,51 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: videoEmbed. Variants: full-width, split, split-asymmetric. youtubeUrl required (https + YouTube host). posterImage optional — set on split-asymmetric only.",
+  "_id": "demo-audit-video-embed",
+  "_type": "page",
+  "title": "Demo — Video Embed",
+  "slug": {"_type": "slug", "current": "demo/video-embed"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: video-embed"},
+  "blocks": [
+    {
+      "_key": "ve-full",
+      "_type": "videoEmbed",
+      "variant": "full-width",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-width YouTube embed",
+      "description": "Tests the full-width video variant with no custom poster — YouTube thumbnail fallback.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    {
+      "_key": "ve-split",
+      "_type": "videoEmbed",
+      "variant": "split",
+      "backgroundVariant": "white",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split video + text",
+      "description": "Two-column split: heading/description left, video right.",
+      "youtubeUrl": "https://youtu.be/dQw4w9WgXcQ"
+    },
+    {
+      "_key": "ve-asym",
+      "_type": "videoEmbed",
+      "variant": "split-asymmetric",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split asymmetric with custom poster image",
+      "description": "Asymmetric split with a custom poster image override.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=9bZkp7q19f0",
+      "posterImage": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"},
+        "alt": "Custom poster thumbnail for the demo video"
+      }
+    }
+  ]
+}

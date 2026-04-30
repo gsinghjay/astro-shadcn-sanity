@@ -1,45 +1,234 @@
 // astro-app/wrangler.jsonc
 //
-// LOCAL DEV ONLY. This file is for `wrangler pages dev` and is NOT the source
-// of truth for production. Per-project env vars and secrets are managed in the
-// CF Pages dashboard for each project:
-//   - ywcc-capstone  (dataset: production, site: capstone, theme: red)
-//   - rwc-us         (dataset: rwc, site: rwc-us, theme: blue)
-//   - rwc-intl       (dataset: rwc, site: rwc-intl, theme: green)
+// Workers + Static Assets config (post-Pages migration, Astro 6 / @astrojs/cloudflare v13).
+// Per-environment vars/secrets remain managed in the CF dashboard for each Worker:
+//   - ywcc-capstone  (env=capstone, dataset=production, theme=red, custom domain=ywcccapstone1.com)
+//   - rwc-us         (env=rwc_us,    dataset=rwc,        theme=blue,  *.workers.dev)
+//   - rwc-intl       (env=rwc_intl,  dataset=rwc,        theme=green, *.workers.dev)
+//
+// Astro 6 + @cloudflare/vite-plugin bakes env at build time and writes
+// dist/server/wrangler.json (auto-located by wrangler via .wrangler/deploy/config.json),
+// so the deploy command is: CLOUDFLARE_ENV=rwc_us astro build && wrangler deploy
+// (the legacy `--env <name>` flag is no longer applicable — the Vite plugin owns env selection).
 {
-  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
-  "name": "ywcc-capstone",
-  "compatibility_date": "2025-12-01",
-  "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
-  "pages_build_output_dir": "./dist",
-  "vars": {
-    // GitHub OAuth, Resend API key, and Google OAuth secrets are set via the CF Pages dashboard.
-    // Local dev bypasses auth via the `import.meta.env.DEV` check in middleware.
-  },
-  "d1_databases": [
-    {
-      "binding": "PORTAL_DB",
-      "database_name": "ywcc-capstone-portal",
-      "database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
-    }
-  ],
-  // KV session cache for student auth (optional — middleware degrades gracefully without it).
-  // Replace "id" with your actual namespace ID from: wrangler kv namespace create SESSION_CACHE
-  "kv_namespaces": [
-    {
-      "binding": "SESSION_CACHE",
-      "id": "f78af5695075451c9d3d7887368e90dc"
-    }
-  ],
-  // Durable Object rate limiter — hosted in a separate worker (Pages can't export DO classes).
-  // The rate-limiter-worker must be deployed before the main app.
-  "durable_objects": {
-    "bindings": [
-      {
-        "name": "RATE_LIMITER",
-        "class_name": "SlidingWindowRateLimiter",
-        "script_name": "rate-limiter-worker"
-      }
-    ]
-  }
+	"$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
+	"name": "ywcc-capstone",
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2025-12-01",
+	// disable_nodejs_process_v2 works around Astro #15434 / #14511 — Astro 6 +
+	// @astrojs/cloudflare v13 + nodejs_compat + middleware emits SSR responses
+	// as async iterables that workerd stringifies to literal "[object Object]".
+	// Remove once compatibility_date >= 2026-02-19 (replace with
+	// fetch_iterable_type_support) or upstream patch lands.
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public",
+		"disable_nodejs_process_v2"
+	],
+	"assets": {
+		"directory": "./dist",
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true,
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1
+		}
+	},
+	"env": {
+		"capstone": {
+			"name": "ywcc-capstone",
+			"routes": [
+				{ "pattern": "ywcccapstone1.com", "custom_domain": true },
+				{ "pattern": "www.ywcccapstone1.com", "custom_domain": true }
+			],
+			"vars": {
+				// Capstone production Worker — POST-CUTOVER. Canonical host is `www`; the apex
+				// `ywcccapstone1.com` is attached to this Worker only as a redirect target — a
+				// zone-level Single Redirect rule (in CF dashboard / Rules / Redirect Rules)
+				// 301s all apex traffic to `https://www.ywcccapstone1.com${path}` before the
+				// Worker is invoked, so apex never burns Worker CPU. Both attachments in
+				// `routes` exist for DNS resolution + a fallback if the redirect rule is ever
+				// disabled.
+				// `routes` above attaches custom domains on `wrangler deploy`. Apex/www must be
+				// detached from any legacy Pages project before the first deploy attaches them
+				// here (CF rejects double-attachment).
+				// Secrets (BETTER_AUTH_SECRET, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID,
+				// GOOGLE_CLIENT_SECRET, RESEND_API_KEY, SANITY_API_READ_TOKEN,
+				// SANITY_API_WRITE_TOKEN, STUDIO_ADMIN_TOKEN, TURNSTILE_SECRET_KEY) remain
+				// dashboard-managed via `wrangler secret put <NAME> --name ywcc-capstone`.
+				// At cutover GITHUB_CLIENT_SECRET MUST be re-put with the prod GitHub OAuth
+				// App's client secret (paired with GITHUB_CLIENT_ID Ov23liFtOiWIyCqJXJMi);
+				// the staging-phase secret paired with Ov23li8R7jigMPatjOml is no longer valid.
+				"BETTER_AUTH_URL": "https://www.ywcccapstone1.com",
+				"GITHUB_CLIENT_ID": "Ov23liFtOiWIyCqJXJMi",
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "capstone",
+				"PUBLIC_SITE_THEME": "red",
+				"PUBLIC_SITE_URL": "https://www.ywcccapstone1.com",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn",
+				"RESEND_FROM_EMAIL": "YWCC Capstone <noreply@intraphase.com>",
+				"STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
+			},
+			"d1_databases": [
+				{
+					"binding": "PORTAL_DB",
+					"database_name": "ywcc-capstone-portal",
+					"database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "SESSION_CACHE",
+					"id": "f78af5695075451c9d3d7887368e90dc"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "RATE_LIMITER",
+						"class_name": "SlidingWindowRateLimiter",
+						"script_name": "rate-limiter-worker"
+					}
+				]
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+		},
+		"rwc_us": {
+			"name": "rwc-us",
+			"vars": {
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "rwc-us",
+				"PUBLIC_SITE_THEME": "blue",
+				"PUBLIC_SITE_URL": "https://rwc-us.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+		},
+		"rwc_intl": {
+			"name": "rwc-intl",
+			"vars": {
+				"PUBLIC_GTM_ID": "GTM-NS9N926Q",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				"PUBLIC_SITE_ID": "rwc-intl",
+				"PUBLIC_SITE_THEME": "green",
+				"PUBLIC_SITE_URL": "https://rwc-intl.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
+		},
+		"capstone_preview": {
+			"name": "ywcc-capstone-preview",
+			"vars": {
+				// Capstone preview Worker — content-only (no D1/KV/DO bindings).
+				// Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
+				// BETTER_AUTH_URL is set because site code reads it during build, but the
+				// auth flow itself doesn't run without BETTER_AUTH_SECRET + PORTAL_DB.
+				// Studio Presentation tool points iframe at this Worker (studio/.env
+				// SANITY_STUDIO_PREVIEW_ORIGIN). Replaces preview.ywcc-capstone.pages.dev.
+				"BETTER_AUTH_URL": "https://ywcc-capstone-preview.js426.workers.dev",
+				"GITHUB_CLIENT_ID": "Ov23liFtOiWIyCqJXJMi",
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "capstone",
+				"PUBLIC_SITE_THEME": "red",
+				"PUBLIC_SITE_URL": "https://ywcc-capstone-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn",
+				"RESEND_FROM_EMAIL": "YWCC Capstone <noreply@intraphase.com>",
+				"STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+		},
+		"rwc_us_preview": {
+			"name": "rwc-us-preview",
+			"vars": {
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "rwc-us",
+				"PUBLIC_SITE_THEME": "blue",
+				"PUBLIC_SITE_URL": "https://rwc-us-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
+		},
+		"rwc_intl_preview": {
+			"name": "rwc-intl-preview",
+			"vars": {
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_DATASET": "rwc",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "rwc-intl",
+				"PUBLIC_SITE_THEME": "green",
+				"PUBLIC_SITE_URL": "https://rwc-intl-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				}
+			}
+			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
+		}
+	}
 }

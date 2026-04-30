@@ -12,8 +12,12 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
       expect(configContent).toMatch(/fontProviders.*from\s+["']astro\/config["']/);
     });
 
-    it('configures fonts inside experimental block (Astro 5.x)', () => {
-      expect(configContent).toMatch(/experimental\s*:\s*\{[\s\S]*fonts\s*:\s*\[/);
+    it('configures fonts at the root of defineConfig (graduated from experimental in Astro 6)', () => {
+      // The Fonts API graduated to stable in Astro 6 — `fonts` now lives at
+      // the top level of the config, not under `experimental`.
+      expect(configContent).toMatch(/\n\s*fonts\s*:\s*\[/);
+      // And there must NOT be an experimental.fonts wrapper anymore.
+      expect(configContent).not.toMatch(/experimental\s*:\s*\{[\s\S]*fonts\s*:\s*\[/);
     });
 
     it('configures Inter font family', () => {
@@ -116,24 +120,27 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
   });
 
   describe('Task 5: Build output verification (AC: #1, #2, #5)', () => {
+    // Adapter v13 + output: "server" splits the build into dist/client/ (assets)
+    // and dist/server/ (Worker). Fonts and HTML now live under dist/client/.
     const DIST = resolve(ROOT, 'dist');
-    const describeIfBuilt = existsSync(DIST) ? describe : describe.skip;
+    const CLIENT = resolve(DIST, 'client');
+    const describeIfBuilt = existsSync(CLIENT) ? describe : describe.skip;
 
     describeIfBuilt('self-hosted font files', () => {
-      it('font files exist in dist/_astro/fonts/', () => {
-        const fontsDir = resolve(DIST, '_astro/fonts');
+      it('font files exist in dist/client/_astro/fonts/', () => {
+        const fontsDir = resolve(CLIENT, '_astro/fonts');
         expect(existsSync(fontsDir)).toBe(true);
       });
 
       it('contains woff2 font file (self-hosted, no external requests)', () => {
-        const fontsDir = resolve(DIST, '_astro/fonts');
+        const fontsDir = resolve(CLIENT, '_astro/fonts');
         const files = readdirSync(fontsDir);
         const woff2Files = files.filter((f: string) => f.endsWith('.woff2'));
         expect(woff2Files.length).toBeGreaterThan(0);
       });
 
       it('index.html contains font preload or @font-face reference', () => {
-        const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+        const html = readFileSync(resolve(CLIENT, 'index.html'), 'utf-8');
         // The Font component should inject either a preload link or inline @font-face CSS
         const hasFontRef =
           html.includes('as="font"') ||
@@ -144,7 +151,7 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
       });
 
       it('no external font CDN requests in HTML', () => {
-        const html = readFileSync(resolve(DIST, 'index.html'), 'utf-8');
+        const html = readFileSync(resolve(CLIENT, 'index.html'), 'utf-8');
         expect(html).not.toContain('fonts.googleapis.com');
         expect(html).not.toContain('fonts.gstatic.com');
         expect(html).not.toContain('use.typekit.net');

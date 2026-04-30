@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -52,56 +52,62 @@ export default function SponsorAgreementViewer({
     };
   }, []);
 
+  const onDocumentLoadSuccess = useCallback(
+    ({ numPages: n }: { numPages: number }) => {
+      setNumPages(n);
+      onReady?.(n);
+      if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
+    },
+    [onReady],
+  );
+  const onDocumentLoadError = useCallback(
+    () => setLoadError('Could not load PDF. Try refreshing.'),
+    [],
+  );
+
   // Memoize the page list so an unrelated parent re-render doesn't reset every page.
   const pages = useMemo(() => {
     if (!numPages) return null;
     return Array.from({ length: numPages }, (_, i) => (
-      <Page
-        key={`page-${i + 1}`}
-        pageNumber={i + 1}
-        width={width}
-        className="mb-2"
-      />
+      <Page key={`page-${i + 1}`} pageNumber={i + 1} width={width} className="mb-2" />
     ));
   }, [numPages, width]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`border bg-muted/30 overflow-y-auto ${className}`}
-      style={{ maxHeight }}
-      data-testid="agreement-viewer"
-    >
-      {loadError ? (
-        <div className="flex flex-col items-center gap-3 p-8 text-center">
-          <p className="text-sm text-muted-foreground">{loadError}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setLoadError(null);
-              setNumPages(null);
-              setReloadKey((k) => k + 1);
-            }}
-            className="text-sm underline"
+    <div className={`relative ${className}`}>
+      <div
+        ref={containerRef}
+        className="border bg-muted/30 overflow-y-auto"
+        style={{ maxHeight }}
+        data-testid="agreement-viewer"
+      >
+        {loadError ? (
+          <div className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-sm text-muted-foreground">{loadError}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoadError(null);
+                setNumPages(null);
+                setReloadKey((k) => k + 1);
+              }}
+              className="text-sm underline"
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <Document
+            key={reloadKey}
+            file={pdfUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
+            loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
           >
-            Try again
-          </button>
-        </div>
-      ) : (
-        <Document
-          key={reloadKey}
-          file={pdfUrl}
-          onLoadSuccess={({ numPages: n }) => {
-            setNumPages(n);
-            onReady?.(n);
-            if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
-          }}
-          onLoadError={() => setLoadError('Could not load PDF. Try refreshing.')}
-          loading={<div className="p-8 text-center text-sm text-muted-foreground">Loading agreement…</div>}
-        >
-          {pages}
-        </Document>
-      )}
+            {pages}
+          </Document>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
 /// <reference types="@sanity/astro/module" />
+/// <reference path="../worker-configuration.d.ts" />
 
 interface ImportMetaEnv {
   readonly PUBLIC_SANITY_STUDIO_PROJECT_ID: string;
@@ -20,7 +21,7 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker) */
+/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker). */
 interface RateLimiterDO {
   checkLimit(windowMs: number, maxRequests: number): Promise<{
     allowed: boolean;
@@ -29,25 +30,30 @@ interface RateLimiterDO {
   }>;
 }
 
-type Runtime = import("@astrojs/cloudflare").Runtime<{
-  TURNSTILE_SECRET_KEY: string;
-  DISCORD_WEBHOOK_URL: string;
-  SANITY_API_WRITE_TOKEN: string;
-  PORTAL_DB: D1Database;
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-  BETTER_AUTH_SECRET: string;
-  BETTER_AUTH_URL: string;
-  RESEND_API_KEY: string;
-  RESEND_FROM_EMAIL?: string;
-  SESSION_CACHE?: KVNamespace;
-  RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
-}>;
+// Augment wrangler-generated Cloudflare.Env with dashboard-managed secrets
+// (which wrangler can't see locally) and properly-typed Durable Object RPC.
+declare namespace Cloudflare {
+  interface Env {
+    TURNSTILE_SECRET_KEY: string;
+    SANITY_API_WRITE_TOKEN: string;
+    SANITY_API_READ_TOKEN?: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    GITHUB_CLIENT_ID: string;
+    GITHUB_CLIENT_SECRET: string;
+    BETTER_AUTH_SECRET: string;
+    BETTER_AUTH_URL: string;
+    RESEND_API_KEY: string;
+    RESEND_FROM_EMAIL?: string;
+    DISCORD_WEBHOOK_URL?: string;
+    STUDIO_ADMIN_TOKEN?: string;
+    GITHUB_DEV_TOKEN?: string;
+    RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
+  }
+}
 
 declare namespace App {
-  interface Locals extends Runtime {
+  interface Locals {
     user?: { email: string; role: 'sponsor' | 'student'; name?: string };
     /** Sponsor Agreement Gate — true when a sponsor must accept the CMS agreement before proceeding */
     requiresAgreement?: boolean;
