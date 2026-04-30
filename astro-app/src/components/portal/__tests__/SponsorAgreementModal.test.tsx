@@ -81,14 +81,27 @@ const BASE_PROPS = {
 };
 
 describe('SponsorAgreementModal', () => {
+  let reloadSpy: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
     viewerMockState.numPages = 3;
-    // @ts-expect-error jsdom - assign reload spy
-    window.location = { ...window.location, reload: vi.fn(), origin: 'http://localhost' };
+    // Stub `location` via vi.stubGlobal so vitest restores it cleanly between
+    // tests — direct `window.location =` assignment leaves Location in a broken
+    // state that breaks URL.prototype.toString() in any test sharing the worker
+    // (CI uses singleFork pool, so leakage is observable).
+    reloadSpy = vi.fn();
+    vi.stubGlobal('location', {
+      ...window.location,
+      reload: reloadSpy,
+      origin: window.location.origin,
+      href: window.location.href,
+      toString: () => window.location.href,
+    });
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.useRealTimers();
     vi.restoreAllMocks();
     if (container) unmount();
@@ -147,7 +160,7 @@ describe('SponsorAgreementModal', () => {
       await Promise.resolve();
       await Promise.resolve();
     });
-    expect(window.location.reload).toHaveBeenCalled();
+    expect(reloadSpy).toHaveBeenCalled();
   });
 
   it('shows inline error on non-200/409 response and re-enables accept button', async () => {
