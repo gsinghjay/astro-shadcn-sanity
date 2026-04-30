@@ -28,6 +28,8 @@ interface Acceptance {
   name: string
   role: string
   agreementAcceptedAt: number | null
+  agreementVersion: string | null
+  versionMatch: boolean | null
 }
 
 interface SponsorDoc {
@@ -66,6 +68,11 @@ function formatAcceptedAt(value: number | null): string {
   } catch {
     return '—'
   }
+}
+
+function formatVersion(value: string | null): string {
+  if (!value) return '—'
+  return value.length > 8 ? value.slice(0, 8) : value
 }
 
 export function SponsorAcceptancesView(props: ToolConfig = {}) {
@@ -265,6 +272,9 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
                   <Text size={1} weight="medium">Accepted At</Text>
                 </Box>
                 <Box flex={1}>
+                  <Text size={1} weight="medium">Version</Text>
+                </Box>
+                <Box flex={1}>
                   <Text size={1} weight="medium">Sponsor Doc</Text>
                 </Box>
               </Flex>
@@ -300,6 +310,18 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
                       <Text size={1} muted={!accepted}>
                         {formatAcceptedAt(row.agreementAcceptedAt)}
                       </Text>
+                    </Box>
+                    <Box flex={1}>
+                      <Inline space={2}>
+                        <Text size={1} muted={!row.agreementVersion} data-testid="acceptances-version">
+                          <code>{formatVersion(row.agreementVersion)}</code>
+                        </Text>
+                        {row.versionMatch === false && (
+                          <Badge tone="caution" mode="outline" data-testid="acceptances-drift-badge">
+                            Drift
+                          </Badge>
+                        )}
+                      </Inline>
                     </Box>
                     <Box flex={1}>
                       {doc ? (

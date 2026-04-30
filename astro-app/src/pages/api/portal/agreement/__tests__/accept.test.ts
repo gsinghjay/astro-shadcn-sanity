@@ -14,6 +14,7 @@ const {
   mockKvPut,
   mockKvDelete,
   mockEnv,
+  mockGetRev,
 } = vi.hoisted(() => {
   const mockD1Run = vi.fn();
   const mockD1First = vi.fn();
@@ -22,14 +23,26 @@ const {
   const mockKvGet = vi.fn();
   const mockKvPut = vi.fn().mockResolvedValue(undefined);
   const mockKvDelete = vi.fn().mockResolvedValue(undefined);
+  const mockGetRev = vi.fn();
   const mockEnv: Record<string, unknown> = {
     PORTAL_DB: { prepare: mockD1Prepare },
     SESSION_CACHE: { get: mockKvGet, put: mockKvPut, delete: mockKvDelete },
   };
-  return { mockD1Run, mockD1First, mockD1Bind, mockD1Prepare, mockKvGet, mockKvPut, mockKvDelete, mockEnv };
+  return {
+    mockD1Run,
+    mockD1First,
+    mockD1Bind,
+    mockD1Prepare,
+    mockKvGet,
+    mockKvPut,
+    mockKvDelete,
+    mockEnv,
+    mockGetRev,
+  };
 });
 
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 
 const { POST, ALL } = await import('../accept');
 
@@ -53,6 +66,8 @@ function buildCtx(opts: {
   referer?: string | null;
   user?: { email: string; role: 'sponsor' | 'student' } | null;
   cookie?: string;
+  ip?: string | null;
+  userAgent?: string | null;
   env?: ReturnType<typeof buildEnv> | null;
   method?: string;
 }) {
@@ -62,6 +77,8 @@ function buildCtx(opts: {
   if (opts.requestOrigin !== null) headers.origin = opts.requestOrigin ?? origin;
   if (opts.referer) headers.referer = opts.referer;
   if (opts.cookie) headers.cookie = opts.cookie;
+  if (opts.ip) headers['cf-connecting-ip'] = opts.ip;
+  if (opts.userAgent) headers['user-agent'] = opts.userAgent;
 
   // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
   if (opts.env === null) {
@@ -93,6 +110,7 @@ describe('POST /api/portal/agreement/accept', () => {
     mockKvGet.mockReset().mockResolvedValue(null);
     mockKvPut.mockReset().mockResolvedValue(undefined);
     mockKvDelete.mockReset().mockResolvedValue(undefined);
+    mockGetRev.mockReset().mockResolvedValue('rev-abc123');
   });
 
   it('returns 403 when both Origin and Referer are missing', async () => {
@@ -148,8 +166,8 @@ describe('POST /api/portal/agreement/accept', () => {
     expect(mockD1Run).not.toHaveBeenCalled();
   });
 
-  it('returns 409 when row exists with non-null acceptance', async () => {
-    mockD1First.mockResolvedValue({ agreement_accepted_at: 1690000000000 });
+  it('returns 409 only when row is accepted AND version matches current Sanity rev', async () => {
+    mockD1First.mockResolvedValue({ agreement_accepted_at: 1690000000000, agreement_version: 'rev-abc123' });
     const ctx = buildCtx({});
     const res = await POST(ctx as never);
     expect(res.status).toBe(409);
@@ -157,17 +175,41 @@ describe('POST /api/portal/agreement/accept', () => {
     expect(mockD1Run).not.toHaveBeenCalled();
   });
 
-  it('returns 200 on sponsor with NULL acceptance, lowercases email, refreshes KV with new timestamp', async () => {
+  it('allows re-acceptance (200) when row is accepted but version is NULL (grandfathered drift)', async () => {
+    mockD1First.mockResolvedValue({ agreement_accepted_at: 1690000000000, agreement_version: null });
+    const ctx = buildCtx({ cookie: 'better-auth.session_token=tok-xyz; Path=/' });
+    const res = await POST(ctx as never);
+    expect(res.status).toBe(200);
+    expect(mockD1Run).toHaveBeenCalledTimes(1);
+    expect(mockKvDelete).toHaveBeenCalledWith('tok-xyz');
+  });
+
+  it('allows re-acceptance (200) when version is stale (drift against current rev)', async () => {
+    mockD1First.mockResolvedValue({ agreement_accepted_at: 1690000000000, agreement_version: 'rev-stale-old' });
+    const ctx = buildCtx({});
+    const res = await POST(ctx as never);
+    expect(res.status).toBe(200);
+    expect(mockD1Run).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns 409 when accepted with NULL version AND Sanity rev fetch fails (cannot prove drift)', async () => {
+    mockGetRev.mockResolvedValue(null);
+    mockD1First.mockResolvedValue({ agreement_accepted_at: 1690000000000, agreement_version: null });
+    const ctx = buildCtx({});
+    const res = await POST(ctx as never);
+    // Without current rev, can't distinguish "real drift" from "Sanity outage on already-accepted user".
+    // Fail safe: keep the legacy timestamp-only semantics so we don't double-write on every request.
+    expect(res.status).toBe(409);
+    expect(mockD1Run).not.toHaveBeenCalled();
+  });
+
+  it('writes acceptedAt + agreementVersion + IP + UA, lowercases email, and invalidates KV', async () => {
     const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(1700000000000);
-    mockKvGet.mockResolvedValue({
-      email: 's@co.com',
-      name: 'Sponsor',
-      role: 'sponsor',
-      agreementAcceptedAt: null,
-    });
     const ctx = buildCtx({
       cookie: 'better-auth.session_token=tok-xyz; Path=/',
       user: { email: 'S@CO.com', role: 'sponsor' },
+      ip: '203.0.113.7',
+      userAgent: 'Mozilla/5.0 (Test)',
     });
 
     const res = await POST(ctx as never);
@@ -175,36 +217,51 @@ describe('POST /api/portal/agreement/accept', () => {
     expect(await res.json()).toEqual({ acceptedAt: 1700000000000 });
 
     expect(mockD1Prepare).toHaveBeenCalledWith(
-      'SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?',
+      'SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?',
     );
     expect(mockD1Prepare).toHaveBeenCalledWith(
-      'UPDATE user SET agreement_accepted_at = ? WHERE LOWER(email) = ?',
+      'UPDATE user SET agreement_accepted_at = ?, agreement_version = ?, agreement_accepted_ip = ?, agreement_accepted_user_agent = ? WHERE LOWER(email) = ?',
     );
     // Email is normalized to lowercase before binding
     expect(mockD1Bind).toHaveBeenCalledWith('s@co.com');
-    expect(mockD1Bind).toHaveBeenCalledWith(1700000000000, 's@co.com');
-    // KV is rewritten with the fresh timestamp, not deleted (avoids stale-cache reprompt)
-    expect(mockKvPut).toHaveBeenCalledWith(
-      'tok-xyz',
-      expect.stringContaining('"agreementAcceptedAt":1700000000000'),
-      expect.objectContaining({ expirationTtl: 300 }),
+    expect(mockD1Bind).toHaveBeenCalledWith(
+      1700000000000,
+      'rev-abc123',
+      '203.0.113.7',
+      'Mozilla/5.0 (Test)',
+      's@co.com',
     );
-    expect(mockKvDelete).not.toHaveBeenCalled();
+    // KV invalidation: delete the cached session so middleware re-reads D1 next request.
+    expect(mockKvDelete).toHaveBeenCalledWith('tok-xyz');
+    expect(mockKvPut).not.toHaveBeenCalled();
     nowSpy.mockRestore();
   });
 
-  it('deletes KV entry when no cached session was present (nothing to refresh)', async () => {
-    mockKvGet.mockResolvedValue(null);
+  it('writes NULL agreement_version when Sanity rev fetch fails (fail-open)', async () => {
+    mockGetRev.mockResolvedValue(null);
     const ctx = buildCtx({
       cookie: 'better-auth.session_token=tok-xyz; Path=/',
+      ip: '203.0.113.7',
+      userAgent: 'UA',
     });
+
     const res = await POST(ctx as never);
     expect(res.status).toBe(200);
-    expect(mockKvPut).not.toHaveBeenCalled();
-    expect(mockKvDelete).toHaveBeenCalledWith('tok-xyz');
+    // Second bind() call is the UPDATE — version arg must be null.
+    const updateBind = mockD1Bind.mock.calls.find((args) => args.length === 5);
+    expect(updateBind).toBeDefined();
+    expect(updateBind?.[1]).toBeNull();
   });
 
-  it('succeeds even when cookie is missing — KV refresh skipped', async () => {
+  it('binds NULL when cf-connecting-ip and user-agent headers are missing (local dev)', async () => {
+    const ctx = buildCtx({ cookie: 'better-auth.session_token=tok-xyz; Path=/' });
+    await POST(ctx as never);
+    const updateBind = mockD1Bind.mock.calls.find((args) => args.length === 5);
+    expect(updateBind?.[2]).toBeNull();
+    expect(updateBind?.[3]).toBeNull();
+  });
+
+  it('succeeds even when cookie is missing — KV invalidation skipped', async () => {
     const ctx = buildCtx({});
     const res = await POST(ctx as never);
     expect(res.status).toBe(200);

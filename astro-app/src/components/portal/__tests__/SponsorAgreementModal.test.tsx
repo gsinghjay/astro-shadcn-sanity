@@ -6,12 +6,11 @@ import { createRoot, type Root } from 'react-dom/client';
 // Silence React 19's "testing environment not configured for act(...)" warning
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-// Mock the viewer to skip loading the pdfjs worker in jsdom.
-// Default: synchronously fires onReady (3 pages) AND onScrolledToEnd so existing tests
-// that don't care about the scroll gate work without modification.
-// Tests that exercise the scroll gate flip `viewerMockState.fireScrolledToEnd = false`.
+// Mock the viewer so jsdom doesn't load the pdfjs worker. The mock fires onReady with
+// `viewerMockState.numPages` synchronously on mount; tests that need the PDF to be "not ready"
+// flip the count to 0 (mirrors empty/corrupt PDF -> checkbox/button stay disabled).
 const { viewerMockState } = vi.hoisted(() => ({
-  viewerMockState: { fireScrolledToEnd: true },
+  viewerMockState: { numPages: 3 },
 }));
 
 vi.mock('../SponsorAgreementViewer', () => {
@@ -19,28 +18,14 @@ vi.mock('../SponsorAgreementViewer', () => {
     default: ({
       pdfUrl,
       onReady,
-      onScrolledToEnd,
     }: {
       pdfUrl: string;
       onReady?: (n: number) => void;
-      onScrolledToEnd?: () => void;
     }) => {
-      if (onReady) onReady(3);
-      if (onScrolledToEnd && viewerMockState.fireScrolledToEnd) onScrolledToEnd();
-      return (
-        <div data-testid="agreement-viewer-mock">
-          viewer: {pdfUrl}
-          {onScrolledToEnd && (
-            <button
-              type="button"
-              data-testid="mock-trigger-scroll-end"
-              onClick={() => onScrolledToEnd()}
-            >
-              fire-scroll-end
-            </button>
-          )}
-        </div>
-      );
+      React.useEffect(() => {
+        onReady?.(viewerMockState.numPages);
+      }, [onReady]);
+      return <div data-testid="agreement-viewer-mock">viewer: {pdfUrl}</div>;
     },
   };
 });
@@ -98,7 +83,7 @@ const BASE_PROPS = {
 describe('SponsorAgreementModal', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'] });
-    viewerMockState.fireScrolledToEnd = true;
+    viewerMockState.numPages = 3;
     // @ts-expect-error jsdom - assign reload spy
     window.location = { ...window.location, reload: vi.fn(), origin: 'http://localhost' };
   });
@@ -118,14 +103,26 @@ describe('SponsorAgreementModal', () => {
     expect(container.querySelector('[data-testid="agreement-viewer-mock"]')).toBeTruthy();
   });
 
-  it('accept button is disabled until checkbox is checked', async () => {
+  it('checkbox is unchecked by default and accept button is disabled until it is checked', async () => {
     render(<SponsorAgreementModal {...BASE_PROPS} />);
+    const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
     const btn = container.querySelector('[data-testid="agreement-accept"]') as HTMLButtonElement;
+
+    expect(cb.checked).toBe(false);
     expect(btn.disabled).toBe(true);
 
-    const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
     await toggleCheckbox(cb);
+    expect(cb.checked).toBe(true);
     expect(btn.disabled).toBe(false);
+  });
+
+  it('checkbox + accept button are disabled while pdfReady=false (numPages=0)', () => {
+    viewerMockState.numPages = 0;
+    render(<SponsorAgreementModal {...BASE_PROPS} />);
+    const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
+    const btn = container.querySelector('[data-testid="agreement-accept"]') as HTMLButtonElement;
+    expect(cb.disabled).toBe(true);
+    expect(btn.disabled).toBe(true);
   });
 
   it('clicking accept POSTs to /api/portal/agreement/accept then reloads on 200', async () => {
@@ -201,35 +198,11 @@ describe('SponsorAgreementModal', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
-  describe('scroll-to-accept gate', () => {
-    it('checkbox is disabled when pdfReady=true and scrolledToEnd=false', () => {
-      viewerMockState.fireScrolledToEnd = false;
-      render(<SponsorAgreementModal {...BASE_PROPS} />);
-      const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
-      expect(cb.disabled).toBe(true);
-    });
-
-    it('checkbox becomes enabled after the viewer fires onScrolledToEnd', async () => {
-      viewerMockState.fireScrolledToEnd = false;
-      render(<SponsorAgreementModal {...BASE_PROPS} />);
-      const cb = container.querySelector('[data-testid="agreement-checkbox"]') as HTMLInputElement;
-      expect(cb.disabled).toBe(true);
-
-      const trigger = container.querySelector('[data-testid="mock-trigger-scroll-end"]');
-      await click(trigger);
-
-      expect(cb.disabled).toBe(false);
-    });
-
-    it('hint text is visible when !scrolledToEnd, hidden when scrolledToEnd', async () => {
-      viewerMockState.fireScrolledToEnd = false;
-      render(<SponsorAgreementModal {...BASE_PROPS} />);
-      expect(container.querySelector('[data-testid="agreement-scroll-hint"]')).toBeTruthy();
-
-      const trigger = container.querySelector('[data-testid="mock-trigger-scroll-end"]');
-      await click(trigger);
-
-      expect(container.querySelector('[data-testid="agreement-scroll-hint"]')).toBeNull();
-    });
+  it('does not render a scroll hint or scroll-related aria-describedby', () => {
+    render(<SponsorAgreementModal {...BASE_PROPS} />);
+    expect(container.querySelector('[data-testid="agreement-scroll-hint"]')).toBeNull();
+    expect(container.querySelector('#agreement-scroll-hint')).toBeNull();
+    const cb = container.querySelector('[data-testid="agreement-checkbox"]');
+    expect(cb?.getAttribute('aria-describedby')).toBeNull();
   });
 });

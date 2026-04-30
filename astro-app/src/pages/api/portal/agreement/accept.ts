@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { extractSessionToken, normalizeEmail } from '@/middleware';
+import { getSponsorAgreementRev } from '@/lib/sanity';
 
 export const prerender = false;
 
@@ -24,7 +25,7 @@ function isSameOrigin(request: Request, expectedOrigin: string): boolean {
   }
 }
 
-export const POST: APIRoute = async ({ request, locals, url }) => {  // eslint-disable-line @typescript-eslint/no-unused-vars
+export const POST: APIRoute = async ({ request, locals, url }) => {
   // `locals` retained for `locals.user` (set by middleware); env now imported from cloudflare:workers.
   if (!isSameOrigin(request, url.origin)) {
     return json({ error: 'forbidden_origin' }, 403);
@@ -39,50 +40,55 @@ export const POST: APIRoute = async ({ request, locals, url }) => {  // eslint-d
   const email = normalizeEmail(user.email);
   const acceptedAt = Date.now();
 
-  // Read existing acceptance state first so we can distinguish three outcomes:
-  //   row missing      → 404 user_not_found
-  //   already accepted → 409 already_accepted
-  //   accepted now     → 200
+  // Read existing acceptance state first. With version pinning, "already accepted" means
+  //   "accepted against the CURRENT revision" — drift (NULL version, or stale rev) is a valid
+  //   re-acceptance path that the middleware actively re-prompts for.
+  //   row missing                                    → 404 user_not_found
+  //   accepted AND version matches current Sanity rev → 409 already_accepted
+  //   accepted but version differs/null OR not accepted yet → 200 (write fresh acceptance)
   const existing = await env.PORTAL_DB
-    .prepare('SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?')
+    .prepare('SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?')
     .bind(email)
-    .first<{ agreement_accepted_at: number | null }>();
+    .first<{ agreement_accepted_at: number | null; agreement_version: string | null }>();
 
   if (!existing) return json({ error: 'user_not_found' }, 404);
+
+  // Audit fields. `cf-connecting-ip` is Cloudflare-injected and trusted; falsifiable only by the
+  // originating client. UA is best-effort. Sanity rev is fail-open: a Sanity outage writes NULL
+  // rather than blocking acceptance — the row will trigger version-drift on next request and
+  // re-prompt once Sanity is reachable again.
+  const ip = request.headers.get('cf-connecting-ip');
+  const ua = request.headers.get('user-agent');
+  const rev = await getSponsorAgreementRev();
+
+  // 409 only when the user has truly already accepted the current published revision. Without a
+  // current rev (Sanity outage) we can't prove drift, so fall back to the old timestamp-only
+  // semantics rather than allowing accidental double-accepts.
   if (existing.agreement_accepted_at != null) {
-    return json({ error: 'already_accepted' }, 409);
+    const upToDate =
+      rev === null
+        ? true
+        : existing.agreement_version != null && existing.agreement_version === rev;
+    if (upToDate) return json({ error: 'already_accepted' }, 409);
   }
 
   await env.PORTAL_DB
-    .prepare('UPDATE user SET agreement_accepted_at = ? WHERE LOWER(email) = ?')
-    .bind(acceptedAt, email)
+    .prepare(
+      'UPDATE user SET agreement_accepted_at = ?, agreement_version = ?, agreement_accepted_ip = ?, agreement_accepted_user_agent = ? WHERE LOWER(email) = ?',
+    )
+    .bind(acceptedAt, rev, ip, ua, email)
     .run();
 
-  // Refresh KV session cache with the new acceptance timestamp. Writing rather than deleting
-  // means a propagation delay or write failure leaves a stale-but-still-correct entry, never a
-  // stale "unaccepted" entry that re-prompts the modal.
+  // Invalidate the cached session so middleware re-reads D1 on the next request and sees the new
+  // acceptance + version. Delete (rather than refresh) avoids smuggling a stale agreementVersion
+  // into the cached blob and keeps the gate behavior driven by D1.
   const sessionToken = extractSessionToken(request.headers.get('cookie'));
   if (sessionToken && env.SESSION_CACHE) {
     try {
-      const cached = await env.SESSION_CACHE.get<{
-        email: string;
-        name: string;
-        role: string;
-        agreementAcceptedAt?: number | null;
-      }>(sessionToken, { type: 'json' });
-      if (cached) {
-        await env.SESSION_CACHE.put(
-          sessionToken,
-          JSON.stringify({ ...cached, agreementAcceptedAt: acceptedAt }),
-          { expirationTtl: 300 },
-        );
-      } else {
-        await env.SESSION_CACHE.delete(sessionToken);
-      }
+      await env.SESSION_CACHE.delete(sessionToken);
     } catch (e) {
-      console.error('[agreement/accept] KV refresh failed:', e);
-      // Fall through — the D1 write succeeded, the modal will re-prompt up to 5 min until
-      // KV TTL expires. Log so ops can correlate user reports.
+      console.error('[agreement/accept] KV invalidation failed:', e);
+      // Fall through — D1 write succeeded; KV entry will TTL out within 5 min.
     }
   }
 
