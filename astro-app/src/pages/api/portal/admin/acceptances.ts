@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
+import { getSponsorAgreementRev } from '@/lib/sanity';
 
 export const prerender = false;
 
@@ -11,6 +12,7 @@ interface AcceptanceRow {
   name: string;
   role: string;
   agreement_accepted_at: number | null;
+  agreement_version: string | null;
 }
 
 interface AdminEnv {
@@ -79,26 +81,54 @@ export const GET: APIRoute = async ({ request, url }) => {
   }
 
   const filter = url.searchParams.get('accepted'); // true | false | all | null
+  const versionDrift = url.searchParams.get('versionDrift') === 'true';
+
+  // Fetch current Sanity rev once per request — needed for both the SQL bind (when versionDrift
+  // filter is requested) and the per-row `versionMatch` derivation. Null on Sanity error → drift
+  // detection cannot happen; report `versionMatch: null` for rows so admins see "unknown" rather
+  // than a misleading "match" / "drift".
+  const currentRev = await getSponsorAgreementRev();
+
   let where = "role = 'sponsor'";
   if (filter === 'true') where += ' AND agreement_accepted_at IS NOT NULL';
   else if (filter === 'false') where += ' AND agreement_accepted_at IS NULL';
 
+  // Drift filter requires currentRev. Without it (Sanity error), we can't compute drift in SQL —
+  // fall back to "no drift filter applied" rather than returning empty results.
+  if (versionDrift && currentRev) {
+    where +=
+      ' AND agreement_accepted_at IS NOT NULL AND (agreement_version IS NULL OR agreement_version != ?)';
+  }
+
   // `agreement_accepted_at IS NULL` first puts NULLs after non-null when sorted DESC,
   // matching `NULLS LAST` semantics across all SQLite versions (D1 backend may vary).
   const sql =
-    `SELECT email, name, role, agreement_accepted_at FROM user WHERE ${where} ` +
+    `SELECT email, name, role, agreement_accepted_at, agreement_version FROM user WHERE ${where} ` +
     `ORDER BY agreement_accepted_at IS NULL, agreement_accepted_at DESC, email ASC`;
 
   try {
-    const rs = await env.PORTAL_DB.prepare(sql).all<AcceptanceRow>();
-    const acceptances = (rs.results ?? []).map((r) => ({
-      email: r.email,
-      name: r.name,
-      role: r.role,
-      agreementAcceptedAt: r.agreement_accepted_at,
-    }));
+    const stmt = env.PORTAL_DB.prepare(sql);
+    const bound = versionDrift && currentRev ? stmt.bind(currentRev) : stmt;
+    const rs = await bound.all<AcceptanceRow>();
+    const acceptances = (rs.results ?? []).map((r) => {
+      const accepted = r.agreement_accepted_at != null;
+      // versionMatch is `null` when there's no acceptance, when Sanity rev fetch failed, or when
+      // the row has no pinned version (grandfathered). Only `false` / `true` indicate a real check.
+      let versionMatch: boolean | null = null;
+      if (accepted && currentRev != null && r.agreement_version != null) {
+        versionMatch = r.agreement_version === currentRev;
+      }
+      return {
+        email: r.email,
+        name: r.name,
+        role: r.role,
+        agreementAcceptedAt: r.agreement_accepted_at,
+        agreementVersion: r.agreement_version,
+        versionMatch,
+      };
+    });
     return json(
-      { acceptances, generatedAt: Date.now() },
+      { acceptances, currentVersion: currentRev, generatedAt: Date.now() },
       200,
       {
         'cache-control': 'private, max-age=0, must-revalidate',

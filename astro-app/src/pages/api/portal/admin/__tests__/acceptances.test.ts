@@ -7,19 +7,23 @@ const ORIGIN = 'https://capstone.sanity.studio';
 // `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
 // them in before the route module loads. `mockEnv` is the live env object —
 // tests mutate it (or buildEnv overrides) by calling `setEnv` between cases.
-const { mockD1All, mockD1Prepare, mockEnv, defaultEnv } = vi.hoisted(() => {
+const { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev } = vi.hoisted(() => {
   const mockD1All = vi.fn();
-  const mockD1Prepare = vi.fn().mockReturnValue({ all: mockD1All });
+  // Two-call shape supported: `prepare(sql).all(...)` (no bind) and `prepare(sql).bind(arg).all(...)`.
+  const mockD1Bind = vi.fn().mockImplementation(() => ({ all: mockD1All }));
+  const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind, all: mockD1All });
   const defaultEnv: Record<string, unknown> = {
     PORTAL_DB: { prepare: mockD1Prepare },
     STUDIO_ADMIN_TOKEN: 'sat_test_token_value',
     STUDIO_ORIGIN: 'https://capstone.sanity.studio',
   };
   const mockEnv: Record<string, unknown> = { ...defaultEnv };
-  return { mockD1All, mockD1Prepare, mockEnv, defaultEnv };
+  const mockGetRev = vi.fn();
+  return { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev };
 });
 
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 
 const { GET, OPTIONS, ALL } = await import('../acceptances');
 
@@ -75,16 +79,32 @@ function buildCtx(opts: {
   };
 }
 
+const CURRENT_REV = 'rev-current-xyz';
+
 describe('GET /api/portal/admin/acceptances', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockD1All.mockReset().mockResolvedValue({
       results: [
-        { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreement_accepted_at: 1700000000000 },
-        { email: 'b@co.com', name: 'Bob', role: 'sponsor', agreement_accepted_at: null },
+        {
+          email: 'a@co.com',
+          name: 'Alice',
+          role: 'sponsor',
+          agreement_accepted_at: 1700000000000,
+          agreement_version: CURRENT_REV,
+        },
+        {
+          email: 'b@co.com',
+          name: 'Bob',
+          role: 'sponsor',
+          agreement_accepted_at: null,
+          agreement_version: null,
+        },
       ],
     });
-    mockD1Prepare.mockReset().mockReturnValue({ all: mockD1All });
+    mockD1Bind.mockReset().mockImplementation(() => ({ all: mockD1All }));
+    mockD1Prepare.mockReset().mockReturnValue({ bind: mockD1Bind, all: mockD1All });
+    mockGetRev.mockReset().mockResolvedValue(CURRENT_REV);
   });
 
   it('returns 401 when authorization header is missing', async () => {
@@ -109,17 +129,82 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(await res.json()).toEqual({ error: 'forbidden_origin' });
   });
 
-  it('returns 200 with acceptances array on valid token + origin', async () => {
+  it('returns 200 with acceptances array on valid token + origin (includes agreementVersion + versionMatch)', async () => {
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.acceptances).toEqual([
-      { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreementAcceptedAt: 1700000000000 },
-      { email: 'b@co.com', name: 'Bob', role: 'sponsor', agreementAcceptedAt: null },
+      {
+        email: 'a@co.com',
+        name: 'Alice',
+        role: 'sponsor',
+        agreementAcceptedAt: 1700000000000,
+        agreementVersion: CURRENT_REV,
+        versionMatch: true,
+      },
+      {
+        email: 'b@co.com',
+        name: 'Bob',
+        role: 'sponsor',
+        agreementAcceptedAt: null,
+        agreementVersion: null,
+        versionMatch: null,
+      },
     ]);
+    expect(body.currentVersion).toBe(CURRENT_REV);
     expect(typeof body.generatedAt).toBe('number');
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('versionMatch=false when row has stale rev; null when grandfathered (no rev)', async () => {
+    mockD1All.mockResolvedValue({
+      results: [
+        { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreement_accepted_at: 1, agreement_version: 'rev-old' },
+        { email: 'g@co.com', name: 'Grand', role: 'sponsor', agreement_accepted_at: 2, agreement_version: null },
+        { email: 'p@co.com', name: 'Pend', role: 'sponsor', agreement_accepted_at: null, agreement_version: null },
+      ],
+    });
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    const body = await res.json();
+    expect(body.acceptances[0].versionMatch).toBe(false);
+    expect(body.acceptances[1].versionMatch).toBeNull();
+    expect(body.acceptances[2].versionMatch).toBeNull();
+  });
+
+  it('SELECT projection includes agreement_version', async () => {
+    const ctx = buildCtx({});
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain('agreement_version');
+  });
+
+  it('?versionDrift=true narrows query to non-null acceptance with mismatched/null version, binds currentRev', async () => {
+    const ctx = buildCtx({ search: '?versionDrift=true' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain('agreement_accepted_at IS NOT NULL');
+    expect(sql).toContain('(agreement_version IS NULL OR agreement_version != ?)');
+    expect(mockD1Bind).toHaveBeenCalledWith(CURRENT_REV);
+  });
+
+  it('?versionDrift=true with Sanity rev unavailable falls back to no drift filter (no empty-result trap)', async () => {
+    mockGetRev.mockResolvedValue(null);
+    const ctx = buildCtx({ search: '?versionDrift=true' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).not.toContain('agreement_version IS NULL OR agreement_version != ?');
+    expect(mockD1Bind).not.toHaveBeenCalled();
+  });
+
+  it('versionMatch is null on every row when Sanity rev fetch fails (drift state unknown)', async () => {
+    mockGetRev.mockResolvedValue(null);
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    const body = await res.json();
+    for (const row of body.acceptances) expect(row.versionMatch).toBeNull();
+    expect(body.currentVersion).toBeNull();
   });
 
   it('?accepted=true narrows query to non-null acceptance timestamps', async () => {
