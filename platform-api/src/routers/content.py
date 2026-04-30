@@ -1,7 +1,7 @@
 # src/routers/content.py
 from fastapi import APIRouter, Depends, Query, Response, HTTPException
 
-from dependencies import get_sanity, get_settings, verify_admin_api_key
+from dependencies import get_sanity, get_settings, get_current_admin
 from models.settings import WorkerSettings
 from services.sanity_client import SanityClient
 from utils.dataset import resolve_dataset
@@ -113,7 +113,7 @@ async def proxy_mutations(
     request: MutationRequest,
     sanity: SanityClient = Depends(get_sanity),
     settings: WorkerSettings = Depends(get_settings),
-    _admin: bool = Depends(verify_admin_api_key)
+    _admin: bool = Depends(get_current_admin)
 ):
     """Proxies mutation requests directly to Sanity API."""
     write_token = settings.optional_secrets.get("sanity_api_write_token")
