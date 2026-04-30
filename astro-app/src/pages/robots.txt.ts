@@ -17,6 +17,7 @@ Disallow: /auth/
 Disallow: /student/
 Disallow: /demo/
 
+# LLMs: ${siteUrl}/llms.txt
 Sitemap: ${siteUrl}/sitemap-index.xml`;
 
   return new Response(body, {

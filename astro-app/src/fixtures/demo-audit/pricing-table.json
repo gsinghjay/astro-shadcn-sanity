@@ -1,0 +1,80 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: pricingTable. 4 variants: simple, featured, comparison, brutalist. tiers min 1 — includes 1-tier (min) and 4-tier instances.",
+  "_id": "demo-audit-pricing-table",
+  "_type": "page",
+  "title": "Demo — Pricing Table",
+  "slug": {"_type": "slug", "current": "demo/pricing-table"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: pricing-table"},
+  "blocks": [
+    {
+      "_key": "pt-simple-1min",
+      "_type": "pricingTable",
+      "variant": "simple",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Simple variant — 1 tier (min)",
+      "description": "Exercises Rule.min(1).",
+      "tiers": [
+        {
+          "_key": "pt-s-free",
+          "_type": "pricingTier",
+          "name": "Free",
+          "price": "$0",
+          "interval": "forever",
+          "description": "Get started at no cost.",
+          "features": ["Community support", "1 project"],
+          "highlighted": false,
+          "ctaText": "Sign up",
+          "ctaUrl": "/signup"
+        }
+      ]
+    },
+    {
+      "_key": "pt-featured-3",
+      "_type": "pricingTable",
+      "variant": "featured",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Featured variant — 3 tiers, middle highlighted",
+      "tiers": [
+        {"_key": "pt-f-basic", "_type": "pricingTier", "name": "Basic", "price": "$9", "interval": "month", "features": ["1 project", "Email support"], "highlighted": false, "ctaText": "Start", "ctaUrl": "/signup?tier=basic"},
+        {"_key": "pt-f-pro", "_type": "pricingTier", "name": "Pro", "price": "$29", "interval": "month", "description": "Most popular", "features": ["Unlimited projects", "Priority support", "Analytics"], "highlighted": true, "ctaText": "Go Pro", "ctaUrl": "/signup?tier=pro"},
+        {"_key": "pt-f-team", "_type": "pricingTier", "name": "Team", "price": "$79", "interval": "month", "features": ["Everything in Pro", "10 seats", "SSO"], "highlighted": false, "ctaText": "Start Team", "ctaUrl": "/signup?tier=team"}
+      ]
+    },
+    {
+      "_key": "pt-comparison-4",
+      "_type": "pricingTable",
+      "variant": "comparison",
+      "backgroundVariant": "hatched-light",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Comparison variant — 4 tiers",
+      "tiers": [
+        {"_key": "pt-c-starter", "_type": "pricingTier", "name": "Starter", "price": "Free", "interval": "", "features": ["1 project"], "highlighted": false},
+        {"_key": "pt-c-solo", "_type": "pricingTier", "name": "Solo", "price": "$19", "interval": "month", "features": ["5 projects", "Email support"], "highlighted": false},
+        {"_key": "pt-c-team", "_type": "pricingTier", "name": "Team", "price": "$49", "interval": "month", "features": ["Unlimited projects", "10 seats"], "highlighted": true},
+        {"_key": "pt-c-ent", "_type": "pricingTier", "name": "Enterprise", "price": "Custom", "interval": "", "features": ["SSO", "Dedicated support", "SLA"], "highlighted": false, "ctaText": "Contact sales", "ctaUrl": "/contact"}
+      ]
+    },
+    {
+      "_key": "pt-brutalist-2",
+      "_type": "pricingTable",
+      "variant": "brutalist",
+      "backgroundVariant": "mono",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Brutalist variant — 2 tiers",
+      "tiers": [
+        {"_key": "pt-b-monthly", "_type": "pricingTier", "name": "Monthly", "price": "$29", "interval": "month", "features": ["Cancel anytime"], "highlighted": false, "ctaText": "Start Monthly", "ctaUrl": "/signup?plan=monthly"},
+        {"_key": "pt-b-yearly", "_type": "pricingTier", "name": "Yearly", "price": "$290", "interval": "year", "description": "Save 17%", "features": ["Two months free"], "highlighted": true, "ctaText": "Start Yearly", "ctaUrl": "/signup?plan=yearly"}
+      ]
+    }
+  ]
+}

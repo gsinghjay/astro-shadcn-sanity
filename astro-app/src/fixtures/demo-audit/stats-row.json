@@ -1,0 +1,92 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: statsRow. Variants: grid, split, spread, brutalist, ticker. stats array min 1 max 10 (AC6 #29 — brutalist instance hits 10-cap).",
+  "_id": "demo-audit-stats-row",
+  "_type": "page",
+  "title": "Demo — Stats Row",
+  "slug": {"_type": "slug", "current": "demo/stats-row"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: stats-row"},
+  "blocks": [
+    {
+      "_key": "stats-grid",
+      "_type": "statsRow",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Program Outcomes at a Glance",
+      "stats": [
+        {"_key": "sg1", "_type": "statItem", "value": "98%", "label": "Graduation Rate", "description": "Across the last three cohorts."},
+        {"_key": "sg2", "_type": "statItem", "value": "50+", "label": "Industry Partners"},
+        {"_key": "sg3", "_type": "statItem", "value": "$2.4M", "label": "Research Funding", "description": "Awarded over the past academic year."},
+        {"_key": "sg4", "_type": "statItem", "value": "12", "label": "Active Labs"}
+      ]
+    },
+    {
+      "_key": "stats-split",
+      "_type": "statsRow",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split — heading on left, vertical stat stack on right",
+      "stats": [
+        {"_key": "ss1", "_type": "statItem", "value": "4.8/5", "label": "Employer Satisfaction"},
+        {"_key": "ss2", "_type": "statItem", "value": "92%", "label": "Placement in 90 Days"},
+        {"_key": "ss3", "_type": "statItem", "value": "140", "label": "Seniors Enrolled"}
+      ]
+    },
+    {
+      "_key": "stats-spread",
+      "_type": "statsRow",
+      "variant": "spread",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Spread variant — icon-based stats with centered heading",
+      "stats": [
+        {"_key": "sp1", "_type": "statItem", "value": "24", "label": "Capstone Teams"},
+        {"_key": "sp2", "_type": "statItem", "value": "3x", "label": "Year-over-year Growth"},
+        {"_key": "sp3", "_type": "statItem", "value": "800h", "label": "Student Effort per Project"}
+      ]
+    },
+    {
+      "_key": "stats-brutalist-max",
+      "_type": "statsRow",
+      "variant": "brutalist",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Brutalist — at the 10-stat cap (AC6 #29 max array)",
+      "stats": [
+        {"_key": "b1", "_type": "statItem", "value": "10", "label": "Stat One"},
+        {"_key": "b2", "_type": "statItem", "value": "20", "label": "Stat Two"},
+        {"_key": "b3", "_type": "statItem", "value": "30", "label": "Stat Three"},
+        {"_key": "b4", "_type": "statItem", "value": "40", "label": "Stat Four"},
+        {"_key": "b5", "_type": "statItem", "value": "50", "label": "Stat Five"},
+        {"_key": "b6", "_type": "statItem", "value": "60", "label": "Stat Six"},
+        {"_key": "b7", "_type": "statItem", "value": "70", "label": "Stat Seven"},
+        {"_key": "b8", "_type": "statItem", "value": "80", "label": "Stat Eight"},
+        {"_key": "b9", "_type": "statItem", "value": "90", "label": "Stat Nine"},
+        {"_key": "b10", "_type": "statItem", "value": "100", "label": "Stat Ten", "description": "Caps at ten — validates Rule.max(10)."}
+      ]
+    },
+    {
+      "_key": "stats-ticker",
+      "_type": "statsRow",
+      "variant": "ticker",
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Ticker — scrolling stats marquee",
+      "stats": [
+        {"_key": "t1", "_type": "statItem", "value": "100%", "label": "On-time Delivery"},
+        {"_key": "t2", "_type": "statItem", "value": "0", "label": "Production Incidents"}
+      ]
+    }
+  ]
+}

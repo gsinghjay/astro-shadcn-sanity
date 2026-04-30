@@ -1,0 +1,74 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: sponsorSteps. 3 variants: steps, split, spread. items of stepItem min 1 max 10. Includes 3, 5, and 10 (max) step instances.",
+  "_id": "demo-audit-sponsor-steps",
+  "_type": "page",
+  "title": "Demo — Sponsor Steps",
+  "slug": {"_type": "slug", "current": "demo/sponsor-steps"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: sponsor-steps"},
+  "blocks": [
+    {
+      "_key": "ss-steps-3",
+      "_type": "sponsorSteps",
+      "variant": "steps",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Steps variant — 3 items",
+      "subheading": "Vertical on mobile, horizontal on desktop with connecting line",
+      "items": [
+        {"_key": "step-1", "_type": "stepItem", "title": "Express interest", "description": "Reach out via the sponsor inquiry form.", "list": ["Review tiers", "Identify goals"]},
+        {"_key": "step-2", "_type": "stepItem", "title": "Meet the team", "description": "Intro call with faculty and student leads."},
+        {"_key": "step-3", "_type": "stepItem", "title": "Sign agreement", "description": "Finalize sponsorship details and logistics."}
+      ],
+      "ctaButtons": [
+        {"_key": "cta-ss-1", "_type": "button", "text": "Become a Sponsor", "url": "/sponsors", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "ss-split-5",
+      "_type": "sponsorSteps",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split variant — 5 items",
+      "subheading": "Heading/buttons left, step grid right",
+      "items": [
+        {"_key": "sp-1", "_type": "stepItem", "title": "Discovery", "description": "Understand your goals."},
+        {"_key": "sp-2", "_type": "stepItem", "title": "Proposal", "description": "Custom sponsorship plan."},
+        {"_key": "sp-3", "_type": "stepItem", "title": "Onboarding", "description": "Logo, bio, and project picks."},
+        {"_key": "sp-4", "_type": "stepItem", "title": "Engagement", "description": "Mentor, judge, or present."},
+        {"_key": "sp-5", "_type": "stepItem", "title": "Recap", "description": "Annual impact report."}
+      ],
+      "ctaButtons": [
+        {"_key": "cta-ss-split-1", "_type": "button", "text": "Start Now", "url": "/contact", "variant": "default"},
+        {"_key": "cta-ss-split-2", "_type": "button", "text": "Download Deck", "url": "/sponsor-deck.pdf", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "ss-spread-10",
+      "_type": "sponsorSteps",
+      "variant": "spread",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Spread variant — 10 items (max)",
+      "subheading": "Exercises the upper bound (Rule.max(10))",
+      "items": [
+        {"_key": "s-1", "_type": "stepItem", "title": "Inquire", "description": "Submit interest form."},
+        {"_key": "s-2", "_type": "stepItem", "title": "Qualify", "description": "Align goals and tier."},
+        {"_key": "s-3", "_type": "stepItem", "title": "Tour", "description": "Studio and lab walkthrough."},
+        {"_key": "s-4", "_type": "stepItem", "title": "Propose", "description": "Draft sponsorship terms."},
+        {"_key": "s-5", "_type": "stepItem", "title": "Approve", "description": "Legal and leadership signoff."},
+        {"_key": "s-6", "_type": "stepItem", "title": "Onboard", "description": "Send brand assets and bio."},
+        {"_key": "s-7", "_type": "stepItem", "title": "Match", "description": "Pair with project team."},
+        {"_key": "s-8", "_type": "stepItem", "title": "Engage", "description": "Participate in milestones."},
+        {"_key": "s-9", "_type": "stepItem", "title": "Showcase", "description": "Demo day and promotion."},
+        {"_key": "s-10", "_type": "stepItem", "title": "Renew", "description": "Plan next year's partnership."}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: countdownTimer. Variants: inline, hero, banner, brutalist. Required: targetDate (future datetime). Optional completedMessage max 150.",
+  "_id": "demo-audit-countdown-timer",
+  "_type": "page",
+  "title": "Demo — Countdown Timer",
+  "slug": {"_type": "slug", "current": "demo/countdown-timer"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: countdown-timer", "metaDescription": "Audit page for countdownTimer block — all 4 variants."},
+  "blocks": [
+    {
+      "_key": "ct-inline",
+      "_type": "countdownTimer",
+      "variant": "inline",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Inline variant countdown",
+      "description": "Compact inline layout for embedding mid-page near call-to-action copy.",
+      "targetDate": "2026-09-01T17:00:00.000Z",
+      "completedMessage": "Registration is now open!"
+    },
+    {
+      "_key": "ct-hero",
+      "_type": "countdownTimer",
+      "variant": "hero",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Capstone Expo kicks off in…",
+      "description": "Join 400+ students, faculty, and industry partners for the showcase of the year.",
+      "targetDate": "2026-05-10T14:00:00.000Z",
+      "completedMessage": "Expo is live — welcome!"
+    },
+    {
+      "_key": "ct-banner",
+      "_type": "countdownTimer",
+      "variant": "banner",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Submissions close in",
+      "description": "Final window to submit your capstone abstract for the Spring cohort.",
+      "targetDate": "2026-07-15T23:59:00.000Z",
+      "completedMessage": "Submissions are now closed — thank you!"
+    },
+    {
+      "_key": "ct-brutalist",
+      "_type": "countdownTimer",
+      "variant": "brutalist",
+      "backgroundVariant": "hatched",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "T-MINUS",
+      "description": "Brutalist countdown variant — monospace, hard edges, hatched background.",
+      "targetDate": "2026-12-31T23:59:59.000Z",
+      "completedMessage": "Liftoff."
+    }
+  ]
+}

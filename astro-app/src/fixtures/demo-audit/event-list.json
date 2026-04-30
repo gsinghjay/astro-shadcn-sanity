@@ -1,0 +1,46 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: eventList. 3 variants: grid, list, timeline. hiddenByVariant: limit hidden in timeline. Enum eventStatus (all/upcoming/past) all covered.",
+  "_id": "demo-audit-event-list",
+  "_type": "page",
+  "title": "Demo — Event List",
+  "slug": {"_type": "slug", "current": "demo/event-list"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: event-list"},
+  "blocks": [
+    {
+      "_key": "el-grid-upcoming",
+      "_type": "eventList",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Grid variant — upcoming",
+      "eventStatus": "upcoming",
+      "limit": 6
+    },
+    {
+      "_key": "el-list-past",
+      "_type": "eventList",
+      "variant": "list",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "List variant — past",
+      "eventStatus": "past",
+      "limit": 10
+    },
+    {
+      "_key": "el-timeline-all-limit-hidden",
+      "_type": "eventList",
+      "variant": "timeline",
+      "backgroundVariant": "mono",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Timeline variant — all (limit hidden by variant)",
+      "eventStatus": "all",
+      "limit": 25
+    }
+  ]
+}
