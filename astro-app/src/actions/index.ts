@@ -1,6 +1,7 @@
 import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro/zod';
 import { createClient } from '@sanity/client';
+import { env } from 'cloudflare:workers';
 
 export const server = {
   submitForm: defineAction({
@@ -13,9 +14,7 @@ export const server = {
       form_id: z.string().optional().default(''),
       'cf-turnstile-response': z.string().min(1, 'Bot verification required'),
     }),
-    handler: async (input, context) => {
-      const { env } = context.locals.runtime;
-
+    handler: async (input) => {
       // 1. Validate Turnstile token
       const verifyRes = await fetch(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',

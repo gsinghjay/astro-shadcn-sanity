@@ -16,9 +16,13 @@ vi.mock('sanity/presentation', () => ({
   defineLocations: <T,>(loc: T) => loc,
 }))
 
-vi.mock('rxjs', () => ({
-  map: () => (source: unknown) => source,
-}))
+vi.mock('rxjs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('rxjs')>()
+  return {
+    ...actual,
+    map: () => (source: unknown) => source,
+  }
+})
 
 import {createResolve} from '../presentation/resolve'
 import {LISTING_PAGE_ROUTES} from '../constants'

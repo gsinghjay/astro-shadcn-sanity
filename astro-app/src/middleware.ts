@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { env } from "cloudflare:workers";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -74,12 +75,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { getDrizzle } = await import("@/lib/db");
   const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
-  const runtimeEnv = context.locals.runtime?.env;
-  if (!runtimeEnv) {
-    console.error("[middleware] Cloudflare runtime env not available");
-    return new Response("Service Unavailable", { status: 503 });
-  }
-
+  const runtimeEnv = env;
   // Rate limiting — per-IP sliding window via Durable Object (fail-open)
   const rateLimiter = runtimeEnv.RATE_LIMITER;
   if (rateLimiter) {
@@ -122,7 +118,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // D1 fallback via Better Auth
     if (!userData && sessionToken) {
-      const db = getDrizzle(context.locals);
+      const db = getDrizzle();
       const auth = createAuth({
         db,
         env: {

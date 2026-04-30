@@ -107,11 +107,34 @@ beforeEach(() => {
     return setTimeout(() => cb(performance.now()), 0) as unknown as number;
   });
   vi.stubGlobal('cancelAnimationFrame', (id: number) => clearTimeout(id as unknown as ReturnType<typeof setTimeout>));
+  // jsdom defaults scrollHeight/clientHeight to 0, which makes the short-PDF
+  // auto-fire path (scrollHeight <= clientHeight + 8) trigger spuriously
+  // during the rAF/flush race window. Pin prototype-level defaults to a
+  // "tall PDF" shape; tests that need a different shape override locally and
+  // restore via Reflect.deleteProperty in their finally{} block.
+  Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
+    configurable: true,
+    get: () => 1000,
+  });
+  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+    configurable: true,
+    get: () => 200,
+  });
+  Object.defineProperty(HTMLElement.prototype, 'scrollTop', {
+    configurable: true,
+    get: () => 0,
+    set: () => {},
+  });
 });
 
 afterEach(() => {
   vi.unstubAllGlobals();
   if (container) unmount();
+  // Tear down the prototype defaults so we don't leak into other test files
+  // that share the jsdom environment.
+  Reflect.deleteProperty(HTMLElement.prototype, 'scrollHeight');
+  Reflect.deleteProperty(HTMLElement.prototype, 'clientHeight');
+  Reflect.deleteProperty(HTMLElement.prototype, 'scrollTop');
 });
 
 describe('SponsorAgreementViewer — onScrolledToEnd', () => {
