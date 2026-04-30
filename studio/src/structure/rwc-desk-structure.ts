@@ -1,6 +1,6 @@
 import {CogIcon, DocumentsIcon, EnvelopeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
-import {SITE_AWARE_TYPES} from '../constants'
+import {LISTING_PAGE_ROUTES, SITE_AWARE_TYPES} from '../constants'
 
 /**
  * Singletons and top-level-special doc types that must be excluded from the
@@ -50,16 +50,15 @@ export function createRwcDeskStructure(siteId: string, siteTitle: string) {
             S.list()
               .title('Listing Pages')
               .items(
-                ['articles', 'authors', 'events', 'gallery', 'projects', 'sponsors'].map(
-                  (route) =>
-                    S.listItem()
-                      .title(route.charAt(0).toUpperCase() + route.slice(1))
-                      .child(
-                        S.document()
-                          .schemaType('listingPage')
-                          .documentId(`listingPage-${route}-${siteId}`)
-                          .initialValueTemplate(`listingPage-${route}-${siteId}`),
-                      ),
+                LISTING_PAGE_ROUTES.map((route) =>
+                  S.listItem()
+                    .title(route.charAt(0).toUpperCase() + route.slice(1))
+                    .child(
+                      S.document()
+                        .schemaType('listingPage')
+                        .documentId(`listingPage-${route}-${siteId}`)
+                        .initialValueTemplate(`listingPage-${route}-${siteId}`),
+                    ),
                 ),
               ),
           ),

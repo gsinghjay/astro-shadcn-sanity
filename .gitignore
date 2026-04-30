@@ -69,3 +69,6 @@ studio/schema.json
 # Dev tooling artifacts
 repomix-output.md
 skills-lock.json
+
+# Lighthouse CI report dumps (generated)
+.lhci/

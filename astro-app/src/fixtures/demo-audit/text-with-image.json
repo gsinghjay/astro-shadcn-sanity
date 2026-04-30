@@ -1,0 +1,142 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: textWithImage. Variants: split, split-asymmetric, reversed, floating, brutalist. hiddenByVariant: imagePosition hidden in reversed|floating|brutalist. Enum imagePosition: left|right. Content is portableText. Image alt required.",
+  "_id": "demo-audit-text-with-image",
+  "_type": "page",
+  "title": "Demo — Text with Image",
+  "slug": {"_type": "slug", "current": "demo/text-with-image"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: text-with-image"},
+  "blocks": [
+    {
+      "_key": "twi-split-right",
+      "_type": "textWithImage",
+      "variant": "split",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split variant — imagePosition right",
+      "imagePosition": "right",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s1", "text": "Split variant renders heading + body text beside an image. imagePosition is visible here (right).", "marks": []}],
+          "markDefs": []
+        }
+      ],
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"},
+        "alt": "Split variant image right"
+      }
+    },
+    {
+      "_key": "twi-split-asym-left",
+      "_type": "textWithImage",
+      "variant": "split-asymmetric",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Split-asymmetric — imagePosition left",
+      "imagePosition": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s1", "text": "Asymmetric split with imagePosition visible and set to left.", "marks": []}],
+          "markDefs": []
+        }
+      ],
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"},
+        "alt": "Asymmetric split image left"
+      }
+    },
+    {
+      "_key": "twi-reversed-hidden",
+      "_type": "textWithImage",
+      "variant": "reversed",
+      "backgroundVariant": "primary",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Reversed — imagePosition hidden",
+      "imagePosition": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s1", "text": "Reversed variant hides imagePosition. Value set to left but ignored.", "marks": []}],
+          "markDefs": []
+        }
+      ],
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"},
+        "alt": "Reversed variant image"
+      }
+    },
+    {
+      "_key": "twi-floating-hidden",
+      "_type": "textWithImage",
+      "variant": "floating",
+      "backgroundVariant": "hatched",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "right",
+      "heading": "Floating — imagePosition hidden",
+      "imagePosition": "right",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s1", "text": "Floating variant hides imagePosition. Alignment right exercised.", "marks": []}],
+          "markDefs": []
+        }
+      ],
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"},
+        "alt": "Floating variant image"
+      }
+    },
+    {
+      "_key": "twi-brutalist-hidden",
+      "_type": "textWithImage",
+      "variant": "brutalist",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Brutalist — imagePosition hidden",
+      "imagePosition": "right",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h3",
+          "children": [{"_type": "span", "_key": "s1", "text": "Brutalist heading", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Brutalist variant hides imagePosition. Dark background with full width.", "marks": []}],
+          "markDefs": []
+        }
+      ],
+      "image": {
+        "_type": "image",
+        "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"},
+        "alt": "Brutalist variant image"
+      }
+    }
+  ]
+}

@@ -6,6 +6,15 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.astro"],
-  "exclude": ["node_modules", "dist", "vitest.config.ts"]
+  "include": [".astro/types.d.ts", "**/*.ts", "**/*.astro"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "vitest.config.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "tests/**",
+    "src/cloudflare/__tests__/**"
+  ]
 }

@@ -5,14 +5,14 @@ export const prerender = false;
 
 // TODO: Gate behind admin check once Story 9.15 lands — sponsors should not
 // see internal table names in production.
-export const GET: APIRoute = async ({ locals }) => {
+export const GET: APIRoute = async () => {
   const headers = {
     'Content-Type': 'application/json',
     'Cache-Control': 'no-store',
   };
 
   try {
-    const db = getDb(locals);
+    const db = getDb();
     const { results } = await db
       .prepare(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' ORDER BY name",

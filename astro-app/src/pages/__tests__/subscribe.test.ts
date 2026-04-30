@@ -1,19 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { POST, DELETE } from '@/pages/api/subscribe';
 
-const mockRun = vi.fn().mockResolvedValue({ success: true });
-const mockBind = vi.fn().mockReturnValue({ run: mockRun });
-const mockFirst = vi.fn().mockResolvedValue({ count: 0 });
-const mockPrepare = vi.fn().mockReturnValue({ bind: mockBind, first: mockFirst });
+// Adapter v13: subscribe.ts reads PORTAL_DB via `import { env } from
+// "cloudflare:workers"` instead of `locals.runtime.env`. Hoist the mocks so
+// the cloudflare:workers stub can wire them in before the route module loads.
+const { mockRun, mockBind, mockFirst, mockPrepare, mockEnv } = vi.hoisted(() => {
+  const mockRun = vi.fn().mockResolvedValue({ success: true });
+  const mockBind = vi.fn().mockReturnValue({ run: mockRun });
+  const mockFirst = vi.fn().mockResolvedValue({ count: 0 });
+  const mockPrepare = vi.fn().mockReturnValue({ bind: mockBind, first: mockFirst });
+  const mockEnv: Record<string, unknown> = {
+    PORTAL_DB: { prepare: mockPrepare },
+  };
+  return { mockRun, mockBind, mockFirst, mockPrepare, mockEnv };
+});
 
-const createLocals = () =>
-  ({
-    runtime: {
-      env: {
-        PORTAL_DB: { prepare: mockPrepare },
-      },
-    },
-  }) as unknown as App.Locals;
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+
+const { POST, DELETE } = await import('@/pages/api/subscribe');
+
+const createLocals = () => ({}) as unknown as App.Locals;
 
 const createPostContext = (body: unknown) => ({
   request: new Request('http://localhost:4321/api/subscribe', {

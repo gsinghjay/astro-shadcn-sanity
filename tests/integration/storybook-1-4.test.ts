@@ -4,11 +4,18 @@
  * @story 1-4
  */
 import { describe, test, expect, beforeAll } from 'vitest'
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import * as fs from 'fs'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
+import { createRequire } from 'node:module'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// Astro 6 + @astrojs/cloudflare v13 wires unenv (Cloudflare's Workers polyfill)
+// into Vite's SSR resolution. Even `node:child_process` resolves to the unenv
+// stub, which throws "child_process.exec is not implemented yet". Reach for
+// the real Node loader via createRequire to bypass Vite altogether.
+const nodeRequire = createRequire(import.meta.url)
+const { exec } = nodeRequire('node:child_process') as typeof import('node:child_process')
+const { promisify } = nodeRequire('node:util') as typeof import('node:util')
 
 const execAsync = promisify(exec)
 

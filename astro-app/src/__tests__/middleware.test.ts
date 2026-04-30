@@ -5,12 +5,63 @@ vi.mock('astro:middleware', () => ({
   defineMiddleware: (fn: any) => fn,
 }));
 
-const { mockGetDrizzle, mockCreateAuth, mockGetSession, mockCheckSponsorWhitelist } = vi.hoisted(() => {
+const {
+  mockGetDrizzle,
+  mockCreateAuth,
+  mockGetSession,
+  mockCheckSponsorWhitelist,
+  mockKvGet,
+  mockKvPut,
+  mockKvDelete,
+  mockCheckLimit,
+  mockD1Run,
+  mockD1First,
+  mockD1Bind,
+  mockD1Prepare,
+  mockEnv,
+} = vi.hoisted(() => {
   const mockGetSession = vi.fn();
   const mockGetDrizzle = vi.fn().mockReturnValue({ __drizzle: true });
   const mockCreateAuth = vi.fn().mockReturnValue({ api: { getSession: mockGetSession } });
   const mockCheckSponsorWhitelist = vi.fn().mockResolvedValue(false);
-  return { mockGetDrizzle, mockCreateAuth, mockGetSession, mockCheckSponsorWhitelist };
+  const mockKvGet = vi.fn();
+  const mockKvPut = vi.fn().mockResolvedValue(undefined);
+  const mockKvDelete = vi.fn().mockResolvedValue(undefined);
+  const mockCheckLimit = vi.fn();
+  const mockD1Run = vi.fn().mockResolvedValue({});
+  const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
+  const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
+  const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
+  // Adapter v13 reads bindings via `import { env } from "cloudflare:workers"`
+  // — `locals.runtime.env` is gone. Tests share this object reference with
+  // the cloudflare:workers mock and mutate it through beforeEach.
+  const mockEnv: Record<string, any> = {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    GOOGLE_CLIENT_ID: 'test-google-id',
+    GOOGLE_CLIENT_SECRET: 'test-google-secret',
+    GITHUB_CLIENT_ID: 'test-github-id',
+    GITHUB_CLIENT_SECRET: 'test-github-secret',
+    BETTER_AUTH_SECRET: 'test-auth-secret',
+    BETTER_AUTH_URL: 'http://localhost:4321',
+    RESEND_API_KEY: 'test-resend-key',
+    SESSION_CACHE: undefined,
+    RATE_LIMITER: undefined,
+  };
+  return {
+    mockGetDrizzle,
+    mockCreateAuth,
+    mockGetSession,
+    mockCheckSponsorWhitelist,
+    mockKvGet,
+    mockKvPut,
+    mockKvDelete,
+    mockCheckLimit,
+    mockD1Run,
+    mockD1First,
+    mockD1Bind,
+    mockD1Prepare,
+    mockEnv,
+  };
 });
 
 vi.mock('@/lib/db', () => ({ getDrizzle: mockGetDrizzle }));
@@ -18,30 +69,9 @@ vi.mock('@/lib/auth-config', () => ({
   createAuth: mockCreateAuth,
   checkSponsorWhitelist: mockCheckSponsorWhitelist,
 }));
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 
 import { onRequest } from '../middleware';
-
-const mockKvGet = vi.fn();
-const mockKvPut = vi.fn().mockResolvedValue(undefined);
-const mockKvDelete = vi.fn().mockResolvedValue(undefined);
-const mockCheckLimit = vi.fn();
-const mockD1Run = vi.fn().mockResolvedValue({});
-const mockD1First = vi.fn().mockResolvedValue({ agreement_accepted_at: null });
-const mockD1Bind = vi.fn().mockReturnValue({ run: mockD1Run, first: mockD1First });
-const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind });
-
-const mockEnv = {
-  PORTAL_DB: { prepare: mockD1Prepare } as any,
-  GOOGLE_CLIENT_ID: 'test-google-id',
-  GOOGLE_CLIENT_SECRET: 'test-google-secret',
-  GITHUB_CLIENT_ID: 'test-github-id',
-  GITHUB_CLIENT_SECRET: 'test-github-secret',
-  BETTER_AUTH_SECRET: 'test-auth-secret',
-  BETTER_AUTH_URL: 'http://localhost:4321',
-  RESEND_API_KEY: 'test-resend-key',
-  SESSION_CACHE: undefined as any,
-  RATE_LIMITER: undefined as any,
-};
 
 function createMockRateLimiter() {
   return {
@@ -54,6 +84,9 @@ function createMockContext(pathname: string, options?: { headers?: Record<string
   return {
     url: new URL(`http://localhost:4321${pathname}`),
     request: new Request(`http://localhost:4321${pathname}`, { headers: options?.headers }),
+    // `runtime.env` is no longer read by middleware (adapter v13 — see
+    // cloudflare:workers mock above). Keep a runtime stub so tests that pass
+    // overrides at this level don't break, but the source of truth is mockEnv.
     locals: { runtime: { env: mockEnv }, ...options?.overrides } as unknown as App.Locals,
     redirect: vi.fn((url: string) => new Response(null, { status: 302, headers: { Location: url } })),
   };
@@ -378,15 +411,26 @@ describe('middleware — unified auth routing', () => {
   });
 
   describe('Runtime env guard', () => {
-    it('returns 503 when runtime env is not available', async () => {
-      const ctx = createMockContext('/portal/index', {
-        overrides: { runtime: { env: undefined as any } } as any,
-      });
+    // Adapter v13 reads bindings from `cloudflare:workers` directly, so the
+    // pre-migration `locals.runtime.env === undefined` guard no longer
+    // applies — the equivalent failure mode now is "PORTAL_DB binding is
+    // missing", which throws during auth and falls through to the 503 catch.
+    it('returns 503 when PORTAL_DB binding is missing', async () => {
+      const originalDb = mockEnv.PORTAL_DB;
+      mockEnv.PORTAL_DB = undefined;
+      mockGetSession.mockRejectedValue(new Error('PORTAL_DB binding missing'));
+      try {
+        const ctx = createMockContext('/portal/index', {
+          headers: { cookie: 'better-auth.session_token=tok; Path=/' },
+        });
 
-      const result = (await onRequest(ctx as any, mockNext)) as Response;
+        const result = (await onRequest(ctx as any, mockNext)) as Response;
 
-      expect(result.status).toBe(503);
-      expect(mockNext).not.toHaveBeenCalled();
+        expect(result.status).toBe(503);
+        expect(mockNext).not.toHaveBeenCalled();
+      } finally {
+        mockEnv.PORTAL_DB = originalDb;
+      }
     });
   });
 

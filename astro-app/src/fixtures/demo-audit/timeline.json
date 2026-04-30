@@ -1,0 +1,118 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: timeline. Variants: vertical, split, horizontal, engineering. hiddenByVariant: description hidden in 'horizontal'. items timelineEntry min 1 max 20.",
+  "_id": "demo-audit-timeline",
+  "_type": "page",
+  "title": "Demo — Timeline",
+  "slug": {"_type": "slug", "current": "demo/timeline"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: timeline"},
+  "blocks": [
+    {
+      "_key": "tl-vertical",
+      "_type": "timeline",
+      "variant": "vertical",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Vertical timeline — description visible",
+      "description": "Program milestones from kickoff to showcase.",
+      "items": [
+        {
+          "_key": "e1",
+          "_type": "timelineEntry",
+          "date": "Sep 2025",
+          "title": "Kickoff",
+          "description": "Teams form and sponsors pitch project briefs.",
+          "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Kickoff event"}
+        },
+        {
+          "_key": "e2",
+          "_type": "timelineEntry",
+          "date": "Nov 2025",
+          "title": "Design review",
+          "description": "Architecture and UX critique from faculty + mentors."
+        },
+        {
+          "_key": "e3",
+          "_type": "timelineEntry",
+          "date": "Feb 2026",
+          "title": "Midpoint demo",
+          "description": "Working software milestone in front of the cohort."
+        },
+        {
+          "_key": "e4",
+          "_type": "timelineEntry",
+          "date": "May 2026",
+          "title": "Showcase",
+          "description": "Public demo day with sponsors and alumni."
+        }
+      ]
+    },
+    {
+      "_key": "tl-split",
+      "_type": "timeline",
+      "variant": "split",
+      "backgroundVariant": "primary",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Split timeline — description visible",
+      "description": "Alternate-sided entries with image support.",
+      "items": [
+        {
+          "_key": "e1",
+          "_type": "timelineEntry",
+          "date": "Week 1",
+          "title": "Intake",
+          "description": "Sponsor intake interviews.",
+          "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Intake meeting"}
+        },
+        {
+          "_key": "e2",
+          "_type": "timelineEntry",
+          "date": "Week 6",
+          "title": "Brief locked",
+          "description": "Scope signed off by sponsor and faculty.",
+          "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Signed brief"}
+        }
+      ]
+    },
+    {
+      "_key": "tl-horizontal-hidden",
+      "_type": "timeline",
+      "variant": "horizontal",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Horizontal — description hidden",
+      "description": "This description should be hidden because variant is 'horizontal'.",
+      "items": [
+        {"_key": "e1", "_type": "timelineEntry", "date": "Q3 25", "title": "Start"},
+        {"_key": "e2", "_type": "timelineEntry", "date": "Q4 25", "title": "Design"},
+        {"_key": "e3", "_type": "timelineEntry", "date": "Q1 26", "title": "Build"},
+        {"_key": "e4", "_type": "timelineEntry", "date": "Q2 26", "title": "Ship"}
+      ]
+    },
+    {
+      "_key": "tl-engineering-min",
+      "_type": "timeline",
+      "variant": "engineering",
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "right",
+      "heading": "Engineering — min 1 entry (AC6 #28)",
+      "description": "Technical-flavored timeline with a single entry for boundary testing.",
+      "items": [
+        {
+          "_key": "e1",
+          "_type": "timelineEntry",
+          "date": "Mar 2026",
+          "title": "Release candidate",
+          "description": "Freeze, QA, and go/no-go review."
+        }
+      ]
+    }
+  ]
+}
