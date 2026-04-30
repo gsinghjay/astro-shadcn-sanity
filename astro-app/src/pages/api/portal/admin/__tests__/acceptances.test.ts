@@ -1,0 +1,287 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const TOKEN = 'sat_test_token_value';
+const ORIGIN = 'https://capstone.sanity.studio';
+
+// Adapter v13: acceptances.ts reads bindings via `cloudflare:workers`, not
+// `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
+// them in before the route module loads. `mockEnv` is the live env object —
+// tests mutate it (or buildEnv overrides) by calling `setEnv` between cases.
+const { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev } = vi.hoisted(() => {
+  const mockD1All = vi.fn();
+  // Two-call shape supported: `prepare(sql).all(...)` (no bind) and `prepare(sql).bind(arg).all(...)`.
+  const mockD1Bind = vi.fn().mockImplementation(() => ({ all: mockD1All }));
+  const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind, all: mockD1All });
+  const defaultEnv: Record<string, unknown> = {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    STUDIO_ADMIN_TOKEN: 'sat_test_token_value',
+    STUDIO_ORIGIN: 'https://capstone.sanity.studio',
+  };
+  const mockEnv: Record<string, unknown> = { ...defaultEnv };
+  const mockGetRev = vi.fn();
+  return { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev };
+});
+
+vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
+vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+
+const { GET, OPTIONS, ALL } = await import('../acceptances');
+
+/** Replace the live cloudflare:workers env object's keys with new values for one test. */
+function setEnv(next: Record<string, unknown>): void {
+  for (const k of Object.keys(mockEnv)) delete mockEnv[k];
+  Object.assign(mockEnv, next);
+}
+
+function buildEnv(overrides: Record<string, unknown> = {}) {
+  return {
+    PORTAL_DB: { prepare: mockD1Prepare },
+    STUDIO_ADMIN_TOKEN: TOKEN,
+    STUDIO_ORIGIN: ORIGIN,
+    ...overrides,
+  };
+}
+
+function buildCtx(opts: {
+  method?: string;
+  origin?: string | null;
+  authToken?: string | null;
+  search?: string;
+  env?: Record<string, unknown> | null;
+} = {}) {
+  const headers: Record<string, string> = {};
+  if (opts.origin !== null) headers.origin = opts.origin ?? ORIGIN;
+  if (opts.authToken !== null && opts.authToken !== undefined) {
+    headers.authorization = `Bearer ${opts.authToken}`;
+  } else if (opts.authToken === undefined) {
+    headers.authorization = `Bearer ${TOKEN}`;
+  }
+  // explicit null = omit header
+  const search = opts.search ?? '';
+  const url = new URL(`https://app.example.com/api/portal/admin/acceptances${search}`);
+  // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
+  // `opts.env === null` simulates "no bindings present" by emptying mockEnv.
+  // `opts.env` overrides replace the live env for this call.
+  if (opts.env === null) {
+    setEnv({});
+  } else if (opts.env !== undefined) {
+    setEnv(opts.env);
+  } else {
+    setEnv(buildEnv());
+  }
+  return {
+    url,
+    request: new Request(url.toString(), {
+      method: opts.method ?? 'GET',
+      headers,
+    }),
+    locals: {} as unknown,
+  };
+}
+
+const CURRENT_REV = 'rev-current-xyz';
+
+describe('GET /api/portal/admin/acceptances', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockD1All.mockReset().mockResolvedValue({
+      results: [
+        {
+          email: 'a@co.com',
+          name: 'Alice',
+          role: 'sponsor',
+          agreement_accepted_at: 1700000000000,
+          agreement_version: CURRENT_REV,
+        },
+        {
+          email: 'b@co.com',
+          name: 'Bob',
+          role: 'sponsor',
+          agreement_accepted_at: null,
+          agreement_version: null,
+        },
+      ],
+    });
+    mockD1Bind.mockReset().mockImplementation(() => ({ all: mockD1All }));
+    mockD1Prepare.mockReset().mockReturnValue({ bind: mockD1Bind, all: mockD1All });
+    mockGetRev.mockReset().mockResolvedValue(CURRENT_REV);
+  });
+
+  it('returns 401 when authorization header is missing', async () => {
+    const ctx = buildCtx({ authToken: null });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(401);
+    expect(await res.json()).toEqual({ error: 'unauthorized' });
+    // Error responses must echo CORS so the Studio caller can read the body.
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('returns 401 when bearer token does not match', async () => {
+    const ctx = buildCtx({ authToken: 'sat_wrong_token_value_x' });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(401);
+  });
+
+  it('returns 403 when origin does not match STUDIO_ORIGIN', async () => {
+    const ctx = buildCtx({ origin: 'https://evil.example' });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'forbidden_origin' });
+  });
+
+  it('returns 200 with acceptances array on valid token + origin (includes agreementVersion + versionMatch)', async () => {
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.acceptances).toEqual([
+      {
+        email: 'a@co.com',
+        name: 'Alice',
+        role: 'sponsor',
+        agreementAcceptedAt: 1700000000000,
+        agreementVersion: CURRENT_REV,
+        versionMatch: true,
+      },
+      {
+        email: 'b@co.com',
+        name: 'Bob',
+        role: 'sponsor',
+        agreementAcceptedAt: null,
+        agreementVersion: null,
+        versionMatch: null,
+      },
+    ]);
+    expect(body.currentVersion).toBe(CURRENT_REV);
+    expect(typeof body.generatedAt).toBe('number');
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('versionMatch=false when row has stale rev; null when grandfathered (no rev)', async () => {
+    mockD1All.mockResolvedValue({
+      results: [
+        { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreement_accepted_at: 1, agreement_version: 'rev-old' },
+        { email: 'g@co.com', name: 'Grand', role: 'sponsor', agreement_accepted_at: 2, agreement_version: null },
+        { email: 'p@co.com', name: 'Pend', role: 'sponsor', agreement_accepted_at: null, agreement_version: null },
+      ],
+    });
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    const body = await res.json();
+    expect(body.acceptances[0].versionMatch).toBe(false);
+    expect(body.acceptances[1].versionMatch).toBeNull();
+    expect(body.acceptances[2].versionMatch).toBeNull();
+  });
+
+  it('SELECT projection includes agreement_version', async () => {
+    const ctx = buildCtx({});
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain('agreement_version');
+  });
+
+  it('?versionDrift=true narrows query to non-null acceptance with mismatched/null version, binds currentRev', async () => {
+    const ctx = buildCtx({ search: '?versionDrift=true' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain('agreement_accepted_at IS NOT NULL');
+    expect(sql).toContain('(agreement_version IS NULL OR agreement_version != ?)');
+    expect(mockD1Bind).toHaveBeenCalledWith(CURRENT_REV);
+  });
+
+  it('?versionDrift=true with Sanity rev unavailable falls back to no drift filter (no empty-result trap)', async () => {
+    mockGetRev.mockResolvedValue(null);
+    const ctx = buildCtx({ search: '?versionDrift=true' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).not.toContain('agreement_version IS NULL OR agreement_version != ?');
+    expect(mockD1Bind).not.toHaveBeenCalled();
+  });
+
+  it('versionMatch is null on every row when Sanity rev fetch fails (drift state unknown)', async () => {
+    mockGetRev.mockResolvedValue(null);
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    const body = await res.json();
+    for (const row of body.acceptances) expect(row.versionMatch).toBeNull();
+    expect(body.currentVersion).toBeNull();
+  });
+
+  it('?accepted=true narrows query to non-null acceptance timestamps', async () => {
+    const ctx = buildCtx({ search: '?accepted=true' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain("role = 'sponsor'");
+    expect(sql).toContain('agreement_accepted_at IS NOT NULL');
+    expect(sql).not.toContain('agreement_accepted_at IS NULL ');
+  });
+
+  it('?accepted=false narrows query to null acceptance timestamps', async () => {
+    const ctx = buildCtx({ search: '?accepted=false' });
+    await GET(ctx as never);
+    const sql = mockD1Prepare.mock.calls[0][0];
+    expect(sql).toContain('agreement_accepted_at IS NULL');
+    expect(sql).not.toContain('IS NOT NULL');
+  });
+
+  it('emits Cache-Control: private, max-age=0, must-revalidate', async () => {
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    expect(res.headers.get('cache-control')).toBe('private, max-age=0, must-revalidate');
+  });
+
+  it('returns 503 with no detail leakage when D1 throws', async () => {
+    mockD1All.mockRejectedValue(new Error('table user does not exist'));
+    const ctx = buildCtx({});
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body).toEqual({ error: 'service_unavailable' });
+    expect(JSON.stringify(body)).not.toContain('table user');
+    // 503 from D1 catch must still echo CORS (origin matched at top of handler).
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('returns 503 when STUDIO_ADMIN_TOKEN env is missing (fail closed)', async () => {
+    const ctx = buildCtx({ env: buildEnv({ STUDIO_ADMIN_TOKEN: undefined }) });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(503);
+    // Even when env is missing, if origin matches we still echo CORS so Studio sees the body.
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+});
+
+describe('OPTIONS /api/portal/admin/acceptances', () => {
+  it('returns 204 with full CORS headers when origin matches', async () => {
+    const ctx = buildCtx({ method: 'OPTIONS' });
+    const res = await OPTIONS(ctx as never);
+    expect(res.status).toBe(204);
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+    expect(res.headers.get('access-control-allow-methods')).toBe('GET, OPTIONS');
+    expect(res.headers.get('access-control-allow-headers')).toBe('authorization, content-type');
+    expect(res.headers.get('access-control-max-age')).toBe('600');
+  });
+
+  it('returns 403 when origin does not match', async () => {
+    const ctx = buildCtx({ method: 'OPTIONS', origin: 'https://evil.example' });
+    const res = await OPTIONS(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 503 (fail closed) when STUDIO_ORIGIN env is missing', async () => {
+    const ctx = buildCtx({
+      method: 'OPTIONS',
+      env: buildEnv({ STUDIO_ORIGIN: undefined }),
+    });
+    const res = await OPTIONS(ctx as never);
+    expect(res.status).toBe(503);
+  });
+});
+
+describe('ALL handler — POST/PUT/DELETE', () => {
+  it('returns 405 with Allow: GET, OPTIONS', async () => {
+    const res = await ALL(null as never);
+    expect(res.status).toBe(405);
+    expect(res.headers.get('allow')).toBe('GET, OPTIONS');
+  });
+});

@@ -1,0 +1,88 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: metricsDashboard. Variants: grid, row, card, terminal, brutalist-grid. metrics array min 1 max 20. Covers trend enum (up, down, neutral).",
+  "_id": "demo-audit-metrics-dashboard",
+  "_type": "page",
+  "title": "Demo — Metrics Dashboard",
+  "slug": {"_type": "slug", "current": "demo/metrics-dashboard"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: metrics-dashboard"},
+  "blocks": [
+    {
+      "_key": "md-grid",
+      "_type": "metricsDashboard",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Grid — Key KPIs",
+      "description": "Quarterly metrics visualized as a responsive grid.",
+      "metrics": [
+        {"_key": "mg1", "_type": "metricItem", "label": "Active Users", "value": "24,500", "change": "+12%", "trend": "up", "icon": "users"},
+        {"_key": "mg2", "_type": "metricItem", "label": "Signups", "value": "1,204", "change": "+5%", "trend": "up", "icon": "user"},
+        {"_key": "mg3", "_type": "metricItem", "label": "Churn", "value": "2.1%", "change": "-0.4%", "trend": "down", "icon": "trending-down"},
+        {"_key": "mg4", "_type": "metricItem", "label": "NPS", "value": "62", "trend": "neutral", "icon": "star"}
+      ]
+    },
+    {
+      "_key": "md-row",
+      "_type": "metricsDashboard",
+      "variant": "row",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Row — inline metric ribbon",
+      "metrics": [
+        {"_key": "mr1", "_type": "metricItem", "label": "Uptime", "value": "99.98%", "change": "+0.02%", "trend": "up"},
+        {"_key": "mr2", "_type": "metricItem", "label": "P95 Latency", "value": "184ms", "change": "-12ms", "trend": "down"},
+        {"_key": "mr3", "_type": "metricItem", "label": "Deploys", "value": "42", "trend": "neutral"}
+      ]
+    },
+    {
+      "_key": "md-card",
+      "_type": "metricsDashboard",
+      "variant": "card",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Card — each metric as a standalone card",
+      "description": "Card variant highlights each KPI individually.",
+      "metrics": [
+        {"_key": "mc1", "_type": "metricItem", "label": "Revenue", "value": "$1.24M", "change": "+18%", "trend": "up", "icon": "dollar-sign"},
+        {"_key": "mc2", "_type": "metricItem", "label": "New Customers", "value": "312", "change": "+7%", "trend": "up", "icon": "handshake"}
+      ]
+    },
+    {
+      "_key": "md-terminal",
+      "_type": "metricsDashboard",
+      "variant": "terminal",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Terminal — monospaced readout",
+      "metrics": [
+        {"_key": "mt1", "_type": "metricItem", "label": "CPU", "value": "38%", "change": "+4%", "trend": "up", "icon": "cpu"},
+        {"_key": "mt2", "_type": "metricItem", "label": "Memory", "value": "72%", "change": "+1%", "trend": "up", "icon": "server"},
+        {"_key": "mt3", "_type": "metricItem", "label": "Errors/min", "value": "0.2", "change": "-0.1", "trend": "down", "icon": "alert-circle"}
+      ]
+    },
+    {
+      "_key": "md-brutalist",
+      "_type": "metricsDashboard",
+      "variant": "brutalist-grid",
+      "backgroundVariant": "hatched",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Brutalist Grid — bold KPI tiles",
+      "metrics": [
+        {"_key": "mb1", "_type": "metricItem", "label": "Pipeline Runs", "value": "1,928", "change": "+9%", "trend": "up"},
+        {"_key": "mb2", "_type": "metricItem", "label": "Failed Builds", "value": "12", "change": "-3", "trend": "down"},
+        {"_key": "mb3", "_type": "metricItem", "label": "Mean Time to Recovery", "value": "7m", "trend": "neutral"},
+        {"_key": "mb4", "_type": "metricItem", "label": "Unit Coverage", "value": "88%", "change": "+2%", "trend": "up"}
+      ]
+    }
+  ]
+}

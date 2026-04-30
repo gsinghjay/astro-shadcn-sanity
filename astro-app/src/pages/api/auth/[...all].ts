@@ -4,15 +4,15 @@
  * This route must be SSR (not prerendered) since it handles OAuth callbacks.
  */
 import type { APIRoute } from 'astro';
+import { env } from 'cloudflare:workers';
 import { getDrizzle } from '@/lib/db';
 import { createAuth } from '@/lib/auth-config';
 
 export const prerender = false;
 
-const handleAuth: APIRoute = async ({ locals, request }) => {
+const handleAuth: APIRoute = async ({ request }) => {
   try {
-    const env = locals.runtime.env;
-    const db = getDrizzle(locals);
+    const db = getDrizzle();
     const requestOrigin = new URL(request.url).origin;
     const auth = createAuth({
       db,

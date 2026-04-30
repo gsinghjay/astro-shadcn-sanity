@@ -1,0 +1,38 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: divider. Variants: line, short, labeled. hiddenByVariant: label hidden in line|short.",
+  "_id": "demo-audit-divider",
+  "_type": "page",
+  "title": "Demo — Divider",
+  "slug": {"_type": "slug", "current": "demo/divider"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: divider", "metaDescription": "Audit page for divider block — all variants."},
+  "blocks": [
+    {
+      "_key": "divider-line-white-default",
+      "_type": "divider",
+      "variant": "line",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left"
+    },
+    {
+      "_key": "divider-short-light-small",
+      "_type": "divider",
+      "variant": "short",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center"
+    },
+    {
+      "_key": "divider-labeled-dark-large",
+      "_type": "divider",
+      "variant": "labeled",
+      "label": "Section Break",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "right"
+    }
+  ]
+}

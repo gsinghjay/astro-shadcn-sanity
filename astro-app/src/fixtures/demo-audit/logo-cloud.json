@@ -1,0 +1,76 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: logoCloud. 5 variants: grid, marquee, flex-wrap, tiered, grid-prominent. AC6 #33: autoPopulate ON (3 instances) and OFF (2 instances, explicit sponsors refs).",
+  "_id": "demo-audit-logo-cloud",
+  "_type": "page",
+  "title": "Demo — Logo Cloud",
+  "slug": {"_type": "slug", "current": "demo/logo-cloud"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: logo-cloud"},
+  "blocks": [
+    {
+      "_key": "lc-grid-auto",
+      "_type": "logoCloud",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Grid — autoPopulate ON",
+      "autoPopulate": true
+    },
+    {
+      "_key": "lc-marquee-auto",
+      "_type": "logoCloud",
+      "variant": "marquee",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Marquee — autoPopulate ON",
+      "autoPopulate": true
+    },
+    {
+      "_key": "lc-flex-wrap-manual",
+      "_type": "logoCloud",
+      "variant": "flex-wrap",
+      "backgroundVariant": "hatched-light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Flex Wrap — autoPopulate OFF (explicit refs)",
+      "autoPopulate": false,
+      "sponsors": [
+        {"_key": "sp-cisco", "_type": "reference", "_ref": "0ac25e8d-f75d-478a-8512-994d83fe6177"},
+        {"_key": "sp-verizon", "_type": "reference", "_ref": "b4aaf35f-dc0d-4567-993b-33bc66820e67"},
+        {"_key": "sp-boa", "_type": "reference", "_ref": "004122e9-a8d4-40c3-82ab-3e980bd5cb72"}
+      ]
+    },
+    {
+      "_key": "lc-tiered-auto",
+      "_type": "logoCloud",
+      "variant": "tiered",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Tiered — autoPopulate ON",
+      "autoPopulate": true
+    },
+    {
+      "_key": "lc-grid-prominent-manual",
+      "_type": "logoCloud",
+      "variant": "grid-prominent",
+      "backgroundVariant": "mono",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Grid Prominent — autoPopulate OFF (explicit refs)",
+      "autoPopulate": false,
+      "sponsors": [
+        {"_key": "sp-ups", "_type": "reference", "_ref": "789cb14e-e72e-4335-b6d5-ac3bb87b022d"},
+        {"_key": "sp-forbes", "_type": "reference", "_ref": "e2febb59-87ae-473f-a91e-60adb83f3e6d"},
+        {"_key": "sp-eco", "_type": "reference", "_ref": "6f2a7a01-a75e-416d-b219-c59b4c6a2dc5"},
+        {"_key": "sp-angeles", "_type": "reference", "_ref": "72e7a364-fd4e-4b38-9acd-a3314ed4cb95"}
+      ]
+    }
+  ]
+}

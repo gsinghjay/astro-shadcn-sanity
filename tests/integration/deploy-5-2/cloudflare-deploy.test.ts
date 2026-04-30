@@ -24,16 +24,21 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(configContent).not.toContain('from "@astrojs/node"')
     })
 
-    test('[P0] 5.2-INT-003 — adapter uses cloudflare with platformProxy enabled', () => {
+    test('[P0] 5.2-INT-003 — adapter uses cloudflare with adapter v13 entrypoint', () => {
+      // adapter v13 dropped the explicit platformProxy option (auto-enabled
+      // via the unified `@astrojs/cloudflare/entrypoints/server` module the
+      // Worker references in wrangler.jsonc). The adapter is still invoked.
       expect(configContent).toContain('cloudflare(')
-      expect(configContent).toContain('platformProxy')
-      expect(configContent).toContain('enabled: true')
+      // Pin imageService so we don't silently regress to the v13 default.
+      expect(configContent).toMatch(/imageService:\s*['"]compile['"]/)
     })
 
-    test('[P0] 5.2-INT-004 — output defaults to static', () => {
-      // Output is conditionally set: isVisualEditing ? "server" : "static"
-      expect(configContent).toContain('"static"')
-      expect(configContent).toMatch(/output:/)
+    test('[P0] 5.2-INT-004 — output is server so Astro Actions deploy on the Worker', () => {
+      // Switched from "static" to "server" so /_actions/* mounts on the
+      // Cloudflare Worker. Marketing pages opt back into static via
+      // `export const prerender = true`.
+      expect(configContent).toContain('"server"')
+      expect(configContent).toMatch(/output:\s*"server"/)
     })
 
     test('[P0] 5.2-INT-005 — site property reads PUBLIC_SITE_URL env var', () => {
@@ -70,18 +75,39 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(config.compatibility_flags).toContain('nodejs_compat')
     })
 
-    test('[P0] 5.2-INT-009 — wrangler.jsonc has pages_build_output_dir pointing to dist', () => {
-      const config = parseJsonc(readFileSync(wranglerPath, 'utf-8'))
-      expect(config.pages_build_output_dir).toBe('./dist')
+    test('[P0] 5.2-INT-009 — wrangler.jsonc uses Workers Static Assets pointing to dist', () => {
+      // Post-migration: pages_build_output_dir is replaced by `assets` (adapter v13).
+      const config = parseJsonc(readFileSync(wranglerPath, 'utf-8')) as {
+        assets?: { directory?: string; binding?: string }
+        pages_build_output_dir?: unknown
+        main?: string
+      }
+      expect(config.assets?.directory).toBe('./dist')
+      expect(config.assets?.binding).toBe('ASSETS')
+      expect(config.pages_build_output_dir).toBeUndefined()
+      expect(config.main).toBe('@astrojs/cloudflare/entrypoints/server')
     })
   })
 
-  describe('AC8: Deploy script in package.json', () => {
-    test('[P0] 5.2-INT-010 — package.json has deploy script with wrangler pages deploy', () => {
+  describe('AC8: Per-env deploy scripts in package.json', () => {
+    test('[P0] 5.2-INT-010 — package.json has per-env deploy scripts using `wrangler deploy`', () => {
+      // Astro 6 bakes env at build time, so deploy is split per environment.
+      // The single `deploy: wrangler pages deploy` script is gone.
       const pkgPath = path.resolve(ASTRO_APP, 'package.json')
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
-      expect(pkg.scripts.deploy).toBeDefined()
-      expect(pkg.scripts.deploy).toContain('wrangler pages deploy')
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8')) as {
+        scripts: Record<string, string | undefined>
+      }
+      expect(pkg.scripts['deploy:capstone']).toBeDefined()
+      expect(pkg.scripts['deploy:rwc-us']).toBeDefined()
+      expect(pkg.scripts['deploy:rwc-intl']).toBeDefined()
+      // Each script must build with CLOUDFLARE_ENV then deploy with `wrangler deploy`.
+      expect(pkg.scripts['deploy:capstone']).toMatch(/CLOUDFLARE_ENV=capstone\s+astro build\s+&&\s+wrangler deploy\b/)
+      expect(pkg.scripts['deploy:rwc-us']).toMatch(/CLOUDFLARE_ENV=rwc_us\s+astro build\s+&&\s+wrangler deploy\s+--env\s+rwc_us\b/)
+      expect(pkg.scripts['deploy:rwc-intl']).toMatch(/CLOUDFLARE_ENV=rwc_intl\s+astro build\s+&&\s+wrangler deploy\s+--env\s+rwc_intl\b/)
+      // Sanity check: the old Pages CLI is not used anywhere in scripts.
+      for (const value of Object.values(pkg.scripts)) {
+        expect(value ?? '').not.toContain('wrangler pages deploy')
+      }
     })
   })
 

@@ -1,0 +1,45 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: embedBlock. Variants: default, contained, full-width. embedUrl required (http/https). caption optional (max 200).",
+  "_id": "demo-audit-embed-block",
+  "_type": "page",
+  "title": "Demo — Embed Block",
+  "slug": {"_type": "slug", "current": "demo/embed-block"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: embed-block"},
+  "blocks": [
+    {
+      "_key": "eb-default",
+      "_type": "embedBlock",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Default Embed — CodePen",
+      "embedUrl": "https://codepen.io/team/codepen/embed/PNaGbb",
+      "caption": "A CodePen embed showcasing interactive CSS art."
+    },
+    {
+      "_key": "eb-contained",
+      "_type": "embedBlock",
+      "variant": "contained",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Contained Embed — Figma",
+      "embedUrl": "https://www.figma.com/embed?embed_host=share&url=https%3A%2F%2Fwww.figma.com%2Ffile%2Fexample",
+      "caption": "Contained variant constrains embed width to the narrow column."
+    },
+    {
+      "_key": "eb-full",
+      "_type": "embedBlock",
+      "variant": "full-width",
+      "backgroundVariant": "stripe",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-width Embed — Observable notebook",
+      "embedUrl": "https://observablehq.com/embed/@d3/zoomable-sunburst"
+    }
+  ]
+}
