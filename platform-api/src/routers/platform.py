@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from models.platform import DeployStatus, RebuildResponse, AnalyticsResponse
 from models.settings import WorkerSettings
-from dependencies import get_settings, verify_admin_api_key
+from dependencies import get_settings, get_current_admin
 from services.cf_client import get_deploy_status, get_cf_analytics
 from services.http_client import get_client
 
@@ -46,7 +46,7 @@ async def deploy_status(
 async def rebuild(
     site: str = Query(..., description="Target site to rebuild"),
     settings: WorkerSettings = Depends(get_settings),
-    _ = Depends(verify_admin_api_key)
+    _ = Depends(get_current_admin)
 ):
     # Import SITE_TO_CF_PROJECT for validation
     from services.cf_client import SITE_TO_CF_PROJECT
@@ -137,7 +137,7 @@ async def analytics(
     metric: Literal["chatbot_queries", "form_submissions", "webhook_events"] = Query("chatbot_queries", description="Metric to fetch"),
     period: str = Query("24h", description="Time period"),
     settings: WorkerSettings = Depends(get_settings),
-    _ = Depends(verify_admin_api_key)
+    _ = Depends(get_current_admin)
 ):
     data = await get_cf_analytics(metric, period, settings)
     return AnalyticsResponse(metric=metric, period=period, data=data)
