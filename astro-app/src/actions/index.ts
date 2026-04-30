@@ -1,6 +1,7 @@
 import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro/zod';
 import { createClient } from '@sanity/client';
+import { env } from 'cloudflare:workers';
 
 export const server = {
   submitForm: defineAction({
@@ -13,9 +14,7 @@ export const server = {
       form_id: z.string().optional().default(''),
       'cf-turnstile-response': z.string().min(1, 'Bot verification required'),
     }),
-    handler: async (input, context) => {
-      const { env } = context.locals.runtime;
-
+    handler: async (input) => {
       // 1. Validate Turnstile token
       const verifyRes = await fetch(
         'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -57,7 +56,15 @@ export const server = {
             : undefined,
           submittedAt: new Date().toISOString(),
         });
-      } catch {
+      } catch (err) {
+        console.error('[submitForm] Sanity write failed:', {
+          message: (err as Error)?.message,
+          name: (err as Error)?.name,
+          hasWriteToken: Boolean(env.SANITY_API_WRITE_TOKEN),
+          projectId: import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID,
+          dataset: import.meta.env.PUBLIC_SANITY_STUDIO_DATASET,
+          formId: input.form_id || '(none)',
+        });
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Submission failed',

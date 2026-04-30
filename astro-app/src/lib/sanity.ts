@@ -1093,6 +1093,11 @@ export const SPONSOR_AGREEMENT_QUERY = defineQuery(groq`*[_type == "sponsorAgree
   bodyContent[]${PORTABLE_TEXT_PROJECTION}
 }`);
 
+/** Minimal rev-only projection for version pinning — used by accept endpoint + middleware drift check. */
+export const SPONSOR_AGREEMENT_REV_QUERY = defineQuery(
+  groq`*[_type == "sponsorAgreement" && _id == $id][0]{ "rev": _rev }`,
+);
+
 function getSponsorAgreementId(): string {
   // Single agreement document for the capstone workspace. RWC workspaces don't expose a portal,
   // so a site-scoped variant is intentionally not constructed here.
@@ -1117,6 +1122,29 @@ export async function getSponsorAgreement(): Promise<SPONSOR_AGREEMENT_QUERY_RES
     return result ?? null;
   } catch (err) {
     console.error('getSponsorAgreement failed; falling back to null', err);
+    return null;
+  }
+}
+
+/**
+ * Fetch the current sponsor agreement Sanity `_rev`. Used to pin per-user acceptance to a
+ * specific document revision (audit trail) and to detect version drift in middleware.
+ *
+ * Bypasses `loadQuery` (which applies stega + sync tag collection) — neither matters for an
+ * opaque rev string. Hits the Sanity client directly with `useCdn: true` semantics, so the
+ * worst-case staleness is ~60s API CDN edge cache. Returns null on any error so callers
+ * fail-open (accept endpoint writes `agreement_version = NULL`; middleware skips the gate).
+ */
+export async function getSponsorAgreementRev(): Promise<string | null> {
+  const id = getSponsorAgreementId();
+  try {
+    const result = await sanityClient.fetch<{ rev: string | null } | null>(
+      SPONSOR_AGREEMENT_REV_QUERY,
+      { id },
+    );
+    return result?.rev ?? null;
+  } catch (err) {
+    console.error('getSponsorAgreementRev failed; returning null', err);
     return null;
   }
 }

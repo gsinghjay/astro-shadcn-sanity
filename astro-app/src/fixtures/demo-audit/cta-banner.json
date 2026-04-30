@@ -1,0 +1,116 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: ctaBanner. 6 variants: centered, split, spread, overlay, brutalist, data-cta. ctaButtons min 1 max 5 (includes 1 and 5 instances). backgroundImages max 5.",
+  "_id": "demo-audit-cta-banner",
+  "_type": "page",
+  "title": "Demo — CTA Banner",
+  "slug": {"_type": "slug", "current": "demo/cta-banner"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: cta-banner"},
+  "blocks": [
+    {
+      "_key": "cb-centered-1btn",
+      "_type": "ctaBanner",
+      "variant": "centered",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Ready to sponsor the next capstone?",
+      "description": "Join 7 industry leaders backing student teams this year.",
+      "ctaButtons": [
+        {"_key": "cb-c-1", "_type": "button", "text": "Become a Sponsor", "url": "/contact", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "cb-split-2btn-1img",
+      "_type": "ctaBanner",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Attend the Spring 2026 Showcase",
+      "description": "Meet project teams, network with sponsors, and see capstone work live.",
+      "backgroundImages": [
+        {"_key": "cb-sp-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Showcase event background"}
+      ],
+      "ctaButtons": [
+        {"_key": "cb-sp-1", "_type": "button", "text": "Register", "url": "/events", "variant": "default"},
+        {"_key": "cb-sp-2", "_type": "button", "text": "See past events", "url": "/events?filter=past", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "cb-spread-3btn",
+      "_type": "ctaBanner",
+      "variant": "spread",
+      "backgroundVariant": "hatched",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Three ways to get involved",
+      "description": "Sponsor, mentor, or hire.",
+      "ctaButtons": [
+        {"_key": "cb-spr-1", "_type": "button", "text": "Sponsor", "url": "/sponsors", "variant": "default"},
+        {"_key": "cb-spr-2", "_type": "button", "text": "Mentor", "url": "/mentor", "variant": "secondary"},
+        {"_key": "cb-spr-3", "_type": "button", "text": "Hire", "url": "/careers", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "cb-overlay-2img-2btn",
+      "_type": "ctaBanner",
+      "variant": "overlay",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Capstone 2026 applications are open",
+      "description": "Partner with a student team this semester.",
+      "backgroundImages": [
+        {"_key": "cb-ov-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Large hero landscape for overlay banner"},
+        {"_key": "cb-ov-img-2", "_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Secondary overlay image"}
+      ],
+      "ctaButtons": [
+        {"_key": "cb-ov-1", "_type": "button", "text": "Apply", "url": "/apply", "variant": "default"},
+        {"_key": "cb-ov-2", "_type": "button", "text": "Learn more", "url": "/about", "variant": "ghost"}
+      ]
+    },
+    {
+      "_key": "cb-brutalist-5btn-max",
+      "_type": "ctaBanner",
+      "variant": "brutalist",
+      "backgroundVariant": "mono",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Pick your action (5 CTAs — max AC6 #29)",
+      "description": "Exercises Rule.max(5) on ctaButtons.",
+      "ctaButtons": [
+        {"_key": "cb-br-1", "_type": "button", "text": "Sponsor", "url": "/sponsors", "variant": "default"},
+        {"_key": "cb-br-2", "_type": "button", "text": "Mentor", "url": "/mentor", "variant": "secondary"},
+        {"_key": "cb-br-3", "_type": "button", "text": "Apply", "url": "/apply", "variant": "outline"},
+        {"_key": "cb-br-4", "_type": "button", "text": "Contact", "url": "mailto:capstone@njit.edu", "variant": "ghost"},
+        {"_key": "cb-br-5", "_type": "button", "text": "Call", "url": "tel:+15555550123", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "cb-data-cta-1btn-5img-max",
+      "_type": "ctaBanner",
+      "variant": "data-cta",
+      "backgroundVariant": "blueprint",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Data CTA — 5 background images (max)",
+      "description": "Exercises backgroundImages upper bound (Rule.max(5)).",
+      "backgroundImages": [
+        {"_key": "cb-dc-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Landscape data background 1"},
+        {"_key": "cb-dc-img-2", "_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Brown OG banner 2"},
+        {"_key": "cb-dc-img-3", "_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Blue OG banner 3"},
+        {"_key": "cb-dc-img-4", "_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Navy OG banner 4"},
+        {"_key": "cb-dc-img-5", "_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Landscape data background 5"}
+      ],
+      "ctaButtons": [
+        {"_key": "cb-dc-1", "_type": "button", "text": "View report", "url": "/impact-report", "variant": "default"}
+      ]
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { env } from "cloudflare:workers";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -16,13 +17,43 @@ const jsonError = (status: number, error: string) =>
     headers: { "content-type": "application/json" },
   });
 
-/** Shape stored in SESSION_CACHE. `agreementAcceptedAt === undefined` means the cache predates the field. */
+/** Shape stored in SESSION_CACHE. `undefined` on either field means the cache predates that field
+ *  and we should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
 type CachedSession = {
   email: string;
   name: string;
   role: string;
   agreementAcceptedAt?: number | null;
+  agreementVersion?: string | null;
 };
+
+/** Module-scope cache of the current Sanity sponsor-agreement `_rev`. Persists across requests
+ *  within a Worker isolate (CF reuses isolates aggressively), so cache hit rate is very high.
+ *  Cold-start penalty is one Sanity API call per isolate, ~50ms. 5-min worst-case lag between
+ *  agreement publish and re-prompt — acceptable for a doc that changes ~1×/year. */
+let _agreementRevCache: { rev: string | null; expiresAt: number } | null = null;
+const AGREEMENT_REV_TTL_MS = 5 * 60 * 1000;
+
+async function getCurrentAgreementRev(): Promise<string | null> {
+  const now = Date.now();
+  if (_agreementRevCache && _agreementRevCache.expiresAt > now) {
+    return _agreementRevCache.rev;
+  }
+  try {
+    const { getSponsorAgreementRev } = await import("@/lib/sanity");
+    const rev = await getSponsorAgreementRev();
+    _agreementRevCache = { rev, expiresAt: now + AGREEMENT_REV_TTL_MS };
+    return rev;
+  } catch (err) {
+    console.warn("[middleware-agreement] rev fetch failed; failing open", err);
+    return null;
+  }
+}
+
+/** Test-only: reset the module-scope rev cache. */
+export function _resetAgreementRevCache(): void {
+  _agreementRevCache = null;
+}
 
 /** Better Auth session user shape including custom additionalFields */
 interface SessionUser {
@@ -34,12 +65,16 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  const isPortalApi = pathname.startsWith("/api/portal/");
+  // Admin endpoints under /api/portal/admin/* authenticate via STUDIO_ADMIN_TOKEN
+  // (cross-origin Studio caller, no session cookie). Skip the session gate so the
+  // route handler can run its own bearer/origin checks and emit CORS headers.
+  const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
+  const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
   const isPortal = isPortalPage || isPortalApi;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
-  // Branch 1: Public routes — zero auth overhead
+  // Branch 1: Public routes (and admin API) — zero auth overhead
   if (!isPortal && !isStudent) {
     return next();
   }
@@ -70,12 +105,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { getDrizzle } = await import("@/lib/db");
   const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
-  const runtimeEnv = context.locals.runtime?.env;
-  if (!runtimeEnv) {
-    console.error("[middleware] Cloudflare runtime env not available");
-    return new Response("Service Unavailable", { status: 503 });
-  }
-
+  const runtimeEnv = env;
   // Rate limiting — per-IP sliding window via Durable Object (fail-open)
   const rateLimiter = runtimeEnv.RATE_LIMITER;
   if (rateLimiter) {
@@ -118,7 +148,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // D1 fallback via Better Auth
     if (!userData && sessionToken) {
-      const db = getDrizzle(context.locals);
+      const db = getDrizzle();
       const auth = createAuth({
         db,
         env: {
@@ -204,14 +234,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
       PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
     if (userData.role === "sponsor" && !skipsAgreementPath) {
       let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
-      if (userData.agreementAcceptedAt === undefined && runtimeEnv?.PORTAL_DB) {
+      let agreementVersion = userData.agreementVersion ?? null;
+      const cacheMissesAcceptance = userData.agreementAcceptedAt === undefined;
+      const cacheMissesVersion = userData.agreementVersion === undefined;
+      if ((cacheMissesAcceptance || cacheMissesVersion) && runtimeEnv?.PORTAL_DB) {
         try {
           const row = await runtimeEnv.PORTAL_DB
-            .prepare("SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?")
+            .prepare(
+              "SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?",
+            )
             .bind(userData.email)
-            .first<{ agreement_accepted_at: number | null }>();
+            .first<{ agreement_accepted_at: number | null; agreement_version: string | null }>();
           agreementAcceptedAt = row?.agreement_accepted_at ?? null;
+          agreementVersion = row?.agreement_version ?? null;
           userData.agreementAcceptedAt = agreementAcceptedAt;
+          userData.agreementVersion = agreementVersion;
           if (kvCache && sessionToken) {
             kvCache
               .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
@@ -222,9 +259,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
           // A D1 outage blocks portal access rather than letting unaccepted sponsors through.
           console.error("[middleware] agreement lookup failed, failing closed:", e);
           agreementAcceptedAt = null;
+          agreementVersion = null;
         }
       }
-      context.locals.requiresAgreement = agreementAcceptedAt === null;
+      // Re-prompt when never accepted, OR when accepted against a different/null rev than the
+      // current Sanity revision. Rev fetch failure returns null (fail-open) — paired with a
+      // non-null version this short-circuits to "no prompt" so a Sanity outage doesn't lock
+      // sponsors out. Grandfathered rows (acceptedAt != null, version == null) re-prompt once
+      // because currentRev is non-null after first successful fetch.
+      const currentRev = await getCurrentAgreementRev();
+      const versionDrift = currentRev !== null && agreementVersion !== currentRev;
+      context.locals.requiresAgreement = agreementAcceptedAt === null || versionDrift;
     } else {
       context.locals.requiresAgreement = false;
     }

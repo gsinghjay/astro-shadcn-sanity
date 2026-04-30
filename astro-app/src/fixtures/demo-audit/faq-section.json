@@ -1,0 +1,166 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: faqSection. Variants: split, stacked, spread-header, narrow, technical. items faqItem min 1 max 20. AC6 #28 min-items (1) exercised on 'narrow'.",
+  "_id": "demo-audit-faq-section",
+  "_type": "page",
+  "title": "Demo — FAQ Section",
+  "slug": {"_type": "slug", "current": "demo/faq-section"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: faq-section"},
+  "blocks": [
+    {
+      "_key": "faq-split",
+      "_type": "faqSection",
+      "variant": "split",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split variant — sticky heading left",
+      "items": [
+        {
+          "_key": "i1",
+          "_type": "faqItem",
+          "question": "What is the capstone program?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "A year-long capstone where students ship real engineering work.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i2",
+          "_type": "faqItem",
+          "question": "Who can apply?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Seniors enrolled in participating programs.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i3",
+          "_type": "faqItem",
+          "question": "How are teams formed?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Teams self-form around proposed project briefs.", "marks": []}], "markDefs": []}
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "faq-stacked",
+      "_type": "faqSection",
+      "variant": "stacked",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Stacked variant — centered heading",
+      "items": [
+        {
+          "_key": "i1",
+          "_type": "faqItem",
+          "question": "When is the showcase?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "End of spring semester, public demo day.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i2",
+          "_type": "faqItem",
+          "question": "Do sponsors attend?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Yes — sponsors judge and network with student teams.", "marks": []}], "markDefs": []}
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "faq-spread-header",
+      "_type": "faqSection",
+      "variant": "spread-header",
+      "backgroundVariant": "hatched-light",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Spread-header variant",
+      "items": [
+        {
+          "_key": "i1",
+          "_type": "faqItem",
+          "question": "Is there a stipend?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Select sponsored tracks include modest stipends.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i2",
+          "_type": "faqItem",
+          "question": "Can alumni mentor?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Absolutely — mentorship applications open each fall.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i3",
+          "_type": "faqItem",
+          "question": "What tech stacks are supported?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Any — the program is stack-agnostic.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i4",
+          "_type": "faqItem",
+          "question": "How is IP handled?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Students retain IP unless sponsor agreements specify otherwise.", "marks": []}], "markDefs": []}
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "faq-narrow-min",
+      "_type": "faqSection",
+      "variant": "narrow",
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Narrow variant — min 1 item (AC6 #28)",
+      "items": [
+        {
+          "_key": "i1",
+          "_type": "faqItem",
+          "question": "Single-question edge case?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Tests the min-1 boundary for the items array.", "marks": []}], "markDefs": []}
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "faq-technical",
+      "_type": "faqSection",
+      "variant": "technical",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Technical variant",
+      "items": [
+        {
+          "_key": "i1",
+          "_type": "faqItem",
+          "question": "How are performance budgets enforced?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Lighthouse CI runs on every PR with a 89+ performance threshold.", "marks": []}], "markDefs": []}
+          ]
+        },
+        {
+          "_key": "i2",
+          "_type": "faqItem",
+          "question": "What is the LCP target?",
+          "answer": [
+            {"_type": "block", "_key": "b1", "style": "normal", "children": [{"_type": "span", "_key": "s1", "text": "Sub-2s LCP on the 4G mobile profile.", "marks": []}], "markDefs": []}
+          ]
+        }
+      ]
+    }
+  ]
+}

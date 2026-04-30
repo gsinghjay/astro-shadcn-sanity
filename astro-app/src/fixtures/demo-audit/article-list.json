@@ -1,0 +1,96 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: articleList. Variants: grid, split-featured, list, brutalist, magazine. hiddenByVariant: description hidden in 'list'. Enum contentType: all|by-category. Toggle showNewsletterCta true/false. AC6 #31: list variant has showNewsletterCta=false and no ctaButtons.",
+  "_id": "demo-audit-article-list",
+  "_type": "page",
+  "title": "Demo — Article List",
+  "slug": {"_type": "slug", "current": "demo/article-list"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: article-list"},
+  "blocks": [
+    {
+      "_key": "al-grid-all-cta",
+      "_type": "articleList",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Grid — contentType all, newsletter ON",
+      "description": "All articles, grid layout, with newsletter CTA and action buttons.",
+      "contentType": "all",
+      "limit": 6,
+      "showNewsletterCta": true,
+      "ctaButtons": [
+        {"_key": "btn1", "_type": "button", "text": "View all articles", "url": "/articles", "variant": "default"},
+        {"_key": "btn2", "_type": "button", "text": "Subscribe", "url": "/subscribe", "variant": "outline"}
+      ]
+    },
+    {
+      "_key": "al-split-bycat",
+      "_type": "articleList",
+      "variant": "split-featured",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Split-featured — contentType by-category",
+      "description": "Filtered to program-news category.",
+      "contentType": "by-category",
+      "categories": [
+        {"_key": "cat1", "_type": "reference", "_ref": "7ee08c97-701d-437c-a497-0b7fed6b191a"}
+      ],
+      "limit": 4,
+      "showNewsletterCta": true,
+      "ctaButtons": [
+        {"_key": "btn1", "_type": "button", "text": "Browse category", "url": "/articles/program-news", "variant": "secondary"}
+      ]
+    },
+    {
+      "_key": "al-list-hidden-desc",
+      "_type": "articleList",
+      "variant": "list",
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "List variant — description hidden (AC6 #31 no-CTA)",
+      "description": "This description should be hidden because variant is 'list'.",
+      "contentType": "all",
+      "limit": 10,
+      "showNewsletterCta": false
+    },
+    {
+      "_key": "al-brutalist-bycat",
+      "_type": "articleList",
+      "variant": "brutalist",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Brutalist — by-category, no newsletter",
+      "description": "Brutalist visual treatment, category filter, newsletter OFF.",
+      "contentType": "by-category",
+      "categories": [
+        {"_key": "cat1", "_type": "reference", "_ref": "7ee08c97-701d-437c-a497-0b7fed6b191a"}
+      ],
+      "limit": 3,
+      "showNewsletterCta": false,
+      "ctaButtons": [
+        {"_key": "btn1", "_type": "button", "text": "Archive", "url": "/articles/archive", "variant": "ghost"}
+      ]
+    },
+    {
+      "_key": "al-magazine-all",
+      "_type": "articleList",
+      "variant": "magazine",
+      "backgroundVariant": "stripe",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "right",
+      "heading": "Magazine — contentType all, newsletter ON",
+      "description": "Magazine-style layout sampling all articles.",
+      "contentType": "all",
+      "limit": 8,
+      "showNewsletterCta": true
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: featureGrid. Variants: grid, grid-centered, horizontal-cards, sidebar-grid, stacked, numbered-brutalist. hiddenByVariant: columns hidden in stacked|sidebar-grid. Enum coverage: columns 2, 3, 4 across grid/grid-centered/horizontal-cards. items min 1 max 20.",
+  "_id": "demo-audit-feature-grid",
+  "_type": "page",
+  "title": "Demo — Feature Grid",
+  "slug": {"_type": "slug", "current": "demo/feature-grid"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: feature-grid"},
+  "blocks": [
+    {
+      "_key": "fg-grid-3",
+      "_type": "featureGrid",
+      "variant": "grid",
+      "columns": 3,
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Grid — 3 columns (default)",
+      "description": "Default grid layout at 3 columns.",
+      "items": [
+        {"_key": "fg-g1", "_type": "featureItem", "title": "Accessibility First", "description": "WCAG AA across every component.", "icon": "shield-check"},
+        {"_key": "fg-g2", "_type": "featureItem", "title": "Type-safe", "description": "End-to-end types with TypeGen.", "icon": "code"},
+        {"_key": "fg-g3", "_type": "featureItem", "title": "Performance", "description": "LCP under 2 seconds on 4G.", "icon": "rocket"}
+      ]
+    },
+    {
+      "_key": "fg-centered-2",
+      "_type": "featureGrid",
+      "variant": "grid-centered",
+      "columns": 2,
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Grid Centered — 2 columns",
+      "items": [
+        {"_key": "fg-c1", "_type": "featureItem", "title": "Student-led", "description": "Every team is driven by seniors in capstone.", "icon": "users", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"}, "alt": "Student collaborating around a laptop"}},
+        {"_key": "fg-c2", "_type": "featureItem", "title": "Industry-reviewed", "description": "Partners review every milestone.", "icon": "handshake"}
+      ]
+    },
+    {
+      "_key": "fg-horiz-4",
+      "_type": "featureGrid",
+      "variant": "horizontal-cards",
+      "columns": 4,
+      "backgroundVariant": "hatched-light",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Horizontal Cards — 4 columns",
+      "items": [
+        {"_key": "fg-h1", "_type": "featureItem", "title": "Research", "description": "Original lab work.", "icon": "book-open"},
+        {"_key": "fg-h2", "_type": "featureItem", "title": "Prototype", "description": "Build to learn.", "icon": "wrench"},
+        {"_key": "fg-h3", "_type": "featureItem", "title": "Ship", "description": "Production deploys.", "icon": "rocket"},
+        {"_key": "fg-h4", "_type": "featureItem", "title": "Reflect", "description": "Retros every sprint.", "icon": "lightbulb"}
+      ]
+    },
+    {
+      "_key": "fg-sidebar",
+      "_type": "featureGrid",
+      "variant": "sidebar-grid",
+      "columns": 4,
+      "backgroundVariant": "mono",
+      "spacing": "small",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Sidebar Grid — columns is hidden by variant",
+      "description": "hiddenByVariant hides the columns field; any set value should be ignored.",
+      "items": [
+        {"_key": "fg-sb1", "_type": "featureItem", "title": "Mentorship", "description": "Faculty and industry mentors.", "icon": "users"},
+        {"_key": "fg-sb2", "_type": "featureItem", "title": "Funding", "description": "Seed support for prototypes.", "icon": "dollar-sign"},
+        {"_key": "fg-sb3", "_type": "featureItem", "title": "Space", "description": "24/7 lab access.", "icon": "box"}
+      ]
+    },
+    {
+      "_key": "fg-stacked",
+      "_type": "featureGrid",
+      "variant": "stacked",
+      "columns": 2,
+      "backgroundVariant": "blueprint",
+      "spacing": "large",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Stacked — columns is hidden by variant",
+      "description": "Vertical stacked list; columns field is hidden and ignored.",
+      "items": [
+        {"_key": "fg-st1", "_type": "featureItem", "title": "Design Review", "description": "Weekly critique sessions.", "icon": "palette"},
+        {"_key": "fg-st2", "_type": "featureItem", "title": "Demo Day", "description": "Public showcase at end of term.", "icon": "megaphone"}
+      ]
+    },
+    {
+      "_key": "fg-numbered-brutalist",
+      "_type": "featureGrid",
+      "variant": "numbered-brutalist",
+      "columns": 3,
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Numbered Brutalist — ordered feature list",
+      "items": [
+        {"_key": "fg-nb1", "_type": "featureItem", "title": "Discover", "description": "Problem framing."},
+        {"_key": "fg-nb2", "_type": "featureItem", "title": "Define", "description": "Scope the MVP."},
+        {"_key": "fg-nb3", "_type": "featureItem", "title": "Deliver", "description": "Ship in 12 weeks."}
+      ]
+    }
+  ]
+}
