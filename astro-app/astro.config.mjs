@@ -192,7 +192,9 @@ export default defineConfig({
         !page.includes('/portal/') &&
         !page.includes('/auth/') &&
         !page.includes('/student/') &&
-        !page.includes('/demo/'),
+        !page.includes('/demo/') &&
+        page !== '/search' &&
+        !page.startsWith('/search/'),
     }),
     // Gate astro-llms-md on visual editing OFF: stega-encoded HTML leaks
     // private-use Unicode markers into the .md/.txt output otherwise.

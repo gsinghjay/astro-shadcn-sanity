@@ -9,6 +9,7 @@ Disallow: /portal/
 Disallow: /auth/
 Disallow: /student/
 Disallow: /demo/
+Disallow: /search/
 
 User-agent: Cloudflare-AI-Search
 Allow: /
@@ -16,6 +17,7 @@ Disallow: /portal/
 Disallow: /auth/
 Disallow: /student/
 Disallow: /demo/
+Disallow: /search/
 
 # LLMs: ${siteUrl}/llms.txt
 Sitemap: ${siteUrl}/sitemap-index.xml`;

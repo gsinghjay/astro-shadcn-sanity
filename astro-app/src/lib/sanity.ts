@@ -411,7 +411,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings" &&
   resourceLinks[]{ _key, label, href, external },
   programLinks[]{ _key, label, href },
   currentSemester,
-  aiSearch{ enabled, apiUrl, placeholder, theme, hideBranding, openByDefault }
+  aiSearch{ enabled, searchModalEnabled, apiUrl, placeholder, theme, hideBranding, openByDefault }
 }`);
 
 /**

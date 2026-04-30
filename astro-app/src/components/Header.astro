@@ -1,5 +1,6 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
+import SearchModal from './SearchModal.astro';
 import { Header as HeaderUI } from '@/components/ui/header';
 import { Logo, LogoText } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
@@ -34,8 +35,11 @@ import { stegaClean } from '@sanity/client/stega';
 import { safeUrlFor } from '@/lib/image';
 
 const settings = await getSiteSettings();
-const { navigationItems, ctaButton, siteName, logo } = settings;
+const { navigationItems, ctaButton, siteName, logo, aiSearch } = settings;
 const currentPath = Astro.url.pathname;
+
+// Compute search modal visibility
+const searchEnabled = Boolean(aiSearch?.searchModalEnabled && aiSearch?.apiUrl);
 
 const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';
@@ -69,16 +73,20 @@ const isActive = (href: string) =>
     {/* Utility — light right */}
     <div class="flex items-center gap-6">
       {/* Search trigger — typographic, no input */}
-      <button
-        type="button"
-        class="hidden lg:inline-flex items-center gap-3 bg-transparent text-foreground/70 transition-colors hover:text-foreground cursor-pointer"
-        data-gtm-category="navigation"
-        data-gtm-label="search"
-      >
-        <Icon name="search" class="h-4 w-4" />
-        <span class="label-caps text-[10px]">Search</span>
-        <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/70 leading-none" aria-hidden="true">⌘K</kbd>
-      </button>
+      {searchEnabled && (
+        <button
+          type="button"
+          class="hidden lg:inline-flex items-center gap-3 bg-transparent text-foreground/70 transition-colors hover:text-foreground cursor-pointer"
+          data-search-trigger
+          data-gtm-category="site-search"
+          data-gtm-action="trigger-click"
+          data-gtm-label="nav-desktop"
+        >
+          <Icon name="search" class="h-4 w-4" />
+          <span class="label-caps text-[10px]">Search</span>
+          <kbd class="border-2 border-foreground/20 px-1.5 pt-1 pb-0.5 text-[10px] font-mono text-foreground/70 leading-none" aria-hidden="true">⌘K</kbd>
+        </button>
+      )}
 
       {/* CTA button — Swiss structural accent */}
       <Button
@@ -102,14 +110,21 @@ const isActive = (href: string) =>
             </SheetHeader>
             <SidebarMenu class="p-4">
               {/* Search button in mobile drawer */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider has-[>svg]:px-4"
-                >
-                  <Icon name="search" class="h-5 w-5" />
-                  Search
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {searchEnabled && (
+                <SidebarMenuItem>
+                  <button
+                    type="button"
+                    class="h-10 w-full rounded-md px-4 text-lg font-bold uppercase tracking-wider flex items-center gap-3 bg-transparent text-foreground hover:text-primary cursor-pointer"
+                    data-search-trigger
+                    data-gtm-category="site-search"
+                    data-gtm-action="trigger-click"
+                    data-gtm-label="nav-mobile"
+                  >
+                    <Icon name="search" class="h-5 w-5" />
+                    Search
+                  </button>
+                </SidebarMenuItem>
+              )}
               <li role="separator"><Separator class="my-2" /></li>
               {/* Nav links — nested items use collapsible */}
               {(navigationItems || []).map((item) => {
@@ -263,4 +278,7 @@ const isActive = (href: string) =>
       Contact
     </a>
   </nav>
+
+  {/* Mount search modal — accessible globally via delegated click handler */}
+  {searchEnabled && <SearchModal apiUrl={aiSearch.apiUrl} placeholder={aiSearch.placeholder} theme={aiSearch.theme} />}
 </HeaderUI>
