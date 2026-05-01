@@ -3,8 +3,10 @@ import { getDb } from '@/lib/db';
 
 export const prerender = false;
 
-// TODO: Gate behind admin check once Story 9.15 lands — sponsors should not
-// see internal table names in production.
+// Portal middleware already gates this on session + role, but any portal user
+// (sponsor or above) can hit it — so the response is intentionally minimal.
+// Returns { ok, tableCount } to confirm the D1 binding is wired without
+// disclosing schema. For full schema introspection use `wrangler d1 execute`.
 export const GET: APIRoute = async () => {
   const headers = {
     'Content-Type': 'application/json',
@@ -15,14 +17,15 @@ export const GET: APIRoute = async () => {
     const db = getDb();
     const { results } = await db
       .prepare(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' ORDER BY name",
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%'",
       )
       .all();
-    return new Response(JSON.stringify({ ok: true, tables: results }), {
+    return new Response(JSON.stringify({ ok: true, tableCount: results.length }), {
       headers,
     });
   } catch (e) {
-    return new Response(JSON.stringify({ ok: false, error: String(e) }), {
+    console.error('[db-health] D1 error:', e);
+    return new Response(JSON.stringify({ ok: false }), {
       status: 500,
       headers,
     });

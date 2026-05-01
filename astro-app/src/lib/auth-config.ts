@@ -8,6 +8,8 @@ import { betterAuth } from 'better-auth';
 import { magicLink } from 'better-auth/plugins/magic-link';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Resend } from 'resend';
+import { defineQuery } from 'groq';
+import { sanityClient } from 'sanity:client';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import type * as schema from './drizzle-schema';
 
@@ -26,12 +28,9 @@ export interface AuthEnv {
   RESEND_FROM_EMAIL?: string;
 }
 
-/**
- * GROQ query for sponsor email whitelist.
- * Not wrapped in defineQuery() because it runs via direct HTTP fetch to the Sanity API
- * (outside of Astro's sanity:client / typegen pipeline).
- */
-const SPONSOR_WHITELIST_QUERY = `count(*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails[])]) > 0`;
+const SPONSOR_WHITELIST_QUERY = defineQuery(
+  `count(*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails[])]) > 0`,
+);
 
 interface CreateAuthOptions {
   db: DrizzleD1Database<typeof schema>;
@@ -49,17 +48,8 @@ interface CreateAuthOptions {
  */
 export async function checkSponsorWhitelist(email: string): Promise<boolean> {
   try {
-    const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
-    const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET;
-    const url = `https://${projectId}.api.sanity.io/v2024-01-01/data/query/${dataset}?query=${encodeURIComponent(SPONSOR_WHITELIST_QUERY)}&$email="${encodeURIComponent(email)}"`;
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error(`[auth] Sanity whitelist query failed: ${response.status}`);
-      return false;
-    }
-    const data = await response.json();
-    return data.result === true;
+    const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email });
+    return result === true;
   } catch (err) {
     console.error('[auth] Sanity whitelist check error:', err);
     return false;
