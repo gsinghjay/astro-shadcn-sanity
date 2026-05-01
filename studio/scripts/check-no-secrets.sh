@@ -21,14 +21,29 @@ if [[ ! -d "$DIST_DIR" ]]; then
   exit 1
 fi
 
+# Reject empty/incomplete builds: a `sanity build` that crashes after creating
+# `dist/` but before emitting any JS chunks would otherwise pass scrub silently.
+script_count=$(find "$DIST_DIR" \
+    \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \
+       -o -name '*.html' -o -name '*.json' \) \
+    -not -name '*.map' \
+    -type f 2>/dev/null | wc -l)
+if [[ "$script_count" -eq 0 ]]; then
+  echo "[check-no-secrets] no script artifacts found in $DIST_DIR — refusing to vouch for an empty build." >&2
+  exit 1
+fi
+
 # Patterns that must not appear in any shipped JS chunk.
-# - sat_<32+ alphanum>: Sanity API token literal (the actual secret).
+# - sat_<32+ url-safe-base64>: Sanity API token literal. The documented
+#   generation recipe (`openssl rand -base64 32 | tr '/+' '_-' | tr -d '='`)
+#   produces tokens whose body is `[A-Za-z0-9_-]+`, so the alphabet must
+#   include `_` and `-` or ~64 % of real tokens slip through.
 # - SANITY_STUDIO_ADMIN_TOKEN: the retired env-var name; if it reappears in
 #   the bundle, someone re-introduced the foot-gun.
 # - STUDIO_ADMIN_TOKEN (without the SANITY_STUDIO_ prefix): the matching
 #   server-side var name; should never be referenced from Studio code.
 FORBIDDEN_PATTERNS=(
-  'sat_[a-zA-Z0-9]{32,}'
+  'sat_[A-Za-z0-9_-]{32,}'
   'SANITY_STUDIO_ADMIN_TOKEN'
   'STUDIO_ADMIN_TOKEN'
 )

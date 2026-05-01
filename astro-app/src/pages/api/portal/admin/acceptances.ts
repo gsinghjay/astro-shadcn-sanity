@@ -138,8 +138,10 @@ function json(body: Record<string, unknown>, status: number, extraHeaders: Recor
 
 export const OPTIONS: APIRoute = ({ request }) => {
   const env = (workerEnv ?? {}) as AdminEnv;
-  // Fail-closed when env is missing so misconfiguration is observable rather than masked as CORS.
-  if (!env.STUDIO_ORIGIN) {
+  // Fail-closed when any env required by the GET handler is missing. Mirroring
+  // the GET check here avoids a window where a cacheable 204 preflight masks a
+  // misconfiguration that 503s every real request.
+  if (!env.STUDIO_ORIGIN || !env.PORTAL_DB || !PUBLIC_SANITY_STUDIO_PROJECT_ID) {
     return new Response(null, { status: 503 });
   }
   const origin = request.headers.get('origin');

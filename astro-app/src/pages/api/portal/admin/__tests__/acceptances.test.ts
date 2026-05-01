@@ -398,6 +398,67 @@ describe('GET /api/portal/admin/acceptances', () => {
     vi.doUnmock('@/lib/sanity');
     vi.resetModules();
   });
+
+  it('returns 401 when introspection times out (AbortSignal abort)', async () => {
+    fetchMock.mockImplementation((_url: string, init?: RequestInit) => {
+      // Resolve only when the wired AbortSignal fires; otherwise hang. This
+      // emulates a Sanity hang past INTROSPECTION_TIMEOUT_MS without coupling
+      // the test to the real 5 s timeout.
+      return new Promise((_resolve, reject) => {
+        const signal = init?.signal;
+        if (signal?.aborted) {
+          reject(new DOMException('aborted', 'AbortError'));
+          return;
+        }
+        signal?.addEventListener('abort', () => {
+          reject(new DOMException('aborted', 'AbortError'));
+        });
+      });
+    });
+    const ctx = buildCtx({ authToken: 'sjwt-slow' });
+    // Force the abort synchronously by stubbing AbortSignal.timeout to return
+    // an already-aborted signal. The original is restored after the test.
+    const originalTimeout = AbortSignal.timeout;
+    AbortSignal.timeout = ((_ms: number) => {
+      const ctrl = new AbortController();
+      ctrl.abort();
+      return ctrl.signal;
+    }) as typeof AbortSignal.timeout;
+    try {
+      const res = await GET(ctx as never);
+      expect(res.status).toBe(401);
+      expect(await res.json()).toEqual({ error: 'unauthorized' });
+      // The route did wire signal: AbortSignal.timeout(...) into the fetch init.
+      const init = fetchCalls[0]?.init as RequestInit | undefined;
+      expect(init?.signal).toBeDefined();
+    } finally {
+      AbortSignal.timeout = originalTimeout;
+    }
+  });
+
+  it('returns 401 with no introspection call when bearer exceeds MAX_BEARER_LENGTH', async () => {
+    mockSanityUser(ADMIN_USER); // would 200 if the cap weren't hit
+    const oversized = 'a'.repeat(4097);
+    const ctx = buildCtx({ authToken: oversized });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(401);
+    expect(await res.json()).toEqual({ error: 'unauthorized' });
+    expect(fetchCalls.length).toBe(0);
+  });
+
+  it('returns 401 when Sanity returns a malformed roles shape (non-array)', async () => {
+    fetchMock.mockImplementation(
+      async () =>
+        new Response(
+          JSON.stringify({ id: 'pZx', email: 'a@b', name: 'A', roles: 'administrator' }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        ),
+    );
+    const ctx = buildCtx({ authToken: 'sjwt-malformed-roles' });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(401);
+    expect(await res.json()).toEqual({ error: 'unauthorized' });
+  });
 });
 
 describe('OPTIONS /api/portal/admin/acceptances', () => {
@@ -421,6 +482,15 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     const ctx = buildCtx({
       method: 'OPTIONS',
       env: buildEnv({ STUDIO_ORIGIN: undefined }),
+    });
+    const res = await OPTIONS(ctx as never);
+    expect(res.status).toBe(503);
+  });
+
+  it('returns 503 (fail closed) when PORTAL_DB binding is missing', async () => {
+    const ctx = buildCtx({
+      method: 'OPTIONS',
+      env: buildEnv({ PORTAL_DB: undefined }),
     });
     const res = await OPTIONS(ctx as never);
     expect(res.status).toBe(503);
