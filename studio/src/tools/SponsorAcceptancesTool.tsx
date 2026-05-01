@@ -106,6 +106,19 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         setData(null)
         return
       }
+      // Apex `ywcccapstone1.com` 301-redirects to `www.` before the Worker runs;
+      // CORS preflights cannot follow redirects, so apex URLs hard-fail with
+      // ERR_FAILED on any request that triggers a preflight (i.e. every request
+      // we make, since we send an Authorization header). Force the canonical host.
+      if (/^https:\/\/ywcccapstone1\.com\b/i.test(apiUrl)) {
+        setError(
+          'SANITY_STUDIO_ACCEPTANCES_API_URL points at apex (ywcccapstone1.com). ' +
+            'Apex 301-redirects break CORS preflights. Use https://www.ywcccapstone1.com/...',
+        )
+        setLoading(false)
+        setData(null)
+        return
+      }
       if (!currentUser) {
         setError('Not signed in to Studio.')
         setLoading(false)
