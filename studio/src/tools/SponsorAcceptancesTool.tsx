@@ -14,7 +14,7 @@ import {
 } from '@sanity/ui'
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {defineQuery} from 'groq'
-import {useClient} from 'sanity'
+import {useClient, useCurrentUser} from 'sanity'
 import {IntentLink} from 'sanity/router'
 
 const SPONSORS_BY_EMAIL_QUERY = defineQuery(
@@ -40,14 +40,12 @@ interface SponsorDoc {
 
 interface ToolConfig {
   apiUrl?: string
-  token?: string
 }
 
 function readConfig(): ToolConfig {
   const e = (import.meta as unknown as {env?: Record<string, string | undefined>}).env ?? {}
   return {
     apiUrl: e.SANITY_STUDIO_ACCEPTANCES_API_URL,
-    token: e.SANITY_STUDIO_ADMIN_TOKEN,
   }
 }
 
@@ -76,8 +74,9 @@ function formatVersion(value: string | null): string {
 }
 
 export function SponsorAcceptancesView(props: ToolConfig = {}) {
-  const {apiUrl, token} = props
+  const {apiUrl} = props
   const client = useClient({apiVersion: '2024-10-01'})
+  const currentUser = useCurrentUser()
 
   const [filter, setFilter] = useState<FilterMode>('all')
   const [search, setSearch] = useState('')
@@ -99,9 +98,27 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
 
   const load = useCallback(
     async (controller?: AbortController) => {
-      if (!apiUrl || !token) {
+      if (!apiUrl) {
         setError(
-          'Acceptances API not configured. Set SANITY_STUDIO_ACCEPTANCES_API_URL and SANITY_STUDIO_ADMIN_TOKEN.',
+          'Acceptances API not configured. Set SANITY_STUDIO_ACCEPTANCES_API_URL.',
+        )
+        setLoading(false)
+        setData(null)
+        return
+      }
+      if (!currentUser) {
+        setError('Not signed in to Studio.')
+        setLoading(false)
+        setData(null)
+        return
+      }
+      // Use the current Studio user's session JWT — same bearer the Sanity
+      // client uses for every API call. The server validates it via Sanity's
+      // /v1/users/me introspection and checks the `administrator` role.
+      const sessionToken = client.config().token
+      if (!sessionToken) {
+        setError(
+          'Studio session has no auth token — please sign out and sign back in.',
         )
         setLoading(false)
         setData(null)
@@ -113,7 +130,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
       setError(null)
       try {
         const res = await fetch(`${apiUrl}?accepted=${filter}`, {
-          headers: {authorization: `Bearer ${token}`},
+          headers: {authorization: `Bearer ${sessionToken}`},
           signal: controller?.signal,
         })
         if (isStale()) return
@@ -142,7 +159,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         if (!isStale()) setLoading(false)
       }
     },
-    [apiUrl, token, filter, client],
+    [apiUrl, filter, client, currentUser],
   )
 
   useEffect(() => {
