@@ -6,6 +6,7 @@
  */
 import { betterAuth } from 'better-auth';
 import { magicLink } from 'better-auth/plugins/magic-link';
+import { emailOTP } from 'better-auth/plugins/email-otp';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Resend } from 'resend';
 import { defineQuery } from 'groq';
@@ -132,6 +133,21 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
             to: email,
             subject: 'Sign in to the Sponsor Portal',
             html: `<p>Click the link below to sign in to the Sponsor Portal:</p><p><a href="${safeUrl}">Sign in to Sponsor Portal</a></p><p>This link expires in 10 minutes.</p>`,
+          });
+        },
+      }),
+      // OTP fallback for inboxes whose link scanners (Microsoft Defender Safe Links,
+      // Proofpoint, Mimecast) pre-fetch URLs and consume single-use magic-link tokens
+      // before the human can click. A copy-paste 6-digit code survives scanning.
+      emailOTP({
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          if (type !== 'sign-in') return;
+          const fromAddress = env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          await resendClient.emails.send({
+            from: fromAddress,
+            to: email,
+            subject: 'Your Sponsor Portal sign-in code',
+            html: `<p>Your sign-in code:</p><p style="font-size:24px;letter-spacing:4px;font-weight:bold;">${otp}</p><p>This code expires in 5 minutes.</p>`,
           });
         },
       }),

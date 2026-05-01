@@ -1,14 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sanityClient } from 'sanity:client';
 
-const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink } = vi.hoisted(() => {
+const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend } = vi.hoisted(() => {
   const mockBetterAuth = vi.fn().mockReturnValue({
     handler: vi.fn(),
     api: { getSession: vi.fn() },
   });
   const mockDrizzleAdapter = vi.fn().mockReturnValue({ __adapter: true });
   const mockMagicLink = vi.fn().mockReturnValue({ id: 'magic-link' });
-  return { mockBetterAuth, mockDrizzleAdapter, mockMagicLink };
+  const mockEmailOTP = vi.fn().mockReturnValue({ id: 'email-otp' });
+  const mockResendSend = vi.fn().mockResolvedValue({ id: 'mock-email-id' });
+  return { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend };
 });
 
 vi.mock('better-auth', () => ({
@@ -23,9 +25,13 @@ vi.mock('better-auth/plugins/magic-link', () => ({
   magicLink: mockMagicLink,
 }));
 
+vi.mock('better-auth/plugins/email-otp', () => ({
+  emailOTP: mockEmailOTP,
+}));
+
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({
-    emails: { send: vi.fn().mockResolvedValue({ id: 'mock-email-id' }) },
+    emails: { send: mockResendSend },
   })),
 }));
 
@@ -89,6 +95,32 @@ describe('createAuth() — unified auth factory', () => {
     expect(mockMagicLink).toHaveBeenCalled();
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.plugins).toContainEqual({ id: 'magic-link' });
+  });
+
+  it('registers Email OTP plugin', () => {
+    createAuth({ db: mockDb, env: mockEnv });
+    expect(mockEmailOTP).toHaveBeenCalled();
+    const config = mockBetterAuth.mock.calls[0][0];
+    expect(config.plugins).toContainEqual({ id: 'email-otp' });
+  });
+
+  it('Email OTP sendVerificationOTP sends sign-in code via Resend', async () => {
+    createAuth({ db: mockDb, env: { ...mockEnv, RESEND_FROM_EMAIL: 'YWCC <noreply@example.com>' } });
+    const otpOpts = mockEmailOTP.mock.calls[0][0];
+    await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'sign-in' });
+    expect(mockResendSend).toHaveBeenCalledWith(expect.objectContaining({
+      from: 'YWCC <noreply@example.com>',
+      to: 'user@example.com',
+      subject: expect.stringContaining('sign-in code'),
+      html: expect.stringContaining('123456'),
+    }));
+  });
+
+  it('Email OTP sendVerificationOTP skips non-sign-in types', async () => {
+    createAuth({ db: mockDb, env: mockEnv });
+    const otpOpts = mockEmailOTP.mock.calls[0][0];
+    await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'email-verification' });
+    expect(mockResendSend).not.toHaveBeenCalled();
   });
 
   it('configures user.additionalFields.role', () => {
