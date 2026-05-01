@@ -62,7 +62,7 @@ npx wrangler kv key put "${ARGS[@]}" \
 
 echo "Setting discord-webhook:form-submissions"
 npx wrangler kv key put "${ARGS[@]}" \
-    "discord-webhook:form-submissions" '"https://discord.com/api/webhooks/1498016849554837637/5sdq9SvxbRZOTTSwcAjpWXN9R4X7wPpFl4TNW3-QDucPiOc38WJenh0IpgAgVVHoegdd?wait=true"'
+    "discord-webhook:form-submissions" '""'
 
 echo ""
 echo ">>> KV seeding complete!"
