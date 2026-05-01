@@ -65,9 +65,10 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  // Admin endpoints under /api/portal/admin/* authenticate via STUDIO_ADMIN_TOKEN
-  // (cross-origin Studio caller, no session cookie). Skip the session gate so the
-  // route handler can run its own bearer/origin checks and emit CORS headers.
+  // Admin endpoints under /api/portal/admin/* authenticate via the Studio user's
+  // Sanity session JWT (cross-origin Studio caller, no portal session cookie).
+  // Skip the portal session gate so the route handler can run its own
+  // identity introspection + origin check + CORS emission.
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";

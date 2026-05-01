@@ -46,7 +46,6 @@ declare namespace Cloudflare {
     RESEND_API_KEY: string;
     RESEND_FROM_EMAIL?: string;
     DISCORD_WEBHOOK_URL?: string;
-    STUDIO_ADMIN_TOKEN?: string;
     GITHUB_DEV_TOKEN?: string;
     RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
   }

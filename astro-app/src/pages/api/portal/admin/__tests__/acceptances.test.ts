@@ -1,31 +1,77 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
-const TOKEN = 'sat_test_token_value';
+const PROJECT_ID = '49nk9b0w';
 const ORIGIN = 'https://capstone.sanity.studio';
 
 // Adapter v13: acceptances.ts reads bindings via `cloudflare:workers`, not
 // `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
 // them in before the route module loads. `mockEnv` is the live env object —
 // tests mutate it (or buildEnv overrides) by calling `setEnv` between cases.
-const { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev } = vi.hoisted(() => {
+const {
+  mockD1All,
+  mockD1Bind,
+  mockD1Prepare,
+  mockEnv,
+  defaultEnv,
+  mockGetRev,
+  fetchMock,
+  fetchCalls,
+} = vi.hoisted(() => {
   const mockD1All = vi.fn();
-  // Two-call shape supported: `prepare(sql).all(...)` (no bind) and `prepare(sql).bind(arg).all(...)`.
   const mockD1Bind = vi.fn().mockImplementation(() => ({ all: mockD1All }));
   const mockD1Prepare = vi.fn().mockReturnValue({ bind: mockD1Bind, all: mockD1All });
   const defaultEnv: Record<string, unknown> = {
     PORTAL_DB: { prepare: mockD1Prepare },
-    STUDIO_ADMIN_TOKEN: 'sat_test_token_value',
     STUDIO_ORIGIN: 'https://capstone.sanity.studio',
   };
   const mockEnv: Record<string, unknown> = { ...defaultEnv };
   const mockGetRev = vi.fn();
-  return { mockD1All, mockD1Bind, mockD1Prepare, mockEnv, defaultEnv, mockGetRev };
+  const fetchCalls: { url: string; init?: RequestInit }[] = [];
+  // `fetchMock` is configured per test via `fetchMock.mockImplementation(...)`.
+  const fetchMock = vi.fn();
+  return {
+    mockD1All,
+    mockD1Bind,
+    mockD1Prepare,
+    mockEnv,
+    defaultEnv,
+    mockGetRev,
+    fetchMock,
+    fetchCalls,
+  };
 });
 
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+vi.mock('astro:env/server', () => ({
+  PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+}));
 
-const { GET, OPTIONS, ALL } = await import('../acceptances');
+// Stub global fetch for the Sanity user-introspection call. The route uses the
+// global `fetch` directly — we replace it on the global rather than via vi.spyOn
+// so the module-level cache lookup sees the same stub each test.
+const originalFetch = globalThis.fetch;
+
+const { GET, OPTIONS, ALL, _resetIntrospectionCacheForTests } = await import('../acceptances');
+
+// Top-level beforeEach: reset the introspection cache + fetch stub between
+// every test, regardless of which describe block. The module-level cache is
+// shared across describe blocks, so resetting only inside a single describe
+// would leak state into any future block.
+beforeEach(() => {
+  _resetIntrospectionCacheForTests();
+  fetchCalls.length = 0;
+  fetchMock.mockReset();
+  globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input.toString();
+    fetchCalls.push({ url, init });
+    return fetchMock(url, init);
+  }) as typeof fetch;
+});
+
+afterAll(() => {
+  globalThis.fetch = originalFetch;
+});
 
 /** Replace the live cloudflare:workers env object's keys with new values for one test. */
 function setEnv(next: Record<string, unknown>): void {
@@ -36,7 +82,6 @@ function setEnv(next: Record<string, unknown>): void {
 function buildEnv(overrides: Record<string, unknown> = {}) {
   return {
     PORTAL_DB: { prepare: mockD1Prepare },
-    STUDIO_ADMIN_TOKEN: TOKEN,
     STUDIO_ORIGIN: ORIGIN,
     ...overrides,
   };
@@ -51,17 +96,15 @@ function buildCtx(opts: {
 } = {}) {
   const headers: Record<string, string> = {};
   if (opts.origin !== null) headers.origin = opts.origin ?? ORIGIN;
-  if (opts.authToken !== null && opts.authToken !== undefined) {
+  if (opts.authToken === undefined) {
+    // Default: a non-null bearer (introspection result driven per-test).
+    headers.authorization = 'Bearer studio-session-jwt-default';
+  } else if (opts.authToken !== null) {
     headers.authorization = `Bearer ${opts.authToken}`;
-  } else if (opts.authToken === undefined) {
-    headers.authorization = `Bearer ${TOKEN}`;
   }
   // explicit null = omit header
   const search = opts.search ?? '';
   const url = new URL(`https://app.example.com/api/portal/admin/acceptances${search}`);
-  // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
-  // `opts.env === null` simulates "no bindings present" by emptying mockEnv.
-  // `opts.env` overrides replace the live env for this call.
   if (opts.env === null) {
     setEnv({});
   } else if (opts.env !== undefined) {
@@ -80,6 +123,36 @@ function buildCtx(opts: {
 }
 
 const CURRENT_REV = 'rev-current-xyz';
+
+const ADMIN_USER = {
+  id: 'pZx',
+  email: 'admin@example.com',
+  name: 'Admin User',
+  roles: [{ name: 'administrator', title: 'Administrator' }],
+};
+
+const NON_ADMIN_USER = {
+  id: 'pZy',
+  email: 'editor@example.com',
+  name: 'Editor User',
+  roles: [{ name: 'editor', title: 'Editor' }],
+};
+
+function mockSanityUser(user: unknown): void {
+  // Build a fresh Response per call — the route reads the body once, but tests
+  // that fire multiple un-cached requests in sequence would otherwise reuse a
+  // single (already-consumed) Response.
+  fetchMock.mockImplementation(async () =>
+    new Response(JSON.stringify(user), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    }),
+  );
+}
+
+function mockSanity401(): void {
+  fetchMock.mockImplementation(async () => new Response('unauthorized', { status: 401 }));
+}
 
 describe('GET /api/portal/admin/acceptances', () => {
   beforeEach(() => {
@@ -116,21 +189,38 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('returns 401 when bearer token does not match', async () => {
-    const ctx = buildCtx({ authToken: 'sat_wrong_token_value_x' });
+  it('returns 401 when Sanity introspection rejects the bearer', async () => {
+    mockSanity401();
+    const ctx = buildCtx({ authToken: 'sjwt_revoked' });
     const res = await GET(ctx as never);
     expect(res.status).toBe(401);
+    expect(await res.json()).toEqual({ error: 'unauthorized' });
+    // Error responses must echo CORS so Studio can read the body cross-origin.
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('returns 403 when origin does not match STUDIO_ORIGIN', async () => {
+  it('returns 403 when the introspected user lacks administrator role', async () => {
+    mockSanityUser(NON_ADMIN_USER);
+    const ctx = buildCtx({ authToken: 'sjwt_editor' });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'forbidden' });
+    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('returns 403 when origin does not match STUDIO_ORIGIN (rejected before introspection)', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({ origin: 'https://evil.example' });
     const res = await GET(ctx as never);
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: 'forbidden_origin' });
+    // Origin check fires before the bearer is forwarded to Sanity, so no introspection call.
+    expect(fetchCalls.length).toBe(0);
   });
 
-  it('returns 200 with acceptances array on valid token + origin (includes agreementVersion + versionMatch)', async () => {
-    const ctx = buildCtx({});
+  it('returns 200 with acceptances when admin user + matching origin', async () => {
+    mockSanityUser(ADMIN_USER);
+    const ctx = buildCtx({ authToken: 'sjwt_admin' });
     const res = await GET(ctx as never);
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -157,7 +247,34 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('versionMatch=false when row has stale rev; null when grandfathered (no rev)', async () => {
+  it('forwards the bearer to Sanity introspection at the projectId-scoped endpoint', async () => {
+    mockSanityUser(ADMIN_USER);
+    const ctx = buildCtx({ authToken: 'sjwt_admin_call_a' });
+    await GET(ctx as never);
+    expect(fetchCalls.length).toBe(1);
+    expect(fetchCalls[0].url).toBe(`https://${PROJECT_ID}.api.sanity.io/v1/users/me`);
+    const headers = fetchCalls[0].init?.headers as Record<string, string>;
+    expect(headers.authorization).toBe('Bearer sjwt_admin_call_a');
+  });
+
+  it('caches introspection: same bearer in the same isolate hits Sanity once', async () => {
+    mockSanityUser(ADMIN_USER);
+    const token = 'sjwt_cached_admin';
+    await GET(buildCtx({ authToken: token }) as never);
+    await GET(buildCtx({ authToken: token }) as never);
+    await GET(buildCtx({ authToken: token }) as never);
+    expect(fetchCalls.length).toBe(1);
+  });
+
+  it('cache miss for a different bearer triggers a fresh introspection', async () => {
+    mockSanityUser(ADMIN_USER);
+    await GET(buildCtx({ authToken: 'sjwt_first' }) as never);
+    await GET(buildCtx({ authToken: 'sjwt_second' }) as never);
+    expect(fetchCalls.length).toBe(2);
+  });
+
+  it('versionMatch=false on stale rev; null when grandfathered (no rev)', async () => {
+    mockSanityUser(ADMIN_USER);
     mockD1All.mockResolvedValue({
       results: [
         { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreement_accepted_at: 1, agreement_version: 'rev-old' },
@@ -174,13 +291,15 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('SELECT projection includes agreement_version', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({});
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
     expect(sql).toContain('agreement_version');
   });
 
-  it('?versionDrift=true narrows query to non-null acceptance with mismatched/null version, binds currentRev', async () => {
+  it('?versionDrift=true narrows query and binds currentRev', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({ search: '?versionDrift=true' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -189,7 +308,8 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(mockD1Bind).toHaveBeenCalledWith(CURRENT_REV);
   });
 
-  it('?versionDrift=true with Sanity rev unavailable falls back to no drift filter (no empty-result trap)', async () => {
+  it('?versionDrift=true with Sanity rev unavailable falls back to no drift filter', async () => {
+    mockSanityUser(ADMIN_USER);
     mockGetRev.mockResolvedValue(null);
     const ctx = buildCtx({ search: '?versionDrift=true' });
     await GET(ctx as never);
@@ -198,7 +318,8 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(mockD1Bind).not.toHaveBeenCalled();
   });
 
-  it('versionMatch is null on every row when Sanity rev fetch fails (drift state unknown)', async () => {
+  it('versionMatch is null on every row when Sanity rev fetch fails', async () => {
+    mockSanityUser(ADMIN_USER);
     mockGetRev.mockResolvedValue(null);
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
@@ -208,6 +329,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?accepted=true narrows query to non-null acceptance timestamps', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({ search: '?accepted=true' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -217,6 +339,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?accepted=false narrows query to null acceptance timestamps', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({ search: '?accepted=false' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -225,12 +348,14 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('emits Cache-Control: private, max-age=0, must-revalidate', async () => {
+    mockSanityUser(ADMIN_USER);
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
     expect(res.headers.get('cache-control')).toBe('private, max-age=0, must-revalidate');
   });
 
   it('returns 503 with no detail leakage when D1 throws', async () => {
+    mockSanityUser(ADMIN_USER);
     mockD1All.mockRejectedValue(new Error('table user does not exist'));
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
@@ -238,16 +363,40 @@ describe('GET /api/portal/admin/acceptances', () => {
     const body = await res.json();
     expect(body).toEqual({ error: 'service_unavailable' });
     expect(JSON.stringify(body)).not.toContain('table user');
-    // 503 from D1 catch must still echo CORS (origin matched at top of handler).
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('returns 503 when STUDIO_ADMIN_TOKEN env is missing (fail closed)', async () => {
-    const ctx = buildCtx({ env: buildEnv({ STUDIO_ADMIN_TOKEN: undefined }) });
+  it('returns 503 when STUDIO_ORIGIN env is missing (fail closed)', async () => {
+    const ctx = buildCtx({ env: buildEnv({ STUDIO_ORIGIN: undefined }) });
     const res = await GET(ctx as never);
     expect(res.status).toBe(503);
-    // Even when env is missing, if origin matches we still echo CORS so Studio sees the body.
-    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+  });
+
+  it('returns 503 when PORTAL_DB binding is missing (fail closed)', async () => {
+    const ctx = buildCtx({ env: buildEnv({ PORTAL_DB: undefined }) });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(503);
+  });
+
+  it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is empty (fail closed)', async () => {
+    // Re-import the route with a different astro:env/server mock so the
+    // module-level named import binds to the empty value. resetModules +
+    // doMock is the documented vitest pattern for swapping a static import
+    // mid-suite. The fresh module also gets a fresh introspection cache, so
+    // no afterAll cleanup is needed beyond the unmock.
+    vi.resetModules();
+    vi.doMock('astro:env/server', () => ({ PUBLIC_SANITY_STUDIO_PROJECT_ID: '' }));
+    vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
+    vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+    const route = await import('../acceptances');
+    const ctx = buildCtx({});
+    const res = await route.GET(ctx as never);
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/server');
+    vi.doUnmock('cloudflare:workers');
+    vi.doUnmock('@/lib/sanity');
+    vi.resetModules();
   });
 });
 

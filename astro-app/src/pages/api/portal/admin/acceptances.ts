@@ -1,11 +1,19 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
+import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/server';
 import { getSponsorAgreementRev } from '@/lib/sanity';
 
 export const prerender = false;
 
 const ALLOW_HEADERS = 'authorization, content-type';
 const ALLOW_METHODS = 'GET, OPTIONS';
+const ADMIN_ROLE_NAME = 'administrator';
+const INTROSPECTION_TTL_MS = 60_000;
+const INTROSPECTION_CACHE_MAX = 100;
+const INTROSPECTION_TIMEOUT_MS = 5_000;
+// Sanity session JWTs are well under 1KB; cap inbound bearer length so a
+// malicious caller can't force unbounded SHA-256 work via a multi-MB header.
+const MAX_BEARER_LENGTH = 4096;
 
 interface AcceptanceRow {
   email: string;
@@ -17,8 +25,98 @@ interface AcceptanceRow {
 
 interface AdminEnv {
   PORTAL_DB?: D1Database;
-  STUDIO_ADMIN_TOKEN?: string;
   STUDIO_ORIGIN?: string;
+}
+
+interface SanityUserRole {
+  name: string;
+  title?: string;
+}
+
+interface SanityUser {
+  id: string;
+  email?: string;
+  name?: string;
+  roles?: SanityUserRole[];
+}
+
+interface CacheEntry {
+  user: SanityUser;
+  expiresAt: number;
+}
+
+// Per-isolate LRU cache of introspection results. The raw bearer is never
+// stored in the cache; only its SHA-256 digest is keyed. 60s TTL is short
+// enough to track Sanity role/account revocation without hammering Sanity on
+// every Studio poll. Bounded at 100 entries — admins per isolate will be in
+// the single digits.
+const introspectionCache = new Map<string, CacheEntry>();
+
+/** Test-only hook so each unit test starts with an empty cache. */
+export function _resetIntrospectionCacheForTests(): void {
+  introspectionCache.clear();
+}
+
+async function hashToken(token: string): Promise<string> {
+  const buf = new TextEncoder().encode(token);
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  const bytes = new Uint8Array(digest);
+  let hex = '';
+  for (const b of bytes) hex += b.toString(16).padStart(2, '0');
+  return hex;
+}
+
+function readCache(key: string): SanityUser | null {
+  const entry = introspectionCache.get(key);
+  if (!entry) return null;
+  if (entry.expiresAt <= Date.now()) {
+    introspectionCache.delete(key);
+    return null;
+  }
+  // Refresh LRU position so the most-recent hit is evicted last.
+  introspectionCache.delete(key);
+  introspectionCache.set(key, entry);
+  return entry.user;
+}
+
+function writeCache(key: string, user: SanityUser): void {
+  if (introspectionCache.size >= INTROSPECTION_CACHE_MAX) {
+    const oldest = introspectionCache.keys().next().value;
+    if (oldest !== undefined) introspectionCache.delete(oldest);
+  }
+  introspectionCache.set(key, { user, expiresAt: Date.now() + INTROSPECTION_TTL_MS });
+}
+
+/**
+ * Resolve the Sanity user who owns the given session bearer. Uses Sanity's
+ * project-scoped `/v1/users/me` endpoint — which authenticates the bearer and
+ * returns the user profile + roles. Returns null on any failure (network,
+ * non-2xx, malformed body) so the caller can map it to a single 401.
+ */
+async function getStudioUser(token: string, projectId: string): Promise<SanityUser | null> {
+  try {
+    const res = await fetch(`https://${projectId}.api.sanity.io/v1/users/me`, {
+      headers: { authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(INTROSPECTION_TIMEOUT_MS),
+    });
+    if (!res.ok) return null;
+    const body = (await res.json()) as SanityUser;
+    if (!body || typeof body !== 'object' || typeof body.id !== 'string') return null;
+    // Reject any response shape where `roles` is present but not an array — a
+    // malformed Sanity payload (e.g. `roles: "administrator"` string, or an
+    // object) would otherwise silently fail isAdmin() and 403 a legit admin.
+    // `undefined` is allowed (guest user / partial body) and falls through to
+    // a clean 403 via isAdmin() returning false.
+    if (body.roles !== undefined && !Array.isArray(body.roles)) return null;
+    return body;
+  } catch (err) {
+    console.error('[admin/acceptances] sanity introspection failed:', err);
+    return null;
+  }
+}
+
+function isAdmin(user: SanityUser): boolean {
+  return Array.isArray(user.roles) && user.roles.some((r) => r?.name === ADMIN_ROLE_NAME);
 }
 
 function corsHeaders(origin: string): Record<string, string> {
@@ -29,13 +127,6 @@ function corsHeaders(origin: string): Record<string, string> {
     'Access-Control-Max-Age': '600',
     Vary: 'Origin',
   };
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
 }
 
 function json(body: Record<string, unknown>, status: number, extraHeaders: Record<string, string> = {}) {
@@ -66,7 +157,7 @@ export const GET: APIRoute = async ({ request, url }) => {
   const errorCors =
     env.STUDIO_ORIGIN && origin === env.STUDIO_ORIGIN ? corsHeaders(env.STUDIO_ORIGIN) : {};
 
-  if (!env.STUDIO_ADMIN_TOKEN || !env.STUDIO_ORIGIN || !env.PORTAL_DB) {
+  if (!env.STUDIO_ORIGIN || !env.PORTAL_DB || !PUBLIC_SANITY_STUDIO_PROJECT_ID) {
     return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 
@@ -75,9 +166,22 @@ export const GET: APIRoute = async ({ request, url }) => {
   }
 
   const auth = request.headers.get('authorization') ?? '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
-  if (!token || !constantTimeEqual(token, env.STUDIO_ADMIN_TOKEN)) {
+  const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+  if (!token || token.length > MAX_BEARER_LENGTH) {
     return json({ error: 'unauthorized' }, 401, errorCors);
+  }
+
+  // Introspect the Studio session bearer. Cache lookups key on SHA-256(token)
+  // — the raw bearer is never persisted past the hash call.
+  const cacheKey = await hashToken(token);
+  let user = readCache(cacheKey);
+  if (!user) {
+    user = await getStudioUser(token, PUBLIC_SANITY_STUDIO_PROJECT_ID);
+    if (!user) return json({ error: 'unauthorized' }, 401, errorCors);
+    writeCache(cacheKey, user);
+  }
+  if (!isAdmin(user)) {
+    return json({ error: 'forbidden' }, 403, errorCors);
   }
 
   const filter = url.searchParams.get('accepted'); // true | false | all | null
