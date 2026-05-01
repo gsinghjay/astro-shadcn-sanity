@@ -46,7 +46,7 @@ npx wrangler kv key put "${ARGS[@]}" \
 # NOTE ~~ add "wait=true" as a query param to your webhooks to make discord return a response body, otherwise the endpoint will crash and return a 500 Internal Service Error
 echo "Setting webhooks:general..."
 npx wrangler kv key put "${ARGS[@]}" \
-    "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL?wait=true"'
+    "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
 echo "Setting discord-webhook:announcements"
 npx wrangler kv key put "${ARGS[@]}" \
