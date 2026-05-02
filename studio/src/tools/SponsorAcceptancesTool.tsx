@@ -14,7 +14,7 @@ import {
 } from '@sanity/ui'
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {defineQuery} from 'groq'
-import {useClient, useCurrentUser} from 'sanity'
+import {useClient} from 'sanity'
 import {IntentLink} from 'sanity/router'
 
 const SPONSORS_BY_EMAIL_QUERY = defineQuery(
@@ -40,12 +40,34 @@ interface SponsorDoc {
 
 interface ToolConfig {
   apiUrl?: string
+  projectId?: string
 }
 
 function readConfig(): ToolConfig {
   const e = (import.meta as unknown as {env?: Record<string, string | undefined>}).env ?? {}
   return {
     apiUrl: e.SANITY_STUDIO_ACCEPTANCES_API_URL,
+    projectId: e.SANITY_STUDIO_PROJECT_ID,
+  }
+}
+
+/**
+ * Cookie-auth probe against Sanity to retrieve the current Studio user id.
+ * Returns null on any failure (network, non-200, malformed body, missing id).
+ * `credentials: 'include'` is required so the httpOnly Sanity session cookie
+ * (scoped to *.api.sanity.io) is sent with the request.
+ */
+async function getCurrentUserId(projectId: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://${projectId}.api.sanity.io/v1/users/me`, {
+      credentials: 'include',
+    })
+    if (!res.ok) return null
+    const body = (await res.json()) as {id?: unknown}
+    if (!body || typeof body !== 'object' || typeof body.id !== 'string') return null
+    return body.id || null
+  } catch {
+    return null
   }
 }
 
@@ -74,9 +96,8 @@ function formatVersion(value: string | null): string {
 }
 
 export function SponsorAcceptancesView(props: ToolConfig = {}) {
-  const {apiUrl} = props
+  const {apiUrl, projectId} = props
   const client = useClient({apiVersion: '2024-10-01'})
-  const currentUser = useCurrentUser()
 
   const [filter, setFilter] = useState<FilterMode>('all')
   const [search, setSearch] = useState('')
@@ -119,19 +140,9 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         setData(null)
         return
       }
-      if (!currentUser) {
-        setError('Not signed in to Studio.')
-        setLoading(false)
-        setData(null)
-        return
-      }
-      // Use the current Studio user's session JWT — same bearer the Sanity
-      // client uses for every API call. The server validates it via Sanity's
-      // /v1/users/me introspection and checks the `administrator` role.
-      const sessionToken = client.config().token
-      if (!sessionToken) {
+      if (!projectId) {
         setError(
-          'Studio session has no auth token — please sign out and sign back in.',
+          'Studio project id missing — set SANITY_STUDIO_PROJECT_ID in studio/.env.',
         )
         setLoading(false)
         setData(null)
@@ -141,9 +152,22 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
       const isStale = () => requestId !== requestIdRef.current
       setLoading(true)
       setError(null)
+      // Capstone Studio runs in cookie-auth mode — the session cookie is
+      // httpOnly, scoped to *.api.sanity.io, and unreadable from JS. Probe
+      // /v1/users/me with `credentials: 'include'` to recover the user id;
+      // forward it (not a bearer) to the Worker, which independently verifies
+      // project membership via a Worker-only Sanity API token.
+      const userId = await getCurrentUserId(projectId)
+      if (isStale()) return
+      if (!userId) {
+        setError('Could not verify Studio session — please sign out and sign back in.')
+        setLoading(false)
+        setData(null)
+        return
+      }
       try {
         const res = await fetch(`${apiUrl}?accepted=${filter}`, {
-          headers: {authorization: `Bearer ${sessionToken}`},
+          headers: {'x-sanity-user-id': userId},
           signal: controller?.signal,
         })
         if (isStale()) return
@@ -172,7 +196,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         if (!isStale()) setLoading(false)
       }
     },
-    [apiUrl, filter, client, currentUser],
+    [apiUrl, projectId, filter, client],
   )
 
   useEffect(() => {

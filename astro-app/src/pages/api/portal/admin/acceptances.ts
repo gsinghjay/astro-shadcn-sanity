@@ -1,19 +1,23 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
-import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/server';
+import {
+  PUBLIC_SANITY_STUDIO_PROJECT_ID,
+  SANITY_PROJECT_READ_TOKEN,
+} from 'astro:env/server';
 import { getSponsorAgreementRev } from '@/lib/sanity';
 
 export const prerender = false;
 
-const ALLOW_HEADERS = 'authorization, content-type';
+const ALLOW_HEADERS = 'content-type, x-sanity-user-id';
 const ALLOW_METHODS = 'GET, OPTIONS';
-const ADMIN_ROLE_NAME = 'administrator';
-const INTROSPECTION_TTL_MS = 60_000;
-const INTROSPECTION_CACHE_MAX = 100;
-const INTROSPECTION_TIMEOUT_MS = 5_000;
-// Sanity session JWTs are well under 1KB; cap inbound bearer length so a
-// malicious caller can't force unbounded SHA-256 work via a multi-MB header.
-const MAX_BEARER_LENGTH = 4096;
+const MEMBERSHIP_TTL_MS = 60_000;
+const MEMBERSHIP_CACHE_MAX = 100;
+const MEMBERSHIP_TIMEOUT_MS = 5_000;
+// Sanity user IDs are short alphanumeric (`p` + 8-9 chars in practice). Cap
+// inbound header length so a malicious caller can't stuff multi-MB payloads
+// into the membership URL.
+const MAX_USER_ID_LENGTH = 64;
+const SANITY_API_VERSION = '2024-10-01';
 
 interface AcceptanceRow {
   email: string;
@@ -28,95 +32,75 @@ interface AdminEnv {
   STUDIO_ORIGIN?: string;
 }
 
-interface SanityUserRole {
-  name: string;
-  title?: string;
-}
-
-interface SanityUser {
-  id: string;
-  email?: string;
-  name?: string;
-  roles?: SanityUserRole[];
-}
-
 interface CacheEntry {
-  user: SanityUser;
   expiresAt: number;
 }
 
-// Per-isolate LRU cache of introspection results. The raw bearer is never
-// stored in the cache; only its SHA-256 digest is keyed. 60s TTL is short
-// enough to track Sanity role/account revocation without hammering Sanity on
-// every Studio poll. Bounded at 100 entries — admins per isolate will be in
-// the single digits.
-const introspectionCache = new Map<string, CacheEntry>();
+// Per-isolate LRU cache of project-membership lookups. The user ID is not a
+// secret (it appears in Sanity API responses, GROQ projections, and audit
+// logs) so it's keyed directly without hashing. 60s TTL tracks Sanity
+// membership revocation without hammering Sanity on every Studio poll.
+const membershipCache = new Map<string, CacheEntry>();
 
 /** Test-only hook so each unit test starts with an empty cache. */
-export function _resetIntrospectionCacheForTests(): void {
-  introspectionCache.clear();
+export function _resetMembershipCacheForTests(): void {
+  membershipCache.clear();
 }
 
-async function hashToken(token: string): Promise<string> {
-  const buf = new TextEncoder().encode(token);
-  const digest = await crypto.subtle.digest('SHA-256', buf);
-  const bytes = new Uint8Array(digest);
-  let hex = '';
-  for (const b of bytes) hex += b.toString(16).padStart(2, '0');
-  return hex;
-}
-
-function readCache(key: string): SanityUser | null {
-  const entry = introspectionCache.get(key);
-  if (!entry) return null;
+function readCache(userId: string): boolean {
+  const entry = membershipCache.get(userId);
+  if (!entry) return false;
   if (entry.expiresAt <= Date.now()) {
-    introspectionCache.delete(key);
-    return null;
+    membershipCache.delete(userId);
+    return false;
   }
   // Refresh LRU position so the most-recent hit is evicted last.
-  introspectionCache.delete(key);
-  introspectionCache.set(key, entry);
-  return entry.user;
+  membershipCache.delete(userId);
+  membershipCache.set(userId, entry);
+  return true;
 }
 
-function writeCache(key: string, user: SanityUser): void {
-  if (introspectionCache.size >= INTROSPECTION_CACHE_MAX) {
-    const oldest = introspectionCache.keys().next().value;
-    if (oldest !== undefined) introspectionCache.delete(oldest);
+function writeCache(userId: string): void {
+  if (membershipCache.size >= MEMBERSHIP_CACHE_MAX) {
+    const oldest = membershipCache.keys().next().value;
+    if (oldest !== undefined) membershipCache.delete(oldest);
   }
-  introspectionCache.set(key, { user, expiresAt: Date.now() + INTROSPECTION_TTL_MS });
+  membershipCache.set(userId, { expiresAt: Date.now() + MEMBERSHIP_TTL_MS });
 }
 
 /**
- * Resolve the Sanity user who owns the given session bearer. Uses Sanity's
- * project-scoped `/v1/users/me` endpoint — which authenticates the bearer and
- * returns the user profile + roles. Returns null on any failure (network,
- * non-2xx, malformed body) so the caller can map it to a single 401.
+ * Verify the claimed Sanity user ID is a current member of the configured
+ * project. Calls the project-scoped users endpoint with a Worker-only read
+ * token; on 200 with a matching `id`, the user is admitted. Any other outcome
+ * (404, non-2xx, malformed body, network/timeout) returns false so the caller
+ * can map it to a single 403.
  */
-async function getStudioUser(token: string, projectId: string): Promise<SanityUser | null> {
+async function verifyProjectMembership(
+  userId: string,
+  projectId: string,
+  readToken: string,
+): Promise<boolean> {
+  if (readCache(userId)) return true;
   try {
-    const res = await fetch(`https://${projectId}.api.sanity.io/v1/users/me`, {
-      headers: { authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(INTROSPECTION_TIMEOUT_MS),
-    });
-    if (!res.ok) return null;
-    const body = (await res.json()) as SanityUser;
-    if (!body || typeof body !== 'object' || typeof body.id !== 'string') return null;
-    // Reject any response shape where `roles` is present but not an array — a
-    // malformed Sanity payload (e.g. `roles: "administrator"` string, or an
-    // object) would otherwise silently fail isAdmin() and 403 a legit admin.
-    // `undefined` is allowed (guest user / partial body) and falls through to
-    // a clean 403 via isAdmin() returning false.
-    if (body.roles !== undefined && !Array.isArray(body.roles)) return null;
-    return body;
+    const res = await fetch(
+      `https://api.sanity.io/v${SANITY_API_VERSION}/projects/${projectId}/users/${userId}`,
+      {
+        headers: { authorization: `Bearer ${readToken}` },
+        signal: AbortSignal.timeout(MEMBERSHIP_TIMEOUT_MS),
+      },
+    );
+    if (!res.ok) return false;
+    const body = (await res.json()) as { id?: unknown };
+    if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
+      return false;
+    }
+    if (body.id !== userId) return false;
+    writeCache(userId);
+    return true;
   } catch (err) {
-    console.error('[admin/acceptances] sanity introspection failed:', err);
-    return null;
+    console.error('[admin/acceptances] sanity membership lookup failed:', err);
+    return false;
   }
-}
-
-function isAdmin(user: SanityUser): boolean {
-  return Array.isArray(user.roles) && user.roles.some((r) => r?.name === ADMIN_ROLE_NAME);
 }
 
 function corsHeaders(origin: string): Record<string, string> {
@@ -136,19 +120,28 @@ function json(body: Record<string, unknown>, status: number, extraHeaders: Recor
   });
 }
 
+function envReady(env: AdminEnv): boolean {
+  return Boolean(
+    env.STUDIO_ORIGIN &&
+      env.PORTAL_DB &&
+      PUBLIC_SANITY_STUDIO_PROJECT_ID &&
+      SANITY_PROJECT_READ_TOKEN,
+  );
+}
+
 export const OPTIONS: APIRoute = ({ request }) => {
   const env = (workerEnv ?? {}) as AdminEnv;
   // Fail-closed when any env required by the GET handler is missing. Mirroring
   // the GET check here avoids a window where a cacheable 204 preflight masks a
   // misconfiguration that 503s every real request.
-  if (!env.STUDIO_ORIGIN || !env.PORTAL_DB || !PUBLIC_SANITY_STUDIO_PROJECT_ID) {
+  if (!envReady(env)) {
     return new Response(null, { status: 503 });
   }
   const origin = request.headers.get('origin');
   if (origin !== env.STUDIO_ORIGIN) {
     return new Response(null, { status: 403 });
   }
-  return new Response(null, { status: 204, headers: corsHeaders(env.STUDIO_ORIGIN) });
+  return new Response(null, { status: 204, headers: corsHeaders(env.STUDIO_ORIGIN!) });
 };
 
 export const GET: APIRoute = async ({ request, url }) => {
@@ -159,7 +152,7 @@ export const GET: APIRoute = async ({ request, url }) => {
   const errorCors =
     env.STUDIO_ORIGIN && origin === env.STUDIO_ORIGIN ? corsHeaders(env.STUDIO_ORIGIN) : {};
 
-  if (!env.STUDIO_ORIGIN || !env.PORTAL_DB || !PUBLIC_SANITY_STUDIO_PROJECT_ID) {
+  if (!envReady(env)) {
     return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 
@@ -167,22 +160,17 @@ export const GET: APIRoute = async ({ request, url }) => {
     return json({ error: 'forbidden_origin' }, 403);
   }
 
-  const auth = request.headers.get('authorization') ?? '';
-  const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
-  if (!token || token.length > MAX_BEARER_LENGTH) {
+  const userId = (request.headers.get('x-sanity-user-id') ?? '').trim();
+  if (!userId || userId.length > MAX_USER_ID_LENGTH) {
     return json({ error: 'unauthorized' }, 401, errorCors);
   }
 
-  // Introspect the Studio session bearer. Cache lookups key on SHA-256(token)
-  // — the raw bearer is never persisted past the hash call.
-  const cacheKey = await hashToken(token);
-  let user = readCache(cacheKey);
-  if (!user) {
-    user = await getStudioUser(token, PUBLIC_SANITY_STUDIO_PROJECT_ID);
-    if (!user) return json({ error: 'unauthorized' }, 401, errorCors);
-    writeCache(cacheKey, user);
-  }
-  if (!isAdmin(user)) {
+  const isMember = await verifyProjectMembership(
+    userId,
+    PUBLIC_SANITY_STUDIO_PROJECT_ID,
+    SANITY_PROJECT_READ_TOKEN!,
+  );
+  if (!isMember) {
     return json({ error: 'forbidden' }, 403, errorCors);
   }
 
@@ -213,7 +201,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     `ORDER BY agreement_accepted_at IS NULL, agreement_accepted_at DESC, email ASC`;
 
   try {
-    const stmt = env.PORTAL_DB.prepare(sql);
+    const stmt = env.PORTAL_DB!.prepare(sql);
     const bound = versionDrift && currentRev ? stmt.bind(currentRev) : stmt;
     const rs = await bound.all<AcceptanceRow>();
     const acceptances = (rs.results ?? []).map((r) => {
@@ -238,7 +226,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       200,
       {
         'cache-control': 'private, max-age=0, must-revalidate',
-        ...corsHeaders(env.STUDIO_ORIGIN),
+        ...corsHeaders(env.STUDIO_ORIGIN!),
       },
     );
   } catch (e) {

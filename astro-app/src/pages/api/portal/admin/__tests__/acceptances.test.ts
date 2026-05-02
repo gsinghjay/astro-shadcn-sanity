@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 
 const PROJECT_ID = '49nk9b0w';
 const ORIGIN = 'https://capstone.sanity.studio';
+const READ_TOKEN = 'sktest_membership_check_token';
+const ADMIN_USER_ID = 'pZxAdmin01';
+const NON_MEMBER_USER_ID = 'pZyOutside9';
+const SANITY_MEMBER_URL = `https://api.sanity.io/v2024-10-01/projects/${PROJECT_ID}/users/`;
 
 // Adapter v13: acceptances.ts reads bindings via `cloudflare:workers`, not
 // `locals.runtime.env`. Hoist mocks so the cloudflare:workers stub can wire
@@ -45,21 +49,22 @@ vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 vi.mock('astro:env/server', () => ({
   PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+  SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
 }));
 
-// Stub global fetch for the Sanity user-introspection call. The route uses the
+// Stub global fetch for the Sanity membership-check call. The route uses the
 // global `fetch` directly — we replace it on the global rather than via vi.spyOn
 // so the module-level cache lookup sees the same stub each test.
 const originalFetch = globalThis.fetch;
 
-const { GET, OPTIONS, ALL, _resetIntrospectionCacheForTests } = await import('../acceptances');
+const { GET, OPTIONS, ALL, _resetMembershipCacheForTests } = await import('../acceptances');
 
-// Top-level beforeEach: reset the introspection cache + fetch stub between
+// Top-level beforeEach: reset the membership cache + fetch stub between
 // every test, regardless of which describe block. The module-level cache is
 // shared across describe blocks, so resetting only inside a single describe
 // would leak state into any future block.
 beforeEach(() => {
-  _resetIntrospectionCacheForTests();
+  _resetMembershipCacheForTests();
   fetchCalls.length = 0;
   fetchMock.mockReset();
   globalThis.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
@@ -90,17 +95,17 @@ function buildEnv(overrides: Record<string, unknown> = {}) {
 function buildCtx(opts: {
   method?: string;
   origin?: string | null;
-  authToken?: string | null;
+  userId?: string | null;
   search?: string;
   env?: Record<string, unknown> | null;
 } = {}) {
   const headers: Record<string, string> = {};
   if (opts.origin !== null) headers.origin = opts.origin ?? ORIGIN;
-  if (opts.authToken === undefined) {
-    // Default: a non-null bearer (introspection result driven per-test).
-    headers.authorization = 'Bearer studio-session-jwt-default';
-  } else if (opts.authToken !== null) {
-    headers.authorization = `Bearer ${opts.authToken}`;
+  if (opts.userId === undefined) {
+    // Default: a non-null user id (membership result driven per-test).
+    headers['x-sanity-user-id'] = ADMIN_USER_ID;
+  } else if (opts.userId !== null) {
+    headers['x-sanity-user-id'] = opts.userId;
   }
   // explicit null = omit header
   const search = opts.search ?? '';
@@ -124,34 +129,20 @@ function buildCtx(opts: {
 
 const CURRENT_REV = 'rev-current-xyz';
 
-const ADMIN_USER = {
-  id: 'pZx',
-  email: 'admin@example.com',
-  name: 'Admin User',
-  roles: [{ name: 'administrator', title: 'Administrator' }],
-};
-
-const NON_ADMIN_USER = {
-  id: 'pZy',
-  email: 'editor@example.com',
-  name: 'Editor User',
-  roles: [{ name: 'editor', title: 'Editor' }],
-};
-
-function mockSanityUser(user: unknown): void {
+function mockSanityMembership(userId: string): void {
   // Build a fresh Response per call — the route reads the body once, but tests
   // that fire multiple un-cached requests in sequence would otherwise reuse a
   // single (already-consumed) Response.
   fetchMock.mockImplementation(async () =>
-    new Response(JSON.stringify(user), {
+    new Response(JSON.stringify({ id: userId }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     }),
   );
 }
 
-function mockSanity401(): void {
-  fetchMock.mockImplementation(async () => new Response('unauthorized', { status: 401 }));
+function mockSanity404(): void {
+  fetchMock.mockImplementation(async () => new Response('not found', { status: 404 }));
 }
 
 describe('GET /api/portal/admin/acceptances', () => {
@@ -180,8 +171,8 @@ describe('GET /api/portal/admin/acceptances', () => {
     mockGetRev.mockReset().mockResolvedValue(CURRENT_REV);
   });
 
-  it('returns 401 when authorization header is missing', async () => {
-    const ctx = buildCtx({ authToken: null });
+  it('returns 401 when X-Sanity-User-Id header is missing', async () => {
+    const ctx = buildCtx({ userId: null });
     const res = await GET(ctx as never);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'unauthorized' });
@@ -189,38 +180,69 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('returns 401 when Sanity introspection rejects the bearer', async () => {
-    mockSanity401();
-    const ctx = buildCtx({ authToken: 'sjwt_revoked' });
+  it('returns 401 when X-Sanity-User-Id is empty', async () => {
+    const ctx = buildCtx({ userId: '   ' });
     const res = await GET(ctx as never);
     expect(res.status).toBe(401);
-    expect(await res.json()).toEqual({ error: 'unauthorized' });
-    // Error responses must echo CORS so Studio can read the body cross-origin.
-    expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
+    expect(fetchCalls.length).toBe(0);
   });
 
-  it('returns 403 when the introspected user lacks administrator role', async () => {
-    mockSanityUser(NON_ADMIN_USER);
-    const ctx = buildCtx({ authToken: 'sjwt_editor' });
+  it('returns 401 when X-Sanity-User-Id exceeds 64 chars', async () => {
+    mockSanityMembership(ADMIN_USER_ID); // would 200 if cap weren't hit
+    const oversized = 'p' + 'a'.repeat(64);
+    const ctx = buildCtx({ userId: oversized });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(401);
+    expect(fetchCalls.length).toBe(0);
+  });
+
+  it('returns 403 when Sanity membership lookup returns 404', async () => {
+    mockSanity404();
+    const ctx = buildCtx({ userId: NON_MEMBER_USER_ID });
     const res = await GET(ctx as never);
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: 'forbidden' });
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('returns 403 when origin does not match STUDIO_ORIGIN (rejected before introspection)', async () => {
-    mockSanityUser(ADMIN_USER);
+  it('returns 403 when membership response id does not match the claimed user id', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ id: 'pSomeoneElse' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'forbidden' });
+  });
+
+  it('returns 403 when membership response is malformed (no id field)', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ email: 'a@b' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when origin does not match STUDIO_ORIGIN (rejected before Sanity call)', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({ origin: 'https://evil.example' });
     const res = await GET(ctx as never);
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: 'forbidden_origin' });
-    // Origin check fires before the bearer is forwarded to Sanity, so no introspection call.
+    // Origin check fires before any Sanity API call.
     expect(fetchCalls.length).toBe(0);
   });
 
-  it('returns 200 with acceptances when admin user + matching origin', async () => {
-    mockSanityUser(ADMIN_USER);
-    const ctx = buildCtx({ authToken: 'sjwt_admin' });
+  it('returns 200 with acceptances when membership matches + matching origin', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
     const res = await GET(ctx as never);
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -247,34 +269,40 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
   });
 
-  it('forwards the bearer to Sanity introspection at the projectId-scoped endpoint', async () => {
-    mockSanityUser(ADMIN_USER);
-    const ctx = buildCtx({ authToken: 'sjwt_admin_call_a' });
+  it('calls the projectId-scoped Sanity members endpoint with the Worker read token', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
     await GET(ctx as never);
     expect(fetchCalls.length).toBe(1);
-    expect(fetchCalls[0].url).toBe(`https://${PROJECT_ID}.api.sanity.io/v1/users/me`);
+    expect(fetchCalls[0].url).toBe(`${SANITY_MEMBER_URL}${ADMIN_USER_ID}`);
     const headers = fetchCalls[0].init?.headers as Record<string, string>;
-    expect(headers.authorization).toBe('Bearer sjwt_admin_call_a');
+    expect(headers.authorization).toBe(`Bearer ${READ_TOKEN}`);
   });
 
-  it('caches introspection: same bearer in the same isolate hits Sanity once', async () => {
-    mockSanityUser(ADMIN_USER);
-    const token = 'sjwt_cached_admin';
-    await GET(buildCtx({ authToken: token }) as never);
-    await GET(buildCtx({ authToken: token }) as never);
-    await GET(buildCtx({ authToken: token }) as never);
+  it('caches membership: same user-id within 60s hits Sanity once', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    await GET(buildCtx({ userId: ADMIN_USER_ID }) as never);
+    await GET(buildCtx({ userId: ADMIN_USER_ID }) as never);
+    await GET(buildCtx({ userId: ADMIN_USER_ID }) as never);
     expect(fetchCalls.length).toBe(1);
   });
 
-  it('cache miss for a different bearer triggers a fresh introspection', async () => {
-    mockSanityUser(ADMIN_USER);
-    await GET(buildCtx({ authToken: 'sjwt_first' }) as never);
-    await GET(buildCtx({ authToken: 'sjwt_second' }) as never);
+  it('cache miss: a different user-id triggers a fresh Sanity call', async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      // Echo back whichever id the Worker is asking about so both succeed.
+      const id = url.split('/').pop() ?? '';
+      return new Response(JSON.stringify({ id }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    await GET(buildCtx({ userId: 'pFirstUser0' }) as never);
+    await GET(buildCtx({ userId: 'pSecondUser' }) as never);
     expect(fetchCalls.length).toBe(2);
   });
 
   it('versionMatch=false on stale rev; null when grandfathered (no rev)', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     mockD1All.mockResolvedValue({
       results: [
         { email: 'a@co.com', name: 'Alice', role: 'sponsor', agreement_accepted_at: 1, agreement_version: 'rev-old' },
@@ -291,7 +319,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('SELECT projection includes agreement_version', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({});
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -299,7 +327,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?versionDrift=true narrows query and binds currentRev', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({ search: '?versionDrift=true' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -309,7 +337,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?versionDrift=true with Sanity rev unavailable falls back to no drift filter', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     mockGetRev.mockResolvedValue(null);
     const ctx = buildCtx({ search: '?versionDrift=true' });
     await GET(ctx as never);
@@ -319,7 +347,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('versionMatch is null on every row when Sanity rev fetch fails', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     mockGetRev.mockResolvedValue(null);
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
@@ -329,7 +357,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?accepted=true narrows query to non-null acceptance timestamps', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({ search: '?accepted=true' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -339,7 +367,7 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('?accepted=false narrows query to null acceptance timestamps', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({ search: '?accepted=false' });
     await GET(ctx as never);
     const sql = mockD1Prepare.mock.calls[0][0];
@@ -348,14 +376,14 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('emits Cache-Control: private, max-age=0, must-revalidate', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
     expect(res.headers.get('cache-control')).toBe('private, max-age=0, must-revalidate');
   });
 
   it('returns 503 with no detail leakage when D1 throws', async () => {
-    mockSanityUser(ADMIN_USER);
+    mockSanityMembership(ADMIN_USER_ID);
     mockD1All.mockRejectedValue(new Error('table user does not exist'));
     const ctx = buildCtx({});
     const res = await GET(ctx as never);
@@ -382,10 +410,13 @@ describe('GET /api/portal/admin/acceptances', () => {
     // Re-import the route with a different astro:env/server mock so the
     // module-level named import binds to the empty value. resetModules +
     // doMock is the documented vitest pattern for swapping a static import
-    // mid-suite. The fresh module also gets a fresh introspection cache, so
+    // mid-suite. The fresh module also gets a fresh membership cache, so
     // no afterAll cleanup is needed beyond the unmock.
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({ PUBLIC_SANITY_STUDIO_PROJECT_ID: '' }));
+    vi.doMock('astro:env/server', () => ({
+      PUBLIC_SANITY_STUDIO_PROJECT_ID: '',
+      SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
+    }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
     const route = await import('../acceptances');
@@ -399,10 +430,29 @@ describe('GET /api/portal/admin/acceptances', () => {
     vi.resetModules();
   });
 
-  it('returns 401 when introspection times out (AbortSignal abort)', async () => {
+  it('returns 503 when SANITY_PROJECT_READ_TOKEN is missing (fail closed)', async () => {
+    vi.resetModules();
+    vi.doMock('astro:env/server', () => ({
+      PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+      SANITY_PROJECT_READ_TOKEN: undefined,
+    }));
+    vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
+    vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+    const route = await import('../acceptances');
+    const ctx = buildCtx({});
+    const res = await route.GET(ctx as never);
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/server');
+    vi.doUnmock('cloudflare:workers');
+    vi.doUnmock('@/lib/sanity');
+    vi.resetModules();
+  });
+
+  it('returns 403 when membership lookup times out (AbortSignal abort)', async () => {
     fetchMock.mockImplementation((_url: string, init?: RequestInit) => {
       // Resolve only when the wired AbortSignal fires; otherwise hang. This
-      // emulates a Sanity hang past INTROSPECTION_TIMEOUT_MS without coupling
+      // emulates a Sanity hang past MEMBERSHIP_TIMEOUT_MS without coupling
       // the test to the real 5 s timeout.
       return new Promise((_resolve, reject) => {
         const signal = init?.signal;
@@ -415,7 +465,7 @@ describe('GET /api/portal/admin/acceptances', () => {
         });
       });
     });
-    const ctx = buildCtx({ authToken: 'sjwt-slow' });
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
     // Force the abort synchronously by stubbing AbortSignal.timeout to return
     // an already-aborted signal. The original is restored after the test.
     const originalTimeout = AbortSignal.timeout;
@@ -426,38 +476,14 @@ describe('GET /api/portal/admin/acceptances', () => {
     }) as typeof AbortSignal.timeout;
     try {
       const res = await GET(ctx as never);
-      expect(res.status).toBe(401);
-      expect(await res.json()).toEqual({ error: 'unauthorized' });
+      expect(res.status).toBe(403);
+      expect(await res.json()).toEqual({ error: 'forbidden' });
       // The route did wire signal: AbortSignal.timeout(...) into the fetch init.
       const init = fetchCalls[0]?.init as RequestInit | undefined;
       expect(init?.signal).toBeDefined();
     } finally {
       AbortSignal.timeout = originalTimeout;
     }
-  });
-
-  it('returns 401 with no introspection call when bearer exceeds MAX_BEARER_LENGTH', async () => {
-    mockSanityUser(ADMIN_USER); // would 200 if the cap weren't hit
-    const oversized = 'a'.repeat(4097);
-    const ctx = buildCtx({ authToken: oversized });
-    const res = await GET(ctx as never);
-    expect(res.status).toBe(401);
-    expect(await res.json()).toEqual({ error: 'unauthorized' });
-    expect(fetchCalls.length).toBe(0);
-  });
-
-  it('returns 401 when Sanity returns a malformed roles shape (non-array)', async () => {
-    fetchMock.mockImplementation(
-      async () =>
-        new Response(
-          JSON.stringify({ id: 'pZx', email: 'a@b', name: 'A', roles: 'administrator' }),
-          { status: 200, headers: { 'content-type': 'application/json' } },
-        ),
-    );
-    const ctx = buildCtx({ authToken: 'sjwt-malformed-roles' });
-    const res = await GET(ctx as never);
-    expect(res.status).toBe(401);
-    expect(await res.json()).toEqual({ error: 'unauthorized' });
   });
 });
 
@@ -468,7 +494,7 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     expect(res.status).toBe(204);
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN);
     expect(res.headers.get('access-control-allow-methods')).toBe('GET, OPTIONS');
-    expect(res.headers.get('access-control-allow-headers')).toBe('authorization, content-type');
+    expect(res.headers.get('access-control-allow-headers')).toBe('content-type, x-sanity-user-id');
     expect(res.headers.get('access-control-max-age')).toBe('600');
   });
 
@@ -494,6 +520,24 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     });
     const res = await OPTIONS(ctx as never);
     expect(res.status).toBe(503);
+  });
+
+  it('returns 503 (fail closed) when SANITY_PROJECT_READ_TOKEN is missing', async () => {
+    vi.resetModules();
+    vi.doMock('astro:env/server', () => ({
+      PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+      SANITY_PROJECT_READ_TOKEN: undefined,
+    }));
+    vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
+    vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+    const route = await import('../acceptances');
+    const ctx = buildCtx({ method: 'OPTIONS' });
+    const res = await route.OPTIONS(ctx as never);
+    expect(res.status).toBe(503);
+    vi.doUnmock('astro:env/server');
+    vi.doUnmock('cloudflare:workers');
+    vi.doUnmock('@/lib/sanity');
+    vi.resetModules();
   });
 });
 

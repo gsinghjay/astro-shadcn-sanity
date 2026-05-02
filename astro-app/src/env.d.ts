@@ -37,6 +37,7 @@ declare namespace Cloudflare {
     TURNSTILE_SECRET_KEY: string;
     SANITY_API_WRITE_TOKEN: string;
     SANITY_API_READ_TOKEN?: string;
+    SANITY_PROJECT_READ_TOKEN?: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GITHUB_CLIENT_ID: string;
