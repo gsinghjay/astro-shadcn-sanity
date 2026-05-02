@@ -321,13 +321,20 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
   });
 
   // Disconnect GitHub — full unlink. Server endpoint wipes project_github_repos
-  // rows + Better Auth account row; client then clears any session state via
-  // unlinkAccount and reloads to surface `no-github-account` UI.
-  // Order: server cleanup → unlinkAccount → reload. Reversing leaves orphan rows.
+  // rows, deletes the Better Auth account row, and invalidates the KV session
+  // cache; client then reloads to surface `no-github-account` UI. The static
+  // disconnect card above the button carries the github.com/settings/applications
+  // revoke nudge for the silent re-auth edge case.
   const disconnectBtn = document.getElementById('disconnect-github') as HTMLButtonElement | null;
   const disconnectError = document.getElementById('disconnect-github-error');
   disconnectBtn?.addEventListener('click', async () => {
     if (!disconnectBtn) return;
+
+    if (disconnectError) {
+      disconnectError.textContent = '';
+      disconnectError.classList.add('hidden');
+    }
+
     if (!confirm('Disconnect GitHub? This removes all your project repo links. Continue?')) return;
 
     const showError = (msg: string) => {
@@ -339,10 +346,6 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
       disconnectBtn.textContent = 'Disconnect GitHub';
     };
 
-    if (disconnectError) {
-      disconnectError.textContent = '';
-      disconnectError.classList.add('hidden');
-    }
     disconnectBtn.disabled = true;
     disconnectBtn.textContent = 'Disconnecting…';
 
@@ -354,22 +357,13 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
       return;
     }
 
-    if (!res.ok) {
-      showError('Failed to disconnect. Please try again.');
+    if (res.status === 401) {
+      showError('Session expired — please reload the page and sign in again.');
       return;
     }
 
-    try {
-      await authClient.unlinkAccount({ providerId: 'github' });
-    } catch {
-      // Server cleanup succeeded but Better Auth couldn't fully detach the
-      // account (rare — usually a session/network blip). Surface a recovery
-      // message with the github.com revoke link and skip the reload so the
-      // user can act on it. Reloading after manual revocation will land them
-      // back in the no-github-account state.
-      showError(
-        "Project links cleared, but GitHub couldn't be fully disconnected. Visit https://github.com/settings/applications to revoke access manually, then refresh.",
-      );
+    if (!res.ok) {
+      showError('Failed to disconnect. Please try again.');
       return;
     }
 

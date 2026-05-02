@@ -1,33 +1,51 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { mockDelete, mockDeleteWhere, mockRun, mockSelect, mockFrom, mockSelectWhere, mockGet, mockGetDrizzle } =
-  vi.hoisted(() => {
-    const mockRun = vi.fn();
-    const mockGet = vi.fn();
-    const mockDeleteWhere = vi.fn(() => ({ run: mockRun }));
-    const mockDelete = vi.fn(() => ({ where: mockDeleteWhere }));
-    const mockSelectWhere = vi.fn(() => ({ get: mockGet }));
-    const mockFrom = vi.fn(() => ({ where: mockSelectWhere }));
-    const mockSelect = vi.fn(() => ({ from: mockFrom }));
-    const mockGetDrizzle = vi.fn(() => ({ delete: mockDelete, select: mockSelect }));
-    return {
-      mockDelete,
-      mockDeleteWhere,
-      mockRun,
-      mockSelect,
-      mockFrom,
-      mockSelectWhere,
-      mockGet,
-      mockGetDrizzle,
-    };
-  });
+const {
+  mockDelete,
+  mockDeleteWhere,
+  mockRun,
+  mockSelect,
+  mockFrom,
+  mockSelectWhere,
+  mockGet,
+  mockGetDrizzle,
+  mockKvDelete,
+  mockEnv,
+} = vi.hoisted(() => {
+  const mockRun = vi.fn();
+  const mockGet = vi.fn();
+  const mockDeleteWhere = vi.fn(() => ({ run: mockRun }));
+  const mockDelete = vi.fn(() => ({ where: mockDeleteWhere }));
+  const mockSelectWhere = vi.fn(() => ({ get: mockGet }));
+  const mockFrom = vi.fn(() => ({ where: mockSelectWhere }));
+  const mockSelect = vi.fn(() => ({ from: mockFrom }));
+  const mockGetDrizzle = vi.fn(() => ({ delete: mockDelete, select: mockSelect }));
+  const mockKvDelete = vi.fn(() => Promise.resolve());
+  const mockEnv: { SESSION_CACHE?: { delete: typeof mockKvDelete } } = {
+    SESSION_CACHE: { delete: mockKvDelete },
+  };
+  return {
+    mockDelete,
+    mockDeleteWhere,
+    mockRun,
+    mockSelect,
+    mockFrom,
+    mockSelectWhere,
+    mockGet,
+    mockGetDrizzle,
+    mockKvDelete,
+    mockEnv,
+  };
+});
 
 vi.mock('@/lib/db', () => ({
   getDrizzle: mockGetDrizzle,
 }));
 
 vi.mock('cloudflare:workers', () => ({
-  env: {},
+  get env() {
+    return mockEnv;
+  },
 }));
 
 import { DELETE } from '../disconnect';
@@ -41,16 +59,37 @@ beforeEach(() => {
   mockFrom.mockClear();
   mockSelectWhere.mockClear();
   mockGetDrizzle.mockClear();
+  mockKvDelete.mockClear();
+  mockEnv.SESSION_CACHE = { delete: mockKvDelete };
   // Default: user lookup returns a row so the account delete proceeds.
   mockGet.mockResolvedValue({ id: 'u1' });
 });
+
+/** Serialize a drizzle SQL predicate to a string for assertion. drizzle's SQL
+ *  objects contain circular refs (column → table → column), so JSON.stringify
+ *  with a WeakSet-based replacer is the simplest way to flatten them. */
+function serializeDrizzlePredicate(value: unknown): string {
+  const seen = new WeakSet();
+  return JSON.stringify(value, (_key, val) => {
+    if (typeof val === 'object' && val !== null) {
+      if (seen.has(val)) return '[Circular]';
+      seen.add(val);
+    }
+    return val;
+  });
+}
 
 interface Ctx {
   locals: { user?: { email?: string; role?: string; name?: string } };
   request: Request;
 }
 
-function makeContext(overrides: Partial<Ctx['locals']> = {}): Ctx {
+function makeContext(
+  overrides: Partial<Ctx['locals']> = {},
+  cookieHeader?: string,
+): Ctx {
+  const headers = new Headers();
+  if (cookieHeader) headers.set('cookie', cookieHeader);
   return {
     locals: {
       user:
@@ -58,7 +97,10 @@ function makeContext(overrides: Partial<Ctx['locals']> = {}): Ctx {
           ? overrides.user
           : { email: 'sponsor@example.com', role: 'sponsor' },
     },
-    request: new Request('http://localhost/portal/api/github/disconnect', { method: 'DELETE' }),
+    request: new Request('http://localhost/portal/api/github/disconnect', {
+      method: 'DELETE',
+      headers,
+    }),
   };
 }
 
@@ -103,6 +145,37 @@ describe('DELETE /portal/api/github/disconnect', () => {
     expect(mockSelect).toHaveBeenCalledTimes(1);
   });
 
+  it('account-delete predicate scopes to userId AND providerId=github (regression guard)', async () => {
+    mockRun
+      .mockResolvedValueOnce({ meta: { changes: 0 } })
+      .mockResolvedValueOnce({ meta: { changes: 1 } });
+    await DELETE(makeContext() as never);
+    // Two delete().where(...) chains: [0] = project_github_repos, [1] = account
+    const accountWherePredicate = mockDeleteWhere.mock.calls[1]?.[0];
+    expect(accountWherePredicate).toBeDefined();
+    const serialized = serializeDrizzlePredicate(accountWherePredicate);
+    expect(serialized).toContain('user_id');
+    expect(serialized).toContain('provider_id');
+    // Confirm the literal 'github' value flows into the predicate.
+    expect(serialized).toContain('github');
+    // Confirm the resolved user.id (mocked as 'u1') flows in too.
+    expect(serialized).toContain('u1');
+  });
+
+  it('AC-7: project_github_repos delete is scoped to the sponsor email (lowercased)', async () => {
+    mockRun
+      .mockResolvedValueOnce({ meta: { changes: 3 } })
+      .mockResolvedValueOnce({ meta: { changes: 1 } });
+    await DELETE(
+      makeContext({ user: { email: 'Sponsor@Example.COM', role: 'sponsor' } }) as never,
+    );
+    const reposWherePredicate = mockDeleteWhere.mock.calls[0]?.[0];
+    const serialized = serializeDrizzlePredicate(reposWherePredicate);
+    expect(serialized).toContain('user_email');
+    expect(serialized).toContain('sponsor@example.com');
+    expect(serialized).not.toContain('Sponsor@Example.COM');
+  });
+
   it('returns count of removed links from project_github_repos delete (AC-3)', async () => {
     mockRun
       .mockResolvedValueOnce({ meta: { changes: 5 } })
@@ -130,20 +203,48 @@ describe('DELETE /portal/api/github/disconnect', () => {
     expect(mockRun).toHaveBeenCalledTimes(1);
   });
 
-  it('returns 500 when project_github_repos delete throws (AC-8)', async () => {
-    mockRun.mockRejectedValueOnce(new Error('D1 unavailable'));
+  it('invalidates the KV session cache on success when cookie carries a session token', async () => {
+    mockRun
+      .mockResolvedValueOnce({ meta: { changes: 1 } })
+      .mockResolvedValueOnce({ meta: { changes: 1 } });
+    const res = await DELETE(
+      makeContext({}, 'better-auth.session_token=abc123; other=value') as never,
+    );
+    expect(res.status).toBe(200);
+    expect(mockKvDelete).toHaveBeenCalledWith('abc123');
+  });
+
+  it('handles missing SESSION_CACHE binding gracefully', async () => {
+    mockEnv.SESSION_CACHE = undefined;
+    mockRun
+      .mockResolvedValueOnce({ meta: { changes: 1 } })
+      .mockResolvedValueOnce({ meta: { changes: 1 } });
+    const res = await DELETE(
+      makeContext({}, 'better-auth.session_token=abc123') as never,
+    );
+    expect(res.status).toBe(200);
+    expect(mockKvDelete).not.toHaveBeenCalled();
+  });
+
+  it('returns 500 with generic message when project_github_repos delete throws (AC-8)', async () => {
+    mockRun.mockRejectedValueOnce(new Error('D1 internal: SQLITE_CORRUPT at offset 0xdead'));
     const res = await DELETE(makeContext() as never);
     expect(res.status).toBe(500);
     const body = await res.json();
-    expect(body.error).toBeDefined();
+    expect(body.error).toBe('Disconnect failed');
+    // Driver error text must NOT leak.
+    expect(body.error).not.toContain('SQLITE_CORRUPT');
   });
 
-  it('returns 500 when account delete throws (AC-8)', async () => {
+  it('returns 500 with generic message when account delete throws (AC-8)', async () => {
     mockRun
       .mockResolvedValueOnce({ meta: { changes: 1 } })
-      .mockRejectedValueOnce(new Error('account delete failed'));
+      .mockRejectedValueOnce(new Error('account delete failed: foreign key constraint'));
     const res = await DELETE(makeContext() as never);
     expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body.error).toBe('Disconnect failed');
+    expect(body.error).not.toContain('foreign key');
   });
 
   it('falls back to 0 when D1 driver omits meta.changes', async () => {
