@@ -214,7 +214,7 @@ export default defineConfig({
             titleSelector: 'h1',
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
-              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**', '**/api/**',
             ],
             generateIndividualMd: true,
             generateLlmsTxt: true,
