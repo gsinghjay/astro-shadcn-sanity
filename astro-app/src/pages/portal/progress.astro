@@ -263,6 +263,36 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
       </>
     )}
 
+    {/* Disconnect GitHub — visible whenever a GitHub OAuth account is linked.
+        See Story 9.22 AC-1. Sponsor can fully unlink (clears all repo mappings
+        and the OAuth account) so a different GitHub identity can be reauthorized. */}
+    {state === 'has-token' && (
+      <div class="border bg-card p-6 flex flex-col gap-3 items-start">
+        <h2 class="text-lg font-semibold">Disconnect GitHub</h2>
+        <p class="text-sm text-muted-foreground">
+          Disconnecting will (1) remove the YWCC Capstone link to your GitHub account, and (2) clear every repo↔project mapping you've set up.
+          <strong class="font-semibold text-foreground">
+            If you plan to connect a different GitHub account, also revoke the YWCC Capstone OAuth grant at
+            <a
+              href="https://github.com/settings/applications"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="underline"
+            >github.com/settings/applications</a>
+            — otherwise GitHub will silently re-link the same account.
+          </strong>
+        </p>
+        <button
+          id="disconnect-github"
+          type="button"
+          class="bg-destructive text-destructive-foreground px-4 py-2 text-sm font-medium hover:bg-destructive/90"
+        >
+          Disconnect GitHub
+        </button>
+        <div id="disconnect-github-error" class="hidden text-sm text-destructive"></div>
+      </div>
+    )}
+
     {portalPage?.footerBlocks && portalPage.footerBlocks.length > 0 && (
       <BlockRenderer blocks={portalPage.footerBlocks} />
     )}
@@ -288,5 +318,61 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
       provider: 'github',
       callbackURL: '/portal/progress',
     });
+  });
+
+  // Disconnect GitHub — full unlink. Server endpoint wipes project_github_repos
+  // rows + Better Auth account row; client then clears any session state via
+  // unlinkAccount and reloads to surface `no-github-account` UI.
+  // Order: server cleanup → unlinkAccount → reload. Reversing leaves orphan rows.
+  const disconnectBtn = document.getElementById('disconnect-github') as HTMLButtonElement | null;
+  const disconnectError = document.getElementById('disconnect-github-error');
+  disconnectBtn?.addEventListener('click', async () => {
+    if (!disconnectBtn) return;
+    if (!confirm('Disconnect GitHub? This removes all your project repo links. Continue?')) return;
+
+    const showError = (msg: string) => {
+      if (disconnectError) {
+        disconnectError.textContent = msg;
+        disconnectError.classList.remove('hidden');
+      }
+      disconnectBtn.disabled = false;
+      disconnectBtn.textContent = 'Disconnect GitHub';
+    };
+
+    if (disconnectError) {
+      disconnectError.textContent = '';
+      disconnectError.classList.add('hidden');
+    }
+    disconnectBtn.disabled = true;
+    disconnectBtn.textContent = 'Disconnecting…';
+
+    let res: Response;
+    try {
+      res = await fetch('/portal/api/github/disconnect', { method: 'DELETE' });
+    } catch {
+      showError('Failed to disconnect. Please try again.');
+      return;
+    }
+
+    if (!res.ok) {
+      showError('Failed to disconnect. Please try again.');
+      return;
+    }
+
+    try {
+      await authClient.unlinkAccount({ providerId: 'github' });
+    } catch {
+      // Server cleanup succeeded but Better Auth couldn't fully detach the
+      // account (rare — usually a session/network blip). Surface a recovery
+      // message with the github.com revoke link and skip the reload so the
+      // user can act on it. Reloading after manual revocation will land them
+      // back in the no-github-account state.
+      showError(
+        "Project links cleared, but GitHub couldn't be fully disconnected. Visit https://github.com/settings/applications to revoke access manually, then refresh.",
+      );
+      return;
+    }
+
+    window.location.assign('/portal/progress');
   });
 </script>
