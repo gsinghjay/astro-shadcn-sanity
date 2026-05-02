@@ -1,13 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { sanityClient } from 'sanity:client';
 
-const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink } = vi.hoisted(() => {
+const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend } = vi.hoisted(() => {
   const mockBetterAuth = vi.fn().mockReturnValue({
     handler: vi.fn(),
     api: { getSession: vi.fn() },
   });
   const mockDrizzleAdapter = vi.fn().mockReturnValue({ __adapter: true });
   const mockMagicLink = vi.fn().mockReturnValue({ id: 'magic-link' });
-  return { mockBetterAuth, mockDrizzleAdapter, mockMagicLink };
+  const mockEmailOTP = vi.fn().mockReturnValue({ id: 'email-otp' });
+  const mockResendSend = vi.fn().mockResolvedValue({ id: 'mock-email-id' });
+  return { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend };
 });
 
 vi.mock('better-auth', () => ({
@@ -22,9 +25,13 @@ vi.mock('better-auth/plugins/magic-link', () => ({
   magicLink: mockMagicLink,
 }));
 
+vi.mock('better-auth/plugins/email-otp', () => ({
+  emailOTP: mockEmailOTP,
+}));
+
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({
-    emails: { send: vi.fn().mockResolvedValue({ id: 'mock-email-id' }) },
+    emails: { send: mockResendSend },
   })),
 }));
 
@@ -88,6 +95,32 @@ describe('createAuth() — unified auth factory', () => {
     expect(mockMagicLink).toHaveBeenCalled();
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.plugins).toContainEqual({ id: 'magic-link' });
+  });
+
+  it('registers Email OTP plugin', () => {
+    createAuth({ db: mockDb, env: mockEnv });
+    expect(mockEmailOTP).toHaveBeenCalled();
+    const config = mockBetterAuth.mock.calls[0][0];
+    expect(config.plugins).toContainEqual({ id: 'email-otp' });
+  });
+
+  it('Email OTP sendVerificationOTP sends sign-in code via Resend', async () => {
+    createAuth({ db: mockDb, env: { ...mockEnv, RESEND_FROM_EMAIL: 'YWCC <noreply@example.com>' } });
+    const otpOpts = mockEmailOTP.mock.calls[0][0];
+    await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'sign-in' });
+    expect(mockResendSend).toHaveBeenCalledWith(expect.objectContaining({
+      from: 'YWCC <noreply@example.com>',
+      to: 'user@example.com',
+      subject: expect.stringContaining('sign-in code'),
+      html: expect.stringContaining('123456'),
+    }));
+  });
+
+  it('Email OTP sendVerificationOTP skips non-sign-in types', async () => {
+    createAuth({ db: mockDb, env: mockEnv });
+    const otpOpts = mockEmailOTP.mock.calls[0][0];
+    await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'email-verification' });
+    expect(mockResendSend).not.toHaveBeenCalled();
   });
 
   it('configures user.additionalFields.role', () => {
@@ -174,57 +207,64 @@ describe('createAuth() — unified auth factory', () => {
 describe('checkSponsorWhitelist()', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal('fetch', vi.fn());
-    // Stub import.meta.env values
-    vi.stubEnv('PUBLIC_SANITY_STUDIO_PROJECT_ID', 'test-project');
-    vi.stubEnv('PUBLIC_SANITY_STUDIO_DATASET', 'production');
   });
 
   it('returns true when email is on the sponsor whitelist', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ result: true })));
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
     const result = await checkSponsorWhitelist('sponsor@company.com');
     expect(result).toBe(true);
   });
 
   it('returns false when email is not on the sponsor whitelist', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ result: false })));
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as any);
     const result = await checkSponsorWhitelist('unknown@test.com');
     expect(result).toBe(false);
   });
 
-  it('returns false when Sanity API returns error', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response('Server Error', { status: 500 }));
+  it('returns false when sanityClient.fetch rejects', async () => {
+    vi.mocked(sanityClient.fetch).mockRejectedValueOnce(new Error('Network error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
-    expect(consoleSpy).toHaveBeenCalledWith('[auth] Sanity whitelist query failed: 500');
+    expect(consoleSpy).toHaveBeenCalledWith(
+      '[auth] Sanity whitelist check error:',
+      expect.any(Error),
+    );
     consoleSpy.mockRestore();
   });
 
-  it('returns false when fetch throws a network error', async () => {
-    vi.mocked(fetch).mockRejectedValue(new Error('Network error'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  it('returns false when sanityClient.fetch returns non-boolean payload', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(undefined as any);
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
-    expect(consoleSpy).toHaveBeenCalledWith('[auth] Sanity whitelist check error:', expect.any(Error));
-    consoleSpy.mockRestore();
   });
 
-  it('returns false when response is not valid JSON', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response('not json', { status: 200 }));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const result = await checkSponsorWhitelist('sponsor@test.com');
-    expect(result).toBe(false);
-    expect(consoleSpy).toHaveBeenCalledWith('[auth] Sanity whitelist check error:', expect.any(Error));
-    consoleSpy.mockRestore();
-  });
-
-  it('calls Sanity API with correct query URL', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ result: false })));
+  it('passes the email through as a GROQ param (not interpolated into the query)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as any);
     await checkSponsorWhitelist('test@example.com');
-    const callUrl = vi.mocked(fetch).mock.calls[0][0] as string;
-    expect(callUrl).toContain('test-project.api.sanity.io');
-    expect(callUrl).toContain('production');
-    expect(callUrl).toContain(encodeURIComponent('test@example.com'));
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('$email'),
+      { email: 'test@example.com' },
+    );
+  });
+
+  it('handles + aliases without breaking the query (regression: hand-built URL leaked)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
+    const result = await checkSponsorWhitelist('sponsor+alias@example.com');
+    expect(result).toBe(true);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { email: 'sponsor+alias@example.com' },
+    );
+  });
+
+  it('handles Unicode local-parts (regression: encodeURIComponent only encoded inner)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
+    const result = await checkSponsorWhitelist('用户@example.com');
+    expect(result).toBe(true);
+    expect(sanityClient.fetch).toHaveBeenCalledWith(
+      expect.any(String),
+      { email: '用户@example.com' },
+    );
   });
 });

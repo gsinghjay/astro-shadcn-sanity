@@ -124,11 +124,15 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
-      STUDIO_ADMIN_TOKEN: envField.string({
+      // Worker-only Sanity API token (Viewer permissions) used by
+      // /api/portal/admin/acceptances to verify project membership of the
+      // claimed Studio user id forwarded as `X-Sanity-User-Id`. Sanity API
+      // tokens are `sk`-prefixed (24.1.5).
+      SANITY_PROJECT_READ_TOKEN: envField.string({
         context: "server",
         access: "secret",
+        startsWith: "sk",
         optional: true,
-        startsWith: "sat_",
       }),
       STUDIO_ORIGIN: envField.string({
         context: "server",
@@ -149,16 +153,21 @@ export default defineConfig({
     },
   ],
   adapter: cloudflare({
-    // Adapter v13 default is 'cloudflare-binding' (Images runtime binding).
-    // Pin to 'compile' to preserve current behavior — Sanity images bypass
-    // <Image> already, so adopting the binding is a separate spike.
+    // Adapter v13 default is 'cloudflare-binding' (Cloudflare Images runtime
+    // binding). Stay on 'compile' until vitest gets a workerd-aware pool —
+    // flipping the default switches @astrojs/cloudflare into Workers test
+    // mode and the existing forks-pool suite collapses with `require is not
+    // defined`. Sanity images bypass <Image> via urlFor() so the build-time
+    // service is fine in production. Track in a follow-up spike.
     imageService: 'compile',
   }),
   vite: {
     plugins: [
       tailwindcss(),
-      // Pre-compile CJS-only deps so they work in the workerd dev environment introduced
-      // by adapter v13. picomatch is reachable via @astrojs/react and uses bare `require`.
+      // Pre-compile CJS-only deps so they work in the workerd dev / vitest
+      // environment introduced by adapter v13. picomatch is reachable via
+      // @astrojs/react and uses a bare `require`. Removing this still trips
+      // "require is not defined" at vitest startup as of adapter 13.2 + react 5.0.
       {
         name: "optimize-cjs-for-workerd",
         configEnvironment(environment) {
@@ -205,7 +214,7 @@ export default defineConfig({
             titleSelector: 'h1',
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
-              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**', '**/api/**',
             ],
             generateIndividualMd: true,
             generateLlmsTxt: true,
