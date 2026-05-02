@@ -1,1334 +1,362 @@
 ---
 title: "Cloudflare Guide"
-description: "Single source of truth for Cloudflare Pages, Workers, Access, D1, and all related services in this project."
+description: "Operational guide for the YWCC Capstone Cloudflare deployment — Workers, D1, KV, DO, Turnstile."
 date: 2026-02-25
+last_revised: 2026-04-29
 status: active
 ---
 
 # Cloudflare Guide
 
-Everything you need to deploy, authenticate, monitor, and optimize this project on Cloudflare — in one place.
+Operational reference for the YWCC Capstone Cloudflare stack: deploy, monitor, and troubleshoot on Workers + D1 + KV + Durable Objects + Turnstile.
+
+> **Revised 2026-04-29 for the Cloudflare Workers cutover (PR #681).** This project no longer uses Cloudflare Pages — all six sites (3 production + 3 preview) run as Workers via `@astrojs/cloudflare` v13 (`output: 'server'`). The legacy Pages projects are scheduled for deletion on **2026-05-03**. Cloudflare Access has also been retired in favor of Better Auth.
+
+This doc previously claimed to be the "single source of truth" for the Cloudflare stack. With the cutover, that role is split across:
+
+- **Topology + per-part architecture** → [architecture.md](architecture.md)
+- **Resources, bindings, env vars, handoff** → [cloudflare-infrastructure-guide.md](cloudflare-infrastructure-guide.md)
+- **Common commands, deploy, schema/D1 pipelines** → [development-guide.md](development-guide.md)
+- **Cross-script rate-limit DO** → [rate-limiting-with-durable-objects.md](rate-limiting-with-durable-objects.md)
+- **Free-tier limits and headroom** → [cost-optimization-strategy.md](cost-optimization-strategy.md)
+- **Better Auth migration rationale** → [auth-consolidation-strategy.md](auth-consolidation-strategy.md)
+- **D1 schema, GROQ queries** → [data-models.md](data-models.md)
+
+This guide collects operational items that don't fit cleanly elsewhere: monitoring, observability, plan trade-offs, troubleshooting, VPS escape hatch, and platform features on the roadmap.
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#1-overview)
-2. [Pages Setup and Deployment](#2-pages-setup-and-deployment)
-3. [Authentication (Cloudflare Access)](#3-authentication-cloudflare-access)
-4. [Plan Comparison: Free vs Workers Paid ($5/month)](#4-plan-comparison-free-vs-workers-paid-5month)
-5. [Cost Optimization and Descoping](#5-cost-optimization-and-descoping)
-6. [Environment Variables](#6-environment-variables)
-7. [Testing](#7-testing)
-8. [Monitoring and Observability](#8-monitoring-and-observability)
-9. [Troubleshooting](#9-troubleshooting)
-10. [VPS Migration Path](#10-vps-migration-path)
-11. [Phase 3 Platform Capabilities](#11-phase-3-platform-capabilities)
+2. [Plan Comparison: Free vs Workers Paid ($5/month)](#2-plan-comparison-free-vs-workers-paid-5month)
+3. [Monitoring and Observability](#3-monitoring-and-observability)
+4. [Troubleshooting](#4-troubleshooting)
+5. [VPS Migration Path](#5-vps-migration-path)
+6. [Platform Capabilities (current + roadmap)](#6-platform-capabilities-current--roadmap)
 
 ---
 
 ## 1. Overview
 
-### Architecture
+### Architecture (current)
 
-The site runs on **Cloudflare Pages** with the `@astrojs/cloudflare` adapter. Public pages are statically pre-rendered at build time (`output: "static"`). Only `/portal/*` routes use SSR via a Cloudflare Worker.
+Six Workers in **one** Cloudflare account host the YWCC public sites + Studio Presentation previews. The capstone Worker also has D1 + KV + a cross-script Durable Object for the rate limiter. RWC and preview Workers are content-only.
 
 ```
-Visitor → Cloudflare CDN (static HTML from edge cache)
-                         ↓ (portal routes only)
-           Cloudflare Access (enforces auth at edge)
-                         ↓
-           Cloudflare Pages Worker (Astro SSR)
-                         ↓
-           middleware.ts → lib/auth.ts (JWT defense-in-depth)
-                         ↓
-           Portal page renders with Astro.locals.user
+Visitor (any of 3 prod hosts) → CF edge
+                                 ↓
+                       Cloudflare Worker
+            ┌─ ASSETS binding ──── prerendered HTML / JS / CSS / images
+            │
+            └─ Astro 6 SSR entry ─ middleware.ts
+                                     ↓ (portal routes only)
+                                   rate-limit DO RPC (cross-script → rate-limiter-worker)
+                                     ↓
+                                   Better Auth session check (D1 + KV cache)
+                                     ↓
+                                   sponsor agreement gate (audit columns on `user`)
+                                     ↓
+                                   route handler / Astro Action / API
 ```
 
-### Services in Use
+### Services in use
 
 | Service | Status | Purpose |
 |:--------|:-------|:--------|
-| **Pages** (3 projects) | Active | Static hosting + CDN — `ywcc-capstone`, `rwc-us`, `rwc-intl` |
-| **Workers** (SSR) | Active | `/portal/*` and `/_server-islands/*` routes |
-| **Access / Zero Trust** | Active | Auth gate for `/portal/*` |
-| **Deploy Hook** | Active | Sanity webhook triggers production rebuild |
-| **Build Cache** | Active | Faster rebuilds (~2m with `SKIP_DEPENDENCY_INSTALL`) |
-| **D1** | Planned (Story 9.8) | Portal database (RSVPs, agreements, notification prefs) |
-| **KV** | Planned (Stories 9.5, 9.13) | Site health index + notification storage |
-| **R2** | Planned (Story 9.5) | Lighthouse/Pa11y report storage |
-| **Queues** | Planned (Story 9.13) | Async notification creation pipeline |
-| **Analytics Engine** | Planned (Stories 9.9, 9.15) | Portal activity tracking + admin analytics |
-| **Cron Triggers** | Planned (Story 9.13) | Daily event reminder notifications |
-| **Workers AI** | Planned (Phase 3) | RAG chatbot generation + form classification |
-| **Durable Objects** | Available | SQLite-backed stateful coordination (not currently planned) |
-| **Aggregated API** | Planned (Phase 3) | FastAPI Python Worker — unified typed REST API for all services |
-| **Turnstile** | Active | Bot protection for contact form (Story 6.1) |
+| **Workers** (6 in this repo) | Active | Astro SSR + ASSETS for ywcc-capstone, rwc-us, rwc-intl, *-preview |
+| **D1** | Active | `ywcc-capstone-portal` — Better Auth + sponsor agreement audit + GitHub linkages |
+| **KV** | Active | `SESSION_CACHE` for Better Auth (capstone Worker only) |
+| **Durable Objects** | Active | `SlidingWindowRateLimiter` in `rate-limiter-worker`, cross-script-bound from capstone |
+| **Cron Triggers** | Active | `ywcc-event-reminders` daily 09:00 UTC |
+| **Turnstile** | Active | Bot protection for forms (capstone) |
+| **Workers Static Assets** | Active | `ASSETS` binding on every Worker (free unlimited bandwidth) |
+| **Deploy Hooks** | Active | Sanity webhook → 3 deploy hooks (one per production Worker) |
+| **Workers AI** | Active (out-of-tree) | RAG via `capstone-ask-worker` over AI Search index `bf002610-…` |
+| **AI Search** | Active (out-of-tree) | Index `bf002610-921a-4047-9298-cc2d2668451a` |
+| **R2** | Not used | — |
+| **Queues** | Not used | — |
+| **Analytics Engine** | Not used | — |
+| **Pages** | **Retired (deletion 2026-05-03)** | Custom domains detached and re-attached to Workers |
+| **Cloudflare Access (Zero Trust)** | **Retired** | Replaced by Better Auth |
 
-### Key Files
+### Key files
 
 | File | Role |
 |:-----|:-----|
-| `astro-app/astro.config.mjs` | `output: "static"`, `adapter: cloudflare({ platformProxy: { enabled: true } })` |
-| `astro-app/wrangler.jsonc` | Project name, compat flags, build output dir, Access env vars |
-| `astro-app/public/_headers` | Security response headers (applied at CDN edge) |
-| `astro-app/src/env.d.ts` | TypeScript types for Cloudflare runtime env |
-| `astro-app/src/middleware.ts` | JWT validation for `/portal/*` routes |
-| `astro-app/src/lib/auth.ts` | `Cf-Access-Jwt-Assertion` header verification via `jose` |
-| `astro-app/src/layouts/PortalLayout.astro` | Portal layout with CF Access logout URL |
+| `astro-app/astro.config.mjs` | `output: "server"`, `adapter: cloudflare({ imageService: 'compile' })`, env schema, Vite + sitemap + llms-md |
+| `astro-app/wrangler.jsonc` | One config; six `[env.*]` blocks (capstone / rwc_us / rwc_intl + 3 preview). `main: "@astrojs/cloudflare/entrypoints/server"` |
+| `astro-app/public/_headers` | Static-asset CSP, STS, Permissions-Policy (served via ASSETS) |
+| `astro-app/src/env.d.ts` | `Cloudflare.Env` augmentation (DO RPC interface, secrets) |
+| `astro-app/src/middleware.ts` | Rate-limit + Better Auth session check + agreement gate |
+| `astro-app/src/lib/auth-config.ts` | Better Auth instance |
+| `astro-app/src/lib/db.ts` + `drizzle-schema.ts` | D1 wrapper + Drizzle schema |
+| `rate-limiter-worker/src/index.ts` | `SlidingWindowRateLimiter` Durable Object |
+| `event-reminders-worker/src/index.ts` | Cron `scheduled()` handler |
 
 ---
 
-## 2. Pages Setup and Deployment
+## 2. Plan Comparison: Free vs Workers Paid ($5/month)
 
-### Prerequisites
+This project runs entirely on the **free plan** today. Below is what each plan includes for the surfaces this project actually uses.
 
-- Cloudflare account ([sign up free](https://dash.cloudflare.com/sign-up))
-- GitHub repository access with admin permissions
-- Node.js 22+ installed locally
+### Free plan (current)
 
-### 2.1 Create a Pages Project
+| Resource | Free allowance | Estimated daily usage |
+|:---------|:--------------|:----------------------|
+| Worker requests | 100K/day | ~2.2K (across all 6 Workers) |
+| Worker CPU time | 10ms / invocation | ~3-6ms per SSR page |
+| Worker subrequests | 50 / invocation | ~3-8 per SSR page |
+| Workers Static Assets bandwidth | Unlimited | — |
+| D1 row reads | 5M/day | ~200/day |
+| D1 row writes | 100K/day | ~50/day |
+| D1 storage | 5 GB (500MB per DB) | ~5 MB |
+| KV reads | 100K/day | ~2K/day |
+| KV writes | 1K/day | ~100/day |
+| Durable Objects requests | 100K/day | ~2K/day (capstone only) |
+| Durable Objects storage | 5 GB / account | Negligible (timestamps, pruned by alarm) |
+| Cron Triggers | 5 active | 1 (ywcc-event-reminders) |
+| Static Assets bandwidth | Unlimited | — |
 
-1. Go to [dash.cloudflare.com](https://dash.cloudflare.com) → **Workers & Pages** → **Create**
-2. Select **Pages** → **Connect to Git** → select the `astro-shadcn-sanity` repo
-3. Configure:
-   - **Project name:** `ywcc-capstone`
-   - **Build command:** `npm run build --workspace=astro-app`
-   - **Build output directory:** `astro-app/dist`
-4. Set environment variables (see [Section 6](#6-environment-variables))
-5. Save and deploy
+The tightest constraint is **CPU per invocation** at 10ms — currently 30-60% utilized. See [cost-optimization-strategy.md](cost-optimization-strategy.md) for the per-operation breakdown and what triggers a paid upgrade.
 
-> You can skip manual creation — the first `wrangler pages deploy` auto-creates the project. But connecting git enables native preview deployments.
+### Workers Paid ($5/month)
 
-### 2.2 Get Credentials
+Switching plans does not change any code. The wrangler config and bindings work identically on either plan.
 
-**Account ID:**
-1. [dash.cloudflare.com](https://dash.cloudflare.com) → right sidebar → **Account ID**
-2. Copy it for local testing and GitHub secrets
+| Resource | Paid plan |
+|:---------|:----------|
+| Worker requests | 10M/month included, then $0.30/M |
+| Worker CPU time | Up to 5 minutes per invocation |
+| Worker subrequests | 1000 per invocation |
+| D1 storage | 50 GB included |
+| D1 reads | 25B/month |
+| D1 writes | 50M/month |
+| KV reads | 10M/month |
+| KV writes | 1M/month |
+| Durable Objects | 1M requests/month, 400K GB-s compute |
+| Cron Triggers | Unlimited |
+| Python Workers | Production-eligible (free plan can run them but daily limits make this fragile) |
+| Email Workers, Queues, Analytics Engine | Available |
 
-**API Token:**
-1. Go to [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens) → **Create Token**
-2. Under **Custom token**, click **"Get started"**
-3. Configure:
-   - **Token name:** `ywcc-capstone-pages-deploy`
-   - **Permissions:** Account → Cloudflare Pages → Edit
-   - **Account Resources:** Include → your account
-4. Create and copy the token (shown only once)
+**Trigger to upgrade:** any of these ship — `platform-api` going live in production, sustained Python Worker traffic, more than 5 cron triggers, real abuse traffic exhausting free-plan DO requests.
 
-> Use the custom token approach — the pre-built "Edit Cloudflare Workers" template gives broader permissions than needed.
+---
 
-### 2.3 Local Deploy Test
+## 3. Monitoring and Observability
+
+Every Worker has `observability.enabled: true` with `head_sampling_rate: 1` (100% of invocations sampled into Workers Logs). Logs are accessible from the dashboard or via `wrangler tail`.
+
+### Tail logs locally
 
 ```bash
-export CLOUDFLARE_API_TOKEN="your-token-here"
-export CLOUDFLARE_ACCOUNT_ID="your-account-id-here"
+# Tail a single Worker
+npx wrangler tail --name ywcc-capstone
 
-npm run build --workspace=astro-app
-cd astro-app && npx wrangler pages deploy dist/ --project-name=ywcc-capstone && cd ..
+# With format JSON for piping
+npx wrangler tail --name ywcc-capstone --format json | jq .
+
+# Filter to errors only
+npx wrangler tail --name ywcc-capstone --status error
+
+# Tail standalone Workers
+npx wrangler tail --name rate-limiter-worker
+npx wrangler tail --name ywcc-event-reminders
 ```
 
-Verify at `https://ywcc-capstone.pages.dev`:
+### Dashboard
 
-- Site loads with HTTPS
-- Pages render (homepage, about, sponsors, projects, contact)
-- DevTools → Network → response headers include security headers
+- **Workers logs**: dashboard → Workers & Pages → `<worker>` → Logs.
+- **Workers metrics**: requests, errors, CPU time per Worker (last 24h, 7d, 30d).
+- **D1 metrics**: dashboard → Workers & Pages → D1 → `ywcc-capstone-portal` → Metrics.
+- **KV metrics**: dashboard → Workers & Pages → KV → `<namespace>` → Metrics.
+- **DO metrics**: dashboard → Workers & Pages → `rate-limiter-worker` → Durable Objects.
 
-### 2.4 Local Wrangler Preview
+### Health checks
 
-Preview the build locally using Miniflare:
+- `/portal/api/db-health` (capstone, authenticated): exposes table names and row counts. ⚠ Known risk — exposes SQLite metadata to any authenticated user. TODO: gate behind admin role.
+- `event-reminders-worker` exposes a thin `fetch()` for uptime monitors (no auth, returns `200 ok`).
+
+### Sanity webhook delivery
+
+- Sanity dashboard → API → Webhooks → Attempts tab. Look for `200 OK` per deploy hook.
+- If a webhook attempt is `5xx`, the corresponding production Worker did not get a content rebuild — re-trigger via dashboard or the deploy hook URL.
+
+---
+
+## 4. Troubleshooting
+
+The most common problems and fixes. For installation / setup issues, see [development-guide.md](development-guide.md).
+
+### `[object Object]` in SSR responses
+
+**Symptom**: Pages render the literal string `[object Object]` instead of HTML, or middleware-routed responses break.
+
+**Cause**: Astro 6 + `@astrojs/cloudflare` v13 + `nodejs_compat` emits SSR responses as async iterables that the `workerd` runtime stringifies incorrectly. Documented in Astro #15434 / #14511.
+
+**Fix**: confirm `compatibility_flags` in `wrangler.jsonc` includes `disable_nodejs_process_v2`:
+
+```jsonc
+"compatibility_flags": [
+  "nodejs_compat",
+  "global_fetch_strictly_public",
+  "disable_nodejs_process_v2"
+]
+```
+
+This is a workaround. Remove `disable_nodejs_process_v2` only after `compatibility_date >= 2026-02-19` (which lands `fetch_iterable_type_support`). Bumping `compatibility_date` past `2025-12-01` requires re-validating the workaround flag set.
+
+### `503 Service Unavailable` on `/portal/*`
+
+**Cause**: Either the request hit `rwc-us` / `rwc-intl` (no D1/KV/DO bindings) or a binding is missing on `ywcc-capstone`.
+
+**Fix**: confirm the URL hits `www.ywcccapstone1.com` (capstone). If yes, check D1 + KV + DO bindings in `[env.capstone]` of `wrangler.jsonc`, then regenerate types and redeploy:
+
+```bash
+npx wrangler types -C astro-app
+npm run deploy:capstone -w astro-app
+```
+
+### Capstone deploy fails with "DO class not found"
+
+**Cause**: `rate-limiter-worker` is not deployed (or has been deleted). The cross-script DO binding fails at deploy time.
+
+**Fix**: deploy the rate limiter first, then capstone:
+
+```bash
+npm run deploy:rate-limiter        # (root)
+npm run deploy:capstone -w astro-app
+```
+
+### OAuth `redirect_uri_mismatch`
+
+**Cause**: The Google or GitHub OAuth app does not list the deployment URL as an authorized redirect URI.
+
+**Fix**: in the OAuth provider:
+
+```
+https://www.ywcccapstone1.com/api/auth/callback/google
+https://www.ywcccapstone1.com/api/auth/callback/github
+```
+
+For Studio Presentation preview iframe: `https://ywcc-capstone-preview.js426.workers.dev` (preview Workers don't run the auth flow but the URL must be valid for any test sign-in attempts).
+
+### Login redirects in a loop
+
+**Cause**: `BETTER_AUTH_URL` mismatch.
+
+**Fix**: confirm `[env.capstone].vars.BETTER_AUTH_URL` is `https://www.ywcccapstone1.com` (the canonical `www` host — apex `ywcccapstone1.com` 301s to `www` via a zone-level Single Redirect rule and never reaches the Worker).
+
+### Turnstile rejects all form submissions
+
+**Cause**: `TURNSTILE_SECRET_KEY` is missing on `ywcc-capstone`, or the public key in `wrangler.jsonc` doesn't match the dashboard widget.
+
+**Fix**:
+
+```bash
+# Confirm the public site key
+grep PUBLIC_TURNSTILE_SITE_KEY astro-app/wrangler.jsonc
+
+# Confirm the secret is set on the Worker
+npx wrangler secret list --name ywcc-capstone | grep TURNSTILE_SECRET_KEY
+
+# If missing
+npx wrangler secret put TURNSTILE_SECRET_KEY --name ywcc-capstone
+```
+
+### `wrangler.jsonc` change doesn't take effect
+
+**Cause**: stale `worker-configuration.d.ts` or cached `.wrangler/`.
+
+**Fix**:
+
+```bash
+npx wrangler types -C astro-app
+rm -rf astro-app/.wrangler astro-app/dist
+npm run deploy:<env> -w astro-app
+```
+
+### GitHub OAuth fails with valid client ID
+
+**Cause**: at production cutover, `GITHUB_CLIENT_SECRET` must be re-put with the **prod GitHub OAuth App's** secret (paired with `GITHUB_CLIENT_ID Ov23liFtOiWIyCqJXJMi`). The staging-phase secret paired with `Ov23li8R7jigMPatjOml` is no longer valid.
+
+**Fix**:
+
+```bash
+npx wrangler secret put GITHUB_CLIENT_SECRET --name ywcc-capstone
+# paste the prod GitHub OAuth App secret
+```
+
+### D1 query returns 0 rows where data should exist
+
+**Cause**: querying via `ywcc-event-reminders` after migrations have only been applied to the local DB.
+
+**Fix**: confirm migrations applied to remote:
 
 ```bash
 cd astro-app
-npx wrangler pages dev dist/
+npx wrangler d1 migrations list PORTAL_DB --remote
+npx wrangler d1 migrations apply PORTAL_DB --remote
 ```
 
-Runs on `http://localhost:8788`. The `_headers` file is not applied locally — that is Cloudflare Pages infrastructure only.
-
-### 2.5 How Deployment Works (Deploy Hook)
-
-Content rebuilds use a **Cloudflare deploy hook** — the simplest possible pipeline with no GitHub Actions in the loop.
-
-```mermaid
-flowchart LR
-    A[Editor publishes\nin Sanity Studio] --> B[Sanity Content Lake\nfires GROQ webhook]
-    B --> C[POST to Cloudflare\nDeploy Hook URL]
-    C --> D[Cloudflare Pages\nbuilds from git]
-    D --> E[Production site\nupdated ~45-75s]
-
-    style A fill:#f9f,stroke:#333
-    style D fill:#ff9,stroke:#333
-    style E fill:#9f9,stroke:#333
-```
-
-**What triggers a build:**
-
-| Trigger | Result |
-|:--------|:-------|
-| Push to `main` (or merge PR) | Production deploy to `ywcc-capstone.pages.dev` |
-| Push to any other branch | Preview deploy to `branch.ywcc-capstone.pages.dev` |
-| Sanity content published | Deploy hook fires → production rebuild |
-
-#### Set Up the Deploy Hook
-
-1. [dash.cloudflare.com](https://dash.cloudflare.com) → `ywcc-capstone` → **Settings** → **Builds & deployments** → **Deploy hooks**
-2. **Add deploy hook** → Name: `Sanity Content Publish`, Branch: `main` → **Save**
-3. Copy the generated URL (treat it as a secret — anyone with this URL can trigger a build)
-
-#### Configure the Sanity Webhook
-
-1. [sanity.io/manage](https://sanity.io/manage) → your project → **API** → **Webhooks**
-2. Create or edit the `Trigger production rebuild` webhook:
-
-| Field | Value |
-|:------|:------|
-| **URL** | The deploy hook URL from above |
-| **Trigger on** | Create, Update, Delete |
-| **Filter** | `_type in ["page", "siteSettings", "sponsor", "project", "team", "event"]` |
-| **Drafts** | OFF (only fire on publish) |
-| **HTTP method** | POST |
-| **HTTP Headers** | None required |
-
-3. Enable and save
-
-#### Verify
-
-1. Publish a content change in Sanity Studio
-2. Check **sanity.io/manage** → Webhooks → **Attempts** tab → `200 OK`
-3. Check **CF Pages dashboard** → **Deployments** → new production build appears
-4. Build completes in ~45-75 seconds (with build cache)
-
-### 2.6 Build Caching
-
-Cloudflare Pages caches dependencies and build outputs across deployments.
-
-**Enable:**
-1. CF Pages → your project → **Settings** → **Build** → **Build cache** → **Enable**
-
-**What gets cached:**
-
-| Cache | Directory | Effect |
-|:------|:----------|:-------|
-| npm global cache | `.npm` | `npm ci` pulls from local cache |
-| Astro build cache | `node_modules/.astro` | Incremental builds |
-
-**Build times:**
-
-| Scenario | Build Time |
-|:---------|:-----------|
-| Cold start (no cache) | ~2 minutes |
-| Warm (cached) | ~45-75 seconds |
-
-**Constraints:** 10 GB per project, expires after 7 days without a build, beta feature.
-
-**Clear cache:** CF Pages → **Settings** → **Build** → **Build cache** → **Clear Cache**
-
-### 2.7 Security Headers
-
-`astro-app/public/_headers` applies these response headers on all routes via Cloudflare Pages CDN:
-
-- `X-Content-Type-Options: nosniff`
-- `Referrer-Policy: strict-origin-when-cross-origin`
-- `Permissions-Policy: camera=(), microphone=(), geolocation=()`
-- `Content-Security-Policy: frame-ancestors 'self' https://*.sanity.studio https://*.sanity.io`
-
-These are only active on deployed Cloudflare Pages, not in local dev.
-
-### 2.8 Multi-Project Deployment (Epic 15)
-
-The same Astro codebase deploys as **three independent CF Pages projects**, each with different environment variables for dataset, site identity, and theme.
-
-#### Projects
-
-| CF Pages Project | Dataset | Site ID | Theme | URL |
-|:-----------------|:--------|:--------|:------|:----|
-| `ywcc-capstone` | `production` | `capstone` | `red` | `ywcc-capstone.pages.dev` |
-| `rwc-us` | `rwc` | `rwc-us` | `blue` | `rwc-us.pages.dev` |
-| `rwc-intl` | `rwc` | `rwc-intl` | `green` | `rwc-intl.pages.dev` |
-
-All three share the same repository (`gsinghjay/astro-shadcn-sanity`), build command, and build output directory. Only the environment variables differ.
-
-#### Build Configuration (identical for all projects)
-
-| Setting | Value |
-|:--------|:------|
-| Framework preset | Astro |
-| Build command | `npm install --prefer-offline --no-audit --no-fund && npm run build --workspace=astro-app` |
-| Build output directory | `astro-app/dist` |
-| Root directory | `/` (monorepo root — npm workspaces need root `package.json`) |
-
-> **Critical:** Root directory must be `/`, NOT `astro-app/`. The build command uses npm workspaces which requires the monorepo root `package.json`.
-
-#### Build Optimization: Skip Automatic Dependency Install
-
-All projects set the `SKIP_DEPENDENCY_INSTALL=true` environment variable (Production + Preview). This tells the CF Pages v3 build image to skip the automatic `npm clean-install` step, which deletes `node_modules` and reinstalls from scratch (~60s).
-
-Instead, the build command runs `npm install --prefer-offline --no-audit --no-fund` which:
-- Reuses the cached `node_modules` from previous builds
-- Only installs new/changed packages from the `.npm` global cache
-- Falls back to the network only when the cache misses
-- Skips vulnerability audit and funding checks (`--no-audit --no-fund`)
-- Is safe for both content rebuilds (same code) and code pushes (lockfile changes)
-
-Additionally, `NODE_VERSION=24.13.1` is pinned on both environments so the build image can cache the Node.js binary instead of re-downloading it each build.
-
-**Before optimization:** ~3m 24s (60s `npm ci` + 50s server build + 8s client build)
-**After optimization:** ~2m (40s `npm install` + 37s server build + 6s client build)
-
-On subsequent builds where `node_modules` is fully cached, the install step drops further.
-
-#### Build Watch Paths
-
-Configured per project to avoid unnecessary rebuilds:
-
-- **Include:** `astro-app/*`, `package-lock.json`
-- **Exclude:** `studio/*`, `_templates/*`, `docs/*`, `_bmad/*`, `_bmad-output/*`, `_wp-scrape/*`, `tests/*`, `.github/*`, `rules/*`, `CHANGELOG.md`, `README.md`, `.cursorrules`
-
-Schema changes in `studio/` don't directly trigger builds — `npm run typegen` updates `astro-app/src/sanity.types.ts`, which IS in the watch path.
-
-#### Per-Project Environment Variables
-
-Set in CF Pages dashboard **Settings → Environment variables** (both Production and Preview):
-
-| Variable | `ywcc-capstone` | `rwc-us` | `rwc-intl` |
-|:---------|:----------------|:---------|:-----------|
-| `PUBLIC_SANITY_STUDIO_PROJECT_ID` | `49nk9b0w` | `49nk9b0w` | `49nk9b0w` |
-| `PUBLIC_SANITY_DATASET` | `production` | `rwc` | `rwc` |
-| `PUBLIC_SITE_ID` | `capstone` | `rwc-us` | `rwc-intl` |
-| `PUBLIC_SITE_THEME` | `red` | `blue` | `green` |
-| `PUBLIC_SITE_URL` | (project domain) | (project domain) | (project domain) |
-| `PUBLIC_SANITY_STUDIO_URL` | studio URL | studio URL | studio URL |
-| `PUBLIC_GTM_ID` | (shared or per-site) | (shared or per-site) | (shared or per-site) |
-| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | `true` | `true` | `true` |
-| `SANITY_API_READ_TOKEN` | (shared token) | (shared token) | (shared token) |
-
-Secrets (encrypted, dashboard Secrets section):
-- `CF_ACCESS_AUD` — per-project or shared Access Application Audience tag
-- `TURNSTILE_SECRET_KEY` — shared Turnstile secret
-- `SANITY_API_WRITE_TOKEN` — shared Sanity write token
-- `DISCORD_WEBHOOK_URL` — shared or per-site Discord webhook
-
-#### Deploy Hooks (Content Rebuild)
-
-Each project has a deploy hook for Sanity content rebuilds:
-
-| Project | Hook Name | Branch |
-|:--------|:----------|:-------|
-| `ywcc-capstone` | `sanity-content-update-capstone` | `main` |
-| `rwc-us` | `sanity-content-update-rwc-us` | `main` |
-| `rwc-intl` | `sanity-content-update-rwc-intl` | `main` |
-
-Deploy hook URLs are secrets — never commit them to source code.
-
-**Content rebuild pipeline:**
-
-```
-Sanity publish → GROQ webhook (per dataset)
-    ├── Dataset: production → POST capstone deploy hook
-    └── Dataset: rwc       → POST rwc-us + rwc-intl deploy hooks
-```
-
-#### Build Limits
-
-| Resource | Free Plan | Paid Plan ($5/mo) |
-|:---------|:----------|:------------------|
-| Builds per month | 500 | 5,000 |
-| Concurrent builds | 1 | 6 |
-| Projects per repo | 5 (we use 3) | 5 |
-
-With 3 projects, each push triggers up to 3 builds. On the free plan they queue sequentially (~60-90s each).
-
-#### How It Works (Code)
-
-The Astro codebase reads environment variables at build time via `vite.define` in `astro.config.mjs`:
-
-- `PUBLIC_SANITY_DATASET` → which Sanity dataset to query
-- `PUBLIC_SITE_ID` → site-specific GROQ filtering via `getSiteParams()`
-- `PUBLIC_SITE_THEME` → `data-site-theme` attribute on `<html>` for CSS overrides
-
-No code branching per site — the same code paths serve all sites. Env vars control behavior.
-
-#### `wrangler.jsonc` and Multi-Project
-
-`astro-app/wrangler.jsonc` is for **local dev only** (`wrangler pages dev`). It references `ywcc-capstone` as the project name. Per-project production config is managed entirely in the CF Pages dashboard. Do not duplicate dashboard env vars in `wrangler.jsonc`.
+Then redeploy both `ywcc-capstone` and `ywcc-event-reminders` (they both bind the same DB).
 
 ---
 
-## 3. Authentication (Cloudflare Access)
+## 5. VPS Migration Path
 
-> **DEPRECATED (Story 9.18):** Cloudflare Access has been replaced by Better Auth for sponsor authentication. Sponsors now log in via Google OAuth, GitHub OAuth, or Magic Link at `/portal/login`. The CF Access application should be removed from the Zero Trust dashboard. See `docs/auth-consolidation-strategy.md` for the full migration details and manual teardown steps.
+If the project ever outgrows Cloudflare's model — needs PostgreSQL, full Node.js runtime without CPU caps, or operational consolidation onto an existing VPS — the [VPS Migration Plan](vps-migration-plan.md) documents the full escape hatch:
 
-~~Cloudflare Access (Zero Trust) protects `/portal/*` routes. Unauthenticated requests never reach the Astro Worker.~~
+- nginx + Astro Node.js (replaces Workers)
+- PostgreSQL (replaces D1)
+- Better Auth on PG (no rewrite — same library, different adapter)
+- nginx rate-limit module or Redis (replaces cross-script DO)
+- Cloudflare DNS proxy (free, keeps the edge benefits)
 
-### 3.1 How It Works
-
-```
-Browser → Cloudflare Edge (Access enforces auth)
-  → CF login page (OTP or Google) → identity verified
-  → Request forwarded with Cf-Access-Jwt-Assertion header
-  → Cloudflare Pages Worker (Astro SSR)
-  → middleware.ts validates JWT (defense-in-depth)
-  → Sets Astro.locals.user = { email }
-  → Portal page renders
-```
-
-**Key point:** `lib/auth.ts` JWT validation is defense-in-depth. CF Access is the primary auth gate. The middleware catches misconfiguration or bypass attempts.
-
-### 3.2 Access Application Setup
-
-These steps are performed in the [Cloudflare Zero Trust dashboard](https://one.dash.cloudflare.com).
-
-1. Navigate to **Access → Applications**
-2. Click **Add an application** → select **Self-hosted**
-3. Configure:
-   - **Application name:** `YWCC Capstone Sponsor Portal`
-   - **Session duration:** 24 hours
-   - **Public hostname:** Your project domain (custom domain or `*.pages.dev`)
-   - **Path:** `/portal/`
-4. Create a second rule for exact path `/portal` — the wildcard `/portal/*` does **not** match `/portal` alone
-5. Record the **Application Audience (AUD) tag** — needed for JWT verification
-6. Verify non-portal routes (`/`, `/sponsors`, `/projects`) remain publicly accessible
-
-#### Path Wildcard Rules
-
-- `/portal/*` protects all subpaths but **not** `/portal` itself
-- Create two rules: `/portal` (exact) and `/portal/*`
-- Only one wildcard per path segment
-- Query strings, ports, and anchors are stripped from path matching
-
-### 3.3 Identity Providers
-
-Two login methods: **One-Time PIN** (fallback) and **Google** (external sponsors).
-
-#### One-Time PIN (OTP)
-
-1. **Cloudflare One → Settings → Authentication → Login methods**
-2. **Add new** → select **One-time PIN**
-3. Save — no client ID or secret needed
-
-#### Google Login
-
-**Google Cloud Console:**
-
-1. [console.cloud.google.com](https://console.cloud.google.com/) → create or select a project
-2. **APIs & Services → OAuth consent screen** → User Type: External
-3. **APIs & Services → Credentials → Create Credentials → OAuth client ID**
-4. Application type: **Web application**
-5. Authorized JavaScript origin: `https://ywcc-capstone-pages.cloudflareaccess.com`
-6. Authorized redirect URI: `https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/callback`
-7. Copy **Client ID** and **Client Secret**
-
-**Cloudflare Zero Trust:**
-
-1. **Cloudflare One → Settings → Authentication → Login methods**
-2. **Add new** → select **Google**
-3. Enter Client ID (as "App ID") and Client Secret
-4. Save
-
-### 3.4 Email Allow Policy
-
-1. In the Access Application, add an **Allow** policy
-2. Add **Include** rules:
-   - **Individual emails:** "Emails" selector → `sponsor@company.com`
-   - **Domain patterns:** "Emails ending in" selector → `@njit.edu`
-3. For multiple domains, use **separate Include rules** (OR logic)
-
-> **Warning:** NEVER put multiple domains in a single "Require" rule. Require uses AND logic — everyone gets locked out.
-
-### 3.5 Add Sponsor Access
-
-1. **Access → Applications → YWCC Capstone Sponsor Portal**
-2. Open the **Allow** policy
-3. Add a new **Include** rule:
-   - Individual: "Emails" → `sponsor@company.com`
-   - Organization: "Emails ending in" → `@company.com`
-4. Save
-
-No account creation needed — CF Access handles authentication.
-
-### 3.6 Remove Sponsor Access
-
-1. **Access → Applications → YWCC Capstone Sponsor Portal**
-2. Open the **Allow** policy → delete the Include rule → Save
-
-The session remains valid until expiry (24 hours). To force immediate revocation:
-
-1. **Access → Applications → Overview → Active sessions**
-2. Revoke the specific user's session
-
-### 3.7 Logging Out
-
-To log out (or switch accounts), visit:
-
-```
-https://ywcc-capstone-pages.cloudflareaccess.com/cdn-cgi/access/logout
-```
-
-This clears the session cookie. The next visit to `/portal/` shows the login page.
-
-### 3.8 JWT Validation (Defense-in-Depth)
-
-`astro-app/src/lib/auth.ts` validates the JWT that CF Access attaches to every authenticated request:
-
-1. Reads the `Cf-Access-Jwt-Assertion` header
-2. Fetches Cloudflare's public keys from `{team-domain}/cdn-cgi/access/certs`
-3. Verifies the JWT signature using `jose` library's `createRemoteJWKSet`
-4. Validates `iss` (team domain) and `aud` (application AUD tag)
-5. Extracts the `email` claim from the verified payload
-
-**Key rotation:** Cloudflare rotates signing keys every 6 weeks. The previous key stays valid for 7 days. The `jose` library handles this automatically via `kid` matching.
-
-**Runtime access pattern:**
-
-- **CF Workers:** `context.locals.runtime.env.CF_ACCESS_TEAM_DOMAIN`
-- **Local dev:** `process.env.CF_ACCESS_TEAM_DOMAIN` (from `.env`)
-
-In local dev, the middleware bypasses JWT validation and sets a mock user when `import.meta.env.DEV` is true.
+Estimated cost: $6/month on an existing VPS. The migration is documented as Docker Compose-based with a CI/CD pipeline and rollback procedures.
 
 ---
 
-## 4. Plan Comparison: Free vs Workers Paid ($5/month)
+## 6. Platform Capabilities (current + roadmap)
 
-The Workers Paid plan ($5/month) has been approved for this project alongside Sanity Growth ($15/month) — $20/month total. This section documents every service limit on both plans and maps estimated usage to the features that consume each resource.
+What's wired today versus what's available if needed.
 
-### 4.1 Why Upgrade to Workers Paid
+### Currently wired
 
-The free plan supports the current portal-only architecture. The paid plan unlocks the Phase 3 platform capabilities brainstormed on 2026-02-24:
+- **Astro 6 SSR** on Workers (3 prod + 3 preview).
+- **D1** for portal data, sessions, audit columns.
+- **KV** for session caching.
+- **Cross-script Durable Object** for sliding-window rate limiting (100 req / 60s on portal routes).
+- **Cron Trigger** (1) for daily event reminders.
+- **Turnstile** for form bot protection.
+- **Workers Static Assets** for prerendered HTML / JS / CSS / images (unlimited bandwidth).
+- **Deploy Hooks** for Sanity content rebuilds (one per production Worker).
 
-- **5-minute CPU time** (vs 10ms) — required for Python Workers (FastAPI Aggregated API, Discord bot)
-- **No daily request cap** — eliminates the 100K/day ceiling as features multiply
-- **10,000 subrequests/invocation** (vs 50) — the Aggregated API fans out to multiple services per request
-- **25 billion D1 rows read/month** (vs 5M/day) — monthly budgets are easier to manage than daily cliffs
-- **250 Cron Triggers** (vs 5) — one cron per scheduled task (neuron reset, D1 sync, notification digest, cache warm, health check)
-- **14-day Queue retention** (vs 24 hours) — fault-tolerant message replay after outages
+### Available but not yet wired
 
-### 4.2 Service-by-Service Comparison
+- **R2** (object storage) — could host Lighthouse / Pa11y report dumps if we want CI history persisted.
+- **Queues** — async fan-out for any future notification or audit pipeline.
+- **Analytics Engine** — typed time-series for portal activity tracking and admin dashboards.
+- **Workers AI** — used today via the out-of-tree `capstone-ask-worker` (RAG over AI Search), but could also wire chatbot generation, form classification, or content moderation directly into `ywcc-capstone`.
+- **Python Workers** — `platform-api` exists as a scaffold (placeholder KV/D1 IDs). Going live requires real binding IDs and a service binding from `ywcc-capstone`.
+- **Hyperdrive** — for connecting to external Postgres (e.g. if a sponsor system integration ever needs a non-CF database).
+- **Vectorize** — alternative RAG store; AI Search is currently sufficient.
+- **Email Workers** — could replace Resend for transactional mail if we want to consolidate.
 
-All data sourced from Cloudflare documentation as of 2026-02-25.
+### Considered and explicitly NOT used
 
-#### Workers (Compute)
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Requests | 100,000/day | No limit (10M included/mo, +$0.30/M) | Daily / Monthly |
-| CPU time | **10 ms** | **5 min** | Per invocation |
-| Memory | 128 MB | 128 MB | Per invocation |
-| Subrequests (external) | 50/request | 10,000/request | Per invocation |
-| Worker size | 3 MB | 10 MB | Per deploy |
-| Number of Workers | 100 | 500 | Per account |
-| Cron Triggers | 5 | 250 | Per account |
-| Environment variables | 64/Worker | 128/Worker | Per Worker |
-
-**10ms CPU cap is the single biggest free-plan constraint.** Python Workers (FastAPI, Discord bot) require hundreds of milliseconds. The Aggregated API and Discord bot cannot run on the free plan.
-
-#### D1 (Database)
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Rows read | 5M/day | 25B/month included (+$0.001/M) | Daily / Monthly |
-| Rows written | 100K/day | 50M/month included (+$1.00/M) | Daily / Monthly |
-| Storage | 5 GB total (500 MB/DB) | 5 GB included (10 GB/DB, +$0.75/GB-mo) | — |
-| Databases | 10 | 50,000 | Per account |
-| Queries per invocation | 50 | 1,000 | Per invocation |
-| Time Travel (point-in-time recovery) | 7 days | 30 days | — |
-
-Free-plan D1 limits reset daily at 00:00 UTC. Exceeding them blocks all queries until reset — no graceful degradation. Paid-plan monthly budgets eliminate daily cliffs.
-
-#### KV (Key-Value)
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Reads | 100,000/day | 10M/month included (+$0.50/M) | Daily / Monthly |
-| Writes | 1,000/day | 1M/month included (+$5.00/M) | Daily / Monthly |
-| Deletes | 1,000/day | 1M/month included (+$5.00/M) | Daily / Monthly |
-| Storage | 1 GB | 1 GB included (+$0.50/GB-mo) | — |
-
-#### R2 (Object Storage)
-
-R2 has a generous always-free tier regardless of Workers plan. No difference between free and paid.
-
-| Resource | Always-Free Included | Overage |
-|:---------|:---------------------|:--------|
-| Storage | 10 GB/month | $0.015/GB-mo |
-| Class A ops (writes) | 1M/month | $4.50/M |
-| Class B ops (reads) | 10M/month | $0.36/M |
-| Egress | Free (always) | Free |
-
-#### Queues
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Operations (read + write + delete) | 10,000/day | 1M/month included (+$0.40/M) | Daily / Monthly |
-| Message retention | 24 hours (non-configurable) | 14 days (configurable) | — |
-| Queues per account | 10,000 | 10,000 | Per account |
-| Message size | 128 KB | 128 KB | Per message |
-
-Each message delivery costs 3 operations (1 write + 1 read + 1 delete). Free plan supports ~3,333 messages/day. Queue consumers must be standalone Workers — Pages Functions can only produce to queues.
-
-#### Workers AI
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Neurons | 10,000/day | 10,000/day free + $0.011/1K Neurons | Daily |
-
-The free neuron allocation is the same on both plans. The paid plan allows overflow at $0.011 per 1,000 Neurons instead of hard-blocking.
-
-#### Analytics Engine
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Data points written | 100,000/day | 10M/month included (+$0.25/M) | Daily / Monthly |
-| Read queries (SQL API) | 10,000/day | 1M/month included (+$1.00/M) | Daily / Monthly |
-| Data retention | 31 days | 31 days | — |
-
-**Key advantage:** SQL API reads run on Cloudflare's infrastructure via HTTP (`api.cloudflare.com`), NOT inside your Worker. Aggregations (GROUP BY, SUM, COUNT) consume zero Worker CPU time and zero D1 rows-read budget. Writes via `writeDataPoint()` are fire-and-forget I/O calls from Workers.
-
-#### Durable Objects (SQLite-backed)
-
-| Resource | Free | Paid ($5/mo) | Reset |
-|:---------|:-----|:-------------|:------|
-| Requests | Daily limit | 1M/month included (+$0.15/M) | Daily / Monthly |
-| Duration | Daily limit | 400K GB-s/month included (+$12.50/M GB-s) | Daily / Monthly |
-| Storage | 5 GB | 5 GB included (+$0.75/GB-mo) | — |
-| Storage per object | 10 GB | 10 GB | — |
-| Classes per account | 100 | 500 | Per account |
-| CPU per request | 30s | 30s (configurable to 5 min) | Per invocation |
-
-Only SQLite-backed Durable Objects are available on the free plan. The paid plan additionally supports the legacy key-value storage backend.
-
-#### Cron Triggers
-
-| Resource | Free | Paid ($5/mo) |
-|:---------|:-----|:-------------|
-| Triggers per account | 5 | 250 |
-| CPU time per invocation | 10 ms | 5 min |
-
-#### Pages
-
-Pages limits are the same on both plans.
-
-| Resource | Limit | Our Usage |
-|:---------|:------|:----------|
-| Builds per month | 500 | ~30-60 |
-| Concurrent builds | 1 | Sufficient |
-| Custom domains | 100 | 1 |
-| Bandwidth | Unlimited | N/A |
-| Static asset files | 20,000/deploy | ~200-500 |
-
-#### Access (Zero Trust)
-
-Access limits are the same on both plans.
-
-| Resource | Limit |
-|:---------|:------|
-| Users (seats) | **50** |
-| Access Applications | Unlimited |
-| Identity providers | Unlimited |
-
-A "seat" is consumed when a user authenticates. Seats are held indefinitely by default. To auto-release inactive seats, enable seat expiration in **Cloudflare One → Settings → Account** (configurable: 1 month to 1 year). Monitor usage at **Cloudflare One → Settings → Account → Usage**.
-
-### 4.3 Estimated Usage by Feature
-
-This matrix maps each project feature to the Cloudflare resources it consumes and estimates monthly usage on the paid plan.
-
-#### Resource Consumption Matrix
-
-| Feature | Workers Requests | CPU Time | D1 Rows Read | D1 Rows Written | KV Reads | KV Writes | Queue Ops | AI Neurons | AE Writes |
-|:--------|:----------------|:---------|:-------------|:----------------|:---------|:----------|:----------|:-----------|:----------|
-| **Public site (static)** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Sponsor Portal (SSR)** | ~7.5K/mo | 3-6ms each | ~22K/mo | ~3K/mo | 0 | 0 | 0 | 0 | 0 |
-| **Queue Event Bus** | ~3K/mo | <1ms each | 0 | 0 | 0 | 0 | ~9K/mo | 0 | ~3K/mo |
-| **RAG Chatbot** | ~1.5K/mo | 5-50ms each | 0 | 0 | ~3K/mo | ~1.5K/mo | 0 | ~150K-300K/mo | ~1.5K/mo |
-| **Aggregated API** | ~50-100K/mo | 50-500ms each | ~50K/mo | ~5K/mo | ~10K/mo | ~1K/mo | ~5K/mo | 0 | ~5K/mo |
-| **Discord Bot** | ~15K/mo | 100-300ms each | 0 | 0 | ~5K/mo | ~500 | 0 | 0 | ~2K/mo |
-| **Selective Rebuild** | ~600/mo | <1ms each | 0 | 0 | 0 | 0 | ~1.8K/mo | 0 | ~600/mo |
-| **Analytics Logging** | 0 (fire-and-forget) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | ~30K/mo |
-| **Cron Jobs** | ~900/mo | 1-5ms each | ~5K/mo | ~1K/mo | ~1K/mo | ~900 | 0 | 0 | ~900/mo |
-| **JSON-LD Utility** | 0 (build-time) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **TOTAL (estimated)** | **~80-130K/mo** | — | **~77K/mo** | **~9K/mo** | **~19K/mo** | **~4K/mo** | **~16K/mo** | **~150-300K/mo** | **~43K/mo** |
-
-#### Usage vs Paid Plan Included Limits
-
-| Resource | Estimated Monthly Usage | Paid Plan Included | Utilization | Headroom |
-|:---------|:-----------------------|:-------------------|:------------|:---------|
-| Worker requests | ~80-130K | 10M | ~1% | 77-125x |
-| D1 rows read | ~77K | 25B | <0.001% | 324,000x |
-| D1 rows written | ~9K | 50M | <0.001% | 5,500x |
-| KV reads | ~19K | 10M | <0.01% | 526x |
-| KV writes | ~4K | 1M | <0.01% | 250x |
-| Queue operations | ~16K | 1M | ~1.6% | 62x |
-| Workers AI neurons | ~5-10K/day | 10K/day free | ~50-100% | **Near cap** |
-| Analytics Engine writes | ~43K | 10M | <0.01% | 232x |
-| R2 storage | ~500 MB | 10 GB | ~5% | 20x |
-
-**Workers AI neurons are the only resource near capacity.** The chatbot's graceful degradation system (curated FAQ index checked first, D1 semantic cache, KV neuron counter with threshold) keeps usage within the free 10K/day allocation. Overflow on heavy days costs $0.011 per 1,000 neurons.
-
-#### What Cannot Run on the Free Plan
-
-| Feature | Blocking Constraint | Paid Plan Resolution |
-|:--------|:-------------------|:---------------------|
-| **Aggregated API (FastAPI)** | 10ms CPU cap — Python Workers need 50-500ms | 5-minute CPU cap |
-| **Discord Bot (Python)** | 10ms CPU cap — Python Workers need 100-300ms | 5-minute CPU cap |
-| **Multiple Cron Triggers** | 5 cron limit — need ~6-8 for all scheduled tasks | 250 cron triggers |
-| **Queue retry tolerance** | 24-hour retention — outages can lose messages | 14-day retention |
-| **Subrequest fan-out** | 50/request — Aggregated API calls 3-5 services per request | 10,000/request |
+- **Cloudflare Pages** — retired. Pages projects scheduled for deletion 2026-05-03.
+- **Cloudflare Access (Zero Trust)** — retired in favor of Better Auth (no per-seat cap, unified auth surface).
+- **Cloudflare Images** — `imageService: 'compile'` is pinned in `astro.config.mjs` (the v13 default `cloudflare-binding` is deferred). Sanity images already bypass Astro's `<Image>` and use the Sanity CDN directly via `urlFor()`.
 
 ---
 
-## 5. Cost Optimization and Descoping
-
-### 5.1 Why Static Output Matters
-
-`output: "static"` in `astro.config.mjs` is the most impactful cost decision. Every public page (home, sponsors, projects, events) is pre-rendered at build time and served from CDN edge cache. **Zero Worker invocations, zero CPU time, zero subrequests** for the public site.
-
-Only `/portal/*` and `/dev` routes set `export const prerender = false` for SSR.
-
-### 5.2 SSR Page Budget
-
-Each SSR page consumes one Worker invocation with a 10ms CPU cap. The planned SSR routes:
-
-| Route | Purpose |
-|:------|:--------|
-| `/portal/[sponsor-slug]` | Sponsor project view |
-| `/portal/events` | Events and program info |
-| `/portal/dashboard` | Submissions panel |
-| `/portal/site-health` | Site health dashboard |
-| `/portal/api/projects` | JSON API for React island |
-| `/portal/api/rsvp` | RSVP POST/GET |
-| `/portal/api/agreements/*` | Agreement signing |
-| `/portal/api/db-health` | D1 verification |
-| `/dev` | GitHub dev dashboard |
-
-At 50 sponsors visiting 5 pages/day = 250 invocations/day (well under 100K limit).
-
-### 5.3 CPU Time Budget per SSR Page
-
-| Operation | Estimated CPU |
-|:----------|:-------------|
-| JWT validation (`jose`) | ~1-2ms |
-| Sanity API call | ~0ms CPU (network I/O is wall-clock, not CPU) |
-| D1 query (single) | ~0.5-1ms CPU |
-| Response serialization | ~1-2ms CPU |
-| **Total per page** | **~3-6ms** (under 10ms) |
-
-Cloudflare measures **CPU time**, not wall-clock time. Network I/O (Sanity API calls, D1 queries) does not count against the 10ms limit.
-
-**Tactics:**
-
-- Cache the JWKS public key in a module-level variable
-- Use `db.batch()` to combine multiple D1 queries into one round-trip
-- Avoid `JSON.parse()` on large payloads in the hot path
-- Keep React island props minimal
-
-### 5.4 D1 Query Optimization
-
-Index everything in a WHERE clause — unindexed queries do full table scans, and every scanned row counts against 5M/day.
-
-```typescript
-// BAD: 3 subrequests (50 max on free tier)
-const rsvps = await db.prepare('SELECT ...').all();
-const agreements = await db.prepare('SELECT ...').all();
-const prefs = await db.prepare('SELECT ...').all();
-
-// GOOD: 1 subrequest
-const [rsvps, agreements, prefs] = await db.batch([
-  db.prepare('SELECT ... FROM event_rsvps WHERE sponsor_email = ?').bind(email),
-  db.prepare('SELECT ... FROM agreement_signatures WHERE sponsor_email = ?').bind(email),
-  db.prepare('SELECT ... FROM notification_preferences WHERE sponsor_email = ?').bind(email),
-]);
-```
-
-### 5.5 Epic 9 Scope Status
-
-All 15 Epic 9 stories are **fully in scope** as of 2026-02-27. The Workers Paid plan ($5/month) removes all free-tier daily limits, and architectural pivots (2026-02-20) to Analytics Engine and Queues+KV further reduce D1 pressure.
-
-| Story | Status | Notes |
-|:------|:-------|:------|
-| 9.1 — CF Access | **IN** | Auth foundation, zero D1 |
-| 9.2 — Sponsor Project View | **IN** | SSR + Sanity only |
-| 9.3 — Events & Program Info | **IN** | SSR + Sanity only |
-| 9.4 — GitHub Dev Dashboard | **IN** | Low-traffic admin page |
-| 9.5 — Site Health CI | **IN** | R2/KV writes in CI, not Workers |
-| 9.6 — Site Health Dashboard | **IN** | Low-traffic, minimal R2/KV reads |
-| 9.7 — Submission Dashboard | **IN** | Full dashboard: submissions + GA4 engagement panel |
-| 9.8 — D1 Setup | **IN** | All 6 tables. Paid plan: 25B reads/mo, 50M writes/mo |
-| 9.9 — Activity Tracking | **IN** | Analytics Engine `writeDataPoint()` + SQL API reads |
-| 9.10 — Event RSVPs | **IN** | Low D1 volume (~100 writes/semester) |
-| 9.11 — Evaluations | **IN** | Unblocked by paid plan — zero architectural changes |
-| 9.12 — Agreement Signatures | **IN** | One-time writes, legally required |
-| 9.13 — Notifications | **IN** | Queues + KV architecture (async pipeline, single-key reads) |
-| 9.14 — Multi-Provider Auth | **IN** | Dashboard config only |
-| 9.15 — Admin Analytics | **IN** | Analytics Engine SQL API for aggregations |
-
-**Architectural pivots retained** (2026-02-20) — these remain optimal even on the paid plan:
-- **9.9 + 9.15:** Workers Analytics Engine (purpose-built for time-series writes and aggregate reads)
-- **9.13:** Cloudflare Queues + KV (async notification pipeline, single-key reads)
-
-The Workers Paid plan also enables Phase 3 platform capabilities described in [Section 11](#11-phase-3-platform-capabilities): Python Workers for the Aggregated API and Discord bot, 250 Cron Triggers for scheduled tasks, and 14-day Queue message retention for fault tolerance.
-
----
-
-## 6. Environment Variables
-
-### Cloudflare-Specific Variables
-
-| Variable | Purpose | Set Where |
-|:---------|:--------|:----------|
-| `CF_ACCESS_TEAM_DOMAIN` | Zero Trust team domain URL for JWT validation | CF Pages dashboard (Production + Preview), `.env` (local) |
-| `CF_ACCESS_AUD` | Access Application Audience tag (64-char hex) | CF Pages dashboard (as **Secret**), `.env` (local) |
-| `CLOUDFLARE_API_TOKEN` | API token for `wrangler pages deploy` | GitHub Actions secrets (only if using manual deploy) |
-| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account ID | GitHub Actions secrets (only if using manual deploy) |
-| `PUBLIC_SITE_URL` | Production URL | CF Pages dashboard, `.env` (local) |
-| `PUBLIC_TURNSTILE_SITE_KEY` | Turnstile widget site key (client-side) | CF Pages dashboard (Production + Preview), `.env` (local) |
-| `TURNSTILE_SECRET_KEY` | Turnstile secret key (server-side verification) | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
-| `SANITY_API_WRITE_TOKEN` | Sanity write token for form submissions | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
-| `DISCORD_WEBHOOK_URL` | Discord webhook for form submission notifications | CF Pages dashboard (as **Secret**, Production + Preview), `.dev.vars` (local) |
-
-### Where to Set Them
-
-**CF Pages dashboard (required for production and preview):**
-
-1. Go to **CF Pages → ywcc-capstone → Settings → Environment variables**
-2. Set for **both Production and Preview**:
-   - `CF_ACCESS_TEAM_DOMAIN` → Plaintext → `https://ywcc-capstone-pages.cloudflareaccess.com`
-   - `CF_ACCESS_AUD` → **Secret (encrypted)** → your 64-char hex AUD tag
-   - `PUBLIC_SITE_URL` → Plaintext → `https://ywcc-capstone.pages.dev`
-   - `PUBLIC_TURNSTILE_SITE_KEY` → Plaintext → your Turnstile site key (from Turnstile dashboard)
-   - `TURNSTILE_SECRET_KEY` → **Secret (encrypted)** → your Turnstile secret key
-   - `SANITY_API_WRITE_TOKEN` → **Secret (encrypted)** → Sanity API token with Editor role
-   - `DISCORD_WEBHOOK_URL` → **Secret (encrypted)** → Discord webhook URL for notifications
-
-**Local development (`astro-app/.env`, not committed):**
-
-```bash
-CF_ACCESS_TEAM_DOMAIN=https://ywcc-capstone-pages.cloudflareaccess.com
-CF_ACCESS_AUD=your-64-char-aud-tag-here
-PUBLIC_SITE_URL=http://localhost:4321
-```
-
-**GitHub Actions secrets (only needed for `wrangler pages deploy` in CI):**
-
-| Secret | Value |
-|:-------|:------|
-| `CLOUDFLARE_API_TOKEN` | API token from [Section 2.2](#22-get-credentials) |
-| `CLOUDFLARE_ACCOUNT_ID` | Account ID from [Section 2.2](#22-get-credentials) |
-| `SANITY_API_READ_TOKEN` | Sanity read token |
-
-**GitHub Actions variables:**
-
-| Variable | Value |
-|:---------|:------|
-| `PUBLIC_SANITY_STUDIO_PROJECT_ID` | `49nk9b0w` |
-| `PUBLIC_SANITY_STUDIO_DATASET` | `production` |
-| `PUBLIC_GTM_ID` | Your GTM container ID or empty |
-| `PUBLIC_SITE_URL` | `https://ywcc-capstone.pages.dev` |
-
-### Runtime Access Patterns
-
-On Cloudflare Workers, env vars are **not** available via `process.env`. They come through the Cloudflare runtime context:
-
-- **Workers runtime:** `context.locals.runtime.env.CF_ACCESS_TEAM_DOMAIN`
-- **Local dev:** `process.env.CF_ACCESS_TEAM_DOMAIN` (from `.env`)
-
-The `wrangler.jsonc` `vars` section holds placeholder values for reference. Real secrets must be set in the CF Pages dashboard — never commit `CF_ACCESS_AUD` to the repo.
-
----
-
-## 7. Testing
-
-### Test Files
-
-| Test | File | What It Validates |
-|:-----|:-----|:-----------------|
-| Wrangler config | `astro-app/src/cloudflare/__tests__/wrangler-config.test.ts` | `wrangler.jsonc` schema: project name, compat date, flags, output dir |
-| SSR Worker smoke | `astro-app/src/cloudflare/__tests__/ssr-worker-smoke.test.ts` | Built `_worker.js/` runs in Miniflare without crashing; no `[object Object]` bug; valid HTML; concurrent requests |
-| Build output | `astro-app/src/cloudflare/__tests__/build-output.test.ts` | `_worker.js/` dir, `_routes.json` schema, `/_astro/*` CDN exclusion, `_headers` file |
-| Deploy integration | `tests/integration/deploy-5-2/cloudflare-deploy.test.ts` | `@astrojs/cloudflare` adapter import, `platformProxy` config, `output: "static"`, security headers (43 test cases) |
-
-### Running Tests
-
-```bash
-# All unit + component + schema tests
-npm run test:unit
-
-# Direct Vitest from astro-app/
-cd astro-app && npx vitest run
-
-# Playwright E2E (builds first)
-npm run test:e2e
-```
-
-### Post-Deploy Verification Checklist
-
-After deploying to `https://ywcc-capstone.pages.dev`:
-
-- [ ] Site loads with HTTPS
-- [ ] All pages render: `/`, `/about`, `/sponsors`, `/projects`, `/contact`
-- [ ] View Source: CSP `<meta>` tag present
-- [ ] DevTools → Network → response headers show: `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`
-- [ ] Portal routes (`/portal/*`) show CF Access login page when not authenticated
-- [ ] Non-portal routes are publicly accessible (no auth prompt)
-- [ ] Lighthouse scores 90+ across Performance, Accessibility, Best Practices, SEO
-
----
-
-## 8. Monitoring and Observability
-
-### 8.1 Cloudflare Dashboard
-
-All free-tier metrics are visible at [dash.cloudflare.com](https://dash.cloudflare.com):
-
-| Dashboard | What It Shows |
-|:----------|:-------------|
-| Workers Metrics (`/:account/workers-and-pages`) | Requests, CPU time, errors, duration |
-| D1 Metrics (`/:account/workers/d1` → select DB → Metrics) | Rows read/written, query latency, storage |
-| KV Metrics (`/:account/workers/kv`) | Read/write operations, storage |
-| R2 Metrics (`/:account/r2`) | Operations (Class A/B), storage |
-
-Workers metrics retention: 3 months (queryable in 1-week increments).
-
-### 8.2 Workers Observability MCP Server
-
-Cloudflare provides an MCP server for Workers observability (`github.com/cloudflare/mcp-server-cloudflare` → `apps/workers-observability`). Add it to `.mcp.json` to query metrics, logs, and traces from your dev environment. Note: this only covers standalone Workers, not Pages Functions/SSR workers. For Pages worker metrics, use the CF Pages dashboard directly.
-
-### 8.3 D1 Query-Level Monitoring
-
-Every D1 query returns a `meta` object with row counts:
-
-```typescript
-const result = await db.prepare('SELECT * FROM event_rsvps WHERE sponsor_email = ?')
-  .bind(email)
-  .all();
-
-console.log(result.meta);
-// { duration: 0.5, rows_read: 3, rows_written: 0, size_after: 45137920 }
-```
-
-A query returning 3 rows but reading 3,000 means the index is missing.
-
-### 8.4 Alert Thresholds
-
-Monitor these thresholds manually or via GitHub Actions + GraphQL API:
-
-| Metric | Warning (70%) | Critical (90%) | Limit |
-|:-------|:-------------|:---------------|:------|
-| Worker requests/day | 70,000 | 90,000 | 100,000 |
-| D1 rows read/day | 3,500,000 | 4,500,000 | 5,000,000 |
-| D1 rows written/day | 70,000 | 90,000 | 100,000 |
-| D1 storage | 350 MB | 450 MB | 500 MB/DB |
-| KV writes/day | 700 | 900 | 1,000 |
-| R2 storage | 7 GB | 9 GB | 10 GB |
-
-### 8.5 GraphQL Analytics API
-
-For automated monitoring, query the Cloudflare GraphQL Analytics API:
-
-```graphql
-query D1Usage($accountTag: string!, $start: Date, $end: Date, $databaseId: string) {
-  viewer {
-    accounts(filter: { accountTag: $accountTag }) {
-      d1AnalyticsAdaptiveGroups(
-        limit: 10000
-        filter: { date_geq: $start, date_leq: $end, databaseId: $databaseId }
-        orderBy: [date_DESC]
-      ) {
-        sum { readQueries writeQueries rowsRead rowsWritten }
-        dimensions { date databaseId }
-      }
-    }
-  }
-}
-```
-
----
-
-## 9. Troubleshooting
-
-### Deployment
-
-**Build fails with "Invalid binding `SESSION`":**
-Informational warning from the Cloudflare adapter about KV sessions. Does not affect static builds. Safe to ignore.
-
-**`_headers` not showing in response:**
-- Verify `astro-app/public/_headers` exists
-- Verify `dist/_headers` is present after build
-- `_headers` only works on deployed CF Pages, not local dev
-
-**GitHub Actions workflow fails:**
-- Verify secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `SANITY_API_READ_TOKEN`
-- Verify variables: `PUBLIC_SANITY_STUDIO_PROJECT_ID`, `PUBLIC_SANITY_STUDIO_DATASET`, `PUBLIC_GTM_ID`, `PUBLIC_SITE_URL`
-- Check the API token has `Cloudflare Pages: Edit` permission
-
-**Wrangler local preview shows errors:**
-- Build first: `npm run build --workspace=astro-app`
-- Run from the correct directory: `cd astro-app && npx wrangler pages dev dist/`
-
-### Deploy Hook
-
-**Webhook shows 403:**
-The deploy hook URL is wrong or was deleted. Recreate in CF Pages dashboard and update the Sanity webhook URL.
-
-**Webhook shows 200 but no build appears:**
-Check that the deploy hook targets the `main` branch and the CF Pages project has git integration active.
-
-**Build triggers but fails:**
-Check CF Pages build logs. Common causes: missing environment variables, monorepo build command misconfigured.
-
-**Build succeeds but content is stale:**
-Brief CDN propagation delay after publish. Wait 30 seconds and hard-refresh.
-
-**Multiple builds per publish:**
-The Sanity webhook filter should exclude drafts (Drafts: OFF). Cloudflare deduplicates builds on the same branch within a short window.
-
-### Build Optimization
-
-**Build is slow (~3+ minutes):**
-Ensure `SKIP_DEPENDENCY_INSTALL=true` is set in the project environment variables (both Production and Preview). Without it, CF Pages runs `npm clean-install` on every build which deletes and reinstalls all 2,400+ packages (~60s wasted). The build command `npm install --prefer-offline --no-audit --no-fund` handles dependency installation efficiently using the build cache.
-
-**`SKIP_DEPENDENCY_INSTALL` not working:**
-This env var is supported on CF Pages build image v3. Check that the project is using v3 (the default for new projects). The build log should show: `SKIP_DEPENDENCY_INSTALL is present in environment. Skipping automatic dependency installation.`
-
-**Build fails after skipping dependency install:**
-If `node_modules` cache is cold (first build or cache expired after 7 days), `npm install --prefer-offline` may fail on packages not in the `.npm` cache. Remove `SKIP_DEPENDENCY_INSTALL` temporarily to force a full install and repopulate the cache, then re-add it.
-
-### Authentication
-
-**OTP email not received:**
-- Check spam/junk folder
-- Allowlist `noreply@notify.cloudflare.com`
-- Wait 60 seconds between attempts (rate-limited)
-
-**"Access denied" after entering OTP:**
-The email is not in the Allow policy. Add it (see [Section 3.5](#35-add-sponsor-access)). Cloudflare always shows "A code has been emailed" regardless of policy — this prevents email enumeration.
-
-**JWT validation failing (401 from middleware):**
-- Verify `CF_ACCESS_TEAM_DOMAIN` matches exactly (include `https://`)
-- Verify `CF_ACCESS_AUD` matches the Application Audience tag
-- Check env vars are available at runtime (not just build time)
-- After key rotation, wait a few minutes for JWK cache refresh
-
-**Portal routes not protected:**
-- Confirm Access Application has paths `/portal` and `/portal/*`
-- Confirm the application is enabled (not paused)
-- Verify the domain matches your deployment URL
-
-**Public routes showing auth prompt:**
-- Verify Access Application path is `/portal/` (not `/`)
-- Check for other Access Applications with broader path rules
-
-### Turnstile
-
-**Error 400020 (widget fails to load):**
-- This means the domain is not authorized for the site key
-- `pages.dev` is on the [Public Suffix List](https://publicsuffix.org/) — `preview.ywcc-capstone.pages.dev` and `ywcc-capstone.pages.dev` are treated as **separate registrable domains**, not subdomains
-- In the Turnstile dashboard, add **each** hostname explicitly: `ywcc-capstone.pages.dev`, `preview.ywcc-capstone.pages.dev`, `localhost`
-- Verify you are using the **Site Key** (not the Secret Key) in `PUBLIC_TURNSTILE_SITE_KEY` — both can start with `0x4...`
-
-**Form submission returns 400/403 after widget loads:**
-- `TURNSTILE_SECRET_KEY` is missing or wrong in CF Pages secrets — this is a server-side secret accessed via `context.locals.runtime.env`, not `import.meta.env`
-- The test secret key (`1x0000000000000000000000000000000AA`) only works with the test site key (`1x00000000000000000000AA`) — don't mix test and production keys
-
-**Turnstile widget not appearing:**
-- Check `PUBLIC_TURNSTILE_SITE_KEY` is set in CF Pages env vars — this is a `PUBLIC_` var baked in at build time, so a redeploy is required after changing it
-- In local dev, use the always-pass test keys: site key `1x00000000000000000000AA`, secret key `1x0000000000000000000000000000000AA`
-
-### GTM
-
-**GTM script not appearing in page source:**
-- Confirm `PUBLIC_GTM_ID` is set (not empty)
-- Rebuild after changing `.env` — env vars are baked in at build time
-
----
-
-## 10. VPS Migration Path
-
-A full migration plan exists at [`docs/vps-migration-plan.md`](vps-migration-plan.md). This section summarizes why and when to migrate.
-
-### When to Migrate
-
-- Sponsor count exceeds 50 (CF Access seat limit)
-- Descoped stories are needed (9.9 activity tracking, 9.15 admin analytics)
-- SSR routes consistently hit 10ms CPU cap
-- D1 daily limits are reached
-
-### Architecture Comparison
-
-| Factor | Cloudflare Pages (Free) | VPS + Docker + Authentik |
-|:-------|:-----------------------|:------------------------|
-| **Cost** | $0 | ~$6/month (existing VPS) |
-| **Auth** | CF Access (50 seats) | Authentik (no seat limit) |
-| **SSR runtime** | Workers (10ms CPU cap) | Node.js (no limit) |
-| **Database** | D1 (5M reads/day) | PostgreSQL (unlimited) |
-| **CDN** | Built-in edge network | CF free DNS proxy (optional) |
-
-### What Changes in Code
-
-1. `astro.config.mjs` — swap `@astrojs/cloudflare` → `@astrojs/node`
-2. `middleware.ts` — replace JWT validation with `x-authentik-email` header read
-3. `lib/auth.ts` — can be removed (Authentik validates upstream)
-4. `wrangler.jsonc` — deleted
-5. `env.d.ts` — gains additional user fields (`username`, `name`, `groups`)
-
-### Recommendation
-
-Start with Cloudflare (free, zero-ops). Migrate when the program outgrows the free tier. The code patterns translate directly — both use path-based auth on `/portal/*`, just with different headers.
-
----
-
-## 11. Phase 3 Platform Capabilities
-
-Phase 3 (Mar 10 – Apr 23) introduces platform features beyond the base Astro + Sanity site, leveraging the Workers Paid plan and Sanity Growth plan ($20/month total). These ideas were brainstormed on 2026-02-24 and refined through morphological analysis, first-principles evaluation, and implementation planning.
-
-### 11.1 Architecture Overview
-
-```mermaid
-flowchart TD
-    subgraph "Content Sources"
-        Studio[Sanity Studio]
-        Forms[Contact Forms]
-        Cron[Cron Triggers]
-    end
-
-    subgraph "Event Bus (Queues)"
-        Router[Router Worker]
-        Q[platform-events Queue]
-        C1[Site Rebuilder]
-        C2[Discord Notifier]
-        C3[Cache Invalidator]
-        C4[Analytics Logger]
-    end
-
-    subgraph "API Layer"
-        API[Aggregated API\nFastAPI Python Worker\n/api/v1/*]
-    end
-
-    subgraph "AI Layer"
-        Chat[Chatbot Worker]
-        Embed[Sanity Embeddings]
-        WAI[Workers AI]
-        Cache[D1 Semantic Cache]
-    end
-
-    subgraph "Storage"
-        D1[(D1)]
-        KV[(KV)]
-        R2[(R2)]
-        AE[(Analytics Engine)]
-    end
-
-    subgraph "Consumers"
-        Astro[Astro SSR\nPortal + Public]
-        Discord[Discord Bot\nPython Worker]
-        Widget[Chat Widget\nAstro Island]
-    end
-
-    Studio -->|webhook| Router
-    Forms -->|submission| Router
-    Cron -->|scheduled| Router
-    Router --> Q
-    Q --> C1 & C2 & C3 & C4
-
-    API --> D1 & KV & R2 & AE
-    API --> Chat
-    Chat --> Embed --> WAI
-    Chat --> Cache
-
-    Astro --> API
-    Discord --> API
-    Widget --> Chat
-```
-
-### 11.2 Queue Event Bus
-
-**Replaces:** Single webhook-to-deploy-hook pipeline.
-
-A Router Worker receives Sanity webhooks and fans out events to a Cloudflare Queue (`platform-events`). Independent consumers process events in parallel:
-
-| Consumer | Trigger | Action |
-|:---------|:--------|:-------|
-| Site Rebuilder | Document publish | Inspects `dataset` and `site` fields, fires deploy hook for the correct site only |
-| Discord Notifier | Document publish, schema change | Posts formatted notification to the appropriate Discord channel |
-| Cache Invalidator | Document publish | Purges chatbot D1 cache entries referencing the changed document |
-| Analytics Logger | All events | Writes operational event to Analytics Engine via `writeDataPoint()` |
-
-**Queue message schema:**
-
-```json
-{
-  "docId": "abc123",
-  "docType": "event",
-  "dataset": "capstone",
-  "site": "capstone",
-  "action": "publish",
-  "timestamp": "2026-03-15T14:30:00Z"
-}
-```
-
-**Resource usage:** ~300 operations/day (100 messages x 3 ops each). Free plan ceiling is 10K/day; paid plan is 1M/month.
-
-### 11.3 RAG Chatbot
-
-**Concept:** Public-facing AI assistant powered by Sanity Embeddings (retrieval) + Workers AI (generation), with a three-tier degradation strategy when the daily neuron budget is exhausted.
-
-**Request flow:**
-
-1. Check editor-curated FAQ index (Sanity Embeddings) — high-similarity match serves KV-cached answer at **0 neurons**
-2. Check D1 semantic cache — cosine similarity match on previously generated answers at **0 neurons**
-3. Query per-site Sanity Embeddings index for relevant content
-4. Generate response via Workers AI (consumes neurons)
-5. Cache response in D1 with TTL
-6. Increment KV neuron counter
-
-**Degradation tiers:**
-
-| Budget Status | Behavior |
-|:-------------|:---------|
-| Under threshold | Full RAG — Embeddings retrieval + Workers AI generation |
-| Approaching threshold | Embeddings-only — returns relevant content snippets without LLM generation |
-| Exhausted | Static FAQ links — serves curated answers from KV |
-
-**Editor controls:** A `chatbotConfig` Sanity document lets editors control which content types and sites are included in the chatbot's knowledge scope via Studio checkboxes. A `chatbotFAQ` document type lets editors write priority Q&A pairs that are checked first (0 neurons). Analytics Engine logs which questions trigger full RAG, so editors can promote frequent questions to curated status.
-
-**Resource usage:** ~50 queries/day, ~100-200 neurons/query = ~5K-10K neurons/day (within 10K/day free allocation). Curated FAQ hits and D1 cache hits reduce actual neuron consumption.
-
-### 11.4 Aggregated API (FastAPI Python Worker)
-
-**Concept:** A unified FastAPI Python Worker that aggregates all backend services behind one documented, typed REST API. Auto-generates OpenAPI/Swagger docs at `/docs`. Future teams call one API instead of learning 5+ service APIs.
-
-**Endpoint structure:**
-
-```
-FastAPI Python Worker: /api/v1/
-
-├── /content
-│   ├── GET  /content/pages?site=capstone         → Sanity GROQ query
-│   ├── GET  /content/events?site=rwc-us          → Sanity GROQ query
-│   ├── GET  /content/sponsors                    → Sanity GROQ query
-│   ├── POST /content/search                      → Sanity Embeddings Index
-│   └── POST /content/mutations                   → Sanity Mutations API
-│
-├── /chat
-│   ├── POST /chat/query                          → Embeddings + Workers AI
-│   ├── GET  /chat/budget                         → KV neuron counter status
-│   └── GET  /chat/config                         → chatbotConfig (cached in KV)
-│
-├── /platform
-│   ├── GET  /platform/deploy-status              → CF Pages API
-│   ├── POST /platform/rebuild?site=capstone      → CF Pages deploy hook
-│   ├── GET  /platform/health                     → Aggregated health check
-│   └── GET  /platform/analytics                  → Analytics Engine query
-│
-├── /forms
-│   ├── POST /forms/submit                        → Turnstile verify + Sanity create
-│   └── GET  /forms/submissions?dataset=capstone  → Sanity query
-│
-└── /discord
-    ├── POST /discord/notify                      → Discord webhook
-    └── POST /discord/interactions                → Discord bot interaction handler
-```
-
-**Technology stack:**
-
-| Component | Technology | Rationale |
-|:----------|:-----------|:----------|
-| Framework | FastAPI | Auto-docs, Pydantic validation, dependency injection |
-| Validation | Pydantic v2 | Typed request/response models |
-| HTTP client | httpx | Async calls to Sanity, Discord, CF APIs |
-| AI/LLM (future) | LangChain | Available on Python Workers for RAG sophistication |
-| Auth | API key + CF Access headers | Simple for internal consumers |
-
-**Why paid plan is required:** Python Workers need 50-500ms CPU per request (vs 10ms free cap). The Aggregated API also makes 3-5 subrequests per request (vs 50 free cap limit).
-
-### 11.5 Discord Bot Enhancements
-
-**Concept:** Python Worker bot with slash commands that query and mutate Sanity content via the Aggregated API.
-
-**Query commands:**
-
-- `/capstone events upcoming` — upcoming events from Sanity
-- `/rwc status` — RWC program status
-- `/capstone sponsors tier:gold` — filtered sponsor list
-
-**Write commands (with emoji-react confirmation):**
-
-- Create draft events
-- Update document statuses
-- Trigger publishes
-
-All writes create drafts first. Audit trail logged to Analytics Engine.
-
-### 11.6 Schema-Driven JSON-LD
-
-**Concept:** Extract the existing per-page inline JSON-LD into a centralized build-time utility that maps Sanity `_type` to Schema.org structured data. Future devs add a new content type to a single mapping table and JSON-LD appears automatically — no Schema.org knowledge required.
-
-**Current state:** JSON-LD is already implemented inline in four places:
-
-| File | Schema.org Type |
-|:-----|:----------------|
-| `Layout.astro` | `EducationalOrganization` (site-wide) |
-| `Breadcrumb.astro` | `BreadcrumbList` (every page with breadcrumbs) |
-| `events/[slug].astro` | `Event` |
-| `sponsors/[slug].astro` | `Organization` |
-
-**What changes:** A `lib/jsonld.ts` utility provides typed builder functions per Schema.org type. Each page calls a one-liner instead of constructing the JSON-LD object inline. The mapping table lives in one file, so the next team sees every content type → Schema.org relationship at a glance.
-
-```typescript
-// lib/jsonld.ts — centralized mapping
-import type { Event, Sponsor } from '@/sanity.types';
-
-export function eventJsonLd(event: Event, siteUrl: string) { /* ... */ }
-export function organizationJsonLd(sponsor: Sponsor) { /* ... */ }
-export function breadcrumbJsonLd(items: BreadcrumbItem[], baseUrl: string) { /* ... */ }
-// Future team adds: export function projectJsonLd(project: Project) { /* ... */ }
-```
-
-**Extensibility for the next team:**
-
-| Sanity `_type` | Schema.org Type | Status |
-|:---------------|:----------------|:-------|
-| `event` | `Event` | Exists (extract from `events/[slug].astro`) |
-| `sponsor` | `Organization` | Exists (extract from `sponsors/[slug].astro`) |
-| (all pages) | `BreadcrumbList` | Exists (extract from `Breadcrumb.astro`) |
-| (site-wide) | `EducationalOrganization` | Exists (extract from `Layout.astro`) |
-| `project` | `CreativeWork` | Next team adds |
-| `team` | `Person` | Next team adds |
-| `chatbotFAQ` | `FAQPage` | Next team adds (if chatbot ships) |
-
-**Runtime cost:** Zero. All JSON-LD is generated at build time during `astro build`. The utility is pure TypeScript with no Worker or API calls.
-
-### 11.7 Selective Site Rebuild
-
-**Concept:** The Queue Event Bus Router Worker inspects the `dataset` and `site` field on published documents to trigger rebuilds only for affected sites.
-
-With the two-dataset architecture (decided 2026-02-24):
-
-| Dataset | Site Field | Deploy Hook Triggered |
-|:--------|:-----------|:---------------------|
-| `capstone` | (not needed) | Capstone site only |
-| `rwc` | `rwc-us` | RWC US site only |
-| `rwc` | `rwc-intl` | RWC International site only |
-| `rwc` | (shared content) | Both RWC sites |
-
-Eliminates unnecessary rebuilds and saves Pages build minutes.
-
-### 11.8 Implementation Sequence
-
-**Foundation (Week 1):** Queue Event Bus — Router Worker, `platform-events` Queue, Site Rebuilder consumer, Discord notifier consumer, schema pipeline consumer.
-
-**Chatbot Core (Week 2):** Sanity Embeddings indices (capstone + rwc), Chatbot Worker with Embeddings lookup + Workers AI generation, KV neuron budget management, graceful degradation, Cron Trigger daily reset.
-
-**Chatbot Polish + JSON-LD (Week 3):** chatbotConfig + chatbotFAQ schemas in Studio, Worker reads config from KV, Queue consumer for cache invalidation, extract inline JSON-LD into centralized `lib/jsonld.ts` utility.
-
-**Portal + API + Integration (Weeks 4-5):** Sponsor Portal SSR, Aggregated API endpoints, form pipeline, content migration, Discord bot query/write commands, cross-site integration testing.
-
-### 11.9 Deferred to Phase 6
-
-These features are incremental enhancements on the Phase 3 foundation:
-
-| Feature | Depends On | Value |
-|:--------|:-----------|:------|
-| D1 semantic response cache | Chatbot Worker + D1 | Biggest chatbot performance win |
-| Structured content cards in chatbot | Chatbot Worker | Events with RSVP links, sponsor comparisons |
-| Deploy progress tracker in Studio | KV + Studio plugin | Real-time build status for editors |
-| Editor-curated FAQ feedback loop | Analytics Engine + chatbotFAQ | Self-improving chatbot knowledge |
-| D1 portal data cache | D1 + Cron Trigger | Edge-native portal reads (~1ms vs ~100ms) |
-| Operational dashboard in Studio | Analytics Engine + Studio plugin | Unified content + ops intelligence |
+## See also
+
+- [architecture.md](architecture.md) — full topology + per-part architecture
+- [cloudflare-infrastructure-guide.md](cloudflare-infrastructure-guide.md) — resources, env vars, bindings, handoff checklist
+- [development-guide.md](development-guide.md) — commands, deploy steps, schema/D1 pipelines
+- [rate-limiting-with-durable-objects.md](rate-limiting-with-durable-objects.md) — cross-script DO design
+- [auth-consolidation-strategy.md](auth-consolidation-strategy.md) — Better Auth migration
+- [cost-optimization-strategy.md](cost-optimization-strategy.md) — free-tier limits + headroom
+- [data-models.md](data-models.md) — Sanity schemas, GROQ inventory, D1 tables

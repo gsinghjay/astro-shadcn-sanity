@@ -27,6 +27,9 @@ export default getViteConfig({
   ],
   resolve: {
     alias: {
+      // Project import alias — mirrors tsconfig `paths` so test imports use
+      // the same `@/foo` form as production code.
+      "@": resolve(import.meta.dirname, "./src"),
       // Mock Astro virtual modules that can't resolve outside Astro build
       "sanity:client": resolve(
         import.meta.dirname,

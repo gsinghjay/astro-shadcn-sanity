@@ -33,4 +33,10 @@ describe('Story 5-19: robots.txt llms.txt advertisement', () => {
       expect(source).toContain(`Disallow: ${path}`);
     }
   });
+
+  it('declares Content-Signal preferences for both User-agent blocks (contentsignals.org)', () => {
+    const matches = source.match(/Content-Signal:\s*ai-train=yes,\s*search=yes,\s*ai-input=yes/g);
+    expect(matches).not.toBeNull();
+    expect(matches!.length).toBe(2);
+  });
 });

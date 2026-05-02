@@ -1,215 +1,276 @@
 # Integration Architecture
 
-**Project:** ywcc-capstone-template v1.18.0
-**Generated:** 2026-04-15
+**Project:** ywcc-capstone-template v2.0.0
+**Generated:** 2026-04-29 (full rescan, deep)
 
-## Parts & their integration status
+How the parts of this monorepo communicate with each other and with external services.
 
-| Part | Role | Integration status |
-|---|---|---|
-| `astro-app` | Public website + sponsor/student portal | **Hub.** Calls every production backend. |
-| `studio` | Editorial CMS | Publishes to Sanity Content Lake (capstone, rwc-us, rwc-intl datasets). |
-| `rate-limiter-worker` | Edge rate limiter (DO) | **Wired** into astro-app via DO binding `RATE_LIMITER`. |
-| `event-reminders-worker` | Cron email + Discord notifier | **Wired** to shared D1 + Sanity + Resend + Discord webhook. |
-| `platform-api` | Typed REST/GROQ proxy (Python Worker) | **Scaffold only.** No astro-app caller; wrangler has placeholder IDs. |
-| `discord-bot` | Discord slash commands | **Scaffold only.** Standalone; queries Sanity directly. |
-
-## Integration diagram
+## Integration map
 
 ```
-                ┌────────────────────────────────────────────────────────┐
-                │                 Sanity Content Lake                    │
-                │           (capstone / rwc-us / rwc-intl datasets)      │
-                └──▲────────────────▲──────────────────────▲─────────────┘
-         publish  │   GROQ read     │   GROQ read          │   GROQ read
-                  │                 │                      │
-  ┌─────────┐     │    ┌────────────┴──────┐   ┌───────────┴────────────┐
-  │ Studio  │─────┘    │ astro-app         │   │ event-reminders-worker │
-  │ (hosted)│          │ (CF Pages)        │   │ (CF Worker, cron)      │
-  └─────────┘          │                   │   │  0 9 * * *             │
-                       │ middleware.ts ───▶│DO │                        │
-                       │                   │RPC│                        │
-                       │                   └─┬─┘                        │
-                       │     ┌───────────────┼──┐                       │
-                       │     │rate-limiter-  │  │                       │
-                       │     │worker (DO+SQL)│  │                       │
-                       │     └───────────────┘  │                       │
-                       │                        │                       │
-                       │  Drizzle / D1 ◀────────┼──── D1 (write)        │
-                       │  KV SESSION_CACHE      │                       │
-                       │                        │                       │
-                       │  Resend (email) ◀──────┼──── Resend (email)    │
-                       │  GitHub API            │                       │
-                       │  Better Auth           │                       │
-                       │                        └──── Discord webhook ─▶│
-                       └──────▲─────────────────┘                       │
-                              │                                         │
-                       ┌──────┴──────┐                                  │
-                       │ Users       │                                  │
-                       │ (browsers)  │                                  │
-                       └─────────────┘                                  │
-                                                                        │
-   ┌──────────────────────────┐                                         │
-   │ D1 ywcc-capstone-portal  │◀────────────────────────────────────────┘
-   │ • user, session, account, verification (Better Auth)               │
-   │ • subscribers                                                      │
-   │ • sent_reminders (idempotency)                                     │
-   │ • project_github_repos                                             │
-   └────────────────────────────────────────────────────────────────────┘
-
-   ┌──────────────────┐          ┌─────────────────┐
-   │ platform-api     │          │ discord-bot     │
-   │ (CF Python Worker│   ──X──  │ (traditional    │
-   │  — scaffold)     │ not wired│  server         │
-   └──────────────────┘          │  — scaffold)    │
-                                 │  slash commands │
-                                 │  query Sanity   │
-                                 └─────────────────┘
+            ┌──────────────────────────────────────────────────────────────────┐
+            │                      CLOUDFLARE WORKERS                          │
+            │                                                                  │
+            │  ┌──────────────────────────────────┐                            │
+            │  │  ywcc-capstone (astro-app SSR)   │                            │
+            │  │                                  │                            │
+            │  │  ┌────────┐   ┌────────────────┐ │      ┌──────────────────┐ │
+            │  │  │ Sanity │   │ Better Auth +  │ │      │ rate-limiter-    │ │
+            │  │  │ client │   │ Drizzle (D1)   │ │ RPC  │ worker (DO       │ │
+            │  │  │        │   │                │◄┼──────┤ SlidingWindow…)  │ │
+            │  │  └───┬────┘   │ KV: SESSION_…  │ │      └──────────────────┘ │
+            │  │      │        └────────────────┘ │                            │
+            │  └──────┼────────────────────────────┘                            │
+            │         │                                                        │
+            │         │   D1 (shared)                                          │
+            │         │   ┌────────────────────────────────┐                   │
+            │         │   │  PORTAL_DB / DB                 │                   │
+            │         │   │  ywcc-capstone-portal           │                   │
+            │         │   └─────────────┬──────────────────┘                   │
+            │         │                 │                                      │
+            │         │     ┌───────────┘                                      │
+            │         │     │                                                  │
+            │         │  ┌──┴────────────────────────┐                         │
+            │         │  │ ywcc-event-reminders      │                         │
+            │         │  │ (cron 0 9 * * *)          │                         │
+            │         │  │ reads sent_reminders +    │                         │
+            │         │  │ subscribers, sends Resend │                         │
+            │         │  └────┬─────────────────┬────┘                         │
+            │         │       │                 │                              │
+            │  ┌──────┼───────┼─────────────────┼────┐                         │
+            │  │ rwc-us / rwc-intl (no D1/KV/DO)     │                         │
+            │  │  Sanity client only                  │                         │
+            │  └──────┼───────┼─────────────────┼────┘                         │
+            │         │       │                 │                              │
+            │  ┌──────┼───────┼─────────────────┼────┐                         │
+            │  │ ywcc-capstone-preview / *-preview   │                         │
+            │  │  Sanity client (drafts perspective) │                         │
+            │  └──────┼───────┼─────────────────┼────┘                         │
+            └─────────┼───────┼─────────────────┼──────────────────────────────┘
+                      │       │                 │
+   ┌──────────────────▼───────┴─────────────────▼──────────────────────────────┐
+   │                       EXTERNAL SERVICES                                    │
+   │                                                                            │
+   │  Sanity Content Lake          Resend          GitHub OAuth   Google OAuth │
+   │  (project 49nk9b0w,           (transactional + magic-link)                │
+   │   datasets production / rwc)                                              │
+   │                                                                            │
+   │  Cloudflare Turnstile         Discord (webhook)              GA4 / GTM     │
+   │  (siteverify endpoint)        (ops + content notifications)               │
+   └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Integration points (authoritative list)
+## Inter-part integrations (this repo)
 
-### 1. astro-app → Sanity Content Lake
-- **Transport:** HTTPS via `@sanity/astro` client (module `sanity:client`).
-- **Auth:** public read for SSG; `SANITY_API_READ_TOKEN` for draft/Visual Editing previews.
-- **Volume:** 30 `defineQuery` exports in `astro-app/src/lib/sanity.ts` (pages, sponsors, projects, events, articles, article-categories, authors, listing-page singletons, sponsor portal, sponsor whitelist, testimonials, site settings).
-- **Caching:** Module-level `const QUERY = defineQuery(…)` bodies and GROQ results are cached by `@sanity/client`'s built-in ETag / deduping during the build. At runtime SSR routes re-fetch per request.
-- **Block projections:** shared `INNER_BLOCK_FIELDS_PROJECTION` includes image + `metadata.lqip` (for LQIP placeholders) and recursive ColumnsBlock expansion.
-- **Visual Editing:** Stega markers injected when `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true`. Presentation resolvers live in `studio/src/presentation/resolve.ts` and map route slugs to preview URLs.
-- **Live Content:** Optional client-side subscription via `sanity-live.ts` when `PUBLIC_SANITY_LIVE_CONTENT_ENABLED=true`.
+### 1. astro-app ↔ rate-limiter-worker (cross-script DO RPC)
 
-### 2. astro-app → Cloudflare D1 (PORTAL_DB)
-- **Database:** `ywcc-capstone-portal` (id `76887418-c356-46d8-983b-fa6e395d8b16`).
-- **ORM:** Drizzle ORM 0.45.1 (`astro-app/src/lib/db.ts`, `drizzle-schema.ts`).
-- **Tables:** `user`, `session`, `account`, `verification` (Better Auth); `subscribers`; `sent_reminders`; `project_github_repos`.
-- **Migrations:** 7 SQL files at `astro-app/migrations/`. Applied via `npx wrangler d1 migrations apply PORTAL_DB`.
-- **Sharing:** `event-reminders-worker` binds the same D1 database to read `subscribers` and write `sent_reminders`.
+**Direction**: `ywcc-capstone` → `rate-limiter-worker`. Bound at deploy time:
 
-### 3. astro-app → KV SESSION_CACHE
-- **Purpose:** Fast-path lookup for Better Auth sessions (avoids a D1 round-trip on hot paths).
-- **Binding:** `SESSION_CACHE` KV namespace `f78af5695075451c9d3d7887368e90dc`.
-- **Policy:** Middleware reads KV first; on miss or error, falls back to D1 via Drizzle. **Fail-open** on KV failure — a bad KV never blocks sign-in.
+```jsonc
+"durable_objects": {
+  "bindings": [{
+    "name": "RATE_LIMITER",
+    "class_name": "SlidingWindowRateLimiter",
+    "script_name": "rate-limiter-worker"
+  }]
+}
+```
 
-### 4. astro-app → Durable Object (RATE_LIMITER)
-- **Binding:** `RATE_LIMITER` → `SlidingWindowRateLimiter` class from `rate-limiter-worker`.
-- **Protocol:** DO RPC. `middleware.ts` calls `stub.checkLimit(60_000, 100)` per request, keyed by IP.
-- **Response:** `{ allowed: boolean, remaining: number, retryAfterMs: number }`. If blocked, middleware returns HTTP 429 with `Retry-After`.
-- **Resilience:** Fail-open on any DO error.
+**Protocol**: Workers RPC. From `middleware.ts`:
 
-### 5. astro-app → Better Auth
-- **Entry:** `/api/auth/[...all].ts` (SSR). Delegates to Better Auth's route handler.
-- **Providers:** Google OAuth, GitHub OAuth, Resend Magic Link.
-- **Cookies:** HttpOnly session cookie signed with `BETTER_AUTH_SECRET`.
-- **Sponsor escalation:** After initial sign-in, middleware runs `SPONSOR_WHITELIST_QUERY` against Sanity. Matching emails get role `sponsor`; all others `student`. Roles are persisted on `user.role`.
+```ts
+import { env } from 'cloudflare:workers';
+const id = env.RATE_LIMITER.idFromName(rateLimitKey);
+const stub = env.RATE_LIMITER.get(id);
+const result = await stub.checkLimit(60_000, 100);
+if (!result.allowed) return new Response('Too many requests', { status: 429 });
+```
 
-### 6. astro-app → Resend
-- **Use cases:** Magic Link delivery (Better Auth), newsletter signup (`/api/subscribe`), optional contact form notifications.
-- **Secret:** `RESEND_API_KEY`, `RESEND_FROM_EMAIL`.
+**Failure mode**: capstone middleware fails closed if the binding is unhealthy (returns 5xx). Deploy `rate-limiter-worker` first when bootstrapping a fresh CF account.
 
-### 7. astro-app → GitHub API
-- **Entry:** `/portal/api/github/repos.ts`, `/portal/api/github/links.ts`.
-- **Purpose:** Let sponsors link/unlink GitHub repositories to their projects (persisted in `project_github_repos`).
-- **Auth:** User's GitHub OAuth access token from Better Auth `account` table.
+### 2. astro-app ↔ event-reminders-worker (shared D1)
 
-### 8. astro-app → rate-limiter-worker (runtime)
-Already covered in point 4. Deploy separately (`npm run deploy:rate-limiter`) so the DO class is available to astro-app.
+**Direction**: both Workers read/write `ywcc-capstone-portal` D1. **There is no direct binding** between them — coordination is through the database.
 
-### 9. event-reminders-worker → D1 + Sanity + Resend + Discord
-- **Trigger:** `0 9 * * *` (daily 09:00 UTC) via `scheduled()` handler.
-- **Flow:**
-  1. Query Sanity for events with `status == "upcoming"` within 30 days.
-  2. For each event, check `sent_reminders` table for idempotency.
-  3. If unsent and `days_to_event` matches a reminder tier (30/7/1), dispatch:
-     - 1 Discord embed per event via `DISCORD_WEBHOOK_URL`.
-     - 1 per-subscriber email via Resend (for subscribers in the `subscribers` table).
-  4. Write rows to `sent_reminders` to prevent re-sends.
-- **Secrets:** `SANITY_API_TOKEN`, `DISCORD_WEBHOOK_URL`, `RESEND_API_KEY`, `RESEND_FROM_EMAIL`.
+| Worker                    | Tables read           | Tables written                     |
+|---------------------------|-----------------------|------------------------------------|
+| ywcc-capstone (astro-app) | `subscribers` (during signup), `user`, `session`, `account`, `verification`, `project_github_repos` | All of the above |
+| ywcc-event-reminders      | `subscribers`, `sent_reminders` | `sent_reminders` (insert per send) |
 
-### 10. Sanity Studio ↔ TypeGen ↔ astro-app types
-- **Contract:** `studio/schema.json` (extracted/deployed) is the source of truth.
-- **Build step:** `npm run typegen` (root) runs `npx sanity typegen generate` from `studio/` with output to `astro-app/src/sanity.types.ts`.
-- **Enforcement:** `astro-app/astro.config.mjs` build runs `astro check`, which fails on any drift between queries and TypeGen result types.
-- **Deploy step:** `npx sanity schema deploy` (from `studio/`) updates the hosted schema for **all three workspaces**. This was fixed in PR `8bcf552` (previously deployed to capstone only).
+**Coordination requirement**: any migration affecting `subscribers` or `sent_reminders` (currently 0004 / 0005) must be deployed before either Worker is updated to read new columns. Migrations under `astro-app/migrations/` are the source of truth — `event-reminders-worker` does not maintain its own migration set.
 
-### 11. Multi-workspace Sanity
-- **Workspaces:** capstone (`/capstone`), rwc-us (`/rwc-us`), rwc-intl (`/rwc-intl`).
-- **Shared schema:** `studio/src/schemaTypes/workspace-utils.ts#createSchemaTypesForWorkspace(siteId)` returns a schema set with the `site` field hidden for capstone and visible/required for rwc-us/rwc-intl.
-- **Uniqueness:** `studio/src/schemaTypes/fields/site-field.ts#siteScopedIsUnique` validates slug uniqueness **per site** using a GROQ count query (so two RWC sites can share slugs without collision).
-- **Desk filtering:** `rwc-desk-structure.ts` filters every site-aware type with GROQ `_type == $type && site == $site`. Listing-page singletons use composite IDs `listingPage-{route}-{siteId}`; site-settings singletons use `siteSettings-{siteId}`.
+### 3. astro-app ↔ studio (Sanity Content Lake)
 
-## Inactive / scaffold integration points
+**Direction**: read-mostly from astro-app to Sanity. Writes only via:
 
-### platform-api (not yet wired)
-- Wrangler bindings include placeholder `<your-kv-namespace-id>` / `<your-d1-database-id>`.
-- astro-app does **not** call any `/api/v1/*` route (grep for `PLATFORM_API_URL` and route paths returns no hits).
-- Decision point: either bind to `SESSION_CACHE` + `PORTAL_DB` and implement a caller, or remove from `package.json` workspaces until wired.
+- **`submitForm` Action**: creates a `submission` document with `SANITY_API_WRITE_TOKEN`.
+- **Sanity Studio**: editorial UI; writes documents directly through the Sanity API.
 
-### discord-bot (not yet deployed)
-- Lives at `discord-bot/discord-bot/` (nested twice — historical).
-- Queries Sanity directly; does not consume any astro-app API.
-- Slash commands registered manually (`python register_commands.py`) — one-time per guild/global registration.
-- No deployment target defined (no Dockerfile at the bot root, no wrangler).
+**Protocol**: HTTPS to `https://<projectId>.api.sanity.io/`. The astro-app uses three modes:
 
-## Cross-cutting concerns
+| Mode                  | Trigger                                                        | Perspective | useCdn | Stega        |
+|-----------------------|----------------------------------------------------------------|-------------|:------:|--------------|
+| Production (published)| `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=false`                   | published   |   ✓    | off          |
+| Preview (drafts)      | `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` (preview Workers)  | drafts      |   ✗    | on           |
+| Live preview          | Within a preview Worker, subscribes to live updates via SSE    | drafts      |   ✗    | on           |
 
-### Session & auth propagation
-Middleware populates `context.locals.user = { id, email, name, role }`. Every SSR page and `/portal/api/*` handler reads from `locals`; no page re-validates the token independently.
+**Caching**: module-level caches (`_sponsorsCache`, `_siteSettingsCache`) are bypassed when `visualEditingEnabled === true`. Live subscriptions use exponential backoff (`lib/sanity-live.ts`, max 5 reconnect attempts).
 
-### Rate limiting
-Applied globally in `middleware.ts`. Static prerendered pages are served from CF Pages edge cache and do not hit the middleware, so the limiter only protects dynamic/API routes.
+**Webhook → deploy**: a single Sanity webhook (publish-only on `_type in [...]`, drafts excluded) triggers three CF Deploy Hooks (one per production Worker). Rebuild + deploy: ~45-75s per environment.
 
-### Caching
-- **Sanity queries:** in-memory during SSG build; revalidated on every SSR request.
-- **CF Pages CDN:** default for prerendered assets; headers in `astro-app/public/_headers` tune cache-control per path.
-- **KV session cache:** opportunistic, not authoritative.
+### 4. astro-app ↔ Sanity Studio (Visual Editing iframe)
 
-### Observability
-- `rate-limiter-worker` has `observability.enabled = true` in `wrangler.toml`.
-- Other Workers log to the CF dashboard by default (no Logpush wired).
-- GTM + GA4 on the frontend via `PUBLIC_GTM_ID`; dataLayer tested by `tests/e2e/gtm-datalayer.spec.ts`.
+**Direction**: Sanity Studio's Presentation tool loads a preview iframe pointing at one of the `*-preview` Workers. The Studio passes context (origin, perspective, document path) via postMessage. The astro-app emits stega markers in rendered HTML; clicking in the iframe focuses the corresponding Studio field.
 
-## Data flows (typical requests)
+The `studio/src/presentation/resolve.ts` resolver picks the iframe origin **per workspace**:
 
-### Anonymous visitor reads `/articles/[slug]`
-1. CF CDN serves prerendered HTML.
-2. No middleware executes; no DO, D1, or KV calls.
-3. Only the browser hits Sanity CDN for images (via `urlFor(...)` URLs with LQIP blur-up).
+| Workspace  | Preview origin (production)                          |
+|------------|------------------------------------------------------|
+| capstone   | https://ywcc-capstone-preview.js426.workers.dev      |
+| rwc-us     | https://rwc-us-preview.js426.workers.dev             |
+| rwc-intl   | https://rwc-intl-preview.js426.workers.dev           |
 
-### Sponsor signs in
-1. User clicks "Sign in with Google" on `/portal/login`.
-2. Redirects to `/api/auth/[...all]` → Google → back to `/api/auth/callback`.
-3. Better Auth creates `session` + `account` rows in D1.
-4. Middleware runs on the next request: reads session token, caches in KV.
-5. Runs `SPONSOR_WHITELIST_QUERY` against Sanity. Email matches → `user.role = sponsor`.
-6. User is redirected to `/portal`.
+The preview Workers carry `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` in their `vars` block.
 
-### Scheduled event reminders
-1. Cloudflare fires `event-reminders-worker` at 09:00 UTC.
-2. Worker queries Sanity for upcoming events.
-3. For each eligible event, inserts a row into `sent_reminders` and dispatches Discord + Resend notifications.
-4. Worker returns; next invocation at 09:00 UTC next day.
+### 5. astro-app ↔ studio (TypeGen pipeline)
 
-### New page published in Studio
-1. Editor publishes a `page` document in the Capstone or RWC workspace.
-2. Sanity triggers the workspace's configured Pages deploy hook (see "Sanity → Pages deploy hooks" below).
-3. Cloudflare Pages rebuilds the matching project on the `main` branch and redeploys.
-4. For in-page hydration without a full rebuild, enable Live Content (`PUBLIC_SANITY_LIVE_CONTENT_ENABLED=true`).
+**Direction**: studio → astro-app, build-time only. The studio extracts the schema and generates types; astro-app consumes them.
 
-### Sanity → Pages deploy hooks (confirmed via Cloudflare API, 2026-04-15)
+```
+studio/src/schemaTypes/*.ts
+        │  (sanity schema extract)
+        ▼
+studio/schema.json
+        │  (sanity typegen generate)
+        ▼
+studio/sanity.types.ts
+        │  (consumed by astro-app/src/lib/types.ts)
+        ▼
+astro-app component prop types
+```
 
-Each Pages project has a production deploy hook wired to its matching Sanity workspace. Publishing (or merging content changes) in Studio invokes these hooks, which trigger a production build on `main`.
+`npm run typegen` (root) runs this chain. After any schema change, the 4-step pipeline (update local schema → `schema:deploy` → `typegen` → update `lib/types.ts`) is mandatory before MCP content tools work with new types.
 
-| Pages project | Deploy hook name | Hook ID | Branch | Created |
-|---|---|---|---|---|
-| `ywcc-capstone` | `sanity-content-update-capstone` | `f6e2c5c6-8951-455c-b48b-6afcbbc82bbb` | `main` | 2026-02-28 |
-| `rwc-us` | `sanity-content-update-rwc-us` | `bca5ddca-d7d0-4742-9308-e405aa38122f` | `main` | 2026-02-28 |
-| `rwc-intl` | `sanity-content-update-rwc-intl` | `8edab80c-19c0-4b68-8ca2-5bba8586646c` | `main` | 2026-02-28 |
+### 6. astro-app ↔ portal-api / discord-bot (NOT WIRED)
 
-The Studio configures these hook URLs as webhooks on publish/unpublish events per dataset (capstone dataset → capstone hook; rwc dataset → rwc-us + rwc-intl hooks). Hooks also fire on PR merges into `main` via the standard Pages GitHub integration (separate from the Sanity webhook path).
+`platform-api` and `discord-bot` are **not currently wired into astro-app**. Their bindings are placeholders. If you need them in the request path:
 
-## Risks & follow-ups
+- `platform-api`: set the real KV/D1 IDs in `platform-api/wrangler.jsonc`, deploy with `wrangler deploy` from that dir, and add a service binding to `astro-app/wrangler.jsonc`.
+- `discord-bot` (Python): needs its own deploy target; not designed for CF Workers in its current form. The production Discord bot lives in `capstone-bot` + `capstone-ask-worker` (see "Out-of-tree" below).
 
-- **Single D1 shared by astro-app + event-reminders-worker.** Safe today but requires coordinated migrations. Keep `astro-app/migrations/` as the single source of truth; event-reminders-worker reads only.
-- **Platform-api drift.** If the scaffold sits unwired long-term, it risks bit-rot. Either invest or archive.
-- **Discord bot hosting.** With no deploy target, slash commands will drift out of date; schedule a decision or move to a cron Worker.
-- **DO binding in astro-app wrangler.jsonc.** Requires `rate-limiter-worker` to be deployed first. New environments must deploy in order.
+## External integrations
+
+### Authentication — Better Auth (Google + GitHub OAuth + Magic Link)
+
+| Component                | Where                                                 | Role                                  |
+|--------------------------|-------------------------------------------------------|---------------------------------------|
+| Better Auth instance     | `astro-app/src/lib/auth-config.ts`                    | OAuth + magic-link configuration      |
+| Catch-all routes         | `src/pages/api/auth/[...all].ts`                       | Provider sign-in / callback / sign-out |
+| Sponsor lookup query     | `SPONSOR_BY_EMAIL_QUERY` (Sanity)                      | Maps user email → sponsor identity   |
+| Magic-link mailer        | `Resend` (`RESEND_API_KEY` secret)                    | Transactional one-time tokens         |
+| Session storage          | D1 `session` (Drizzle) + KV `SESSION_CACHE`           |                                       |
+
+GitHub OAuth client ID `Ov23liFtOiWIyCqJXJMi` (production capstone). At cutover, `GITHUB_CLIENT_SECRET` must be re-put with the prod App's secret.
+
+### Email — Resend
+
+- Auth: magic-link emails to portal users.
+- Reminders: `ywcc-event-reminders` daily cron sends event reminder emails.
+- From address: `RESEND_FROM_EMAIL` env var (default `YWCC Capstone <noreply@intraphase.com>`).
+
+### Bot protection — Cloudflare Turnstile
+
+- Site key (public): `PUBLIC_TURNSTILE_SITE_KEY`. Same value across environments (`0x4AAAAAACf0yCNwVePpAiMn`).
+- Secret: `TURNSTILE_SECRET_KEY` (Worker secret).
+- Verified server-side in `submitForm` Astro Action via `POST https://challenges.cloudflare.com/turnstile/v0/siteverify`.
+
+### Discord — webhook
+
+- Ops + content notifications.
+- Used by:
+  - `submitForm` Action (form submission alerts).
+  - `event-reminders-worker` (daily run summary).
+  - `sync-preview.yml` GitHub Action (auto-merge result).
+- Webhook URLs are stored as Worker secrets / GitHub Action secrets (per environment).
+
+### GTM / GA4
+
+- Container ID: `GTM-NS9N926Q`.
+- Loaded via `Layout.astro` `<head>`.
+- Tracking attributes: `data-gtm-category` / `data-gtm-action` / `data-gtm-label` on interactive elements (NEVER inline event handlers).
+- Disabled in preview Workers (`PUBLIC_GTM_ID=""`).
+
+### GitHub REST (via OAuth user tokens)
+
+- Portal: when a sponsor has a GitHub OAuth account linked, `/portal/api/github/repos` calls `https://api.github.com/user/repos` server-side using the user's stored access token.
+- `/portal/api/github/links` persists sponsor → repo selections in `project_github_repos` D1 table.
+
+### Sanity Content Lake (project `49nk9b0w`)
+
+- Datasets: `production` (capstone) + `rwc` (RWC sites). Schemas are shared across all three workspaces; site filtering is applied at query time.
+- API token usage:
+  - `SANITY_API_READ_TOKEN`: preview Workers only (drafts perspective).
+  - `SANITY_API_WRITE_TOKEN`: server-only in production (used by `submitForm` and event reminders).
+  - The `SponsorAcceptancesTool` admin endpoint authenticates the calling Studio user's own Sanity session JWT (no shared bearer); see `api-contracts.md` `POST /api/portal/admin/acceptances`.
+
+### Cloudflare AI Search (production, out-of-tree)
+
+- Index: `bf002610-921a-4047-9298-cc2d2668451a`.
+- Consumed by `capstone-ask-worker` (RAG) — service-bound from `capstone-bot`.
+- The astro-app's `ChatBubble.astro` uses `@cloudflare/ai-search-snippet` (a vendor web component, Shadow-DOM-rendered) to surface answers from this index.
+
+## Multi-site mechanics
+
+The same astro-app codebase serves three production environments. Differentiation is driven by:
+
+1. **`CLOUDFLARE_ENV` build var**: selects `[env.<name>]` block in `wrangler.jsonc`. The astro.config reads the block's `vars` and mirrors them into `process.env` before `defineConfig`.
+2. **`PUBLIC_SITE_ID`** (`capstone` / `rwc-us` / `rwc-intl`): drives GROQ `$site` parameter.
+3. **`PUBLIC_SITE_THEME`** (`red` / `blue` / `green`): sets `<html data-site-theme>` for CSS theming.
+4. **`PUBLIC_SANITY_DATASET`** (`production` / `rwc`): flips multi-site mode (`isMultiSite = DATASET === 'rwc'`).
+5. **`PUBLIC_SANITY_VISUAL_EDITING_ENABLED`**: flips drafts vs published, stega on/off, useCdn on/off, server:defer islands, `astro-llms-md` (gated OFF when stega is on).
+
+Three preview Workers carry the same env layering plus visual editing on. Studio Presentation iframe URL is selected by workspace.
+
+## Branch + release flow (CI integration)
+
+```
+feature/* ─► preview ─► main
+                          │
+                          ├─► release.yml → semantic-release tag + CHANGELOG commit
+                          │
+                          ├─► deploy-storybook.yml → GH Pages (path-filtered)
+                          │
+                          └─► sync-preview.yml → main → preview auto-merge + Discord notify
+```
+
+| Workflow                       | Triggers              | Purpose                                                      |
+|--------------------------------|-----------------------|--------------------------------------------------------------|
+| `ci.yml`                       | PR to `preview`       | Vitest unit + LHCI + Pa11y (sitemap-driven)                   |
+| `release.yml`                  | push to `main`        | semantic-release versioning + tagging                         |
+| `deploy-storybook.yml`         | push to `main`        | GH Pages publish                                              |
+| `enforce-preview-branch.yml`   | PR to `main`          | Blocks any source other than `preview`                        |
+| `enforce-preview-source.yml`   | PR to `preview`       | Blocks `main → preview` PRs                                   |
+| `sync-preview.yml`             | release.yml completion| Auto-merge `main → preview` + Discord notify                  |
+
+There is **no automated CF deploy on `main`** for the astro-app — `wrangler deploy` happens on demand via `npm run deploy:capstone` etc. The Sanity webhook → CF Deploy Hook flow handles content-driven rebuilds.
+
+## Out-of-tree services (production)
+
+Operationally adjacent but not part of this repo's deploy pipeline:
+
+| Service                     | Type                                | Bindings                                                              |
+|-----------------------------|-------------------------------------|-----------------------------------------------------------------------|
+| `capstone-bot`              | CF Worker (Discord bot)             | service binding `ASK_WORKER` → `capstone-ask-worker`, KV, Sanity vars  |
+| `capstone-ask-worker`       | CF Worker (RAG over AI Search)      | AI Search index `bf002610-…`                                          |
+| `little-dawn-0015-nlweb`    | CF Worker (MCP-style tool surface)  | AI, ASSETS, MCP_OBJECT (DO), RAG_ID, RATE_LIMITER (ratelimit binding) |
+
+These are pinned to the same CF account but deploy independently. If you change Sanity schemas or Discord webhook URLs, audit downstream consumers in this list before merging.
+
+## Risks (integration-level)
+
+1. **Cross-script DO**: `ywcc-capstone` middleware fails closed if `rate-limiter-worker` is undeployed. Always deploy the rate limiter first when standing up a new CF account.
+2. **Shared D1**: `astro-app` + `event-reminders-worker` share `ywcc-capstone-portal`. Migration changes affect both — coordinate deploys.
+3. **Sanity webhook scope**: filter is `_type in ["page","siteSettings","sponsor","project","team","event"]`. Adding a new content type that should trigger rebuild requires updating the webhook config in the Sanity dashboard — not in code.
+4. **Discord webhook URLs**: stored as secrets in Worker / Action contexts. A leaked URL allows arbitrary message posting; rotate via the Discord channel settings.
+5. **Stale OAuth tokens**: the prod GitHub client secret must be re-put at cutover (the staging-phase secret is invalid). Documented in `wrangler.jsonc` comments.
+6. **`platform-api` placeholders**: deploying with placeholder KV/D1 IDs breaks at runtime. Treat as a scaffold until IDs are real.

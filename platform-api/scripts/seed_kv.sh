@@ -42,11 +42,9 @@ npx wrangler kv key put "${ARGS[@]}" \
     "config:features" '{"notifications": true, "maintenance_mode": false}'
 
 # Example: webhook mapping for Discord notifications
-
-# NOTE ~~ add "wait=true" as a query param to your webhooks to make discord return a response body, otherwise the endpoint will crash and return a 500 Internal Service Error
-echo "Setting webhooks:general..."
-npx wrangler kv key put "${ARGS[@]}" \
-    "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
+# echo "Setting webhooks:general..."
+# npx wrangler kv key put "${ARGS[@]}" \
+#     "webhooks:general" '"https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"'
 
 echo "Setting discord-webhook:announcements"
 npx wrangler kv key put "${ARGS[@]}" \
