@@ -40,14 +40,48 @@ interface SponsorDoc {
 
 interface ToolConfig {
   apiUrl?: string
-  token?: string
+  projectId?: string
 }
 
 function readConfig(): ToolConfig {
   const e = (import.meta as unknown as {env?: Record<string, string | undefined>}).env ?? {}
   return {
     apiUrl: e.SANITY_STUDIO_ACCEPTANCES_API_URL,
-    token: e.SANITY_STUDIO_ADMIN_TOKEN,
+    projectId: e.SANITY_STUDIO_PROJECT_ID,
+  }
+}
+
+/**
+ * Cookie-auth probe against Sanity to retrieve the current Studio user id.
+ * Returns null on any failure (network, non-200, malformed body, missing id).
+ * `credentials: 'include'` is required so the httpOnly Sanity session cookie
+ * (scoped to *.api.sanity.io) is sent with the request. The optional signal
+ * lets the caller cancel the in-flight probe on unmount/remount so a slow
+ * /v1/users/me doesn't keep a request live across React effect cycles.
+ */
+async function getCurrentUserId(
+  projectId: string,
+  signal?: AbortSignal,
+): Promise<string | null> {
+  try {
+    const res = await fetch(`https://${projectId}.api.sanity.io/v1/users/me`, {
+      credentials: 'include',
+      signal,
+    })
+    if (!res.ok) {
+      console.warn('[SponsorAcceptances] /v1/users/me probe non-OK:', res.status)
+      return null
+    }
+    const body = (await res.json()) as {id?: unknown}
+    if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
+      console.warn('[SponsorAcceptances] /v1/users/me returned malformed body')
+      return null
+    }
+    return body.id || null
+  } catch (err) {
+    if ((err as Error)?.name === 'AbortError') return null
+    console.warn('[SponsorAcceptances] /v1/users/me probe failed:', err)
+    return null
   }
 }
 
@@ -76,7 +110,7 @@ function formatVersion(value: string | null): string {
 }
 
 export function SponsorAcceptancesView(props: ToolConfig = {}) {
-  const {apiUrl, token} = props
+  const {apiUrl, projectId} = props
   const client = useClient({apiVersion: '2024-10-01'})
 
   const [filter, setFilter] = useState<FilterMode>('all')
@@ -99,9 +133,30 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
 
   const load = useCallback(
     async (controller?: AbortController) => {
-      if (!apiUrl || !token) {
+      if (!apiUrl) {
         setError(
-          'Acceptances API not configured. Set SANITY_STUDIO_ACCEPTANCES_API_URL and SANITY_STUDIO_ADMIN_TOKEN.',
+          'Acceptances API not configured. Set SANITY_STUDIO_ACCEPTANCES_API_URL.',
+        )
+        setLoading(false)
+        setData(null)
+        return
+      }
+      // Apex `ywcccapstone1.com` 301-redirects to `www.` before the Worker runs;
+      // CORS preflights cannot follow redirects, so apex URLs hard-fail with
+      // ERR_FAILED on any request that triggers a preflight (i.e. every request
+      // we make, since we send an Authorization header). Force the canonical host.
+      if (/^https:\/\/ywcccapstone1\.com\b/i.test(apiUrl)) {
+        setError(
+          'SANITY_STUDIO_ACCEPTANCES_API_URL points at apex (ywcccapstone1.com). ' +
+            'Apex 301-redirects break CORS preflights. Use https://www.ywcccapstone1.com/...',
+        )
+        setLoading(false)
+        setData(null)
+        return
+      }
+      if (!projectId) {
+        setError(
+          'Studio project id missing — set SANITY_STUDIO_PROJECT_ID in studio/.env.',
         )
         setLoading(false)
         setData(null)
@@ -111,9 +166,22 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
       const isStale = () => requestId !== requestIdRef.current
       setLoading(true)
       setError(null)
+      // Capstone Studio runs in cookie-auth mode — the session cookie is
+      // httpOnly, scoped to *.api.sanity.io, and unreadable from JS. Probe
+      // /v1/users/me with `credentials: 'include'` to recover the user id;
+      // forward it (not a bearer) to the Worker, which independently verifies
+      // project membership via a Worker-only Sanity API token.
+      const userId = await getCurrentUserId(projectId, controller?.signal)
+      if (isStale()) return
+      if (!userId) {
+        setError('Could not verify Studio session — please sign out and sign back in.')
+        setLoading(false)
+        setData(null)
+        return
+      }
       try {
         const res = await fetch(`${apiUrl}?accepted=${filter}`, {
-          headers: {authorization: `Bearer ${token}`},
+          headers: {'x-sanity-user-id': userId},
           signal: controller?.signal,
         })
         if (isStale()) return
@@ -142,7 +210,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
         if (!isStale()) setLoading(false)
       }
     },
-    [apiUrl, token, filter, client],
+    [apiUrl, projectId, filter, client],
   )
 
   useEffect(() => {

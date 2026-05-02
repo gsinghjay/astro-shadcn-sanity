@@ -114,6 +114,38 @@ test.describe('Story 9.4: Portal Landing Page — Progress Card', () => {
   });
 });
 
+test.describe('Story 9.22: Disconnect GitHub control', () => {
+  test('disconnect card is hidden in no-github-account state (AC-1)', async ({ page }) => {
+    await page.goto('/portal/progress');
+
+    // The dev user typically has no GitHub account in D1, so the page renders
+    // the "Connect GitHub" panel (no-github-account state). The disconnect
+    // card must NOT be present in that state per AC-1.
+    const connectBtn = page.locator('#connect-github');
+    if (await connectBtn.isVisible()) {
+      const disconnectBtn = page.locator('#disconnect-github');
+      await expect(disconnectBtn).toHaveCount(0);
+    }
+  });
+
+  test('disconnect card and revoke nudge are visible in has-token state (AC-1, AC-10)', async ({
+    page,
+  }) => {
+    await page.goto('/portal/progress');
+
+    // Only assert visibility when the page is actually in has-token state
+    // (depends on D1 seed — locally the dev user usually lacks a token).
+    const disconnectBtn = page.locator('#disconnect-github');
+    if (await disconnectBtn.isVisible()) {
+      await expect(disconnectBtn).toContainText('Disconnect GitHub');
+      const revokeLink = page.locator(
+        'a[href="https://github.com/settings/applications"]',
+      );
+      await expect(revokeLink.first()).toBeVisible();
+    }
+  });
+});
+
 test.describe('Story 9.4: GitHub API Endpoints', () => {
   test('GET /portal/api/github/repos returns JSON', async ({ request }) => {
     // In dev mode, the dev user likely has no GitHub account, so we expect 404

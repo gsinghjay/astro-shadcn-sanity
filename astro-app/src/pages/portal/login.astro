@@ -65,17 +65,34 @@ const headTitle = stegaClean(pageTitle);
         <div class="flex-1 h-px bg-border"></div>
       </div>
 
-      <form class="flex flex-col gap-3" id="magic-link-form">
+      <form class="flex flex-col gap-3" id="email-form">
         <label for="email" class="text-sm font-medium text-foreground">Sign in with Email</label>
         <Input type="email" id="email" placeholder="you@company.com" required />
-        <Button type="submit" id="magic-link-submit">
-          Send sign-in link
+        <Button type="submit" id="email-submit">
+          Send sign-in code
         </Button>
+        <p class="text-muted-foreground text-xs text-center">
+          We'll email you a 6-digit code and a backup sign-in link.
+        </p>
+        <p class="text-muted-foreground text-xs text-center">
+          Not seeing the email? Check spam, then add
+          <span class="font-medium text-foreground">noreply@intraphase.com</span>
+          to your safe-senders list.
+        </p>
       </form>
 
-      <div class="border border-border bg-secondary text-foreground text-sm text-center p-4 mt-3" id="magic-link-success" aria-live="polite" hidden>
-        Check your email for a sign-in link.
-      </div>
+      <form class="flex flex-col gap-3" id="otp-form" hidden>
+        <label for="otp" class="text-sm font-medium text-foreground">
+          Enter the 6-digit code sent to <span id="otp-email-display" class="font-normal"></span>
+        </label>
+        <Input type="text" id="otp" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="123456" required />
+        <Button type="submit" id="otp-submit">
+          Verify and sign in
+        </Button>
+        <button type="button" id="otp-back" class="text-muted-foreground text-xs underline self-center">
+          Use a different email
+        </button>
+      </form>
 
       <div class="border border-destructive bg-destructive/5 text-destructive text-sm text-center p-3 mt-3" id="error-msg" role="alert" hidden></div>
       </div>
@@ -114,37 +131,103 @@ const headTitle = stegaClean(pageTitle);
         authClient.signIn.social({ provider: "github", callbackURL: redirectParam });
       });
 
-      document.getElementById('magic-link-form')?.addEventListener('submit', async (e) => {
+      const emailForm = document.getElementById('email-form') as HTMLFormElement | null;
+      const otpForm = document.getElementById('otp-form') as HTMLFormElement | null;
+      const emailInput = document.getElementById('email') as HTMLInputElement | null;
+      const otpInput = document.getElementById('otp') as HTMLInputElement | null;
+      const emailSubmit = document.getElementById('email-submit');
+      const otpSubmit = document.getElementById('otp-submit');
+      const otpEmailDisplay = document.getElementById('otp-email-display');
+      const otpBack = document.getElementById('otp-back');
+      const errorEl = document.getElementById('error-msg');
+
+      function setBusy(el: Element | null, busy: boolean) {
+        if (!el) return;
+        if (busy) {
+          el.setAttribute('disabled', '');
+          el.setAttribute('aria-busy', 'true');
+        } else {
+          el.removeAttribute('disabled');
+          el.removeAttribute('aria-busy');
+        }
+      }
+
+      function showError(msg: string) {
+        if (!errorEl) return;
+        errorEl.textContent = msg;
+        errorEl.hidden = false;
+      }
+
+      function clearError() {
+        if (errorEl) errorEl.hidden = true;
+      }
+
+      emailForm?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const emailInput = document.getElementById('email') as HTMLInputElement | null;
-        const submitBtn = document.getElementById('magic-link-submit');
-        const errorEl = document.getElementById('error-msg');
-        const formEl = document.getElementById('magic-link-form');
-        const successEl = document.getElementById('magic-link-success');
+        if (!emailInput) return;
+        clearError();
+        const email = emailInput.value.trim();
+        if (!email) return;
 
-        if (!emailInput || !errorEl) return;
-        const email = emailInput.value;
-        errorEl.hidden = true;
+        setBusy(emailSubmit, true);
+        emailInput.disabled = true;
 
-        if (submitBtn) {
-          submitBtn.setAttribute('disabled', '');
-          submitBtn.setAttribute('aria-busy', 'true');
+        // Send both: OTP (scanner-proof) and magic link (one-click convenience).
+        // The user picks whichever lands first / works in their inbox.
+        const otpResult = await authClient.emailOtp.sendVerificationOtp({ email, type: 'sign-in' });
+        // Fire-and-forget the magic link — failure shouldn't block the OTP path.
+        authClient.signIn.magicLink({ email, callbackURL: redirectParam }).catch(() => {});
+
+        if (otpResult?.error) {
+          showError('Failed to send sign-in code. Please try again.');
+          setBusy(emailSubmit, false);
+          emailInput.disabled = false;
+          return;
         }
-        if (emailInput) emailInput.disabled = true;
 
-        try {
-          await authClient.signIn.magicLink({ email, callbackURL: redirectParam });
-          if (formEl) formEl.hidden = true;
-          if (successEl) successEl.hidden = false;
-        } catch {
-          errorEl.textContent = 'Failed to send sign-in link. Please try again.';
-          errorEl.hidden = false;
-          if (submitBtn) {
-            submitBtn.removeAttribute('disabled');
-            submitBtn.removeAttribute('aria-busy');
-          }
-          if (emailInput) emailInput.disabled = false;
+        if (otpEmailDisplay) otpEmailDisplay.textContent = email;
+        if (emailForm) emailForm.hidden = true;
+        if (otpForm) otpForm.hidden = false;
+        otpInput?.focus();
+      });
+
+      otpForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!emailInput || !otpInput) return;
+        clearError();
+        const email = emailInput.value.trim();
+        const otp = otpInput.value.trim();
+        if (!/^\d{6}$/.test(otp)) {
+          showError('Please enter the 6-digit code from your email.');
+          return;
         }
+
+        setBusy(otpSubmit, true);
+        otpInput.disabled = true;
+
+        const result = await authClient.signIn.emailOtp({ email, otp });
+        if (result?.error) {
+          showError(result.error.message || 'Invalid or expired code. Please try again.');
+          setBusy(otpSubmit, false);
+          otpInput.disabled = false;
+          return;
+        }
+
+        window.location.href = redirectParam;
+      });
+
+      otpBack?.addEventListener('click', () => {
+        clearError();
+        if (otpForm) otpForm.hidden = true;
+        if (emailForm) emailForm.hidden = false;
+        if (otpInput) {
+          otpInput.value = '';
+          otpInput.disabled = false;
+        }
+        if (emailInput) emailInput.disabled = false;
+        setBusy(emailSubmit, false);
+        setBusy(otpSubmit, false);
+        emailInput?.focus();
       });
     </script>
   </body>

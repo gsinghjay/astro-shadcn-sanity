@@ -101,9 +101,17 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
       expect(pkg.scripts['deploy:rwc-us']).toBeDefined()
       expect(pkg.scripts['deploy:rwc-intl']).toBeDefined()
       // Each script must build with CLOUDFLARE_ENV then deploy with `wrangler deploy`.
-      expect(pkg.scripts['deploy:capstone']).toMatch(/CLOUDFLARE_ENV=capstone\s+astro build\s+&&\s+wrangler deploy\b/)
-      expect(pkg.scripts['deploy:rwc-us']).toMatch(/CLOUDFLARE_ENV=rwc_us\s+astro build\s+&&\s+wrangler deploy\s+--env\s+rwc_us\b/)
-      expect(pkg.scripts['deploy:rwc-intl']).toMatch(/CLOUDFLARE_ENV=rwc_intl\s+astro build\s+&&\s+wrangler deploy\s+--env\s+rwc_intl\b/)
+      // The `--env <name>` flag is intentionally omitted — Astro 6 + @cloudflare/vite-plugin
+      // bake env selection into dist/server/wrangler.json at build time, so wrangler
+      // resolves the env from the artifact rather than the CLI flag.
+      // Permissive build+deploy ordering: extra steps (e.g. predeploy cleanup, post-build
+      // guards) may appear between `astro build` and `wrangler deploy`.
+      expect(pkg.scripts['deploy:capstone']).toMatch(/CLOUDFLARE_ENV=capstone\s+astro build\b/)
+      expect(pkg.scripts['deploy:capstone']).toMatch(/wrangler deploy\b/)
+      expect(pkg.scripts['deploy:rwc-us']).toMatch(/CLOUDFLARE_ENV=rwc_us\s+astro build\b/)
+      expect(pkg.scripts['deploy:rwc-us']).toMatch(/wrangler deploy\b/)
+      expect(pkg.scripts['deploy:rwc-intl']).toMatch(/CLOUDFLARE_ENV=rwc_intl\s+astro build\b/)
+      expect(pkg.scripts['deploy:rwc-intl']).toMatch(/wrangler deploy\b/)
       // Sanity check: the old Pages CLI is not used anywhere in scripts.
       for (const value of Object.values(pkg.scripts)) {
         expect(value ?? '').not.toContain('wrangler pages deploy')

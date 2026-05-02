@@ -14,20 +14,26 @@
 	"$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema/schema.json",
 	"name": "ywcc-capstone",
 	"main": "@astrojs/cloudflare/entrypoints/server",
-	"compatibility_date": "2025-12-01",
-	// disable_nodejs_process_v2 works around Astro #15434 / #14511 — Astro 6 +
-	// @astrojs/cloudflare v13 + nodejs_compat + middleware emits SSR responses
-	// as async iterables that workerd stringifies to literal "[object Object]".
-	// Remove once compatibility_date >= 2026-02-19 (replace with
-	// fetch_iterable_type_support) or upstream patch lands.
+	"compatibility_date": "2026-04-01",
+	// compatibility_date >= 2026-02-19 enables fetch_iterable_type_support, which
+	// supersedes the disable_nodejs_process_v2 workaround for Astro #15434 / #14511.
 	"compatibility_flags": [
 		"nodejs_compat",
-		"global_fetch_strictly_public",
-		"disable_nodejs_process_v2"
+		"global_fetch_strictly_public"
 	],
 	"assets": {
 		"directory": "./dist",
-		"binding": "ASSETS"
+		"binding": "ASSETS",
+		// Story 5.21: route every request to the Worker so the postbuild
+		// wrapper (`scripts/wrap-entry-for-agents.mjs`, layered on top of
+		// `dist/server/entry.mjs`) can intercept `Accept: text/markdown`
+		// before the @astrojs/cloudflare v13 adapter's internal short-circuit
+		// at `chunks/worker-entry_*.mjs:~18289`. Without this flag CF Static
+		// Assets serves prerendered HTML directly and the Worker never runs.
+		// The wrapper bails fast on non-negotiable requests (1 header read +
+		// `Accept` parse), so per-asset CPU overhead is bounded — well within
+		// free-tier limits.
+		"run_worker_first": true
 	},
 	"observability": {
 		"enabled": true,
@@ -56,8 +62,18 @@
 				// here (CF rejects double-attachment).
 				// Secrets (BETTER_AUTH_SECRET, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID,
 				// GOOGLE_CLIENT_SECRET, RESEND_API_KEY, SANITY_API_READ_TOKEN,
-				// SANITY_API_WRITE_TOKEN, STUDIO_ADMIN_TOKEN, TURNSTILE_SECRET_KEY) remain
-				// dashboard-managed via `wrangler secret put <NAME> --name ywcc-capstone`.
+				// SANITY_API_WRITE_TOKEN, SANITY_PROJECT_READ_TOKEN, TURNSTILE_SECRET_KEY)
+				// remain dashboard-managed via `wrangler secret put <NAME> --name ywcc-capstone`.
+				// Story 24.1 retired the shared admin bearer for the
+				// /api/portal/admin/acceptances endpoint. Story 24.1.5 replaced 24.1's
+				// Studio-bearer-forwarding (incompatible with cookie-mode Studio auth)
+				// with a server-side project-membership check: Studio cookie-fetches
+				// /v1/users/me to obtain the user id, forwards it as `X-Sanity-User-Id`,
+				// and the Worker independently calls
+				// `https://api.sanity.io/v2024-10-01/projects/<id>/users/<id>` with
+				// Bearer SANITY_PROJECT_READ_TOKEN (Viewer permissions, sk-prefixed).
+				// After rotating tokens, regenerate worker-configuration.d.ts with
+				// `npx wrangler types -C astro-app`.
 				// At cutover GITHUB_CLIENT_SECRET MUST be re-put with the prod GitHub OAuth
 				// App's client secret (paired with GITHUB_CLIENT_ID Ov23liFtOiWIyCqJXJMi);
 				// the staging-phase secret paired with Ov23li8R7jigMPatjOml is no longer valid.
