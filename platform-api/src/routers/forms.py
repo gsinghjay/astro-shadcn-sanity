@@ -1,97 +1,108 @@
-from typing import List
-from fastapi import HTTPException, Depends, Request, APIRouter, Query
+from fastapi import HTTPException, Depends, Request, APIRouter, Query, BackgroundTasks
 from models.forms import SubmissionResponse, FormSubmission, SubmissionListItem
 from models.settings import WorkerSettings
-from services.http_client import get_client
+from models.discord import DiscordNotification, EmbedField
+from routers.discord import send_notification
 from services.sanity_client import SanityClient
 from services.turnstile import verify_turnstile
 from dependencies import get_settings, verify_admin_api_key, get_sanity
 from datetime import datetime, timezone
 from utils.dataset import resolve_dataset
-import uuid
+import logging, uuid, asyncio, httpx
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/forms", tags=["forms"])
 
 @router.post("/submit", response_model=SubmissionResponse)
-async def submit_form(request: Request, body: FormSubmission, settings: WorkerSettings = Depends(get_settings), sanity = Depends(get_sanity)):
-    client_ip = request.headers.get("CF-Connecting-IP", "unknown")
+async def submit_form(request: Request, body: FormSubmission, background_tasks: BackgroundTasks, settings: WorkerSettings = Depends(get_settings), sanity = Depends(get_sanity)):
+    client_ip = request.headers.get("CF-Connecting-IP")
+    if not client_ip:
+        raise HTTPException(400, "Missing CF-Connecting-IP header")
 
-    # Rate limit
-    if await check_and_increment_rate_limit(client_ip, settings.kv):
+    # Rate limit - use composite key to mitigate distributed abuse
+    rate_limit_key = f"{client_ip}:{body.email}:{body.site}"
+
+    if await is_rate_limited(rate_limit_key, settings.kv):
         raise HTTPException(429, "Rate limit exceeded — max 5 submissions per hour")
+    await increment_rate_limit(rate_limit_key, settings.kv)
 
     # Turnstile
     if not await verify_turnstile(body.turnstile_token, client_ip, settings.optional_secrets.get("turnstile_secret_key")):
         raise HTTPException(400, "Turnstile verification failed")
 
-    # Create Sanity draft
+    # Create Sanity submission document
     doc_id = await create_submission(body, settings, sanity)
 
-    # Discord notification (fire-and-forget)
-    # FIXME currently this has been removed, maybe replaced with settings.kv.get("discord-webhook:{channel}") from 12.6
-    webhook_url = settings.optional_secrets.get("discord_webhook_url") 
-
-    # Fire and forget to Discord
-    await notify_discord(body, webhook_url)
+    # Discord notification
+    await notify_discord(body, settings, background_tasks)
 
     return SubmissionResponse(id=doc_id)
 
-@router.get("/submissions", response_model=List[SubmissionListItem])
+@router.get("/submissions", response_model=list[SubmissionListItem])
 async def list_submissions(
     site: str = Query("capstone", description="Target site/workspace"),
-    status: str = Query("submitted", description="Submission status filter (use 'all' for no filter)"),
     limit: int = Query(20, ge=1, le=100, description="Max records to return"),
+    offset: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     sanity: SanityClient = Depends(get_sanity),
-    _admin: bool = Depends(verify_admin_api_key) # Protect route
+    _ = Depends(verify_admin_api_key)  # Protect route
 ):
     """Admin-only endpoint to list recent submissions."""
-    dataset, _ = resolve_dataset(site)
-    
-    # GROQ query now filters by status (unless status='all') and selects 'status'
-    query = """
-    *[_type == 'submission' && ($status == 'all' || status == $status)] | order(submittedAt desc)[0...$limit] { 
-        _id, name, email, organization, submittedAt, status 
-    }
+    dataset, site_filter = resolve_dataset(site)
+
+    # GROQ query to fetch submissions with pagination using parameters
+    site_predicate = "&& site == $site" if site_filter else ""
+    end_index = offset + limit
+    query = f"""
+    *[_type == 'submission' {site_predicate}] | order(submittedAt desc)[$offset...$end] {{
+        _id, name, email, organization, submittedAt, status, formType, site
+    }}
     """
-    
-    return await sanity.query(query, dataset, {"limit": limit, "status": status})
+    params = {"offset": offset, "end": end_index}
+    if site_filter:
+        params["site"] = site_filter
 
-RATE_LIMIT_MAX = 5
-RATE_LIMIT_WINDOW_SECS = 3600
+    return await sanity.query(query, dataset, params)
 
-async def check_and_increment_rate_limit(ip: str, kv) -> bool:
-    """Increment first, then check; preserve original TTL on subsequent puts."""
+async def is_rate_limited(ip: str, kv) -> bool:
     key = f"rate:forms:{ip}"
-    raw = await kv.get(key)
-    count = int(raw or "0") + 1
-    # Only set TTL on first write so the window doesn't slide on every hit.
-    if raw is None:
-        await kv.put(key, str(count), expirationTtl=RATE_LIMIT_WINDOW_SECS)
-    else:
-        await kv.put(key, str(count))
-    return count > RATE_LIMIT_MAX
+    count = int(await kv.get(key) or "0")
+    return count >= 5
 
-async def notify_discord(body: FormSubmission, webhook_url: str | None):
+async def increment_rate_limit(ip: str, kv):
+    key = f"rate:forms:{ip}"
+    count = int(await kv.get(key) or "0")
+    await kv.put(key, str(count + 1), expirationTtl=3600)
+
+async def notify_discord(body: FormSubmission, settings: WorkerSettings, background_tasks: BackgroundTasks):
+    # Look up webhook URL from KV using a configurable key per site
+    webhook_key = "discord-webhook:form-submissions"
+    webhook_url = await settings.kv.get(webhook_key) if settings.kv else None
     if not webhook_url:
         return
-        
-    embed = {
-        "title": "New Form Submission",
-        "color": 0x0066cc, # Blue
-        "fields": [
-            {"name": "Name", "value": body.name, "inline": True},
-            {"name": "Email", "value": body.email, "inline": True},
-            {"name": "Organization", "value": body.organization or "N/A", "inline": True},
-            {"name": "Message", "value": body.message[:1024]} # Discord limit is 1024
-        ],
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
     
+    embed = DiscordNotification(
+        channel = "form-submissions",
+        title = "New Form Submission",
+        message = "A new form submission has been added to sanity",
+        color = "blue",
+        fields = [
+            EmbedField(name = "Name", value = body.name),
+            EmbedField(name = "Email", value = body.email),
+            EmbedField(name = "Organization", value = body.organization or "N/A"),
+            EmbedField(name = "Message", value = body.message[:1024]) # discord imposes 1024 char limit
+        ],
+        async_mode = True
+    )
+
     try:
-        async with get_client() as client:
-            await client.post(webhook_url, json={"embeds": [embed]})
-    except Exception:
-        pass # Fire and forget, don't break the user's submission if Discord fails
+        await send_notification(embed, background_tasks, settings)
+    except (httpx.HTTPError, asyncio.TimeoutError):
+        # Log the exception with context, but don't break submission flow
+        logger.exception(
+            "Discord notification failed for webhook"
+        )
+        raise
 
 async def create_submission(body: FormSubmission, settings: WorkerSettings, sanity: SanityClient) -> str:
     """Creates a new submission document in Sanity."""
@@ -107,14 +118,11 @@ async def create_submission(body: FormSubmission, settings: WorkerSettings, sani
         "email": body.email,
         "organization": body.organization,
         "message": body.message,
-        "formType": body.form_type,
+        "submittedAt": datetime.now(timezone.utc).isoformat(),
         "status": "submitted",
-        "submittedAt": datetime.now(timezone.utc).isoformat()
+        "formType": body.form_type,
+        "site": body.site
     }
-    
-    # unsure if the form ID is required to be returned
-    # if body.form_id:
-    #     doc["form"] = {"_type": "reference", "_ref": body.form_id}
 
     dataset, _ = resolve_dataset(body.site)
 

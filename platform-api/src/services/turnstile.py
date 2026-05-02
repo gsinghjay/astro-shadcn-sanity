@@ -1,4 +1,5 @@
-import logging, httpx
+import logging
+import httpx
 from services.http_client import get_client
 
 logger = logging.getLogger(__name__)
