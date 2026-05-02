@@ -1,3 +1,35 @@
+## [2.1.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.0.0...v2.1.0) (2026-05-02)
+
+### Features
+
+* **portal:** add emailOTP fallback to magic-link sign-in ([378223f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/378223fb223338c522a321a40d21ee82ed2cd85d))
+* **portal:** GitHub account disconnect & re-link control (9.22) ([44316b0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/44316b0a48ec243736e259241ade62fdf50d3f39))
+* **portal:** redesign sponsor agreement gate with version pinning + audit capture (15.11) ([2777597](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2777597cb24217a92195764bc5316a0d18e387bf))
+* **security:** identity-based authz for sponsor acceptances tool (24.1) ([3b3ccbb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3b3ccbbaef26fa8702790b2f72ec22b44e2bcf63))
+* **seo:** agent discovery — Link headers + markdown content negotiation (5.21) ([bdce6a5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bdce6a502fb56d5eb54a9426abb52418b6f42197))
+* **seo:** declare Content-Signal preferences in robots.txt ([b3cda06](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b3cda063154780ada93d60b1cd5dfc6d4b2ad7d8))
+* **studio:** add facebook to socialLinks platform enum ([1ab6c55](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1ab6c550a69d38c8fcfde731000ae69b1e6aa7d6))
+
+### Bug Fixes
+
+* **ci:** bump storybook-astro to 0.2.1 for Astro 6 peer support ([f06f514](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f06f514b3c679478bac7f466c7e3275d79c4c119)), closes [#681](https://github.com/gsinghjay/astro-shadcn-sanity/issues/681)
+* **portal:** code review patches for 9.22 disconnect flow ([3f09e08](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3f09e0832d4668b26c3757c14ae4e20c2055d35f))
+* **security:** close gaps in 24.1 round-2 review ([3af30e7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3af30e706d13ac04a091f04871d79c6d13f9098b))
+* **security:** code review patches for 24.1.5 acceptances endpoint ([1940b85](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1940b852c82bcde5695a18a0306789b64f201134))
+* **security:** parameterize sponsor whitelist GROQ + redact db-health response ([436807c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/436807cf2557556a753909697f510ad4dd765e64))
+* **security:** restore acceptances tool via project membership check (24.1.5) ([b08bb43](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b08bb4359efec14277f027a24072e9242e47de8d))
+* **seo:** agent discovery code review patches (5.21) ([d4d6fb1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d4d6fb13861323bc27046e06f011e41fb69743d2)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1)
+* **studio:** force www host for acceptances API to avoid CORS preflight redirect ([740cf30](https://github.com/gsinghjay/astro-shadcn-sanity/commit/740cf306cbba434ac3315e5ff51ecc4d3a209250))
+
+### Miscellaneous
+
+* **deploy:** guard against stale dist + localhost vars in built bundle ([7b6400b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7b6400b33e758164204a2abbba7c7de26328a919))
+
+### Tests
+
+* **infra:** allow extra steps between astro build and wrangler deploy ([1b5a35f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1b5a35f63a283a8723cf094cdcb182f382450f8a))
+* **portal:** stub window.location via vi.stubGlobal in modal test ([354b9ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/354b9ca8ee59cf52d3e12107f67e77f09f505af4))
+
 ## [2.0.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.1...v2.0.0) (2026-04-30)
 
 ### ⚠ BREAKING CHANGES
