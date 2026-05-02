@@ -135,7 +135,7 @@ export const siteSettings = defineType({
               title: 'Platform',
               type: 'string',
               options: {
-                list: ['github', 'linkedin', 'twitter', 'instagram', 'youtube'],
+                list: ['github', 'linkedin', 'twitter', 'instagram', 'youtube', 'facebook'],
               },
               validation: (Rule) => Rule.required(),
             }),

@@ -124,6 +124,16 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      // Worker-only Sanity API token (Viewer permissions) used by
+      // /api/portal/admin/acceptances to verify project membership of the
+      // claimed Studio user id forwarded as `X-Sanity-User-Id`. Sanity API
+      // tokens are `sk`-prefixed (24.1.5).
+      SANITY_PROJECT_READ_TOKEN: envField.string({
+        context: "server",
+        access: "secret",
+        startsWith: "sk",
+        optional: true,
+      }),
       STUDIO_ORIGIN: envField.string({
         context: "server",
         access: "public",
@@ -204,7 +214,7 @@ export default defineConfig({
             titleSelector: 'h1',
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
-              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**', '**/api/**',
             ],
             generateIndividualMd: true,
             generateLlmsTxt: true,
