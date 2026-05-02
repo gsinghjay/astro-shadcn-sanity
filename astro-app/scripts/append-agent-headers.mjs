@@ -48,9 +48,12 @@ function walkMd(dir, base = dir) {
  *  - `/.md` → `/`
  *  - `/sponsors.md` → `/sponsors/`
  *  - `/articles/foo.md` → `/articles/foo/`
+ *  - `/articles/index.md` → `/articles/` (index files map to parent dir; the
+ *    served URL is `/articles/`, not `/articles/index/`)
  */
 function pagePathForTwin(twinPath) {
   if (twinPath === "/.md") return "/";
+  if (twinPath.endsWith("/index.md")) return twinPath.slice(0, -"index.md".length);
   return twinPath.replace(/\.md$/, "/");
 }
 
@@ -94,10 +97,14 @@ function main() {
 
   const section = buildSection(twins);
   const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const cleaned = original.replace(
-    new RegExp(`\\n*${escape(SECTION_BEGIN)}[\\s\\S]*?${escape(SECTION_END)}\\n*`),
-    "\n",
+  // Strip ALL prior auto-generated sections, not just the first. Defends
+  // against merge-conflict residue where two markers slipped through and the
+  // non-greedy regex would otherwise leave a duplicate behind on next run.
+  const sectionRegex = new RegExp(
+    `\\n*${escape(SECTION_BEGIN)}[\\s\\S]*?${escape(SECTION_END)}\\n*`,
+    "g",
   );
+  const cleaned = original.replace(sectionRegex, "\n");
   const next = `${cleaned.trimEnd()}\n\n${section}\n`;
 
   if (next === original) {

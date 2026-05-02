@@ -78,4 +78,49 @@ test.describe("[P0] 5-21-E2E Markdown negotiation", () => {
       expect(ct).not.toMatch(/text\/markdown/); // Static assets keep their default content-type
     }
   });
+
+  test("5-21-E2E-007 :: markdown response carries content-signal header", async ({ request }) => {
+    // Mirrors Cloudflare's "Markdown for Agents" platform contract — every
+    // markdown response advertises ai-train / search / ai-input policy.
+    const res = await request.get("/", { headers: { accept: "text/markdown" } });
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-signal"]).toBe("ai-train=yes, search=yes, ai-input=yes");
+  });
+});
+
+test.describe("[P0] 5-21-E2E Corpus URLs strip Link/Vary", () => {
+  // The /* wildcard in _headers attaches Link + Vary: Accept globally; the
+  // corpus URLs themselves must NOT carry these (would be self-referential
+  // for Link, meaningless for Vary since they don't negotiate).
+  for (const path of ["/llms.txt", "/llms-full.txt", "/sitemap-index.xml", "/robots.txt"]) {
+    test(`5-21-E2E-008 :: ${path} has no Link or Vary header`, async ({ request }) => {
+      const res = await request.get(path);
+      // Some corpus URLs may not exist on every deploy (e.g. preview Workers
+      // gate astro-llms-md off). Skip-if-404 keeps the test honest.
+      test.skip(res.status() === 404, `${path} not present on this build`);
+      expect(res.status()).toBe(200);
+      expect(res.headers()["link"]).toBeFalsy();
+      expect(res.headers()["vary"]).toBeFalsy();
+    });
+  }
+});
+
+test.describe("[P0] 5-21-E2E Prerendered HTML emits Link", () => {
+  // The wrapper-based negotiation only fires on Accept: text/markdown.
+  // For default browser Accept on a prerendered HTML route, the Link header
+  // must come from the static `_headers` `/*` rule. This test confirms that
+  // path is wired correctly — independent of the middleware/wrapper code.
+  test("5-21-E2E-009 :: prerendered HTML carries the 4-member Link header", async ({ request }) => {
+    const res = await request.get("/", {
+      headers: { accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" },
+    });
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toMatch(/text\/html/);
+    const link = res.headers()["link"] ?? "";
+    expect(link).toContain("</llms.txt>");
+    expect(link).toContain("</llms-full.txt>");
+    expect(link).toContain("</sitemap-index.xml>");
+    // 4th member is per-page; the homepage twin advertises </.md>.
+    expect(link).toContain('type="text/markdown"');
+  });
 });

@@ -160,6 +160,17 @@ describe("agent-discovery lib", () => {
       expect(parseAcceptHeader("text/markdown;q=0,text/html")).toEqual({ prefersMarkdown: false });
     });
 
+    it("clamps q-values above 1 to 1 per RFC 9110 §12.4.2", () => {
+      // q=2.5 is invalid; both clamp to 1 — and HTML defaults to 1 so HTML wins.
+      expect(parseAcceptHeader("text/markdown;q=2.5,text/html")).toEqual({
+        prefersMarkdown: false,
+      });
+      // q=2.5 vs explicit q=0.5 → md clamps to 1, still > 0.5
+      expect(parseAcceptHeader("text/markdown;q=2.5,text/html;q=0.5")).toEqual({
+        prefersMarkdown: true,
+      });
+    });
+
     it("handles whitespace and casing", () => {
       expect(parseAcceptHeader("  TEXT/MARKDOWN  ;  q=0.9  ,  TEXT/HTML ; q=0.5")).toEqual({
         prefersMarkdown: true,
@@ -291,6 +302,7 @@ describe("middleware decorateForAgents", () => {
       expect(res.headers.get("x-markdown-tokens")).toBeTruthy();
       const tokens = Number(res.headers.get("x-markdown-tokens"));
       expect(tokens).toBeGreaterThan(0);
+      expect(res.headers.get("content-signal")).toBe("ai-train=yes, search=yes, ai-input=yes");
       expect(await res.text()).toBe("# Sponsors\n\nMarkdown body.");
     });
 

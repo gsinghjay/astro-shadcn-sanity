@@ -1,6 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { env } from "cloudflare:workers";
 import {
+  AGENT_CONTENT_SIGNAL,
   buildLinkHeader,
   estimateTokens,
   getMarkdownTwin,
@@ -311,18 +312,22 @@ export async function decorateForAgents(
     const assets = (env as { ASSETS?: { fetch: (input: URL | string | Request) => Promise<Response> } }).ASSETS;
     if (assets) {
       const twin = await getMarkdownTwin(pathname, assets, context.url.origin);
-      if (twin) {
+      // Range requests come back as 206 with Content-Range; rewriting to 200
+      // would strip partial-content semantics. Fall through so the adapter
+      // serves the asset natively in that case.
+      if (twin && twin.status === 200) {
         const body = await twin.text();
         const headers = new Headers();
         headers.set("content-type", "text/markdown; charset=utf-8");
         headers.set("vary", "Accept");
         headers.set("link", buildLinkHeader(pathname, true));
         headers.set("x-markdown-tokens", String(estimateTokens(body)));
+        headers.set("content-signal", AGENT_CONTENT_SIGNAL);
         // Mirror upstream cache-control if the static asset declared one
         // (parity with HTML response per AC). Default to no override.
         const upstreamCacheControl = twin.headers.get("cache-control");
         if (upstreamCacheControl) headers.set("cache-control", upstreamCacheControl);
-        return new Response(body, { status: 200, headers });
+        return new Response(body, { status: twin.status, headers });
       }
     }
     // Asset fetch failed or twin missing — fall through to HTML below.

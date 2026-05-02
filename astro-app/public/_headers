@@ -33,3 +33,54 @@
 /robots.txt
   ! Link
   ! Vary
+
+# Strip the corpus Link/Vary on immutable static assets — they don't vary on
+# Accept and don't benefit from the discovery hint. Keeps CDN cache cardinality
+# from doubling unnecessarily on hot asset paths.
+/_astro/*
+  ! Link
+  ! Vary
+
+/fonts/*
+  ! Link
+  ! Vary
+
+/favicon.ico
+  ! Link
+  ! Vary
+
+/favicon.svg
+  ! Link
+  ! Vary
+
+/*.png
+  ! Link
+  ! Vary
+
+/*.jpg
+  ! Link
+  ! Vary
+
+/*.jpeg
+  ! Link
+  ! Vary
+
+/*.webp
+  ! Link
+  ! Vary
+
+/*.svg
+  ! Link
+  ! Vary
+
+/*.ico
+  ! Link
+  ! Vary
+
+/*.woff
+  ! Link
+  ! Vary
+
+/*.woff2
+  ! Link
+  ! Vary
