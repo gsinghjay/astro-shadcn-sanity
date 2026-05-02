@@ -33,13 +33,13 @@ if [[ -n "$ENVIRONMENT" ]]; then
 fi
 
 # --- Seed values ---
-# echo "Setting config:version..."
-# npx wrangler kv key put "${ARGS[@]}" \
-#     "config:version" '"1.0.0"'
+echo "Setting config:version..."
+npx wrangler kv key put "${ARGS[@]}" \
+    "config:version" '"1.0.0"'
 
-# echo "Setting config:features..."
-# npx wrangler kv key put "${ARGS[@]}" \
-#     "config:features" '{"notifications": true, "maintenance_mode": false}'
+echo "Setting config:features..."
+npx wrangler kv key put "${ARGS[@]}" \
+    "config:features" '{"notifications": true, "maintenance_mode": false}'
 
 # Example: webhook mapping for Discord notifications
 # echo "Setting webhooks:general..."
