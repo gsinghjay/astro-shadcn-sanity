@@ -21,8 +21,11 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker). */
-interface RateLimiterDO {
+/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker).
+ *  Extends Rpc.DurableObjectBranded so the type satisfies DurableObjectNamespace<T>'s
+ *  brand constraint — without this, callers see `DurableObjectStub<undefined>` and
+ *  calls to `checkLimit` type-error. */
+interface RateLimiterDO extends Rpc.DurableObjectBranded {
   checkLimit(windowMs: number, maxRequests: number): Promise<{
     allowed: boolean;
     remaining: number;

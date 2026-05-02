@@ -17,7 +17,16 @@ const MEMBERSHIP_TIMEOUT_MS = 5_000;
 // inbound header length so a malicious caller can't stuff multi-MB payloads
 // into the membership URL.
 const MAX_USER_ID_LENGTH = 64;
-const SANITY_API_VERSION = '2024-10-01';
+// Accept only alphanumeric + `-`/`_`. Forbids `/`, `?`, `#`, `..`, whitespace
+// — anything that would mutate the membership URL path/query when interpolated.
+const USER_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+const SANITY_API_PATH = 'v2024-10-01';
+// Per-IP sliding-window cap for the admin endpoint. Tighter than the portal
+// middleware (100/60s) because this route is expected to see only one human
+// admin polling — anything faster is enumeration / amplification against
+// Sanity API. Rate limiter binding is shared cross-script with rate-limiter-worker.
+const ADMIN_RATE_LIMIT_WINDOW_MS = 60_000;
+const ADMIN_RATE_LIMIT_MAX = 30;
 
 interface AcceptanceRow {
   email: string;
@@ -30,6 +39,9 @@ interface AcceptanceRow {
 interface AdminEnv {
   PORTAL_DB?: D1Database;
   STUDIO_ORIGIN?: string;
+  // RateLimiterDO is declared globally in env.d.ts (RPC interface for the
+  // cross-script Durable Object hosted in rate-limiter-worker).
+  RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
 }
 
 interface CacheEntry {
@@ -82,8 +94,10 @@ async function verifyProjectMembership(
 ): Promise<boolean> {
   if (readCache(userId)) return true;
   try {
+    // userId is validated against USER_ID_PATTERN upstream so encodeURIComponent
+    // is belt-and-braces — defends against any future relaxation of the regex.
     const res = await fetch(
-      `https://api.sanity.io/v${SANITY_API_VERSION}/projects/${projectId}/users/${userId}`,
+      `https://api.sanity.io/${SANITY_API_PATH}/projects/${projectId}/users/${encodeURIComponent(userId)}`,
       {
         headers: { authorization: `Bearer ${readToken}` },
         signal: AbortSignal.timeout(MEMBERSHIP_TIMEOUT_MS),
@@ -94,12 +108,50 @@ async function verifyProjectMembership(
     if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
       return false;
     }
-    if (body.id !== userId) return false;
+    const responseId = body.id.trim();
+    if (!responseId || responseId !== userId) return false;
     writeCache(userId);
     return true;
   } catch (err) {
     console.error('[admin/acceptances] sanity membership lookup failed:', err);
     return false;
+  }
+}
+
+/**
+ * Rate-limit GET on the admin endpoint via the shared cross-script Durable
+ * Object. Fail-open on missing binding (RWC envs do not carry it) or DO error
+ * (don't block legitimate admins on a transient infra blip).
+ */
+async function checkRateLimit(
+  rateLimiter: DurableObjectNamespace<RateLimiterDO> | undefined,
+  request: Request,
+): Promise<Response | null> {
+  if (!rateLimiter) return null;
+  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
+  try {
+    const id = rateLimiter.idFromName(`admin-acceptances:${ip}`);
+    const stub = rateLimiter.get(id);
+    const result = await stub.checkLimit(
+      ADMIN_RATE_LIMIT_WINDOW_MS,
+      ADMIN_RATE_LIMIT_MAX,
+    );
+    if (!result.allowed) {
+      const retryAfter = Math.ceil(result.retryAfterMs / 1000);
+      return new Response(JSON.stringify({ error: 'rate_limited' }), {
+        status: 429,
+        headers: {
+          'content-type': 'application/json',
+          'Retry-After': String(retryAfter),
+          'X-RateLimit-Limit': String(ADMIN_RATE_LIMIT_MAX),
+          'X-RateLimit-Remaining': '0',
+        },
+      });
+    }
+    return null;
+  } catch (err) {
+    console.error('[admin/acceptances] rate limiter error, failing open:', err);
+    return null;
   }
 }
 
@@ -125,6 +177,12 @@ function envReady(env: AdminEnv): boolean {
     env.STUDIO_ORIGIN &&
       env.PORTAL_DB &&
       PUBLIC_SANITY_STUDIO_PROJECT_ID &&
+      // `astro.config.mjs` falls back to the literal "placeholder" when neither
+      // PUBLIC_SANITY_STUDIO_PROJECT_ID nor PUBLIC_SANITY_PROJECT_ID is set at
+      // build time. That string is truthy, so without this guard the route
+      // would call /projects/placeholder/users/<id> and 403 every admin instead
+      // of 503ing on the misconfig.
+      PUBLIC_SANITY_STUDIO_PROJECT_ID !== 'placeholder' &&
       SANITY_PROJECT_READ_TOKEN,
   );
 }
@@ -133,13 +191,15 @@ export const OPTIONS: APIRoute = ({ request }) => {
   const env = (workerEnv ?? {}) as AdminEnv;
   // Fail-closed when any env required by the GET handler is missing. Mirroring
   // the GET check here avoids a window where a cacheable 204 preflight masks a
-  // misconfiguration that 503s every real request.
+  // misconfiguration that 503s every real request. Bodies are JSON (matching
+  // GET) so curl / wrangler-tail diagnostics surface the cause; browsers can't
+  // read preflight bodies regardless.
   if (!envReady(env)) {
-    return new Response(null, { status: 503 });
+    return json({ error: 'service_unavailable' }, 503);
   }
   const origin = request.headers.get('origin');
   if (origin !== env.STUDIO_ORIGIN) {
-    return new Response(null, { status: 403 });
+    return json({ error: 'forbidden_origin' }, 403);
   }
   return new Response(null, { status: 204, headers: corsHeaders(env.STUDIO_ORIGIN!) });
 };
@@ -161,9 +221,19 @@ export const GET: APIRoute = async ({ request, url }) => {
   }
 
   const userId = (request.headers.get('x-sanity-user-id') ?? '').trim();
-  if (!userId || userId.length > MAX_USER_ID_LENGTH) {
+  if (
+    !userId ||
+    userId.length > MAX_USER_ID_LENGTH ||
+    !USER_ID_PATTERN.test(userId)
+  ) {
     return json({ error: 'unauthorized' }, 401, errorCors);
   }
+
+  // Per-IP rate limit fires before the outbound Sanity call so an attacker
+  // spoofing Origin + enumerating user IDs can't use this Worker as an
+  // amplifier against api.sanity.io.
+  const limited = await checkRateLimit(env.RATE_LIMITER, request);
+  if (limited) return limited;
 
   const isMember = await verifyProjectMembership(
     userId,

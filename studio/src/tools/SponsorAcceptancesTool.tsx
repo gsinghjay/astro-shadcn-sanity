@@ -55,18 +55,32 @@ function readConfig(): ToolConfig {
  * Cookie-auth probe against Sanity to retrieve the current Studio user id.
  * Returns null on any failure (network, non-200, malformed body, missing id).
  * `credentials: 'include'` is required so the httpOnly Sanity session cookie
- * (scoped to *.api.sanity.io) is sent with the request.
+ * (scoped to *.api.sanity.io) is sent with the request. The optional signal
+ * lets the caller cancel the in-flight probe on unmount/remount so a slow
+ * /v1/users/me doesn't keep a request live across React effect cycles.
  */
-async function getCurrentUserId(projectId: string): Promise<string | null> {
+async function getCurrentUserId(
+  projectId: string,
+  signal?: AbortSignal,
+): Promise<string | null> {
   try {
     const res = await fetch(`https://${projectId}.api.sanity.io/v1/users/me`, {
       credentials: 'include',
+      signal,
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.warn('[SponsorAcceptances] /v1/users/me probe non-OK:', res.status)
+      return null
+    }
     const body = (await res.json()) as {id?: unknown}
-    if (!body || typeof body !== 'object' || typeof body.id !== 'string') return null
+    if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
+      console.warn('[SponsorAcceptances] /v1/users/me returned malformed body')
+      return null
+    }
     return body.id || null
-  } catch {
+  } catch (err) {
+    if ((err as Error)?.name === 'AbortError') return null
+    console.warn('[SponsorAcceptances] /v1/users/me probe failed:', err)
     return null
   }
 }
@@ -157,7 +171,7 @@ export function SponsorAcceptancesView(props: ToolConfig = {}) {
       // /v1/users/me with `credentials: 'include'` to recover the user id;
       // forward it (not a bearer) to the Worker, which independently verifies
       // project membership via a Worker-only Sanity API token.
-      const userId = await getCurrentUserId(projectId)
+      const userId = await getCurrentUserId(projectId, controller?.signal)
       if (isStale()) return
       if (!userId) {
         setError('Could not verify Studio session — please sign out and sign back in.')

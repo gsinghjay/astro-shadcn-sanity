@@ -196,6 +196,28 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(fetchCalls.length).toBe(0);
   });
 
+  it('returns 401 when X-Sanity-User-Id contains forbidden chars (path-traversal guard)', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    // Only ASCII-byte values — non-ASCII (e.g. U+200B ZWSP) is rejected by the
+    // Headers API at Request construction, before reaching the route.
+    for (const bad of [
+      'pAdmin/../../organizations/X',
+      'pAdmin?foo=bar',
+      'pAdmin#frag',
+      'pAdmin..bypass',
+      'pAdmin space',
+      'pAdmin%2Fescaped',
+      'pAdmin.dot',
+      'pAdmin+plus',
+    ]) {
+      fetchCalls.length = 0;
+      const ctx = buildCtx({ userId: bad });
+      const res = await GET(ctx as never);
+      expect(res.status, `expected 401 for "${bad}"`).toBe(401);
+      expect(fetchCalls.length, `no Sanity call for "${bad}"`).toBe(0);
+    }
+  });
+
   it('returns 403 when Sanity membership lookup returns 404', async () => {
     mockSanity404();
     const ctx = buildCtx({ userId: NON_MEMBER_USER_ID });
@@ -228,6 +250,30 @@ describe('GET /api/portal/admin/acceptances', () => {
     const ctx = buildCtx({ userId: ADMIN_USER_ID });
     const res = await GET(ctx as never);
     expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when membership response id is empty string', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ id: '' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('admits when Sanity returns id with surrounding whitespace (symmetric trim)', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ id: `  ${ADMIN_USER_ID}  ` }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
   });
 
   it('returns 403 when origin does not match STUDIO_ORIGIN (rejected before Sanity call)', async () => {
@@ -406,6 +452,25 @@ describe('GET /api/portal/admin/acceptances', () => {
     expect(res.status).toBe(503);
   });
 
+  it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is the literal "placeholder" build-time fallback', async () => {
+    vi.resetModules();
+    vi.doMock('astro:env/server', () => ({
+      PUBLIC_SANITY_STUDIO_PROJECT_ID: 'placeholder',
+      SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
+    }));
+    vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
+    vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
+    const route = await import('../acceptances');
+    const ctx = buildCtx({});
+    const res = await route.GET(ctx as never);
+    expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/server');
+    vi.doUnmock('cloudflare:workers');
+    vi.doUnmock('@/lib/sanity');
+    vi.resetModules();
+  });
+
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is empty (fail closed)', async () => {
     // Re-import the route with a different astro:env/server mock so the
     // module-level named import binds to the empty value. resetModules +
@@ -447,6 +512,87 @@ describe('GET /api/portal/admin/acceptances', () => {
     vi.doUnmock('cloudflare:workers');
     vi.doUnmock('@/lib/sanity');
     vi.resetModules();
+  });
+
+  it('returns 429 with Retry-After when RATE_LIMITER reports !allowed (no Sanity call)', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const checkLimit = vi
+      .fn()
+      .mockResolvedValue({ allowed: false, retryAfterMs: 12_000 });
+    const stub = { checkLimit };
+    const rateLimiter = {
+      idFromName: vi.fn().mockReturnValue('id-token'),
+      get: vi.fn().mockReturnValue(stub),
+    };
+    const ctx = buildCtx({
+      userId: ADMIN_USER_ID,
+      env: buildEnv({ RATE_LIMITER: rateLimiter }),
+    });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(429);
+    expect(res.headers.get('retry-after')).toBe('12');
+    expect(await res.json()).toEqual({ error: 'rate_limited' });
+    // Rate limit fires before the outbound Sanity call.
+    expect(fetchCalls.length).toBe(0);
+    expect(checkLimit).toHaveBeenCalledTimes(1);
+  });
+
+  it('proceeds when RATE_LIMITER returns allowed (passes through to membership check)', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const checkLimit = vi
+      .fn()
+      .mockResolvedValue({ allowed: true, retryAfterMs: 0 });
+    const rateLimiter = {
+      idFromName: vi.fn().mockReturnValue('id-token'),
+      get: vi.fn().mockReturnValue({ checkLimit }),
+    };
+    const ctx = buildCtx({
+      userId: ADMIN_USER_ID,
+      env: buildEnv({ RATE_LIMITER: rateLimiter }),
+    });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
+    expect(checkLimit).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails open when RATE_LIMITER throws (does not block legitimate admins)', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const rateLimiter = {
+      idFromName: vi.fn().mockImplementation(() => {
+        throw new Error('DO unavailable');
+      }),
+      get: vi.fn(),
+    };
+    const ctx = buildCtx({
+      userId: ADMIN_USER_ID,
+      env: buildEnv({ RATE_LIMITER: rateLimiter }),
+    });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
+  });
+
+  it('keys rate limit by CF-Connecting-IP', async () => {
+    mockSanityMembership(ADMIN_USER_ID);
+    const checkLimit = vi
+      .fn()
+      .mockResolvedValue({ allowed: true, retryAfterMs: 0 });
+    const idFromName = vi.fn().mockReturnValue('id-token');
+    const rateLimiter = {
+      idFromName,
+      get: vi.fn().mockReturnValue({ checkLimit }),
+    };
+    setEnv(buildEnv({ RATE_LIMITER: rateLimiter }));
+    const url = new URL('https://app.example.com/api/portal/admin/acceptances');
+    const req = new Request(url.toString(), {
+      method: 'GET',
+      headers: {
+        origin: ORIGIN,
+        'x-sanity-user-id': ADMIN_USER_ID,
+        'CF-Connecting-IP': '203.0.113.42',
+      },
+    });
+    await GET({ url, request: req, locals: {} } as never);
+    expect(idFromName).toHaveBeenCalledWith('admin-acceptances:203.0.113.42');
   });
 
   it('returns 403 when membership lookup times out (AbortSignal abort)', async () => {
@@ -498,19 +644,21 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     expect(res.headers.get('access-control-max-age')).toBe('600');
   });
 
-  it('returns 403 when origin does not match', async () => {
+  it('returns 403 with JSON body when origin does not match (curl-friendly diagnostics)', async () => {
     const ctx = buildCtx({ method: 'OPTIONS', origin: 'https://evil.example' });
     const res = await OPTIONS(ctx as never);
     expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'forbidden_origin' });
   });
 
-  it('returns 503 (fail closed) when STUDIO_ORIGIN env is missing', async () => {
+  it('returns 503 with JSON body (fail closed) when STUDIO_ORIGIN env is missing', async () => {
     const ctx = buildCtx({
       method: 'OPTIONS',
       env: buildEnv({ STUDIO_ORIGIN: undefined }),
     });
     const res = await OPTIONS(ctx as never);
     expect(res.status).toBe(503);
+    expect(await res.json()).toEqual({ error: 'service_unavailable' });
   });
 
   it('returns 503 (fail closed) when PORTAL_DB binding is missing', async () => {
