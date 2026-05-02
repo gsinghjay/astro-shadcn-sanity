@@ -9,6 +9,7 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "build": "sanity build",
+    "postbuild": "bash scripts/check-no-secrets.sh",
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "schema:extract": "sanity schema extract --path=schema.json",

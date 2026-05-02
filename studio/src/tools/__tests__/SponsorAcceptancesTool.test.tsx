@@ -6,11 +6,19 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
 ;(globalThis as {IS_REACT_ACT_ENVIRONMENT?: boolean}).IS_REACT_ACT_ENVIRONMENT = true
 
+const SANITY_USER_ID = 'pTestAdminId'
+const PROJECT_ID = '49nk9b0w'
+
 const {mockClientFetch} = vi.hoisted(() => ({mockClientFetch: vi.fn()}))
 
 vi.mock('sanity', () => {
-  const stableClient = {fetch: mockClientFetch}
-  return {useClient: () => stableClient}
+  const stableClient = {
+    fetch: mockClientFetch,
+    config: () => ({apiVersion: '2024-10-01'}),
+  }
+  return {
+    useClient: () => stableClient,
+  }
 })
 
 vi.mock('sanity/router', () => ({
@@ -64,7 +72,6 @@ const PENDING = {
 }
 
 const API_URL = 'https://app.example/api/portal/admin/acceptances'
-const TOKEN = 'sat_test_token_value'
 
 beforeEach(() => {
   mockClientFetch.mockReset().mockResolvedValue([])
@@ -97,8 +104,32 @@ describe('sponsorAcceptancesTool factory', () => {
 describe.skip('<SponsorAcceptancesView />', () => {
   it('shows loading spinner while fetching', () => {
     vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})))
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     expect(container.querySelector('[data-testid="acceptances-loading"]')).toBeTruthy()
+  })
+
+  it('forwards the current Studio user id as X-Sanity-User-Id', async () => {
+    const fetchSpy = vi.fn().mockImplementation(async (input: string | URL) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/v1/users/me')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({id: SANITY_USER_ID}),
+        }
+      }
+      return {ok: true, status: 200, json: async () => ({acceptances: []})}
+    })
+    vi.stubGlobal('fetch', fetchSpy)
+    render(<SponsorAcceptancesView apiUrl={API_URL} projectId={PROJECT_ID} />)
+    await flush()
+    // Find the Worker call (the second fetch — first is /v1/users/me).
+    const workerCall = fetchSpy.mock.calls.find(([input]) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      return url.startsWith(API_URL)
+    })
+    const headers = workerCall?.[1]?.headers as Record<string, string> | undefined
+    expect(headers?.['x-sanity-user-id']).toBe(SANITY_USER_ID)
   })
 
   it('renders an error card with retry button when fetch fails', async () => {
@@ -106,7 +137,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
       'fetch',
       vi.fn().mockResolvedValue({ok: false, status: 500, json: async () => ({})}),
     )
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
     const errCard = container.querySelector('[data-testid="acceptances-error"]')
     expect(errCard).toBeTruthy()
@@ -119,7 +150,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
       'fetch',
       vi.fn().mockResolvedValue({ok: true, status: 200, json: async () => ({acceptances: []})}),
     )
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
     expect(container.querySelector('[data-testid="acceptances-empty"]')).toBeTruthy()
   })
@@ -133,7 +164,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
         json: async () => ({acceptances: [ACCEPTED, PENDING]}),
       }),
     )
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
     const rows = container.querySelectorAll('[data-testid="acceptances-row"]')
     expect(rows.length).toBe(2)
@@ -149,7 +180,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
       json: async () => ({acceptances: [ACCEPTED]}),
     })
     vi.stubGlobal('fetch', fetchSpy)
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
 
     const acceptedTab = container.querySelector(
@@ -174,7 +205,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
         json: async () => ({acceptances: [ACCEPTED, PENDING]}),
       }),
     )
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
 
     const input = container.querySelector(
@@ -211,7 +242,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
     mockClientFetch.mockResolvedValue([
       {_id: 'sponsor-1', contactEmail: 'alice@example.com', name: 'Acme Co'},
     ])
-    render(<SponsorAcceptancesView apiUrl={API_URL} token={TOKEN} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} />)
     await flush()
 
     const links = container.querySelectorAll('[data-testid="acceptances-sponsor-link"]')
@@ -219,7 +250,7 @@ describe.skip('<SponsorAcceptancesView />', () => {
     expect(links[0].textContent).toBe('Acme Co')
   })
 
-  it('renders configuration error when api url / token props are missing', async () => {
+  it('renders configuration error when apiUrl prop is missing', async () => {
     vi.stubGlobal('fetch', vi.fn())
     render(<SponsorAcceptancesView />)
     await flush()

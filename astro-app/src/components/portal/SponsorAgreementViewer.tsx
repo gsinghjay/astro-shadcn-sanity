@@ -16,20 +16,15 @@ interface Props {
   /** Fires when the PDF reports its page count. Empty/corrupt PDFs report 0 — caller should
    *  use this to keep the accept checkbox/button disabled. */
   onReady?: (numPages: number) => void;
-  /** Fires once per mount when the user has scrolled to the end of the agreement (8px tolerance).
-   *  Short PDFs that fit entirely in the viewport fire this immediately after `onReady`. */
-  onScrolledToEnd?: () => void;
 }
 
 const DEFAULT_WIDTH = 800;
-const SCROLL_TOLERANCE_PX = 8;
 
 export default function SponsorAgreementViewer({
   pdfUrl,
   maxHeight = '70vh',
   className = '',
   onReady,
-  onScrolledToEnd,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [numPages, setNumPages] = useState<number | null>(null);
@@ -37,9 +32,6 @@ export default function SponsorAgreementViewer({
   // Default width keeps pages legible before/without ResizeObserver (older browsers).
   const [width, setWidth] = useState<number>(DEFAULT_WIDTH);
   const [reloadKey, setReloadKey] = useState(0);
-  const [scrolledToEnd, setScrolledToEnd] = useState(false);
-  const [renderedPages, setRenderedPages] = useState(0);
-  const hasFiredRef = useRef(false);
 
   // Debounced ResizeObserver: avoid thrashing pdfjs on every resize tick.
   useEffect(() => {
@@ -60,46 +52,8 @@ export default function SponsorAgreementViewer({
     };
   }, []);
 
-  // Scroll listener: fire onScrolledToEnd once when within 8px of the bottom.
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el || !onScrolledToEnd) return;
-    const onScroll = () => {
-      if (hasFiredRef.current) return;
-      if (el.scrollTop + el.clientHeight >= el.scrollHeight - SCROLL_TOLERANCE_PX) {
-        hasFiredRef.current = true;
-        setScrolledToEnd(true);
-        onScrolledToEnd();
-      }
-    };
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [onScrolledToEnd]);
-
-  // Short-PDF auto-fire: once ALL pages have rendered (not just `onLoadSuccess`) and width has
-  // settled, measure scrollHeight. Without waiting for `onRenderSuccess`, the rAF tick can run
-  // while pages are still laying out, making `scrollHeight <= clientHeight` falsely true and
-  // bypassing the scroll gate on multi-page PDFs.
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el || !numPages || hasFiredRef.current || !onScrolledToEnd) return;
-    if (renderedPages < numPages) return;
-    const id = requestAnimationFrame(() => {
-      if (!el || hasFiredRef.current) return;
-      if (el.scrollHeight <= el.clientHeight + SCROLL_TOLERANCE_PX) {
-        hasFiredRef.current = true;
-        setScrolledToEnd(true);
-        onScrolledToEnd();
-      }
-    });
-    return () => cancelAnimationFrame(id);
-  }, [numPages, renderedPages, width, onScrolledToEnd]);
-
-  const onPageRendered = useCallback(() => setRenderedPages((n) => n + 1), []);
-
   const onDocumentLoadSuccess = useCallback(
     ({ numPages: n }: { numPages: number }) => {
-      setRenderedPages(0);
       setNumPages(n);
       onReady?.(n);
       if (n === 0) setLoadError('PDF is empty. Contact your program administrator.');
@@ -115,15 +69,9 @@ export default function SponsorAgreementViewer({
   const pages = useMemo(() => {
     if (!numPages) return null;
     return Array.from({ length: numPages }, (_, i) => (
-      <Page
-        key={`page-${i + 1}`}
-        pageNumber={i + 1}
-        width={width}
-        className="mb-2"
-        onRenderSuccess={onPageRendered}
-      />
+      <Page key={`page-${i + 1}`} pageNumber={i + 1} width={width} className="mb-2" />
     ));
-  }, [numPages, width, onPageRendered]);
+  }, [numPages, width]);
 
   return (
     <div className={`relative ${className}`}>
@@ -141,9 +89,6 @@ export default function SponsorAgreementViewer({
               onClick={() => {
                 setLoadError(null);
                 setNumPages(null);
-                setRenderedPages(0);
-                hasFiredRef.current = false;
-                setScrolledToEnd(false);
                 setReloadKey((k) => k + 1);
               }}
               className="text-sm underline"
@@ -163,28 +108,6 @@ export default function SponsorAgreementViewer({
           </Document>
         )}
       </div>
-      {!loadError && numPages != null && !scrolledToEnd && onScrolledToEnd && (
-        <span
-          aria-hidden="true"
-          data-testid="agreement-scroll-indicator"
-          className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1 border bg-background/90 px-2 py-1 text-xs text-muted-foreground shadow"
-        >
-          Keep scrolling
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </span>
-      )}
     </div>
   );
 }

@@ -1,5 +1,13 @@
 import { defineMiddleware } from "astro:middleware";
 import { env } from "cloudflare:workers";
+import {
+  AGENT_CONTENT_SIGNAL,
+  buildLinkHeader,
+  estimateTokens,
+  getMarkdownTwin,
+  hasMarkdownTwin,
+  parseAcceptHeader,
+} from "@/lib/agent-discovery";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -17,13 +25,43 @@ const jsonError = (status: number, error: string) =>
     headers: { "content-type": "application/json" },
   });
 
-/** Shape stored in SESSION_CACHE. `agreementAcceptedAt === undefined` means the cache predates the field. */
+/** Shape stored in SESSION_CACHE. `undefined` on either field means the cache predates that field
+ *  and we should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
 type CachedSession = {
   email: string;
   name: string;
   role: string;
   agreementAcceptedAt?: number | null;
+  agreementVersion?: string | null;
 };
+
+/** Module-scope cache of the current Sanity sponsor-agreement `_rev`. Persists across requests
+ *  within a Worker isolate (CF reuses isolates aggressively), so cache hit rate is very high.
+ *  Cold-start penalty is one Sanity API call per isolate, ~50ms. 5-min worst-case lag between
+ *  agreement publish and re-prompt — acceptable for a doc that changes ~1×/year. */
+let _agreementRevCache: { rev: string | null; expiresAt: number } | null = null;
+const AGREEMENT_REV_TTL_MS = 5 * 60 * 1000;
+
+async function getCurrentAgreementRev(): Promise<string | null> {
+  const now = Date.now();
+  if (_agreementRevCache && _agreementRevCache.expiresAt > now) {
+    return _agreementRevCache.rev;
+  }
+  try {
+    const { getSponsorAgreementRev } = await import("@/lib/sanity");
+    const rev = await getSponsorAgreementRev();
+    _agreementRevCache = { rev, expiresAt: now + AGREEMENT_REV_TTL_MS };
+    return rev;
+  } catch (err) {
+    console.warn("[middleware-agreement] rev fetch failed; failing open", err);
+    return null;
+  }
+}
+
+/** Test-only: reset the module-scope rev cache. */
+export function _resetAgreementRevCache(): void {
+  _agreementRevCache = null;
+}
 
 /** Better Auth session user shape including custom additionalFields */
 interface SessionUser {
@@ -35,18 +73,21 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
-  // Admin endpoints under /api/portal/admin/* authenticate via STUDIO_ADMIN_TOKEN
-  // (cross-origin Studio caller, no session cookie). Skip the session gate so the
-  // route handler can run its own bearer/origin checks and emit CORS headers.
+  // Admin endpoints under /api/portal/admin/* authenticate via the Studio user's
+  // Sanity session JWT (cross-origin Studio caller, no portal session cookie).
+  // Skip the portal session gate so the route handler can run its own
+  // identity introspection + origin check + CORS emission.
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
   const isPortal = isPortalPage || isPortalApi;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
-  // Branch 1: Public routes (and admin API) — zero auth overhead
+  // Branch 1: Public routes (and admin API) — zero auth overhead.
+  // Layer in agent discovery: RFC 8288 Link headers on HTML responses, plus
+  // `Accept: text/markdown` content negotiation against the static `.md` twins.
   if (!isPortal && !isStudent) {
-    return next();
+    return decorateForAgents(context, next);
   }
 
   // Whitelist login/denied pages from auth check (normalize trailing slash)
@@ -204,14 +245,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
       PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
     if (userData.role === "sponsor" && !skipsAgreementPath) {
       let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
-      if (userData.agreementAcceptedAt === undefined && runtimeEnv?.PORTAL_DB) {
+      let agreementVersion = userData.agreementVersion ?? null;
+      const cacheMissesAcceptance = userData.agreementAcceptedAt === undefined;
+      const cacheMissesVersion = userData.agreementVersion === undefined;
+      if ((cacheMissesAcceptance || cacheMissesVersion) && runtimeEnv?.PORTAL_DB) {
         try {
           const row = await runtimeEnv.PORTAL_DB
-            .prepare("SELECT agreement_accepted_at FROM user WHERE LOWER(email) = ?")
+            .prepare(
+              "SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?",
+            )
             .bind(userData.email)
-            .first<{ agreement_accepted_at: number | null }>();
+            .first<{ agreement_accepted_at: number | null; agreement_version: string | null }>();
           agreementAcceptedAt = row?.agreement_accepted_at ?? null;
+          agreementVersion = row?.agreement_version ?? null;
           userData.agreementAcceptedAt = agreementAcceptedAt;
+          userData.agreementVersion = agreementVersion;
           if (kvCache && sessionToken) {
             kvCache
               .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
@@ -222,9 +270,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
           // A D1 outage blocks portal access rather than letting unaccepted sponsors through.
           console.error("[middleware] agreement lookup failed, failing closed:", e);
           agreementAcceptedAt = null;
+          agreementVersion = null;
         }
       }
-      context.locals.requiresAgreement = agreementAcceptedAt === null;
+      // Re-prompt when never accepted, OR when accepted against a different/null rev than the
+      // current Sanity revision. Rev fetch failure returns null (fail-open) — paired with a
+      // non-null version this short-circuits to "no prompt" so a Sanity outage doesn't lock
+      // sponsors out. Grandfathered rows (acceptedAt != null, version == null) re-prompt once
+      // because currentRev is non-null after first successful fetch.
+      const currentRev = await getCurrentAgreementRev();
+      const versionDrift = currentRev !== null && agreementVersion !== currentRev;
+      context.locals.requiresAgreement = agreementAcceptedAt === null || versionDrift;
     } else {
       context.locals.requiresAgreement = false;
     }
@@ -236,6 +292,67 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return new Response("Service Unavailable", { status: 503 });
   }
 });
+
+/** Public-route handler that adds RFC 8288 `Link` headers to HTML responses
+ *  and content-negotiates `Accept: text/markdown` against the static `.md`
+ *  twin corpus emitted by `astro-llms-md` (Story 5.19). Pure layering on top
+ *  of `next()` — no auth or rate-limiting concerns intrude here. */
+export async function decorateForAgents(
+  context: { url: URL; request: Request },
+  next: () => Promise<Response>,
+): Promise<Response> {
+  const { pathname } = context.url;
+
+  // Step 1: Markdown content negotiation. Only attempt for paths that have a
+  // twin in the corpus — excluded paths fall through to HTML. Direct `.md`
+  // requests are served as static assets by the runtime; we don't intercept.
+  const accept = context.request.headers.get("accept");
+  const { prefersMarkdown } = parseAcceptHeader(accept);
+  if (prefersMarkdown && hasMarkdownTwin(pathname) && !pathname.endsWith(".md")) {
+    const assets = (env as { ASSETS?: { fetch: (input: URL | string | Request) => Promise<Response> } }).ASSETS;
+    if (assets) {
+      const twin = await getMarkdownTwin(pathname, assets, context.url.origin);
+      // Range requests come back as 206 with Content-Range; rewriting to 200
+      // would strip partial-content semantics. Fall through so the adapter
+      // serves the asset natively in that case.
+      if (twin && twin.status === 200) {
+        const body = await twin.text();
+        const headers = new Headers();
+        headers.set("content-type", "text/markdown; charset=utf-8");
+        headers.set("vary", "Accept");
+        headers.set("link", buildLinkHeader(pathname, true));
+        headers.set("x-markdown-tokens", String(estimateTokens(body)));
+        headers.set("content-signal", AGENT_CONTENT_SIGNAL);
+        // Mirror upstream cache-control if the static asset declared one
+        // (parity with HTML response per AC). Default to no override.
+        const upstreamCacheControl = twin.headers.get("cache-control");
+        if (upstreamCacheControl) headers.set("cache-control", upstreamCacheControl);
+        return new Response(body, { status: twin.status, headers });
+      }
+    }
+    // Asset fetch failed or twin missing — fall through to HTML below.
+  }
+
+  const response = await next();
+  const contentType = response.headers.get("content-type") ?? "";
+
+  // Step 2: Link + Vary headers on HTML responses only. Non-HTML responses
+  // (`/llms.txt`, `/sitemap-index.xml`, `/api/*` JSON, asset bytes) skip this
+  // — they own their own content-type contract.
+  if (contentType.includes("text/html")) {
+    response.headers.set("link", buildLinkHeader(pathname, hasMarkdownTwin(pathname)));
+    // Vary: Accept is required so caches don't return HTML to a markdown-prefering
+    // agent (or vice-versa) once a path has two representations.
+    const existingVary = response.headers.get("vary");
+    if (!existingVary) {
+      response.headers.set("vary", "Accept");
+    } else if (!/\baccept\b/i.test(existingVary)) {
+      response.headers.set("vary", `${existingVary}, Accept`);
+    }
+  }
+
+  return response;
+}
 
 /** Extract Better Auth session token from Cookie header.
  *  Handles both standard and __Secure- prefixed cookie names

@@ -21,8 +21,11 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
-/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker). */
-interface RateLimiterDO {
+/** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker).
+ *  Extends Rpc.DurableObjectBranded so the type satisfies DurableObjectNamespace<T>'s
+ *  brand constraint — without this, callers see `DurableObjectStub<undefined>` and
+ *  calls to `checkLimit` type-error. */
+interface RateLimiterDO extends Rpc.DurableObjectBranded {
   checkLimit(windowMs: number, maxRequests: number): Promise<{
     allowed: boolean;
     remaining: number;
@@ -37,6 +40,7 @@ declare namespace Cloudflare {
     TURNSTILE_SECRET_KEY: string;
     SANITY_API_WRITE_TOKEN: string;
     SANITY_API_READ_TOKEN?: string;
+    SANITY_PROJECT_READ_TOKEN?: string;
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     GITHUB_CLIENT_ID: string;
@@ -46,7 +50,6 @@ declare namespace Cloudflare {
     RESEND_API_KEY: string;
     RESEND_FROM_EMAIL?: string;
     DISCORD_WEBHOOK_URL?: string;
-    STUDIO_ADMIN_TOKEN?: string;
     GITHUB_DEV_TOKEN?: string;
     RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
   }
