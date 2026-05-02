@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 from app import app
 from dependencies import get_sanity, get_settings
 from models.settings import WorkerSettings
-from services.sanity_client import SanityClient
 
 
 class MockSanityClient:

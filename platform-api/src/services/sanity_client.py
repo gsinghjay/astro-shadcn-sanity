@@ -1,5 +1,4 @@
 # src/services/sanity_client.py
-from typing import Any
 from services.http_client import get_client, raise_for_status
 
 class SanityClient:
