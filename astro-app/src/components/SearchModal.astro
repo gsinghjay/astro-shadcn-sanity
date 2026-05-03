@@ -28,8 +28,17 @@ interface Props {
 
 const { apiUrl, placeholder, theme, seeMore = "/search?q=" } = Astro.props;
 
-// Sanitize inputs and reject empty apiUrl (render nothing if not provided).
-const cleanApiUrl = stegaClean(apiUrl);
+// Sanitize inputs and reject empty / non-HTTPS / non-URL apiUrl (mirror ChatBubble.astro).
+const rawApiUrl = stegaClean(apiUrl).trim();
+const cleanApiUrl = (() => {
+  if (!rawApiUrl) return "";
+  try {
+    const u = new URL(rawApiUrl);
+    return u.protocol === "http:" || u.protocol === "https:" ? rawApiUrl : "";
+  } catch {
+    return "";
+  }
+})();
 const cleanPlaceholder = stegaClean(placeholder ?? "Search the site…");
 const cleanTheme = stegaClean(theme ?? "auto");
 const cleanSeeMore = stegaClean(seeMore);
@@ -95,6 +104,8 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
     /* States: error uses destructive, focus ring matches site ring. */
     --search-snippet-error-background: var(--secondary);
     --search-snippet-error-color: var(--destructive);
+    --search-snippet-warning-background: var(--secondary);
+    --search-snippet-warning-color: var(--destructive);
     --search-snippet-focus-ring: 2px solid var(--ring);
   }
 </style>
@@ -105,8 +116,9 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
   // elements: chat-bubble-snippet, search-modal-snippet, search-bar-snippet, chat-page-snippet.
   import "@cloudflare/ai-search-snippet";
 
-  // Track initialized shells to avoid re-binding on SPA navigation.
-  const initializedShells = new WeakSet<HTMLElement>();
+  // AbortController is reset on every (re)bind so the prior nav's document listeners
+  // are removed before new ones are attached — prevents N-fold leak across SPA nav.
+  let abortController: AbortController | null = null;
 
   function openModal(source: "click" | "shortcut"): void {
     const modal = document.querySelector<
@@ -115,14 +127,20 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
     if (!modal?.open) return;
 
     (window as any).dataLayer = (window as any).dataLayer || [];
-    (window as any).dataLayer.push({
-      event: "site_search_open",
-      source,
-    });
+    (window as any).dataLayer.push({ event: "site_search_open", source });
     modal.open();
+
+    // Close any open mobile Sheet drawer so the modal isn't stacked behind it.
+    document
+      .querySelector<HTMLDialogElement>("[data-slot='sheet-dialog'][open]")
+      ?.close();
   }
 
   function bindTriggers(): void {
+    abortController?.abort();
+    abortController = new AbortController();
+    const { signal } = abortController;
+
     // Delegated click handler for [data-search-trigger] elements (desktop + mobile).
     document.addEventListener(
       "click",
@@ -134,49 +152,44 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
         e.preventDefault();
         openModal("click");
       },
-      { capture: false },
+      { signal },
     );
 
-    // Keyboard shortcut handler for ⌘K / Ctrl+K.
-    // The snippet's shortcut="k" use-meta-key="" handles the global keydown,
-    // but we need to push the GTM dataLayer event BEFORE it opens, at capture
-    // phase to ensure our event fires first.
+    // ⌘K / Ctrl+K — the snippet handles the actual open() via shortcut="k" use-meta-key="".
+    // We only push the GTM event, but ONLY if the snippet has registered AND the modal
+    // actually opens (deferred one frame so the vendor's listener runs first). This avoids
+    // overcounting on toggles, pre-registration shortcuts, and IME/focus-ignored events.
     document.addEventListener(
       "keydown",
       (e) => {
         const isMac = navigator.platform.toLowerCase().includes("mac");
         const metaKey = isMac ? e.metaKey : e.ctrlKey;
-        if (metaKey && e.key.toLowerCase() === "k") {
+        if (!metaKey || e.key.toLowerCase() !== "k") return;
+
+        requestAnimationFrame(() => {
+          const modal = document.querySelector<
+            HTMLElement & { isModalOpen?: () => boolean }
+          >("search-modal-snippet");
+          if (!modal?.isModalOpen?.()) return;
+
           (window as any).dataLayer = (window as any).dataLayer || [];
           (window as any).dataLayer.push({
             event: "site_search_open",
             source: "shortcut",
           });
-          // Do NOT call openModal() here — the snippet already handles the open()
-          // call internally when it detects the shortcut. Calling it twice would
-          // cause a double-open or race condition. The dataLayer push above is
-          // sufficient for GTM tracking.
-        }
+        });
       },
-      { capture: true },
+      { capture: true, signal },
     );
   }
 
-  // Re-bind triggers on page load and SPA navigation (astro:page-load).
-  // Use a guard to prevent duplicate listeners on repeated navigation.
-  let bindingInitialized = false;
-
-  function initSearchModal(): void {
-    if (bindingInitialized) return;
-    bindingInitialized = true;
-
+  // astro:page-load fires on initial render + every SPA nav (when ClientRouter is on the page).
+  // DOMContentLoaded is the fallback for routes without ViewTransitions; the AbortController
+  // dedup guarantees only one set of listeners is active regardless of which fires first.
+  document.addEventListener("astro:page-load", bindTriggers);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bindTriggers, { once: true });
+  } else {
     bindTriggers();
   }
-
-  document.addEventListener("DOMContentLoaded", initSearchModal);
-  document.addEventListener("astro:page-load", () => {
-    // Reset flag on SPA nav so re-navigation rebinds (old listeners are GC'd).
-    bindingInitialized = false;
-    initSearchModal();
-  });
 </script>

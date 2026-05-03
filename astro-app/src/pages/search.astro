@@ -18,8 +18,17 @@ import { PUBLIC_SITE_THEME } from "astro:env/client";
 const settings = await getSiteSettings();
 const aiSearch = settings.aiSearch;
 
-// Sanitize inputs — reject empty apiUrl (render unavailable state).
-const cleanApiUrl = stegaClean(aiSearch?.apiUrl ?? "");
+// Sanitize inputs — reject empty / non-HTTPS / non-URL apiUrl (mirror SearchModal/ChatBubble).
+const rawApiUrl = stegaClean(aiSearch?.apiUrl ?? "").trim();
+const cleanApiUrl = (() => {
+  if (!rawApiUrl) return "";
+  try {
+    const u = new URL(rawApiUrl);
+    return u.protocol === "http:" || u.protocol === "https:" ? rawApiUrl : "";
+  } catch {
+    return "";
+  }
+})();
 const cleanPlaceholder = stegaClean(aiSearch?.placeholder ?? "Search the site…");
 const cleanTheme = stegaClean(aiSearch?.theme ?? "auto");
 
@@ -101,6 +110,8 @@ const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
     /* States: error uses destructive, focus ring matches site ring. */
     --search-snippet-error-background: var(--secondary);
     --search-snippet-error-color: var(--destructive);
+    --search-snippet-warning-background: var(--secondary);
+    --search-snippet-warning-color: var(--destructive);
     --search-snippet-focus-ring: 2px solid var(--ring);
   }
 </style>

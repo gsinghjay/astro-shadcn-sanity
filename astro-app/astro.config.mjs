@@ -207,6 +207,7 @@ export default defineConfig({
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
               '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+              'search', '**/search/**',
             ],
             generateIndividualMd: true,
             generateLlmsTxt: true,
