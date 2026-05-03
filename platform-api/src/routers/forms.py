@@ -5,7 +5,7 @@ from models.discord import DiscordNotification, EmbedField
 from routers.discord import send_notification
 from services.sanity_client import SanityClient
 from services.turnstile import verify_turnstile
-from dependencies import get_settings, verify_admin_api_key, get_sanity
+from dependencies import get_settings, get_current_admin, get_sanity
 from datetime import datetime, timezone
 from utils.dataset import resolve_dataset
 import logging, uuid, asyncio, httpx
@@ -45,7 +45,7 @@ async def list_submissions(
     limit: int = Query(20, ge=1, le=100, description="Max records to return"),
     offset: int = Query(0, ge=0, description="Number of records to skip for pagination"),
     sanity: SanityClient = Depends(get_sanity),
-    _ = Depends(verify_admin_api_key)  # Protect route
+    _ = Depends(get_current_admin)  # Protect route
 ):
     """Admin-only endpoint to list recent submissions."""
     dataset, site_filter = resolve_dataset(site)

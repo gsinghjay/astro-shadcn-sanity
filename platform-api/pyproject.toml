@@ -8,6 +8,7 @@ dependencies = [
     "httpx",
     "pydantic",
     "email-validator",
+    "pyjwt>=2.12.1",
 ]
 
 [dependency-groups]

@@ -38,13 +38,13 @@ Usage in route handlers::
         return {"message": "You have access"}
 """
 
-import hmac
+import hmac, jwt
 
-from fastapi import Request, HTTPException, Depends, Security
+from fastapi import Request, HTTPException, Depends
 
 from models.settings import WorkerSettings
 from services.sanity_client import SanityClient
-from fastapi.security import APIKeyHeader
+from fastapi.security import OAuth2PasswordBearer
 
 async def get_env(request: Request):
     """Extract the raw Cloudflare env proxy from the ASGI request scope.
@@ -207,21 +207,26 @@ async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> Sanity
 
     return SanityClient(project_id=project_id, token=token)
 
-# Looks for 'X-Admin-API-Key' in the request headers
-admin_api_key_header = APIKeyHeader(name="X-Admin-API-Key", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
-async def verify_admin_api_key(
-    api_key_header: str = Security(admin_api_key_header),
+async def get_current_admin(
+    token: str = Depends(oauth2_scheme),
     settings: WorkerSettings = Depends(get_settings)
-) -> bool:
-    """Verifies that the request includes the correct Admin API Key."""
-    expected_key = settings.required_secrets.get("admin_api_key")
+) -> str:
+    """Verifies the JWT token and returns the username."""
     
-    if not expected_key:
-        # Failsafe: If no key is configured in Cloudflare, block all mutations
-        raise HTTPException(status_code=500, detail="admin_api_key not configured on server")
+    # Ensure that this is found within your optional_secrets config
+    jwt_secret = settings.optional_secrets.get("JWT_SECRET", "super-secret-default-key")
+    
+    try:
+        # Decode the token
+        payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+        username = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return username
         
-    if not api_key_header or not hmac.compare_digest(api_key_header, expected_key):
-        raise HTTPException(status_code=403, detail="Invalid or missing Admin API Key")
-        
-    return True
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token has expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
