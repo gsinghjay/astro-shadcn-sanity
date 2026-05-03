@@ -34,18 +34,32 @@ if [[ "$script_count" -eq 0 ]]; then
 fi
 
 # Patterns that must not appear in any shipped JS chunk.
-# - sat_<32+ url-safe-base64>: Sanity API token literal. The documented
-#   generation recipe (`openssl rand -base64 32 | tr '/+' '_-' | tr -d '='`)
-#   produces tokens whose body is `[A-Za-z0-9_-]+`, so the alphabet must
-#   include `_` and `-` or ~64 % of real tokens slip through.
-# - SANITY_STUDIO_ADMIN_TOKEN: the retired env-var name; if it reappears in
-#   the bundle, someone re-introduced the foot-gun.
-# - STUDIO_ADMIN_TOKEN (without the SANITY_STUDIO_ prefix): the matching
-#   server-side var name; should never be referenced from Studio code.
+# - sat_<32+ url-safe-base64>: Sanity API token literal (legacy `sat_*` family).
+#   The documented generation recipe
+#   (`openssl rand -base64 32 | tr '/+' '_-' | tr -d '='`) produces tokens
+#   whose body is `[A-Za-z0-9_-]+`, so the alphabet must include `_` and `-`
+#   or ~64 % of real tokens slip through.
+# - sk<60+ url-safe-base64>: current Sanity API token literal (24.1.5 added
+#   SANITY_PROJECT_READ_TOKEN, an `sk`-prefixed Worker-only token; this guard
+#   ensures a future regression that copies it into a SANITY_STUDIO_* var
+#   trips the scrub instead of leaking). Body ≥60 chars to stay above natural
+#   identifier length ceilings — `skipAnimationFrameInResizeObserver` (37
+#   chars after `sk`, real symbol in bundled deps) was the false-positive
+#   that forced raising the floor; real Sanity API tokens are ~80 chars total.
+# - SANITY_STUDIO_ADMIN_TOKEN / STUDIO_ADMIN_TOKEN: 24.1's retired env-var
+#   names; if either reappears in the bundle, someone re-introduced the
+#   foot-gun.
+# - SANITY_PROJECT_READ_TOKEN / SANITY_API_READ_TOKEN / SANITY_API_WRITE_TOKEN:
+#   server-only env-var names that should never be referenced from Studio
+#   code (24.1.5 widening — none belong in any Studio chunk).
 FORBIDDEN_PATTERNS=(
   'sat_[A-Za-z0-9_-]{32,}'
+  'sk[A-Za-z0-9_-]{60,}'
   'SANITY_STUDIO_ADMIN_TOKEN'
   'STUDIO_ADMIN_TOKEN'
+  'SANITY_PROJECT_READ_TOKEN'
+  'SANITY_API_READ_TOKEN'
+  'SANITY_API_WRITE_TOKEN'
 )
 
 found_any=0

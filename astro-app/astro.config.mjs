@@ -56,7 +56,51 @@ const siteUrl = pick("PUBLIC_SITE_URL", "http://localhost:4321");
 const studioUrlBase = pick("PUBLIC_SANITY_STUDIO_URL", "http://localhost:3333");
 const studioWorkspace = dataset === "rwc" ? "/rwc" : "/capstone";
 const studioUrl = `${studioUrlBase.replace(/\/$/, "")}${studioWorkspace}`;
-const visualEditingEnabled = pick("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "");
+// Coerce to string before comparison: wrangler.jsonc permits literal boolean
+// `true`/`false` in `vars` blocks alongside the string forms we use today.
+// Without this, a contributor flipping to the JSON-literal form would silently
+// skip the SSR flip below (and the `useCdn` toggle further down) with no log.
+const visualEditingEnabled = String(pick("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", ""));
+
+// Story 5.22: preview Workers (visual editing on) flip these content routes to
+// SSR so newly-published Sanity pages and global chrome (logo / nav / footer
+// from siteSettings) surface immediately. Production keeps them prerendered to
+// stay inside the LCP <=2000ms gate. Astro v5+ removed dynamic `prerender`
+// exports — the supported pattern is the `astro:route:setup` hook below, which
+// overrides `route.prerender` based on the build-time VE flag (per
+// docs.astro.build/en/reference/integrations-reference/#astroroutesetup).
+// Each entry is matched against `route.component` via `endsWith` — same idiom
+// the official docs use. Values are bare suffixes so the check works whether
+// the runtime hands us a project-relative `src/pages/...` path or an absolute
+// `/abs/.../src/pages/...` one.
+const PREVIEW_SSR_ROUTES = [
+  'src/pages/index.astro',
+  'src/pages/[...slug].astro',
+  'src/pages/events/index.astro',
+  'src/pages/events/[slug].astro',
+  'src/pages/sponsors/index.astro',
+  'src/pages/sponsors/[slug].astro',
+  'src/pages/articles/index.astro',
+  'src/pages/articles/[slug].astro',
+  'src/pages/articles/category/[slug].astro',
+  'src/pages/authors/index.astro',
+  'src/pages/authors/[slug].astro',
+  'src/pages/projects/index.astro',
+  'src/pages/projects/[slug].astro',
+  'src/pages/gallery/index.astro',
+];
+
+const previewSsrIntegration = {
+  name: 'preview-ssr-content-routes',
+  hooks: {
+    'astro:route:setup': ({ route }) => {
+      if (visualEditingEnabled !== 'true') return;
+      if (PREVIEW_SSR_ROUTES.some((suffix) => route.component.endsWith(suffix))) {
+        route.prerender = false;
+      }
+    },
+  },
+};
 
 export default defineConfig({
   output: "server",
@@ -124,6 +168,16 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      // Worker-only Sanity API token (Viewer permissions) used by
+      // /api/portal/admin/acceptances to verify project membership of the
+      // claimed Studio user id forwarded as `X-Sanity-User-Id`. Sanity API
+      // tokens are `sk`-prefixed (24.1.5).
+      SANITY_PROJECT_READ_TOKEN: envField.string({
+        context: "server",
+        access: "secret",
+        startsWith: "sk",
+        optional: true,
+      }),
       STUDIO_ORIGIN: envField.string({
         context: "server",
         access: "public",
@@ -176,6 +230,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    previewSsrIntegration,
     sanity({
       projectId,
       dataset,
@@ -206,7 +261,7 @@ export default defineConfig({
             titleSelector: 'h1',
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
-              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**',
+              '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**', '**/api/**',
               'search', '**/search/**',
             ],
             generateIndividualMd: true,

@@ -1,5 +1,13 @@
 import { defineMiddleware } from "astro:middleware";
 import { env } from "cloudflare:workers";
+import {
+  AGENT_CONTENT_SIGNAL,
+  buildLinkHeader,
+  estimateTokens,
+  getMarkdownTwin,
+  hasMarkdownTwin,
+  parseAcceptHeader,
+} from "@/lib/agent-discovery";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -75,9 +83,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPortal = isPortalPage || isPortalApi;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
-  // Branch 1: Public routes (and admin API) — zero auth overhead
+  // Branch 1: Public routes (and admin API) — zero auth overhead.
+  // Layer in agent discovery: RFC 8288 Link headers on HTML responses, plus
+  // `Accept: text/markdown` content negotiation against the static `.md` twins.
   if (!isPortal && !isStudent) {
-    return next();
+    return decorateForAgents(context, next);
   }
 
   // Whitelist login/denied pages from auth check (normalize trailing slash)
@@ -282,6 +292,67 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return new Response("Service Unavailable", { status: 503 });
   }
 });
+
+/** Public-route handler that adds RFC 8288 `Link` headers to HTML responses
+ *  and content-negotiates `Accept: text/markdown` against the static `.md`
+ *  twin corpus emitted by `astro-llms-md` (Story 5.19). Pure layering on top
+ *  of `next()` — no auth or rate-limiting concerns intrude here. */
+export async function decorateForAgents(
+  context: { url: URL; request: Request },
+  next: () => Promise<Response>,
+): Promise<Response> {
+  const { pathname } = context.url;
+
+  // Step 1: Markdown content negotiation. Only attempt for paths that have a
+  // twin in the corpus — excluded paths fall through to HTML. Direct `.md`
+  // requests are served as static assets by the runtime; we don't intercept.
+  const accept = context.request.headers.get("accept");
+  const { prefersMarkdown } = parseAcceptHeader(accept);
+  if (prefersMarkdown && hasMarkdownTwin(pathname) && !pathname.endsWith(".md")) {
+    const assets = (env as { ASSETS?: { fetch: (input: URL | string | Request) => Promise<Response> } }).ASSETS;
+    if (assets) {
+      const twin = await getMarkdownTwin(pathname, assets, context.url.origin);
+      // Range requests come back as 206 with Content-Range; rewriting to 200
+      // would strip partial-content semantics. Fall through so the adapter
+      // serves the asset natively in that case.
+      if (twin && twin.status === 200) {
+        const body = await twin.text();
+        const headers = new Headers();
+        headers.set("content-type", "text/markdown; charset=utf-8");
+        headers.set("vary", "Accept");
+        headers.set("link", buildLinkHeader(pathname, true));
+        headers.set("x-markdown-tokens", String(estimateTokens(body)));
+        headers.set("content-signal", AGENT_CONTENT_SIGNAL);
+        // Mirror upstream cache-control if the static asset declared one
+        // (parity with HTML response per AC). Default to no override.
+        const upstreamCacheControl = twin.headers.get("cache-control");
+        if (upstreamCacheControl) headers.set("cache-control", upstreamCacheControl);
+        return new Response(body, { status: twin.status, headers });
+      }
+    }
+    // Asset fetch failed or twin missing — fall through to HTML below.
+  }
+
+  const response = await next();
+  const contentType = response.headers.get("content-type") ?? "";
+
+  // Step 2: Link + Vary headers on HTML responses only. Non-HTML responses
+  // (`/llms.txt`, `/sitemap-index.xml`, `/api/*` JSON, asset bytes) skip this
+  // — they own their own content-type contract.
+  if (contentType.includes("text/html")) {
+    response.headers.set("link", buildLinkHeader(pathname, hasMarkdownTwin(pathname)));
+    // Vary: Accept is required so caches don't return HTML to a markdown-prefering
+    // agent (or vice-versa) once a path has two representations.
+    const existingVary = response.headers.get("vary");
+    if (!existingVary) {
+      response.headers.set("vary", "Accept");
+    } else if (!/\baccept\b/i.test(existingVary)) {
+      response.headers.set("vary", `${existingVary}, Accept`);
+    }
+  }
+
+  return response;
+}
 
 /** Extract Better Auth session token from Cookie header.
  *  Handles both standard and __Secure- prefixed cookie names

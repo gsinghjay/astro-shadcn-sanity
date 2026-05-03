@@ -6,26 +6,18 @@ import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest'
 
 ;(globalThis as {IS_REACT_ACT_ENVIRONMENT?: boolean}).IS_REACT_ACT_ENVIRONMENT = true
 
-const SESSION_TOKEN = 'sjwt-test-admin'
+const SANITY_USER_ID = 'pTestAdminId'
+const PROJECT_ID = '49nk9b0w'
 
 const {mockClientFetch} = vi.hoisted(() => ({mockClientFetch: vi.fn()}))
 
 vi.mock('sanity', () => {
   const stableClient = {
     fetch: mockClientFetch,
-    // Story 24.1: SponsorAcceptancesView reads `client.config().token` to pull
-    // the current Studio user's session JWT. Stub a fixed value so the fetch
-    // helper can assert the bearer it forwarded.
-    config: () => ({token: SESSION_TOKEN, apiVersion: '2024-10-01'}),
+    config: () => ({apiVersion: '2024-10-01'}),
   }
   return {
     useClient: () => stableClient,
-    useCurrentUser: () => ({
-      id: 'pTest',
-      email: 'admin@example.com',
-      name: 'Admin User',
-      roles: [{name: 'administrator', title: 'Administrator'}],
-    }),
   }
 })
 
@@ -116,18 +108,28 @@ describe.skip('<SponsorAcceptancesView />', () => {
     expect(container.querySelector('[data-testid="acceptances-loading"]')).toBeTruthy()
   })
 
-  it('forwards the Studio user session JWT as the Authorization bearer', async () => {
-    const fetchSpy = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({acceptances: []}),
+  it('forwards the current Studio user id as X-Sanity-User-Id', async () => {
+    const fetchSpy = vi.fn().mockImplementation(async (input: string | URL) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      if (url.includes('/v1/users/me')) {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({id: SANITY_USER_ID}),
+        }
+      }
+      return {ok: true, status: 200, json: async () => ({acceptances: []})}
     })
     vi.stubGlobal('fetch', fetchSpy)
-    render(<SponsorAcceptancesView apiUrl={API_URL} />)
+    render(<SponsorAcceptancesView apiUrl={API_URL} projectId={PROJECT_ID} />)
     await flush()
-    const init = fetchSpy.mock.calls[0]?.[1] as RequestInit | undefined
-    const headers = init?.headers as Record<string, string> | undefined
-    expect(headers?.authorization).toBe(`Bearer ${SESSION_TOKEN}`)
+    // Find the Worker call (the second fetch — first is /v1/users/me).
+    const workerCall = fetchSpy.mock.calls.find(([input]) => {
+      const url = typeof input === 'string' ? input : input.toString()
+      return url.startsWith(API_URL)
+    })
+    const headers = workerCall?.[1]?.headers as Record<string, string> | undefined
+    expect(headers?.['x-sanity-user-id']).toBe(SANITY_USER_ID)
   })
 
   it('renders an error card with retry button when fetch fails', async () => {
