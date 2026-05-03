@@ -87,7 +87,9 @@ function createSSRResult() {
 
     // Creates the Astro global object used by compiled .astro components.
     // The compiled factory calls: const Astro2 = $$result.createAstro($$Astro, $$props, $$slots)
-    createAstro(astroGlobal: any, props: any, slotValues: any) {
+    // NOTE: do NOT spread `astroGlobal` — Astro 6's $$Astro is a bag of throwing
+    // getters (callAction, clientAddress, locals, etc.) and spread invokes them all.
+    createAstro(_astroGlobal: any, props: any, slotValues: any) {
       const slots = {
         has: (name: string) => !!slotValues?.[name],
         render: async (name: string) => {
@@ -100,7 +102,6 @@ function createSSRResult() {
         },
       }
       return {
-        ...astroGlobal,
         props,
         self: null,
         slots,
