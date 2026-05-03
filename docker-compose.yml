@@ -1,7 +1,8 @@
 # Requires: cp astro-app/.env.example astro-app/.env && cp studio/.env.example studio/.env
 
 x-user: &host-user
-  user: "${UID:-1000}:${GID:-1000}"
+  user: root  
+  #user: "${UID:-1000}:${GID:-1000}"
 
 services:
   astro-app:

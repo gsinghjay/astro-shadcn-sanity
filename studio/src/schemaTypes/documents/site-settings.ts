@@ -224,10 +224,10 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'aiSearch',
-      title: 'AI Search Chat Bubble',
+      title: 'AI Search',
       type: 'object',
       group: 'aiSearch',
-      description: 'Configure the Cloudflare AI Search chat bubble widget',
+      description: 'Configure the Cloudflare AI Search widgets (chat bubble and search modal)',
       fields: [
         defineField({
           name: 'enabled',
@@ -237,15 +237,22 @@ export const siteSettings = defineType({
           description: 'Show the floating AI search chat bubble on the site',
         }),
         defineField({
+          name: 'searchModalEnabled',
+          title: 'Enable Search Modal',
+          type: 'boolean',
+          initialValue: false,
+          description: 'Show the AI search modal trigger in the site nav (⌘K / Ctrl+K). Requires apiUrl below.',
+        }),
+        defineField({
           name: 'apiUrl',
           title: 'API URL',
           type: 'url',
           description: 'NLWeb Worker URL (e.g., https://your-worker.workers.dev)',
           validation: (Rule) =>
             Rule.uri({scheme: ['https']}).custom((value, context) => {
-              const parent = context.parent as {enabled?: boolean}
-              if (parent?.enabled && !value) {
-                return 'API URL is required when chat bubble is enabled'
+              const parent = context.parent as {enabled?: boolean; searchModalEnabled?: boolean}
+              if ((parent?.enabled || parent?.searchModalEnabled) && !value) {
+                return 'API URL is required when chat bubble or search modal is enabled'
               }
               return true
             }),

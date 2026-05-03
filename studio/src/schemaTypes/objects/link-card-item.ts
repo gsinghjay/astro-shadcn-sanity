@@ -21,6 +21,14 @@ export const linkCardItem = defineType({
       validation: (Rule) => Rule.max(500),
     }),
     defineField({
+      name: 'ctaLabel',
+      title: 'CTA Label',
+      type: 'string',
+      description:
+        "Optional CTA label shown next to the arrow on the grid variant. Defaults to 'Learn more' if blank. Other variants (list, icon-list) ignore this field.",
+      validation: (Rule) => Rule.max(50),
+    }),
+    defineField({
       name: 'icon',
       title: 'Icon',
       type: 'string',

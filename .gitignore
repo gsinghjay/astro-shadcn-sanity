@@ -65,6 +65,7 @@ studio/schema.json
 .github/agents/
 .github/copilot-instructions.md
 .github/prompts/
+.github/skills/
 
 # Dev tooling artifacts
 repomix-output.md

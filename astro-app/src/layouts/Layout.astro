@@ -63,7 +63,7 @@ const liveContentEnabled = PUBLIC_SANITY_LIVE_CONTENT_ENABLED;
 const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
 
 // Extract AI Search worker origin for CSP connect-src (scoped, not wildcard)
-const aiSearchApiUrl = siteSettings?.aiSearch?.enabled
+const aiSearchApiUrl = (siteSettings?.aiSearch?.enabled || siteSettings?.aiSearch?.searchModalEnabled)
   ? stegaClean(siteSettings.aiSearch.apiUrl ?? "")
   : "";
 const aiSearchWorkerOrigin = aiSearchApiUrl

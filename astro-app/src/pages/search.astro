@@ -1,0 +1,162 @@
+---
+/*
+ * /search — Dedicated search results page using <search-bar-snippet> (inline bar, not modal).
+ *
+ * Story 5.15 — renders the "See more" deep-link destination for queries that originate
+ * in the SearchModal. The bar variant displays results directly on the page (no backdrop,
+ * no scroll-lock, no ⌘K shortcut), making it suitable for a standalone content destination.
+ *
+ * Swiss design applied via the same vendor token override pattern as SearchModal.astro.
+ * Marked noIndex via Layout's SEO prop (internal search results page, no external crawl).
+ */
+import Layout from "@/layouts/Layout.astro";
+import { Section, SectionContent } from "@/components/ui/section";
+import { getSiteSettings } from "@/lib/sanity";
+import { stegaClean } from "@sanity/client/stega";
+import { PUBLIC_SITE_THEME } from "astro:env/client";
+
+const settings = await getSiteSettings();
+const aiSearch = settings.aiSearch;
+
+// Sanitize inputs — reject empty / non-HTTPS / non-URL apiUrl (mirror SearchModal).
+// Studio schema is https-only; runtime mirrors that contract.
+const rawApiUrl = stegaClean(aiSearch?.apiUrl ?? "").trim();
+const cleanApiUrl = (() => {
+  if (!rawApiUrl) return "";
+  try {
+    const u = new URL(rawApiUrl);
+    return u.protocol === "https:" ? rawApiUrl : "";
+  } catch {
+    return "";
+  }
+})();
+const cleanPlaceholder = stegaClean(aiSearch?.placeholder ?? "Search the site…").trim();
+const cleanTheme = stegaClean(aiSearch?.theme ?? "auto").trim();
+
+// Resolve 'auto' → explicit 'light' | 'dark' from PUBLIC_SITE_THEME,
+// mirroring SearchModal.astro pattern.
+const siteThemeAttr: "light" | "dark" =
+  (PUBLIC_SITE_THEME as string) === "dark" ? "dark" : "light";
+const allowedThemes = new Set(["light", "dark"]);
+const resolvedTheme = allowedThemes.has(cleanTheme) ? cleanTheme : siteThemeAttr;
+
+// Guard: searchModalEnabled must be true AND apiUrl must be present.
+const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
+---
+
+<Layout title="Search" seo={{ noIndex: true }}>
+  <Section>
+    <SectionContent>
+      <h1 class="label-caps mb-8">Search</h1>
+
+      {!searchAvailable ? (
+        <div class="rounded border-2 border-foreground bg-secondary p-6 text-center">
+          <p class="text-foreground">
+            Search is currently unavailable. Please try again later.
+          </p>
+        </div>
+      ) : (
+        <div class="search-bar-shell" data-search-bar-root>
+          <search-bar-snippet
+            api-url={cleanApiUrl}
+            placeholder={cleanPlaceholder}
+            max-results="20"
+            debounce-ms="200"
+            theme={resolvedTheme}
+            hide-branding=""
+            show-url=""
+          ></search-bar-snippet>
+        </div>
+      )}
+    </SectionContent>
+  </Section>
+</Layout>
+
+<style>
+  /* Shell is an inert wrapper for style scoping and test queryability. */
+  .search-bar-shell {
+    font-family: var(--font-inter), "Helvetica Neue", Helvetica, Arial,
+      sans-serif;
+  }
+
+  /* Vendor token overrides (Story 5.18 Path A pattern).
+     `:global()` required because `<search-bar-snippet>` is a custom element.
+     Scoped to `.search-bar-shell` to isolate this instance.
+     Tokens cascade into Shadow DOM via CSS inheritance.
+     Mirror the token map from SearchModal.astro exactly. */
+  :global(.search-bar-shell search-bar-snippet) {
+    /* Swiss foundation: flat, black borders, no radius, no shadows. */
+    --search-snippet-border-radius: 0;
+    --search-snippet-border-radius-sm: 0;
+    --search-snippet-border-width: 2px;
+    --search-snippet-border-color: var(--foreground);
+    --search-snippet-shadow: none;
+    --search-snippet-shadow-lg: none;
+    --search-snippet-result-item-shadow: none;
+
+    /* Typography: Helvetica Neue via Inter variable. */
+    --search-snippet-font-family: var(--font-inter), "Helvetica Neue",
+      Helvetica, Arial, sans-serif;
+
+    /* Swiss palette: primary = site theme color, surface = background. */
+    --search-snippet-primary-color: var(--primary);
+    --search-snippet-primary-hover: var(--primary);
+    --search-snippet-background: var(--background);
+    --search-snippet-surface: var(--background);
+    --search-snippet-hover-background: var(--secondary);
+    --search-snippet-hover: var(--secondary);
+    --search-snippet-text-color: var(--foreground);
+    --search-snippet-text-secondary: var(--muted-foreground);
+    --search-snippet-text-description: var(--muted-foreground);
+
+    /* States: error uses destructive, focus ring matches site ring. */
+    --search-snippet-error-background: var(--secondary);
+    --search-snippet-error-color: var(--destructive);
+    --search-snippet-warning-background: var(--secondary);
+    --search-snippet-warning-color: var(--destructive);
+    --search-snippet-focus-ring: 2px solid var(--ring);
+  }
+</style>
+
+<script>
+  // Static import — Vite bundles as deferred module; same module as SearchModal.astro
+  // so both import from the same copy (Vite ESM dedup). Registers all four custom
+  // elements: chat-bubble-snippet, search-modal-snippet, search-bar-snippet, chat-page-snippet.
+  import "@cloudflare/ai-search-snippet";
+
+  // Cap query length to keep Worker request size bounded (414/400 risk).
+  const MAX_QUERY_LENGTH = 256;
+
+  function runQueryFromUrl(): void {
+    const raw = new URLSearchParams(location.search).get("q") ?? "";
+    const query = raw.trim().slice(0, MAX_QUERY_LENGTH);
+    if (!query) return;
+
+    customElements.whenDefined("search-bar-snippet").then(() => {
+      const bar = document.querySelector<
+        HTMLElement & { search?: (q: string) => Promise<void> }
+      >("search-bar-snippet");
+      if (!bar?.search) return;
+
+      // Optionally pre-fill the visible input (cosmetic — search() is authoritative).
+      // The input is in Shadow DOM, so we access it via shadowRoot (Chromium only;
+      // closed shadow roots in Firefox/Safari silently no-op).
+      const input = bar?.shadowRoot?.querySelector<HTMLInputElement>("input");
+      if (input) {
+        input.value = query;
+      }
+
+      // Call the public search() method to trigger the API call + result rendering.
+      // Catch rejections so a vendor/network failure doesn't surface as an
+      // unhandled promise rejection.
+      bar.search(query).catch(() => {
+        /* swallow — vendor renders empty state */
+      });
+    });
+  }
+
+  // Run once on initial load and again on every SPA nav so query changes
+  // (e.g. /search?q=foo → /search?q=bar) re-trigger the search.
+  runQueryFromUrl();
+  document.addEventListener("astro:page-load", runQueryFromUrl);
+</script>
