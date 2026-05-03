@@ -56,7 +56,11 @@ const siteUrl = pick("PUBLIC_SITE_URL", "http://localhost:4321");
 const studioUrlBase = pick("PUBLIC_SANITY_STUDIO_URL", "http://localhost:3333");
 const studioWorkspace = dataset === "rwc" ? "/rwc" : "/capstone";
 const studioUrl = `${studioUrlBase.replace(/\/$/, "")}${studioWorkspace}`;
-const visualEditingEnabled = pick("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", "");
+// Coerce to string before comparison: wrangler.jsonc permits literal boolean
+// `true`/`false` in `vars` blocks alongside the string forms we use today.
+// Without this, a contributor flipping to the JSON-literal form would silently
+// skip the SSR flip below (and the `useCdn` toggle further down) with no log.
+const visualEditingEnabled = String(pick("PUBLIC_SANITY_VISUAL_EDITING_ENABLED", ""));
 
 // Story 5.22: preview Workers (visual editing on) flip these content routes to
 // SSR so newly-published Sanity pages and global chrome (logo / nav / footer
