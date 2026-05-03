@@ -1,3 +1,34 @@
+## [2.2.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.1.0...v2.2.0) (2026-05-03)
+
+### Features
+
+* **2-8:** add logoCloud variant support (grid, marquee, flex-wrap) ([dec418f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/dec418fdaae6c8eebcecf1e37dff80f80b6a06ae))
+* **2-8:** add variants + image field to contactForm ([b1961ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b1961ca3393dcbe044e442e31a0b1bb751971379))
+* **blocks:** add editable per-card CTA label to linkCards grid variant ([7018812](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7018812da3f2b0ecf45736f58ccded36795e9dba))
+* **infra:** preview Workers SSR mode for content freshness (Story 5.22) ([bed8902](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bed89023df35cacb28e46e643a8083fda429e7e7))
+* **story-2.8:** support YouTube Shorts in video embeds ([19e337c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/19e337c6e692355d1f14bec61b8ee35b35f671d6))
+
+### Bug Fixes
+
+* apply CodeRabbit auto-fixes ([cda79d3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cda79d39ca14372d7d299f87337f767677b3dae1))
+* apply CodeRabbit auto-fixes ([066dacb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/066dacb0deb1836f02631e72c54072abdb61cbea))
+* apply CodeRabbit auto-fixes ([a29738d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a29738dcdb8c8a399bbc63d00ec74fb66698a7e6))
+* apply CodeRabbit auto-fixes ([a6cadbc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a6cadbc228bd9e25335b622b90de499a0909fd01))
+* **blocks:** apply 5.15 site-search code review patches ([01279b7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/01279b7d918125998a2762aae554bb3c27b6595d)), closes [#692](https://github.com/gsinghjay/astro-shadcn-sanity/issues/692)
+* **blocks:** trim whitespace in linkCards ctaLabel fallback ([c651ad7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c651ad70c86039309c605db0e06845dcb652777d))
+* **ci:** drop $$Astro spread in storybook renderer ([774d039](https://github.com/gsinghjay/astro-shadcn-sanity/commit/774d03904795720dbbc85eeb3772536703d0f8d9))
+* **infra:** coerce visualEditingEnabled to string before VE-flag comparison ([0ca75bb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0ca75bb8873fbd773308579fc357fdb022602261))
+* **search:** apply 5.15 second-pass review patches + deploy schema ([1faa037](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1faa037b054b571d0ae0c6810ef28a5456f3c464))
+
+### Miscellaneous
+
+* untrack .github/skills/ (BMAD agent skill files) ([a8d504a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a8d504af513a78bb7066f5963176764ccab830f8))
+* updated project documentation ([ade5961](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ade596119cf7c3cdea35a7f84cad47ffd823acbe))
+
+### Tests
+
+* **video-embed:** align Shorts assertions with facade render ([7030a92](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7030a920d274eb67eebbe56b7f5ed3ecb2d8c8b9))
+
 ## [2.1.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.0.0...v2.1.0) (2026-05-02)
 
 ### Features
