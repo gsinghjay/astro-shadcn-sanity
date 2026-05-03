@@ -1,0 +1,182 @@
+---
+/*
+ * SearchModal — Cloudflare AI Search modal widget with Swiss-design theming.
+ *
+ * Story 5.15 — wraps the vendor `<search-modal-snippet>` (nav trigger + modal
+ * overlay + keyboard shortcuts + deep-link "See more" affordance). Mirrors the
+ * Story 5.18 Path A vendor-token override pattern from `ChatBubble.astro`.
+ *
+ * Swiss design applied at two levels:
+ *   - EXTERNAL: nav trigger, focus ring, page-level positioning (handled by Header.astro)
+ *   - INTERNAL: vendor's Shadow DOM colors/borders/radius/fonts via CSS custom
+ *     properties (`--search-snippet-*` namespace), cascaded via `:global()` selector
+ *
+ * `hide-branding=""` is always set (Swiss-design rule supersedes the Sanity field).
+ *
+ * GTM integration: delegated click handler pushes dataLayer event with
+ * `event: 'site_search_open', source: 'click' | 'shortcut'`.
+ */
+import { stegaClean } from "@sanity/client/stega";
+import { PUBLIC_SITE_THEME } from "astro:env/client";
+
+interface Props {
+  apiUrl: string;
+  placeholder?: string;
+  theme?: string;
+  seeMore?: string;
+}
+
+const { apiUrl, placeholder, theme, seeMore = "/search?q=" } = Astro.props;
+
+// Sanitize inputs and reject empty apiUrl (render nothing if not provided).
+const cleanApiUrl = stegaClean(apiUrl);
+const cleanPlaceholder = stegaClean(placeholder ?? "Search the site…");
+const cleanTheme = stegaClean(theme ?? "auto");
+const cleanSeeMore = stegaClean(seeMore);
+
+// Resolve 'auto' → explicit 'light' | 'dark' from PUBLIC_SITE_THEME,
+// mirroring ChatBubble.astro:62-64.
+const siteThemeAttr: "light" | "dark" =
+  (PUBLIC_SITE_THEME as string) === "dark" ? "dark" : "light";
+const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
+---
+
+{cleanApiUrl && (
+  <div class="search-modal-shell" data-search-modal-root>
+    <search-modal-snippet
+      api-url={cleanApiUrl}
+      placeholder={cleanPlaceholder}
+      max-results="8"
+      debounce-ms="200"
+      theme={resolvedTheme}
+      hide-branding=""
+      show-url=""
+      shortcut="k"
+      use-meta-key=""
+      see-more={cleanSeeMore}
+    ></search-modal-snippet>
+  </div>
+)}
+
+<style>
+  /* Shell is an inert wrapper for style scoping and test queryability. */
+  .search-modal-shell {
+    font-family: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  /* Vendor token overrides (Story 5.18 Path A pattern).
+     `:global()` required because `<search-modal-snippet>` is a custom element.
+     Scoped to `.search-modal-shell` to isolate this instance.
+     Tokens cascade into Shadow DOM via CSS inheritance. */
+  :global(.search-modal-shell search-modal-snippet) {
+    /* Swiss foundation: flat, black borders, no radius, no shadows. */
+    --search-snippet-border-radius: 0;
+    --search-snippet-border-radius-sm: 0;
+    --search-snippet-border-width: 2px;
+    --search-snippet-border-color: var(--foreground);
+    --search-snippet-shadow: none;
+    --search-snippet-shadow-lg: none;
+    --search-snippet-result-item-shadow: none;
+
+    /* Typography: Helvetica Neue via Inter variable. */
+    --search-snippet-font-family: var(--font-inter), "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    /* Swiss palette: primary = site theme color, surface = background. */
+    --search-snippet-primary-color: var(--primary);
+    --search-snippet-primary-hover: var(--primary);
+    --search-snippet-background: var(--background);
+    --search-snippet-surface: var(--background);
+    --search-snippet-hover-background: var(--secondary);
+    --search-snippet-hover: var(--secondary);
+    --search-snippet-text-color: var(--foreground);
+    --search-snippet-text-secondary: var(--muted-foreground);
+    --search-snippet-text-description: var(--muted-foreground);
+
+    /* States: error uses destructive, focus ring matches site ring. */
+    --search-snippet-error-background: var(--secondary);
+    --search-snippet-error-color: var(--destructive);
+    --search-snippet-focus-ring: 2px solid var(--ring);
+  }
+</style>
+
+<script>
+  // Static import — Vite bundles as deferred module; same module as ChatBubble.astro
+  // so both import from the same copy (Vite ESM dedup). Registers all four custom
+  // elements: chat-bubble-snippet, search-modal-snippet, search-bar-snippet, chat-page-snippet.
+  import "@cloudflare/ai-search-snippet";
+
+  // Track initialized shells to avoid re-binding on SPA navigation.
+  const initializedShells = new WeakSet<HTMLElement>();
+
+  function openModal(source: "click" | "shortcut"): void {
+    const modal = document.querySelector<
+      HTMLElement & { open?: () => void }
+    >("search-modal-snippet");
+    if (!modal?.open) return;
+
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    (window as any).dataLayer.push({
+      event: "site_search_open",
+      source,
+    });
+    modal.open();
+  }
+
+  function bindTriggers(): void {
+    // Delegated click handler for [data-search-trigger] elements (desktop + mobile).
+    document.addEventListener(
+      "click",
+      (e) => {
+        const trigger = (e.target as HTMLElement | null)?.closest(
+          "[data-search-trigger]",
+        );
+        if (!trigger) return;
+        e.preventDefault();
+        openModal("click");
+      },
+      { capture: false },
+    );
+
+    // Keyboard shortcut handler for ⌘K / Ctrl+K.
+    // The snippet's shortcut="k" use-meta-key="" handles the global keydown,
+    // but we need to push the GTM dataLayer event BEFORE it opens, at capture
+    // phase to ensure our event fires first.
+    document.addEventListener(
+      "keydown",
+      (e) => {
+        const isMac = navigator.platform.toLowerCase().includes("mac");
+        const metaKey = isMac ? e.metaKey : e.ctrlKey;
+        if (metaKey && e.key.toLowerCase() === "k") {
+          (window as any).dataLayer = (window as any).dataLayer || [];
+          (window as any).dataLayer.push({
+            event: "site_search_open",
+            source: "shortcut",
+          });
+          // Do NOT call openModal() here — the snippet already handles the open()
+          // call internally when it detects the shortcut. Calling it twice would
+          // cause a double-open or race condition. The dataLayer push above is
+          // sufficient for GTM tracking.
+        }
+      },
+      { capture: true },
+    );
+  }
+
+  // Re-bind triggers on page load and SPA navigation (astro:page-load).
+  // Use a guard to prevent duplicate listeners on repeated navigation.
+  let bindingInitialized = false;
+
+  function initSearchModal(): void {
+    if (bindingInitialized) return;
+    bindingInitialized = true;
+
+    bindTriggers();
+  }
+
+  document.addEventListener("DOMContentLoaded", initSearchModal);
+  document.addEventListener("astro:page-load", () => {
+    // Reset flag on SPA nav so re-navigation rebinds (old listeners are GC'd).
+    bindingInitialized = false;
+    initSearchModal();
+  });
+</script>

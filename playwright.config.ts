@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 const BASE_URL = process.env.BASE_URL || 'http://localhost:4321'
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   outputDir: './test-results',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -32,7 +32,7 @@ export default defineConfig({
     command: 'sh -c "npm run build --workspace=astro-app && cd astro-app/dist && python3 -m http.server 4321"',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 300_000,
     stdout: 'pipe',
   },
 

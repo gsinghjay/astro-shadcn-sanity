@@ -35,6 +35,7 @@
     "platform-api"
   ],
   "devDependencies": {
+    "astro": "^6.1.10",
     "@axe-core/playwright": "^4.11.1",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.58.2",
