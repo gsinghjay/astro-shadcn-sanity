@@ -61,6 +61,17 @@ describe('LinkCards (Story 18.9 — editable per-card CTA label)', () => {
     expect(html).toContain('Learn more &rarr;');
   });
 
+  test('grid variant: whitespace-only ctaLabel falls back to "Learn more"', async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(LinkCards, {
+      props: makeProps({
+        variant: 'grid',
+        links: [{ ...baseLink, ctaLabel: '   ' }],
+      }),
+    });
+    expect(html).toContain('Learn more &rarr;');
+  });
+
   test('list variant: ignores ctaLabel and renders standalone arrow only', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(LinkCards, {
