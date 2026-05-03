@@ -205,7 +205,7 @@ const INNER_BLOCK_FIELDS_PROJECTION = `
     _type == "linkCards" => {
       heading,
       description,
-      links[]{ _key, title, description, icon, url }
+      links[]{ _key, title, description, ctaLabel, icon, url }
     },
     _type == "newsletter" => {
       heading,
