@@ -38,8 +38,10 @@ const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo, aiSearch } = settings;
 const currentPath = Astro.url.pathname;
 
-// Compute search modal visibility
-const searchEnabled = Boolean(aiSearch?.searchModalEnabled && aiSearch?.apiUrl);
+// Compute search modal visibility — stega-clean + trim so a stega-decoded-empty apiUrl
+// doesn't render a dead trigger that opens nothing.
+const cleanedSearchApiUrl = stegaClean(aiSearch?.apiUrl ?? '').trim();
+const searchEnabled = Boolean(aiSearch?.searchModalEnabled && cleanedSearchApiUrl);
 
 const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';

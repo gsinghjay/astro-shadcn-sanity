@@ -29,10 +29,10 @@ export default defineConfig({
   },
 
   webServer: {
-    command: 'sh -c "npm run build --workspace=astro-app && cd astro-app/dist && python3 -m http.server 4321"',
+    command: 'sh -c "npm run build --workspace=astro-app && npm run preview --workspace=astro-app"',
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
+    timeout: 120_000,
     stdout: 'pipe',
   },
 

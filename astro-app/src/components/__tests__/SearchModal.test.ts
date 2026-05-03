@@ -110,4 +110,32 @@ describe('SearchModal', () => {
 
     expect(html).toContain('see-more="/search?q="');
   });
+
+  test('returns empty output when apiUrl is whitespace-only', async () => {
+    const html = await renderSearchModal({ apiUrl: '   ' });
+
+    expect(html).not.toContain('search-modal-shell');
+    expect(html).not.toContain('search-modal-snippet');
+  });
+
+  test('rejects non-http(s) protocols (e.g. javascript:)', async () => {
+    const html = await renderSearchModal({ apiUrl: 'javascript:alert(1)' });
+
+    expect(html).not.toContain('search-modal-shell');
+    expect(html).not.toContain('search-modal-snippet');
+  });
+
+  test('rejects scheme-less / malformed URLs', async () => {
+    const html = await renderSearchModal({ apiUrl: 'worker.dev/api' });
+
+    expect(html).not.toContain('search-modal-shell');
+    expect(html).not.toContain('search-modal-snippet');
+  });
+
+  test('accepts plain http:// (allowlist matches ChatBubble)', async () => {
+    const html = await renderSearchModal({ apiUrl: 'http://worker.dev' });
+
+    expect(html).toContain('search-modal-shell');
+    expect(html).toContain('api-url="http://worker.dev"');
+  });
 });
