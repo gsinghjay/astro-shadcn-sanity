@@ -80,6 +80,14 @@ Visitor (any of 3 prod hosts) → CF edge
 | **Pages** | **Retired (deletion 2026-05-03)** | Custom domains detached and re-attached to Workers |
 | **Cloudflare Access (Zero Trust)** | **Retired** | Replaced by Better Auth |
 
+### Preview vs Production rendering (Story 5.22)
+
+The 14 content routes (homepage, `[...slug]`, sponsors / events / articles / authors / projects / gallery listings + their `[slug]` detail routes + `articles/category/[slug]`) are **prerendered on production** Workers (LCP gate) and **server-rendered on preview** Workers so newly-published Sanity content surfaces without a code rebuild.
+
+The route-level `prerender = true` exports stay in the source files so production builds stay byte-identical; an `astro:route:setup` integration in `astro-app/astro.config.mjs` overrides `route.prerender = false` for the listed routes when `PUBLIC_SANITY_VISUAL_EDITING_ENABLED === 'true'` (which is set on the three preview Workers via `wrangler.jsonc`). Adding a new content route requires updating the `PREVIEW_SSR_ROUTES` allowlist in `astro.config.mjs` — the integration test at `tests/integration/preview-ssr-5-22/preview-ssr.test.ts` flags drift.
+
+Sitemap, RSS, llms.txt, and individual `.md` twins are still **baked at build time** and won't list newly-published content on preview Workers until the next code-push. Preview Workers are for content-review, not SEO/agent-discovery validation.
+
 ### Key files
 
 | File | Role |
