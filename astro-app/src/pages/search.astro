@@ -18,25 +18,27 @@ import { PUBLIC_SITE_THEME } from "astro:env/client";
 const settings = await getSiteSettings();
 const aiSearch = settings.aiSearch;
 
-// Sanitize inputs — reject empty / non-HTTPS / non-URL apiUrl (mirror SearchModal/ChatBubble).
+// Sanitize inputs — reject empty / non-HTTPS / non-URL apiUrl (mirror SearchModal).
+// Studio schema is https-only; runtime mirrors that contract.
 const rawApiUrl = stegaClean(aiSearch?.apiUrl ?? "").trim();
 const cleanApiUrl = (() => {
   if (!rawApiUrl) return "";
   try {
     const u = new URL(rawApiUrl);
-    return u.protocol === "http:" || u.protocol === "https:" ? rawApiUrl : "";
+    return u.protocol === "https:" ? rawApiUrl : "";
   } catch {
     return "";
   }
 })();
-const cleanPlaceholder = stegaClean(aiSearch?.placeholder ?? "Search the site…");
-const cleanTheme = stegaClean(aiSearch?.theme ?? "auto");
+const cleanPlaceholder = stegaClean(aiSearch?.placeholder ?? "Search the site…").trim();
+const cleanTheme = stegaClean(aiSearch?.theme ?? "auto").trim();
 
 // Resolve 'auto' → explicit 'light' | 'dark' from PUBLIC_SITE_THEME,
 // mirroring SearchModal.astro pattern.
 const siteThemeAttr: "light" | "dark" =
   (PUBLIC_SITE_THEME as string) === "dark" ? "dark" : "light";
-const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
+const allowedThemes = new Set(["light", "dark"]);
+const resolvedTheme = allowedThemes.has(cleanTheme) ? cleanTheme : siteThemeAttr;
 
 // Guard: searchModalEnabled must be true AND apiUrl must be present.
 const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
@@ -122,11 +124,14 @@ const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
   // elements: chat-bubble-snippet, search-modal-snippet, search-bar-snippet, chat-page-snippet.
   import "@cloudflare/ai-search-snippet";
 
-  // Auto-run query from ?q= parameter on page load.
-  // The snippet's input field is in Shadow DOM, so we await registration,
-  // then call the public search() method with the query string.
-  const query = new URLSearchParams(location.search).get("q") ?? "";
-  if (query) {
+  // Cap query length to keep Worker request size bounded (414/400 risk).
+  const MAX_QUERY_LENGTH = 256;
+
+  function runQueryFromUrl(): void {
+    const raw = new URLSearchParams(location.search).get("q") ?? "";
+    const query = raw.trim().slice(0, MAX_QUERY_LENGTH);
+    if (!query) return;
+
     customElements.whenDefined("search-bar-snippet").then(() => {
       const bar = document.querySelector<
         HTMLElement & { search?: (q: string) => Promise<void> }
@@ -134,14 +139,24 @@ const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
       if (!bar?.search) return;
 
       // Optionally pre-fill the visible input (cosmetic — search() is authoritative).
-      // The input is in Shadow DOM, so we access it via shadowRoot (Chromium only).
+      // The input is in Shadow DOM, so we access it via shadowRoot (Chromium only;
+      // closed shadow roots in Firefox/Safari silently no-op).
       const input = bar?.shadowRoot?.querySelector<HTMLInputElement>("input");
       if (input) {
         input.value = query;
       }
 
       // Call the public search() method to trigger the API call + result rendering.
-      bar.search(query);
+      // Catch rejections so a vendor/network failure doesn't surface as an
+      // unhandled promise rejection.
+      bar.search(query).catch(() => {
+        /* swallow — vendor renders empty state */
+      });
     });
   }
+
+  // Run once on initial load and again on every SPA nav so query changes
+  // (e.g. /search?q=foo → /search?q=bar) re-trigger the search.
+  runQueryFromUrl();
+  document.addEventListener("astro:page-load", runQueryFromUrl);
 </script>

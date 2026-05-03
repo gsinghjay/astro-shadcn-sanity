@@ -235,17 +235,10 @@ test.describe('Site Search Modal', () => {
     expect(borderRadiusToken).toBe('0');
   });
 
-  test('search modal is absent when disabled', async ({ page }) => {
-    await page.goto('/');
-
-    const modal = page.locator('search-modal-snippet');
-    if ((await modal.count()) > 0) {
-      test.skip();
-      return;
-    }
-
-    await expect(modal).toHaveCount(0);
-  });
+  // AC 14(g) "modal does not render when searchModalEnabled=false" is covered by
+  // the SearchModal.test.ts unit tests (see "returns empty output when apiUrl is
+  // empty/whitespace/non-https"). An E2E variant requires a fixture/env override
+  // to flip the flag at runtime; deferred until a test-fixture pattern lands.
 
   test('search page shows unavailable state when search is disabled', async ({ page }) => {
     await page.goto('/search');

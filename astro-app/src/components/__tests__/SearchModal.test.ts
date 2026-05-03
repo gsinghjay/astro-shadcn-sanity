@@ -118,7 +118,7 @@ describe('SearchModal', () => {
     expect(html).not.toContain('search-modal-snippet');
   });
 
-  test('rejects non-http(s) protocols (e.g. javascript:)', async () => {
+  test('rejects non-https protocols (e.g. javascript:)', async () => {
     const html = await renderSearchModal({ apiUrl: 'javascript:alert(1)' });
 
     expect(html).not.toContain('search-modal-shell');
@@ -132,10 +132,10 @@ describe('SearchModal', () => {
     expect(html).not.toContain('search-modal-snippet');
   });
 
-  test('accepts plain http:// (allowlist matches ChatBubble)', async () => {
+  test('rejects plain http:// (mirrors studio https-only schema)', async () => {
     const html = await renderSearchModal({ apiUrl: 'http://worker.dev' });
 
-    expect(html).toContain('search-modal-shell');
-    expect(html).toContain('api-url="http://worker.dev"');
+    expect(html).not.toContain('search-modal-shell');
+    expect(html).not.toContain('search-modal-snippet');
   });
 });

@@ -28,26 +28,28 @@ interface Props {
 
 const { apiUrl, placeholder, theme, seeMore = "/search?q=" } = Astro.props;
 
-// Sanitize inputs and reject empty / non-HTTPS / non-URL apiUrl (mirror ChatBubble.astro).
+// Sanitize inputs and reject empty / non-HTTPS / non-URL apiUrl. Studio schema is
+// https-only (Rule.uri({scheme: ['https']})); the runtime mirrors that contract.
 const rawApiUrl = stegaClean(apiUrl).trim();
 const cleanApiUrl = (() => {
   if (!rawApiUrl) return "";
   try {
     const u = new URL(rawApiUrl);
-    return u.protocol === "http:" || u.protocol === "https:" ? rawApiUrl : "";
+    return u.protocol === "https:" ? rawApiUrl : "";
   } catch {
     return "";
   }
 })();
-const cleanPlaceholder = stegaClean(placeholder ?? "Search the site…");
-const cleanTheme = stegaClean(theme ?? "auto");
-const cleanSeeMore = stegaClean(seeMore);
+const cleanPlaceholder = stegaClean(placeholder ?? "Search the site…").trim();
+const cleanTheme = stegaClean(theme ?? "auto").trim();
+const cleanSeeMore = stegaClean(seeMore).trim();
 
 // Resolve 'auto' → explicit 'light' | 'dark' from PUBLIC_SITE_THEME,
 // mirroring ChatBubble.astro:62-64.
 const siteThemeAttr: "light" | "dark" =
   (PUBLIC_SITE_THEME as string) === "dark" ? "dark" : "light";
-const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
+const allowedThemes = new Set(["light", "dark"]);
+const resolvedTheme = allowedThemes.has(cleanTheme) ? cleanTheme : siteThemeAttr;
 ---
 
 {cleanApiUrl && (
@@ -162,6 +164,7 @@ const resolvedTheme = cleanTheme === "auto" ? siteThemeAttr : cleanTheme;
     document.addEventListener(
       "keydown",
       (e) => {
+        if (e.repeat) return;
         const isMac = navigator.platform.toLowerCase().includes("mac");
         const metaKey = isMac ? e.metaKey : e.ctrlKey;
         if (!metaKey || e.key.toLowerCase() !== "k") return;
