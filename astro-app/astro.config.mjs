@@ -246,7 +246,9 @@ export default defineConfig({
         !page.includes('/portal/') &&
         !page.includes('/auth/') &&
         !page.includes('/student/') &&
-        !page.includes('/demo/'),
+        !page.includes('/demo/') &&
+        page !== '/search' &&
+        !page.startsWith('/search/'),
     }),
     // Gate astro-llms-md on visual editing OFF: stega-encoded HTML leaks
     // private-use Unicode markers into the .md/.txt output otherwise.
@@ -260,6 +262,7 @@ export default defineConfig({
             exclude: [
               '404', '404.html', '_astro', '**.xml', '**.txt', 'node_modules',
               '**/portal/**', '**/auth/**', '**/student/**', '**/demo/**', '**/api/**',
+              'search', '**/search/**',
             ],
             generateIndividualMd: true,
             generateLlmsTxt: true,
