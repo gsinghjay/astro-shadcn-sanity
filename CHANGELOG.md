@@ -1,3 +1,15 @@
+## [2.2.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.0...v2.2.1) (2026-05-04)
+
+### Bug Fixes
+
+* **ci:** handle 2-arg createAstro in storybook renderer + pin compiler ([172f09f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/172f09f92df34387ea80208b92a80b1c5d916a8e))
+* **search:** align Header URL gate with SearchModal credentials check ([5cc270e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5cc270e430e9b59fef4db07c5698cf7cd1e3e53e))
+* **search:** apply 5.15 third-pass review patches ([b8126aa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b8126aa2f59b11276346029f3bf8da92350aefdb)), closes [#692](https://github.com/gsinghjay/astro-shadcn-sanity/issues/692)
+
+### Documentation
+
+* **infra:** add Cloudflare Workers best-practices review ([8242bed](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8242bed812cd4b1cbe4668b77f83658fe8091b2a))
+
 ## [2.2.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.1.0...v2.2.0) (2026-05-03)
 
 ### Features
