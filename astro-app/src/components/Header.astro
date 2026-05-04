@@ -38,14 +38,17 @@ const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo, aiSearch } = settings;
 const currentPath = Astro.url.pathname;
 
-// Compute search modal visibility — stega-clean + trim, then validate as an https URL.
-// Without the URL/protocol gate, a non-https or malformed apiUrl renders the trigger
-// button but SearchModal rejects internally → click goes nowhere (dead trigger).
+// Compute search modal visibility — stega-clean + trim, then validate as an https URL
+// with no embedded credentials. Must mirror SearchModal.astro's acceptance gate exactly,
+// otherwise the trigger renders but SearchModal rejects internally → click goes nowhere.
 const cleanedSearchApiUrl = stegaClean(aiSearch?.apiUrl ?? '').trim();
 const searchApiUrlValid = (() => {
   if (!cleanedSearchApiUrl) return false;
   try {
-    return new URL(cleanedSearchApiUrl).protocol === 'https:';
+    const u = new URL(cleanedSearchApiUrl);
+    if (u.protocol !== 'https:') return false;
+    if (u.username !== '' || u.password !== '') return false;
+    return true;
   } catch {
     return false;
   }
