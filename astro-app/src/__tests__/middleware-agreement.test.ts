@@ -76,10 +76,21 @@ import { onRequest, _resetAgreementRevCache } from '../middleware';
 const CURRENT_REV = 'rev-current-xyz';
 
 function createMockContext(pathname: string, headers?: Record<string, string>) {
+  // Story 22.10: middleware uses `cfContext?.waitUntil(...)` for fire-and-forget
+  // KV writes. Without a cfContext mock, the optional chain short-circuits and
+  // the underlying put/delete never fires. Seed a benign waitUntil that runs
+  // its argument inline so existing KV-side-effect assertions still pass.
   return {
     url: new URL(`http://localhost:4321${pathname}`),
     request: new Request(`http://localhost:4321${pathname}`, { headers }),
-    locals: {} as unknown as App.Locals,
+    locals: {
+      cfContext: {
+        waitUntil: vi.fn((p: Promise<unknown>) => {
+          void p;
+        }),
+        passThroughOnException: vi.fn(),
+      },
+    } as unknown as App.Locals,
     redirect: vi.fn((url: string) => new Response(null, { status: 302, headers: { Location: url } })),
   };
 }

@@ -2,8 +2,11 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { extractSessionToken, normalizeEmail } from '@/middleware';
 import { getSponsorAgreementRev } from '@/lib/sanity';
+import { log } from '@/lib/log';
 
 export const prerender = false;
+
+const MAX_REQUEST_BYTES = 1_000;
 
 const json = (body: Record<string, unknown>, status: number) =>
   new Response(JSON.stringify(body), {
@@ -29,6 +32,19 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   // `locals` retained for `locals.user` (set by middleware); env now imported from cloudflare:workers.
   if (!isSameOrigin(request, url.origin)) {
     return json({ error: 'forbidden_origin' }, 403);
+  }
+
+  // Defense-in-depth: this endpoint takes no user-supplied JSON beyond the
+  // session cookie, but a malicious client could POST a huge body to drag the
+  // Worker into reading it. Reject before any expensive work. Missing Content-
+  // Length is 411 (we can't size-bound it); oversize is 413 (RFC 9110).
+  const contentLengthHeader = request.headers.get('content-length');
+  const contentLength = contentLengthHeader === null ? NaN : Number(contentLengthHeader);
+  if (!Number.isFinite(contentLength)) {
+    return json({ error: 'length_required' }, 411);
+  }
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return json({ error: 'payload_too_large' }, 413);
   }
 
   const user = locals.user;
@@ -87,7 +103,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
     try {
       await env.SESSION_CACHE.delete(sessionToken);
     } catch (e) {
-      console.error('[agreement/accept] KV invalidation failed:', e);
+      log.error('agreement-accept-kv-invalidation-failed', e);
       // Fall through — D1 write succeeded; KV entry will TTL out within 5 min.
     }
   }

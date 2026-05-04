@@ -8,6 +8,7 @@ import {
   hasMarkdownTwin,
   parseAcceptHeader,
 } from "@/lib/agent-discovery";
+import { log } from "@/lib/log";
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -53,7 +54,9 @@ async function getCurrentAgreementRev(): Promise<string | null> {
     _agreementRevCache = { rev, expiresAt: now + AGREEMENT_REV_TTL_MS };
     return rev;
   } catch (err) {
-    console.warn("[middleware-agreement] rev fetch failed; failing open", err);
+    log.warn("middleware-agreement-rev-fetch-failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
     return null;
   }
 }
@@ -73,6 +76,12 @@ interface SessionUser {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
+  // Adapter v13 attaches the Workers ExecutionContext as `locals.cfContext`.
+  // Calling `cfContext.waitUntil(...)` keeps the isolate alive past response so
+  // fire-and-forget side effects (KV cache writes, D1 background updates) are
+  // not silently dropped on isolate eviction. NEVER destructure waitUntil — it
+  // loses its `this` binding and throws "Illegal invocation" at runtime.
+  const cfContext = context.locals.cfContext;
   // Admin endpoints under /api/portal/admin/* authenticate via the Studio user's
   // Sanity session JWT (cross-origin Studio caller, no portal session cookie).
   // Skip the portal session gate so the route handler can run its own
@@ -136,7 +145,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         });
       }
     } catch (e) {
-      console.error("[middleware] Rate limiter error, failing open:", e);
+      log.error("middleware-rate-limiter-failed-open", e);
       // Continue to auth — don't block legitimate users
     }
   }
@@ -175,7 +184,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
         // Cache session in KV (fire-and-forget, 5-min TTL)
         if (kvCache) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
+          cfContext?.waitUntil(
+            kvCache
+              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
+          );
         }
       }
     }
@@ -196,19 +209,29 @@ export const onRequest = defineMiddleware(async (context, next) => {
         userData.role = "sponsor";
         // Persist escalated role to KV cache (fire-and-forget)
         if (kvCache && sessionToken) {
-          kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
+          cfContext?.waitUntil(
+            kvCache
+              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
+          );
         }
         // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
         if (env?.PORTAL_DB) {
-          env.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE LOWER(email) = ?')
-            .bind('sponsor', userData.email)
-            .run()
-            .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
+          cfContext?.waitUntil(
+            env.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE LOWER(email) = ?')
+              .bind('sponsor', userData.email)
+              .run()
+              .catch((e: unknown) => log.error('middleware-d1-role-update-failed', e)),
+          );
         }
       } else {
         // Non-sponsor on portal: 403 JSON for API, denied-page redirect for pages
         if (kvCache && sessionToken) {
-          kvCache.delete(sessionToken).catch((e: unknown) => console.error('[middleware] KV cache delete failed:', e));
+          cfContext?.waitUntil(
+            kvCache
+              .delete(sessionToken)
+              .catch((e: unknown) => log.error('middleware-kv-delete-failed', e)),
+          );
         }
         if (isPortalApi) return jsonError(403, "forbidden");
         return new Response(null, {
@@ -248,14 +271,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
           userData.agreementAcceptedAt = agreementAcceptedAt;
           userData.agreementVersion = agreementVersion;
           if (kvCache && sessionToken) {
-            kvCache
-              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
-              .catch((e: unknown) => console.error("[middleware] KV cache write failed:", e));
+            cfContext?.waitUntil(
+              kvCache
+                .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+                .catch((e: unknown) => log.error("middleware-kv-write-failed", e)),
+            );
           }
         } catch (e) {
           // Fail closed: keep agreementAcceptedAt = null so requiresAgreement stays true.
           // A D1 outage blocks portal access rather than letting unaccepted sponsors through.
-          console.error("[middleware] agreement lookup failed, failing closed:", e);
+          log.error("middleware-agreement-lookup-failed-closed", e);
           agreementAcceptedAt = null;
           agreementVersion = null;
         }
@@ -275,7 +300,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = { email: userData.email, name: userData.name, role: userData.role as 'sponsor' | 'student' };
     return next();
   } catch (error) {
-    console.error("[middleware] Auth error:", error);
+    log.error("middleware-auth-error", error);
     return new Response("Service Unavailable", { status: 503 });
   }
 });

@@ -4,11 +4,26 @@ import { env } from 'cloudflare:workers';
 export const prerender = false;
 
 const MAX_SUBSCRIPTIONS_PER_HOUR = 10;
+const MAX_REQUEST_BYTES = 10_000;
 
 const jsonResponse = (body: { success: boolean; error?: string }, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 export const POST: APIRoute = async ({ request }) => {
+  // Defense-in-depth: reject before reading the body so a malicious client
+  // can't drag the Worker into a multi-MB JSON.parse on a route that should
+  // only ever see a small payload. Missing or non-numeric Content-Length is a
+  // 411 because we can't size-bound the body without it; oversize bodies are
+  // 413 per RFC 9110.
+  const contentLengthHeader = request.headers.get('content-length');
+  const contentLength = contentLengthHeader === null ? NaN : Number(contentLengthHeader);
+  if (!Number.isFinite(contentLength)) {
+    return jsonResponse({ success: false, error: 'Length Required' }, 411);
+  }
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return jsonResponse({ success: false, error: 'Payload too large' }, 413);
+  }
+
   let body: { email?: string; discord_user_id?: string; remind_days_before?: number };
   try {
     body = await request.json();

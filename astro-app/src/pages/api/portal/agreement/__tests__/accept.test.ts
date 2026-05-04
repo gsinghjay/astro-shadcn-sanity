@@ -79,6 +79,10 @@ function buildCtx(opts: {
   if (opts.cookie) headers.cookie = opts.cookie;
   if (opts.ip) headers['cf-connecting-ip'] = opts.ip;
   if (opts.userAgent) headers['user-agent'] = opts.userAgent;
+  // Story 22.10 added a Content-Length size guard. Tests don't pass a body
+  // (POST is conceptually empty), so seed a small numeric value to satisfy the
+  // 411 check. Tests that exercise the size guard explicitly override this.
+  if (!('content-length' in headers)) headers['content-length'] = '0';
 
   // Adapter v13: env now comes from the cloudflare:workers mock, not locals.
   if (opts.env === null) {
@@ -273,5 +277,47 @@ describe('POST /api/portal/agreement/accept', () => {
     const res = await ALL(null as never);
     expect(res.status).toBe(405);
     expect(res.headers.get('allow')).toBe('POST');
+  });
+
+  describe('body-size cap (Story 22.10)', () => {
+    function buildCtxWithContentLength(value: string | null) {
+      const headers: Record<string, string> = {
+        origin: 'https://example.com',
+      };
+      if (value !== null) headers['content-length'] = value;
+      return {
+        url: new URL('https://example.com/api/portal/agreement/accept'),
+        request: new Request('https://example.com/api/portal/agreement/accept', {
+          method: 'POST',
+          headers,
+        }),
+        locals: { user: { email: 's@co.com', role: 'sponsor' } } as unknown,
+      };
+    }
+
+    it('returns 411 when Content-Length header is missing', async () => {
+      const res = await POST(buildCtxWithContentLength(null) as never);
+      expect(res.status).toBe(411);
+      expect(await res.json()).toEqual({ error: 'length_required' });
+    });
+
+    it('returns 411 when Content-Length is non-numeric', async () => {
+      const res = await POST(buildCtxWithContentLength('not-a-number') as never);
+      expect(res.status).toBe(411);
+    });
+
+    it('returns 413 when Content-Length exceeds 1000 bytes', async () => {
+      const res = await POST(buildCtxWithContentLength('1001') as never);
+      expect(res.status).toBe(413);
+      expect(await res.json()).toEqual({ error: 'payload_too_large' });
+    });
+
+    it('admits a request whose Content-Length is exactly the cap', async () => {
+      const ctx = buildCtxWithContentLength('1000');
+      const res = await POST(ctx as never);
+      // 1000 is at-cap → not 411/413; route proceeds and returns 200 happy path.
+      expect([200, 401, 403, 404, 409, 503]).toContain(res.status);
+      expect([411, 413]).not.toContain(res.status);
+    });
   });
 });
