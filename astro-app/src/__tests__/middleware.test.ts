@@ -385,7 +385,7 @@ describe('middleware — unified auth routing', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('creates auth with correct env vars', async () => {
+    it('creates auth with db + requestOrigin only (env vars come from astro:env/server)', async () => {
       mockGetSession.mockResolvedValue({
         user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
         session: { id: 's1' },
@@ -396,15 +396,6 @@ describe('middleware — unified auth routing', () => {
 
       expect(mockCreateAuth).toHaveBeenCalledWith({
         db: { __drizzle: true },
-        env: {
-          GOOGLE_CLIENT_ID: 'test-google-id',
-          GOOGLE_CLIENT_SECRET: 'test-google-secret',
-          GITHUB_CLIENT_ID: 'test-github-id',
-          GITHUB_CLIENT_SECRET: 'test-github-secret',
-          BETTER_AUTH_SECRET: 'test-auth-secret',
-          BETTER_AUTH_URL: 'http://localhost:4321',
-          RESEND_API_KEY: 'test-resend-key',
-        },
         requestOrigin: 'http://localhost:4321',
       });
     });

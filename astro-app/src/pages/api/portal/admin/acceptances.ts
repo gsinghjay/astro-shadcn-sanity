@@ -1,9 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
-import {
-  PUBLIC_SANITY_STUDIO_PROJECT_ID,
-  SANITY_PROJECT_READ_TOKEN,
-} from 'astro:env/server';
+import { SANITY_PROJECT_READ_TOKEN } from 'astro:env/server';
+import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/client';
 import { getSponsorAgreementRev } from '@/lib/sanity';
 
 export const prerender = false;

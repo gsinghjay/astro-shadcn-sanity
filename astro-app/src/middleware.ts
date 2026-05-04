@@ -116,9 +116,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const { getDrizzle } = await import("@/lib/db");
   const { createAuth, checkSponsorWhitelist } = await import("@/lib/auth-config");
 
-  const runtimeEnv = env;
   // Rate limiting — per-IP sliding window via Durable Object (fail-open)
-  const rateLimiter = runtimeEnv.RATE_LIMITER;
+  const rateLimiter = env.RATE_LIMITER;
   if (rateLimiter) {
     const ip = context.request.headers.get("CF-Connecting-IP") ?? "unknown";
     try {
@@ -144,7 +143,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   // Unified session check — one path for both sponsors and students
   try {
-    const kvCache = runtimeEnv?.SESSION_CACHE;
+    const kvCache = env?.SESSION_CACHE;
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
     let userData: CachedSession | null = null;
@@ -160,19 +159,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // D1 fallback via Better Auth
     if (!userData && sessionToken) {
       const db = getDrizzle();
-      const auth = createAuth({
-        db,
-        env: {
-          GOOGLE_CLIENT_ID: runtimeEnv.GOOGLE_CLIENT_ID,
-          GOOGLE_CLIENT_SECRET: runtimeEnv.GOOGLE_CLIENT_SECRET,
-          GITHUB_CLIENT_ID: runtimeEnv.GITHUB_CLIENT_ID,
-          GITHUB_CLIENT_SECRET: runtimeEnv.GITHUB_CLIENT_SECRET,
-          BETTER_AUTH_SECRET: runtimeEnv.BETTER_AUTH_SECRET,
-          BETTER_AUTH_URL: runtimeEnv.BETTER_AUTH_URL,
-          RESEND_API_KEY: runtimeEnv.RESEND_API_KEY,
-        },
-        requestOrigin: context.url.origin,
-      });
+      const auth = createAuth({ db, requestOrigin: context.url.origin });
 
       const session = await auth.api.getSession({
         headers: context.request.headers,
@@ -212,8 +199,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
           kvCache.put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 }).catch((e: unknown) => console.error('[middleware] KV cache write failed:', e));
         }
         // Persist escalated role to D1 so future sessions don't re-query Sanity (fire-and-forget)
-        if (runtimeEnv?.PORTAL_DB) {
-          runtimeEnv.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE LOWER(email) = ?')
+        if (env?.PORTAL_DB) {
+          env.PORTAL_DB.prepare('UPDATE user SET role = ? WHERE LOWER(email) = ?')
             .bind('sponsor', userData.email)
             .run()
             .catch((e: unknown) => console.error('[middleware] D1 role update failed:', e));
@@ -248,9 +235,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       let agreementVersion = userData.agreementVersion ?? null;
       const cacheMissesAcceptance = userData.agreementAcceptedAt === undefined;
       const cacheMissesVersion = userData.agreementVersion === undefined;
-      if ((cacheMissesAcceptance || cacheMissesVersion) && runtimeEnv?.PORTAL_DB) {
+      if ((cacheMissesAcceptance || cacheMissesVersion) && env?.PORTAL_DB) {
         try {
-          const row = await runtimeEnv.PORTAL_DB
+          const row = await env.PORTAL_DB
             .prepare(
               "SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?",
             )

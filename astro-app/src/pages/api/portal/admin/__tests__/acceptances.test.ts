@@ -47,8 +47,11 @@ const {
 
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-vi.mock('astro:env/server', () => ({
+// PUBLIC_SANITY_STUDIO_PROJECT_ID flipped to client context in Story 5.20.
+vi.mock('astro:env/client', () => ({
   PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+}));
+vi.mock('astro:env/server', () => ({
   SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
 }));
 
@@ -454,8 +457,10 @@ describe('GET /api/portal/admin/acceptances', () => {
 
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is the literal "placeholder" build-time fallback', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: 'placeholder',
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
@@ -465,6 +470,7 @@ describe('GET /api/portal/admin/acceptances', () => {
     const res = await route.GET(ctx as never);
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/client');
     vi.doUnmock('astro:env/server');
     vi.doUnmock('cloudflare:workers');
     vi.doUnmock('@/lib/sanity');
@@ -472,14 +478,16 @@ describe('GET /api/portal/admin/acceptances', () => {
   });
 
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is empty (fail closed)', async () => {
-    // Re-import the route with a different astro:env/server mock so the
-    // module-level named import binds to the empty value. resetModules +
-    // doMock is the documented vitest pattern for swapping a static import
-    // mid-suite. The fresh module also gets a fresh membership cache, so
-    // no afterAll cleanup is needed beyond the unmock.
+    // Re-import the route with a different astro:env mock so the module-level
+    // named import binds to the empty value. resetModules + doMock is the
+    // documented vitest pattern for swapping a static import mid-suite. The
+    // fresh module also gets a fresh membership cache, so no afterAll cleanup
+    // is needed beyond the unmock.
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: '',
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
@@ -489,6 +497,7 @@ describe('GET /api/portal/admin/acceptances', () => {
     const res = await route.GET(ctx as never);
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/client');
     vi.doUnmock('astro:env/server');
     vi.doUnmock('cloudflare:workers');
     vi.doUnmock('@/lib/sanity');
@@ -497,8 +506,10 @@ describe('GET /api/portal/admin/acceptances', () => {
 
   it('returns 503 when SANITY_PROJECT_READ_TOKEN is missing (fail closed)', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: undefined,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
@@ -508,6 +519,7 @@ describe('GET /api/portal/admin/acceptances', () => {
     const res = await route.GET(ctx as never);
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    vi.doUnmock('astro:env/client');
     vi.doUnmock('astro:env/server');
     vi.doUnmock('cloudflare:workers');
     vi.doUnmock('@/lib/sanity');
@@ -672,8 +684,10 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
 
   it('returns 503 (fail closed) when SANITY_PROJECT_READ_TOKEN is missing', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: undefined,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
@@ -682,6 +696,7 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     const ctx = buildCtx({ method: 'OPTIONS' });
     const res = await route.OPTIONS(ctx as never);
     expect(res.status).toBe(503);
+    vi.doUnmock('astro:env/client');
     vi.doUnmock('astro:env/server');
     vi.doUnmock('cloudflare:workers');
     vi.doUnmock('@/lib/sanity');

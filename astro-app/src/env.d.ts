@@ -3,24 +3,6 @@
 /// <reference types="@sanity/astro/module" />
 /// <reference path="../worker-configuration.d.ts" />
 
-interface ImportMetaEnv {
-  readonly PUBLIC_SANITY_STUDIO_PROJECT_ID: string;
-  readonly PUBLIC_SANITY_STUDIO_DATASET: string;
-  readonly PUBLIC_SANITY_DATASET: string;
-  readonly PUBLIC_SANITY_VISUAL_EDITING_ENABLED: string;
-  readonly PUBLIC_SANITY_LIVE_CONTENT_ENABLED: string;
-  readonly PUBLIC_SANITY_STUDIO_URL: string;
-  readonly PUBLIC_SITE_ID: string;
-  readonly PUBLIC_SITE_THEME: "red" | "blue" | "green";
-  readonly PUBLIC_SITE_URL: string;
-  readonly PUBLIC_GTM_ID: string;
-  readonly PUBLIC_TURNSTILE_SITE_KEY: string;
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}
-
 /** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker).
  *  Extends Rpc.DurableObjectBranded so the type satisfies DurableObjectNamespace<T>'s
  *  brand constraint — without this, callers see `DurableObjectStub<undefined>` and
@@ -33,23 +15,12 @@ interface RateLimiterDO extends Rpc.DurableObjectBranded {
   }>;
 }
 
-// Augment wrangler-generated Cloudflare.Env with dashboard-managed secrets
-// (which wrangler can't see locally) and properly-typed Durable Object RPC.
+// Augment wrangler-generated Cloudflare.Env with bindings/extras that wrangler
+// can't infer locally. Declared env *vars* now come from the astro:env schema
+// (astro.config.mjs) and are read via astro:env/server | astro:env/client —
+// they don't need to live here. Only bindings + non-schema dev tokens remain.
 declare namespace Cloudflare {
   interface Env {
-    TURNSTILE_SECRET_KEY: string;
-    SANITY_API_WRITE_TOKEN: string;
-    SANITY_API_READ_TOKEN?: string;
-    SANITY_PROJECT_READ_TOKEN?: string;
-    GOOGLE_CLIENT_ID: string;
-    GOOGLE_CLIENT_SECRET: string;
-    GITHUB_CLIENT_ID: string;
-    GITHUB_CLIENT_SECRET: string;
-    BETTER_AUTH_SECRET: string;
-    BETTER_AUTH_URL: string;
-    RESEND_API_KEY: string;
-    RESEND_FROM_EMAIL?: string;
-    DISCORD_WEBHOOK_URL?: string;
     GITHUB_DEV_TOKEN?: string;
     RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
   }

@@ -11,23 +11,18 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Resend } from 'resend';
 import { defineQuery } from 'groq';
 import { sanityClient } from 'sanity:client';
+import {
+  BETTER_AUTH_SECRET,
+  BETTER_AUTH_URL,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  RESEND_API_KEY,
+  RESEND_FROM_EMAIL,
+} from 'astro:env/server';
 import type { DrizzleD1Database } from 'drizzle-orm/d1';
 import type * as schema from './drizzle-schema';
-
-/**
- * Environment variables required for Better Auth configuration.
- * PORTAL_DB is NOT included — Drizzle instance is provided externally via getDrizzle().
- */
-export interface AuthEnv {
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
-  GITHUB_CLIENT_ID: string;
-  GITHUB_CLIENT_SECRET: string;
-  BETTER_AUTH_SECRET: string;
-  BETTER_AUTH_URL: string;
-  RESEND_API_KEY: string;
-  RESEND_FROM_EMAIL?: string;
-}
 
 const SPONSOR_WHITELIST_QUERY = defineQuery(
   `count(*[_type == "sponsor" && (contactEmail == $email || $email in allowedEmails[])]) > 0`,
@@ -35,7 +30,6 @@ const SPONSOR_WHITELIST_QUERY = defineQuery(
 
 interface CreateAuthOptions {
   db: DrizzleD1Database<typeof schema>;
-  env: AuthEnv;
   /** Request origin (e.g., https://feat-branch.ywcc-capstone.pages.dev). Used as baseURL
    *  so OAuth callbacks route to the correct deployment, and added to trustedOrigins
    *  so Better Auth CSRF checks pass on preview deployments. */
@@ -61,35 +55,42 @@ export async function checkSponsorWhitelist(email: string): Promise<boolean> {
  * Creates a Better Auth instance bound to the request's D1 database.
  * Must be called per-request since D1 binding comes from the runtime env.
  *
+ * Auth env vars are imported directly from astro:env/server — required ones
+ * (BETTER_AUTH_SECRET / GOOGLE_CLIENT_SECRET / GITHUB_CLIENT_SECRET /
+ * RESEND_API_KEY) are validated at build start by validateSecrets:true.
+ * The optional public vars (BETTER_AUTH_URL / GITHUB_CLIENT_ID /
+ * RESEND_FROM_EMAIL) are checked at runtime below — fail-loud on rwc Workers
+ * where they're absent rather than letting Better Auth surface a confusing
+ * internal error.
+ *
  * @param options.db - Shared Drizzle instance from getDrizzle()
- * @param options.env - Auth-specific environment variables
  */
-export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
-  const required: (keyof AuthEnv)[] = [
-    'BETTER_AUTH_SECRET', 'BETTER_AUTH_URL',
-    'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
-    'GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET',
-    'RESEND_API_KEY',
-  ];
-  for (const key of required) {
-    if (!env[key]?.trim()) {
+export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
+  const required = {
+    BETTER_AUTH_SECRET, BETTER_AUTH_URL,
+    GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
+    GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET,
+    RESEND_API_KEY,
+  } as const;
+  for (const [key, value] of Object.entries(required)) {
+    if (!value?.trim()) {
       throw new Error(`Missing required auth environment variable: ${key}`);
     }
   }
 
   // Use request origin when available so OAuth callbacks and CSRF checks
   // work on preview deployments (e.g., feat-branch.ywcc-capstone.pages.dev).
-  const baseURL = requestOrigin || env.BETTER_AUTH_URL;
-  const origins = [env.BETTER_AUTH_URL];
-  if (requestOrigin && requestOrigin !== env.BETTER_AUTH_URL) {
+  const baseURL = requestOrigin || BETTER_AUTH_URL;
+  const origins = [BETTER_AUTH_URL];
+  if (requestOrigin && requestOrigin !== BETTER_AUTH_URL) {
     origins.push(requestOrigin);
   }
 
-  const resendClient = new Resend(env.RESEND_API_KEY);
+  const resendClient = new Resend(RESEND_API_KEY);
 
   return betterAuth({
     baseURL,
-    secret: env.BETTER_AUTH_SECRET,
+    secret: BETTER_AUTH_SECRET,
     database: drizzleAdapter(db, {
       provider: 'sqlite',
     }),
@@ -105,12 +106,12 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
     },
     socialProviders: {
       google: {
-        clientId: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        clientId: GOOGLE_CLIENT_ID,
+        clientSecret: GOOGLE_CLIENT_SECRET,
       },
       github: {
-        clientId: env.GITHUB_CLIENT_ID,
-        clientSecret: env.GITHUB_CLIENT_SECRET,
+        clientId: GITHUB_CLIENT_ID,
+        clientSecret: GITHUB_CLIENT_SECRET,
         scope: ['repo'],
       },
     },
@@ -123,8 +124,8 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
     plugins: [
       magicLink({
         sendMagicLink: async ({ email, url }) => {
-          const fromAddress = env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
-          if (!env.RESEND_FROM_EMAIL) {
+          const fromAddress = RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          if (!RESEND_FROM_EMAIL) {
             console.warn('[auth] RESEND_FROM_EMAIL not set — using default .pages.dev sender. Set RESEND_FROM_EMAIL to a verified domain for production.');
           }
           const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -142,7 +143,7 @@ export function createAuth({ db, env, requestOrigin }: CreateAuthOptions) {
       emailOTP({
         sendVerificationOTP: async ({ email, otp, type }) => {
           if (type !== 'sign-in') return;
-          const fromAddress = env.RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          const fromAddress = RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
           await resendClient.emails.send({
             from: fromAddress,
             to: email,

@@ -4,7 +4,6 @@
  * This route must be SSR (not prerendered) since it handles OAuth callbacks.
  */
 import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
 import { getDrizzle } from '@/lib/db';
 import { createAuth } from '@/lib/auth-config';
 
@@ -14,20 +13,7 @@ const handleAuth: APIRoute = async ({ request }) => {
   try {
     const db = getDrizzle();
     const requestOrigin = new URL(request.url).origin;
-    const auth = createAuth({
-      db,
-      env: {
-        GOOGLE_CLIENT_ID: env.GOOGLE_CLIENT_ID,
-        GOOGLE_CLIENT_SECRET: env.GOOGLE_CLIENT_SECRET,
-        GITHUB_CLIENT_ID: env.GITHUB_CLIENT_ID,
-        GITHUB_CLIENT_SECRET: env.GITHUB_CLIENT_SECRET,
-        BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET,
-        BETTER_AUTH_URL: env.BETTER_AUTH_URL,
-        RESEND_API_KEY: env.RESEND_API_KEY,
-        RESEND_FROM_EMAIL: env.RESEND_FROM_EMAIL,
-      },
-      requestOrigin,
-    });
+    const auth = createAuth({ db, requestOrigin });
     return await auth.handler(request);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown auth error';
