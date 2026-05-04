@@ -38,10 +38,22 @@ const settings = await getSiteSettings();
 const { navigationItems, ctaButton, siteName, logo, aiSearch } = settings;
 const currentPath = Astro.url.pathname;
 
-// Compute search modal visibility — stega-clean + trim so a stega-decoded-empty apiUrl
-// doesn't render a dead trigger that opens nothing.
+// Compute search modal visibility — stega-clean + trim, then validate as an https URL
+// with no embedded credentials. Must mirror SearchModal.astro's acceptance gate exactly,
+// otherwise the trigger renders but SearchModal rejects internally → click goes nowhere.
 const cleanedSearchApiUrl = stegaClean(aiSearch?.apiUrl ?? '').trim();
-const searchEnabled = Boolean(aiSearch?.searchModalEnabled && cleanedSearchApiUrl);
+const searchApiUrlValid = (() => {
+  if (!cleanedSearchApiUrl) return false;
+  try {
+    const u = new URL(cleanedSearchApiUrl);
+    if (u.protocol !== 'https:') return false;
+    if (u.username !== '' || u.password !== '') return false;
+    return true;
+  } catch {
+    return false;
+  }
+})();
+const searchEnabled = Boolean(aiSearch?.searchModalEnabled && searchApiUrlValid);
 
 const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';

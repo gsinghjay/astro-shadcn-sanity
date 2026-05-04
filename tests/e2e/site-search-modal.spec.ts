@@ -118,10 +118,16 @@ test.describe('Site Search Modal', () => {
 
     const href = await firstResult.getAttribute('href');
     expect(href).toBeTruthy();
+    expect(href!.trim().length).toBeGreaterThan(0);
+
+    // Resolve href against the current page so relative result URLs (e.g. "/about")
+    // produce a concrete pathname rather than a regex that vacuously matches anything.
+    const targetPath = new URL(href!, page.url()).pathname;
+    expect(targetPath).not.toBe('/');
 
     await firstResult.focus();
     await Promise.all([
-      page.waitForURL(new RegExp(href!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))),
+      page.waitForURL((url) => url.pathname === targetPath),
       page.keyboard.press('Enter'),
     ]);
   });
