@@ -62,13 +62,19 @@ const liveContentEnabled = PUBLIC_SANITY_LIVE_CONTENT_ENABLED;
 
 const syncTags = liveContentEnabled || visualEditingEnabled ? getSyncTags() : [];
 
-// Extract AI Search worker origin for CSP connect-src (scoped, not wildcard)
+// Extract AI Search worker origin for CSP connect-src (scoped, not wildcard).
+// new URL() throws on malformed input — guard so a misconfigured apiUrl doesn't 500 every page.
 const aiSearchApiUrl = (siteSettings?.aiSearch?.enabled || siteSettings?.aiSearch?.searchModalEnabled)
   ? stegaClean(siteSettings.aiSearch.apiUrl ?? "")
   : "";
-const aiSearchWorkerOrigin = aiSearchApiUrl
-  ? new URL(aiSearchApiUrl).origin
-  : "";
+let aiSearchWorkerOrigin = "";
+if (aiSearchApiUrl) {
+  try {
+    aiSearchWorkerOrigin = new URL(aiSearchApiUrl).origin;
+  } catch {
+    aiSearchWorkerOrigin = "";
+  }
+}
 
 const cspConnectSrc = [
   "'self'",

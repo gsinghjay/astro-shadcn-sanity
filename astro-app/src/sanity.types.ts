@@ -2590,7 +2590,13 @@ export type SiteSettings = {
     copyrightText?: string;
   };
   socialLinks?: Array<{
-    platform?: "github" | "linkedin" | "twitter" | "instagram" | "youtube";
+    platform?:
+      | "github"
+      | "linkedin"
+      | "twitter"
+      | "instagram"
+      | "youtube"
+      | "facebook";
     url?: string;
     _key: string;
   }>;
@@ -3602,6 +3608,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   socialLinks: Array<{
     _key: string;
     platform:
+      | "facebook"
       | "github"
       | "instagram"
       | "linkedin"
