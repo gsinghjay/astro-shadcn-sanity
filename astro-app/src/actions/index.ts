@@ -81,8 +81,9 @@ export const server = {
 
       // 3. Discord notification (fire-and-forget — don't fail if Discord errors).
       // DISCORD_WEBHOOK_URL is optional in the schema (rwc Workers don't carry it);
-      // the guard avoids a TypeError on `fetch(undefined)` in those environments.
-      if (DISCORD_WEBHOOK_URL) {
+      // the trim() guard avoids `fetch(undefined)` AND `fetch("   ")` (a whitespace
+      // value passes envField.string validation but throws TypeError: Invalid URL).
+      if (DISCORD_WEBHOOK_URL?.trim()) {
         try {
           await fetch(DISCORD_WEBHOOK_URL, {
             method: 'POST',

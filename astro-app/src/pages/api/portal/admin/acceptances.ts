@@ -175,11 +175,13 @@ function envReady(env: AdminEnv): boolean {
     env.STUDIO_ORIGIN &&
       env.PORTAL_DB &&
       PUBLIC_SANITY_STUDIO_PROJECT_ID &&
-      // `astro.config.mjs` falls back to the literal "placeholder" when neither
-      // PUBLIC_SANITY_STUDIO_PROJECT_ID nor PUBLIC_SANITY_PROJECT_ID is set at
-      // build time. That string is truthy, so without this guard the route
-      // would call /projects/placeholder/users/<id> and 403 every admin instead
-      // of 503ing on the misconfig.
+      // Post Story 5.20 the schema requires `PUBLIC_SANITY_STUDIO_PROJECT_ID`
+      // (`context: "client"`, no default), so a missing wrangler value fails
+      // the build before this guard runs. The `!== 'placeholder'` check still
+      // catches the deliberate-misconfig case where someone literally sets the
+      // wrangler var to "placeholder" (the historical Sanity-adapter fallback
+      // in `astro.config.mjs:53`); without this we'd call
+      // /projects/placeholder/users/<id> and 403 every admin instead of 503ing.
       PUBLIC_SANITY_STUDIO_PROJECT_ID !== 'placeholder' &&
       SANITY_PROJECT_READ_TOKEN,
   );

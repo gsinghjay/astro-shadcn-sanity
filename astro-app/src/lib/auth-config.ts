@@ -124,8 +124,8 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
     plugins: [
       magicLink({
         sendMagicLink: async ({ email, url }) => {
-          const fromAddress = RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
-          if (!RESEND_FROM_EMAIL) {
+          const fromAddress = RESEND_FROM_EMAIL?.trim() || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          if (!RESEND_FROM_EMAIL?.trim()) {
             console.warn('[auth] RESEND_FROM_EMAIL not set — using default .pages.dev sender. Set RESEND_FROM_EMAIL to a verified domain for production.');
           }
           const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -143,7 +143,7 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
       emailOTP({
         sendVerificationOTP: async ({ email, otp, type }) => {
           if (type !== 'sign-in') return;
-          const fromAddress = RESEND_FROM_EMAIL || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
+          const fromAddress = RESEND_FROM_EMAIL?.trim() || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
           await resendClient.emails.send({
             from: fromAddress,
             to: email,

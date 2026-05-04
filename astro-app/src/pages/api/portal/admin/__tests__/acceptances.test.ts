@@ -465,16 +465,19 @@ describe('GET /api/portal/admin/acceptances', () => {
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/client');
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is empty (fail closed)', async () => {
@@ -492,16 +495,19 @@ describe('GET /api/portal/admin/acceptances', () => {
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/client');
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 503 when SANITY_PROJECT_READ_TOKEN is missing (fail closed)', async () => {
@@ -514,16 +520,19 @@ describe('GET /api/portal/admin/acceptances', () => {
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/client');
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 429 with Retry-After when RATE_LIMITER reports !allowed (no Sanity call)', async () => {
@@ -692,15 +701,18 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({ method: 'OPTIONS' });
-    const res = await route.OPTIONS(ctx as never);
-    expect(res.status).toBe(503);
-    vi.doUnmock('astro:env/client');
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({ method: 'OPTIONS' });
+      const res = await route.OPTIONS(ctx as never);
+      expect(res.status).toBe(503);
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 });
 
