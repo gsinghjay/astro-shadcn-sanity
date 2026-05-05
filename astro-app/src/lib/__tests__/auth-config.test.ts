@@ -1,7 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { sanityClient } from 'sanity:client';
 
-const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend } = vi.hoisted(() => {
+const {
+  mockBetterAuth,
+  mockDrizzleAdapter,
+  mockMagicLink,
+  mockEmailOTP,
+  mockResendSend,
+  serverEnv,
+} = vi.hoisted(() => {
   const mockBetterAuth = vi.fn().mockReturnValue({
     handler: vi.fn(),
     api: { getSession: vi.fn() },
@@ -10,7 +17,26 @@ const { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockRes
   const mockMagicLink = vi.fn().mockReturnValue({ id: 'magic-link' });
   const mockEmailOTP = vi.fn().mockReturnValue({ id: 'email-otp' });
   const mockResendSend = vi.fn().mockResolvedValue({ id: 'mock-email-id' });
-  return { mockBetterAuth, mockDrizzleAdapter, mockMagicLink, mockEmailOTP, mockResendSend };
+  // Mutable state for the astro:env/server mock — getters read this object so
+  // each createAuth() call sees the current values without resetModules.
+  const serverEnv: Record<string, string | undefined> = {
+    GOOGLE_CLIENT_ID: 'test-client-id',
+    GOOGLE_CLIENT_SECRET: 'test-client-secret',
+    GITHUB_CLIENT_ID: 'test-github-id',
+    GITHUB_CLIENT_SECRET: 'test-github-secret',
+    BETTER_AUTH_SECRET: 'test-secret-at-least-32-chars-long!!',
+    BETTER_AUTH_URL: 'http://localhost:4321',
+    RESEND_API_KEY: 'test-resend-key',
+    RESEND_FROM_EMAIL: undefined,
+  };
+  return {
+    mockBetterAuth,
+    mockDrizzleAdapter,
+    mockMagicLink,
+    mockEmailOTP,
+    mockResendSend,
+    serverEnv,
+  };
 });
 
 vi.mock('better-auth', () => ({
@@ -35,9 +61,22 @@ vi.mock('resend', () => ({
   })),
 }));
 
+// Live-binding mock: destructured imports in auth-config.ts read these
+// getters at use-time, so tests can mutate `serverEnv` between assertions.
+vi.mock('astro:env/server', () => ({
+  get GOOGLE_CLIENT_ID() { return serverEnv.GOOGLE_CLIENT_ID; },
+  get GOOGLE_CLIENT_SECRET() { return serverEnv.GOOGLE_CLIENT_SECRET; },
+  get GITHUB_CLIENT_ID() { return serverEnv.GITHUB_CLIENT_ID; },
+  get GITHUB_CLIENT_SECRET() { return serverEnv.GITHUB_CLIENT_SECRET; },
+  get BETTER_AUTH_SECRET() { return serverEnv.BETTER_AUTH_SECRET; },
+  get BETTER_AUTH_URL() { return serverEnv.BETTER_AUTH_URL; },
+  get RESEND_API_KEY() { return serverEnv.RESEND_API_KEY; },
+  get RESEND_FROM_EMAIL() { return serverEnv.RESEND_FROM_EMAIL; },
+}));
+
 import { createAuth, checkSponsorWhitelist } from '@/lib/auth-config';
 
-const mockEnv = {
+const validEnv: Record<string, string | undefined> = {
   GOOGLE_CLIENT_ID: 'test-client-id',
   GOOGLE_CLIENT_SECRET: 'test-client-secret',
   GITHUB_CLIENT_ID: 'test-github-id',
@@ -45,28 +84,30 @@ const mockEnv = {
   BETTER_AUTH_SECRET: 'test-secret-at-least-32-chars-long!!',
   BETTER_AUTH_URL: 'http://localhost:4321',
   RESEND_API_KEY: 'test-resend-key',
+  RESEND_FROM_EMAIL: undefined,
 };
 
-const mockDb = { __drizzle: true } as any;
+const mockDb = { __drizzle: true } as never;
 
 describe('createAuth() — unified auth factory', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.assign(serverEnv, validEnv);
   });
 
-  it('accepts a Drizzle db instance and auth env', () => {
-    const auth = createAuth({ db: mockDb, env: mockEnv });
+  it('accepts a Drizzle db instance', () => {
+    const auth = createAuth({ db: mockDb });
     expect(auth).toBeDefined();
     expect(auth.handler).toBeDefined();
   });
 
   it('passes the provided Drizzle instance to drizzleAdapter', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     expect(mockDrizzleAdapter).toHaveBeenCalledWith(mockDb, { provider: 'sqlite' });
   });
 
   it('configures Google social provider', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.socialProviders.google).toEqual({
       clientId: 'test-client-id',
@@ -75,7 +116,7 @@ describe('createAuth() — unified auth factory', () => {
   });
 
   it('configures GitHub social provider', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.socialProviders.github).toEqual({
       clientId: 'test-github-id',
@@ -85,27 +126,28 @@ describe('createAuth() — unified auth factory', () => {
   });
 
   it('enables account linking', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: true });
   });
 
   it('registers Magic Link plugin', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     expect(mockMagicLink).toHaveBeenCalled();
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.plugins).toContainEqual({ id: 'magic-link' });
   });
 
   it('registers Email OTP plugin', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     expect(mockEmailOTP).toHaveBeenCalled();
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.plugins).toContainEqual({ id: 'email-otp' });
   });
 
   it('Email OTP sendVerificationOTP sends sign-in code via Resend', async () => {
-    createAuth({ db: mockDb, env: { ...mockEnv, RESEND_FROM_EMAIL: 'YWCC <noreply@example.com>' } });
+    serverEnv.RESEND_FROM_EMAIL = 'YWCC <noreply@example.com>';
+    createAuth({ db: mockDb });
     const otpOpts = mockEmailOTP.mock.calls[0][0];
     await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'sign-in' });
     expect(mockResendSend).toHaveBeenCalledWith(expect.objectContaining({
@@ -117,14 +159,14 @@ describe('createAuth() — unified auth factory', () => {
   });
 
   it('Email OTP sendVerificationOTP skips non-sign-in types', async () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const otpOpts = mockEmailOTP.mock.calls[0][0];
     await otpOpts.sendVerificationOTP({ email: 'user@example.com', otp: '123456', type: 'email-verification' });
     expect(mockResendSend).not.toHaveBeenCalled();
   });
 
   it('configures user.additionalFields.role', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.user.additionalFields.role).toEqual({
       type: 'string',
@@ -135,31 +177,31 @@ describe('createAuth() — unified auth factory', () => {
   });
 
   it('configures databaseHooks.user.create.before', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.databaseHooks.user.create.before).toBeTypeOf('function');
   });
 
   it('sets basePath to /api/auth', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.basePath).toBe('/api/auth');
   });
 
   it('configures session expiresIn to 7 days', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.session.expiresIn).toBe(60 * 60 * 24 * 7);
   });
 
   it('configures session updateAge to 1 day', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.session.updateAge).toBe(60 * 60 * 24);
   });
 
   it('enables cookie cache with 5-minute maxAge', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.session.cookieCache).toEqual({
       enabled: true,
@@ -168,39 +210,39 @@ describe('createAuth() — unified auth factory', () => {
   });
 
   it('configures trustedOrigins from env', () => {
-    createAuth({ db: mockDb, env: mockEnv });
+    createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
     expect(config.trustedOrigins).toContain('http://localhost:4321');
   });
 
   it('throws when GITHUB_CLIENT_ID is missing', () => {
-    const badEnv = { ...mockEnv, GITHUB_CLIENT_ID: '' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('GITHUB_CLIENT_ID');
+    serverEnv.GITHUB_CLIENT_ID = '';
+    expect(() => createAuth({ db: mockDb })).toThrow('GITHUB_CLIENT_ID');
   });
 
   it('throws when GITHUB_CLIENT_SECRET is missing', () => {
-    const badEnv = { ...mockEnv, GITHUB_CLIENT_SECRET: '' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('GITHUB_CLIENT_SECRET');
+    serverEnv.GITHUB_CLIENT_SECRET = '';
+    expect(() => createAuth({ db: mockDb })).toThrow('GITHUB_CLIENT_SECRET');
   });
 
   it('throws when RESEND_API_KEY is missing', () => {
-    const badEnv = { ...mockEnv, RESEND_API_KEY: '' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('RESEND_API_KEY');
+    serverEnv.RESEND_API_KEY = '';
+    expect(() => createAuth({ db: mockDb })).toThrow('RESEND_API_KEY');
   });
 
   it('throws when BETTER_AUTH_SECRET is missing', () => {
-    const badEnv = { ...mockEnv, BETTER_AUTH_SECRET: '' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('BETTER_AUTH_SECRET');
+    serverEnv.BETTER_AUTH_SECRET = '';
+    expect(() => createAuth({ db: mockDb })).toThrow('BETTER_AUTH_SECRET');
   });
 
   it('throws when GOOGLE_CLIENT_ID is missing', () => {
-    const badEnv = { ...mockEnv, GOOGLE_CLIENT_ID: '' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('GOOGLE_CLIENT_ID');
+    serverEnv.GOOGLE_CLIENT_ID = '';
+    expect(() => createAuth({ db: mockDb })).toThrow('GOOGLE_CLIENT_ID');
   });
 
   it('throws when env var is whitespace-only', () => {
-    const badEnv = { ...mockEnv, BETTER_AUTH_SECRET: '   ' };
-    expect(() => createAuth({ db: mockDb, env: badEnv })).toThrow('BETTER_AUTH_SECRET');
+    serverEnv.BETTER_AUTH_SECRET = '   ';
+    expect(() => createAuth({ db: mockDb })).toThrow('BETTER_AUTH_SECRET');
   });
 });
 
@@ -210,13 +252,13 @@ describe('checkSponsorWhitelist()', () => {
   });
 
   it('returns true when email is on the sponsor whitelist', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
     const result = await checkSponsorWhitelist('sponsor@company.com');
     expect(result).toBe(true);
   });
 
   it('returns false when email is not on the sponsor whitelist', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as never);
     const result = await checkSponsorWhitelist('unknown@test.com');
     expect(result).toBe(false);
   });
@@ -226,21 +268,23 @@ describe('checkSponsorWhitelist()', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      '[auth] Sanity whitelist check error:',
-      expect.any(Error),
-    );
+    // Story 22.10: structured JSON logger replaces ad-hoc `[auth] ...` strings.
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
+    const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    expect(parsed.level).toBe('error');
+    expect(parsed.msg).toBe('auth-sanity-whitelist-check-failed');
+    expect(parsed.error).toBe('Network error');
     consoleSpy.mockRestore();
   });
 
   it('returns false when sanityClient.fetch returns non-boolean payload', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(undefined as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(undefined as never);
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
   });
 
   it('passes the email through as a GROQ param (not interpolated into the query)', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as never);
     await checkSponsorWhitelist('test@example.com');
     expect(sanityClient.fetch).toHaveBeenCalledWith(
       expect.stringContaining('$email'),
@@ -249,7 +293,7 @@ describe('checkSponsorWhitelist()', () => {
   });
 
   it('handles + aliases without breaking the query (regression: hand-built URL leaked)', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
     const result = await checkSponsorWhitelist('sponsor+alias@example.com');
     expect(result).toBe(true);
     expect(sanityClient.fetch).toHaveBeenCalledWith(
@@ -259,7 +303,7 @@ describe('checkSponsorWhitelist()', () => {
   });
 
   it('handles Unicode local-parts (regression: encodeURIComponent only encoded inner)', async () => {
-    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as any);
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
     const result = await checkSponsorWhitelist('用户@example.com');
     expect(result).toBe(true);
     expect(sanityClient.fetch).toHaveBeenCalledWith(

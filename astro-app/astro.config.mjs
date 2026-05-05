@@ -150,16 +150,44 @@ export default defineConfig({
         values: ["red", "blue", "green"],
         default: "red",
       }),
-
-      // --- Server-side public vars ---
+      // SanityLiveUpdater.astro reads these from a client-side <script> block;
+      // ContactForm reads PUBLIC_TURNSTILE_SITE_KEY from frontmatter rendered
+      // server-side but they're public values surfaced to the markup either way.
+      // PROJECT_ID has no safe fallback — required-client-public so a
+      // misconfigured Worker fails at build instead of silently going dark.
       PUBLIC_SANITY_STUDIO_PROJECT_ID: envField.string({
-        context: "server",
+        context: "client",
         access: "public",
       }),
       PUBLIC_SANITY_STUDIO_DATASET: envField.string({
-        context: "server",
+        context: "client",
         access: "public",
         default: "production",
+      }),
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({
+        context: "client",
+        access: "public",
+        default: "",
+      }),
+
+      // --- Server-side public vars (capstone-only — optional for rwc parity) ---
+      // rwc_us / rwc_intl wrangler blocks don't carry these. optional:true
+      // closes the audit's parity-gap item; createAuth() throws fail-loud at
+      // runtime if portal/auth code paths actually need them.
+      BETTER_AUTH_URL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      GITHUB_CLIENT_ID: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      RESEND_FROM_EMAIL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
       }),
 
       // --- Server-side secrets ---
@@ -183,6 +211,20 @@ export default defineConfig({
         access: "public",
         optional: true,
       }),
+
+      // --- Server-side secrets (production) ---
+      // Required on capstone deploys; rwc Workers don't carry these and are
+      // expected to fail validateSecrets unless rwc deploy is revived (see
+      // story 5.20 Gotcha #8). GOOGLE_CLIENT_ID lives in CF dashboard secrets,
+      // hence access:"secret" matches its storage location.
+      BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
+      GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+      GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret" }),
+      GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+      RESEND_API_KEY: envField.string({ context: "server", access: "secret" }),
+      TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
+      SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret" }),
+      DISCORD_WEBHOOK_URL: envField.string({ context: "server", access: "secret", optional: true }),
     },
     validateSecrets: true,
   },

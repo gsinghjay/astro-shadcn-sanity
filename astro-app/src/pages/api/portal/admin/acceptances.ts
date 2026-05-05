@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
-import {
-  PUBLIC_SANITY_STUDIO_PROJECT_ID,
-  SANITY_PROJECT_READ_TOKEN,
-} from 'astro:env/server';
+import { SANITY_PROJECT_READ_TOKEN } from 'astro:env/server';
+import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/client';
 import { getSponsorAgreementRev } from '@/lib/sanity';
+import { log } from '@/lib/log';
 
 export const prerender = false;
 
@@ -113,7 +112,7 @@ async function verifyProjectMembership(
     writeCache(userId);
     return true;
   } catch (err) {
-    console.error('[admin/acceptances] sanity membership lookup failed:', err);
+    log.error('admin-acceptances-sanity-membership-failed', err);
     return false;
   }
 }
@@ -150,7 +149,7 @@ async function checkRateLimit(
     }
     return null;
   } catch (err) {
-    console.error('[admin/acceptances] rate limiter error, failing open:', err);
+    log.error('admin-acceptances-rate-limiter-failed-open', err);
     return null;
   }
 }
@@ -177,11 +176,13 @@ function envReady(env: AdminEnv): boolean {
     env.STUDIO_ORIGIN &&
       env.PORTAL_DB &&
       PUBLIC_SANITY_STUDIO_PROJECT_ID &&
-      // `astro.config.mjs` falls back to the literal "placeholder" when neither
-      // PUBLIC_SANITY_STUDIO_PROJECT_ID nor PUBLIC_SANITY_PROJECT_ID is set at
-      // build time. That string is truthy, so without this guard the route
-      // would call /projects/placeholder/users/<id> and 403 every admin instead
-      // of 503ing on the misconfig.
+      // Post Story 5.20 the schema requires `PUBLIC_SANITY_STUDIO_PROJECT_ID`
+      // (`context: "client"`, no default), so a missing wrangler value fails
+      // the build before this guard runs. The `!== 'placeholder'` check still
+      // catches the deliberate-misconfig case where someone literally sets the
+      // wrangler var to "placeholder" (the historical Sanity-adapter fallback
+      // in `astro.config.mjs:53`); without this we'd call
+      // /projects/placeholder/users/<id> and 403 every admin instead of 503ing.
       PUBLIC_SANITY_STUDIO_PROJECT_ID !== 'placeholder' &&
       SANITY_PROJECT_READ_TOKEN,
   );
@@ -300,7 +301,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       },
     );
   } catch (e) {
-    console.error('[admin/acceptances] D1 error:', e);
+    log.error('admin-acceptances-d1-error', e);
     return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 };
