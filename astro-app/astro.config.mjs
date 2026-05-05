@@ -212,18 +212,33 @@ export default defineConfig({
         optional: true,
       }),
 
-      // --- Server-side secrets (production) ---
-      // Required on capstone deploys; rwc Workers don't carry these and are
-      // expected to fail validateSecrets unless rwc deploy is revived (see
-      // story 5.20 Gotcha #8). GOOGLE_CLIENT_ID lives in CF dashboard secrets,
-      // hence access:"secret" matches its storage location.
-      BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
-      GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
-      GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret" }),
-      GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
-      RESEND_API_KEY: envField.string({ context: "server", access: "secret" }),
-      TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
-      SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret" }),
+      // --- Server-side secrets (portal / auth / write paths) ---
+      // Only the prod `capstone` Worker carries these — the rwc + *-preview
+      // Workers are content-only (no D1/KV/DO bindings) and portal/auth/api
+      // routes return 503 there. Marking these `optional` for non-prod envs
+      // lets `astro:env/server` return undefined at runtime instead of
+      // throwing EnvInvalidVariables on every request when the bundle imports
+      // `actions/index.ts` (which transitively reads these). Prod stays strict
+      // so a missing secret still fails the build immediately.
+      ...(process.env.CLOUDFLARE_ENV === "capstone"
+        ? {
+            BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
+            GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+            GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret" }),
+            GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+            RESEND_API_KEY: envField.string({ context: "server", access: "secret" }),
+            TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
+            SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret" }),
+          }
+        : {
+            BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret", optional: true }),
+            GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            RESEND_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+            TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+            SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret", optional: true }),
+          }),
       DISCORD_WEBHOOK_URL: envField.string({ context: "server", access: "secret", optional: true }),
     },
     validateSecrets: true,
