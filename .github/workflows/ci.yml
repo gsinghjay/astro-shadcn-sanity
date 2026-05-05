@@ -26,6 +26,23 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Seed placeholder secrets for miniflare prerender
+        # The Astro 6 / @astrojs/cloudflare v13 prerender runs the bundled Worker
+        # under miniflare, which reads .dev.vars for its Worker env. Shell-level
+        # env vars on the build step don't reach that runtime, so astro:env/server
+        # re-validates inside miniflare and fails on missing secrets. Seeding
+        # placeholders into .dev.vars satisfies validateSecrets for CI builds
+        # (real prod secrets stay dashboard-managed).
+        run: |
+          cat > astro-app/.dev.vars <<'EOF'
+          BETTER_AUTH_SECRET=ci-placeholder-better-auth-secret
+          GITHUB_CLIENT_SECRET=ci-placeholder-github-client-secret
+          GOOGLE_CLIENT_ID=ci-placeholder-google-client-id
+          GOOGLE_CLIENT_SECRET=ci-placeholder-google-client-secret
+          RESEND_API_KEY=ci-placeholder-resend-api-key
+          TURNSTILE_SECRET_KEY=ci-placeholder-turnstile-secret
+          SANITY_API_WRITE_TOKEN=ci-placeholder-sanity-write-token
+          EOF
       - name: Build Astro site
         run: npm run build --workspace=astro-app
         env:
