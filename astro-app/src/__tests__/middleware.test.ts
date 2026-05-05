@@ -80,14 +80,32 @@ function createMockRateLimiter() {
   };
 }
 
-function createMockContext(pathname: string, options?: { headers?: Record<string, string>; overrides?: Partial<App.Locals> }) {
+/** Mock `cfContext.waitUntil` that records the call. KV / D1 spies fire because the production
+ *  source builds the promise expression as the argument to `waitUntil` (e.g. `waitUntil(kv.put())`),
+ *  so by the time we reach the mock body the side effect is already in flight. The mock body
+ *  itself does not await the promise — tests that need the rejection branch should await the
+ *  recorded `mock.calls[i][0]` via `Promise.allSettled`. */
+function createMockCfContext() {
+  return {
+    waitUntil: vi.fn((promise: Promise<unknown>) => {
+      void promise;
+    }),
+    passThroughOnException: vi.fn(),
+  };
+}
+
+function createMockContext(pathname: string, options?: { headers?: Record<string, string>; overrides?: Partial<App.Locals>; cfContext?: ReturnType<typeof createMockCfContext> }) {
+  const cfContext = options?.cfContext ?? createMockCfContext();
   return {
     url: new URL(`http://localhost:4321${pathname}`),
     request: new Request(`http://localhost:4321${pathname}`, { headers: options?.headers }),
     // `runtime.env` is no longer read by middleware (adapter v13 — see
     // cloudflare:workers mock above). Keep a runtime stub so tests that pass
     // overrides at this level don't break, but the source of truth is mockEnv.
-    locals: { runtime: { env: mockEnv }, ...options?.overrides } as unknown as App.Locals,
+    // `cfContext` mirrors the Workers ExecutionContext that the v13 adapter
+    // attaches at request time — required so `cfContext?.waitUntil(...)` calls
+    // in middleware don't short-circuit and skip the side effect under test.
+    locals: { runtime: { env: mockEnv }, cfContext, ...options?.overrides } as unknown as App.Locals,
     redirect: vi.fn((url: string) => new Response(null, { status: 302, headers: { Location: url } })),
   };
 }
@@ -617,10 +635,12 @@ describe('middleware — unified auth routing', () => {
 
       await onRequest(ctx as any, mockNext);
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        '[middleware] Rate limiter error, failing open:',
-        expect.any(Error),
-      );
+      expect(consoleSpy).toHaveBeenCalledTimes(1);
+      const logLine = consoleSpy.mock.calls[0]?.[0] as string;
+      const parsed = JSON.parse(logLine);
+      expect(parsed.level).toBe('error');
+      expect(parsed.msg).toBe('middleware-rate-limiter-failed-open');
+      expect(parsed.error).toBe('DO unavailable');
       expect(mockNext).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -695,6 +715,118 @@ describe('middleware — unified auth routing', () => {
 
       expect(result.status).toBe(429);
       expect(result.headers.get('Retry-After')).toBe('2');
+    });
+  });
+
+  describe('cfContext.waitUntil — fire-and-forget side effects', () => {
+    const sessionCookie = 'better-auth.session_token=wu-token-1; Path=/';
+
+    beforeEach(() => {
+      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
+    });
+
+    it('wraps KV cache write after D1 fallback in cfContext.waitUntil', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie }, cfContext });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(cfContext.waitUntil).toHaveBeenCalledTimes(1);
+      expect(cfContext.waitUntil.mock.calls[0][0]).toBeInstanceOf(Promise);
+    });
+
+    it('wraps KV cache write after sponsor escalation AND D1 role update in waitUntil', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '3', email: 'new-sponsor@co.com', name: 'New Sponsor', role: 'student' },
+        session: { id: 's3' },
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(true);
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie }, cfContext });
+
+      await onRequest(ctx as any, mockNext);
+
+      // 1 initial KV cache write (D1 fallback) + 1 KV write (escalation) + 1 D1 role update +
+      // 1 KV write (agreement-row read after sponsor escalation triggers the agreement gate).
+      expect(cfContext.waitUntil).toHaveBeenCalledTimes(4);
+    });
+
+    it('wraps KV cache delete on non-sponsor in waitUntil', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '2', email: 'random@test.com', name: 'Random', role: 'student' },
+        session: { id: 's2' },
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(false);
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie }, cfContext });
+
+      await onRequest(ctx as any, mockNext);
+
+      // KV write on the cache-miss fallback + KV delete on the denied path.
+      expect(cfContext.waitUntil).toHaveBeenCalledTimes(2);
+      expect(mockKvDelete).toHaveBeenCalledWith('wu-token-1');
+    });
+
+    it('logs structured error when KV write inside waitUntil rejects', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      // Force the put().catch() rejection branch so the log.error tail runs.
+      mockKvPut.mockRejectedValueOnce(new Error('KV outage'));
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie }, cfContext });
+      await onRequest(ctx as any, mockNext);
+
+      // Drive the waitUntil-wrapped promises to completion so the .catch(log.error)
+      // tail fires. The mock body itself does not await; tests must do it explicitly.
+      await Promise.allSettled(cfContext.waitUntil.mock.calls.map(c => c[0]));
+
+      const errorLog = consoleSpy.mock.calls
+        .map(call => {
+          try { return JSON.parse(call[0] as string); } catch { return null; }
+        })
+        .find(parsed => parsed?.msg === 'middleware-kv-write-failed');
+      expect(errorLog).toBeDefined();
+      expect(errorLog.level).toBe('error');
+      expect(errorLog.error).toBe('KV outage');
+      consoleSpy.mockRestore();
+    });
+
+    it('does not destructure waitUntil — calls it as a method on cfContext', async () => {
+      // If the source ever changed to `const { waitUntil } = cfContext`, the function
+      // would lose its `this` binding and throw "Illegal invocation" when called via a
+      // non-binding mock. We assert by giving waitUntil a guard that throws when its
+      // `this` is not the surrounding object.
+      const cfContext = {
+        passThroughOnException: vi.fn(),
+        waitUntil(this: unknown, _promise: Promise<unknown>) {
+          if (this !== cfContext) {
+            throw new TypeError('Illegal invocation');
+          }
+        },
+      };
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', {
+        headers: { cookie: sessionCookie },
+        cfContext: cfContext as unknown as ReturnType<typeof createMockCfContext>,
+      });
+
+      await expect(onRequest(ctx as any, mockNext)).resolves.toBeDefined();
     });
   });
 });

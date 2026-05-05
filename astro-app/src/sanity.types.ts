@@ -4561,6 +4561,11 @@ export type ARTICLES_BY_CATEGORY_QUERY_RESULT = Array<{
 }>;
 
 // Source: ../astro-app/src/lib/sanity.ts
+// Variable: GALLERY_ASSETS_QUERY
+// Query: *[_type == "sanity.imageAsset" && "gallery" in opt.media.tags[]->name.current] | order(_createdAt desc){  _id,  url,  altText,  title,  description,  metadata { lqip, dimensions },  "tags": opt.media.tags[]->name.current}
+export type GALLERY_ASSETS_QUERY_RESULT = Array<never>;
+
+// Source: ../astro-app/src/lib/sanity.ts
 // Variable: ALL_AUTHORS_QUERY
 // Query: *[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){  _id, name, "slug": slug.current,  role, bio,  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }}
 export type ALL_AUTHORS_QUERY_RESULT = Array<{
@@ -37701,6 +37706,7 @@ declare module "@sanity/client" {
     '*[_type == "articleCategory" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_ARTICLE_CATEGORY_SLUGS_QUERY_RESULT;
     '*[_type == "articleCategory" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, title, "slug": slug.current, description\n}': ARTICLE_CATEGORY_BY_SLUG_QUERY_RESULT;
     '*[_type == "article" && defined(slug.current) && category._ref == $categoryId && ($site == "" || site == $site)] | order(publishedAt desc){\n  _id, title, "slug": slug.current,\n  excerpt,\n  featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n  author->{ name, "slug": slug.current },\n  publishedAt,\n  category->{ _id, title, "slug": slug.current }\n}': ARTICLES_BY_CATEGORY_QUERY_RESULT;
+    '*[_type == "sanity.imageAsset" && "gallery" in opt.media.tags[]->name.current] | order(_createdAt desc){\n  _id,\n  url,\n  altText,\n  title,\n  description,\n  metadata { lqip, dimensions },\n  "tags": opt.media.tags[]->name.current\n}': GALLERY_ASSETS_QUERY_RESULT;
     '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)] | order(name asc){\n  _id, name, "slug": slug.current,\n  role, bio,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt }\n}': ALL_AUTHORS_QUERY_RESULT;
     '*[_type == "author" && defined(slug.current) && ($site == "" || site == $site)]{ "slug": slug.current }': ALL_AUTHOR_SLUGS_QUERY_RESULT;
     '*[_type == "author" && slug.current == $slug && ($site == "" || site == $site)][0]{\n  _id, name, "slug": slug.current,\n  role, bio, credentials,\n  image{ asset->{ _id, url, metadata { lqip, dimensions } }, alt },\n  sameAs,\n  socialLinks[]{ _key, platform, url },\n  "articles": *[_type == "article" && author._ref == ^._id && defined(slug.current) && ($site == "" || site == $site)] | order(publishedAt desc){\n    _id, title, "slug": slug.current,\n    excerpt,\n    featuredImage{ asset->{ _id, url, metadata { lqip, dimensions } }, alt, hotspot, crop },\n    author->{ name, "slug": slug.current },\n    publishedAt,\n    category->{ _id, title, "slug": slug.current }\n  }\n}': AUTHOR_BY_SLUG_QUERY_RESULT;

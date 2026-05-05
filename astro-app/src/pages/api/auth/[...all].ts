@@ -6,6 +6,7 @@
 import type { APIRoute } from 'astro';
 import { getDrizzle } from '@/lib/db';
 import { createAuth } from '@/lib/auth-config';
+import { log } from '@/lib/log';
 
 export const prerender = false;
 
@@ -20,7 +21,7 @@ const handleAuth: APIRoute = async ({ request }) => {
     const isEnvError = message.includes('Missing required') || message.includes('binding not available');
     const status = isEnvError ? 500 : 503;
 
-    console.error(`[auth] ${message}`);
+    log.error('auth-handler-failed', error, { isEnvError });
 
     return new Response(JSON.stringify({ error: isEnvError ? 'Auth configuration error' : 'Auth service unavailable' }), {
       status,

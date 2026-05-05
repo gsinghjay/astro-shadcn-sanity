@@ -3,6 +3,7 @@ import { env as workerEnv } from 'cloudflare:workers';
 import { SANITY_PROJECT_READ_TOKEN } from 'astro:env/server';
 import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/client';
 import { getSponsorAgreementRev } from '@/lib/sanity';
+import { log } from '@/lib/log';
 
 export const prerender = false;
 
@@ -111,7 +112,7 @@ async function verifyProjectMembership(
     writeCache(userId);
     return true;
   } catch (err) {
-    console.error('[admin/acceptances] sanity membership lookup failed:', err);
+    log.error('admin-acceptances-sanity-membership-failed', err);
     return false;
   }
 }
@@ -148,7 +149,7 @@ async function checkRateLimit(
     }
     return null;
   } catch (err) {
-    console.error('[admin/acceptances] rate limiter error, failing open:', err);
+    log.error('admin-acceptances-rate-limiter-failed-open', err);
     return null;
   }
 }
@@ -300,7 +301,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       },
     );
   } catch (e) {
-    console.error('[admin/acceptances] D1 error:', e);
+    log.error('admin-acceptances-d1-error', e);
     return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 };

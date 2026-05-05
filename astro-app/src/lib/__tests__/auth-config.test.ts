@@ -268,10 +268,12 @@ describe('checkSponsorWhitelist()', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
-    expect(consoleSpy).toHaveBeenCalledWith(
-      '[auth] Sanity whitelist check error:',
-      expect.any(Error),
-    );
+    // Story 22.10: structured JSON logger replaces ad-hoc `[auth] ...` strings.
+    expect(consoleSpy).toHaveBeenCalledTimes(1);
+    const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    expect(parsed.level).toBe('error');
+    expect(parsed.msg).toBe('auth-sanity-whitelist-check-failed');
+    expect(parsed.error).toBe('Network error');
     consoleSpy.mockRestore();
   });
 

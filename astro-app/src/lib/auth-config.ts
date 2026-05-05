@@ -11,6 +11,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { Resend } from 'resend';
 import { defineQuery } from 'groq';
 import { sanityClient } from 'sanity:client';
+import { log } from '@/lib/log';
 import {
   BETTER_AUTH_SECRET,
   BETTER_AUTH_URL,
@@ -46,7 +47,7 @@ export async function checkSponsorWhitelist(email: string): Promise<boolean> {
     const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email });
     return result === true;
   } catch (err) {
-    console.error('[auth] Sanity whitelist check error:', err);
+    log.error('auth-sanity-whitelist-check-failed', err);
     return false;
   }
 }
@@ -126,7 +127,9 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
         sendMagicLink: async ({ email, url }) => {
           const fromAddress = RESEND_FROM_EMAIL?.trim() || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
           if (!RESEND_FROM_EMAIL?.trim()) {
-            console.warn('[auth] RESEND_FROM_EMAIL not set — using default .pages.dev sender. Set RESEND_FROM_EMAIL to a verified domain for production.');
+            log.warn('auth-resend-from-email-missing', {
+              detail: 'using default .pages.dev sender; set RESEND_FROM_EMAIL to a verified domain for production',
+            });
           }
           const safeUrl = url.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
           await resendClient.emails.send({

@@ -40,6 +40,10 @@
 		"logs": {
 			"enabled": true,
 			"head_sampling_rate": 1
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.01
 		}
 	},
 	"env": {
@@ -119,6 +123,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 		},
@@ -141,6 +149,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
@@ -164,6 +176,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
@@ -197,6 +213,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 		},
@@ -219,6 +239,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
@@ -242,6 +266,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.

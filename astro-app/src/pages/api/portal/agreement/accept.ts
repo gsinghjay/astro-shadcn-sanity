@@ -2,8 +2,11 @@ import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { extractSessionToken, normalizeEmail } from '@/middleware';
 import { getSponsorAgreementRev } from '@/lib/sanity';
+import { log } from '@/lib/log';
 
 export const prerender = false;
+
+const MAX_REQUEST_BYTES = 1_000;
 
 const json = (body: Record<string, unknown>, status: number) =>
   new Response(JSON.stringify(body), {
@@ -29,6 +32,20 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   // `locals` retained for `locals.user` (set by middleware); env now imported from cloudflare:workers.
   if (!isSameOrigin(request, url.origin)) {
     return json({ error: 'forbidden_origin' }, 403);
+  }
+
+  // Defense-in-depth: this endpoint takes no user-supplied JSON beyond the
+  // session cookie, but a malicious client could POST a huge body to drag the
+  // Worker into reading it. RFC 9110 §8.6 defines Content-Length as a base-10
+  // unsigned integer; strict regex rejects spoofed `-1` / `0x10` / `1e2` /
+  // whitespace before `Number()` admits them. Missing → 411; oversize → 413.
+  const contentLengthHeader = request.headers.get('content-length');
+  if (contentLengthHeader === null || !/^\d+$/.test(contentLengthHeader)) {
+    return json({ error: 'length_required' }, 411);
+  }
+  const contentLength = Number(contentLengthHeader);
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return json({ error: 'payload_too_large' }, 413);
   }
 
   const user = locals.user;
@@ -87,7 +104,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
     try {
       await env.SESSION_CACHE.delete(sessionToken);
     } catch (e) {
-      console.error('[agreement/accept] KV invalidation failed:', e);
+      log.error('agreement-accept-kv-invalidation-failed', e);
       // Fall through — D1 write succeeded; KV entry will TTL out within 5 min.
     }
   }
