@@ -38,6 +38,13 @@ jobs:
           PUBLIC_SANITY_STUDIO_URL: ${{ vars.PUBLIC_SANITY_STUDIO_URL }}
           PUBLIC_GTM_ID: ${{ vars.PUBLIC_GTM_ID }}
           PUBLIC_SANITY_VISUAL_EDITING_ENABLED: ${{ vars.PUBLIC_SANITY_VISUAL_EDITING_ENABLED }}
+          BETTER_AUTH_SECRET: ci-placeholder-better-auth-secret
+          GITHUB_CLIENT_SECRET: ci-placeholder-github-client-secret
+          GOOGLE_CLIENT_ID: ci-placeholder-google-client-id
+          GOOGLE_CLIENT_SECRET: ci-placeholder-google-client-secret
+          RESEND_API_KEY: ci-placeholder-resend-api-key
+          TURNSTILE_SECRET_KEY: ci-placeholder-turnstile-secret
+          SANITY_API_WRITE_TOKEN: ci-placeholder-sanity-write-token
       - name: Serve built site
         run: npx --yes http-server astro-app/dist -p 4321 --silent &
       - name: Wait for server
