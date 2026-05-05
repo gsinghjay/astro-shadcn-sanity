@@ -1332,6 +1332,51 @@ describe("getGalleryAssets() (Story 22.11)", () => {
     expect(items).toEqual([]);
   });
 
+  it("skips null/non-string tag entries from broken media.tag references", async () => {
+    // Broken/unpublished media.tag refs deref to null in the GROQ projection;
+    // tag.match() on null would throw — verify the helper survives.
+    const mockAssets = [
+      mockAsset({
+        _id: 'a-broken-ref',
+        tags: ['gallery', null, 'gallery-2026', undefined, 42, 'gallery-web-apps'],
+      }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ year: 2026, category: 'web-apps' });
+  });
+
+  it("strips stega markers before regex matching tag values", async () => {
+    // Visual-editing previews wrap string values with stega zero-width markers;
+    // raw tag strings would no longer match /^gallery-(\d{4})$/. Spec Task 2
+    // CRITICAL note required this assertion.
+    const { vercelStegaCombine } = await import("@vercel/stega");
+    const sourcePath = { origin: 'sanity.io', href: '/x', kind: 'asset' };
+    const wrap = (s: string) => vercelStegaCombine(s, sourcePath);
+    const mockAssets = [
+      mockAsset({
+        _id: 'a-stega',
+        tags: [wrap('gallery'), wrap('gallery-2026'), wrap('gallery-web-apps'), wrap('gallery-featured')],
+      }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ featured: true, year: 2026, category: 'web-apps' });
+  });
+
+  it("returns [] and does not throw when loadQuery rejects", async () => {
+    vi.mocked(sanityClient.fetch).mockRejectedValueOnce(new Error('sanity outage') as never);
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toEqual([]);
+  });
+
   it("returns cached result on subsequent calls without additional API calls", async () => {
     vi.resetModules();
     vi.doMock("astro:env/client", () => ({

@@ -1021,7 +1021,11 @@ const GALLERY_CATEGORY_SLUGS: ReadonlySet<string> = new Set([
  * Non-canonical category-shaped tags (e.g. `gallery-typo`) are ignored.
  */
 function parseGalleryAssetTags(asset: GalleryAsset): Pick<GalleryItem, 'featured' | 'year' | 'category'> {
-  const tags = asset.tags ?? [];
+  // Filter out null entries from broken/unpublished media.tag references and
+  // strip stega markers so regex matching survives visual-editing previews.
+  const tags = (asset.tags ?? [])
+    .map((t) => (typeof t === 'string' ? (stegaClean(t) ?? t) : null))
+    .filter((t): t is string => typeof t === 'string');
   const featured = tags.includes('gallery-featured');
   let year: number | null = null;
   let category: string | null = null;
@@ -1048,30 +1052,35 @@ let _galleryAssetsCache: GalleryItem[] | null = null;
 
 export async function getGalleryAssets(): Promise<GalleryItem[]> {
   if (!visualEditingEnabled && _galleryAssetsCache) return _galleryAssetsCache;
-  const { result } = await loadQuery<GalleryAsset[]>({ query: GALLERY_ASSETS_QUERY });
-  const assets: GalleryAsset[] = result ?? [];
-  const items: GalleryItem[] = assets.map((a) => {
-    const { featured, year, category } = parseGalleryAssetTags(a);
-    const caption = a.description ?? a.title ?? null;
-    const alt = a.altText ?? null;
-    return {
-      _key: a._id,
-      image: {
-        asset: {
-          _id: a._id,
-          url: a.url ?? '',
-          metadata: a.metadata ?? null,
+  try {
+    const { result } = await loadQuery<GalleryAsset[]>({ query: GALLERY_ASSETS_QUERY });
+    const assets: GalleryAsset[] = result ?? [];
+    const items: GalleryItem[] = assets.map((a) => {
+      const { featured, year, category } = parseGalleryAssetTags(a);
+      const caption = a.description ?? a.title ?? null;
+      const alt = a.altText ?? null;
+      return {
+        _key: a._id,
+        image: {
+          asset: {
+            _id: a._id,
+            url: a.url ?? '',
+            metadata: a.metadata ?? null,
+          },
+          alt,
         },
-        alt,
-      },
-      caption,
-      featured,
-      year,
-      category,
-    };
-  });
-  _galleryAssetsCache = items;
-  return items;
+        caption,
+        featured,
+        year,
+        category,
+      };
+    });
+    _galleryAssetsCache = items;
+    return items;
+  } catch (err) {
+    console.warn('[getGalleryAssets] failed; returning empty list', err);
+    return [];
+  }
 }
 
 // ---------------------------------------------------------------------------
