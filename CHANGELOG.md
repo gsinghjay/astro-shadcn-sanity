@@ -1,3 +1,20 @@
+## [2.3.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.1...v2.3.0) (2026-05-05)
+
+### Features
+
+* **blocks:** auto-curate /gallery from sanity-plugin-media asset tags (Story 22.11) ([7e344a6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7e344a69cd83de26212836a312272e3c816b8ad3))
+* **env:** complete astro:env migration — declare 8 secrets + migrate all consumers ([88ad2e8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/88ad2e8e781449a9eae98a3134c123ddc8b2e91e)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1)
+* **infra:** Cloudflare Workers best-practices hardening (Story 22.10) ([2790c7f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2790c7fcd48293e15235c350ce36ffbf2c96d7b6))
+
+### Bug Fixes
+
+* **blocks:** harden gallery auto-curate from code review (Story 22.11) ([e6b3d7e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e6b3d7e7ce73bcd8d90df4b43ce1d65dc1c0747c))
+* **ci:** inject placeholder secrets so site-health build passes astro:env validateSecrets ([b2705ba](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b2705babca584e759f7dc53b669e59beac975a4a))
+* **ci:** seed .dev.vars so miniflare prerender Worker passes astro:env validation ([ebc62fd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ebc62fd6a1ece3a2bbd089802dfeb7d2474320f2))
+* **env:** harden astro:env migration consumers from code review ([54758f2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/54758f27f68898c032f3eaee0ca447833288ab0b))
+* **env:** mark portal-only secrets optional on non-capstone envs ([6257076](https://github.com/gsinghjay/astro-shadcn-sanity/commit/62570769ec8440eb1d49a6a41b47561eaf5aa8db))
+* **infra:** harden Story 22.10 from code review ([26a4131](https://github.com/gsinghjay/astro-shadcn-sanity/commit/26a413141bdce77486446b58566d7430384b33a6))
+
 ## [2.2.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.0...v2.2.1) (2026-05-04)
 
 ### Bug Fixes
