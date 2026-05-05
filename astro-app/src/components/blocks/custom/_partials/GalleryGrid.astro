@@ -344,23 +344,26 @@ const hasFilters = years.length > 0 || categories.length > 0;
   import PhotoSwipeLightbox from 'photoswipe/lightbox';
   import 'photoswipe/style.css';
 
-  let lightbox: InstanceType<typeof PhotoSwipeLightbox> | null = null;
+  // One PhotoSwipeLightbox per `.pswp-gallery` container so multiple
+  // GalleryGrid instances on the same page don't share state.
+  const lightboxes = new Map<string, InstanceType<typeof PhotoSwipeLightbox>>();
 
-  function initLightbox() {
-    if (lightbox) {
-      lightbox.destroy();
-      lightbox = null;
+  function initLightbox(galleryId: string) {
+    const existing = lightboxes.get(galleryId);
+    if (existing) {
+      existing.destroy();
+      lightboxes.delete(galleryId);
     }
 
-    lightbox = new PhotoSwipeLightbox({
-      gallery: '.pswp-gallery',
+    const lightbox = new PhotoSwipeLightbox({
+      gallery: `#${galleryId}`,
       children: 'a:not([hidden])',
       pswpModule: () => import('photoswipe'),
     });
 
     // Caption overlay
     lightbox.on('uiRegister', () => {
-      lightbox!.pswp!.ui.registerElement({
+      lightbox.pswp!.ui.registerElement({
         name: 'caption',
         order: 9,
         isButton: false,
@@ -368,8 +371,8 @@ const hasFilters = years.length > 0 || categories.length > 0;
         html: '',
         onInit: (el) => {
           el.style.cssText = 'position:absolute;bottom:0;left:0;right:0;padding:16px 24px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:14px;text-align:center;pointer-events:none;';
-          lightbox!.pswp!.on('change', () => {
-            const slide = lightbox!.pswp!.currSlide?.data.element;
+          lightbox.pswp!.on('change', () => {
+            const slide = lightbox.pswp!.currSlide?.data.element;
             const caption = slide?.closest('figure')?.querySelector('figcaption')?.textContent || '';
             el.textContent = caption;
             el.style.display = caption ? '' : 'none';
@@ -378,7 +381,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
       });
 
       // Share button
-      lightbox!.pswp!.ui.registerElement({
+      lightbox.pswp!.ui.registerElement({
         name: 'share-button',
         order: 8,
         isButton: true,
@@ -404,7 +407,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
 
     // Set ?img= on first open (before any change event fires)
     lightbox.on('afterInit', () => {
-      const index = lightbox!.pswp!.currIndex;
+      const index = lightbox.pswp!.currIndex;
       const url = new URL(window.location.href);
       url.searchParams.set('img', String(index + 1));
       history.replaceState(null, '', url.toString());
@@ -412,7 +415,7 @@ const hasFilters = years.length > 0 || categories.length > 0;
 
     // Deep linking: update URL on slide change
     lightbox.on('change', () => {
-      const index = lightbox!.pswp!.currIndex;
+      const index = lightbox.pswp!.currIndex;
       const url = new URL(window.location.href);
       url.searchParams.set('img', String(index + 1));
       history.replaceState(null, '', url.toString());
@@ -426,18 +429,27 @@ const hasFilters = years.length > 0 || categories.length > 0;
     });
 
     lightbox.init();
+    lightboxes.set(galleryId, lightbox);
+    return lightbox;
   }
 
-  initLightbox();
+  // Initialize a lightbox for every gallery container on the page
+  document.querySelectorAll<HTMLElement>('.pswp-gallery').forEach((container) => {
+    if (container.id) initLightbox(container.id);
+  });
 
-  // Deep linking: open to ?img=N on page load (with bounds check)
+  // Deep linking: open the first gallery to ?img=N on page load (with bounds check)
   const params = new URLSearchParams(window.location.search);
   const imgParam = params.get('img');
-  if (imgParam && lightbox) {
-    const imgIndex = parseInt(imgParam, 10) - 1;
-    const totalItems = document.querySelectorAll('.pswp-gallery a').length;
-    if (imgIndex >= 0 && imgIndex < totalItems) {
-      lightbox.loadAndOpen(imgIndex);
+  if (imgParam) {
+    const firstGallery = document.querySelector<HTMLElement>('.pswp-gallery[id]');
+    const firstLightbox = firstGallery ? lightboxes.get(firstGallery.id) : null;
+    if (firstGallery && firstLightbox) {
+      const imgIndex = parseInt(imgParam, 10) - 1;
+      const totalItems = firstGallery.querySelectorAll('a:not([hidden])').length;
+      if (imgIndex >= 0 && imgIndex < totalItems) {
+        firstLightbox.loadAndOpen(imgIndex);
+      }
     }
   }
 
@@ -467,8 +479,8 @@ const hasFilters = years.length > 0 || categories.length > 0;
         }
       });
 
-      // Reinitialize PhotoSwipe to update its item list after filtering
-      initLightbox();
+      // Reinitialize only this gallery's lightbox so the item list refreshes
+      initLightbox(targetId!);
     }
 
     filterBar.querySelectorAll('.gallery-filter-pill').forEach(pill => {
