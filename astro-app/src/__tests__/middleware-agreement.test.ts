@@ -78,8 +78,10 @@ const CURRENT_REV = 'rev-current-xyz';
 function createMockContext(pathname: string, headers?: Record<string, string>) {
   // Story 22.10: middleware uses `cfContext?.waitUntil(...)` for fire-and-forget
   // KV writes. Without a cfContext mock, the optional chain short-circuits and
-  // the underlying put/delete never fires. Seed a benign waitUntil that runs
-  // its argument inline so existing KV-side-effect assertions still pass.
+  // the underlying put/delete never fires (the promise expression is evaluated
+  // as the argument to waitUntil — short-circuit means the put/delete is never
+  // even constructed). Seed a benign cfContext so the side effect fires; the
+  // mock body just records the call and discards the promise.
   return {
     url: new URL(`http://localhost:4321${pathname}`),
     request: new Request(`http://localhost:4321${pathname}`, { headers }),

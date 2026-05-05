@@ -12,14 +12,15 @@ const jsonResponse = (body: { success: boolean; error?: string }, status: number
 export const POST: APIRoute = async ({ request }) => {
   // Defense-in-depth: reject before reading the body so a malicious client
   // can't drag the Worker into a multi-MB JSON.parse on a route that should
-  // only ever see a small payload. Missing or non-numeric Content-Length is a
-  // 411 because we can't size-bound the body without it; oversize bodies are
-  // 413 per RFC 9110.
+  // only ever see a small payload. RFC 9110 §8.6 defines Content-Length as a
+  // base-10 unsigned integer — `Number()` would happily admit `"-1"`, `"0x10"`,
+  // `"1e2"`, leading/trailing whitespace, etc. Strict regex first so spoofed
+  // values cannot bypass the cap. Missing or non-numeric → 411; oversize → 413.
   const contentLengthHeader = request.headers.get('content-length');
-  const contentLength = contentLengthHeader === null ? NaN : Number(contentLengthHeader);
-  if (!Number.isFinite(contentLength)) {
+  if (contentLengthHeader === null || !/^\d+$/.test(contentLengthHeader)) {
     return jsonResponse({ success: false, error: 'Length Required' }, 411);
   }
+  const contentLength = Number(contentLengthHeader);
   if (contentLength > MAX_REQUEST_BYTES) {
     return jsonResponse({ success: false, error: 'Payload too large' }, 413);
   }

@@ -80,10 +80,11 @@ function createMockRateLimiter() {
   };
 }
 
-/** Mock `cfContext.waitUntil` that records the call AND immediately invokes the promise so
- *  KV/D1 spy assertions still see the side effect fire. Production-code parity: the Workers
- *  runtime keeps the isolate alive until the promise settles; for tests, awaiting synchronously
- *  is the closest equivalent that doesn't require deferred-task plumbing. */
+/** Mock `cfContext.waitUntil` that records the call. KV / D1 spies fire because the production
+ *  source builds the promise expression as the argument to `waitUntil` (e.g. `waitUntil(kv.put())`),
+ *  so by the time we reach the mock body the side effect is already in flight. The mock body
+ *  itself does not await the promise — tests that need the rejection branch should await the
+ *  recorded `mock.calls[i][0]` via `Promise.allSettled`. */
 function createMockCfContext() {
   return {
     waitUntil: vi.fn((promise: Promise<unknown>) => {
@@ -771,6 +772,35 @@ describe('middleware — unified auth routing', () => {
       // KV write on the cache-miss fallback + KV delete on the denied path.
       expect(cfContext.waitUntil).toHaveBeenCalledTimes(2);
       expect(mockKvDelete).toHaveBeenCalledWith('wu-token-1');
+    });
+
+    it('logs structured error when KV write inside waitUntil rejects', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      // Force the put().catch() rejection branch so the log.error tail runs.
+      mockKvPut.mockRejectedValueOnce(new Error('KV outage'));
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie }, cfContext });
+      await onRequest(ctx as any, mockNext);
+
+      // Drive the waitUntil-wrapped promises to completion so the .catch(log.error)
+      // tail fires. The mock body itself does not await; tests must do it explicitly.
+      await Promise.allSettled(cfContext.waitUntil.mock.calls.map(c => c[0]));
+
+      const errorLog = consoleSpy.mock.calls
+        .map(call => {
+          try { return JSON.parse(call[0] as string); } catch { return null; }
+        })
+        .find(parsed => parsed?.msg === 'middleware-kv-write-failed');
+      expect(errorLog).toBeDefined();
+      expect(errorLog.level).toBe('error');
+      expect(errorLog.error).toBe('KV outage');
+      consoleSpy.mockRestore();
     });
 
     it('does not destructure waitUntil — calls it as a method on cfContext', async () => {

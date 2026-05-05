@@ -36,13 +36,14 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
 
   // Defense-in-depth: this endpoint takes no user-supplied JSON beyond the
   // session cookie, but a malicious client could POST a huge body to drag the
-  // Worker into reading it. Reject before any expensive work. Missing Content-
-  // Length is 411 (we can't size-bound it); oversize is 413 (RFC 9110).
+  // Worker into reading it. RFC 9110 §8.6 defines Content-Length as a base-10
+  // unsigned integer; strict regex rejects spoofed `-1` / `0x10` / `1e2` /
+  // whitespace before `Number()` admits them. Missing → 411; oversize → 413.
   const contentLengthHeader = request.headers.get('content-length');
-  const contentLength = contentLengthHeader === null ? NaN : Number(contentLengthHeader);
-  if (!Number.isFinite(contentLength)) {
+  if (contentLengthHeader === null || !/^\d+$/.test(contentLengthHeader)) {
     return json({ error: 'length_required' }, 411);
   }
+  const contentLength = Number(contentLengthHeader);
   if (contentLength > MAX_REQUEST_BYTES) {
     return json({ error: 'payload_too_large' }, 413);
   }

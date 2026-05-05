@@ -83,38 +83,41 @@ export const server = {
       // the trim() guard avoids `fetch(undefined)` AND `fetch("   ")` (a whitespace
       // value passes envField.string validation but throws TypeError: Invalid URL).
       // `cfContext.waitUntil` keeps the isolate alive past response so the webhook
-      // POST isn't dropped on isolate eviction. Net effect: the action returns
-      // ~200–800ms faster than the prior `await fetch(...)`. Falls through to a
-      // floating promise when cfContext is unavailable (vitest envs).
+      // POST isn't dropped on isolate eviction. The fetch expression lives INSIDE
+      // the optional chain so a missing cfContext (vitest, non-Worker runtimes)
+      // short-circuits the whole call instead of leaving a floating fetch behind.
+      // Mirrors middleware.ts pattern. Net effect vs prior `await fetch(...)`:
+      // action returns ~200–800ms faster.
       if (DISCORD_WEBHOOK_URL?.trim()) {
         const discordWebhookUrl = DISCORD_WEBHOOK_URL;
-        const discordPromise = fetch(discordWebhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            embeds: [
-              {
-                title: 'New Sponsor Inquiry',
-                color: 0x0066cc,
-                fields: [
-                  { name: 'Name', value: input.name, inline: true },
-                  { name: 'Email', value: input.email, inline: true },
-                  {
-                    name: 'Organization',
-                    value: input.organization || 'N/A',
-                    inline: true,
-                  },
-                  {
-                    name: 'Message',
-                    value: input.message.slice(0, 1024),
-                  },
-                ],
-                timestamp: new Date().toISOString(),
-              },
-            ],
-          }),
-        }).catch((e) => log.error('submitForm-discord-webhook-failed', e));
-        ctx.locals.cfContext?.waitUntil(discordPromise);
+        ctx.locals.cfContext?.waitUntil(
+          fetch(discordWebhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              embeds: [
+                {
+                  title: 'New Sponsor Inquiry',
+                  color: 0x0066cc,
+                  fields: [
+                    { name: 'Name', value: input.name, inline: true },
+                    { name: 'Email', value: input.email, inline: true },
+                    {
+                      name: 'Organization',
+                      value: input.organization || 'N/A',
+                      inline: true,
+                    },
+                    {
+                      name: 'Message',
+                      value: input.message.slice(0, 1024),
+                    },
+                  ],
+                  timestamp: new Date().toISOString(),
+                },
+              ],
+            }),
+          }).catch((e) => log.error('submitForm-discord-webhook-failed', e)),
+        );
       }
 
       return { success: true };
