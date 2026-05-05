@@ -24,7 +24,21 @@ function extractSchemaVariants(filePath: string): string[] {
 
 /** Extract variant branches from a component file's conditional rendering */
 function extractComponentVariants(filePath: string): string[] {
-  const content = readFileSync(filePath, 'utf8')
+  let content = readFileSync(filePath, 'utf8')
+  // Follow `_partials/` imports so wrapper components that delegate their
+  // render bodies to a shared partial (e.g. ImageGallery → GalleryGrid) are
+  // scanned as a single unit. Story 22.11 introduced this pattern.
+  const partialImports = [
+    ...content.matchAll(/from\s+['"]\.\/_partials\/([A-Za-z0-9_-]+)\.astro['"]/g),
+  ].map(m => m[1])
+  for (const partialName of partialImports) {
+    const partialPath = join(COMPONENT_DIR, '_partials', `${partialName}.astro`)
+    try {
+      content += '\n' + readFileSync(partialPath, 'utf8')
+    } catch {
+      // Partial missing — let other tests catch that; do not crash the scan.
+    }
+  }
   // Match explicit variant checks: cleanVariant === 'xxx', variant === 'xxx', etc.
   const variantChecks = [
     ...content.matchAll(
