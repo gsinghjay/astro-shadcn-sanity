@@ -935,6 +935,155 @@ export async function getArticlesByCategory(
 }
 
 // ---------------------------------------------------------------------------
+// Gallery asset queries (Story 22.11)
+// ---------------------------------------------------------------------------
+
+/**
+ * GROQ query: fetch every Sanity image asset tagged "gallery" via the
+ * sanity-plugin-media tag system. Tags are stored as weak references at
+ * `opt.media.tags[]` (see sanity-plugin-media README §"Querying").
+ *
+ * Workspace-global by design — image assets carry no `site` field, so this
+ * query intentionally omits the multi-site filter (`getSiteParams()`).
+ * All three Sanity workspaces share one CDN/dataset for media.
+ */
+export const GALLERY_ASSETS_QUERY = defineQuery(groq`*[_type == "sanity.imageAsset" && "gallery" in opt.media.tags[]->name.current] | order(_createdAt desc){
+  _id,
+  url,
+  altText,
+  title,
+  description,
+  metadata { lqip, dimensions },
+  "tags": opt.media.tags[]->name.current
+}`);
+
+/**
+ * Raw asset shape returned by GALLERY_ASSETS_QUERY.
+ *
+ * Defined manually rather than derived from `GALLERY_ASSETS_QUERY_RESULT[number]`
+ * because TypeGen emits `Array<never>` for queries against `sanity.imageAsset` —
+ * that built-in plugin type isn't declared in `studio/src/schemaTypes/index.ts`,
+ * so the query result is structurally empty. The runtime data still matches the
+ * GROQ projection; this type mirrors that projection field-for-field.
+ */
+export type GalleryAsset = {
+  _id: string;
+  url: string | null;
+  altText: string | null;
+  title: string | null;
+  description: string | null;
+  metadata: {
+    lqip: string | null;
+    dimensions: { width: number; height: number } | null;
+  } | null;
+  tags: string[] | null;
+};
+
+/**
+ * Normalized item shape consumed by `_partials/GalleryGrid.astro`.
+ * Both the asset-tag listing path (`getGalleryAssets`) and the page-builder
+ * `imageGallery` block (via `ImageGallery.astro` wrapper) feed this shape.
+ */
+export type GalleryItem = {
+  _key: string;
+  image: {
+    asset: {
+      _id: string;
+      url: string;
+      metadata?: {
+        lqip?: string | null;
+        dimensions?: { width?: number; height?: number } | null;
+      } | null;
+    };
+    alt?: string | null;
+  };
+  caption?: string | null;
+  featured?: boolean | null;
+  year?: number | null;
+  category?: string | null;
+};
+
+const GALLERY_CATEGORY_SLUGS: ReadonlySet<string> = new Set([
+  'web-apps',
+  'mobile',
+  'ai-ml',
+  'data-viz',
+  'iot',
+  'other',
+]);
+
+/**
+ * Parse the asset's tag list into `featured` / `year` / `category`.
+ * Tag conventions (editor contract, see docs/team/gallery-tag-conventions.md):
+ *   `gallery-featured`         → featured: true
+ *   `gallery-<4-digit-year>`   → year: parseInt(year)        (first match wins)
+ *   `gallery-<canonical-slug>` → category: slug              (first match wins)
+ * Non-canonical category-shaped tags (e.g. `gallery-typo`) are ignored.
+ */
+function parseGalleryAssetTags(asset: GalleryAsset): Pick<GalleryItem, 'featured' | 'year' | 'category'> {
+  // Filter out null entries from broken/unpublished media.tag references and
+  // strip stega markers so regex matching survives visual-editing previews.
+  const tags = (asset.tags ?? [])
+    .map((t) => (typeof t === 'string' ? (stegaClean(t) ?? t) : null))
+    .filter((t): t is string => typeof t === 'string');
+  const featured = tags.includes('gallery-featured');
+  let year: number | null = null;
+  let category: string | null = null;
+  for (const tag of tags) {
+    if (year === null) {
+      const yMatch = tag.match(/^gallery-(\d{4})$/);
+      if (yMatch) year = parseInt(yMatch[1], 10);
+    }
+    if (category === null) {
+      const cMatch = tag.match(/^gallery-(.+)$/);
+      if (cMatch && GALLERY_CATEGORY_SLUGS.has(cMatch[1])) category = cMatch[1];
+    }
+  }
+  return { featured, year, category };
+}
+
+/**
+ * Fetch all gallery-tagged image assets from Sanity, normalized to
+ * `GalleryItem[]`. Mirrors the `_sponsorsCache` build-time memoization pattern.
+ * Cache is bypassed when visual editing is active so tag changes surface
+ * instantly on preview Workers.
+ */
+let _galleryAssetsCache: GalleryItem[] | null = null;
+
+export async function getGalleryAssets(): Promise<GalleryItem[]> {
+  if (!visualEditingEnabled && _galleryAssetsCache) return _galleryAssetsCache;
+  try {
+    const { result } = await loadQuery<GalleryAsset[]>({ query: GALLERY_ASSETS_QUERY });
+    const assets: GalleryAsset[] = result ?? [];
+    const items: GalleryItem[] = assets.map((a) => {
+      const { featured, year, category } = parseGalleryAssetTags(a);
+      const caption = a.description ?? a.title ?? null;
+      const alt = a.altText ?? null;
+      return {
+        _key: a._id,
+        image: {
+          asset: {
+            _id: a._id,
+            url: a.url ?? '',
+            metadata: a.metadata ?? null,
+          },
+          alt,
+        },
+        caption,
+        featured,
+        year,
+        category,
+      };
+    });
+    _galleryAssetsCache = items;
+    return items;
+  } catch (err) {
+    console.warn('[getGalleryAssets] failed; returning empty list', err);
+    return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Author queries (Story 20.2)
 // ---------------------------------------------------------------------------
 
@@ -1162,6 +1311,7 @@ export function resetAllCaches(): void {
   _articlesCache = null;
   _articleCategoriesCache = null;
   _authorsCache = null;
+  _galleryAssetsCache = null;
   _listingPageCache.clear();
   _portalPageCache.clear();
 }

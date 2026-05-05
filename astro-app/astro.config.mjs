@@ -150,16 +150,44 @@ export default defineConfig({
         values: ["red", "blue", "green"],
         default: "red",
       }),
-
-      // --- Server-side public vars ---
+      // SanityLiveUpdater.astro reads these from a client-side <script> block;
+      // ContactForm reads PUBLIC_TURNSTILE_SITE_KEY from frontmatter rendered
+      // server-side but they're public values surfaced to the markup either way.
+      // PROJECT_ID has no safe fallback — required-client-public so a
+      // misconfigured Worker fails at build instead of silently going dark.
       PUBLIC_SANITY_STUDIO_PROJECT_ID: envField.string({
-        context: "server",
+        context: "client",
         access: "public",
       }),
       PUBLIC_SANITY_STUDIO_DATASET: envField.string({
-        context: "server",
+        context: "client",
         access: "public",
         default: "production",
+      }),
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({
+        context: "client",
+        access: "public",
+        default: "",
+      }),
+
+      // --- Server-side public vars (capstone-only — optional for rwc parity) ---
+      // rwc_us / rwc_intl wrangler blocks don't carry these. optional:true
+      // closes the audit's parity-gap item; createAuth() throws fail-loud at
+      // runtime if portal/auth code paths actually need them.
+      BETTER_AUTH_URL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      GITHUB_CLIENT_ID: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
+      }),
+      RESEND_FROM_EMAIL: envField.string({
+        context: "server",
+        access: "public",
+        optional: true,
       }),
 
       // --- Server-side secrets ---
@@ -183,6 +211,35 @@ export default defineConfig({
         access: "public",
         optional: true,
       }),
+
+      // --- Server-side secrets (portal / auth / write paths) ---
+      // Only the prod `capstone` Worker carries these — the rwc + *-preview
+      // Workers are content-only (no D1/KV/DO bindings) and portal/auth/api
+      // routes return 503 there. Marking these `optional` for non-prod envs
+      // lets `astro:env/server` return undefined at runtime instead of
+      // throwing EnvInvalidVariables on every request when the bundle imports
+      // `actions/index.ts` (which transitively reads these). Prod stays strict
+      // so a missing secret still fails the build immediately.
+      ...(process.env.CLOUDFLARE_ENV === "capstone"
+        ? {
+            BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
+            GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+            GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret" }),
+            GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+            RESEND_API_KEY: envField.string({ context: "server", access: "secret" }),
+            TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret" }),
+            SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret" }),
+          }
+        : {
+            BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            GOOGLE_CLIENT_ID: envField.string({ context: "server", access: "secret", optional: true }),
+            GOOGLE_CLIENT_SECRET: envField.string({ context: "server", access: "secret", optional: true }),
+            RESEND_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+            TURNSTILE_SECRET_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+            SANITY_API_WRITE_TOKEN: envField.string({ context: "server", access: "secret", optional: true }),
+          }),
+      DISCORD_WEBHOOK_URL: envField.string({ context: "server", access: "secret", optional: true }),
     },
     validateSecrets: true,
   },
