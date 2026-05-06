@@ -17,8 +17,10 @@ const RATE_LIMIT_MAX_REQUESTS = 100;
 /** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
 const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
 
-/** Endpoint that handles agreement acceptance — must remain reachable while the gate is active */
-const AGREEMENT_ACCEPT_PATH = "/api/portal/agreement/accept";
+/** Astro Action endpoint for accepting the sponsor agreement.
+ *  Classified as portal so the auth flow runs (otherwise `ctx.locals.user` is unset),
+ *  AND skipped from the agreement gate so a not-yet-accepted sponsor can submit. */
+const ACCEPT_AGREEMENT_ACTION_PATH = "/_actions/acceptAgreement";
 
 const jsonError = (status: number, error: string) =>
   new Response(JSON.stringify({ error }), {
@@ -103,7 +105,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
-  const isPortal = isPortalPage || isPortalApi;
+  // The acceptAgreement Action endpoint runs through the portal auth flow so its handler
+  // sees `ctx.locals.user`; the agreement gate then skips this same path so the not-yet-accepted
+  // sponsor can actually submit. Other Astro Actions (e.g. submitForm on public pages) are NOT
+  // portal-routed — they remain unauthenticated by design.
+  const isAcceptAgreementAction = pathname === ACCEPT_AGREEMENT_ACTION_PATH;
+  const isPortal = isPortalPage || isPortalApi || isAcceptAgreementAction;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
   // Branch 1: Public routes (and admin API) — zero auth overhead.
@@ -242,7 +249,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // No session → 401 JSON for API routes, redirect for pages
     if (!userData) {
-      if (isPortalApi) return jsonError(401, "unauthorized");
+      // JSON response for fetch-based callers (portal API + acceptAgreement Action endpoint).
+      // Astro Actions invoke handlers via fetch and expect a structured response — a 302 to
+      // /auth/login would be opaque to the React client.
+      if (isPortalApi || isAcceptAgreementAction) return jsonError(401, "unauthorized");
       const loginUrl = isPortalPage
         ? `/portal/login?redirect=${encodeURIComponent(pathname)}`
         : `/auth/login?redirect=${encodeURIComponent(pathname)}`;
@@ -285,7 +295,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
               .catch((e: unknown) => log.error('middleware-kv-delete-failed', e)),
           );
         }
-        if (isPortalApi) return jsonError(403, "forbidden");
+        if (isPortalApi || isAcceptAgreementAction) return jsonError(403, "forbidden");
         return new Response(null, {
           status: 302,
           headers: {
@@ -302,9 +312,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Sponsor Agreement gate — sponsors must accept the CMS agreement once before using the portal.
-    // The accept endpoint itself must remain reachable so the modal can submit acceptance.
+    // The acceptAgreement Action endpoint must remain reachable so the modal can submit acceptance.
     const skipsAgreementPath =
-      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
+      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === ACCEPT_AGREEMENT_ACTION_PATH;
     if (userData.role === "sponsor" && !skipsAgreementPath) {
       let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
       let agreementVersion = userData.agreementVersion ?? null;

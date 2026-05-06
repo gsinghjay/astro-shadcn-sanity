@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { actions } from 'astro:actions';
 // React renderer is required here: this island runs client-side. The server-rendered
 // /portal/agreement page uses `astro-portabletext` for the same content (Astro convention),
 // so two renderers are intentional — one per render context.
@@ -94,19 +95,19 @@ export default function SponsorAgreementModal({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch('/api/portal/agreement/accept', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'content-type': 'application/json' },
-      });
-      if (res.status === 200 || res.status === 409) {
+      const { data, error: actionError } = await actions.acceptAgreement({});
+      if (data) {
+        // 'accepted' and 'already_accepted' both mean "modal can close" — reload to re-run middleware.
         // Defensive: if reload is blocked or delayed, drop the spinner so user can retry.
         setTimeout(() => setSubmitting(false), 5000);
         window.location.reload();
         return;
       }
-      const body = await res.json().catch(() => ({}));
-      setError(body?.error ? `Could not accept (${body.error}). Try again.` : 'Could not accept. Try again.');
+      setError(
+        actionError
+          ? `Could not accept (${actionError.message}). Try again.`
+          : 'Could not accept. Try again.',
+      );
     } catch {
       setError('Network error. Try again.');
     } finally {

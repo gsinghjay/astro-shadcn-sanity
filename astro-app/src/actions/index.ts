@@ -1,6 +1,7 @@
 import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro/zod';
 import { createClient } from '@sanity/client';
+import { env } from 'cloudflare:workers';
 import {
   TURNSTILE_SECRET_KEY,
   SANITY_API_WRITE_TOKEN,
@@ -10,6 +11,8 @@ import {
   PUBLIC_SANITY_STUDIO_PROJECT_ID,
   PUBLIC_SANITY_STUDIO_DATASET,
 } from 'astro:env/client';
+import { extractSessionToken, hashToken, normalizeEmail } from '@/middleware';
+import { getSponsorAgreementRev } from '@/lib/sanity';
 import { log } from '@/lib/log';
 
 export const server = {
@@ -121,6 +124,61 @@ export const server = {
       }
 
       return { success: true };
+    },
+  }),
+
+  acceptAgreement: defineAction({
+    input: z.object({}),
+    handler: async (_input, ctx) => {
+      const user = ctx.locals.user;
+      if (!user) throw new ActionError({ code: 'UNAUTHORIZED', message: 'unauthorized' });
+      if (user.role !== 'sponsor') throw new ActionError({ code: 'FORBIDDEN', message: 'forbidden' });
+      if (!env?.PORTAL_DB) throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'service_unavailable' });
+
+      const email = normalizeEmail(user.email);
+      const acceptedAt = Date.now();
+
+      const existing = await env.PORTAL_DB
+        .prepare('SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?')
+        .bind(email)
+        .first<{ agreement_accepted_at: number | null; agreement_version: string | null }>();
+
+      if (!existing) throw new ActionError({ code: 'NOT_FOUND', message: 'user_not_found' });
+
+      const ip = ctx.request.headers.get('cf-connecting-ip');
+      const ua = ctx.request.headers.get('user-agent');
+      const rev = await getSponsorAgreementRev();
+
+      // Sanity outage (rev === null) → trust the existing accepted_at to avoid double-accept;
+      // otherwise re-accept on version drift.
+      if (existing.agreement_accepted_at != null) {
+        const upToDate =
+          rev === null
+            ? true
+            : existing.agreement_version != null && existing.agreement_version === rev;
+        if (upToDate) {
+          return { status: 'already_accepted' as const, acceptedAt: existing.agreement_accepted_at };
+        }
+      }
+
+      await env.PORTAL_DB
+        .prepare(
+          'UPDATE user SET agreement_accepted_at = ?, agreement_version = ?, agreement_accepted_ip = ?, agreement_accepted_user_agent = ? WHERE LOWER(email) = ?',
+        )
+        .bind(acceptedAt, rev, ip, ua, email)
+        .run();
+
+      const sessionToken = extractSessionToken(ctx.request.headers.get('cookie'));
+      if (sessionToken && env.SESSION_CACHE) {
+        try {
+          const hashedKey = await hashToken(sessionToken);
+          await env.SESSION_CACHE.delete(hashedKey);
+        } catch (e) {
+          log.error('agreement-accept-kv-invalidation-failed', e);
+        }
+      }
+
+      return { status: 'accepted' as const, acceptedAt };
     },
   }),
 };
