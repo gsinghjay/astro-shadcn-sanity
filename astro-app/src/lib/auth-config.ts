@@ -51,10 +51,14 @@ function getTrustedOrigins(): string[] {
  * Checks if an email is on the sponsor whitelist by querying Sanity.
  * Returns true if the email matches any sponsor's contactEmail or exists in any sponsor's allowedEmails[].
  * Fails closed (returns false) on any error — non-whitelisted users default to student role.
+ *
+ * Email is lowercased before the GROQ comparison (which is case-sensitive) so the
+ * create-before hook (raw provider email) and middleware escalation (already
+ * normalised) agree on whitelist membership for the same physical user.
  */
 export async function checkSponsorWhitelist(email: string): Promise<boolean> {
   try {
-    const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email });
+    const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email: email.toLowerCase() });
     return result === true;
   } catch (err) {
     log.error('auth-sanity-whitelist-check-failed', err);
@@ -176,17 +180,27 @@ export function createAuth({ db }: CreateAuthOptions) {
           // Sponsor role gate — only assign 'sponsor' when the provider verified the email
           // AND the email is on the Sanity whitelist. Better Auth normalizes the provider's
           // verification field (Google `email_verified`, GitHub primary-email `verified` via
-          // `/user/emails`) into `user.emailVerified` before this hook fires, and the magic-link
-          // plugin sets `emailVerified: true` because the click is itself proof of email control.
-          // Anything else (no provider verification, an unrecognized provider) → 'student'.
+          // `/user/emails`) into `user.emailVerified` before this hook fires, so this is the
+          // single signal we trust. Anything else (no provider verification, unrecognized
+          // provider) → 'student'.
+          //
+          // Magic-link reachability: with `disableSignUp: true` Better Auth rejects unknown
+          // emails with `new_user_signup_disabled` BEFORE creating a user, so this hook does
+          // not fire on a normal magic-link click. It would fire only if a future flow
+          // creates a user via the magic-link plugin path (admin pre-provisioning etc.); in
+          // that case the plugin sets `emailVerified: true` because the click itself proves
+          // email control. AC 8 closes the privilege-escalation path in upstream Better Auth.
           before: async (user, ctx) => {
             const emailIsVerified = (user as { emailVerified?: boolean }).emailVerified === true;
-            const provider = ctx?.path?.split('/').filter(Boolean).pop() ?? 'unknown';
+            // `pathSegment` is the URL last-segment of the auth route that triggered creation
+            // (e.g. 'google', 'github', 'magic-link'). Used for ops correlation only — it is
+            // NOT necessarily an OAuth provider name.
+            const pathSegment = ctx?.path?.split('/').filter(Boolean).pop() ?? 'unknown';
             const isSponsor = emailIsVerified ? await checkSponsorWhitelist(user.email) : false;
             if (!emailIsVerified) {
               log.warn('auth-denied-sponsor-role-unverified-email', {
                 email: user.email,
-                provider,
+                pathSegment,
               });
             }
             return {

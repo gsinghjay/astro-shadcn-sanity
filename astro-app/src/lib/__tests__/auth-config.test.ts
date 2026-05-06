@@ -324,7 +324,7 @@ describe('databaseHooks.user.create.before — verified-email sponsor gate (Stor
     const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
     expect(parsed.msg).toBe('auth-denied-sponsor-role-unverified-email');
     expect(parsed.email).toBe('attacker@sponsor.com');
-    expect(parsed.provider).toBe('google');
+    expect(parsed.pathSegment).toBe('google');
     consoleSpy.mockRestore();
   });
 
@@ -365,10 +365,13 @@ describe('databaseHooks.user.create.before — verified-email sponsor gate (Stor
     expect(result.data.role).toBe('student');
   });
 
-  it('treats magic-link click as verification (email control proven by click)', async () => {
-    // The magic-link plugin sets emailVerified: true on the created user because the click
-    // is itself proof of email control. With disableSignUp:true the auto-create only runs
-    // when an admin has pre-provisioned the row, but the hook still fires.
+  it('classifies a magic-link-shaped invocation as verified (documents intended behaviour)', async () => {
+    // Production reachability note: with `disableSignUp: true`, Better Auth rejects unknown
+    // emails on the magic-link click with `new_user_signup_disabled` BEFORE this hook runs,
+    // so a real magic-link click does NOT exercise this branch. The test invokes the hook
+    // directly to document what *would* happen if a future flow created a user via the
+    // magic-link plugin path (e.g. admin pre-provisioning) — the plugin would set
+    // `emailVerified: true` because the click itself proves email control.
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
     const before = getCreateBeforeHook();
 
@@ -380,14 +383,14 @@ describe('databaseHooks.user.create.before — verified-email sponsor gate (Stor
     expect(result.data.role).toBe('sponsor');
   });
 
-  it('logs unknown provider when context.path is absent', async () => {
+  it('logs unknown pathSegment when context.path is absent', async () => {
     const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const before = getCreateBeforeHook();
 
     await before({ email: 'x@y.com', emailVerified: false, name: 'X' });
 
     const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
-    expect(parsed.provider).toBe('unknown');
+    expect(parsed.pathSegment).toBe('unknown');
     consoleSpy.mockRestore();
   });
 });
@@ -427,6 +430,15 @@ describe('checkSponsorWhitelist()', () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce(undefined as never);
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
+  });
+
+  it('lowercases email before GROQ comparison (Story 24.2 review fix)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
+    await checkSponsorWhitelist('Sponsor@Company.com');
+    // GROQ `==` is case-sensitive; the create-before hook receives raw provider emails
+    // (e.g. Google may return mixed case) while middleware escalation runs through
+    // `normalizeEmail()` first. Folding here keeps both call sites consistent.
+    expect(sanityClient.fetch).toHaveBeenCalledWith(expect.anything(), { email: 'sponsor@company.com' });
   });
 
   it('passes the email through as a GROQ param (not interpolated into the query)', async () => {
