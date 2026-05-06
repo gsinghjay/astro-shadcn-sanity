@@ -128,12 +128,20 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** GROQ matches `$email in allowedEmails[]`. If `allowedEmails` is editable by sponsor users in Studio (typical self-serve sponsor workflow), any sponsor can elevate arbitrary external users to sponsor role by editing their own document. There is no admin-approval gate.
 - **Exploit Scenario:** Sponsor A appends `attacker@evil.example` to their sponsor doc's `allowedEmails`. Attacker signs up via Google/magic-link; `checkSponsorWhitelist` returns true; attacker is provisioned as a `sponsor` and gains portal access spanning evaluations, RSVPs, and the agreement audit table.
 - **Fix:** Restrict `allowedEmails` write access at the Sanity role level (admin-only). Or add an `approved: boolean` controlled by an admin-only field. Or replace per-email allowlist with admin-managed domain allowlist.
+- **Status: RESOLVED 2026-05-05 via Story 24.7.**
+  - `sponsor.allowedEmails` field gains a `readOnly` callback that returns `true` for any Studio user whose roles do not include `administrator` (UI gate at `studio/src/schemaTypes/documents/sponsor.ts:101-114`).
+  - Description updated to call out the admin-only edit policy and direct contributors to their project administrator.
+  - Sanity dashboard ACL posture verified by Jay (recorded in PR description per Task 2): non-administrator roles either lack write access to sponsor documents or are restricted by a custom-role rule limiting `sponsor.allowedEmails` writes to administrators. Schema-level `readOnly` is belt-and-braces with the dashboard ACL.
 
 ### M-5: D1 `role` column lacks a CHECK constraint
 - **File:** `astro-app/migrations/0002_add_user_role.sql:4`
 - **Confidence:** 8
 - **Description:** Migration adds `role TEXT DEFAULT 'student' NOT NULL` with no CHECK. The Drizzle enum (`drizzle-schema.ts:17`) is TypeScript-only — SQLite does not enforce it. Today the only writer is `middleware.ts:205-208` (parameterised, hard-coded `'sponsor'`), so this is defense-in-depth — but if a future endpoint ever takes `role` from a request body, the DB will silently accept anything.
 - **Fix:** New migration that recreates `user` with `CHECK(role IN ('student','sponsor'))` (SQLite cannot ALTER COLUMN). Or a `CREATE TRIGGER` enforcing the invariant.
+- **Status: RESOLVED 2026-05-05 via Story 24.7.**
+  - `astro-app/migrations/0011_user_role_check_constraint.sql` rebuilds the `user` table with `role TEXT NOT NULL DEFAULT 'student' CHECK(role IN ('student','sponsor'))`. The CHECK on `user_new` doubles as the pre-flight gate: the INSERT-SELECT step aborts with a CHECK error before the original table is touched if any existing row carries a non-canonical value (RAISE(ABORT, ...) only fires inside trigger programs in SQLite, so the table-rebuild check is the cleaner mechanism).
+  - Drizzle TypeScript enum already matches (`text('role', { enum: ['student','sponsor'] })` at `astro-app/src/lib/drizzle-schema.ts:17`); D1 now enforces the same set at write time.
+  - Tests cover INSERT/UPDATE acceptance for `student`/`sponsor` and CHECK rejection for arbitrary values via `node:sqlite` against the migrated schema (`astro-app/src/lib/__tests__/drizzle-schema.test.ts`).
 
 ### M-6: Magic-link `expiresIn` default vs email copy
 - **File:** `astro-app/src/lib/auth-config.ts:122-137`
@@ -205,5 +213,5 @@ All routes gated by middleware (session + role + sponsor whitelist + agreement a
 4. **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`.
 5. **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`.
 6. [x] **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist. **RESOLVED 2026-05-05 via Story 24.2.**
-7. **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio.
-8. **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. (M-6 RESOLVED 2026-05-05 via Story 24.2; M-5 outstanding.)
+7. [x] **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio. **RESOLVED 2026-05-05 via Story 24.7.**
+8. [x] **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. **RESOLVED 2026-05-05 via Story 24.7 (M-5) + Story 24.2 (M-6).**

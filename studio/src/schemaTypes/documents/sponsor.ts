@@ -103,7 +103,12 @@ export const sponsor = defineType({
       title: 'Allowed Emails',
       type: 'array',
       group: 'main',
-      description: 'Additional emails authorized to access this sponsor portal',
+      description:
+        'Additional emails authorized to access this sponsor portal. Editable only by Sanity administrators (defense-in-depth — sponsor whitelist gate matches against this field at login). Contact your project administrator to add or remove entries.',
+      readOnly: ({currentUser}) => {
+        if (!currentUser) return true
+        return !currentUser.roles?.some((r) => r.name === 'administrator')
+      },
       of: [defineArrayMember({type: 'string', validation: (Rule) => Rule.email()})],
     }),
     defineField({
