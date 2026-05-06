@@ -89,6 +89,11 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
   - Set `accountLinking.allowDifferentEmails: false`.
   - Require provider-verified email before assigning sponsor role (check `account.providerData.email_verified` in the create hook; reject if false).
   - Move sponsor whitelist authoritative check to admin-curated allowlist, not Studio-editable `allowedEmails[]` (see also M-4).
+- **Status: RESOLVED 2026-05-05 via Story 24.2.**
+  - `magicLink({ disableSignUp: true, expiresIn: 600 })` — magic-link click on an unknown email returns the Better Auth signup-disabled error rather than auto-creating a user.
+  - `accountLinking.allowDifferentEmails: false` — second-provider link refuses if the new account's primary email differs from the existing user's email (closes Path B).
+  - `databaseHooks.user.create.before` gates `role: 'sponsor'` on `user.emailVerified === true`. Better Auth normalises Google `email_verified` and GitHub primary-email `verified` (via `/user/emails`) into `user.emailVerified` before the hook fires; magic-link clicks set it to `true` because the click itself proves email control. Anything else (no provider verification, unrecognised provider) → `'student'` plus a `auth-denied-sponsor-role-unverified-email` warn log.
+  - Sanity-whitelist authoritative check + admin-curated allowlist hardening tracked in Story 24.7 (M-4).
 
 ---
 
@@ -114,6 +119,8 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** `requestOrigin` is taken from `context.url.origin` (in turn derived from request `Host` header) and used as Better Auth's `baseURL`, then unconditionally added to `trustedOrigins`. CSRF / Origin protection becomes self-referential — every request implicitly trusts its own Origin. Production is somewhat protected by CF Routes locking `Host`, but `*.workers.dev` and any preview URL share the cookie domain in some configurations, and any non-browser client can attack the worker on `*.workers.dev` directly.
 - **Exploit Scenario:** Attacker reaches the worker via its `*.workers.dev` URL with a forged `Host: attacker.example` and finds CSRF/Origin checks pass for the attacker-controlled origin (because that origin has just been added to `trustedOrigins`). On preview deployments, this is the standard surface.
 - **Fix:** Static allowlist of trusted origins, derived from `CLOUDFLARE_ENV`. Never push request-derived values into `trustedOrigins`. `baseURL` from server config only.
+- **Status: RESOLVED 2026-05-05 via Story 24.2.**
+  - `requestOrigin` parameter removed from `CreateAuthOptions` and from `createAuth()` body. `baseURL = BETTER_AUTH_URL` (server config only). `trustedOrigins` driven by `getTrustedOrigins()` keyed on `import.meta.env.CLOUDFLARE_ENV`: `[BETTER_AUTH_URL]` on capstone, `[]` on rwc_us / rwc_intl (those Workers 503 portal routes anyway). Call sites in `pages/api/auth/[...all].ts` and `middleware.ts` simplified to `createAuth({ db })`.
 
 ### M-4: Sponsor whitelist via Studio-editable `allowedEmails[]`
 - **File:** `astro-app/src/lib/auth-config.ts:31-33` (query); `studio/src/schemaTypes/documents/sponsor.ts:102` (schema field)
@@ -133,6 +140,7 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Confidence:** 8
 - **Description:** Email body says "This link expires in 10 minutes" but `magicLink({})` is configured with no `expiresIn` (Better Auth default is 5 min). UX/copy mismatch; combined with default `disableSignUp: false`, a user clicking after 5 min sees a confusing error. Pair with H-3 fix.
 - **Fix:** `magicLink({ disableSignUp: true, expiresIn: 600 })` (or shorten the copy).
+- **Status: RESOLVED 2026-05-05 via Story 24.2.** `magicLink({ disableSignUp: true, expiresIn: 600, sendMagicLink })` — copy ("This link expires in 10 minutes") now matches actual TTL.
 
 ### M-7: XSS via `set:html` on JSON-LD scripts (~14 files)
 - **Files:** `astro-app/src/pages/sponsors/[slug].astro:64`, plus identical pattern in:
@@ -187,10 +195,10 @@ All routes gated by middleware (session + role + sponsor whitelist + agreement a
 ## Recommended remediation order
 
 1. [x] **H-1** — rotate `STUDIO_ADMIN_TOKEN`; refactor `SponsorAcceptancesTool` to authenticate via Studio user identity rather than a shared bearer. (Highest blast radius, simplest fix.) **RESOLVED 2026-05-01 via Story 24.1.**
-2. **H-3** — set `disableSignUp: true` on magic link, `allowDifferentEmails: false` on account linking. One-line config changes.
+2. [x] **H-3** — set `disableSignUp: true` on magic link, `allowDifferentEmails: false` on account linking. One-line config changes. **RESOLVED 2026-05-05 via Story 24.2.**
 3. **M-1, M-2** — add unsubscribe token + double-opt-in to `/api/subscribe`. New random column + email flow.
 4. **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`.
 5. **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`.
-6. **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist.
+6. [x] **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist. **RESOLVED 2026-05-05 via Story 24.2.**
 7. **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio.
-8. **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene.
+8. **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. (M-6 RESOLVED 2026-05-05 via Story 24.2; M-5 outstanding.)
