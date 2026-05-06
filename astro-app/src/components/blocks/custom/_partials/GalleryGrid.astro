@@ -79,7 +79,7 @@ const earliestYear = years.length > 0 ? Math.min(...years) : null;
 let creatorOrg: { "@type": "Organization"; "name": string } | null = null;
 try {
   const siteSettings = await getSiteSettings();
-  const siteName = stegaClean(siteSettings.title);
+  const siteName = stegaClean(siteSettings.siteName);
   if (siteName) {
     creatorOrg = { "@type": "Organization", "name": siteName };
   }
@@ -91,7 +91,7 @@ const galleryJsonLd = galleryImages.length > 0 ? {
   "@type": "ImageGallery",
   ...(heading && { "name": stegaClean(heading) }),
   ...(description && { "description": stegaClean(description) }),
-  ...(earliestYear && { "dateCreated": new Date(earliestYear, 0, 1).toISOString() }),
+  ...(earliestYear && { "dateCreated": new Date(Date.UTC(earliestYear, 0, 1)).toISOString() }),
   ...(creatorOrg && { "creator": creatorOrg }),
   "image": galleryImages,
 } : null;

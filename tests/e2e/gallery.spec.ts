@@ -111,6 +111,7 @@ test.describe('Image Gallery — PhotoSwipe Lightbox & Listing', () => {
     await expect(page.locator(matchSelector).first()).toBeVisible({ timeout: 3000 })
 
     const others = await page.locator(otherSelector).all()
+    expect(others.length, 'year filter must have other-year figures to actually hide').toBeGreaterThan(0)
     for (const fig of others) {
       const display = await fig.evaluate((el) => getComputedStyle(el).display)
       expect(display).toBe('none')
