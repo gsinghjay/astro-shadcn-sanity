@@ -9,6 +9,7 @@ import { loadQuery, ALL_EVENTS_QUERY, SPONSOR_BY_EMAIL_QUERY, getSiteParams, get
 import type { ALL_EVENTS_QUERY_RESULT, SPONSOR_BY_EMAIL_QUERY_RESULT } from "@/sanity.types";
 import { buildBreadcrumbJsonLd } from "@/lib/breadcrumb-jsonld";
 import { buildPageGraph } from "@/lib/page-jsonld";
+import JsonLd from "@/components/ui/json-ld/JsonLd.astro";
 
 const user = Astro.locals.user;
 
@@ -37,7 +38,7 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
 <PortalLayout title={pageTitle} activeNav="/portal/events" sponsorSlug={sponsor?.slug}>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   <div class="flex flex-col gap-6">
     <Breadcrumb items={breadcrumbItems} />
 

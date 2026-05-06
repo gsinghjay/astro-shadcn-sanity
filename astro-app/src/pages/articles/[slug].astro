@@ -22,6 +22,7 @@ import { buildArticleJsonLd } from '@/lib/article-jsonld';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
 import { buildOrgJsonLd } from '@/lib/org-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 import ArticleNewsletterCta from '@/components/ArticleNewsletterCta.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -91,7 +92,7 @@ const cleanAuthorSlug = authorSlug;
       <meta property="article:tag" content={tag} />
     ))}
   </Fragment>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
 
   <Section>
     <SectionContent>

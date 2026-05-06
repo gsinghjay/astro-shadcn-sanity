@@ -2,6 +2,7 @@
 import { Section, SectionContent } from '@/components/ui/section';
 import { stegaClean } from '@sanity/client/stega';
 import { cn } from '@/lib/utils';
+import { validateEmbedUrl } from '@/lib/embed-allowlist';
 import type { EmbedBlockBlock } from '@/lib/types';
 
 interface Props extends EmbedBlockBlock {
@@ -20,8 +21,12 @@ const {
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'contained' || rawCleaned === 'full-width' ? rawCleaned : 'default';
-const embedUrl = stegaClean(rawEmbedUrl) ?? '';
-const cleanRawEmbedCode = stegaClean(rawRawEmbedCode) ?? '';
+const embedUrl = (stegaClean(rawEmbedUrl) ?? '').trim();
+const cleanRawEmbedCode = (stegaClean(rawRawEmbedCode) ?? '').trim();
+const safeEmbedUrl = validateEmbedUrl(embedUrl);
+const iframeTitle = (stegaClean(heading) || '').trim() || (stegaClean(caption) || '').trim() || 'Embedded content';
+const sandboxFlags = 'allow-scripts allow-popups';
+const placeholderText = embedUrl ? 'Invalid embed URL (must be https://)' : 'No embed URL provided';
 ---
 
 {cleanVariant === 'default' && (
@@ -34,24 +39,30 @@ const cleanRawEmbedCode = stegaClean(rawRawEmbedCode) ?? '';
 
     <div class="w-full">
       {cleanRawEmbedCode ? (
-        <div class="w-full">
-          <Fragment set:html={cleanRawEmbedCode} />
-        </div>
-      ) : embedUrl ? (
         <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
           <iframe
-            src={embedUrl}
-            title={stegaClean(heading) || stegaClean(caption) || 'Embedded content'}
+            srcdoc={cleanRawEmbedCode}
+            title={iframeTitle}
             class="absolute inset-0 w-full h-full border-0"
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox={sandboxFlags}
+          ></iframe>
+        </div>
+      ) : safeEmbedUrl ? (
+        <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
+          <iframe
+            src={safeEmbedUrl}
+            title={iframeTitle}
+            class="absolute inset-0 w-full h-full border-0"
+            loading="lazy"
+            sandbox={sandboxFlags}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
         </div>
       ) : (
         <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
-          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">No embed URL provided</div>
+          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">{placeholderText}</div>
         </div>
       )}
       {caption && (
@@ -71,24 +82,30 @@ const cleanRawEmbedCode = stegaClean(rawRawEmbedCode) ?? '';
 
     <div class="w-full max-w-3xl mx-auto">
       {cleanRawEmbedCode ? (
-        <div class="w-full">
-          <Fragment set:html={cleanRawEmbedCode} />
-        </div>
-      ) : embedUrl ? (
         <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
           <iframe
-            src={embedUrl}
-            title={stegaClean(heading) || stegaClean(caption) || 'Embedded content'}
+            srcdoc={cleanRawEmbedCode}
+            title={iframeTitle}
             class="absolute inset-0 w-full h-full border-0"
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox={sandboxFlags}
+          ></iframe>
+        </div>
+      ) : safeEmbedUrl ? (
+        <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
+          <iframe
+            src={safeEmbedUrl}
+            title={iframeTitle}
+            class="absolute inset-0 w-full h-full border-0"
+            loading="lazy"
+            sandbox={sandboxFlags}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
         </div>
       ) : (
         <div class="relative w-full overflow-hidden rounded-sm" style="aspect-ratio: 16/9">
-          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">No embed URL provided</div>
+          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">{placeholderText}</div>
         </div>
       )}
       {caption && (
@@ -108,24 +125,30 @@ const cleanRawEmbedCode = stegaClean(rawRawEmbedCode) ?? '';
 
     <div class="w-full">
       {cleanRawEmbedCode ? (
-        <div class="w-full">
-          <Fragment set:html={cleanRawEmbedCode} />
-        </div>
-      ) : embedUrl ? (
         <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9">
           <iframe
-            src={embedUrl}
-            title={stegaClean(heading) || stegaClean(caption) || 'Embedded content'}
+            srcdoc={cleanRawEmbedCode}
+            title={iframeTitle}
             class="absolute inset-0 w-full h-full border-0"
             loading="lazy"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox={sandboxFlags}
+          ></iframe>
+        </div>
+      ) : safeEmbedUrl ? (
+        <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9">
+          <iframe
+            src={safeEmbedUrl}
+            title={iframeTitle}
+            class="absolute inset-0 w-full h-full border-0"
+            loading="lazy"
+            sandbox={sandboxFlags}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
         </div>
       ) : (
         <div class="relative w-full overflow-hidden" style="aspect-ratio: 16/9">
-          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">No embed URL provided</div>
+          <div class="absolute inset-0 flex items-center justify-center bg-muted text-muted-foreground text-sm">{placeholderText}</div>
         </div>
       )}
       {caption && (

