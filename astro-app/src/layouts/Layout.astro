@@ -126,7 +126,7 @@ const fallbackOrgJsonLd = hasStructuredData ? null : buildPageGraph(await buildO
       http-equiv="Content-Security-Policy"
       content={cspContent}
     />
-    {hasStructuredData ? <slot name="structured-data" /> : <JsonLd schema={fallbackOrgJsonLd!} />}
+    {hasStructuredData ? <slot name="structured-data" /> : (fallbackOrgJsonLd && <JsonLd schema={fallbackOrgJsonLd} />)}
     {preloadImage && !preloadImageSrcset && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
     {preloadImageSrcset && <link rel="preload" as="image" imagesrcset={preloadImageSrcset} imagesizes={preloadImageSizes || '100vw'} fetchpriority="high" />}
     <title>{fullTitle}</title>
