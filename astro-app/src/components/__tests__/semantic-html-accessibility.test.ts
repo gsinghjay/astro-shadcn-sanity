@@ -510,7 +510,7 @@ describe('AC8: EmbedBlock Iframe Title', () => {
 
   test('renders rawEmbedCode inside sandboxed iframe srcdoc (no top-level script)', async () => {
     const container = await AstroContainer.create();
-    const rawEmbedCode = '<script src="https://example.com/embed.js"></script><div id="form-anchor"></div>';
+    const rawEmbedCode = '<script src="https://example.com/embed.js"></script><div data-marker="form-anchor"></div>';
     const html = await container.renderToString(EmbedBlock, {
       props: {
         _type: 'embedBlock' as const,
@@ -527,15 +527,17 @@ describe('AC8: EmbedBlock Iframe Title', () => {
     });
     expect(html).toContain('<iframe');
     expect(html).toContain('srcdoc=');
-    expect(html).toContain('sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"');
+    expect(html).toContain('sandbox="allow-scripts allow-popups"');
+    // Sentinel must appear inside srcdoc (entity-encoded) but never at top level.
+    expect(html).toMatch(/srcdoc="[^"]*data-marker=&#34;form-anchor&#34;/);
     const stripped = html.replace(/srcdoc="[^"]*"/g, 'srcdoc="..."');
+    expect(stripped).not.toContain('data-marker="form-anchor"');
     expect(stripped).not.toMatch(/<script src=["']https:\/\/example\.com\/embed\.js["']/);
-    expect(stripped).not.toMatch(/<div id=["']form-anchor["']/);
   });
 
   test('rawEmbedCode takes precedence when both embedUrl and rawEmbedCode are set', async () => {
     const container = await AstroContainer.create();
-    const rawEmbedCode = '<div class="raw-wins">hello</div>';
+    const rawEmbedCode = '<div data-marker="raw-wins">hello</div>';
     const html = await container.renderToString(EmbedBlock, {
       props: {
         _type: 'embedBlock' as const,
@@ -551,12 +553,13 @@ describe('AC8: EmbedBlock Iframe Title', () => {
       },
     });
     expect(html).toContain('srcdoc=');
+    expect(html).toMatch(/srcdoc="[^"]*data-marker=&#34;raw-wins&#34;/);
     expect(html).not.toContain('src="https://www.youtube.com/embed/test"');
   });
 
   test('rawEmbedCode renders in all three variants', async () => {
     const container = await AstroContainer.create();
-    const rawEmbedCode = '<div class="variant-probe">probe</div>';
+    const rawEmbedCode = '<div data-marker="variant-probe">probe</div>';
     for (const variant of ['default', 'contained', 'full-width'] as const) {
       const html = await container.renderToString(EmbedBlock, {
         props: {
@@ -573,7 +576,7 @@ describe('AC8: EmbedBlock Iframe Title', () => {
         },
       });
       expect(html).toContain('<iframe');
-      expect(html).toContain('srcdoc=');
+      expect(html).toMatch(/srcdoc="[^"]*data-marker=&#34;variant-probe&#34;/);
     }
   });
 });

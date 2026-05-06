@@ -21,12 +21,12 @@ const {
 } = Astro.props;
 const rawCleaned = stegaClean(rawVariant);
 const cleanVariant = rawCleaned === 'default' || rawCleaned === 'contained' || rawCleaned === 'full-width' ? rawCleaned : 'default';
-const embedUrl = stegaClean(rawEmbedUrl) ?? '';
-const cleanRawEmbedCode = stegaClean(rawRawEmbedCode) ?? '';
+const embedUrl = (stegaClean(rawEmbedUrl) ?? '').trim();
+const cleanRawEmbedCode = (stegaClean(rawRawEmbedCode) ?? '').trim();
 const safeEmbedUrl = validateEmbedUrl(embedUrl);
-const iframeTitle = stegaClean(heading) || stegaClean(caption) || 'Embedded content';
-const sandboxFlags = 'allow-scripts allow-popups allow-popups-to-escape-sandbox';
-const placeholderText = embedUrl ? 'Embed URL not allowed' : 'No embed URL provided';
+const iframeTitle = (stegaClean(heading) || '').trim() || (stegaClean(caption) || '').trim() || 'Embedded content';
+const sandboxFlags = 'allow-scripts allow-popups';
+const placeholderText = embedUrl ? 'Invalid embed URL (must be https://)' : 'No embed URL provided';
 ---
 
 {cleanVariant === 'default' && (
