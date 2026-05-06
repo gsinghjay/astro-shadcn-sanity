@@ -581,8 +581,7 @@ describe('articles/[slug].astro integration', () => {
 
   test('emits structured data via structured-data slot', () => {
     expect(content).toContain('slot="structured-data"');
-    expect(content).toContain('application/ld+json');
-    expect(content).toContain('pageGraph');
+    expect(content).toMatch(/<JsonLd[^>]*schema={pageGraph}/);
   });
 });
 

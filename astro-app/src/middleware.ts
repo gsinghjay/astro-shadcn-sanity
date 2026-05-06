@@ -168,7 +168,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // D1 fallback via Better Auth
     if (!userData && sessionToken) {
       const db = getDrizzle();
-      const auth = createAuth({ db, requestOrigin: context.url.origin });
+      const auth = createAuth({ db });
 
       const session = await auth.api.getSession({
         headers: context.request.headers,

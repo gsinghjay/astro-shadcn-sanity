@@ -31,20 +31,34 @@ const SPONSOR_WHITELIST_QUERY = defineQuery(
 
 interface CreateAuthOptions {
   db: DrizzleD1Database<typeof schema>;
-  /** Request origin (e.g., https://feat-branch.ywcc-capstone.pages.dev). Used as baseURL
-   *  so OAuth callbacks route to the correct deployment, and added to trustedOrigins
-   *  so Better Auth CSRF checks pass on preview deployments. */
-  requestOrigin?: string;
+}
+
+/**
+ * Static trusted-origin allowlist driven by CLOUDFLARE_ENV (per-Worker constant).
+ * Capstone is the only deployment that runs auth (rwc + *-preview Workers 503 portal
+ * routes), so the allowlist is empty there. CLOUDFLARE_ENV is undeclared in the
+ * astro:env schema and inlined from process.env at build time by Astro 6 / Vite.
+ *
+ * Read at call time (not module init) so vitest can stub via vi.stubEnv between cases.
+ */
+function getTrustedOrigins(): string[] {
+  const cfEnv = import.meta.env.CLOUDFLARE_ENV ?? 'capstone';
+  if (cfEnv !== 'capstone') return [];
+  return [BETTER_AUTH_URL].filter(Boolean) as string[];
 }
 
 /**
  * Checks if an email is on the sponsor whitelist by querying Sanity.
  * Returns true if the email matches any sponsor's contactEmail or exists in any sponsor's allowedEmails[].
  * Fails closed (returns false) on any error — non-whitelisted users default to student role.
+ *
+ * Email is lowercased before the GROQ comparison (which is case-sensitive) so the
+ * create-before hook (raw provider email) and middleware escalation (already
+ * normalised) agree on whitelist membership for the same physical user.
  */
 export async function checkSponsorWhitelist(email: string): Promise<boolean> {
   try {
-    const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email });
+    const result = await sanityClient.fetch<boolean>(SPONSOR_WHITELIST_QUERY, { email: email.toLowerCase() });
     return result === true;
   } catch (err) {
     log.error('auth-sanity-whitelist-check-failed', err);
@@ -64,9 +78,14 @@ export async function checkSponsorWhitelist(email: string): Promise<boolean> {
  * where they're absent rather than letting Better Auth surface a confusing
  * internal error.
  *
+ * `baseURL` and `trustedOrigins` are derived from BETTER_AUTH_URL + CLOUDFLARE_ENV
+ * — the request `Origin` header is intentionally NOT consulted. A request-derived
+ * allowlist is self-referential against any non-browser HTTP client (which can
+ * forge Origin freely), defeating Better Auth's CSRF gate.
+ *
  * @param options.db - Shared Drizzle instance from getDrizzle()
  */
-export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
+export function createAuth({ db }: CreateAuthOptions) {
   const required = {
     BETTER_AUTH_SECRET, BETTER_AUTH_URL,
     GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET,
@@ -79,13 +98,8 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
     }
   }
 
-  // Use request origin when available so OAuth callbacks and CSRF checks
-  // work on preview deployments (e.g., feat-branch.ywcc-capstone.pages.dev).
-  const baseURL = requestOrigin || BETTER_AUTH_URL;
-  const origins = [BETTER_AUTH_URL];
-  if (requestOrigin && requestOrigin !== BETTER_AUTH_URL) {
-    origins.push(requestOrigin);
-  }
+  const baseURL = BETTER_AUTH_URL;
+  const trustedOrigins = getTrustedOrigins();
 
   const resendClient = new Resend(RESEND_API_KEY);
 
@@ -117,13 +131,17 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
       },
     },
     account: {
+      // Sponsor role is email-keyed via Sanity whitelist — never link an OAuth
+      // account whose primary email differs from the existing user's email.
       accountLinking: {
         enabled: true,
-        allowDifferentEmails: true,
+        allowDifferentEmails: false,
       },
     },
     plugins: [
       magicLink({
+        disableSignUp: true,
+        expiresIn: 600,
         sendMagicLink: async ({ email, url }) => {
           const fromAddress = RESEND_FROM_EMAIL?.trim() || 'YWCC Capstone <noreply@ywcc-capstone.pages.dev>';
           if (!RESEND_FROM_EMAIL?.trim()) {
@@ -159,8 +177,32 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
     databaseHooks: {
       user: {
         create: {
-          before: async (user) => {
-            const isSponsor = await checkSponsorWhitelist(user.email);
+          // Sponsor role gate — only assign 'sponsor' when the provider verified the email
+          // AND the email is on the Sanity whitelist. Better Auth normalizes the provider's
+          // verification field (Google `email_verified`, GitHub primary-email `verified` via
+          // `/user/emails`) into `user.emailVerified` before this hook fires, so this is the
+          // single signal we trust. Anything else (no provider verification, unrecognized
+          // provider) → 'student'.
+          //
+          // Magic-link reachability: with `disableSignUp: true` Better Auth rejects unknown
+          // emails with `new_user_signup_disabled` BEFORE creating a user, so this hook does
+          // not fire on a normal magic-link click. It would fire only if a future flow
+          // creates a user via the magic-link plugin path (admin pre-provisioning etc.); in
+          // that case the plugin sets `emailVerified: true` because the click itself proves
+          // email control. AC 8 closes the privilege-escalation path in upstream Better Auth.
+          before: async (user, ctx) => {
+            const emailIsVerified = (user as { emailVerified?: boolean }).emailVerified === true;
+            // `pathSegment` is the URL last-segment of the auth route that triggered creation
+            // (e.g. 'google', 'github', 'magic-link'). Used for ops correlation only — it is
+            // NOT necessarily an OAuth provider name.
+            const pathSegment = ctx?.path?.split('/').filter(Boolean).pop() ?? 'unknown';
+            const isSponsor = emailIsVerified ? await checkSponsorWhitelist(user.email) : false;
+            if (!emailIsVerified) {
+              log.warn('auth-denied-sponsor-role-unverified-email', {
+                email: user.email,
+                pathSegment,
+              });
+            }
             return {
               data: {
                 ...user,
@@ -182,7 +224,7 @@ export function createAuth({ db, requestOrigin }: CreateAuthOptions) {
         // role ?? "student" and self-heals via Sanity whitelist escalation.
       },
     },
-    trustedOrigins: origins,
+    trustedOrigins,
     basePath: '/api/auth',
   });
 }

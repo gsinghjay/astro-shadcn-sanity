@@ -403,7 +403,7 @@ describe('middleware — unified auth routing', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it('creates auth with db + requestOrigin only (env vars come from astro:env/server)', async () => {
+    it('creates auth with db only (env vars come from astro:env/server, no requestOrigin)', async () => {
       mockGetSession.mockResolvedValue({
         user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
         session: { id: 's1' },
@@ -414,7 +414,6 @@ describe('middleware — unified auth routing', () => {
 
       expect(mockCreateAuth).toHaveBeenCalledWith({
         db: { __drizzle: true },
-        requestOrigin: 'http://localhost:4321',
       });
     });
   });

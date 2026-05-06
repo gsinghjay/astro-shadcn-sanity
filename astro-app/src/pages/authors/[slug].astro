@@ -15,6 +15,7 @@ import { buildAuthorJsonLd } from '@/lib/author-jsonld';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
 import { buildOrgJsonLd } from '@/lib/org-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const authors = await sanityClient.fetch<ALL_AUTHOR_SLUGS_QUERY_RESULT>(ALL_AUTHOR_SLUGS_QUERY, getSiteParams());
@@ -64,7 +65,7 @@ const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd, authorJsonLd);
   title={`${author.name ?? 'Author'} | Authors`}
   seo={metaDescription ? { metaDescription } : undefined}
 >
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   <Section>
     <SectionContent>
       <Breadcrumb items={breadcrumbItems} />
