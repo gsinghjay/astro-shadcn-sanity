@@ -80,11 +80,17 @@ function writeCache(userId: string): void {
 }
 
 /**
- * Verify the claimed Sanity user ID is a current member of the configured
- * project. Calls the project-scoped users endpoint with a Worker-only read
- * token; on 200 with a matching `id`, the user is admitted. Any other outcome
- * (404, non-2xx, malformed body, network/timeout) returns false so the caller
- * can map it to a single 403.
+ * Verify the claimed Sanity user ID is a current `administrator` of the
+ * configured project. Calls the project-scoped users endpoint with a
+ * Worker-only read token; admits on 200 with matching `id` AND a role entry
+ * whose name is `administrator`. Any other outcome (non-admin role, 404,
+ * non-2xx, malformed body, network/timeout) returns false so the caller can
+ * map it to a single 403.
+ *
+ * Mirrors the sponsor-schema `readOnly` gate (Story 24.7 / M-4): both surfaces
+ * restrict sensitive sponsor-related operations to project administrators.
+ * The Sanity Members API returns membership as `roles: Array<{name: string}>`
+ * (machine names, lowercased — `'administrator'`, `'editor'`, etc.).
  */
 async function verifyProjectMembership(
   userId: string,
@@ -103,12 +109,21 @@ async function verifyProjectMembership(
       },
     );
     if (!res.ok) return false;
-    const body = (await res.json()) as { id?: unknown };
+    const body = (await res.json()) as { id?: unknown; roles?: unknown };
     if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
       return false;
     }
     const responseId = body.id.trim();
     if (!responseId || responseId !== userId) return false;
+    if (!Array.isArray(body.roles)) return false;
+    const isAdmin = body.roles.some(
+      (r): boolean =>
+        typeof r === 'object' &&
+        r !== null &&
+        typeof (r as { name?: unknown }).name === 'string' &&
+        (r as { name: string }).name === 'administrator',
+    );
+    if (!isAdmin) return false;
     writeCache(userId);
     return true;
   } catch (err) {
