@@ -6,6 +6,7 @@ import Breadcrumb from '@/components/Breadcrumb.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 import GitHubDashboard from '@/components/portal/GitHubDashboard';
 import RepoLinker from '@/components/portal/RepoLinker';
 import { getDrizzle } from '@/lib/db';
@@ -166,7 +167,7 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
 ---
 
 <PortalLayout title={pageTitle} activeNav="/portal/progress" sponsorSlug={sponsor?.slug}>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   <div class="flex flex-col gap-6">
     <Breadcrumb items={breadcrumbItems} />
 

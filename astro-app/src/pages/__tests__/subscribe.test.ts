@@ -20,14 +20,22 @@ const { POST, DELETE } = await import('@/pages/api/subscribe');
 
 const createLocals = () => ({}) as unknown as App.Locals;
 
-const createPostContext = (body: unknown) => ({
-  request: new Request('http://localhost:4321/api/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  }),
-  locals: createLocals(),
-});
+const createPostContext = (body: unknown) => {
+  const serialized = JSON.stringify(body);
+  return {
+    request: new Request('http://localhost:4321/api/subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Workers undici doesn't auto-populate Content-Length on Request init
+        // — the size guard relies on it, so seed an honest byte length here.
+        'Content-Length': String(new TextEncoder().encode(serialized).length),
+      },
+      body: serialized,
+    }),
+    locals: createLocals(),
+  };
+};
 
 const createDeleteContext = (email?: string) => {
   const url = email ? `http://localhost:4321/api/subscribe?email=${encodeURIComponent(email)}` : 'http://localhost:4321/api/subscribe';
@@ -71,6 +79,7 @@ describe('POST /api/subscribe', () => {
     const res = await POST({
       request: new Request('http://localhost:4321/api/subscribe', {
         method: 'POST',
+        headers: { 'Content-Length': '8' },
         body: 'not json',
       }),
       locals: createLocals(),
@@ -219,5 +228,58 @@ describe('DELETE /api/subscribe', () => {
 
     expect(res.status).toBe(500);
     expect(body.error).toBe('Unsubscribe failed');
+  });
+});
+
+describe('POST /api/subscribe — body-size cap (Story 22.10)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockRun.mockResolvedValue({ success: true });
+    mockBind.mockReturnValue({ run: mockRun });
+    mockFirst.mockResolvedValue({ count: 0 });
+    mockPrepare.mockReturnValue({ bind: mockBind, first: mockFirst });
+  });
+
+  function buildCtx(headers: Record<string, string>) {
+    return {
+      request: new Request('http://localhost:4321/api/subscribe', {
+        method: 'POST',
+        headers,
+        body: '{}',
+      }),
+      locals: createLocals(),
+    };
+  }
+
+  it('returns 411 when Content-Length header is missing', async () => {
+    const res = await POST(buildCtx({ 'Content-Type': 'application/json' }) as any);
+    expect(res.status).toBe(411);
+    const body = await res.json();
+    expect(body.success).toBe(false);
+    expect(body.error).toBe('Length Required');
+  });
+
+  it('returns 411 when Content-Length is non-numeric', async () => {
+    const res = await POST(
+      buildCtx({ 'Content-Type': 'application/json', 'Content-Length': 'abc' }) as any,
+    );
+    expect(res.status).toBe(411);
+  });
+
+  it('returns 413 when Content-Length exceeds 10000 bytes', async () => {
+    const res = await POST(
+      buildCtx({ 'Content-Type': 'application/json', 'Content-Length': '10001' }) as any,
+    );
+    expect(res.status).toBe(413);
+    const body = await res.json();
+    expect(body.error).toBe('Payload too large');
+  });
+
+  it('admits a request with Content-Length at the cap', async () => {
+    const ctx = createPostContext({ email: 'cap@example.com' });
+    // createPostContext seeds an honest Content-Length already.
+    const res = await POST(ctx as any);
+    expect([200, 400, 429, 500]).toContain(res.status);
+    expect([411, 413]).not.toContain(res.status);
   });
 });

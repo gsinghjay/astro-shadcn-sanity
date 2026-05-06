@@ -11,6 +11,7 @@ import ProjectFilterBar from '@/components/ProjectFilterBar.astro';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
 import { buildOrgJsonLd } from '@/lib/org-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 import ProjectPageHeader from '@/components/ProjectPageHeader.astro';
 import ProjectEmptyState from '@/components/ProjectEmptyState.astro';
 
@@ -36,7 +37,7 @@ const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <SidebarLayout title={pageTitle} seo={pageSeo}>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} slot="header" />
   )}

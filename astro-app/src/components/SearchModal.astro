@@ -35,7 +35,9 @@ const cleanApiUrl = (() => {
   if (!rawApiUrl) return "";
   try {
     const u = new URL(rawApiUrl);
-    return u.protocol === "https:" ? rawApiUrl : "";
+    if (u.protocol !== "https:") return "";
+    if (u.username || u.password) return "";
+    return u.origin + u.pathname;
   } catch {
     return "";
   }
@@ -165,9 +167,10 @@ const resolvedTheme = allowedThemes.has(cleanTheme) ? cleanTheme : siteThemeAttr
       "keydown",
       (e) => {
         if (e.repeat) return;
+        if (e.isComposing) return;
         const isMac = navigator.platform.toLowerCase().includes("mac");
         const metaKey = isMac ? e.metaKey : e.ctrlKey;
-        if (!metaKey || e.key.toLowerCase() !== "k") return;
+        if (!metaKey || e.code !== "KeyK") return;
 
         requestAnimationFrame(() => {
           const modal = document.querySelector<

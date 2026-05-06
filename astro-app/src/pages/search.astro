@@ -25,7 +25,9 @@ const cleanApiUrl = (() => {
   if (!rawApiUrl) return "";
   try {
     const u = new URL(rawApiUrl);
-    return u.protocol === "https:" ? rawApiUrl : "";
+    if (u.protocol !== "https:") return "";
+    if (u.username || u.password) return "";
+    return u.origin + u.pathname;
   } catch {
     return "";
   }
@@ -50,7 +52,7 @@ const searchAvailable = Boolean(aiSearch?.searchModalEnabled && cleanApiUrl);
       <h1 class="label-caps mb-8">Search</h1>
 
       {!searchAvailable ? (
-        <div class="rounded border-2 border-foreground bg-secondary p-6 text-center">
+        <div class="border-2 border-foreground bg-secondary p-6 text-center">
           <p class="text-foreground">
             Search is currently unavailable. Please try again later.
           </p>

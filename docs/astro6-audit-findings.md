@@ -10,7 +10,7 @@ Audit run 2026-04-30 by team `astro6-audit` (config-build, runtime-routes, compo
 
 ## P0 — Blockers
 
-### [~] 1. Complete the `astro:env` migration — declare secrets, drop `import.meta.env` for runtime config
+### [x] 1. Complete the `astro:env` migration — declare secrets, drop `import.meta.env` for runtime config
 **EFFORT:** M
 
 `validateSecrets: true` is set, but 8 production secrets (`BETTER_AUTH_SECRET`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`, `SANITY_API_WRITE_TOKEN`, `DISCORD_WEBHOOK_URL`) are read via `env.X` / `runtimeEnv.X` without being declared in the schema. Separately, `PUBLIC_SANITY_STUDIO_PROJECT_ID` and `..._DATASET` ARE in the schema as `context: server` but are read via `import.meta.env.X` — server-context vars are not exposed there in strict mode; today it only works because astro.config.mjs:42-46 mirrors wrangler vars into `process.env` at build time.
@@ -19,10 +19,10 @@ Audit run 2026-04-30 by team `astro6-audit` (config-build, runtime-routes, compo
 
 **FIX:** Add `envField.string({ context: "server", access: "secret" })` for the 8 secrets (`DISCORD_WEBHOOK_URL` optional). Migrate every `env.X` / `runtimeEnv.X` to named imports from `astro:env/server`. Replace `import.meta.env.PUBLIC_SANITY_STUDIO_*` with `astro:env/server` imports. For rwc-us / rwc-intl, decide between `optional: true` or per-env schema variants.
 
-**Status:**
+**Status:** Closed by Story 5.20 (2026-05-04).
 - [x] `auth-config.ts` `import.meta.env.PUBLIC_SANITY_STUDIO_*` reads removed (via Finding #7's refactor)
-- [ ] 8 secrets declared in schema
-- [ ] Consumer migration to `astro:env/server` named imports
+- [x] 8 secrets declared in schema
+- [x] Consumer migration to `astro:env/server` named imports
 
 ---
 
@@ -169,7 +169,7 @@ Two transitional v13 patterns piggyback in astro.config.mjs. (a) The custom plug
 - [ ] Regen + CI-pin `worker-configuration.d.ts` (currently embeds the staging GitHub OAuth client id)
 - [ ] Vitest coverage for `actions/index.ts` (Turnstile + Sanity write + Discord webhook paths)
 - [ ] Cross-collection blocks (`Testimonials`, `ArticleList`) as `server:defer` opt-ins
-- [ ] rwc_us / rwc_intl env-block parity gaps (`BETTER_AUTH_URL`, `STUDIO_ORIGIN` absent — fine for content-only sites but undefined-vs-clean-503 distinction)
+- [x] rwc_us / rwc_intl env-block parity gaps (`BETTER_AUTH_URL`, `STUDIO_ORIGIN` absent — fine for content-only sites but undefined-vs-clean-503 distinction). Closed by Story 5.20: `BETTER_AUTH_URL` / `GITHUB_CLIENT_ID` / `RESEND_FROM_EMAIL` declared `optional: true` in env.schema; `createAuth()` runtime check throws fail-loud if portal/auth code paths actually need them (rwc Workers don't host /portal/* anyway).
 
 ---
 

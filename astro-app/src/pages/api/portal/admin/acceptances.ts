@@ -1,10 +1,9 @@
 import type { APIRoute } from 'astro';
 import { env as workerEnv } from 'cloudflare:workers';
-import {
-  PUBLIC_SANITY_STUDIO_PROJECT_ID,
-  SANITY_PROJECT_READ_TOKEN,
-} from 'astro:env/server';
+import { SANITY_PROJECT_READ_TOKEN } from 'astro:env/server';
+import { PUBLIC_SANITY_STUDIO_PROJECT_ID } from 'astro:env/client';
 import { getSponsorAgreementRev } from '@/lib/sanity';
+import { log } from '@/lib/log';
 
 export const prerender = false;
 
@@ -81,11 +80,17 @@ function writeCache(userId: string): void {
 }
 
 /**
- * Verify the claimed Sanity user ID is a current member of the configured
- * project. Calls the project-scoped users endpoint with a Worker-only read
- * token; on 200 with a matching `id`, the user is admitted. Any other outcome
- * (404, non-2xx, malformed body, network/timeout) returns false so the caller
- * can map it to a single 403.
+ * Verify the claimed Sanity user ID is a current `administrator` of the
+ * configured project. Calls the project-scoped users endpoint with a
+ * Worker-only read token; admits on 200 with matching `id` AND a role entry
+ * whose name is `administrator`. Any other outcome (non-admin role, 404,
+ * non-2xx, malformed body, network/timeout) returns false so the caller can
+ * map it to a single 403.
+ *
+ * Mirrors the sponsor-schema `readOnly` gate (Story 24.7 / M-4): both surfaces
+ * restrict sensitive sponsor-related operations to project administrators.
+ * The Sanity Members API returns membership as `roles: Array<{name: string}>`
+ * (machine names, lowercased — `'administrator'`, `'editor'`, etc.).
  */
 async function verifyProjectMembership(
   userId: string,
@@ -104,16 +109,25 @@ async function verifyProjectMembership(
       },
     );
     if (!res.ok) return false;
-    const body = (await res.json()) as { id?: unknown };
+    const body = (await res.json()) as { id?: unknown; roles?: unknown };
     if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
       return false;
     }
     const responseId = body.id.trim();
     if (!responseId || responseId !== userId) return false;
+    if (!Array.isArray(body.roles)) return false;
+    const isAdmin = body.roles.some(
+      (r): boolean =>
+        typeof r === 'object' &&
+        r !== null &&
+        typeof (r as { name?: unknown }).name === 'string' &&
+        (r as { name: string }).name === 'administrator',
+    );
+    if (!isAdmin) return false;
     writeCache(userId);
     return true;
   } catch (err) {
-    console.error('[admin/acceptances] sanity membership lookup failed:', err);
+    log.error('admin-acceptances-sanity-membership-failed', err);
     return false;
   }
 }
@@ -150,7 +164,7 @@ async function checkRateLimit(
     }
     return null;
   } catch (err) {
-    console.error('[admin/acceptances] rate limiter error, failing open:', err);
+    log.error('admin-acceptances-rate-limiter-failed-open', err);
     return null;
   }
 }
@@ -177,11 +191,13 @@ function envReady(env: AdminEnv): boolean {
     env.STUDIO_ORIGIN &&
       env.PORTAL_DB &&
       PUBLIC_SANITY_STUDIO_PROJECT_ID &&
-      // `astro.config.mjs` falls back to the literal "placeholder" when neither
-      // PUBLIC_SANITY_STUDIO_PROJECT_ID nor PUBLIC_SANITY_PROJECT_ID is set at
-      // build time. That string is truthy, so without this guard the route
-      // would call /projects/placeholder/users/<id> and 403 every admin instead
-      // of 503ing on the misconfig.
+      // Post Story 5.20 the schema requires `PUBLIC_SANITY_STUDIO_PROJECT_ID`
+      // (`context: "client"`, no default), so a missing wrangler value fails
+      // the build before this guard runs. The `!== 'placeholder'` check still
+      // catches the deliberate-misconfig case where someone literally sets the
+      // wrangler var to "placeholder" (the historical Sanity-adapter fallback
+      // in `astro.config.mjs:53`); without this we'd call
+      // /projects/placeholder/users/<id> and 403 every admin instead of 503ing.
       PUBLIC_SANITY_STUDIO_PROJECT_ID !== 'placeholder' &&
       SANITY_PROJECT_READ_TOKEN,
   );
@@ -300,7 +316,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       },
     );
   } catch (e) {
-    console.error('[admin/acceptances] D1 error:', e);
+    log.error('admin-acceptances-d1-error', e);
     return json({ error: 'service_unavailable' }, 503, errorCors);
   }
 };

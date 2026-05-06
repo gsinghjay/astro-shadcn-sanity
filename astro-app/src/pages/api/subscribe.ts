@@ -4,11 +4,27 @@ import { env } from 'cloudflare:workers';
 export const prerender = false;
 
 const MAX_SUBSCRIPTIONS_PER_HOUR = 10;
+const MAX_REQUEST_BYTES = 10_000;
 
 const jsonResponse = (body: { success: boolean; error?: string }, status: number) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 export const POST: APIRoute = async ({ request }) => {
+  // Defense-in-depth: reject before reading the body so a malicious client
+  // can't drag the Worker into a multi-MB JSON.parse on a route that should
+  // only ever see a small payload. RFC 9110 §8.6 defines Content-Length as a
+  // base-10 unsigned integer — `Number()` would happily admit `"-1"`, `"0x10"`,
+  // `"1e2"`, leading/trailing whitespace, etc. Strict regex first so spoofed
+  // values cannot bypass the cap. Missing or non-numeric → 411; oversize → 413.
+  const contentLengthHeader = request.headers.get('content-length');
+  if (contentLengthHeader === null || !/^\d+$/.test(contentLengthHeader)) {
+    return jsonResponse({ success: false, error: 'Length Required' }, 411);
+  }
+  const contentLength = Number(contentLengthHeader);
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return jsonResponse({ success: false, error: 'Payload too large' }, 413);
+  }
+
   let body: { email?: string; discord_user_id?: string; remind_days_before?: number };
   try {
     body = await request.json();

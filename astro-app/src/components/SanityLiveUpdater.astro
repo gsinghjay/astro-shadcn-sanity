@@ -31,10 +31,14 @@ const liveToken = visualEditingEnabled ? (SANITY_API_READ_TOKEN ?? '') : '';
 {/* Bundled client module — processed by Vite, can import from project modules */}
 <script>
   import { createLiveClient, startLiveSubscription } from '@/lib/sanity-live';
-  import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
+  import {
+    PUBLIC_SANITY_VISUAL_EDITING_ENABLED,
+    PUBLIC_SANITY_STUDIO_PROJECT_ID,
+    PUBLIC_SANITY_STUDIO_DATASET,
+  } from "astro:env/client";
 
-  const projectId = import.meta.env.PUBLIC_SANITY_STUDIO_PROJECT_ID;
-  const dataset = import.meta.env.PUBLIC_SANITY_STUDIO_DATASET || 'production';
+  const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID;
+  const dataset = PUBLIC_SANITY_STUDIO_DATASET || 'production';
   const apiVersion = '2025-03-01';
   const visualEditing = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
 

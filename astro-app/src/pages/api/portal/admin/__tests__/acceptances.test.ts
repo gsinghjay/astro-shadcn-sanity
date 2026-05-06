@@ -47,8 +47,11 @@ const {
 
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-vi.mock('astro:env/server', () => ({
+// PUBLIC_SANITY_STUDIO_PROJECT_ID flipped to client context in Story 5.20.
+vi.mock('astro:env/client', () => ({
   PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+}));
+vi.mock('astro:env/server', () => ({
   SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
 }));
 
@@ -133,8 +136,11 @@ function mockSanityMembership(userId: string): void {
   // Build a fresh Response per call — the route reads the body once, but tests
   // that fire multiple un-cached requests in sequence would otherwise reuse a
   // single (already-consumed) Response.
+  // Story 24.7: route requires the membership response to include a roles entry
+  // with name='administrator'. Mock matches what the Sanity Members API returns
+  // for an administrator-grade project member.
   fetchMock.mockImplementation(async () =>
-    new Response(JSON.stringify({ id: userId }), {
+    new Response(JSON.stringify({ id: userId, roles: [{ name: 'administrator' }] }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     }),
@@ -266,10 +272,76 @@ describe('GET /api/portal/admin/acceptances', () => {
 
   it('admits when Sanity returns id with surrounding whitespace (symmetric trim)', async () => {
     fetchMock.mockImplementation(async () =>
-      new Response(JSON.stringify({ id: `  ${ADMIN_USER_ID}  ` }), {
+      new Response(
+        JSON.stringify({ id: `  ${ADMIN_USER_ID}  `, roles: [{ name: 'administrator' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
+  });
+
+  // Story 24.7 (M-4): membership alone is insufficient — the user must hold the
+  // `administrator` role on the project. Mirrors the new `readOnly` gate on the
+  // sponsor.allowedEmails schema field.
+  it('returns 403 when membership response omits roles entirely', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ id: ADMIN_USER_ID }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
       }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when roles array does not include administrator', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({ id: ADMIN_USER_ID, roles: [{ name: 'editor' }, { name: 'developer' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when role name has wrong case ("Administrator" — display name, not machine name)', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({ id: ADMIN_USER_ID, roles: [{ name: 'Administrator' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('admits when administrator is one of multiple roles', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({
+          id: ADMIN_USER_ID,
+          roles: [{ name: 'editor' }, { name: 'administrator' }],
+        }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
     );
     const ctx = buildCtx({ userId: ADMIN_USER_ID });
     const res = await GET(ctx as never);
@@ -454,64 +526,82 @@ describe('GET /api/portal/admin/acceptances', () => {
 
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is the literal "placeholder" build-time fallback', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: 'placeholder',
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 503 when PUBLIC_SANITY_STUDIO_PROJECT_ID is empty (fail closed)', async () => {
-    // Re-import the route with a different astro:env/server mock so the
-    // module-level named import binds to the empty value. resetModules +
-    // doMock is the documented vitest pattern for swapping a static import
-    // mid-suite. The fresh module also gets a fresh membership cache, so
-    // no afterAll cleanup is needed beyond the unmock.
+    // Re-import the route with a different astro:env mock so the module-level
+    // named import binds to the empty value. resetModules + doMock is the
+    // documented vitest pattern for swapping a static import mid-suite. The
+    // fresh module also gets a fresh membership cache, so no afterAll cleanup
+    // is needed beyond the unmock.
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: '',
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: READ_TOKEN,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 503 when SANITY_PROJECT_READ_TOKEN is missing (fail closed)', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: undefined,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({});
-    const res = await route.GET(ctx as never);
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'service_unavailable' });
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({});
+      const res = await route.GET(ctx as never);
+      expect(res.status).toBe(503);
+      expect(await res.json()).toEqual({ error: 'service_unavailable' });
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 
   it('returns 429 with Retry-After when RATE_LIMITER reports !allowed (no Sanity call)', async () => {
@@ -672,20 +762,26 @@ describe('OPTIONS /api/portal/admin/acceptances', () => {
 
   it('returns 503 (fail closed) when SANITY_PROJECT_READ_TOKEN is missing', async () => {
     vi.resetModules();
-    vi.doMock('astro:env/server', () => ({
+    vi.doMock('astro:env/client', () => ({
       PUBLIC_SANITY_STUDIO_PROJECT_ID: PROJECT_ID,
+    }));
+    vi.doMock('astro:env/server', () => ({
       SANITY_PROJECT_READ_TOKEN: undefined,
     }));
     vi.doMock('cloudflare:workers', () => ({ env: mockEnv }));
     vi.doMock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
-    const route = await import('../acceptances');
-    const ctx = buildCtx({ method: 'OPTIONS' });
-    const res = await route.OPTIONS(ctx as never);
-    expect(res.status).toBe(503);
-    vi.doUnmock('astro:env/server');
-    vi.doUnmock('cloudflare:workers');
-    vi.doUnmock('@/lib/sanity');
-    vi.resetModules();
+    try {
+      const route = await import('../acceptances');
+      const ctx = buildCtx({ method: 'OPTIONS' });
+      const res = await route.OPTIONS(ctx as never);
+      expect(res.status).toBe(503);
+    } finally {
+      vi.doUnmock('astro:env/client');
+      vi.doUnmock('astro:env/server');
+      vi.doUnmock('cloudflare:workers');
+      vi.doUnmock('@/lib/sanity');
+      vi.resetModules();
+    }
   });
 });
 

@@ -40,11 +40,24 @@
 		"logs": {
 			"enabled": true,
 			"head_sampling_rate": 1
+		},
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.01
 		}
 	},
 	"env": {
 		"capstone": {
 			"name": "ywcc-capstone",
+			// Explicit per-env compat config — defense against accidental drift if a
+			// future override on one flag forgets the others. Mirrors top-level
+			// values; keep both in sync. Inheritable keys per CF docs, so removing
+			// these lines reverts to top-level inheritance with identical effect.
+			"compatibility_date": "2026-04-01",
+			"compatibility_flags": [
+				"nodejs_compat",
+				"global_fetch_strictly_public"
+			],
 			"routes": [
 				{ "pattern": "ywcccapstone1.com", "custom_domain": true },
 				{ "pattern": "www.ywcccapstone1.com", "custom_domain": true }
@@ -119,6 +132,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 		},
@@ -141,6 +158,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
@@ -164,12 +185,25 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
 		},
 		"capstone_preview": {
 			"name": "ywcc-capstone-preview",
+			// Explicit per-env compat config — mirrors capstone production so the
+			// preview Worker exercises the same runtime semantics editors will see
+			// in prod (drafts perspective + stega differ from prod, but compat
+			// flags MUST match to avoid "works in preview, breaks in prod" gaps).
+			"compatibility_date": "2026-04-01",
+			"compatibility_flags": [
+				"nodejs_compat",
+				"global_fetch_strictly_public"
+			],
 			"vars": {
 				// Capstone preview Worker — content-only (no D1/KV/DO bindings).
 				// Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
@@ -197,6 +231,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 		},
@@ -219,6 +257,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
@@ -242,6 +284,10 @@
 				"logs": {
 					"enabled": true,
 					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
 				}
 			}
 			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.

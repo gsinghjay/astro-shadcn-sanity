@@ -1,6 +1,7 @@
 ---
 import { getSiteSettings } from '../lib/sanity';
 import { stegaClean } from '@sanity/client/stega';
+import { PUBLIC_GTM_ID } from 'astro:env/client';
 import { safeUrlFor } from '@/lib/image';
 import {
   Footer as FooterUI,
@@ -31,7 +32,7 @@ const {
 
 const footerLogoUrl = safeUrlFor(logoLight)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain-light.svg';
 const footerLogoAlt = logoLight?.alt || 'NJIT';
-const gtmId = import.meta.env.PUBLIC_GTM_ID;
+const gtmId = PUBLIC_GTM_ID;
 
 // Split siteName for footer display
 const nameParts = (siteName || 'YWCC Industry Capstone').split(' ');

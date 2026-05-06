@@ -51,6 +51,9 @@ const {
   AUTHOR_BY_SLUG_QUERY,
   getAllAuthors,
   getAuthorBySlug,
+  GALLERY_ASSETS_QUERY,
+  getGalleryAssets,
+  resetAllCaches,
 } = await import("@/lib/sanity");
 
 // Reset module state between tests (clears _siteSettingsCache)
@@ -1196,5 +1199,237 @@ describe("Multi-site query patterns", () => {
 
   it("ALL_AUTHOR_SLUGS_QUERY includes site filter", () => {
     expect(ALL_AUTHOR_SLUGS_QUERY).toContain('$site == "" || site == $site');
+  });
+});
+
+describe("GALLERY_ASSETS_QUERY shape (Story 22.11)", () => {
+  it("targets sanity.imageAsset filtered by the 'gallery' tag in opt.media.tags", () => {
+    expect(GALLERY_ASSETS_QUERY).toContain('_type == "sanity.imageAsset"');
+    expect(GALLERY_ASSETS_QUERY).toContain('"gallery" in opt.media.tags[]->name.current');
+    expect(GALLERY_ASSETS_QUERY).toContain('order(_createdAt desc)');
+    expect(GALLERY_ASSETS_QUERY).toContain('"tags": opt.media.tags[]->name.current');
+  });
+
+  it("does NOT include a multi-site filter (assets are workspace-global)", () => {
+    expect(GALLERY_ASSETS_QUERY).not.toContain('$site');
+    expect(GALLERY_ASSETS_QUERY).not.toContain('site ==');
+  });
+});
+
+describe("getGalleryAssets() (Story 22.11)", () => {
+  function mockAsset(overrides: Record<string, unknown>) {
+    return {
+      _id: 'image-x-1024x768-jpg',
+      url: 'https://cdn.sanity.io/images/49nk9b0w/production/x.jpg',
+      altText: null,
+      title: null,
+      description: null,
+      metadata: { lqip: null, dimensions: { width: 1024, height: 768 } },
+      tags: [],
+      ...overrides,
+    };
+  }
+
+  it("normalizes assets into GalleryItem[] with tag-derived featured/year/category", async () => {
+    const mockAssets = [
+      mockAsset({ _id: 'a1', tags: ['gallery'] }),
+      mockAsset({ _id: 'a2', tags: ['gallery', 'gallery-featured'] }),
+      mockAsset({ _id: 'a3', tags: ['gallery', 'gallery-2026', 'gallery-web-apps'] }),
+      mockAsset({ _id: 'a4', tags: ['gallery', 'gallery-featured', 'gallery-2025', 'gallery-ai-ml'] }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toHaveLength(4);
+
+    expect(items[0]).toMatchObject({ _key: 'a1', featured: false, year: null, category: null });
+    expect(items[1]).toMatchObject({ _key: 'a2', featured: true, year: null, category: null });
+    expect(items[2]).toMatchObject({ _key: 'a3', featured: false, year: 2026, category: 'web-apps' });
+    expect(items[3]).toMatchObject({ _key: 'a4', featured: true, year: 2025, category: 'ai-ml' });
+  });
+
+  it("derives caption with description -> title -> null fallback chain", async () => {
+    const mockAssets = [
+      mockAsset({ _id: 'a-desc', tags: ['gallery'], description: 'desc only' }),
+      mockAsset({ _id: 'a-title', tags: ['gallery'], description: null, title: 'title only' }),
+      mockAsset({ _id: 'a-both', tags: ['gallery'], description: 'desc wins', title: 'title' }),
+      mockAsset({ _id: 'a-none', tags: ['gallery'] }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items[0].caption).toBe('desc only');
+    expect(items[1].caption).toBe('title only');
+    expect(items[2].caption).toBe('desc wins');
+    expect(items[3].caption).toBeNull();
+  });
+
+  it("derives alt from altText -> null", async () => {
+    const mockAssets = [
+      mockAsset({ _id: 'a-alt', tags: ['gallery'], altText: 'an alt' }),
+      mockAsset({ _id: 'a-noalt', tags: ['gallery'] }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items[0].image.alt).toBe('an alt');
+    expect(items[1].image.alt).toBeNull();
+  });
+
+  it("year regex is by-design lenient (4-digit), category is strict (canonical slugs only)", async () => {
+    // 'gallery-2099' (out-of-range year) → year: 2099 (regex doesn't validate range)
+    // 'gallery-future' (non-canonical) → category: null (not in CATEGORY_SLUGS)
+    const mockAssets = [
+      mockAsset({ _id: 'a1', tags: ['gallery', 'gallery-2099', 'gallery-future'] }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items[0].year).toBe(2099);
+    expect(items[0].category).toBeNull();
+  });
+
+  it("first matching year tag wins (tag order = priority)", async () => {
+    const mockAssets = [
+      mockAsset({ _id: 'a1', tags: ['gallery', 'gallery-2025', 'gallery-2026'] }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items[0].year).toBe(2025);
+  });
+
+  it("normalizes asset image shape so urlFor() can consume it", async () => {
+    const mockAssets = [
+      mockAsset({
+        _id: 'a-img',
+        tags: ['gallery'],
+        url: 'https://cdn.sanity.io/img.jpg',
+        metadata: { lqip: 'data:image/jpeg;base64,xxx', dimensions: { width: 800, height: 600 } },
+      }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items[0].image.asset._id).toBe('a-img');
+    expect(items[0].image.asset.url).toBe('https://cdn.sanity.io/img.jpg');
+    expect(items[0].image.asset.metadata).toEqual({
+      lqip: 'data:image/jpeg;base64,xxx',
+      dimensions: { width: 800, height: 600 },
+    });
+  });
+
+  it("returns [] when query returns null", async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: null } as never);
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toEqual([]);
+  });
+
+  it("skips null/non-string tag entries from broken media.tag references", async () => {
+    // Broken/unpublished media.tag refs deref to null in the GROQ projection;
+    // tag.match() on null would throw — verify the helper survives.
+    const mockAssets = [
+      mockAsset({
+        _id: 'a-broken-ref',
+        tags: ['gallery', null, 'gallery-2026', undefined, 42, 'gallery-web-apps'],
+      }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ year: 2026, category: 'web-apps' });
+  });
+
+  it("strips stega markers before regex matching tag values", async () => {
+    // Visual-editing previews wrap string values with stega zero-width markers;
+    // raw tag strings would no longer match /^gallery-(\d{4})$/. Spec Task 2
+    // CRITICAL note required this assertion.
+    const { vercelStegaCombine } = await import("@vercel/stega");
+    const sourcePath = { origin: 'sanity.io', href: '/x', kind: 'asset' };
+    const wrap = (s: string) => vercelStegaCombine(s, sourcePath);
+    const mockAssets = [
+      mockAsset({
+        _id: 'a-stega',
+        tags: [wrap('gallery'), wrap('gallery-2026'), wrap('gallery-web-apps'), wrap('gallery-featured')],
+      }),
+    ];
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ featured: true, year: 2026, category: 'web-apps' });
+  });
+
+  it("returns [] and does not throw when loadQuery rejects", async () => {
+    vi.mocked(sanityClient.fetch).mockRejectedValueOnce(new Error('sanity outage') as never);
+    resetAllCaches();
+    const items = await getGalleryAssets();
+    expect(items).toEqual([]);
+  });
+
+  it("returns cached result on subsequent calls without additional API calls", async () => {
+    vi.resetModules();
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockAssets = [
+      { _id: 'a1', url: 'u', altText: null, title: null, description: null, metadata: null, tags: ['gallery'] },
+    ];
+    vi.mocked(freshClient.fetch).mockResolvedValueOnce({ result: mockAssets } as never);
+
+    await freshModule.getGalleryAssets();
+    expect(freshClient.fetch).toHaveBeenCalledOnce();
+
+    vi.mocked(freshClient.fetch).mockClear();
+
+    const cached = await freshModule.getGalleryAssets();
+    expect(cached).toHaveLength(1);
+    expect(freshClient.fetch).not.toHaveBeenCalled();
+  });
+
+  it("resetAllCaches() clears the gallery cache so the next call refetches", async () => {
+    vi.resetModules();
+    vi.doMock("astro:env/client", () => ({
+      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: false,
+      PUBLIC_SANITY_DATASET: "production",
+      PUBLIC_SITE_ID: "capstone",
+    }));
+    vi.doMock("astro:env/server", () => ({
+      SANITY_API_READ_TOKEN: undefined,
+    }));
+    const { sanityClient: freshClient } = await import("sanity:client");
+    const freshModule = await import("@/lib/sanity");
+
+    const mockAssets = [
+      { _id: 'a1', url: 'u', altText: null, title: null, description: null, metadata: null, tags: ['gallery'] },
+    ];
+    vi.mocked(freshClient.fetch).mockResolvedValue({ result: mockAssets } as never);
+
+    await freshModule.getGalleryAssets();
+    await freshModule.getGalleryAssets();
+    expect(freshClient.fetch).toHaveBeenCalledTimes(1);
+
+    freshModule.resetAllCaches();
+
+    await freshModule.getGalleryAssets();
+    expect(freshClient.fetch).toHaveBeenCalledTimes(2);
   });
 });

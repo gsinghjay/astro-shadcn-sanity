@@ -38,7 +38,8 @@ describe('SearchModal', () => {
     expect(html).toContain('class="search-modal-shell"');
     expect(html).toContain('data-search-modal-root');
     expect(snippet).toContain('<search-modal-snippet');
-    expect(snippet).toContain('api-url="https://worker.dev"');
+    // URL is normalized to origin+pathname; bare host gets a trailing slash from URL.pathname.
+    expect(snippet).toContain('api-url="https://worker.dev/"');
     expect(snippet).toContain('placeholder="Search the site…"');
     expect(snippet).toContain('max-results="8"');
     expect(snippet).toContain('debounce-ms="200"');
@@ -64,7 +65,7 @@ describe('SearchModal', () => {
     });
 
     expect(html).not.toContain(stegaSuffix);
-    expect(html).toContain('api-url="https://worker.dev"');
+    expect(html).toContain('api-url="https://worker.dev/"');
     expect(html).toContain('placeholder="Search the site…"');
     expect(html).toContain('theme="dark"');
     expect(html).toContain('see-more="/search?q="');
