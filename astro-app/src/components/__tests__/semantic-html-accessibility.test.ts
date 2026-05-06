@@ -508,7 +508,7 @@ describe('AC8: EmbedBlock Iframe Title', () => {
     expect(html).toContain('title="Embedded content"');
   });
 
-  test('renders rawEmbedCode via set:html and omits iframe', async () => {
+  test('renders rawEmbedCode inside sandboxed iframe srcdoc (no top-level script)', async () => {
     const container = await AstroContainer.create();
     const rawEmbedCode = '<script src="https://example.com/embed.js"></script><div id="form-anchor"></div>';
     const html = await container.renderToString(EmbedBlock, {
@@ -525,9 +525,12 @@ describe('AC8: EmbedBlock Iframe Title', () => {
         variant: 'default',
       },
     });
-    expect(html).toContain('https://example.com/embed.js');
-    expect(html).toContain('id="form-anchor"');
-    expect(html).not.toMatch(/<iframe[^>]*src="https:\/\/example\.com\/embed\.js"/);
+    expect(html).toContain('<iframe');
+    expect(html).toContain('srcdoc=');
+    expect(html).toContain('sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"');
+    const stripped = html.replace(/srcdoc="[^"]*"/g, 'srcdoc="..."');
+    expect(stripped).not.toMatch(/<script src=["']https:\/\/example\.com\/embed\.js["']/);
+    expect(stripped).not.toMatch(/<div id=["']form-anchor["']/);
   });
 
   test('rawEmbedCode takes precedence when both embedUrl and rawEmbedCode are set', async () => {
@@ -547,7 +550,7 @@ describe('AC8: EmbedBlock Iframe Title', () => {
         variant: 'contained',
       },
     });
-    expect(html).toContain('class="raw-wins"');
+    expect(html).toContain('srcdoc=');
     expect(html).not.toContain('src="https://www.youtube.com/embed/test"');
   });
 
@@ -569,7 +572,8 @@ describe('AC8: EmbedBlock Iframe Title', () => {
           variant,
         },
       });
-      expect(html).toContain('class="variant-probe"');
+      expect(html).toContain('<iframe');
+      expect(html).toContain('srcdoc=');
     }
   });
 });
