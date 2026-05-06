@@ -9,6 +9,7 @@ dependencies = [
     "pydantic",
     "email-validator",
     "pyjwt>=2.12.1",
+    "python-multipart>=0.0.27",
 ]
 
 [dependency-groups]
