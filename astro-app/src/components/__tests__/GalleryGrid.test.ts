@@ -5,7 +5,7 @@ import type { GalleryItem } from '@/lib/sanity';
 
 vi.mock('@/lib/sanity', () => ({
   getSiteSettings: vi.fn().mockResolvedValue({
-    title: 'YWCC Industry Capstone',
+    siteName: 'YWCC Industry Capstone',
   }),
 }));
 
@@ -44,6 +44,8 @@ describe('GalleryGrid', () => {
     expect(html).toContain('Cap B');
     expect(html).toContain('My Gallery');
     expect(html).toContain('id="gallery-unit"');
+    // JSON-LD ImageGallery.creator is sourced from siteSettings.siteName (AC14).
+    expect(html).toMatch(/"creator":\s*\{[^}]*"name":\s*"YWCC Industry Capstone"/);
   });
 
   test('empty items renders no JSON-LD and no figures', async () => {
