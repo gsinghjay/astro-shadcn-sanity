@@ -72,6 +72,12 @@ The newer auth/portal API surface (Better Auth + middleware + portal routes) has
   1. **Post-revocation replay.** A user signs in legitimately; their cookie token `T` lives in KV with 300 s TTL, *re-extended on every authenticated request* (fire-and-forget put). When their Better Auth session is revoked or expires in D1, the KV cache continues to authenticate `T` until the TTL window finally lapses without any traffic.
   2. **KV-read → impersonation.** Anyone with read access to `SESSION_CACHE` (CF dashboard read-only role, leaked Wrangler creds, accidentally read-only-bound debug worker) can list keys and use any one as a bearer cookie to impersonate that user — no OAuth required, no signature check. KV keys are not secrets in CF's threat model; raw session tokens are.
 - **Fix:** Use `SHA-256(token)` as the KV key, store `expiresAt` in the cached payload and check it on read, and invalidate on sign-out. Better: drop the bespoke cache and rely on Better Auth's signed `cookieCache`.
+- **Status: RESOLVED 2026-05-06 via Story 24.3.**
+  - KV keys are SHA-256(token) rendered as lowercase hex (64 chars). `hashToken()` exported from `astro-app/src/middleware.ts`.
+  - `CachedSession.expiresAt` is required and enforced on every read; stale entries are dropped fire-and-forget.
+  - Cache writes set `expiresAt = min(now + 5min, session.session.expiresAt)` and a matching `expirationTtl` (60s floor); role-escalation and agreement-gate writes reuse the original `expiresAt` so the cache lifetime never extends past the session window.
+  - Sign-out hook in `astro-app/src/pages/api/auth/[...all].ts` hashes the incoming cookie and deletes the KV entry inside `ctx.waitUntil` after `auth.handler` returns.
+  - cookieCache-only follow-up filed for evaluation post-rollout.
 
 ### H-3: Account-linking + magic-link signup enables sponsor role takeover
 - **File:** `astro-app/src/lib/auth-config.ts:117-120` (account linking), `:122-137` (magic link), `:142-149` (`databaseHooks.user.create.before`)
@@ -216,7 +222,7 @@ All routes gated by middleware (session + role + sponsor whitelist + agreement a
 2. [x] **H-3** — set `disableSignUp: true` on magic link, `allowDifferentEmails: false` on account linking. One-line config changes. **RESOLVED 2026-05-05 via Story 24.2.**
 3. **M-1, M-2** — add unsubscribe token + double-opt-in to `/api/subscribe`. New random column + email flow.
 4. [x] **M-7, M-8** — introduce `<JsonLd>` component with proper escaping; sandbox or DOMPurify the `EmbedBlock`. **RESOLVED 2026-05-05 via Story 24.5 (M-7) + Story 24.6 (M-8).**
-5. **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`.
+5. [x] **H-2** — switch `SESSION_CACHE` to hashed keys + stored `expiresAt`, or remove and rely on Better Auth `cookieCache`. **RESOLVED 2026-05-06 via Story 24.3.**
 6. [x] **M-3** — replace request-reflective `trustedOrigins`/`baseURL` with `CLOUDFLARE_ENV`-driven static allowlist. **RESOLVED 2026-05-05 via Story 24.2.**
 7. [x] **M-4** — restrict who can edit `sponsor.allowedEmails` in Studio. **RESOLVED 2026-05-05 via Story 24.7.**
 8. [x] **M-5, M-6** — DB `CHECK` constraint, magic-link `expiresIn`. Hygiene. **RESOLVED 2026-05-05 via Story 24.7 (M-5) + Story 24.2 (M-6).**

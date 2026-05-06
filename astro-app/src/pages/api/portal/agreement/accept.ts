@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
-import { extractSessionToken, normalizeEmail } from '@/middleware';
+import { extractSessionToken, hashToken, normalizeEmail } from '@/middleware';
 import { getSponsorAgreementRev } from '@/lib/sanity';
 import { log } from '@/lib/log';
 
@@ -102,7 +102,8 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   const sessionToken = extractSessionToken(request.headers.get('cookie'));
   if (sessionToken && env.SESSION_CACHE) {
     try {
-      await env.SESSION_CACHE.delete(sessionToken);
+      const hashedKey = await hashToken(sessionToken);
+      await env.SESSION_CACHE.delete(hashedKey);
     } catch (e) {
       log.error('agreement-accept-kv-invalidation-failed', e);
       // Fall through — D1 write succeeded; KV entry will TTL out within 5 min.

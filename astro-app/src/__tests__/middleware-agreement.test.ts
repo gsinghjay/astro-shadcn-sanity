@@ -74,6 +74,8 @@ vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 import { onRequest, _resetAgreementRevCache } from '../middleware';
 
 const CURRENT_REV = 'rev-current-xyz';
+// SHA-256(`tok`) — Story 24.3 hashes every KV key, so KV assertions reference this digest.
+const HASH_TOK = '1a7674eb4ee78df7e1ac439a93c3fa8e3c945784d4dec9fd8e3011738b2f1d62';
 
 function createMockContext(pathname: string, headers?: Record<string, string>) {
   // Story 22.10: middleware uses `cfContext?.waitUntil(...)` for fire-and-forget
@@ -274,6 +276,7 @@ describe('middleware — sponsor agreement gate', () => {
       email: 's@co.com',
       name: 'Sponsor',
       role: 'sponsor',
+      expiresAt: Date.now() + 5 * 60 * 1000,
       agreementAcceptedAt: 111,
       agreementVersion: CURRENT_REV,
     });
@@ -287,14 +290,16 @@ describe('middleware — sponsor agreement gate', () => {
     );
   });
 
-  it('KV cache missing the version field triggers D1 lookup and re-caches', async () => {
+  it('KV cache missing the version field triggers D1 lookup and re-caches under hashed key', async () => {
     mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete } as unknown;
+    const expiresAt = Date.now() + 5 * 60 * 1000;
     mockKvGet.mockResolvedValue({
       email: 's@co.com',
       name: 'Sponsor',
       role: 'sponsor',
+      expiresAt,
       agreementAcceptedAt: 111,
-      // agreementVersion omitted — simulates pre-story cached session
+      // agreementVersion omitted — simulates a cached session from before the version field landed
     });
     mockD1First.mockResolvedValueOnce({ agreement_accepted_at: 111, agreement_version: CURRENT_REV });
 
@@ -306,10 +311,13 @@ describe('middleware — sponsor agreement gate', () => {
       'SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?',
     );
     expect(mockKvPut).toHaveBeenCalledWith(
-      'tok',
+      HASH_TOK,
       expect.stringContaining(`"agreementVersion":"${CURRENT_REV}"`),
-      expect.objectContaining({ expirationTtl: 300 }),
+      expect.objectContaining({ expirationTtl: expect.any(Number) }),
     );
+    // Re-cache must reuse the cached entry's expiresAt — never extends the window.
+    const [, value] = mockKvPut.mock.calls[0];
+    expect(JSON.parse(value).expiresAt).toBe(expiresAt);
   });
 
   it('D1 lookup failure fails closed (flag stays true — blocks portal access on outage)', async () => {

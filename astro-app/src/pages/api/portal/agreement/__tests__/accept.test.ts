@@ -46,6 +46,10 @@ vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 
 const { POST, ALL } = await import('../accept');
 
+// SHA-256 hex of 'tok-xyz' (matches middleware.ts hashToken output for the
+// raw token used across this suite). Pre-computed deterministically.
+const HASH_TOK_XYZ = '5d699dd34a86ef68942415bbe6a200e948e7025e3aef1bbda99b57fa6c84b2c5';
+
 function setEnv(next: Record<string, unknown>): void {
   for (const k of Object.keys(mockEnv)) delete mockEnv[k];
   Object.assign(mockEnv, next);
@@ -185,7 +189,7 @@ describe('POST /api/portal/agreement/accept', () => {
     const res = await POST(ctx as never);
     expect(res.status).toBe(200);
     expect(mockD1Run).toHaveBeenCalledTimes(1);
-    expect(mockKvDelete).toHaveBeenCalledWith('tok-xyz');
+    expect(mockKvDelete).toHaveBeenCalledWith(HASH_TOK_XYZ);
   });
 
   it('allows re-acceptance (200) when version is stale (drift against current rev)', async () => {
@@ -236,7 +240,7 @@ describe('POST /api/portal/agreement/accept', () => {
       's@co.com',
     );
     // KV invalidation: delete the cached session so middleware re-reads D1 next request.
-    expect(mockKvDelete).toHaveBeenCalledWith('tok-xyz');
+    expect(mockKvDelete).toHaveBeenCalledWith(HASH_TOK_XYZ);
     expect(mockKvPut).not.toHaveBeenCalled();
     nowSpy.mockRestore();
   });

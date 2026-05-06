@@ -71,7 +71,13 @@ vi.mock('@/lib/auth-config', () => ({
 }));
 vi.mock('cloudflare:workers', () => ({ env: mockEnv }));
 
-import { onRequest } from '../middleware';
+import { onRequest, hashToken } from '../middleware';
+
+// SHA-256 hex digests of the cookie-token literals used in the tests below.
+// Story 24.3 hashes every KV cache key, so all assertions reference these.
+const HASH_SPONSOR_TOKEN_123 = 'fbe2293197b03ff87a9de5c27e1c042a0d280db40ba28937d31df8cee9fed45d';
+const HASH_TEST_TOKEN_123 = '19b6b086eebb807f54e6327309dec0ff347a6c3c30bf3bb396f167513eba3475';
+const HASH_WU_TOKEN_1 = '22100cc9d95ebd2294d6d3d84d7f6b253d9ec00ed1d5260d6ea87e8f9629a1f6';
 
 function createMockRateLimiter() {
   return {
@@ -265,7 +271,7 @@ describe('middleware — unified auth routing', () => {
 
       await onRequest(ctx as any, mockNext);
 
-      expect(mockKvDelete).toHaveBeenCalledWith('sponsor-token-123');
+      expect(mockKvDelete).toHaveBeenCalledWith(HASH_SPONSOR_TOKEN_123);
     });
 
     it('escalates role to sponsor when Sanity whitelist matches', async () => {
@@ -321,12 +327,17 @@ describe('middleware — unified auth routing', () => {
 
     it('sponsor session in KV cache → cache hit works', async () => {
       mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
-      mockKvGet.mockResolvedValue({ email: 'cached-sponsor@co.com', name: 'Cached Sponsor', role: 'sponsor' });
+      mockKvGet.mockResolvedValue({
+        email: 'cached-sponsor@co.com',
+        name: 'Cached Sponsor',
+        role: 'sponsor',
+        expiresAt: Date.now() + 5 * 60 * 1000,
+      });
       const ctx = createMockContext('/portal/dashboard', { headers: { cookie: sessionCookie } });
 
       await onRequest(ctx as any, mockNext);
 
-      expect(mockKvGet).toHaveBeenCalledWith('sponsor-token-123', { type: 'json' });
+      expect(mockKvGet).toHaveBeenCalledWith(HASH_SPONSOR_TOKEN_123, { type: 'json' });
       expect(ctx.locals.user).toEqual({ email: 'cached-sponsor@co.com', name: 'Cached Sponsor', role: 'sponsor' });
       expect(mockGetSession).not.toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalled();
@@ -504,12 +515,17 @@ describe('middleware — unified auth routing', () => {
     });
 
     it('uses cached session from KV on cache hit (student)', async () => {
-      mockKvGet.mockResolvedValue({ email: 'cached@test.com', name: 'Cached Student', role: 'student' });
+      mockKvGet.mockResolvedValue({
+        email: 'cached@test.com',
+        name: 'Cached Student',
+        role: 'student',
+        expiresAt: Date.now() + 5 * 60 * 1000,
+      });
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
 
       await onRequest(ctx as any, mockNext);
 
-      expect(mockKvGet).toHaveBeenCalledWith('test-token-123', { type: 'json' });
+      expect(mockKvGet).toHaveBeenCalledWith(HASH_TEST_TOKEN_123, { type: 'json' });
       expect(ctx.locals.user).toEqual({ email: 'cached@test.com', name: 'Cached Student', role: 'student' });
       expect(mockGetSession).not.toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalled();
@@ -521,17 +537,25 @@ describe('middleware — unified auth routing', () => {
         user: { id: '1', email: 'student@test.com', name: 'Test Student', role: 'student' },
         session: { id: 's1' },
       });
+      const before = Date.now();
       const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
 
       await onRequest(ctx as any, mockNext);
 
-      expect(mockKvGet).toHaveBeenCalledWith('test-token-123', { type: 'json' });
+      expect(mockKvGet).toHaveBeenCalledWith(HASH_TEST_TOKEN_123, { type: 'json' });
       expect(mockGetSession).toHaveBeenCalled();
-      expect(mockKvPut).toHaveBeenCalledWith(
-        'test-token-123',
-        JSON.stringify({ email: 'student@test.com', name: 'Test Student', role: 'student' }),
-        { expirationTtl: 300 },
-      );
+      expect(mockKvPut).toHaveBeenCalledTimes(1);
+      const [putKey, putValue, putOpts] = mockKvPut.mock.calls[0];
+      expect(putKey).toBe(HASH_TEST_TOKEN_123);
+      const parsed = JSON.parse(putValue);
+      expect(parsed).toMatchObject({
+        email: 'student@test.com',
+        name: 'Test Student',
+        role: 'student',
+      });
+      expect(parsed.expiresAt).toBeGreaterThanOrEqual(before + 5 * 60 * 1000 - 1);
+      expect(parsed.expiresAt).toBeLessThanOrEqual(Date.now() + 5 * 60 * 1000 + 1);
+      expect(putOpts).toEqual({ expirationTtl: 300 });
       expect(ctx.locals.user).toEqual({ email: 'student@test.com', name: 'Test Student', role: 'student' });
     });
 
@@ -770,7 +794,7 @@ describe('middleware — unified auth routing', () => {
 
       // KV write on the cache-miss fallback + KV delete on the denied path.
       expect(cfContext.waitUntil).toHaveBeenCalledTimes(2);
-      expect(mockKvDelete).toHaveBeenCalledWith('wu-token-1');
+      expect(mockKvDelete).toHaveBeenCalledWith(HASH_WU_TOKEN_1);
     });
 
     it('logs structured error when KV write inside waitUntil rejects', async () => {
@@ -826,6 +850,174 @@ describe('middleware — unified auth routing', () => {
       });
 
       await expect(onRequest(ctx as any, mockNext)).resolves.toBeDefined();
+    });
+  });
+
+  describe('Story 24.3 — hashed KV keys, stored expiresAt, sign-out invalidation', () => {
+    const sessionCookie = 'better-auth.session_token=test-token-123; Path=/';
+
+    beforeEach(() => {
+      mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete };
+    });
+
+    it('hashToken returns lowercase 64-char hex SHA-256 of the input', async () => {
+      const hex = await hashToken('test-token-123');
+      expect(hex).toBe(HASH_TEST_TOKEN_123);
+      expect(hex).toMatch(/^[0-9a-f]{64}$/);
+    });
+
+    it('cache miss when stored expiresAt is in the past — falls through to D1', async () => {
+      mockKvGet.mockResolvedValue({
+        email: 'stale@test.com',
+        name: 'Stale',
+        role: 'student',
+        expiresAt: Date.now() - 1000,
+      });
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'fresh@test.com', name: 'Fresh', role: 'student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockKvGet).toHaveBeenCalledWith(HASH_TEST_TOKEN_123, { type: 'json' });
+      expect(mockGetSession).toHaveBeenCalled();
+      expect(ctx.locals.user?.email).toBe('fresh@test.com');
+    });
+
+    it('stale cache hit triggers fire-and-forget delete on the hashed key', async () => {
+      mockKvGet.mockResolvedValue({
+        email: 'stale@test.com',
+        name: 'Stale',
+        role: 'student',
+        expiresAt: Date.now() - 1000,
+      });
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'fresh@test.com', name: 'Fresh', role: 'student' },
+        session: { id: 's1' },
+      });
+      const cfContext = createMockCfContext();
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie }, cfContext });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockKvDelete).toHaveBeenCalledWith(HASH_TEST_TOKEN_123);
+    });
+
+    it('pre-Story-24.3 cached entry without expiresAt is treated as a cache miss (orphan reaped via TTL)', async () => {
+      // AC 12: old raw-keyed payloads have no expiresAt. After the upgrade these never satisfy
+      // `Date.now() < cached.expiresAt`, so the middleware falls through to D1 and overwrites
+      // the entry under the hashed key on the next write.
+      mockKvGet.mockResolvedValue({
+        email: 'legacy@test.com',
+        name: 'Legacy',
+        role: 'student',
+        // expiresAt deliberately omitted — simulates pre-story payload
+      } as unknown);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'fresh@test.com', name: 'Fresh', role: 'student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      expect(mockGetSession).toHaveBeenCalled();
+      expect(ctx.locals.user?.email).toBe('fresh@test.com');
+    });
+
+    it('cache write stores expiresAt in payload and uses hashed key with capped TTL', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'student@test.com', name: 'Student', role: 'student' },
+        session: { id: 's1' },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      const [key, value, opts] = mockKvPut.mock.calls[0];
+      expect(key).toBe(HASH_TEST_TOKEN_123);
+      const payload = JSON.parse(value);
+      expect(payload.expiresAt).toBeGreaterThan(Date.now());
+      expect(payload.expiresAt).toBeLessThanOrEqual(Date.now() + 5 * 60 * 1000);
+      expect(opts.expirationTtl).toBe(300);
+    });
+
+    it('caps expiresAt at the underlying Better Auth session expiry', async () => {
+      mockKvGet.mockResolvedValue(null);
+      const sessionExpiry = Date.now() + 90 * 1000; // 90 s — shorter than the 5-min freshness window
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'shortlived@test.com', name: 'Short', role: 'student' },
+        session: { id: 's1', expiresAt: sessionExpiry },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      const [, value, opts] = mockKvPut.mock.calls[0];
+      const payload = JSON.parse(value);
+      expect(payload.expiresAt).toBe(sessionExpiry);
+      // TTL collapses to the session's remaining seconds (~90), well below the 5-min cap.
+      expect(opts.expirationTtl).toBeGreaterThanOrEqual(60);
+      expect(opts.expirationTtl).toBeLessThanOrEqual(90);
+    });
+
+    it('handles Better Auth session.expiresAt as a Date instance', async () => {
+      mockKvGet.mockResolvedValue(null);
+      const sessionExpiry = new Date(Date.now() + 5 * 60 * 1000);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'date@test.com', name: 'Date', role: 'student' },
+        session: { id: 's1', expiresAt: sessionExpiry },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      const [, value] = mockKvPut.mock.calls[0];
+      const payload = JSON.parse(value);
+      expect(payload.expiresAt).toBeLessThanOrEqual(sessionExpiry.getTime());
+    });
+
+    it('floors KV expirationTtl at 60 seconds even when session is about to expire', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'edge@test.com', name: 'Edge', role: 'student' },
+        // Session expires in 5 seconds — KV requires expirationTtl >= 60
+        session: { id: 's1', expiresAt: Date.now() + 5_000 },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      const [, , opts] = mockKvPut.mock.calls[0];
+      expect(opts.expirationTtl).toBe(60);
+    });
+
+    it('role escalation reuses the original expiresAt — never extends cache lifetime', async () => {
+      const sessionCookie = 'better-auth.session_token=sponsor-token-123; Path=/';
+      const fixedExpiresAt = Date.now() + 60 * 1000; // 60 s window from the original write
+      mockKvGet.mockResolvedValue({
+        email: 'escalating@co.com',
+        name: 'Escalating',
+        role: 'student',
+        expiresAt: fixedExpiresAt,
+      });
+      mockCheckSponsorWhitelist.mockResolvedValue(true);
+      const ctx = createMockContext('/portal/index', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      // Two writes are expected: (1) escalation re-writes the cache with role=sponsor;
+      // (2) the agreement gate writes back the agreement-row data because the cached entry
+      // lacks agreementAcceptedAt/agreementVersion. Both must reuse the original expiresAt.
+      expect(mockKvPut).toHaveBeenCalledTimes(2);
+      for (const [key, value] of mockKvPut.mock.calls) {
+        expect(key).toBe(HASH_SPONSOR_TOKEN_123);
+        const payload = JSON.parse(value);
+        expect(payload.expiresAt).toBe(fixedExpiresAt);
+      }
     });
   });
 });

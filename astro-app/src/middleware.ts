@@ -26,15 +26,29 @@ const jsonError = (status: number, error: string) =>
     headers: { "content-type": "application/json" },
   });
 
-/** Shape stored in SESSION_CACHE. `undefined` on either field means the cache predates that field
- *  and we should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
+/** Shape stored in SESSION_CACHE. `expiresAt` (epoch ms) is required and checked on every read —
+ *  see Story 24.3. `undefined` on the agreement fields means the cache predates that field and we
+ *  should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
 type CachedSession = {
   email: string;
   name: string;
   role: string;
+  expiresAt: number;
   agreementAcceptedAt?: number | null;
   agreementVersion?: string | null;
 };
+
+/** Hash a session token for KV-cache key derivation. SHA-256 → lowercase hex (64 chars).
+ *  KV reads/writes never use the raw bearer cookie — see Story 24.3 (audit H-2). */
+export async function hashToken(token: string): Promise<string> {
+  const data = new TextEncoder().encode(token);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** KV's minimum expirationTtl is 60 seconds; the freshness window caps at 5 minutes. */
+const KV_TTL_MIN_SECONDS = 60;
+const SESSION_CACHE_FRESHNESS_MS = 5 * 60 * 1000;
 
 /** Module-scope cache of the current Sanity sponsor-agreement `_rev`. Persists across requests
  *  within a Worker isolate (CF reuses isolates aggressively), so cache hit rate is very high.
@@ -156,12 +170,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
     let userData: CachedSession | null = null;
+    // Cache the hashed key per request so we don't re-derive SHA-256 on each KV op.
+    const hashedSessionKey = sessionToken ? await hashToken(sessionToken) : null;
 
-    // KV cache check — skip D1 if session is cached
-    if (kvCache && sessionToken) {
-      const cached = await kvCache.get<CachedSession>(sessionToken, { type: "json" });
-      if (cached) {
+    // KV cache check — skip D1 if session is cached. Stale entries (expiresAt elapsed) are
+    // dropped fire-and-forget; the request falls through to the D1 path either way.
+    if (kvCache && hashedSessionKey) {
+      const cached = await kvCache.get<CachedSession>(hashedSessionKey, { type: "json" });
+      if (cached && Date.now() < cached.expiresAt) {
         userData = cached;
+      } else if (cached) {
+        cfContext?.waitUntil(
+          kvCache
+            .delete(hashedSessionKey)
+            .catch((e: unknown) => log.error('middleware-kv-stale-delete-failed', e)),
+        );
       }
     }
 
@@ -176,17 +199,41 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       if (session?.user) {
         const sessionUser = session.user as SessionUser;
+        // Better Auth returns session.expiresAt as a Date in some versions, an epoch number in
+        // others — handle both. Cap the cache lifetime at min(now+5min, sessionExpiry) so a
+        // cached entry never outlives the underlying Better Auth session.
+        const sessionExpiryRaw = session.session?.expiresAt as Date | number | string | undefined;
+        const parsed =
+          sessionExpiryRaw instanceof Date
+            ? sessionExpiryRaw.getTime()
+            : typeof sessionExpiryRaw === 'string'
+              ? Date.parse(sessionExpiryRaw)
+              : typeof sessionExpiryRaw === 'number'
+                ? sessionExpiryRaw
+                : NaN;
+        // Fall back to the freshness window when the adapter returns an unexpected
+        // shape — never poison the cache with NaN (Math.min(_, NaN) is NaN, which
+        // would write expirationTtl: NaN and reject the KV put).
+        const sessionExpiryMs = Number.isFinite(parsed)
+          ? parsed
+          : Date.now() + SESSION_CACHE_FRESHNESS_MS;
+        const cacheExpiresAt = Math.min(Date.now() + SESSION_CACHE_FRESHNESS_MS, sessionExpiryMs);
         userData = {
           email: normalizeEmail(sessionUser.email),
           name: sessionUser.name ?? "",
           role: sessionUser.role ?? "student",
+          expiresAt: cacheExpiresAt,
         };
 
-        // Cache session in KV (fire-and-forget, 5-min TTL)
-        if (kvCache) {
+        // Cache session in KV (fire-and-forget). KV expirationTtl floors at 60s.
+        if (kvCache && hashedSessionKey) {
+          const ttlSeconds = Math.max(
+            KV_TTL_MIN_SECONDS,
+            Math.floor((cacheExpiresAt - Date.now()) / 1000),
+          );
           cfContext?.waitUntil(
             kvCache
-              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
               .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
           );
         }
@@ -207,11 +254,16 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const isSponsor = await checkSponsorWhitelist(userData.email);
       if (isSponsor) {
         userData.role = "sponsor";
-        // Persist escalated role to KV cache (fire-and-forget)
-        if (kvCache && sessionToken) {
+        // Persist escalated role to KV cache (fire-and-forget). Reuse the original expiresAt so
+        // role escalation cannot extend the cache lifetime past the session window.
+        if (kvCache && hashedSessionKey) {
+          const ttlSeconds = Math.max(
+            KV_TTL_MIN_SECONDS,
+            Math.floor((userData.expiresAt - Date.now()) / 1000),
+          );
           cfContext?.waitUntil(
             kvCache
-              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
               .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
           );
         }
@@ -226,10 +278,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }
       } else {
         // Non-sponsor on portal: 403 JSON for API, denied-page redirect for pages
-        if (kvCache && sessionToken) {
+        if (kvCache && hashedSessionKey) {
           cfContext?.waitUntil(
             kvCache
-              .delete(sessionToken)
+              .delete(hashedSessionKey)
               .catch((e: unknown) => log.error('middleware-kv-delete-failed', e)),
           );
         }
@@ -270,10 +322,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
           agreementVersion = row?.agreement_version ?? null;
           userData.agreementAcceptedAt = agreementAcceptedAt;
           userData.agreementVersion = agreementVersion;
-          if (kvCache && sessionToken) {
+          if (kvCache && hashedSessionKey) {
+            const ttlSeconds = Math.max(
+              KV_TTL_MIN_SECONDS,
+              Math.floor((userData.expiresAt - Date.now()) / 1000),
+            );
             cfContext?.waitUntil(
               kvCache
-                .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+                .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
                 .catch((e: unknown) => log.error("middleware-kv-write-failed", e)),
             );
           }
