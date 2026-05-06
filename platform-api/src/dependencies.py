@@ -211,22 +211,33 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 async def get_current_admin(
     token: str = Depends(oauth2_scheme),
-    settings: WorkerSettings = Depends(get_settings)
-) -> str:
-    """Verifies the JWT token and returns the username."""
+    settings: WorkerSettings = Depends(get_settings),
+    db = Depends(get_db)
+) -> str:    
+    if not settings.kv or not db:
+        raise HTTPException(500, "D1 or KV not configured")
     
-    # Ensure that this is found within your optional_secrets config
-    jwt_secret = settings.optional_secrets.get("JWT_SECRET", "super-secret-default-key")
+    # check cache first...
+    cached_email = await settings.kv.get(f"session_token:{token}")
+    if cached_email:
+        return cached_email
+
+    query = """
+        SELECT user.email 
+        FROM session 
+        JOIN user ON session.user_id = user.id 
+        WHERE session.token = ? 
+          AND user.role IN ('sponsor', 'admin') 
+          AND session.expires_at > (unixepoch() * 1000)
+    """
     
-    try:
-        # Decode the token
-        payload = jwt.decode(token, jwt_secret, algorithms=["HS256"])
-        username = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return username
+    result = await db.prepare(query).bind(token).first()
+    
+    if not result:
+        raise HTTPException(status_code=401, detail="Invalid or expired session")
         
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    email = result["email"]
+
+    await settings.kv.put(f"session_token:{token}", email, expirationTtl=300) # 5 minute expiry time, consider changing to global value
+    
+    return email
