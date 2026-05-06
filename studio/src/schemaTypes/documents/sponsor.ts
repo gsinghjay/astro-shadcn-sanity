@@ -1,6 +1,7 @@
 import {defineType, defineField, defineArrayMember} from 'sanity'
 import {CreditCardIcon, SearchIcon} from '@sanity/icons'
 import {siteField, siteScopedIsUnique} from '../fields/site-field'
+import {isAdministrator} from '../../lib/is-administrator'
 
 export const sponsor = defineType({
   name: 'sponsor',
@@ -104,11 +105,8 @@ export const sponsor = defineType({
       type: 'array',
       group: 'main',
       description:
-        'Additional emails authorized to access this sponsor portal. Editable only by Sanity administrators (defense-in-depth — sponsor whitelist gate matches against this field at login). Contact your project administrator to add or remove entries.',
-      readOnly: ({currentUser}) => {
-        if (!currentUser) return true
-        return !currentUser.roles?.some((r) => r.name === 'administrator')
-      },
+        'Additional emails authorized to access this sponsor portal. Editable only by Sanity administrators (defense-in-depth — sponsor whitelist gate matches against this field at login). Enter all emails in lowercase — the whitelist comparison is case-sensitive against the lowercased provider email. Contact your project administrator to add or remove entries.',
+      readOnly: ({currentUser}) => !isAdministrator(currentUser),
       of: [defineArrayMember({type: 'string', validation: (Rule) => Rule.email()})],
     }),
     defineField({

@@ -12,6 +12,26 @@
 -- outside ('student','sponsor'). Expected: zero such rows (middleware writes 'sponsor', Better
 -- Auth user-create hook writes 'student' or 'sponsor'). If this INSERT errors, triage the
 -- offending row(s) and re-run the migration; the original `user` table is still intact.
+--
+-- FK handling: `session.user_id` and `account.user_id` reference `user(id) ON DELETE CASCADE`
+-- (migration 0001). D1 defaults `foreign_keys = OFF` (per Cloudflare D1 docs), so `DROP TABLE
+-- user` does not cascade dependent rows in production today and the rebuilt `user` table
+-- inherits the same FK references after the RENAME. `defer_foreign_keys = ON` is set as a
+-- forward-compat hedge: if a future D1 default flips FKs to ON, deferral keeps FK *constraint*
+-- enforcement at COMMIT instead of mid-rebuild. NOTE: `defer_foreign_keys` does NOT defer the
+-- CASCADE *action* — with FKs ON, DROP TABLE user would still cascade-delete session/account
+-- rows. If D1 ever flips defaults, this migration must be reissued with the dependent tables
+-- pre-bridged (e.g. INSERT OR IGNORE into snapshot tables before DROP) or run via non-migration
+-- direct execute with `PRAGMA foreign_keys = OFF` set on the connection.
+-- The pragma is per-transaction; D1 wraps each migration file in an implicit transaction, so
+-- the deferral resets at COMMIT.
+
+PRAGMA defer_foreign_keys = ON;
+
+-- Idempotency guard: if a prior partial run left `user_new` on disk (e.g. INSERT-SELECT aborted
+-- on a non-conformant row), drop it before recreating. Without this the CREATE below would fail
+-- with `table user_new already exists` and the migration runner would loop without recovery.
+DROP TABLE IF EXISTS user_new;
 
 -- 1. Rebuild user table with CHECK constraint on role.
 --    Mirrors the original CREATE TABLE plus the four ALTER-added columns,
