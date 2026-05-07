@@ -227,12 +227,12 @@ describe('middleware — sponsor agreement gate', () => {
     expect(ctx.locals.requiresAgreement).toBeUndefined();
   });
 
-  it('agreement accept endpoint runs through middleware (populates locals.user) but skips the gate', async () => {
+  it('acceptAgreement action endpoint runs through middleware (populates locals.user) but skips the gate', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
       session: { id: 's1', token: 'tok' },
     });
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     await onRequest(ctx as never, mockNext);
 
     expect(ctx.locals.user?.role).toBe('sponsor');
@@ -240,21 +240,21 @@ describe('middleware — sponsor agreement gate', () => {
     expect(mockNext).toHaveBeenCalled();
   });
 
-  it('portal API route returns 401 JSON (not redirect) when no session present', async () => {
+  it('acceptAgreement action returns 401 JSON (not redirect) when no session present', async () => {
     mockGetSession.mockResolvedValue(null);
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     const res = (await onRequest(ctx as never, mockNext)) as Response;
     expect(res.status).toBe(401);
     expect(res.headers.get('content-type')).toContain('application/json');
   });
 
-  it('portal API route returns 403 JSON (not redirect) when non-sponsor hits it', async () => {
+  it('acceptAgreement action returns 403 JSON (not redirect) when non-sponsor hits it', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '2', email: 'stu@co.com', name: 'Student', role: 'student' },
       session: { id: 's2', token: 'tok' },
     });
     mockCheckSponsorWhitelist.mockResolvedValue(false);
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     const res = (await onRequest(ctx as never, mockNext)) as Response;
     expect(res.status).toBe(403);
     expect(res.headers.get('content-type')).toContain('application/json');
