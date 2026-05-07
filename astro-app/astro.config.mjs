@@ -45,6 +45,29 @@ for (const [key, value] of Object.entries(wranglerVars)) {
   }
 }
 
+// @astrojs/cloudflare's astro:config:done hook unconditionally loads .dev.vars
+// into process.env via Object.assign(process.env, parsed) — even for production
+// builds. That fires AFTER this config file returns and silently overwrites
+// wrangler-block values for any key present in both (e.g. BETTER_AUTH_URL),
+// which broke Better Auth's trustedOrigins check on prod (Story 24.2 baked
+// the resolved BETTER_AUTH_URL into the bundle, the .dev.vars `localhost:4321`
+// landed instead of the wrangler `https://www.ywcccapstone1.com`, every
+// sign-in 403'd with "Invalid origin"). Re-apply wrangler vars at
+// astro:build:start — that hook fires AFTER astro:config:done but BEFORE the
+// rollup phase reads process.env to inline astro:env public vars.
+const wranglerOverrideIntegration = {
+  name: "override-from-wrangler-vars",
+  hooks: {
+    "astro:build:start": () => {
+      for (const [key, value] of Object.entries(wranglerVars)) {
+        if (typeof value === "string") {
+          process.env[key] = value;
+        }
+      }
+    },
+  },
+};
+
 // Config-scope vars — astro:env is NOT available here (config runs before init).
 // Precedence: wrangler.jsonc env block > .env / process.env > fallback.
 const pick = (key, fallback) =>
@@ -296,6 +319,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    wranglerOverrideIntegration,
     previewSsrIntegration,
     sanity({
       projectId,
