@@ -362,7 +362,6 @@ describe('authors/[slug].astro — JSON-LD integration', () => {
 
   test('emits structured data via structured-data slot', () => {
     expect(pageContent).toContain('slot="structured-data"');
-    expect(pageContent).toContain('application/ld+json');
-    expect(pageContent).toContain('pageGraph');
+    expect(pageContent).toMatch(/<JsonLd[^>]*schema={pageGraph}/);
   });
 });

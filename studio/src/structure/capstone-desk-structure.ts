@@ -1,6 +1,6 @@
 import {CogIcon, DashboardIcon, DocumentsIcon, DocumentTextIcon, EnvelopeIcon} from '@sanity/icons'
 import type {StructureBuilder} from 'sanity/structure'
-import {CAPSTONE_SINGLETON_TYPES} from '../constants'
+import {CAPSTONE_SINGLETON_TYPES, LISTING_PAGE_ROUTES} from '../constants'
 
 export const capstoneDeskStructure = (S: StructureBuilder) =>
   S.list()
@@ -21,56 +21,18 @@ export const capstoneDeskStructure = (S: StructureBuilder) =>
         .child(
           S.list()
             .title('Listing Pages')
-            .items([
-              S.listItem()
-                .title('Articles')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-articles')
-                    .initialValueTemplate('listingPage-articles'),
-                ),
-              S.listItem()
-                .title('Events')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-events')
-                    .initialValueTemplate('listingPage-events'),
-                ),
-              S.listItem()
-                .title('Gallery')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-gallery')
-                    .initialValueTemplate('listingPage-gallery'),
-                ),
-              S.listItem()
-                .title('Projects')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-projects')
-                    .initialValueTemplate('listingPage-projects'),
-                ),
-              S.listItem()
-                .title('Sponsors')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-sponsors')
-                    .initialValueTemplate('listingPage-sponsors'),
-                ),
-              S.listItem()
-                .title('Authors')
-                .child(
-                  S.document()
-                    .schemaType('listingPage')
-                    .documentId('listingPage-authors')
-                    .initialValueTemplate('listingPage-authors'),
-                ),
-            ]),
+            .items(
+              LISTING_PAGE_ROUTES.map((route) =>
+                S.listItem()
+                  .title(route.charAt(0).toUpperCase() + route.slice(1))
+                  .child(
+                    S.document()
+                      .schemaType('listingPage')
+                      .documentId(`listingPage-${route}`)
+                      .initialValueTemplate(`listingPage-${route}`),
+                  ),
+              ),
+            ),
         ),
       // Singleton group: Portal Pages (Story 22.9)
       S.listItem()

@@ -86,8 +86,14 @@ function createSSRResult() {
     cookies: undefined,
 
     // Creates the Astro global object used by compiled .astro components.
-    // The compiled factory calls: const Astro2 = $$result.createAstro($$Astro, $$props, $$slots)
-    createAstro(astroGlobal: any, props: any, slotValues: any) {
+    // @astrojs/compiler v4 emits 3-arg `$$result.createAstro($$Astro, $$props, $$slots)`;
+    // v2 emits 2-arg `$$result.createAstro($$props, $$slots)`. Accept both — npm
+    // can hoist either compiler version depending on the workspace install state.
+    // NOTE: do NOT spread the v4 `astroGlobal` arg — it is a bag of throwing
+    // getters (callAction, clientAddress, locals, etc.) and spread invokes them all.
+    createAstro(...createAstroArgs: any[]) {
+      const [props, slotValues] =
+        createAstroArgs.length >= 3 ? createAstroArgs.slice(1) : createAstroArgs
       const slots = {
         has: (name: string) => !!slotValues?.[name],
         render: async (name: string) => {
@@ -100,7 +106,6 @@ function createSSRResult() {
         },
       }
       return {
-        ...astroGlobal,
         props,
         self: null,
         slots,

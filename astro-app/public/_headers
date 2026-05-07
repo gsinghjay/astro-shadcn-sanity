@@ -1,6 +1,11 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Story 5.21: RFC 8288 agent-discovery base resources on every static asset
+# response. The 4th Link member (per-page `.md` twin) is appended by middleware
+# on SSR responses only — prerendered HTML bypasses middleware due to
+# @astrojs/cloudflare v13's adapter short-circuit, but llms.txt itself indexes
+# every twin so agents still reach them.
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
@@ -8,3 +13,74 @@
   Content-Security-Policy: frame-ancestors 'self' https://*.sanity.studio https://*.sanity.io
   X-Frame-Options: SAMEORIGIN
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Link: </llms.txt>; rel="describedby"; type="text/plain", </llms-full.txt>; rel="alternate"; type="text/plain", </sitemap-index.xml>; rel="sitemap"; type="application/xml"
+  Vary: Accept
+
+# Strip the corpus Link/Vary on responses that are themselves part of the
+# advertised corpus (avoids self-referential Link headers per AC).
+/llms.txt
+  ! Link
+  ! Vary
+
+/llms-full.txt
+  ! Link
+  ! Vary
+
+/sitemap-index.xml
+  ! Link
+  ! Vary
+
+/robots.txt
+  ! Link
+  ! Vary
+
+# Strip the corpus Link/Vary on immutable static assets — they don't vary on
+# Accept and don't benefit from the discovery hint. Keeps CDN cache cardinality
+# from doubling unnecessarily on hot asset paths.
+/_astro/*
+  ! Link
+  ! Vary
+
+/fonts/*
+  ! Link
+  ! Vary
+
+/favicon.ico
+  ! Link
+  ! Vary
+
+/favicon.svg
+  ! Link
+  ! Vary
+
+/*.png
+  ! Link
+  ! Vary
+
+/*.jpg
+  ! Link
+  ! Vary
+
+/*.jpeg
+  ! Link
+  ! Vary
+
+/*.webp
+  ! Link
+  ! Vary
+
+/*.svg
+  ! Link
+  ! Vary
+
+/*.ico
+  ! Link
+  ! Vary
+
+/*.woff
+  ! Link
+  ! Vary
+
+/*.woff2
+  ! Link
+  ! Vary

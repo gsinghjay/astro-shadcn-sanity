@@ -1,0 +1,57 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: announcementBar. Variants: inline, floating. hiddenByVariant: dismissible hidden in floating. AC1 #5 dismissible toggle ON+OFF covered on inline instances. Icon enum uses Lucide values.",
+  "_id": "demo-audit-announcement-bar",
+  "_type": "page",
+  "title": "Demo — Announcement Bar",
+  "slug": {"_type": "slug", "current": "demo/announcement-bar"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: announcement-bar", "metaDescription": "Audit page for announcementBar block — all variants + dismissible toggle."},
+  "blocks": [
+    {
+      "_key": "ab-inline-dismissible-on",
+      "_type": "announcementBar",
+      "variant": "inline",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "icon": "megaphone",
+      "text": "Early-bird capstone registration ends Friday — dismissible enabled.",
+      "link": {
+        "label": "Register now",
+        "href": "/capstone/register"
+      },
+      "dismissible": true
+    },
+    {
+      "_key": "ab-inline-dismissible-off",
+      "_type": "announcementBar",
+      "variant": "inline",
+      "backgroundVariant": "dark",
+      "spacing": "small",
+      "maxWidth": "default",
+      "alignment": "left",
+      "icon": "info",
+      "text": "System notice: scheduled maintenance Sunday 02:00–04:00 UTC.",
+      "link": {
+        "label": "Status page",
+        "href": "https://status.example.com"
+      },
+      "dismissible": false
+    },
+    {
+      "_key": "ab-floating-bell",
+      "_type": "announcementBar",
+      "variant": "floating",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "icon": "bell",
+      "text": "New: sponsor dashboards now live — floating variant hides dismissible.",
+      "link": {
+        "label": "View dashboards",
+        "href": "/sponsors/dashboards"
+      }
+    }
+  ]
+}

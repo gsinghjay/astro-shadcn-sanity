@@ -1,0 +1,105 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: sponsorshipTiers. 2 variants: default, brutalist. tiers min 1 max 5. AC6 #29: includes one instance with 5 tiers (upper bound).",
+  "_id": "demo-audit-sponsorship-tiers",
+  "_type": "page",
+  "title": "Demo — Sponsorship Tiers",
+  "slug": {"_type": "slug", "current": "demo/sponsorship-tiers"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: sponsorship-tiers"},
+  "blocks": [
+    {
+      "_key": "st-default-3",
+      "_type": "sponsorshipTiers",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Sponsorship tiers — default (3 tiers)",
+      "description": "Choose the level that fits your engagement goals.",
+      "tiers": [
+        {
+          "_key": "tier-bronze",
+          "_type": "sponsorshipTierItem",
+          "name": "Bronze",
+          "price": "$2,500/year",
+          "benefits": ["Logo on site", "Recognition at demo day"],
+          "highlighted": false,
+          "ctaButton": {"_type": "button", "text": "Choose Bronze", "url": "/contact?tier=bronze", "variant": "outline"}
+        },
+        {
+          "_key": "tier-silver",
+          "_type": "sponsorshipTierItem",
+          "name": "Silver",
+          "price": "$5,000/year",
+          "benefits": ["Bronze benefits", "Mentor a project team", "Printed materials"],
+          "highlighted": true,
+          "ctaButton": {"_type": "button", "text": "Choose Silver", "url": "/contact?tier=silver", "variant": "default"}
+        },
+        {
+          "_key": "tier-gold",
+          "_type": "sponsorshipTierItem",
+          "name": "Gold",
+          "price": "$10,000/year",
+          "benefits": ["Silver benefits", "Dedicated demo session", "Keynote slot"],
+          "highlighted": false,
+          "ctaButton": {"_type": "button", "text": "Choose Gold", "url": "/contact?tier=gold", "variant": "default"}
+        }
+      ]
+    },
+    {
+      "_key": "st-brutalist-5-max",
+      "_type": "sponsorshipTiers",
+      "variant": "brutalist",
+      "backgroundVariant": "mono",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Sponsorship tiers — brutalist (5 tiers, max AC6 #29)",
+      "description": "Exercises the Rule.max(5) upper bound.",
+      "tiers": [
+        {
+          "_key": "tier-friend",
+          "_type": "sponsorshipTierItem",
+          "name": "Friend",
+          "price": "$500/year",
+          "benefits": ["Thank-you list"],
+          "highlighted": false
+        },
+        {
+          "_key": "tier-bronze-2",
+          "_type": "sponsorshipTierItem",
+          "name": "Bronze",
+          "price": "$2,500/year",
+          "benefits": ["Friend benefits", "Logo on site"],
+          "highlighted": false
+        },
+        {
+          "_key": "tier-silver-2",
+          "_type": "sponsorshipTierItem",
+          "name": "Silver",
+          "price": "$5,000/year",
+          "benefits": ["Bronze benefits", "Mentor program access", "Social shoutouts"],
+          "highlighted": false
+        },
+        {
+          "_key": "tier-gold-2",
+          "_type": "sponsorshipTierItem",
+          "name": "Gold",
+          "price": "$10,000/year",
+          "benefits": ["Silver benefits", "Dedicated demo", "Keynote slot", "Annual report"],
+          "highlighted": true,
+          "ctaButton": {"_type": "button", "text": "Choose Gold", "url": "/contact?tier=gold", "variant": "default"}
+        },
+        {
+          "_key": "tier-platinum",
+          "_type": "sponsorshipTierItem",
+          "name": "Platinum",
+          "price": "Custom",
+          "benefits": ["Gold benefits", "Naming rights", "Exclusive events", "Year-round engagement"],
+          "highlighted": false,
+          "ctaButton": {"_type": "button", "text": "Contact Us", "url": "/contact?tier=platinum", "variant": "secondary"}
+        }
+      ]
+    }
+  ]
+}

@@ -13,3 +13,7 @@ export const PUBLIC_SANITY_STUDIO_URL = "http://localhost:3333";
 export const PUBLIC_SANITY_DATASET = "production";
 export const PUBLIC_SITE_ID = "capstone";
 export const PUBLIC_SITE_THEME = "red";
+export const PUBLIC_SANITY_STUDIO_PROJECT_ID = "test-project-id";
+export const PUBLIC_SANITY_STUDIO_DATASET = "production";
+export const PUBLIC_TURNSTILE_SITE_KEY = "";
+export const PUBLIC_PLATFORM_API_BASE_URL: string | undefined = undefined;

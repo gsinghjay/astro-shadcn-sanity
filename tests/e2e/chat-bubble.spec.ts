@@ -25,17 +25,13 @@ async function isOpenByDefault(page: import('@playwright/test').Page): Promise<b
   });
 }
 
+// Truth source matches the component: vendor toggles `.expanded` on
+// `.chat-window`. (Confirmed against @cloudflare/ai-search-snippet
+// `toggleChat`/`closeChat` — see ChatBubble.astro `isPanelOpen`.)
 function isPanelOpen(page: import('@playwright/test').Page): Promise<boolean> {
   return page.evaluate(() => {
     const el = document.querySelector('chat-bubble-snippet');
-    const root = el?.shadowRoot;
-    if (!root) return false;
-    const candidate = root.querySelector<HTMLElement>(
-      '.chat-bubble-window, .bubble-window, [role="dialog"][open], [data-open="true"], [aria-expanded="true"]',
-    );
-    if (!candidate) return false;
-    const style = window.getComputedStyle(candidate);
-    return style.display !== 'none' && style.visibility !== 'hidden';
+    return !!el?.shadowRoot?.querySelector('.chat-window.expanded');
   });
 }
 
@@ -72,19 +68,63 @@ test.describe('ChatBubble (Story 5.18 Path A)', () => {
 
     await trigger.click();
 
-    // Wait for the panel to actually render (visible, not just present).
+    // Wait for the panel to actually render. Vendor toggles `.expanded` on
+    // `.chat-window` — that's the truth source.
     await page.waitForFunction(() => {
       const el = document.querySelector('chat-bubble-snippet');
-      const root = el?.shadowRoot;
-      if (!root) return false;
-      const candidate = root.querySelector(
-        '.chat-bubble-window, .bubble-window, [role="dialog"][open], [data-open="true"], [aria-expanded="true"]',
-      );
-      if (!candidate) return false;
-      const style = window.getComputedStyle(candidate as HTMLElement);
-      return style.display !== 'none' && style.visibility !== 'hidden';
+      return !!el?.shadowRoot?.querySelector('.chat-window.expanded');
     }, null, { timeout: 5000 });
 
+    expect(await isPanelOpen(page)).toBe(true);
+  });
+
+  test('reopens after vendor X close (regression: stuck aria-expanded)', async ({ page }) => {
+    await page.goto('/');
+
+    const trigger = page.locator('[data-chat-bubble-external-trigger]');
+    if ((await trigger.count()) === 0) {
+      test.skip();
+      return;
+    }
+
+    // Hydration gate — vendor button must exist in shadow DOM.
+    await page.waitForFunction(() => {
+      const el = document.querySelector('chat-bubble-snippet');
+      return Boolean(el?.shadowRoot?.querySelector('.bubble-button'));
+    }, null, { timeout: 5000 });
+
+    // Open via external Swiss trigger.
+    await trigger.click();
+    await page.waitForFunction(() => {
+      const el = document.querySelector('chat-bubble-snippet');
+      return !!el?.shadowRoot?.querySelector('.chat-window.expanded');
+    }, null, { timeout: 5000 });
+    expect(await isPanelOpen(page)).toBe(true);
+
+    // Close via the vendor's X button (inside Shadow DOM). This is the path
+    // that previously left our trigger stuck at aria-expanded="true" and
+    // blocked reopening.
+    await page.evaluate(() => {
+      const el = document.querySelector('chat-bubble-snippet');
+      const closeBtn = el?.shadowRoot?.querySelector<HTMLButtonElement>('.close-button');
+      closeBtn?.click();
+    });
+
+    await page.waitForFunction(() => {
+      const el = document.querySelector('chat-bubble-snippet');
+      return !el?.shadowRoot?.querySelector('.chat-window.expanded');
+    }, null, { timeout: 5000 });
+    expect(await isPanelOpen(page)).toBe(false);
+
+    // Trigger should have resynced to aria-expanded="false" via the class
+    // mutation observer; assert the regression is fixed by reopening.
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+    await trigger.click();
+    await page.waitForFunction(() => {
+      const el = document.querySelector('chat-bubble-snippet');
+      return !!el?.shadowRoot?.querySelector('.chat-window.expanded');
+    }, null, { timeout: 5000 });
     expect(await isPanelOpen(page)).toBe(true);
   });
 

@@ -1,5 +1,6 @@
 import {defineField, defineType} from 'sanity'
 import {EnvelopeIcon} from '@sanity/icons'
+import {siteField} from '../fields/site-field'
 
 export const submission = defineType({
   name: 'submission',
@@ -8,6 +9,7 @@ export const submission = defineType({
   icon: EnvelopeIcon,
   readOnly: true,
   fields: [
+    siteField,
     defineField({
       name: 'name',
       title: 'Name',

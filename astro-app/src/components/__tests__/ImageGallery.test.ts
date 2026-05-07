@@ -9,10 +9,13 @@ import {
   imageGalleryMinimal,
 } from './__fixtures__/image-gallery';
 
-// Mock getSiteSettings to avoid Sanity API dependency
+// Mock getSiteSettings to avoid Sanity API dependency.
+// Field name MUST match the Sanity schema (`siteName`) — GalleryGrid.astro reads
+// siteSettings.siteName for the JSON-LD creator. The earlier `title` shape was a
+// fixture-vs-schema drift that masked a passing test under stale TypeGen output.
 vi.mock('@/lib/sanity', () => ({
   getSiteSettings: vi.fn().mockResolvedValue({
-    title: 'YWCC Industry Capstone',
+    siteName: 'YWCC Industry Capstone',
   }),
 }));
 

@@ -3,78 +3,76 @@ import { existsSync, readFileSync, readdirSync } from "fs";
 import { resolve } from "path";
 
 const DIST = resolve(__dirname, "../../../dist");
+const CLIENT = resolve(DIST, "client");
+const SERVER = resolve(DIST, "server");
 
 /**
- * These tests validate the Cloudflare Pages build output.
- * They require `npm run build --workspace=astro-app` to have run first.
- * In CI, the build step runs before unit tests, so these will pass.
- * Locally, run `npm run build --workspace=astro-app` before `npm run test:unit`.
+ * Validates the Cloudflare Workers Static Assets build output (Astro 6 +
+ * `@astrojs/cloudflare` v13). Requires a prior `astro build` — gated by
+ * `existsSync(DIST)` so CI without a build step skips the suite.
+ *
+ * Shape: with `output: "server"` and adapter v13, Astro emits TWO top-level
+ * directories under `dist/`:
+ *   - `dist/client/` — static assets (mounted as the ASSETS binding)
+ *   - `dist/server/` — the Worker code (entry.mjs + chunks + adapter-generated
+ *                     `wrangler.json`, which overrides the user-facing
+ *                     `wrangler.jsonc` at deploy time).
+ *
+ * Pages-era artifacts (`dist/_worker.js/`, `dist/_routes.json`) are NO LONGER
+ * emitted.
  */
 const describeIfBuilt = existsSync(DIST) ? describe : describe.skip;
 
-describeIfBuilt("Build output — Cloudflare Pages structure", () => {
-  it("dist/ directory exists", () => {
+describeIfBuilt("Build output — Cloudflare Workers Static Assets", () => {
+  it("dist/ exists with split client/ + server/ trees (adapter v13 layout)", () => {
     expect(existsSync(DIST)).toBe(true);
+    expect(existsSync(CLIENT)).toBe(true);
+    expect(existsSync(SERVER)).toBe(true);
   });
 
-  it("_worker.js/ directory exists (Cloudflare Workers entrypoint)", () => {
-    expect(existsSync(resolve(DIST, "_worker.js"))).toBe(true);
+  it("does NOT emit dist/_worker.js (Pages-era artifact removed in adapter v13)", () => {
+    expect(existsSync(resolve(DIST, "_worker.js"))).toBe(false);
   });
 
-  it("_worker.js/index.js exists (main worker script)", () => {
-    expect(existsSync(resolve(DIST, "_worker.js/index.js"))).toBe(true);
+  it("does NOT emit dist/_routes.json (Pages routing replaced by Workers Static Assets)", () => {
+    expect(existsSync(resolve(DIST, "_routes.json"))).toBe(false);
   });
 
-  it("_routes.json exists (Cloudflare Pages routing)", () => {
-    expect(existsSync(resolve(DIST, "_routes.json"))).toBe(true);
-  });
-
-  it("_routes.json has valid structure", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    expect(routes).toHaveProperty("version", 1);
-    expect(routes).toHaveProperty("include");
-    expect(routes).toHaveProperty("exclude");
-    expect(Array.isArray(routes.include)).toBe(true);
-    expect(Array.isArray(routes.exclude)).toBe(true);
-  });
-
-  it("_routes.json excludes static assets from worker", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    // _astro/ contains hashed JS/CSS bundles — should be served as static
-    expect(routes.exclude).toContain("/_astro/*");
-  });
-
-  it("_astro/ directory exists (client-side bundles)", () => {
-    expect(existsSync(resolve(DIST, "_astro"))).toBe(true);
-  });
-
-  it("_astro/ contains hashed JS bundles", () => {
-    const files = readdirSync(resolve(DIST, "_astro"));
+  it("dist/client/_astro/ contains hashed JS bundles", () => {
+    const astroDir = resolve(CLIENT, "_astro");
+    expect(existsSync(astroDir)).toBe(true);
+    const files = readdirSync(astroDir);
     const jsFiles = files.filter((f) => f.endsWith(".js"));
     expect(jsFiles.length).toBeGreaterThan(0);
   });
 
-  it("published pages are prerendered as static HTML", () => {
-    // With output: "static" + server islands (Story 7.4),
-    // all pages are prerendered at build time. The server island
-    // handles only the dynamic content area via /_server-islands/*.
-    const indexHtml = resolve(DIST, "index.html");
-    expect(existsSync(indexHtml), "index.html should exist (prerendered)").toBe(true);
+  it("public pages are prerendered as static HTML under dist/client/", () => {
+    const indexHtml = resolve(CLIENT, "index.html");
+    expect(existsSync(indexHtml), "dist/client/index.html should exist (prerendered)").toBe(true);
   });
 
-  it("_routes.json excludes prerendered pages from worker", () => {
-    const routes = JSON.parse(readFileSync(resolve(DIST, "_routes.json"), "utf-8"));
-    // Root route should be excluded — served as static HTML, not by the worker
-    expect(routes.exclude).toContain("/");
+  it("dist/client/_headers is emitted with the security baseline copied from public/_headers", () => {
+    const headersPath = resolve(CLIENT, "_headers");
+    expect(existsSync(headersPath)).toBe(true);
+    const headers = readFileSync(headersPath, "utf-8");
+    expect(headers).toContain("X-Content-Type-Options: nosniff");
+    expect(headers).toContain("Referrer-Policy: strict-origin-when-cross-origin");
   });
 
-  it("worker entry includes server island map", () => {
-    const workerEntry = readFileSync(resolve(DIST, "_worker.js/index.js"), "utf-8");
-    expect(workerEntry).toContain("serverIslandMap");
-    expect(workerEntry).toContain("SanityPageContent");
+  it("dist/server/entry.mjs is the Worker entrypoint", () => {
+    expect(existsSync(resolve(SERVER, "entry.mjs"))).toBe(true);
   });
 
-  it("_headers file exists (Cloudflare custom headers)", () => {
-    expect(existsSync(resolve(DIST, "_headers"))).toBe(true);
+  it("dist/server/wrangler.json is the adapter-generated deploy config", () => {
+    const generated = resolve(SERVER, "wrangler.json");
+    expect(existsSync(generated)).toBe(true);
+    const cfg = JSON.parse(readFileSync(generated, "utf-8")) as {
+      main?: string;
+      assets?: { directory?: string; binding?: string };
+    };
+    // Adapter rewrites `main` and `assets.directory` to per-build paths.
+    expect(cfg.main).toBe("entry.mjs");
+    expect(cfg.assets?.directory).toBe("../client");
+    expect(cfg.assets?.binding).toBe("ASSETS");
   });
 });

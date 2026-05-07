@@ -1,0 +1,401 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. AC5 interactions page (#21–#27). Exercises: dark→light→dark sequence, adjacent same backgroundVariant+spacing, adjacent spacing:none, maxWidth:full adjacent to maxWidth:narrow, full-bleed hero+video+embed sequence, reverseOnMobile ON+OFF sidebar variants, at least one inner block from each non-hero insert-menu group nested inside columnsBlock.",
+  "_id": "demo-audit-interactions",
+  "_type": "page",
+  "title": "Demo — Block Interactions",
+  "slug": {"_type": "slug", "current": "demo/interactions"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: interactions", "metaDescription": "Audit page exercising inter-block behavior: dark/light alternation, same-bg adjacency, spacing:none stacking, full-bleed media sequences, reverseOnMobile toggles, and columnsBlock with inner blocks from each insert-menu group."},
+  "blocks": [
+    {
+      "_key": "ix-cta-dark-1",
+      "_type": "ctaBanner",
+      "variant": "centered",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Dark → Light → Dark sequence (block 1 of 3)",
+      "description": "First block in the alternation test — dark CTA banner.",
+      "ctaButtons": [
+        {"_key": "b1", "_type": "button", "text": "Primary CTA", "url": "/capstone", "variant": "default"}
+      ]
+    },
+    {
+      "_key": "ix-rt-light-2",
+      "_type": "richText",
+      "variant": "standard",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h3",
+          "children": [{"_type": "span", "_key": "s1", "text": "Dark → Light → Dark sequence (block 2 of 3)", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Light middle block between two dark ones. Verifies background transitions between adjacent blocks do not bleed or double-pad.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "ix-pullquote-dark-3",
+      "_type": "pullquote",
+      "variant": "centered",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "quote": "Dark → Light → Dark sequence (block 3 of 3). Alternation test completes here.",
+      "attribution": "Audit fixture",
+      "role": "AC5 #21"
+    },
+    {
+      "_key": "ix-same-bg-1",
+      "_type": "divider",
+      "variant": "line",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left"
+    },
+    {
+      "_key": "ix-same-bg-2",
+      "_type": "divider",
+      "variant": "line",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left"
+    },
+    {
+      "_key": "ix-spacing-none-1",
+      "_type": "divider",
+      "variant": "short",
+      "backgroundVariant": "light",
+      "spacing": "none",
+      "maxWidth": "default",
+      "alignment": "center"
+    },
+    {
+      "_key": "ix-spacing-none-2",
+      "_type": "divider",
+      "variant": "short",
+      "backgroundVariant": "light",
+      "spacing": "none",
+      "maxWidth": "default",
+      "alignment": "center"
+    },
+    {
+      "_key": "ix-hero-bleed",
+      "_type": "heroBanner",
+      "variant": "split-bleed",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-bleed hero",
+      "subheading": "First in a full-width media sequence (hero → video → embed)."
+    },
+    {
+      "_key": "ix-video-full",
+      "_type": "videoEmbed",
+      "variant": "full-width",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-width video embed",
+      "description": "Second in the full-bleed media sequence.",
+      "youtubeUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+    },
+    {
+      "_key": "ix-embed-full",
+      "_type": "embedBlock",
+      "variant": "full-width",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-width iframe embed",
+      "embedUrl": "https://codesandbox.io/embed/demo",
+      "caption": "Third in the full-bleed media sequence."
+    },
+    {
+      "_key": "ix-rt-full",
+      "_type": "richText",
+      "variant": "prose",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h3",
+          "children": [{"_type": "span", "_key": "s1", "text": "maxWidth: full adjacent to maxWidth: narrow", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "This full-width block precedes a narrow block to verify width transitions do not introduce horizontal scroll or overflow.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "ix-rt-narrow",
+      "_type": "richText",
+      "variant": "prose",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h3",
+          "children": [{"_type": "span", "_key": "s1", "text": "Narrow block follows full-width", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Narrow block placed immediately after a full-width block. Verifies no horizontal shift or layout jump between adjacent widths.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "ix-sidebar-reverse-on",
+      "_type": "columnsBlock",
+      "variant": "sidebar-left",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": true,
+      "verticalAlign": "top",
+      "leftBlocks": [
+        {
+          "_key": "ix-cb1-l-divider",
+          "_type": "divider",
+          "variant": "short",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left"
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "ix-cb1-r-rt",
+          "_type": "richText",
+          "variant": "standard",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h3",
+              "children": [{"_type": "span", "_key": "s1", "text": "sidebar-left · reverseOnMobile: true", "marks": []}],
+              "markDefs": []
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "children": [{"_type": "span", "_key": "s2", "text": "Main column rendered first on mobile because reverseOnMobile flips the stacking order.", "marks": []}],
+              "markDefs": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "ix-sidebar-reverse-off",
+      "_type": "columnsBlock",
+      "variant": "sidebar-right",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": false,
+      "verticalAlign": "stretch",
+      "leftBlocks": [
+        {
+          "_key": "ix-cb2-l-rt",
+          "_type": "richText",
+          "variant": "standard",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h3",
+              "children": [{"_type": "span", "_key": "s1", "text": "sidebar-right · reverseOnMobile: false", "marks": []}],
+              "markDefs": []
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "children": [{"_type": "span", "_key": "s2", "text": "Main content renders in the natural DOM order on every breakpoint because reverseOnMobile is off.", "marks": []}],
+              "markDefs": []
+            }
+          ]
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "ix-cb2-r-divider",
+          "_type": "divider",
+          "variant": "labeled",
+          "label": "Sidebar",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left"
+        }
+      ]
+    },
+    {
+      "_key": "ix-columns-all-groups",
+      "_type": "columnsBlock",
+      "variant": "equal",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "verticalAlign": "top",
+      "leftBlocks": [
+        {
+          "_key": "ix-ag-l-rt",
+          "_type": "richText",
+          "variant": "standard",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h3",
+              "children": [{"_type": "span", "_key": "s1", "text": "Insert-menu groups inside columns (AC5 #26)", "marks": []}],
+              "markDefs": []
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "children": [{"_type": "span", "_key": "s2", "text": "Left column includes Content (richText), Media & Stats (statsRow), and Display (cardGrid) group members.", "marks": []}],
+              "markDefs": []
+            }
+          ]
+        },
+        {
+          "_key": "ix-ag-l-stats",
+          "_type": "statsRow",
+          "variant": "grid",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "center",
+          "heading": "Media & Stats",
+          "stats": [
+            {"_key": "s1", "_type": "statItem", "value": "99%", "label": "Uptime"},
+            {"_key": "s2", "_type": "statItem", "value": "250", "label": "Teams"}
+          ]
+        },
+        {
+          "_key": "ix-ag-l-cards",
+          "_type": "cardGrid",
+          "variant": "grid-2",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Display",
+          "cards": [
+            {"_key": "c1", "_type": "cardGridItem", "title": "Card A", "description": "Display group member."},
+            {"_key": "c2", "_type": "cardGridItem", "title": "Card B", "description": "Display group member."}
+          ]
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "ix-ag-r-testimonials",
+          "_type": "testimonials",
+          "variant": "grid",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Social Proof",
+          "testimonialSource": "all"
+        },
+        {
+          "_key": "ix-ag-r-pricing",
+          "_type": "pricingTable",
+          "variant": "simple",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Data",
+          "tiers": [
+            {
+              "_key": "t1",
+              "_type": "pricingTier",
+              "name": "Starter",
+              "price": "$0",
+              "features": ["One project", "Community support"]
+            }
+          ]
+        },
+        {
+          "_key": "ix-ag-r-newsletter",
+          "_type": "newsletter",
+          "variant": "inline",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Calls to Action",
+          "description": "Newsletter as CTA insert-menu group member.",
+          "inputPlaceholder": "you@school.edu",
+          "submitButtonLabel": "Subscribe"
+        },
+        {
+          "_key": "ix-ag-r-divider",
+          "_type": "divider",
+          "variant": "labeled",
+          "label": "Utility",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left"
+        }
+      ]
+    }
+  ]
+}

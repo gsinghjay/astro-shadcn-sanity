@@ -1,7 +1,7 @@
 # src/models/content.py
 from __future__ import annotations
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Union
 
 from pydantic import BaseModel, Field, ConfigDict, Discriminator, Tag
 

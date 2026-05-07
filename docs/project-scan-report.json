@@ -3,42 +3,52 @@
   "scan_method": "parallel_agent_team",
   "agent_count": 5,
   "timestamps": {
-    "started": "2026-04-15T00:00:00Z",
-    "last_updated": "2026-04-15T20:12:00Z",
-    "completed": "2026-04-15T20:12:00Z"
+    "started": "2026-04-29T00:00:00Z",
+    "last_updated": "2026-04-29T00:00:00Z",
+    "completed": "2026-04-29T00:00:00Z"
   },
   "previous_scan": {
-    "date": "2026-03-11T00:15:00Z",
+    "date": "2026-04-15T20:12:00Z",
     "version": "1.2.0",
-    "project_version": "1.11.0"
+    "project_version": "1.18.0",
+    "archived_to": "docs/.archive/project-scan-report-2026-04-15.json"
   },
   "mode": "full_rescan",
-  "scan_level": "exhaustive",
+  "scan_level": "deep",
   "project_root": "/home/jay/github/astro-shadcn-sanity",
   "project_knowledge": "/home/jay/github/astro-shadcn-sanity/docs",
   "project_classification": {
     "name": "ywcc-capstone-template",
-    "version": "1.18.0",
+    "version": "2.0.0",
     "type": "monorepo",
     "package_manager": "npm workspaces (+ uv for Python)",
     "language": "TypeScript + Python",
     "branch": "preview",
     "parts": [
-      { "part_id": "astro-app", "project_type_id": "web", "framework": "Astro 5.18 SSG + React 19 + Tailwind 4", "display_name": "Astro Frontend (SSG + per-route SSR)", "status": "production" },
-      { "part_id": "studio", "project_type_id": "web", "framework": "Sanity Studio v5.20 (3 workspaces)", "display_name": "Sanity CMS Studio", "status": "production" },
-      { "part_id": "rate-limiter-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker + Durable Object", "display_name": "Rate Limiter Worker", "status": "production" },
-      { "part_id": "event-reminders-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker (cron)", "display_name": "Event Reminders Worker", "status": "production" },
-      { "part_id": "platform-api", "project_type_id": "backend", "framework": "FastAPI + Python Cloudflare Worker", "display_name": "Platform API", "status": "scaffolding" },
-      { "part_id": "discord-bot", "project_type_id": "backend", "framework": "Python FastAPI + discord.py", "display_name": "Discord Bot", "status": "scaffolding" }
+      { "part_id": "astro-app", "project_type_id": "web", "framework": "Astro 6.1.10 SSR + React 19 + Tailwind 4 + @astrojs/cloudflare v13 (Workers)", "display_name": "Astro Frontend (full SSR on Cloudflare Workers)", "status": "production" },
+      { "part_id": "studio", "project_type_id": "web", "framework": "Sanity Studio v5.23 (3 workspaces, project 49nk9b0w)", "display_name": "Sanity CMS Studio", "status": "production" },
+      { "part_id": "rate-limiter-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker + Durable Object SQLite (SlidingWindowRateLimiter)", "display_name": "Rate Limiter Worker", "status": "production" },
+      { "part_id": "event-reminders-worker", "project_type_id": "backend", "framework": "TS Cloudflare Worker (cron 0 9 * * *)", "display_name": "Event Reminders Worker", "status": "production" },
+      { "part_id": "platform-api", "project_type_id": "backend", "framework": "FastAPI + Python Cloudflare Worker (python_workers flag)", "display_name": "Platform API", "status": "scaffolding" },
+      { "part_id": "discord-bot", "project_type_id": "backend", "framework": "Python FastAPI + discord.py", "display_name": "Discord Bot (scaffold)", "status": "scaffolding" }
     ]
   },
   "key_metrics": {
-    "routes": { "total": 34, "ssg_pages": 22, "ssr_pages": 8, "api_endpoints": 12 },
-    "sanity": { "documents": 11, "objects": 23, "blocks": 38, "workspaces": 3, "schema_json_lines": 17861, "groq_queries": 30, "migrations": 3 },
-    "astro_components": { "total_files": 681, "custom_blocks": 38, "ui_primitive_families": 40, "portable_text": 6, "stories": 187 },
-    "d1": { "tables": 7, "migrations": 7, "database_name": "ywcc-capstone-portal", "database_id": "76887418-c356-46d8-983b-fa6e395d8b16" },
-    "testing": { "vitest_files": 75, "e2e_specs": 19, "browsers": 5, "storybook_stories": 187 },
-    "infrastructure": { "github_workflows": 6, "docker_services": 5, "wiki_pages": 33 }
+    "routes": { "total": 41, "ssr_pages": 20, "prerender_pages": 16, "api_endpoints": 13 },
+    "actions": { "count": 1, "files": ["src/actions/index.ts"] },
+    "sanity": { "documents": 13, "objects": 23, "blocks": 38, "fields": 1, "workspaces": 3, "schema_loc": 6683, "groq_queries": 32, "migrations": 3 },
+    "astro_components": { "total_files_blocks_dir": 279, "total_files_ui_dir": 254, "custom_blocks": 38, "ui_primitive_families": 40, "portable_text": 6, "portal": 13, "react_islands": 4, "stories": 187, "demo_audit_fixtures": 39 },
+    "d1": { "tables": 13, "drizzle_declared": 5, "migrations": 10, "database_name": "ywcc-capstone-portal", "database_id": "76887418-c356-46d8-983b-fa6e395d8b16" },
+    "testing": { "vitest_files_astro_app": 84, "vitest_files_studio": 13, "e2e_specs": 20, "browsers": 5, "storybook_stories": 187 },
+    "infrastructure": { "github_workflows": 6, "docker_services": 5, "wiki_pages": 31, "rules_mdc": 16 },
+    "cloudflare_workers_in_repo": [
+      { "name": "ywcc-capstone", "env": "capstone", "domain": "www.ywcccapstone1.com", "bindings": ["D1 PORTAL_DB", "KV SESSION_CACHE", "DO RATE_LIMITER (cross-script)", "ASSETS"] },
+      { "name": "rwc-us", "env": "rwc_us", "domain": "rwc-us.js426.workers.dev", "bindings": ["ASSETS"] },
+      { "name": "rwc-intl", "env": "rwc_intl", "domain": "rwc-intl.js426.workers.dev", "bindings": ["ASSETS"] },
+      { "name": "ywcc-capstone-preview", "env": "capstone_preview", "domain": "ywcc-capstone-preview.js426.workers.dev", "bindings": ["ASSETS"] },
+      { "name": "rwc-us-preview", "env": "rwc_us_preview", "domain": "rwc-us-preview.js426.workers.dev", "bindings": ["ASSETS"] },
+      { "name": "rwc-intl-preview", "env": "rwc_intl_preview", "domain": "rwc-intl-preview.js426.workers.dev", "bindings": ["ASSETS"] }
+    ]
   },
   "outputs_generated": [
     "project-scan-report.json",
@@ -61,35 +71,57 @@
     "docs_generated": 10
   },
   "completed_steps": [
-    { "step": "step_1", "status": "completed", "timestamp": "2026-04-15T00:00:00Z", "summary": "Classified as monorepo with 6 parts (3 workspaces + 3 standalone)" },
-    { "step": "step_2-4", "status": "completed", "timestamp": "2026-04-15T00:10:00Z", "summary": "Parallel exhaustive scan: astro-app, studio, backends, infra, existing docs via 5 agents" },
-    { "step": "step_5-9", "status": "completed", "timestamp": "2026-04-15T20:11:00Z", "summary": "9 docs written directly (source-tree, architecture, project-overview, component-inventory, data-models, api-contracts, development-guide, integration-architecture) from consolidated scan summary" },
-    { "step": "step_10", "status": "completed", "timestamp": "2026-04-15T20:12:00Z", "summary": "Master index.md generated with links to all new + existing docs" },
-    { "step": "step_11-12", "status": "completed", "timestamp": "2026-04-15T20:12:00Z", "summary": "Validation: no 'To be generated' markers; one stray TBD corrected in component-inventory.md" }
+    { "step": "step_1", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "Classified as monorepo v2.0.0 with 6 parts (3 workspaces + 3 standalone)" },
+    { "step": "step_2-4", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "Parallel deep scan: astro-app surface, studio schemas, standalone Workers, infra/CI, existing docs (5 Explore agents)" },
+    { "step": "step_5", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "source-tree-analysis.md written reflecting Astro 6 / Workers topology" },
+    { "step": "step_6-8", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "project-overview.md + architecture.md written; D1 table count corrected to 13 (legacy + Better Auth + feature)" },
+    { "step": "step_9", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "5 supporting docs (component-inventory, data-models, api-contracts, integration-architecture, development-guide) written directly" },
+    { "step": "step_10", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "Master index.md generated with cross-links to generated docs + strategy docs (with Pages-era staleness warnings) + wiki + BMad" },
+    { "step": "step_11-12", "status": "completed", "timestamp": "2026-04-29T00:00:00Z", "summary": "Validation: 0 (To be generated) markers in 9 generated docs; index.md flags 4 strategy docs as Pages-era stale" }
   ],
   "findings_summary": {
-    "project_classification": "Monorepo v1.18.0 (7 releases since prior scan). 6 parts, npm workspaces (astro-app, studio, platform-api) + standalone Cloudflare workers (rate-limiter, event-reminders) + standalone Python discord-bot.",
-    "technology_stack": "Astro 5.18 + Sanity 5.20 + Tailwind 4.1 + React 19.2 + Better Auth 1.5 + Drizzle 0.45 (D1) + nanostores + @schedule-x + Resend + Astro Fonts API + astro:env + Storybook 10.2 + Vitest 3.2 + Playwright 1.58",
-    "new_parts_since_last_scan": "event-reminders-worker (production cron), platform-api (scaffold), discord-bot relocated to nested path",
-    "notable_features_since_last_scan": "astro:env typed schema (5.13); Astro Fonts API self-hosted Inter (22.5); 12-column grid + container queries (17.8); ColumnsBlock (21.10); ImageGallery + PhotoSwipe (22.4); author listing/detail + Person JSON-LD (20.2-20.3); Article JSON-LD (19.6); category archive pages (19.10); newsletter CTA (19.7); listing-page singleton documents (21.0); /projects sorting controls (4.6); sponsor logoSquare/logoHorizontal; Lighthouse+Pa11y CI over /demo/; schema deploy fixed for all 3 workspaces",
+    "project_classification": "Monorepo v2.0.0 (major bump from v1.18.0 due to Astro 6 + Workers cutover). 6 parts. astro-app + studio + platform-api are npm workspaces; rate-limiter-worker, event-reminders-worker, discord-bot are standalone.",
+    "technology_stack": "Astro 6.1.10 + @astrojs/cloudflare v13 (Workers-only) + Sanity 5.23 + Tailwind 4.1 (CSS-first) + React 19.2 (islands) + Better Auth 1.5 + Drizzle 0.45 (D1) + nanostores + @schedule-x + Resend + Astro Fonts API (graduated) + astro:env + astro-llms-md + Storybook 10.2 + Vitest 3.2 + Playwright 1.58 + LHCI 0.15 + Pa11y CI",
+    "platform_changes_since_2026_04_15": [
+      "Astro 5.18 -> 6.1.10 (output 'server'; static via prerender = true)",
+      "@astrojs/cloudflare 12 -> 13 (Workers-only adapter; main: '@astrojs/cloudflare/entrypoints/server')",
+      "Cloudflare Pages -> Workers (PR #681 feat/h1-astro-6-workers-2026-04)",
+      "Astro.locals.runtime.env removed; replaced with `import { env } from cloudflare:workers`",
+      "Per-env build via CLOUDFLARE_ENV=<name> astro build (legacy `wrangler deploy --env` flag dropped)",
+      "Astro Fonts API graduated out of experimental",
+      "disable_nodejs_process_v2 workaround flag added (Astro #15434/#14511; remove when compatibility_date >= 2026-02-19)",
+      "Sanity Studio 5.20 -> 5.23",
+      "3 capstone-preview Workers added for Studio Presentation iframe (Story 15.10)",
+      "Sponsor agreement gate redesigned with version pinning + audit columns on user (Story 15.11; migrations 0007/0008/0009)",
+      "Sitemap-driven LHCI/Pa11y URL set (PR #680) replacing /demo/** scope",
+      "astro-llms-md added (gated OFF when stega is enabled)",
+      "Vite project-local optimize-cjs-for-workerd plugin pre-bundles picomatch for workerd SSR"
+    ],
     "key_risks": [
       "platform-api has placeholder KV/D1 IDs in wrangler.jsonc and is not wired to astro-app",
-      "discord-bot/ Python scaffold diverges from the production bot (Workers 'capstone-bot' + 'capstone-ask-worker')",
-      "Single D1 shared between astro-app and event-reminders-worker — migrations must stay coordinated",
-      "No Husky / pre-commit hooks; CI is the only enforcement gate"
+      "discord-bot/ Python scaffold diverges from production bots (Workers 'capstone-bot' + 'capstone-ask-worker')",
+      "Single D1 (ywcc-capstone-portal) shared between astro-app and event-reminders-worker; migrations must stay coordinated",
+      "Cross-script DO dependency: capstone middleware fails closed if rate-limiter-worker is unhealthy",
+      "src/pages/portal/api/db-health.ts exposes SQLite table names to authenticated users (TODO: admin gate)",
+      "compatibility_date pinned to 2025-12-01; bumping requires re-validating workaround flag set",
+      "GITHUB_CLIENT_SECRET must be re-put with prod secret at cutover (staging-phase secret invalid)",
+      "No Husky/pre-commit hooks; CI is the only enforcement gate",
+      "ESLint listed in astro-app deps but no flat-config file -- lint is advisory only",
+      "4 strategy docs (cloudflare-guide, cloudflare-infrastructure-guide, cost-optimization-strategy, rate-limiting-with-durable-objects) contain Pages-era references -- flagged in index.md but not rewritten"
     ],
-    "deploy_hooks_verified_2026_04_15": {
+    "deploy_hooks_2026_04_15": {
       "ywcc-capstone": { "hook_id": "f6e2c5c6-8951-455c-b48b-6afcbbc82bbb", "name": "sanity-content-update-capstone", "branch": "main" },
       "rwc-us": { "hook_id": "bca5ddca-d7d0-4742-9308-e405aa38122f", "name": "sanity-content-update-rwc-us", "branch": "main" },
       "rwc-intl": { "hook_id": "8edab80c-19c0-4b68-8ca2-5bba8586646c", "name": "sanity-content-update-rwc-intl", "branch": "main" }
     },
-    "production_workers_verified_2026_04_15": [
-      { "name": "rate-limiter-worker", "bindings": ["RATE_LIMITER (DO)"], "observability": true },
-      { "name": "ywcc-event-reminders", "bindings": ["DB (D1)", "SANITY_*", "RESEND_*"] },
-      { "name": "capstone-bot", "bindings": ["ASK_WORKER (service)", "KV", "DISCORD_* secrets", "SANITY_PROJECT_ID"] },
-      { "name": "capstone-ask-worker", "bindings": [], "notes": "RAG answerer hitting AI Search index bf002610-921a-4047-9298-cc2d2668451a" },
-      { "name": "little-dawn-0015-nlweb", "bindings": ["AI", "ASSETS", "MCP_OBJECT (DO)", "RAG_ID", "RATE_LIMITER (ratelimit)"] }
+    "cf_account": "70bc6caa244ede05b7f964c0c2d533bb (YWCC Capstone Sponsors)",
+    "out_of_tree_workers": [
+      { "name": "rate-limiter-worker", "in_repo": true },
+      { "name": "ywcc-event-reminders", "in_repo": true },
+      { "name": "capstone-bot", "in_repo": false, "notes": "Production Discord bot; service-binds to capstone-ask-worker" },
+      { "name": "capstone-ask-worker", "in_repo": false, "notes": "RAG over CF AI Search index bf002610-921a-4047-9298-cc2d2668451a" },
+      { "name": "little-dawn-0015-nlweb", "in_repo": false, "notes": "MCP-style Worker (AI/ASSETS/MCP_OBJECT/RAG_ID/RATE_LIMITER bindings)" }
     ]
   },
-  "resume_instructions": "Workflow completed successfully. All documentation generated and indexed."
+  "resume_instructions": "Workflow completed successfully. All 9 auto-generated docs + index.md regenerated for v2.0.0. Strategy docs were not rewritten -- index.md flags Pages-era staleness inline."
 }

@@ -1,6 +1,7 @@
 import type {SchemaTypeDefinition} from 'sanity'
 
 import {schemaTypes} from './index'
+import {siteField} from './fields/site-field'
 
 /**
  * Minimal field shape for type-safe field lookups.
@@ -27,7 +28,7 @@ export function createSchemaTypesForWorkspace(
   return schemaTypes.map((type) => {
     if (!('fields' in type) || !type.fields) return type
 
-    const fields = type.fields as SchemaField[]
+    const fields = type.fields as unknown as SchemaField[]
     const siteFieldIndex = fields.findIndex((f) => f.name === 'site')
     if (siteFieldIndex === -1) return type
 
@@ -39,6 +40,39 @@ export function createSchemaTypesForWorkspace(
       ...updatedFields[siteFieldIndex],
       hidden: shouldHide,
     }
-    return {...type, fields: updatedFields}
+    return {...type, fields: updatedFields} as unknown as SchemaTypeDefinition
   })
+}
+
+/**
+ * Workspace schema types reducer that:
+ * 1. Injects the siteField into the plugin-registered `form` type so forms
+ *    can be scoped per site (the @sanity/form-toolkit form schema has no
+ *    site field by default).
+ * 2. Appends our own schema types with siteField visibility resolved per
+ *    dataset (via createSchemaTypesForWorkspace).
+ *
+ * Pass as `schema.types` to each workspace: `types: createWorkspaceSchemaTypes('rwc')`.
+ */
+export function createWorkspaceSchemaTypes(targetDataset: string) {
+  return (prev: SchemaTypeDefinition[]): SchemaTypeDefinition[] => {
+    const shouldHide = targetDataset === 'production'
+    const transformedPrev = prev.map((type) => {
+      if (type.name !== 'form') return type
+      if (!('fields' in type) || !Array.isArray(type.fields)) return type
+      const existing = type.fields as unknown as SchemaField[]
+      const hasSite = existing.some((f) => f.name === 'site')
+      if (hasSite) {
+        const idx = existing.findIndex((f) => f.name === 'site')
+        const updated = [...existing]
+        updated[idx] = {...updated[idx], hidden: shouldHide}
+        return {...type, fields: updated} as unknown as SchemaTypeDefinition
+      }
+      return {
+        ...type,
+        fields: [...existing, {...siteField, hidden: shouldHide}],
+      } as unknown as SchemaTypeDefinition
+    })
+    return [...transformedPrev, ...createSchemaTypesForWorkspace(targetDataset)]
+  }
 }

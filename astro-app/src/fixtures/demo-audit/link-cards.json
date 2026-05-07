@@ -1,0 +1,57 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: linkCards. Variants: grid, list, icon-list. links linkCardItem min 1 max 20. url is required on each linkCardItem.",
+  "_id": "demo-audit-link-cards",
+  "_type": "page",
+  "title": "Demo — Link Cards",
+  "slug": {"_type": "slug", "current": "demo/link-cards"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: link-cards"},
+  "blocks": [
+    {
+      "_key": "lc-grid",
+      "_type": "linkCards",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Resource grid",
+      "description": "Essential links for incoming capstone students.",
+      "links": [
+        {"_key": "l1", "_type": "linkCardItem", "title": "Handbook", "description": "Program handbook and policies.", "icon": "book-open", "url": "/handbook"},
+        {"_key": "l2", "_type": "linkCardItem", "title": "Calendar", "description": "Important dates and deadlines.", "icon": "calendar", "url": "/calendar"},
+        {"_key": "l3", "_type": "linkCardItem", "title": "Slack", "description": "Join the cohort workspace.", "icon": "message-circle", "url": "https://slack.example.com"}
+      ]
+    },
+    {
+      "_key": "lc-list",
+      "_type": "linkCards",
+      "variant": "list",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Quick-reference list",
+      "links": [
+        {"_key": "l1", "_type": "linkCardItem", "title": "Style guide", "description": "Brand and design system reference.", "icon": "palette", "url": "/style-guide"},
+        {"_key": "l2", "_type": "linkCardItem", "title": "API docs", "description": "Internal platform API reference.", "icon": "code", "url": "/docs/api"}
+      ]
+    },
+    {
+      "_key": "lc-icon-list",
+      "_type": "linkCards",
+      "variant": "icon-list",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Icon-driven resource list",
+      "description": "Compact icon list with external links.",
+      "links": [
+        {"_key": "l1", "_type": "linkCardItem", "title": "GitHub org", "icon": "code", "url": "https://github.com/example"},
+        {"_key": "l2", "_type": "linkCardItem", "title": "Figma library", "icon": "palette", "url": "https://figma.com"},
+        {"_key": "l3", "_type": "linkCardItem", "title": "Status page", "icon": "shield-check", "url": "https://status.example.com"},
+        {"_key": "l4", "_type": "linkCardItem", "title": "Mail list", "icon": "mail", "url": "https://lists.example.edu/capstone"}
+      ]
+    }
+  ]
+}

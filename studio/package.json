@@ -9,6 +9,7 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "build": "sanity build",
+    "postbuild": "bash scripts/check-no-secrets.sh",
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy",
     "schema:extract": "sanity schema extract --path=schema.json",
@@ -22,10 +23,11 @@
   ],
   "dependencies": {
     "@sanity/form-toolkit": "^2.2.3",
-    "@sanity/vision": "^5.21.0",
+    "@sanity/vision": "^5.24.0",
+    "groq": "^5.8.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "sanity": "^5.21.0",
+    "sanity": "^5.24.0",
     "sanity-plugin-media": "^4.1.1",
     "styled-components": "^6.3.9"
   },

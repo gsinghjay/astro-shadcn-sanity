@@ -1,0 +1,59 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: mapBlock. Variants: default, split, full-width. hiddenByVariant: contactInfo hidden on default + full-width. coordinates.lat required (-90..90), coordinates.lng required (-180..180). Covers both contactInfo states.",
+  "_id": "demo-audit-map-block",
+  "_type": "page",
+  "title": "Demo — Map Block",
+  "slug": {"_type": "slug", "current": "demo/map-block"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: map-block"},
+  "blocks": [
+    {
+      "_key": "mb-default",
+      "_type": "mapBlock",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Default Map — contactInfo is hidden by variant",
+      "address": "123 Engineering Quad, Example City, EX 00000",
+      "coordinates": {"lat": 40.7128, "lng": -74.006},
+      "caption": "Default variant should not render contact info even if authored below.",
+      "contactInfo": {
+        "phone": "+1 555 0100",
+        "email": "hidden@example.com",
+        "hours": "Hidden on default variant"
+      }
+    },
+    {
+      "_key": "mb-split",
+      "_type": "mapBlock",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split Map — with contactInfo visible",
+      "address": "500 Innovation Blvd, Sample Town, ST 11111",
+      "coordinates": {"lat": 37.7749, "lng": -122.4194},
+      "caption": "Split variant surfaces address alongside contact details.",
+      "contactInfo": {
+        "phone": "+1 555 0123",
+        "email": "hello@example.com",
+        "hours": "Mon–Fri 9a–5p"
+      }
+    },
+    {
+      "_key": "mb-full",
+      "_type": "mapBlock",
+      "variant": "full-width",
+      "backgroundVariant": "blueprint",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Full-width Map — contactInfo hidden by variant",
+      "address": "Polar research station, Antarctica",
+      "coordinates": {"lat": -89.999, "lng": 179.999},
+      "caption": "Edge-of-range coordinates test the lat/lng boundaries."
+    }
+  ]
+}

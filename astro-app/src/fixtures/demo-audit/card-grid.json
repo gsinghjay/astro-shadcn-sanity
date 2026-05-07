@@ -1,0 +1,87 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: cardGrid. Variants: grid-2, grid-3, grid-4, masonry, brutalist. cards of cardGridItem min 1 max 20. Rotates base fields to cover 'stripe', 'hatched', 'hatched-light' backgrounds and 'none' spacing + 'right' alignment gaps.",
+  "_id": "demo-audit-card-grid",
+  "_type": "page",
+  "title": "Demo — Card Grid",
+  "slug": {"_type": "slug", "current": "demo/card-grid"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: card-grid"},
+  "blocks": [
+    {
+      "_key": "cg-2",
+      "_type": "cardGrid",
+      "variant": "grid-2",
+      "backgroundVariant": "stripe",
+      "spacing": "none",
+      "maxWidth": "narrow",
+      "alignment": "right",
+      "heading": "2-column Card Grid",
+      "description": "Right-aligned heading with no vertical padding — tests spacing 'none'.",
+      "cards": [
+        {"_key": "cg2-1", "_type": "cardGridItem", "title": "Research Lab", "description": "Undergraduate research programs.", "badge": "New", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Research lab"}, "link": {"label": "Learn more", "href": "/research"}},
+        {"_key": "cg2-2", "_type": "cardGridItem", "title": "Maker Space", "description": "Shared fabrication resources.", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Maker space"}}
+      ]
+    },
+    {
+      "_key": "cg-3",
+      "_type": "cardGrid",
+      "variant": "grid-3",
+      "backgroundVariant": "hatched",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "right",
+      "heading": "3-column Card Grid",
+      "cards": [
+        {"_key": "cg3-1", "_type": "cardGridItem", "title": "Career Fair", "description": "Annual industry meet.", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Career fair booths"}},
+        {"_key": "cg3-2", "_type": "cardGridItem", "title": "Hackathon", "description": "Weekend-long build sprint.", "badge": "Popular", "link": {"label": "Register", "href": "/hackathon"}},
+        {"_key": "cg3-3", "_type": "cardGridItem", "title": "Mentorship", "description": "1-on-1 with alumni engineers."}
+      ]
+    },
+    {
+      "_key": "cg-4",
+      "_type": "cardGrid",
+      "variant": "grid-4",
+      "backgroundVariant": "hatched-light",
+      "spacing": "none",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "4-column Card Grid",
+      "cards": [
+        {"_key": "cg4-1", "_type": "cardGridItem", "title": "Advising", "description": "Program advising sessions."},
+        {"_key": "cg4-2", "_type": "cardGridItem", "title": "Clubs", "description": "Student-led tech clubs."},
+        {"_key": "cg4-3", "_type": "cardGridItem", "title": "Events", "description": "Talks and workshops.", "badge": "Upcoming"},
+        {"_key": "cg4-4", "_type": "cardGridItem", "title": "Alumni", "description": "Graduate network."}
+      ]
+    },
+    {
+      "_key": "cg-masonry",
+      "_type": "cardGrid",
+      "variant": "masonry",
+      "backgroundVariant": "hatched",
+      "spacing": "small",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Masonry Card Grid",
+      "description": "Variable-height cards arranged masonry-style.",
+      "cards": [
+        {"_key": "cgm-1", "_type": "cardGridItem", "title": "Capstone Spotlight", "description": "Featured project of the month.", "badge": "Featured", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Project spotlight"}, "link": {"label": "Read case study", "href": "/spotlight"}},
+        {"_key": "cgm-2", "_type": "cardGridItem", "title": "Research Paper", "description": "Short note on architecture decisions."},
+        {"_key": "cgm-3", "_type": "cardGridItem", "title": "Open Source", "description": "Contributions from this term.", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"}, "alt": "Open source contributions"}}
+      ]
+    },
+    {
+      "_key": "cg-brutalist",
+      "_type": "cardGrid",
+      "variant": "brutalist",
+      "backgroundVariant": "stripe",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Brutalist Card Grid",
+      "cards": [
+        {"_key": "cgb-1", "_type": "cardGridItem", "title": "Declaration", "description": "Bold typographic card."},
+        {"_key": "cgb-2", "_type": "cardGridItem", "title": "Manifesto", "description": "Grid-breaking composition."},
+        {"_key": "cgb-3", "_type": "cardGridItem", "title": "Call to Action", "description": "Hard edges, no shadow.", "badge": "Act"}
+      ]
+    }
+  ]
+}

@@ -2,13 +2,15 @@
 
 How Cloudflare Durable Objects provide stateful, per-IP rate limiting at the edge — and how this project implements it.
 
+> **Revised 2026-04-29 for the Cloudflare Workers cutover (PR #681).** The middleware now runs inside an Astro 6 Worker (`@astrojs/cloudflare` v13, `output: 'server'`), not a Pages project. The cross-script Durable Object architecture is unchanged. Cloudflare Access has been fully retired (Stories 9.17 / 9.18 both shipped); the DO rate limiter is the sole pre-auth traffic filter.
+
 ## Why This Exists
 
-This project originally used **Cloudflare Access** to protect sponsor portal routes (`/portal/*`). CF Access blocks unauthenticated requests at the CDN edge — zero Worker CPU consumed, zero D1 reads. That edge-level protection is being removed as the project migrates sponsors to **Better Auth** (Story 9.18), unifying the auth stack into a single session-based system.
+This project originally used **Cloudflare Access** to protect sponsor portal routes (`/portal/*`). CF Access blocked unauthenticated requests at the CDN edge — zero Worker CPU consumed, zero D1 reads. That edge-level protection has been removed; sponsor auth is now unified under **Better Auth** (Google + GitHub OAuth + Resend Magic Link), with sessions in D1 and a KV cache.
 
-Without a replacement, every bot probe, brute-force attempt, and unauthenticated hit to protected routes spins up a Worker, runs middleware, and counts against plan limits. The Durable Object rate limiter fills that gap — blocking abusive traffic **before** it reaches the auth layer.
+Without a CDN-edge gate, every bot probe, brute-force attempt, and unauthenticated hit to protected routes spins up a Worker, runs middleware, and counts against plan limits. The Durable Object rate limiter fills that gap — blocking abusive traffic **before** it reaches the auth layer.
 
-The rate limiter was deployed first (Story 9.17), while CF Access is still active, so both layers run in parallel during the transition. After Story 9.18 completes, the rate limiter becomes the **sole pre-auth defense** at the edge.
+The rate limiter was deployed first (Story 9.17), while CF Access was still active, so both layers ran in parallel during the transition. With Story 9.18 (Better Auth consolidation) and PR #681 (Workers cutover) both shipped, the rate limiter is now the **sole pre-auth defense** at the edge.
 
 ## The Problem: Stateless Workers Need State
 
@@ -50,15 +52,15 @@ A common first instinct is to create a single global rate limiter DO. Cloudflare
 
 The correct pattern is **one DO per rate-limit key**. Each IP address gets its own instance. This scales horizontally — 10,000 unique IPs means 10,000 independent DOs, each handling only that IP's traffic. Cloudflare distributes them across its network automatically.
 
-## Architecture: Separate Worker Requirement
+## Architecture: Separate Worker via Cross-Script Binding
 
-This project deploys as **Cloudflare Pages** (the `pages_build_output_dir` setting in `wrangler.jsonc`). Pages projects cannot export Durable Object classes from the same bundle. The DO must live in a **separate Worker**, referenced via `script_name`.
+The astro-app and the rate limiter live in **separate Workers** in the same Cloudflare account. The DO class is declared on `rate-limiter-worker`; the astro-app references it by `script_name` via a cross-script Durable Object binding. This keeps each Worker's bundle small and lets the rate limiter be deployed/upgraded independently.
 
 ```mermaid
 flowchart TB
-    subgraph Main["Main App (Cloudflare Pages)"]
-        MW["Middleware"]
-        Auth["Auth Logic"]
+    subgraph Main["Main App (ywcc-capstone Worker)"]
+        MW["src/middleware.ts"]
+        Auth["Better Auth + Agreement Gate"]
     end
 
     subgraph RLW["rate-limiter-worker (Separate Worker)"]
@@ -91,22 +93,27 @@ Two `wrangler.jsonc` files wire this together:
 }
 ```
 
-**Main app** — binds to the DO via `script_name`, pointing to the other worker:
+**Main app** — binds to the DO via `script_name`, pointing to the other worker. The binding lives inside the `[env.capstone]` block (only the production capstone Worker uses the rate limiter; RWC content Workers and preview Workers don't bind it):
 
 ```jsonc
 // astro-app/wrangler.jsonc
 {
-  "durable_objects": {
-    "bindings": [{
-      "name": "RATE_LIMITER",
-      "class_name": "SlidingWindowRateLimiter",
-      "script_name": "rate-limiter-worker"
-    }]
+  "env": {
+    "capstone": {
+      "name": "ywcc-capstone",
+      "durable_objects": {
+        "bindings": [{
+          "name": "RATE_LIMITER",
+          "class_name": "SlidingWindowRateLimiter",
+          "script_name": "rate-limiter-worker"
+        }]
+      }
+    }
   }
 }
 ```
 
-The rate limiter worker must be deployed before the main app — the binding references it by name.
+The rate limiter worker must be deployed **before** the main app — the binding references it by name. Bootstrapping a fresh CF account: deploy `rate-limiter-worker` first, then `ywcc-capstone`.
 
 ## The Sliding Window Algorithm
 
@@ -188,39 +195,38 @@ Hibernation is key to keeping costs low. A DO that has no pending alarms and no 
 
 ## Middleware Integration
 
-The middleware sits in the request pipeline between the "is this a protected route?" check and the auth logic. The diagram below shows the **post-migration target** (after Story 9.18), where the rate limiter is the sole pre-auth gate and a unified Better Auth session check handles both sponsors and students:
+The middleware sits in the request pipeline between the "is this a protected route?" check and the auth logic. With CF Access retired, the rate limiter is the sole pre-auth gate; a unified Better Auth session check + sponsor agreement gate handles every authenticated request:
 
 ```mermaid
 flowchart TD
-    Req["Incoming Request"] --> RouteCheck{"Portal or Student<br/>route?"}
+    Req["Incoming Request"] --> RouteCheck{"Portal route?"}
     RouteCheck -->|No| Pass["Next() — public route"]
-    RouteCheck -->|Yes| LoginCheck{"Login or Denied<br/>page?"}
+    RouteCheck -->|Yes| LoginCheck{"Login or Denied<br/>or Agreement page?"}
     LoginCheck -->|Yes| Pass
     LoginCheck -->|No| DevCheck{"Dev mode?"}
-    DevCheck -->|Yes| MockUser["Set mock user by route prefix,<br/>skip everything"]
+    DevCheck -->|Yes| MockUser["Set mock sponsor user,<br/>skip everything"]
     DevCheck -->|No| RateLimit["Rate Limit Check<br/>(Durable Object)"]
     RateLimit --> RLResult{"Allowed?"}
     RLResult -->|No| Block["429 Too Many Requests<br/>+ Retry-After header"]
-    RLResult -->|Yes| Session["Unified Better Auth<br/>Session Check"]
+    RLResult -->|Yes| Session["Better Auth<br/>Session Check"]
     RLResult -->|DO Error| Session
-    Session -->|No session| Redirect["Redirect to login<br/>/portal/login or /auth/login"]
-    Session -->|Valid session| RoleCheck{"Role matches<br/>route?"}
-    RoleCheck -->|Sponsor + /portal| Proceed["Set locals.user<br/>→ next()"]
-    RoleCheck -->|Student + /student| Proceed
-    RoleCheck -->|Mismatch| Deny["403 Forbidden<br/>or /portal/denied"]
+    Session -->|No session| Redirect["Redirect to /portal/login"]
+    Session -->|Valid session| Agreement{"Agreement<br/>accepted &<br/>version matches?"}
+    Agreement -->|No| AgreeRedir["Redirect to /portal/agreement"]
+    Agreement -->|Yes| Proceed["Set locals.user<br/>→ next()"]
 
     style Block fill:#ef4444,stroke:#dc2626,color:#fff
     style RateLimit fill:#3b82f6,stroke:#2563eb,color:#fff
-    style Deny fill:#ef4444,stroke:#dc2626,color:#fff
+    style AgreeRedir fill:#f59e0b,stroke:#d97706,color:#fff
     style Proceed fill:#10b981,stroke:#059669,color:#fff
 ```
 
-During the transition (Story 9.17 deployed, Story 9.18 in progress), the middleware still has two auth branches — CF Access JWT for portal routes and Better Auth sessions for student routes. The rate limiter code is identical in both states; only the downstream auth logic changes.
-
-The middleware code:
+The middleware code uses the Astro 6 / adapter v13 binding pattern (`import { env } from 'cloudflare:workers'`):
 
 ```typescript
-const rateLimiter = runtimeEnv?.RATE_LIMITER;
+import { env } from 'cloudflare:workers';
+
+const rateLimiter = env.RATE_LIMITER;
 if (rateLimiter) {
   const ip = context.request.headers.get("CF-Connecting-IP") ?? "unknown";
   try {
@@ -246,8 +252,10 @@ if (rateLimiter) {
 Three design choices to note:
 
 1. **`CF-Connecting-IP` header** — Cloudflare populates this with the true client IP, even behind proxies. Falls back to `"unknown"` if absent (e.g., in test environments).
-2. **Optional binding** (`RATE_LIMITER?`) — The binding is typed as optional in `env.d.ts`. If it isn't configured (local dev, misconfiguration), the middleware skips rate limiting entirely.
+2. **Optional binding** (`RATE_LIMITER?`) — The binding is typed as optional in `env.d.ts`. RWC content Workers (`rwc-us`, `rwc-intl`) and all preview Workers do **not** bind the rate limiter; they don't serve portal traffic. The middleware skips rate limiting on those Workers.
 3. **Dev mode bypass** — `import.meta.env.DEV` short-circuits the entire pipeline, including rate limiting. You don't need the rate-limiter-worker running locally.
+
+> Pre-Astro-6 code paths used `runtimeEnv = (Astro.locals as any).runtime?.env` — that path was removed in `@astrojs/cloudflare` v13. Always import from `cloudflare:workers`.
 
 ## Fail-Open Design
 
@@ -259,15 +267,15 @@ If the DO throws an error (network issue, storage corruption, Cloudflare interna
 
 The alternative — fail-closed — would block legitimate users during any DO disruption.
 
-### What Changes After CF Access Removal (Story 9.18)
+### Post-CF-Access State (Story 9.18 + PR #681)
 
-Before 9.18, two layers sat in front of the auth logic: CF Access at the CDN edge and the DO rate limiter in the Worker. After 9.18, CF Access is gone. The rate limiter becomes the **only pre-auth traffic filter**.
+Before 9.18, two layers sat in front of the auth logic: CF Access at the CDN edge and the DO rate limiter in the Worker. After 9.18 + the Workers cutover (PR #681), CF Access is gone. The rate limiter is the **only pre-auth traffic filter**.
 
-This does not change the fail-open rationale. Even without CF Access, the auth layer (Better Auth session check + Sanity email whitelist) still rejects unauthenticated and unauthorized requests. A rate limiter failure means abusive IPs consume more Worker CPU and D1 reads, but they still cannot access protected content. The impact is a cost/resource concern, not a security breach.
+This does not change the fail-open rationale. Even without CF Access, the auth layer (Better Auth session check + Sanity sponsor email whitelist + agreement gate) still rejects unauthenticated and unauthorized requests. A rate limiter failure means abusive IPs consume more Worker CPU and D1 reads, but they still cannot access protected content. The impact is a cost/resource concern, not a security breach.
 
 ## Type Safety Across the Boundary
 
-The main app and the rate limiter worker are separate deployments. To keep the RPC call type-safe, `env.d.ts` declares an interface that mirrors the DO's public method:
+The main app and the rate limiter worker are separate deployments. To keep the RPC call type-safe, `env.d.ts` augments `Cloudflare.Env` with an interface that mirrors the DO's public method. The base `Cloudflare.Env` type is generated by `npx wrangler types -C astro-app` (it reads `wrangler.jsonc` and produces `worker-configuration.d.ts`) — re-run that command after every binding edit:
 
 ```typescript
 /** Rate limiter Durable Object RPC interface (hosted in rate-limiter-worker) */
@@ -279,8 +287,12 @@ interface RateLimiterDO {
   }>;
 }
 
-// In the Runtime type:
-RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
+// In env.d.ts, augment Cloudflare.Env:
+declare namespace Cloudflare {
+  interface Env {
+    RATE_LIMITER?: DurableObjectNamespace<RateLimiterDO>;
+  }
+}
 ```
 
 TypeScript now enforces that `stub.checkLimit()` is called with the correct arguments and returns the expected shape — even though the actual class lives in a different Worker bundle.
@@ -320,16 +332,16 @@ Durable Objects with SQLite storage are available on both plans. The implementat
 
 | Resource | Free Allowance | Estimated Daily Usage |
 |:---------|:---------------|:---------------------|
-| DO requests | 100,000/day | ~8,400 (420 users x 20 page loads) |
-| DO compute (GB-s) | 13,000/day | ~11 (8,400 x 10ms x 128MB) |
+| DO requests | 100,000/day | ~2,000 (20 sponsors x 100 page loads) |
+| DO compute (GB-s) | 13,000/day | ~3 (2,000 x 10ms x 128MB) |
 | Storage per account | 5 GB | Negligible (timestamps, pruned) |
 | DO classes | 100 max | 1 |
 
-At ~20 sponsors + ~400 students, normal traffic uses **under 10%** of the daily budget.
+At ~20 sponsors with the agreement gate active, normal traffic uses **under 2%** of the daily budget. Note: only the production capstone Worker hits the rate limiter — RWC content Workers and preview Workers don't bind it, so they don't contribute to DO request counts.
 
 **The catch:** Free plan limits are hard caps. If you exceed any limit, further DO operations **fail with an error** (not throttled — they error). The fail-open `catch` block handles this gracefully: requests pass through to auth, and the limit resets the next day.
 
-**The irony under attack:** A bot hammering `/portal/*` is the scenario where you most need rate limiting, but each of those requests also consumes a DO call. A sustained attack can exhaust the 100K daily DO quota, at which point the rate limiter stops working for the rest of the day. After Story 9.18 removes CF Access, there is no other edge-level filter to fall back on — the auth layer still blocks unauthorized access, but every request burns Worker CPU and D1 reads until the daily limit resets.
+**The irony under attack:** A bot hammering `/portal/*` is the scenario where you most need rate limiting, but each of those requests also consumes a DO call. A sustained attack can exhaust the 100K daily DO quota, at which point the rate limiter stops working for the rest of the day. With CF Access retired (Story 9.18), there is no other edge-level filter to fall back on — the auth layer (Better Auth session + agreement gate + sponsor email allowlist) still blocks unauthorized access, but every request burns Worker CPU and D1 reads until the daily limit resets.
 
 ### Paid Plan ($5/month, Monthly Limits)
 
@@ -345,4 +357,4 @@ On the paid plan, the same bot attack just costs fractions of a cent in overages
 
 ### Recommendation
 
-The free plan works for this project's current scale under normal traffic. The risk is only during sustained abuse — and even then, the auth layer prevents unauthorized access. If the project later faces real abuse traffic or if the CF Access removal (Story 9.18) makes the rate limiter the sole defense in a higher-traffic environment, upgrading to the paid plan eliminates the daily ceiling concern entirely.
+The free plan works for this project's current scale under normal traffic. The risk is only during sustained abuse — and even then, the auth layer prevents unauthorized access. With CF Access retired and the rate limiter as the sole pre-auth filter, upgrading to the Workers Paid plan ($5/month) is the obvious escape hatch if real abuse traffic ever arrives — it eliminates the daily ceiling concern entirely.

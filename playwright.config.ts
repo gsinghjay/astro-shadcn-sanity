@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test'
 const BASE_URL = process.env.BASE_URL || 'http://localhost:4321'
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './tests/e2e',
   outputDir: './test-results',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

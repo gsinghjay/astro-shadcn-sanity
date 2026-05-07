@@ -1,4 +1,5 @@
 ---
+export const prerender = true;
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
@@ -8,6 +9,7 @@ import SponsorCard from '@/components/SponsorCard.astro';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
 import { buildOrgJsonLd } from '@/lib/org-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 
 const [sponsors, listingPage] = await Promise.all([
   getAllSponsors(),
@@ -29,7 +31,7 @@ const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout title={pageTitle} seo={pageSeo}>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} />
   )}

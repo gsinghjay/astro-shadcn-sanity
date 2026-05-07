@@ -1,0 +1,72 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: tabsBlock. Variants: default, pills, underline, brutalist. tabs tabItem min 1 max 8. AC6 #29 max-tabs=8 exercised on 'default'.",
+  "_id": "demo-audit-tabs-block",
+  "_type": "page",
+  "title": "Demo — Tabs Block",
+  "slug": {"_type": "slug", "current": "demo/tabs-block"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: tabs-block"},
+  "blocks": [
+    {
+      "_key": "tb-default-max",
+      "_type": "tabsBlock",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Default — max 8 tabs (AC6 #29)",
+      "tabs": [
+        {"_key": "t1", "_type": "tabItem", "label": "Overview", "content": "Tab 1 content — overview of the program."},
+        {"_key": "t2", "_type": "tabItem", "label": "Timeline", "content": "Tab 2 content — program schedule."},
+        {"_key": "t3", "_type": "tabItem", "label": "Teams", "content": "Tab 3 content — how teams are formed."},
+        {"_key": "t4", "_type": "tabItem", "label": "Sponsors", "content": "Tab 4 content — sponsor involvement."},
+        {"_key": "t5", "_type": "tabItem", "label": "Grading", "content": "Tab 5 content — evaluation rubric."},
+        {"_key": "t6", "_type": "tabItem", "label": "Showcase", "content": "Tab 6 content — public demo day details."},
+        {"_key": "t7", "_type": "tabItem", "label": "Alumni", "content": "Tab 7 content — alumni network."},
+        {"_key": "t8", "_type": "tabItem", "label": "FAQ", "content": "Tab 8 content — frequently asked questions."}
+      ]
+    },
+    {
+      "_key": "tb-pills",
+      "_type": "tabsBlock",
+      "variant": "pills",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Pills tab style",
+      "tabs": [
+        {"_key": "t1", "_type": "tabItem", "label": "Engineering", "content": "Engineering tracks and focus areas."},
+        {"_key": "t2", "_type": "tabItem", "label": "Design", "content": "Design thinking and UX workstreams."},
+        {"_key": "t3", "_type": "tabItem", "label": "Product", "content": "Product strategy and discovery."}
+      ]
+    },
+    {
+      "_key": "tb-underline",
+      "_type": "tabsBlock",
+      "variant": "underline",
+      "backgroundVariant": "stripe",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Underline tab style",
+      "tabs": [
+        {"_key": "t1", "_type": "tabItem", "label": "Deliverables", "content": "Working software, public demo, and reflection writeup."},
+        {"_key": "t2", "_type": "tabItem", "label": "Checkpoints", "content": "Weekly standups, bi-weekly mentor reviews, quarterly panels."}
+      ]
+    },
+    {
+      "_key": "tb-brutalist-min",
+      "_type": "tabsBlock",
+      "variant": "brutalist",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "right",
+      "heading": "Brutalist — min 1 tab (AC6 #28)",
+      "tabs": [
+        {"_key": "t1", "_type": "tabItem", "label": "Only tab", "content": "Single-tab boundary case for tabsBlock."}
+      ]
+    }
+  ]
+}

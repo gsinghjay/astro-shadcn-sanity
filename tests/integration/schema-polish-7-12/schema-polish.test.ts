@@ -40,7 +40,12 @@ import { blockBaseFields } from '../../../studio/src/schemaTypes/objects/block-b
 import { button } from '../../../studio/src/schemaTypes/objects/button'
 
 // Presentation
-import { resolve } from '../../../studio/src/presentation/resolve'
+import { createResolve } from '../../../studio/src/presentation/resolve'
+
+// Story 15.9: `resolve` is now produced by a workspace-scoped factory.
+// AC6 just verifies the resolver shape — Capstone (siteId undefined) is
+// equivalent to the previous static export.
+const resolve = createResolve(undefined)
 
 // Helper to get fields from a schema
 function getFields(schema: any): any[] {

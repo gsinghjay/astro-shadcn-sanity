@@ -8,10 +8,15 @@
  * @phase GREEN
  */
 import { describe, test, expect, beforeAll } from 'vitest'
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
+import { createRequire } from 'node:module'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// Astro 6 + @astrojs/cloudflare v13 routes `child_process` through unenv's
+// Workers polyfill, which throws on exec. createRequire bypasses Vite/unenv.
+const nodeRequire = createRequire(import.meta.url)
+const { exec } = nodeRequire('node:child_process') as typeof import('node:child_process')
+const { promisify } = nodeRequire('node:util') as typeof import('node:util')
 
 const execAsync = promisify(exec)
 

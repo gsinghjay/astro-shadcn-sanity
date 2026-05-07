@@ -1,0 +1,49 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: projectCards. 3 variants: default, case-study, blueprint. displayMode enum (all/featured/manual) all three exercised per AC6 #32. Manual mode refs 4 existing project docs.",
+  "_id": "demo-audit-project-cards",
+  "_type": "page",
+  "title": "Demo — Project Cards",
+  "slug": {"_type": "slug", "current": "demo/project-cards"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: project-cards"},
+  "blocks": [
+    {
+      "_key": "pc-default-all",
+      "_type": "projectCards",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "All projects — default variant",
+      "displayMode": "all"
+    },
+    {
+      "_key": "pc-case-study-featured",
+      "_type": "projectCards",
+      "variant": "case-study",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Featured projects — case-study variant",
+      "displayMode": "featured"
+    },
+    {
+      "_key": "pc-blueprint-manual",
+      "_type": "projectCards",
+      "variant": "blueprint",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Manual picks — blueprint variant",
+      "displayMode": "manual",
+      "projects": [
+        {"_key": "proj-1", "_type": "reference", "_ref": "64bde361-ae0b-4ee5-a0d7-9c29b542a5ff"},
+        {"_key": "proj-2", "_type": "reference", "_ref": "c46bba9f-41ec-445a-8fd3-5fd875e3bcff"},
+        {"_key": "proj-3", "_type": "reference", "_ref": "025360c6-57e3-4bc9-93ae-0a78c3923f5d"},
+        {"_key": "proj-4", "_type": "reference", "_ref": "21871347-6c05-4f12-8f40-ad0bcc129bb4"}
+      ]
+    }
+  ]
+}

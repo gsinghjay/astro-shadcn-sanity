@@ -1,0 +1,243 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: columnsBlock. Variants: equal, wide-left, wide-right, sidebar-left, sidebar-right. hiddenByVariant: reverseOnMobile hidden in equal. verticalAlign enum (top/center/stretch) all covered. AC5 #27 reverseOnMobile toggle ON+OFF on sidebar variants. AC5 #26 at least 1 nested inner block from each non-hero insert-menu group: richText (Content), statsRow (Media & Stats), cardGrid (Display), testimonials displayMode=all (Social Proof), pricingTable (Data), newsletter (CTA), divider (Utility).",
+  "_id": "demo-audit-columns-block",
+  "_type": "page",
+  "title": "Demo — Columns Block",
+  "slug": {"_type": "slug", "current": "demo/columns-block"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: columns-block", "metaDescription": "Audit page for columnsBlock — all 5 variants with nested inner blocks from every insert-menu group."},
+  "blocks": [
+    {
+      "_key": "cb-equal",
+      "_type": "columnsBlock",
+      "variant": "equal",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "verticalAlign": "top",
+      "leftBlocks": [
+        {
+          "_key": "cb-equal-l-rt",
+          "_type": "richText",
+          "variant": "standard",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h3",
+              "children": [{"_type": "span", "_key": "s1", "text": "Content group — richText", "marks": []}],
+              "markDefs": []
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "children": [{"_type": "span", "_key": "s2", "text": "Left column of equal-50/50 columnsBlock. Covers the Content insert-menu group requirement (AC5 #26).", "marks": []}],
+              "markDefs": []
+            }
+          ]
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "cb-equal-r-stats",
+          "_type": "statsRow",
+          "variant": "grid",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "center",
+          "heading": "Media & Stats group — statsRow",
+          "stats": [
+            {"_key": "st1", "_type": "statItem", "value": "400+", "label": "Students"},
+            {"_key": "st2", "_type": "statItem", "value": "75", "label": "Sponsors"},
+            {"_key": "st3", "_type": "statItem", "value": "12", "label": "Programs"}
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "cb-wide-left",
+      "_type": "columnsBlock",
+      "variant": "wide-left",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": false,
+      "verticalAlign": "center",
+      "leftBlocks": [
+        {
+          "_key": "cb-wl-l-cards",
+          "_type": "cardGrid",
+          "variant": "grid-3",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Display group — cardGrid",
+          "cards": [
+            {"_key": "c1", "_type": "cardGridItem", "title": "Card one", "description": "Short supporting copy for card one."},
+            {"_key": "c2", "_type": "cardGridItem", "title": "Card two", "description": "Short supporting copy for card two."},
+            {"_key": "c3", "_type": "cardGridItem", "title": "Card three", "description": "Short supporting copy for card three."}
+          ]
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "cb-wl-r-divider",
+          "_type": "divider",
+          "variant": "labeled",
+          "label": "Utility group — divider",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "center"
+        }
+      ]
+    },
+    {
+      "_key": "cb-wide-right",
+      "_type": "columnsBlock",
+      "variant": "wide-right",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": false,
+      "verticalAlign": "stretch",
+      "leftBlocks": [
+        {
+          "_key": "cb-wr-l-newsletter",
+          "_type": "newsletter",
+          "variant": "inline",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "CTA group — newsletter",
+          "description": "Subscribe for capstone updates straight to your inbox.",
+          "submitButtonLabel": "Subscribe",
+          "inputPlaceholder": "you@school.edu"
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "cb-wr-r-pricing",
+          "_type": "pricingTable",
+          "variant": "simple",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Data group — pricingTable",
+          "tiers": [
+            {
+              "_key": "t1",
+              "_type": "pricingTier",
+              "name": "Bronze",
+              "price": "$1,000",
+              "features": ["Logo on program", "1 capstone mentor slot"]
+            },
+            {
+              "_key": "t2",
+              "_type": "pricingTier",
+              "name": "Silver",
+              "price": "$2,500",
+              "features": ["All Bronze benefits", "3 mentor slots + expo booth"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "_key": "cb-sidebar-left-reverse-on",
+      "_type": "columnsBlock",
+      "variant": "sidebar-left",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": true,
+      "verticalAlign": "top",
+      "leftBlocks": [
+        {
+          "_key": "cb-sl-l-divider",
+          "_type": "divider",
+          "variant": "short",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left"
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "cb-sl-r-testimonials",
+          "_type": "testimonials",
+          "variant": "grid",
+          "backgroundVariant": "white",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "heading": "Social Proof group — testimonials (all)",
+          "testimonialSource": "all"
+        }
+      ]
+    },
+    {
+      "_key": "cb-sidebar-right-reverse-off",
+      "_type": "columnsBlock",
+      "variant": "sidebar-right",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "reverseOnMobile": false,
+      "verticalAlign": "center",
+      "leftBlocks": [
+        {
+          "_key": "cb-sr-l-rt",
+          "_type": "richText",
+          "variant": "prose",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left",
+          "content": [
+            {
+              "_type": "block",
+              "_key": "b1",
+              "style": "h3",
+              "children": [{"_type": "span", "_key": "s1", "text": "sidebar-right + reverseOnMobile OFF", "marks": []}],
+              "markDefs": []
+            },
+            {
+              "_type": "block",
+              "_key": "b2",
+              "style": "normal",
+              "children": [{"_type": "span", "_key": "s2", "text": "Main content column. Sidebar renders on the right and stays on the right at all breakpoints because reverseOnMobile is false.", "marks": []}],
+              "markDefs": []
+            }
+          ]
+        }
+      ],
+      "rightBlocks": [
+        {
+          "_key": "cb-sr-r-divider",
+          "_type": "divider",
+          "variant": "labeled",
+          "label": "Sidebar",
+          "backgroundVariant": "light",
+          "spacing": "none",
+          "maxWidth": "default",
+          "alignment": "left"
+        }
+      ]
+    }
+  ]
+}

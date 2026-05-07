@@ -1,0 +1,70 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: accordion. Variants: default, bordered, separated, technical. items accordionItem min 1 max 20. AC6 #28 min-items=1 exercised on 'default'.",
+  "_id": "demo-audit-accordion",
+  "_type": "page",
+  "title": "Demo — Accordion",
+  "slug": {"_type": "slug", "current": "demo/accordion"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: accordion"},
+  "blocks": [
+    {
+      "_key": "ac-default-min",
+      "_type": "accordion",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Default — min 1 item (AC6 #28)",
+      "items": [
+        {"_key": "i1", "_type": "accordionItem", "title": "Only item", "content": "Single-item boundary case for the accordion items array."}
+      ]
+    },
+    {
+      "_key": "ac-bordered",
+      "_type": "accordion",
+      "variant": "bordered",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Bordered accordion",
+      "description": "Each item has a visible border frame.",
+      "items": [
+        {"_key": "i1", "_type": "accordionItem", "title": "Eligibility", "content": "Seniors enrolled in a participating program are eligible for capstone."},
+        {"_key": "i2", "_type": "accordionItem", "title": "Selection", "content": "Teams are selected based on fit with sponsor briefs."},
+        {"_key": "i3", "_type": "accordionItem", "title": "Deliverables", "content": "Each team ships a working product and a public demo."}
+      ]
+    },
+    {
+      "_key": "ac-separated",
+      "_type": "accordion",
+      "variant": "separated",
+      "backgroundVariant": "hatched",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Separated accordion",
+      "items": [
+        {"_key": "i1", "_type": "accordionItem", "title": "Grading rubric", "content": "Rubric weights technical depth, user impact, and presentation quality equally."},
+        {"_key": "i2", "_type": "accordionItem", "title": "Appeals process", "content": "Grade appeals are reviewed by the faculty steering committee within two weeks."}
+      ]
+    },
+    {
+      "_key": "ac-technical",
+      "_type": "accordion",
+      "variant": "technical",
+      "backgroundVariant": "blueprint",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "right",
+      "heading": "Technical accordion",
+      "description": "Engineering-flavored item list.",
+      "items": [
+        {"_key": "i1", "_type": "accordionItem", "title": "Runtime requirements", "content": "Node 20 LTS and up. Bun and Deno are explicitly unsupported for this iteration."},
+        {"_key": "i2", "_type": "accordionItem", "title": "Deploy target", "content": "Cloudflare Pages with the static Astro adapter."},
+        {"_key": "i3", "_type": "accordionItem", "title": "Observability", "content": "Sentry for errors, Plausible for analytics, Lighthouse CI for perf regressions."},
+        {"_key": "i4", "_type": "accordionItem", "title": "Testing", "content": "Vitest for units/schema, Playwright for E2E. CI runs chromium + firefox."}
+      ]
+    }
+  ]
+}

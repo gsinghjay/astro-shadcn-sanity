@@ -184,6 +184,14 @@ Visual regression via Chromatic.
 - Block coverage: `BlockRenderer.test.ts`, `BlockWrapper.test.ts`.
 - E2E visual checks: `tests/e2e/*.spec.ts` (Playwright) — see [development-guide.md](./development-guide.md).
 
+## Agent discovery (Story 5.21 — RFC 8288 + markdown content negotiation)
+
+- **Link headers**: every HTML response advertises `</llms.txt>; rel="describedby"`, `</llms-full.txt>; rel="alternate"`, `</sitemap-index.xml>; rel="sitemap"`, plus `<{path}.md>; rel="alternate"; type="text/markdown"` per page. The base 3 are emitted by `astro-app/public/_headers`; the per-page 4th member is appended at build time by `astro-app/scripts/append-agent-headers.mjs` (one rule per `dist/client/<path>.md` twin). `_headers` overrides strip Link/Vary off corpus self-references (`/llms.txt`, `/llms-full.txt`, `/sitemap-index.xml`, `/robots.txt`).
+- **Markdown content negotiation**: when `Accept: text/markdown` is q-ranked over `text/html`, a postbuild-generated wrapper around `dist/server/entry.mjs` (`astro-app/scripts/wrap-entry-for-agents.mjs`) intercepts the request and returns the `.md` twin via the `ASSETS` binding with `content-type: text/markdown; charset=utf-8`, `Vary: Accept`, `x-markdown-tokens` (length÷4 heuristic), and the full Link header. HTML wins ties; excluded paths (`/portal/**`, `/auth/**`, `/student/**`, `/demo/**`, `/api/**`) and direct `.md` requests fall through to the adapter without 406.
+- **Why a wrapper**: `@astrojs/cloudflare` v13 short-circuits prerendered HTML inside its worker entry (`if (app.manifest.assets.has(path)) return env.ASSETS.fetch(...)`) **before** Astro's middleware runs. The wrapper layer sits in front of that adapter handler so negotiation can fire on prerendered routes. `wrangler.jsonc` therefore needs `assets.run_worker_first: true`.
+- **Pure functions** in `astro-app/src/lib/agent-discovery.ts` (q-value parsing, twin path resolution, exclusion check, token estimate) — exhaustively unit-tested. The wrapper inlines an equivalent JS port (Cloudflare entry can't reach src/), kept in lock-step via shared AC.
+- **Multi-site**: top-level `assets` config in `wrangler.jsonc` applies to all six Workers; `_headers` is bundled by every build; the per-page rules script enumerates whatever `.md` twins each site emits (capstone ~36, rwc-us ~16, rwc-intl ~5, preview Workers 0 because `astro-llms-md` is gated off when visual editing is on).
+
 ## Notable component changes since 2026-03
 
 - **Added:** ColumnsBlock (21.10), ImageGallery w/ PhotoSwipe (22.4), `section/*` grid sub-components (17.8), category archive layouts (19.10), author detail layouts (20.2, 20.3), ProjectFilterBar + variants (4.6).

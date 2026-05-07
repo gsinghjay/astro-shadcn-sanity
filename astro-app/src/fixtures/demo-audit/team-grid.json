@@ -1,0 +1,58 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: teamGrid. Variants: grid, grid-compact, split. hiddenByVariant: description hidden in grid-compact. items of teamMember min 1 max 30.",
+  "_id": "demo-audit-team-grid",
+  "_type": "page",
+  "title": "Demo — Team Grid",
+  "slug": {"_type": "slug", "current": "demo/team-grid"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: team-grid"},
+  "blocks": [
+    {
+      "_key": "tg-grid",
+      "_type": "teamGrid",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Grid — with description visible",
+      "description": "The grid variant shows the description; hiddenByVariant excludes only grid-compact.",
+      "items": [
+        {"_key": "tm1", "_type": "teamMember", "name": "Ada Lovelace", "role": "Lead Engineer", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Portrait placeholder for Ada Lovelace"}, "links": [{"_key": "tm1-l1", "_type": "link", "label": "LinkedIn", "href": "https://www.linkedin.com/in/example", "external": true}]},
+        {"_key": "tm2", "_type": "teamMember", "name": "Alan Turing", "role": "Research Scientist", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Portrait placeholder for Alan Turing"}},
+        {"_key": "tm3", "_type": "teamMember", "name": "Grace Hopper", "role": "Compiler Architect", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Portrait placeholder for Grace Hopper"}},
+        {"_key": "tm4", "_type": "teamMember", "name": "Katherine Johnson", "role": "Systems Analyst", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Portrait placeholder for Katherine Johnson"}}
+      ]
+    },
+    {
+      "_key": "tg-compact",
+      "_type": "teamGrid",
+      "variant": "grid-compact",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "Grid Compact — description is hidden by variant",
+      "description": "Should be hidden — tests the hiddenByVariant rule for description.",
+      "items": [
+        {"_key": "tc1", "_type": "teamMember", "name": "Margaret Hamilton", "role": "Apollo Guidance", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Portrait placeholder for Margaret Hamilton"}},
+        {"_key": "tc2", "_type": "teamMember", "name": "Dennis Ritchie", "role": "Language Designer", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"}, "alt": "Portrait placeholder for Dennis Ritchie"}},
+        {"_key": "tc3", "_type": "teamMember", "name": "Barbara Liskov", "role": "Abstraction Researcher", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Portrait placeholder for Barbara Liskov"}}
+      ]
+    },
+    {
+      "_key": "tg-split",
+      "_type": "teamGrid",
+      "variant": "split",
+      "backgroundVariant": "dark",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Split — heading left, team right",
+      "description": "Two-column split layout with description visible alongside team members.",
+      "items": [
+        {"_key": "ts1", "_type": "teamMember", "name": "Linus Torvalds", "role": "Kernel Maintainer", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Portrait placeholder for Linus Torvalds"}, "links": [{"_key": "ts1-l1", "_type": "link", "label": "GitHub", "href": "https://github.com/torvalds", "external": true}, {"_key": "ts1-l2", "_type": "link", "label": "Blog", "href": "https://example.com/blog", "external": true}]},
+        {"_key": "ts2", "_type": "teamMember", "name": "Rasmus Lerdorf", "role": "Language Author", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Portrait placeholder for Rasmus Lerdorf"}}
+      ]
+    }
+  ]
+}

@@ -98,9 +98,9 @@ describe('Story 15-1: siteField in document schemas', () => {
     expect(siteIndex).toBeGreaterThan(slugIndex)
   })
 
-  test('submission schema does NOT include site field', async () => {
+  test('submission schema includes site field for per-site scoping', async () => {
     const {submission} = await import('../../documents/submission')
     const fieldNames = (submission as any).fields.map((f: any) => f.name)
-    expect(fieldNames).not.toContain('site')
+    expect(fieldNames).toContain('site')
   })
 })

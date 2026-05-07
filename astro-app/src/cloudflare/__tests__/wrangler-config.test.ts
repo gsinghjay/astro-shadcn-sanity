@@ -40,8 +40,28 @@ describe("Wrangler config — astro-app/wrangler.jsonc", () => {
     expect(app.compatibility_flags).toContain("nodejs_compat");
   });
 
-  it("pages_build_output_dir points to ./dist", () => {
+  it("uses Workers Static Assets pointing to ./dist with ASSETS binding", () => {
     const app = loadAppWranglerJsonc();
-    expect(app.pages_build_output_dir).toBe("./dist");
+    // Adapter v13 / post-Pages: `pages_build_output_dir` is replaced by an
+    // `assets` block. The directory still points at the Astro `dist/` output;
+    // the binding name `ASSETS` is what `@astrojs/cloudflare` reads at runtime.
+    const assets = app.assets as { directory?: string; binding?: string } | undefined;
+    expect(assets).toBeDefined();
+    expect(assets?.directory).toBe("./dist");
+    expect(assets?.binding).toBe("ASSETS");
+    expect(app.pages_build_output_dir).toBeUndefined();
+  });
+
+  it("uses the unified Astro adapter entrypoint (not a built _worker.js path)", () => {
+    const app = loadAppWranglerJsonc();
+    // adapter v13 ships a static module entrypoint; do NOT change to dist/_worker.js/index.js.
+    expect(app.main).toBe("@astrojs/cloudflare/entrypoints/server");
+  });
+
+  it("declares per-environment blocks for rwc_us and rwc_intl", () => {
+    const app = loadAppWranglerJsonc();
+    const envBlock = app.env as Record<string, { name?: string }> | undefined;
+    expect(envBlock?.rwc_us?.name).toBe("rwc-us");
+    expect(envBlock?.rwc_intl?.name).toBe("rwc-intl");
   });
 });

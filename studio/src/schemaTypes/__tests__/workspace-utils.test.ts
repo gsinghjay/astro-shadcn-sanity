@@ -15,8 +15,15 @@ import {createSchemaTypesForWorkspace} from '../workspace-utils'
 import {schemaTypes} from '../index'
 import {SITE_AWARE_TYPES} from '../../constants'
 
-/** All document types that have the site field (SITE_AWARE_TYPES + siteSettings) */
-const TYPES_WITH_SITE_FIELD = [...SITE_AWARE_TYPES, 'siteSettings']
+/** All document types that have the site field (SITE_AWARE_TYPES + siteSettings).
+ *  `form` is in SITE_AWARE_TYPES but its schema is registered by the
+ *  @sanity/form-toolkit plugin (not in our local schemaTypes), so
+ *  createSchemaTypesForWorkspace() does not see it here. The workspace-level
+ *  createWorkspaceSchemaTypes() reducer injects the site field onto `form`
+ *  via the plugin prev array — that path is covered separately. */
+const TYPES_WITH_SITE_FIELD = [...SITE_AWARE_TYPES, 'siteSettings'].filter(
+  (t) => t !== 'form',
+)
 
 interface SchemaField {
   name: string
@@ -65,10 +72,10 @@ describe('Story 15-2: createSchemaTypesForWorkspace', () => {
 
   test('types without site field are returned unchanged', () => {
     const result = createSchemaTypesForWorkspace('production')
-    const submission = findType(result, 'submission')
-    expect(submission).toBeDefined()
-    const original = findType(schemaTypes, 'submission')
-    expect(submission).toBe(original) // same reference — not cloned
+    const listingPage = findType(result, 'listingPage')
+    expect(listingPage).toBeDefined()
+    const original = findType(schemaTypes, 'listingPage')
+    expect(listingPage).toBe(original) // same reference — not cloned
   })
 
   test('object types without fields are returned unchanged', () => {

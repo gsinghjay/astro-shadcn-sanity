@@ -1,0 +1,65 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: imageGallery. Variants: grid, masonry, single. images array required min 1 max 30. Masonry uses 12 images (large-set sample) reusing demo asset IDs. Covers featured boolean, year, and category enum values.",
+  "_id": "demo-audit-image-gallery",
+  "_type": "page",
+  "title": "Demo — Image Gallery",
+  "slug": {"_type": "slug", "current": "demo/image-gallery"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: image-gallery"},
+  "blocks": [
+    {
+      "_key": "ig-grid",
+      "_type": "imageGallery",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Grid Gallery",
+      "description": "Grid variant with a mix of featured and regular images across categories.",
+      "images": [
+        {"_key": "igg1", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Wide landscape demo image"}, "caption": "Landscape demo", "featured": true, "year": 2025, "category": "web-apps"},
+        {"_key": "igg2", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Team collaborating on a whiteboard"}, "caption": "Team session", "year": 2024, "category": "mobile"},
+        {"_key": "igg3", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Lab bench with electronics"}, "caption": "IoT lab", "year": 2025, "category": "iot"},
+        {"_key": "igg4", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Student presenting dashboards"}, "caption": "Analytics demo", "year": 2023, "category": "data-viz"}
+      ]
+    },
+    {
+      "_key": "ig-masonry",
+      "_type": "imageGallery",
+      "variant": "masonry",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Masonry Gallery — 12 images",
+      "description": "Masonry layout with a larger sample set; reuses demo asset IDs per brief.",
+      "images": [
+        {"_key": "igm01", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Capstone demo image 01"}, "caption": "AI project", "featured": true, "year": 2025, "category": "ai-ml"},
+        {"_key": "igm02", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Capstone demo image 02"}, "caption": "Web app", "year": 2025, "category": "web-apps"},
+        {"_key": "igm03", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Capstone demo image 03"}, "caption": "Mobile design", "year": 2024, "category": "mobile"},
+        {"_key": "igm04", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Capstone demo image 04"}, "caption": "Dashboard", "year": 2024, "category": "data-viz"},
+        {"_key": "igm05", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"}, "alt": "Capstone demo image 05"}, "caption": "Hardware build", "year": 2023, "category": "iot"},
+        {"_key": "igm06", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Capstone demo image 06"}, "caption": "Research poster", "year": 2023, "category": "other"},
+        {"_key": "igm07", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Capstone demo image 07"}, "caption": "Game prototype", "year": 2022, "category": "other"},
+        {"_key": "igm08", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Capstone demo image 08"}, "caption": "AR concept", "featured": true, "year": 2025, "category": "mobile"},
+        {"_key": "igm09", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Capstone demo image 09"}, "caption": "ML model viz", "year": 2024, "category": "ai-ml"},
+        {"_key": "igm10", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1629d9cf7aed8f62aacc0aaa2665e2d80344a744-307x164-jpg"}, "alt": "Capstone demo image 10"}, "caption": "Pitch slides", "year": 2022, "category": "other"},
+        {"_key": "igm11", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Capstone demo image 11"}, "caption": "Demo night", "year": 2023, "category": "other"},
+        {"_key": "igm12", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Capstone demo image 12"}, "caption": "Awards ceremony", "year": 2021, "category": "other"}
+      ]
+    },
+    {
+      "_key": "ig-single",
+      "_type": "imageGallery",
+      "variant": "single",
+      "backgroundVariant": "dark",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Single Hero Image",
+      "images": [
+        {"_key": "igs1", "_type": "galleryImage", "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Single hero demo image"}, "caption": "Lone hero shot for the single variant.", "featured": true, "year": 2025, "category": "web-apps"}
+      ]
+    }
+  ]
+}

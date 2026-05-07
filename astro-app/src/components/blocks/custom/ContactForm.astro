@@ -1,6 +1,7 @@
 ---
 import type { ContactFormBlock } from '@/lib/types';
 import { stegaClean } from '@sanity/client/stega';
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
 import { Section, SectionSplit, SectionContent, SectionMedia } from '@/components/ui/section';
 import { AutoForm } from '@/components/ui/auto-form';
 import { Icon } from '@/components/ui/icon';
@@ -17,7 +18,7 @@ const variant = (() => {
   return v === 'split' || v === 'split-image' ? v : 'stacked';
 })();
 
-const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const turnstileSiteKey = PUBLIC_TURNSTILE_SITE_KEY;
 const formId = form?._id ?? '';
 
 // Map Sanity formField[] → AutoForm Field[] with stegaClean on logic-critical values

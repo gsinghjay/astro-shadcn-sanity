@@ -1,29 +1,24 @@
 ---
+export const prerender = true;
 import Layout from '@/layouts/Layout.astro';
 import Breadcrumb from '@/components/Breadcrumb.astro';
-import ImageGallery from '@/components/blocks/custom/ImageGallery.astro';
+import GalleryGrid from '@/components/blocks/custom/_partials/GalleryGrid.astro';
 import BlockRenderer from '@/components/BlockRenderer.astro';
 import { Section, SectionContent } from '@/components/ui/section';
-import { getPage, getListingPage } from '@/lib/sanity';
-import type { ImageGalleryBlock } from '@/lib/types';
+import { getListingPage, getGalleryAssets } from '@/lib/sanity';
 import { buildBreadcrumbJsonLd } from '@/lib/breadcrumb-jsonld';
 import { buildPageGraph } from '@/lib/page-jsonld';
 import { buildOrgJsonLd } from '@/lib/org-jsonld';
+import JsonLd from '@/components/ui/json-ld/JsonLd.astro';
 
-const [page, listingPage] = await Promise.all([
-  getPage('gallery'),
+const [listingPage, galleryItems] = await Promise.all([
   getListingPage('gallery'),
+  getGalleryAssets(),
 ]);
 
-if (!page) {
-  return Astro.redirect('/404');
-}
-
-const pageTitle = listingPage?.title ?? page.title ?? 'Gallery';
+const pageTitle = listingPage?.title ?? 'Gallery';
 const pageDescription = listingPage?.description ?? null;
-const pageSeo = listingPage?.seo ?? page.seo ?? { metaDescription: 'Browse photos from the YWCC Industry Capstone program.' };
-
-const galleryBlock = (page.blocks ?? []).find(b => b._type === 'imageGallery') as ImageGalleryBlock | undefined;
+const pageSeo = listingPage?.seo ?? { metaDescription: 'Browse photos from the YWCC Industry Capstone program.' };
 
 const breadcrumbItems = [
   { label: 'Home', href: '/' },
@@ -35,7 +30,7 @@ const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
 ---
 
 <Layout title={pageTitle} seo={pageSeo}>
-  <script slot="structured-data" type="application/ld+json" set:html={JSON.stringify(pageGraph)} />
+  <JsonLd schema={pageGraph} slot="structured-data" />
   {listingPage?.headerBlocks && listingPage.headerBlocks.length > 0 && (
     <BlockRenderer blocks={listingPage.headerBlocks} />
   )}
@@ -44,7 +39,18 @@ const pageGraph = buildPageGraph(orgJsonLd, breadcrumbJsonLd);
     <SectionContent>
       <Breadcrumb items={breadcrumbItems} />
 
-      {galleryBlock && <ImageGallery {...galleryBlock} bare />}
+      {galleryItems.length > 0 ? (
+        <GalleryGrid
+          items={galleryItems}
+          variant="grid"
+          heading={pageTitle}
+          description={pageDescription}
+          bare
+          idSuffix="gallery-listing"
+        />
+      ) : (
+        <p class="text-muted-foreground">No gallery photos yet. Check back soon.</p>
+      )}
     </SectionContent>
   </Section>
 

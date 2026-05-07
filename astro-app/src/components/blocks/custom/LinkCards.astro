@@ -34,7 +34,7 @@ const cleanVariant = rawCleaned === 'grid' || rawCleaned === 'list' || rawCleane
             {link.icon && <Icon name={link.icon} class="size-8" />}
             <TileTitle>{link.title}</TileTitle>
             {link.description && <TileDescription>{link.description}</TileDescription>}
-            <span class="text-sm text-primary font-medium mt-auto">Learn more &rarr;</span>
+            <span class="text-sm text-primary font-medium mt-auto">{link.ctaLabel?.trim() || 'Learn more'} &rarr;</span>
           </TileContent>
         </Tile>
       ))}

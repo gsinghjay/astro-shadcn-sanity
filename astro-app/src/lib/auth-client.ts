@@ -8,7 +8,7 @@
  * imported client-side due to server-only dependencies (drizzle, resend).
  */
 import { createAuthClient } from 'better-auth/client';
-import { magicLinkClient } from 'better-auth/client/plugins';
+import { magicLinkClient, emailOTPClient } from 'better-auth/client/plugins';
 
 // Better Auth requires an absolute URL. In the browser (where this module runs),
 // build the full origin; in test/SSR contexts fall back to relative path.
@@ -23,5 +23,5 @@ const baseURL = typeof window !== 'undefined'
 // available at runtime via the core client regardless.
 export const authClient = createAuthClient({
   baseURL,
-  plugins: [magicLinkClient()],
+  plugins: [magicLinkClient(), emailOTPClient()],
 });

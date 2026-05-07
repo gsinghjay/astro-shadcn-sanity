@@ -1,0 +1,65 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: newsletter. 4 variants: inline, banner, split, brutalist. inputPlaceholder + submitButtonLabel required (always populated).",
+  "_id": "demo-audit-newsletter",
+  "_type": "page",
+  "title": "Demo — Newsletter",
+  "slug": {"_type": "slug", "current": "demo/newsletter"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: newsletter"},
+  "blocks": [
+    {
+      "_key": "nl-inline",
+      "_type": "newsletter",
+      "variant": "inline",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "center",
+      "heading": "Stay in the loop",
+      "description": "Monthly capstone updates, right in your inbox.",
+      "inputPlaceholder": "you@example.com",
+      "submitButtonLabel": "Subscribe",
+      "privacyDisclaimerText": "We never share your email. Unsubscribe anytime."
+    },
+    {
+      "_key": "nl-banner",
+      "_type": "newsletter",
+      "variant": "banner",
+      "backgroundVariant": "primary",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Subscribe to Capstone Weekly",
+      "description": "Team progress, sponsor spotlights, and showcase updates.",
+      "inputPlaceholder": "Enter your email",
+      "submitButtonLabel": "Join",
+      "privacyDisclaimerText": "By subscribing, you agree to our privacy policy."
+    },
+    {
+      "_key": "nl-split",
+      "_type": "newsletter",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Get capstone highlights",
+      "description": "Curated stories from student teams and their mentors.",
+      "inputPlaceholder": "Work email preferred",
+      "submitButtonLabel": "Sign me up"
+    },
+    {
+      "_key": "nl-brutalist",
+      "_type": "newsletter",
+      "variant": "brutalist",
+      "backgroundVariant": "mono",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "NEWSLETTER",
+      "description": "No fluff. Just capstone signal.",
+      "inputPlaceholder": "email@domain",
+      "submitButtonLabel": "→",
+      "privacyDisclaimerText": "One email per month. Zero spam."
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: richText. Variants: prose, standard, highlighted, sidebar. Content is portableText.",
+  "_id": "demo-audit-rich-text",
+  "_type": "page",
+  "title": "Demo — Rich Text",
+  "slug": {"_type": "slug", "current": "demo/rich-text"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: rich-text"},
+  "blocks": [
+    {
+      "_key": "rt-prose",
+      "_type": "richText",
+      "variant": "prose",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h2",
+          "children": [{"_type": "span", "_key": "s1", "text": "Variant: prose", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Prose variant uses relaxed typography for article-style reading. This paragraph tests paragraph wrapping, line height, and the default max-width applied to long-form content blocks.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "rt-standard",
+      "_type": "richText",
+      "variant": "standard",
+      "backgroundVariant": "light",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h3",
+          "children": [{"_type": "span", "_key": "s1", "text": "Variant: standard", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Standard variant renders with default typography settings.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "rt-highlighted",
+      "_type": "richText",
+      "variant": "highlighted",
+      "backgroundVariant": "primary",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h2",
+          "children": [{"_type": "span", "_key": "s1", "text": "Variant: highlighted", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Highlighted variant against a primary background. Tests foreground contrast.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    },
+    {
+      "_key": "rt-sidebar",
+      "_type": "richText",
+      "variant": "sidebar",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "content": [
+        {
+          "_type": "block",
+          "_key": "b1",
+          "style": "h4",
+          "children": [{"_type": "span", "_key": "s1", "text": "Variant: sidebar", "marks": []}],
+          "markDefs": []
+        },
+        {
+          "_type": "block",
+          "_key": "b2",
+          "style": "normal",
+          "children": [{"_type": "span", "_key": "s2", "text": "Sidebar variant uses narrower column and tighter spacing.", "marks": []}],
+          "markDefs": []
+        }
+      ]
+    }
+  ]
+}

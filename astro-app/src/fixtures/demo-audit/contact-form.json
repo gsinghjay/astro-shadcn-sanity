@@ -1,0 +1,58 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: contactForm. 3 variants: stacked, split, split-image. hiddenByVariant: backgroundImages hidden in stacked/split (set but ignored); visible in split-image. form ref is REQUIRED (94f851ab-b59d-4c1c-9940-2a5ca778159c Sponsor Inquiry Form).",
+  "_id": "demo-audit-contact-form",
+  "_type": "page",
+  "title": "Demo — Contact Form",
+  "slug": {"_type": "slug", "current": "demo/contact-form"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: contact-form"},
+  "blocks": [
+    {
+      "_key": "cf-stacked-img-hidden",
+      "_type": "contactForm",
+      "variant": "stacked",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Stacked variant — backgroundImages hidden",
+      "description": "backgroundImages is set but hidden by variant rule.",
+      "successMessage": "Thanks — we'll be in touch within 2 business days.",
+      "form": {"_type": "reference", "_ref": "94f851ab-b59d-4c1c-9940-2a5ca778159c"},
+      "backgroundImages": [
+        {"_key": "cf-st-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-122cafda703c42a605cd9419994b3f326d08bf4c-1424x752-jpg"}, "alt": "Should not render — hidden in stacked"}
+      ]
+    },
+    {
+      "_key": "cf-split-img-hidden",
+      "_type": "contactForm",
+      "variant": "split",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Split variant — backgroundImages hidden",
+      "description": "Image set but hidden in split too.",
+      "successMessage": "Got it — message sent.",
+      "form": {"_type": "reference", "_ref": "94f851ab-b59d-4c1c-9940-2a5ca778159c"},
+      "backgroundImages": [
+        {"_key": "cf-sp-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-12d1a6a9a872ae7e52390dd8775d592ae228820b-1424x752-jpg"}, "alt": "Should not render — hidden in split"}
+      ]
+    },
+    {
+      "_key": "cf-split-image-img-visible",
+      "_type": "contactForm",
+      "variant": "split-image",
+      "backgroundVariant": "dark",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Split with Image — backgroundImages visible",
+      "description": "Image field is visible only in split-image variant.",
+      "successMessage": "Thanks — check your inbox.",
+      "form": {"_type": "reference", "_ref": "94f851ab-b59d-4c1c-9940-2a5ca778159c"},
+      "backgroundImages": [
+        {"_key": "cf-si-img-1", "_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Contact form background on split-image"}
+      ]
+    }
+  ]
+}

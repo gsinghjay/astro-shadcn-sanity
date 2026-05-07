@@ -1,0 +1,49 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: sponsorCards. Variants: default, showcase, brutalist-tier. displayMode enum (all/featured/manual) must all appear (AC1 #4, AC6 #32). Manual mode refs existing sponsor docs in capstone/production.",
+  "_id": "demo-audit-sponsor-cards",
+  "_type": "page",
+  "title": "Demo — Sponsor Cards",
+  "slug": {"_type": "slug", "current": "demo/sponsor-cards"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: sponsor-cards"},
+  "blocks": [
+    {
+      "_key": "sc-default-all",
+      "_type": "sponsorCards",
+      "variant": "default",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "All sponsors — default variant",
+      "displayMode": "all"
+    },
+    {
+      "_key": "sc-showcase-featured",
+      "_type": "sponsorCards",
+      "variant": "showcase",
+      "backgroundVariant": "light",
+      "spacing": "large",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Featured sponsors — showcase variant",
+      "displayMode": "featured"
+    },
+    {
+      "_key": "sc-brutalist-manual",
+      "_type": "sponsorCards",
+      "variant": "brutalist-tier",
+      "backgroundVariant": "hatched",
+      "spacing": "default",
+      "maxWidth": "full",
+      "alignment": "left",
+      "heading": "Manual picks — brutalist-tier variant",
+      "displayMode": "manual",
+      "sponsors": [
+        {"_key": "sp-cisco", "_type": "reference", "_ref": "0ac25e8d-f75d-478a-8512-994d83fe6177"},
+        {"_key": "sp-verizon", "_type": "reference", "_ref": "b4aaf35f-dc0d-4567-993b-33bc66820e67"},
+        {"_key": "sp-boa", "_type": "reference", "_ref": "004122e9-a8d4-40c3-82ab-3e980bd5cb72"},
+        {"_key": "sp-ups", "_type": "reference", "_ref": "789cb14e-e72e-4335-b6d5-ac3bb87b022d"}
+      ]
+    }
+  ]
+}

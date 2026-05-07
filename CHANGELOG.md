@@ -1,3 +1,235 @@
+## [2.4.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.3.0...v2.4.0) (2026-05-07)
+
+### Features
+
+* **auth:** harden Better Auth — disable magic-link signup, lock account linking, static trustedOrigins (Story 24.2) ([b4266c3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b4266c3ec2064b818f7a238aa7581edf1c77deca))
+* **blocks:** EmbedBlock sandboxed srcdoc + URL allow-list (Story 24.6) ([eabccc4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/eabccc4b937536010fb50786e528e93a3c635307))
+* **portal:** add platform-api client helper for Better Auth bridge (Story 12.8a) ([01d5bbb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/01d5bbbfa8b03f3293c02352d255acbc1cf4287c))
+* **security:** close M-4 + M-5 — sponsor allowedEmails admin-only + D1 user.role CHECK (Story 24.7) ([2586bf9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2586bf9b15b9ed10dc856f82eb6f9d5e4c88bdb6))
+* **seo:** close M-7 — JsonLd escape + 16 callsite migration (Story 24.5) ([6bb0146](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6bb01468dff55b0fef91ebd8747657e27ec8c5a7))
+
+### Bug Fixes
+
+* **auth:** apply Story 24.2 code-review patches — lowercase whitelist email, tighten magic-link comments, rename log field ([efa924f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/efa924f2fe2c535b79a3e51930dced2a8787d93c))
+* **blocks:** align ImageGallery test mock with siteSettings.siteName schema ([11af91f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/11af91fc087083882bd0dd136408dfc419c21013))
+* **blocks:** apply Story 24.6 code-review patches — drop URL allow-list, drop popup-escape, sandbox-only defense (+ Sanity 5.23→5.24) ([7d78f2d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7d78f2d90564e2d982181397bbc985ac5ded461c)), closes [#34](https://github.com/gsinghjay/astro-shadcn-sanity/issues/34)
+* **blocks:** harden gallery JSON-LD + filter test (Story 22.11 second review) ([d133ed1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d133ed1498436c738b05417d37bd0a0404bfcf07))
+* **security:** apply Story 24.7 code-review patches — migration safety, admin gate, helper extraction ([4222169](https://github.com/gsinghjay/astro-shadcn-sanity/commit/422216906c55b37ff3dd285b351849d139dcd7c4))
+* **seo:** apply Story 24.5 code-review patches — <!-- test, fallback guard, strengthened breakout assertion, dedup test files ([7d643ef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7d643efb0afad20f99d9b3e094f82298413494c6))
+
+### Miscellaneous
+
+* **infra:** pin per-env compat config on capstone Workers ([5db9c35](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5db9c35255f3320053274eb6b9085d09662d4299))
+
+## [2.3.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.1...v2.3.0) (2026-05-05)
+
+### Features
+
+* **blocks:** auto-curate /gallery from sanity-plugin-media asset tags (Story 22.11) ([7e344a6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7e344a69cd83de26212836a312272e3c816b8ad3))
+* **env:** complete astro:env migration — declare 8 secrets + migrate all consumers ([88ad2e8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/88ad2e8e781449a9eae98a3134c123ddc8b2e91e)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1)
+* **infra:** Cloudflare Workers best-practices hardening (Story 22.10) ([2790c7f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2790c7fcd48293e15235c350ce36ffbf2c96d7b6))
+
+### Bug Fixes
+
+* **blocks:** harden gallery auto-curate from code review (Story 22.11) ([e6b3d7e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e6b3d7e7ce73bcd8d90df4b43ce1d65dc1c0747c))
+* **ci:** inject placeholder secrets so site-health build passes astro:env validateSecrets ([b2705ba](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b2705babca584e759f7dc53b669e59beac975a4a))
+* **ci:** seed .dev.vars so miniflare prerender Worker passes astro:env validation ([ebc62fd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ebc62fd6a1ece3a2bbd089802dfeb7d2474320f2))
+* **env:** harden astro:env migration consumers from code review ([54758f2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/54758f27f68898c032f3eaee0ca447833288ab0b))
+* **env:** mark portal-only secrets optional on non-capstone envs ([6257076](https://github.com/gsinghjay/astro-shadcn-sanity/commit/62570769ec8440eb1d49a6a41b47561eaf5aa8db))
+* **infra:** harden Story 22.10 from code review ([26a4131](https://github.com/gsinghjay/astro-shadcn-sanity/commit/26a413141bdce77486446b58566d7430384b33a6))
+
+## [2.2.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.0...v2.2.1) (2026-05-04)
+
+### Bug Fixes
+
+* **ci:** handle 2-arg createAstro in storybook renderer + pin compiler ([172f09f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/172f09f92df34387ea80208b92a80b1c5d916a8e))
+* **search:** align Header URL gate with SearchModal credentials check ([5cc270e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5cc270e430e9b59fef4db07c5698cf7cd1e3e53e))
+* **search:** apply 5.15 third-pass review patches ([b8126aa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b8126aa2f59b11276346029f3bf8da92350aefdb)), closes [#692](https://github.com/gsinghjay/astro-shadcn-sanity/issues/692)
+
+### Documentation
+
+* **infra:** add Cloudflare Workers best-practices review ([8242bed](https://github.com/gsinghjay/astro-shadcn-sanity/commit/8242bed812cd4b1cbe4668b77f83658fe8091b2a))
+
+## [2.2.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.1.0...v2.2.0) (2026-05-03)
+
+### Features
+
+* **2-8:** add logoCloud variant support (grid, marquee, flex-wrap) ([dec418f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/dec418fdaae6c8eebcecf1e37dff80f80b6a06ae))
+* **2-8:** add variants + image field to contactForm ([b1961ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b1961ca3393dcbe044e442e31a0b1bb751971379))
+* **blocks:** add editable per-card CTA label to linkCards grid variant ([7018812](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7018812da3f2b0ecf45736f58ccded36795e9dba))
+* **infra:** preview Workers SSR mode for content freshness (Story 5.22) ([bed8902](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bed89023df35cacb28e46e643a8083fda429e7e7))
+* **story-2.8:** support YouTube Shorts in video embeds ([19e337c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/19e337c6e692355d1f14bec61b8ee35b35f671d6))
+
+### Bug Fixes
+
+* apply CodeRabbit auto-fixes ([cda79d3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/cda79d39ca14372d7d299f87337f767677b3dae1))
+* apply CodeRabbit auto-fixes ([066dacb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/066dacb0deb1836f02631e72c54072abdb61cbea))
+* apply CodeRabbit auto-fixes ([a29738d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a29738dcdb8c8a399bbc63d00ec74fb66698a7e6))
+* apply CodeRabbit auto-fixes ([a6cadbc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a6cadbc228bd9e25335b622b90de499a0909fd01))
+* **blocks:** apply 5.15 site-search code review patches ([01279b7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/01279b7d918125998a2762aae554bb3c27b6595d)), closes [#692](https://github.com/gsinghjay/astro-shadcn-sanity/issues/692)
+* **blocks:** trim whitespace in linkCards ctaLabel fallback ([c651ad7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c651ad70c86039309c605db0e06845dcb652777d))
+* **ci:** drop $$Astro spread in storybook renderer ([774d039](https://github.com/gsinghjay/astro-shadcn-sanity/commit/774d03904795720dbbc85eeb3772536703d0f8d9))
+* **infra:** coerce visualEditingEnabled to string before VE-flag comparison ([0ca75bb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0ca75bb8873fbd773308579fc357fdb022602261))
+* **search:** apply 5.15 second-pass review patches + deploy schema ([1faa037](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1faa037b054b571d0ae0c6810ef28a5456f3c464))
+
+### Miscellaneous
+
+* untrack .github/skills/ (BMAD agent skill files) ([a8d504a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a8d504af513a78bb7066f5963176764ccab830f8))
+* updated project documentation ([ade5961](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ade596119cf7c3cdea35a7f84cad47ffd823acbe))
+
+### Tests
+
+* **video-embed:** align Shorts assertions with facade render ([7030a92](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7030a920d274eb67eebbe56b7f5ed3ecb2d8c8b9))
+
+## [2.1.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.0.0...v2.1.0) (2026-05-02)
+
+### Features
+
+* **portal:** add emailOTP fallback to magic-link sign-in ([378223f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/378223fb223338c522a321a40d21ee82ed2cd85d))
+* **portal:** GitHub account disconnect & re-link control (9.22) ([44316b0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/44316b0a48ec243736e259241ade62fdf50d3f39))
+* **portal:** redesign sponsor agreement gate with version pinning + audit capture (15.11) ([2777597](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2777597cb24217a92195764bc5316a0d18e387bf))
+* **security:** identity-based authz for sponsor acceptances tool (24.1) ([3b3ccbb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3b3ccbbaef26fa8702790b2f72ec22b44e2bcf63))
+* **seo:** agent discovery — Link headers + markdown content negotiation (5.21) ([bdce6a5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bdce6a502fb56d5eb54a9426abb52418b6f42197))
+* **seo:** declare Content-Signal preferences in robots.txt ([b3cda06](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b3cda063154780ada93d60b1cd5dfc6d4b2ad7d8))
+* **studio:** add facebook to socialLinks platform enum ([1ab6c55](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1ab6c550a69d38c8fcfde731000ae69b1e6aa7d6))
+
+### Bug Fixes
+
+* **ci:** bump storybook-astro to 0.2.1 for Astro 6 peer support ([f06f514](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f06f514b3c679478bac7f466c7e3275d79c4c119)), closes [#681](https://github.com/gsinghjay/astro-shadcn-sanity/issues/681)
+* **portal:** code review patches for 9.22 disconnect flow ([3f09e08](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3f09e0832d4668b26c3757c14ae4e20c2055d35f))
+* **security:** close gaps in 24.1 round-2 review ([3af30e7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3af30e706d13ac04a091f04871d79c6d13f9098b))
+* **security:** code review patches for 24.1.5 acceptances endpoint ([1940b85](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1940b852c82bcde5695a18a0306789b64f201134))
+* **security:** parameterize sponsor whitelist GROQ + redact db-health response ([436807c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/436807cf2557556a753909697f510ad4dd765e64))
+* **security:** restore acceptances tool via project membership check (24.1.5) ([b08bb43](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b08bb4359efec14277f027a24072e9242e47de8d))
+* **seo:** agent discovery code review patches (5.21) ([d4d6fb1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d4d6fb13861323bc27046e06f011e41fb69743d2)), closes [#1](https://github.com/gsinghjay/astro-shadcn-sanity/issues/1)
+* **studio:** force www host for acceptances API to avoid CORS preflight redirect ([740cf30](https://github.com/gsinghjay/astro-shadcn-sanity/commit/740cf306cbba434ac3315e5ff51ecc4d3a209250))
+
+### Miscellaneous
+
+* **deploy:** guard against stale dist + localhost vars in built bundle ([7b6400b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7b6400b33e758164204a2abbba7c7de26328a919))
+
+### Tests
+
+* **infra:** allow extra steps between astro build and wrangler deploy ([1b5a35f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1b5a35f63a283a8723cf094cdcb182f382450f8a))
+* **portal:** stub window.location via vi.stubGlobal in modal test ([354b9ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/354b9ca8ee59cf52d3e12107f67e77f09f505af4))
+
+## [2.0.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.1...v2.0.0) (2026-04-30)
+
+### ⚠ BREAKING CHANGES
+
+* **infra:** refactors required by adapter v13:
+
+- 9 sites convert `Astro.locals.runtime.env` → `import { env } from
+  'cloudflare:workers'` (middleware, actions, lib/db, all portal/api
+  routes). Removed 'locals' parameter from getDb / getDrizzle.
+- wrangler.jsonc replaces `pages_build_output_dir` with
+  `assets.directory + binding=ASSETS` and `main:
+  '@astrojs/cloudflare/entrypoints/server'` (the new unified adapter
+  entry, not a build-output path).
+- env.d.ts drops the `Runtime<>` ambient and references
+  wrangler-generated worker-configuration.d.ts. Cloudflare.Env is
+  augmented with dashboard-managed secrets (Better Auth / Resend /
+  OAuth / Studio admin) and the RATE_LIMITER cross-script DO RPC type.
+- Per-env deploys now use CLOUDFLARE_ENV build-time var, not
+  `wrangler deploy --env`. New scripts: deploy:capstone /
+  deploy:rwc-us / deploy:rwc-intl.
+- experimental.fonts → root-level fonts (graduated in v6).
+- adapter pinned to imageService:'compile' (v13 default
+  cloudflare-binding deferred — Sanity images bypass <Image> already).
+- Vite plugin pre-compiles picomatch (CJS via @astrojs/react) so it
+  works in the new workerd dev runtime.
+- block-registry drops the Astro 5 internal type import path.
+- tsconfig excludes test files from astro check (vitest globals
+  drift); db.test rewritten against mocked cloudflare:workers env.
+
+Verified: `astro build` succeeds (10.2 MB / 2.8 MB gz, 239 assets,
+59 modules), `wrangler deploy --dry-run` resolves all bindings
+(RATE_LIMITER, SESSION_CACHE, PORTAL_DB, ASSETS, STUDIO_ORIGIN).
+Pre-existing TypeGen / fixture drift errors in astro check are out
+of scope for this commit.
+
+NOT YET DONE (follow-ups):
+- Phased deploy: rwc-intl → rwc-us → ywcc-capstone (custom domain
+  cutover + Better Auth callback URL update).
+- Pa11y / LHCI gates already green via sitemap-driven URL set.
+- CLAUDE.md + project-context.md doc updates.
+- Audit endpoints with file extension trailing slashes (Astro 6
+  rejects /sitemap.xml/ etc).
+
+### Features
+
+* **infra:** add rwc-us-preview + rwc-intl-preview Workers (story 15.10 AC 3-5) ([fc72939](https://github.com/gsinghjay/astro-shadcn-sanity/commit/fc7293993ec8f19312967a8bda820334a9d09945))
+* **infra:** cutover capstone to www.ywcccapstone1.com + add capstone-preview Worker (story 15.10) ([509df13](https://github.com/gsinghjay/astro-shadcn-sanity/commit/509df13969fdb480d8263e6423906392ae79460f))
+* **infra:** migrate to Astro 6 + Cloudflare Workers static-assets ([f687f66](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f687f661a1a774e3a2d38a8bb12a79bbb9e586a7))
+* **seo:** add astro-llms-md + sitemap-driven LHCI/Pa11y scope ([321526c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/321526c1649918c6e9988fd041a2cbb1403d78b8))
+
+### Bug Fixes
+
+* **chat-bubble:** restore reopen after vendor X close (Story 5.18) ([b230b76](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b230b76c0f1739558264b305408eab526ed3b61d))
+* **ci:** tighten LHCI gating and useCdn coercion after Story 5.19 ([d1b3e04](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d1b3e045a60b51fdc4c5d01a9dbec8ab4b69b3db))
+* **infra:** refactor Capstone into [env.capstone] block + fix wrangler-vars lookup ([9d36cef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9d36cefb85c3fa5c8cc52ed184a55ac19fc5bbc4))
+* **infra:** unblock SSR portal pages on Workers (astro[#15434](https://github.com/gsinghjay/astro-shadcn-sanity/issues/15434) workaround) ([39874ce](https://github.com/gsinghjay/astro-shadcn-sanity/commit/39874ce7e21c8f325fecb4a606dd08c880df69fc)), closes [astro#15917](https://github.com/gsinghjay/astro/issues/15917) [astro#16040](https://github.com/gsinghjay/astro/issues/16040)
+* **infra:** wire wrangler.jsonc env vars into Astro 6 build ([d70ee9a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d70ee9a2373dcee652ba91ab6370ec8b9ab12c04))
+* **studio:** site-aware Presentation resolver + workspace tooling cleanup (Story 15.9) ([bd9281c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bd9281c9c1bc9e409a49a176ae31448ea8f6c766))
+
+### Miscellaneous
+
+* **ci:** pin Node to 22 for CF Pages build cache compatibility ([081b139](https://github.com/gsinghjay/astro-shadcn-sanity/commit/081b1390c213d5be793acac54d64497b21aed4c8))
+* gitignore .lhci report dumps and check in demo-audit assets ([b809c5a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b809c5aa6d1b5f113ad712252219fc4b227016cb))
+* project files ([c0ea28a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c0ea28ad3be45f1e80731b72e8e1b24b94187c03))
+* **studio:** auto-bump @sanity/vision + sanity to 5.23.0 ([565bf78](https://github.com/gsinghjay/astro-shadcn-sanity/commit/565bf78bd6c43097fdfbda47e432912ded145673))
+
+### Tests
+
+* **infra:** green unit suite under Astro 6 + @astrojs/cloudflare v13 ([3bafec6](https://github.com/gsinghjay/astro-shadcn-sanity/commit/3bafec631a522993e71cd55299274dc39ce88553))
+
+## [1.20.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.20.0...v1.20.1) (2026-04-29)
+
+### Bug Fixes
+
+* **portal:** bypass session middleware for /api/portal/admin/* + log Sanity write errors ([acb4e6f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/acb4e6f8cde375e3f83215b41c9ff06306091f4d))
+
+## [1.20.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.19.0...v1.20.0) (2026-04-29)
+
+### Features
+
+* **portal:** sponsor acceptances Studio tool + scroll-to-accept gate ([c6ec470](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c6ec470de9b9f9430215ad053d8db2ea8d648116))
+
+### Bug Fixes
+
+* **forms:** switch to output:server so Astro Actions deploy as Worker routes ([d7e2417](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d7e2417b056b65bdf3a378e5d155352351ae1252))
+* **portal:** address code-review findings on acceptances tool + scroll gate ([2f448bc](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2f448bc24e64eff2882dbf2a4527000c7f490b64))
+* **studio:** post-review fixes for sponsor acceptances tool ([9b96718](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9b9671801b09316d33d237aa3021120c835a4af2))
+
+### Tests
+
+* **deploy:** update 5.2-INT-004 to assert output:server ([977c688](https://github.com/gsinghjay/astro-shadcn-sanity/commit/977c688ad622bff5b1d040c30581c071e5e68e5b))
+
+## [1.19.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.18.0...v1.19.0) (2026-04-21)
+
+### Features
+
+* **chatbubble:** Swiss-design upgrade + code review patches (story 5.18) ([30fbe23](https://github.com/gsinghjay/astro-shadcn-sanity/commit/30fbe23ef3e1b2045f82dd2709b8bab069f3e923))
+* **embed-block:** add raw embed code support for script-based widgets ([ee57349](https://github.com/gsinghjay/astro-shadcn-sanity/commit/ee57349ae945f35d225821e9d2b63a4261e1f49c))
+* **portal:** add portalPage singleton schema for CMS-editable portal pages ([6c48ba4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6c48ba4391448d4926ed37f6e1c26e039060f0e2))
+* **portal:** sponsor agreement gate + rename sponsorship to agreement + /portal/form ([c29b563](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c29b563789444edffec6cc272d2e835bc11a5070))
+* **seo:** consolidate JSON-LD into single [@graph](https://github.com/graph) per page ([12f2590](https://github.com/gsinghjay/astro-shadcn-sanity/commit/12f2590e114dab74ae29db3ba9f7db5e0e8dd01e))
+
+### Bug Fixes
+
+* **csp:** allowlist *.formsite.com for raw embed code support ([7a9b594](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7a9b594863efb3cfed546c148d20683d764c3a45))
+* **portal:** apply sponsor agreement code review patches + backfill migration ([5e793df](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5e793df8649fe0e4d24b96c8bb9ae60b2267d6c1))
+* **portal:** apply story 22.9 code review patches ([1f33223](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1f33223e47a8d0479ed771279f1220549eb9003a))
+* **portal:** code review fixes for portal page singletons ([29c94ca](https://github.com/gsinghjay/astro-shadcn-sanity/commit/29c94cab4c81537ea2d64becd56cee40fbd19969))
+* **seo:** avoid input mutation in buildPageGraph ([5dc1982](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5dc19821928c9cb6ffa73b4f241bb8f9581ed469))
+* **seo:** code review fixes for JSON-LD structured data ([f7e9916](https://github.com/gsinghjay/astro-shadcn-sanity/commit/f7e9916d653cd1da5eb833d937b398a6ec979600))
+* **studio:** reach RWC workspace parity with Capstone desk + per-site forms ([80ead26](https://github.com/gsinghjay/astro-shadcn-sanity/commit/80ead26852d216a102ae92ae7fab4b9de038ef8d))
+
+### Miscellaneous
+
+* documentation updates ([a024a95](https://github.com/gsinghjay/astro-shadcn-sanity/commit/a024a95beeb094eef310490e50f405be8992504f))
+* **studio:** bump sanity and @sanity/vision to ^5.21.0 ([5cc068e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5cc068e28cfcf767b8b9a07a8f0cf342f949eb35))
+
 ## [1.18.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v1.17.0...v1.18.0) (2026-04-15)
 
 ### Features

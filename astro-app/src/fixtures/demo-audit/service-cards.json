@@ -1,0 +1,99 @@
+{
+  "$comment": "workspace: capstone, dataset: production — Story 23.1 block audit. Block: serviceCards. Variants: grid, list, alternating, icon-grid, specification. services serviceItem min 1 max 20. AC6 #30 >=100 char heading on 'specification'.",
+  "_id": "demo-audit-service-cards",
+  "_type": "page",
+  "title": "Demo — Service Cards",
+  "slug": {"_type": "slug", "current": "demo/service-cards"},
+  "seo": {"_type": "seo", "noIndex": true, "metaTitle": "Demo: service-cards"},
+  "blocks": [
+    {
+      "_key": "sc-grid",
+      "_type": "serviceCards",
+      "variant": "grid",
+      "backgroundVariant": "white",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "left",
+      "heading": "Grid of services",
+      "description": "Three cards in a responsive grid.",
+      "services": [
+        {"_key": "s1", "_type": "serviceItem", "title": "Mentorship", "description": "Pair with an industry mentor.", "icon": "users", "link": {"label": "Learn more", "href": "/mentors"}},
+        {"_key": "s2", "_type": "serviceItem", "title": "Workshops", "description": "Weekly technical deep-dives.", "icon": "graduation-cap"},
+        {"_key": "s3", "_type": "serviceItem", "title": "Office hours", "description": "Drop-in support from faculty.", "icon": "clock"}
+      ]
+    },
+    {
+      "_key": "sc-list",
+      "_type": "serviceCards",
+      "variant": "list",
+      "backgroundVariant": "light",
+      "spacing": "small",
+      "maxWidth": "narrow",
+      "alignment": "left",
+      "heading": "List of services",
+      "services": [
+        {"_key": "s1", "_type": "serviceItem", "title": "Code review", "description": "Structured review against production-ready criteria.", "icon": "code"},
+        {"_key": "s2", "_type": "serviceItem", "title": "Design critique", "description": "UX reviews with the design faculty.", "icon": "palette"}
+      ]
+    },
+    {
+      "_key": "sc-alternating",
+      "_type": "serviceCards",
+      "variant": "alternating",
+      "backgroundVariant": "hatched-light",
+      "spacing": "large",
+      "maxWidth": "full",
+      "alignment": "center",
+      "heading": "Alternating service rows",
+      "description": "Cards alternate image sides for visual rhythm.",
+      "services": [
+        {
+          "_key": "s1",
+          "_type": "serviceItem",
+          "title": "Sponsor matchmaking",
+          "description": "We pair teams with sponsors based on skills and interest.",
+          "icon": "handshake",
+          "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-117be8afe69ff441c417bb9de6e457e82848aaf4-5712x4284-jpg"}, "alt": "Matchmaking session"}
+        },
+        {
+          "_key": "s2",
+          "_type": "serviceItem",
+          "title": "Launchpad funding",
+          "description": "Selected teams get modest launch grants.",
+          "icon": "rocket",
+          "image": {"_type": "image", "asset": {"_type": "reference", "_ref": "image-1523e949aae03ed9e321e5af7a18954133c34a56-1424x752-jpg"}, "alt": "Launchpad ceremony"}
+        }
+      ]
+    },
+    {
+      "_key": "sc-icon-grid",
+      "_type": "serviceCards",
+      "variant": "icon-grid",
+      "backgroundVariant": "primary",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "center",
+      "heading": "Icon-driven service tiles",
+      "services": [
+        {"_key": "s1", "_type": "serviceItem", "title": "Security", "description": "Threat modelling support.", "icon": "shield"},
+        {"_key": "s2", "_type": "serviceItem", "title": "Performance", "description": "Lighthouse and LCP coaching.", "icon": "zap"},
+        {"_key": "s3", "_type": "serviceItem", "title": "A11y", "description": "Accessibility audits on every PR.", "icon": "check-circle"},
+        {"_key": "s4", "_type": "serviceItem", "title": "Observability", "description": "Error tracking and analytics setup.", "icon": "bar-chart-3"}
+      ]
+    },
+    {
+      "_key": "sc-specification-long",
+      "_type": "serviceCards",
+      "variant": "specification",
+      "backgroundVariant": "stripe",
+      "spacing": "default",
+      "maxWidth": "default",
+      "alignment": "right",
+      "heading": "Specification-style service catalog with an intentionally long heading exceeding one hundred characters to audit wrapping (AC6 30)",
+      "description": "Heading above is >=100 characters to exercise overflow, line-height, and truncation per AC6 #30.",
+      "services": [
+        {"_key": "s1", "_type": "serviceItem", "title": "Technical spec review", "description": "Line-by-line review of architecture and interface specs.", "icon": "file-text"}
+      ]
+    }
+  ]
+}
