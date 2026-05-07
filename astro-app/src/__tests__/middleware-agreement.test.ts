@@ -277,6 +277,34 @@ describe('middleware — sponsor agreement gate', () => {
     expect(res.headers.get('content-type')).toContain('application/json');
   });
 
+  it('non-acceptAgreement portal action returns 401 JSON (not 302) when no session present', async () => {
+    // AC 13: all 9 portal actions get JSON 401 on auth failure, never opaque 302s.
+    mockGetSession.mockResolvedValue(null);
+    const ctx = createMockContext('/_actions/getSponsorProjects', { cookie: sessionCookie });
+    const res = (await onRequest(ctx as never, mockNext)) as Response;
+    expect(res.status).toBe(401);
+    expect(res.headers.get('content-type')).toContain('application/json');
+  });
+
+  it('agreement gate applies to non-acceptAgreement portal actions (flag set, no redirect)', async () => {
+    // AC 14: only acceptAgreement bypasses the gate. Other portal actions stay behind it,
+    // but the gate just sets requiresAgreement — it never short-circuits or redirects, so
+    // the action handler still runs (the modal blocks UI before invocation in normal flow).
+    mockGetSession.mockResolvedValue({
+      user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
+      session: { id: 's1', token: 'tok' },
+    });
+    mockD1First.mockResolvedValueOnce({ agreement_accepted_at: null, agreement_version: null });
+
+    const ctx = createMockContext('/_actions/getSponsorProjects', { cookie: sessionCookie });
+    await onRequest(ctx as never, mockNext);
+
+    expect(ctx.locals.user?.role).toBe('sponsor');
+    expect(ctx.locals.requiresAgreement).toBe(true);
+    expect(mockNext).toHaveBeenCalled();
+    expect(ctx.redirect).not.toHaveBeenCalled();
+  });
+
   it('dev mode bypass sets requiresAgreement=false without DB lookup', async () => {
     import.meta.env.DEV = true;
     const ctx = createMockContext('/portal/');

@@ -343,12 +343,14 @@ describe('middleware — unified auth routing', () => {
       expect(mockNext).toHaveBeenCalled();
     });
 
-    it('routes /portal/api/me through portal auth (not public)', async () => {
+    it('routes /_actions/getMe through portal auth (portal-classified)', async () => {
+      // Story 26.5: getMe is a portal-scoped Astro Action — middleware must populate
+      // locals.user so the action handler can read the authenticated sponsor.
       mockGetSession.mockResolvedValue({
         user: { id: '1', email: 'sponsor@test.com', name: 'Sponsor', role: 'sponsor' },
         session: { id: 's1' },
       });
-      const ctx = createMockContext('/portal/api/me', { headers: { cookie: sessionCookie } });
+      const ctx = createMockContext('/_actions/getMe', { headers: { cookie: sessionCookie } });
 
       await onRequest(ctx as any, mockNext);
 
