@@ -50,6 +50,10 @@ vi.mock('cloudflare:workers', () => ({
 
 import { DELETE } from '../disconnect';
 
+// SHA-256 hex of 'abc123' (matches middleware.ts hashToken output for the
+// raw token used in the cookie-bearing tests in this suite).
+const HASH_ABC123 = '6ca13d52ca70c883e0f0bb101e425a89e8624de51db2d2392593af6a84118090';
+
 beforeEach(() => {
   mockRun.mockReset();
   mockGet.mockReset();
@@ -211,7 +215,7 @@ describe('DELETE /portal/api/github/disconnect', () => {
       makeContext({}, 'better-auth.session_token=abc123; other=value') as never,
     );
     expect(res.status).toBe(200);
-    expect(mockKvDelete).toHaveBeenCalledWith('abc123');
+    expect(mockKvDelete).toHaveBeenCalledWith(HASH_ABC123);
   });
 
   it('handles missing SESSION_CACHE binding gracefully', async () => {

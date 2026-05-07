@@ -3,16 +3,11 @@ import { eq, and } from 'drizzle-orm';
 import { env } from 'cloudflare:workers';
 import { getDrizzle } from '@/lib/db';
 import { account, projectGithubRepos, user } from '@/lib/drizzle-schema';
+import { extractSessionToken, hashToken } from '@/middleware';
 
 export const prerender = false;
 
 const JSON_HEADERS = { 'Content-Type': 'application/json', 'Cache-Control': 'private, no-store' };
-
-function extractSessionToken(cookie: string | null): string | null {
-  if (!cookie) return null;
-  const match = cookie.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/);
-  return match?.[1] ?? null;
-}
 
 /**
  * DELETE — fully unlink the sponsor's GitHub OAuth account.
@@ -76,8 +71,9 @@ export const DELETE: APIRoute = async ({ locals, request }) => {
     const sessionToken = extractSessionToken(request.headers.get('cookie'));
     const kvCache = env.SESSION_CACHE;
     if (sessionToken && kvCache) {
+      const hashedKey = await hashToken(sessionToken);
       await kvCache
-        .delete(sessionToken)
+        .delete(hashedKey)
         .catch((e: unknown) => console.error('[disconnect] KV cache delete failed:', e));
     }
 

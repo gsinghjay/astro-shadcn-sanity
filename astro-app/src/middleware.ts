@@ -17,8 +17,10 @@ const RATE_LIMIT_MAX_REQUESTS = 100;
 /** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
 const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
 
-/** Endpoint that handles agreement acceptance — must remain reachable while the gate is active */
-const AGREEMENT_ACCEPT_PATH = "/api/portal/agreement/accept";
+/** Astro Action endpoint for accepting the sponsor agreement.
+ *  Classified as portal so the auth flow runs (otherwise `ctx.locals.user` is unset),
+ *  AND skipped from the agreement gate so a not-yet-accepted sponsor can submit. */
+const ACCEPT_AGREEMENT_ACTION_PATH = "/_actions/acceptAgreement";
 
 const jsonError = (status: number, error: string) =>
   new Response(JSON.stringify({ error }), {
@@ -26,15 +28,29 @@ const jsonError = (status: number, error: string) =>
     headers: { "content-type": "application/json" },
   });
 
-/** Shape stored in SESSION_CACHE. `undefined` on either field means the cache predates that field
- *  and we should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
+/** Shape stored in SESSION_CACHE. `expiresAt` (epoch ms) is required and checked on every read —
+ *  see Story 24.3. `undefined` on the agreement fields means the cache predates that field and we
+ *  should re-query D1 (mirrors the original `agreementAcceptedAt === undefined` fallback). */
 type CachedSession = {
   email: string;
   name: string;
   role: string;
+  expiresAt: number;
   agreementAcceptedAt?: number | null;
   agreementVersion?: string | null;
 };
+
+/** Hash a session token for KV-cache key derivation. SHA-256 → lowercase hex (64 chars).
+ *  KV reads/writes never use the raw bearer cookie — see Story 24.3 (audit H-2). */
+export async function hashToken(token: string): Promise<string> {
+  const data = new TextEncoder().encode(token);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** KV's minimum expirationTtl is 60 seconds; the freshness window caps at 5 minutes. */
+const KV_TTL_MIN_SECONDS = 60;
+const SESSION_CACHE_FRESHNESS_MS = 5 * 60 * 1000;
 
 /** Module-scope cache of the current Sanity sponsor-agreement `_rev`. Persists across requests
  *  within a Worker isolate (CF reuses isolates aggressively), so cache hit rate is very high.
@@ -89,7 +105,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
-  const isPortal = isPortalPage || isPortalApi;
+  // The acceptAgreement Action endpoint runs through the portal auth flow so its handler
+  // sees `ctx.locals.user`; the agreement gate then skips this same path so the not-yet-accepted
+  // sponsor can actually submit. Other Astro Actions (e.g. submitForm on public pages) are NOT
+  // portal-routed — they remain unauthenticated by design.
+  const isAcceptAgreementAction = pathname === ACCEPT_AGREEMENT_ACTION_PATH;
+  const isPortal = isPortalPage || isPortalApi || isAcceptAgreementAction;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
   // Branch 1: Public routes (and admin API) — zero auth overhead.
@@ -156,12 +177,26 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const sessionToken = extractSessionToken(context.request.headers.get("cookie"));
 
     let userData: CachedSession | null = null;
+    // Cache the hashed key per request so we don't re-derive SHA-256 on each KV op.
+    const hashedSessionKey = sessionToken ? await hashToken(sessionToken) : null;
+    // When upstream session.expiresAt is unparseable we synthesize a fallback so this request's
+    // in-memory auth flow proceeds, but writing that synthetic value to KV would persist a forged
+    // expiry into later requests' caches (whitelist re-cache, agreement re-cache). Default true so
+    // the KV-cached path keeps working; the new-session branch overrides to Number.isFinite(parsed).
+    let kvCacheable = true;
 
-    // KV cache check — skip D1 if session is cached
-    if (kvCache && sessionToken) {
-      const cached = await kvCache.get<CachedSession>(sessionToken, { type: "json" });
-      if (cached) {
+    // KV cache check — skip D1 if session is cached. Stale entries (expiresAt elapsed) are
+    // dropped fire-and-forget; the request falls through to the D1 path either way.
+    if (kvCache && hashedSessionKey) {
+      const cached = await kvCache.get<CachedSession>(hashedSessionKey, { type: "json" });
+      if (cached && Date.now() < cached.expiresAt) {
         userData = cached;
+      } else if (cached) {
+        cfContext?.waitUntil(
+          kvCache
+            .delete(hashedSessionKey)
+            .catch((e: unknown) => log.error('middleware-kv-stale-delete-failed', e)),
+        );
       }
     }
 
@@ -176,26 +211,62 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       if (session?.user) {
         const sessionUser = session.user as SessionUser;
+        // Better Auth returns session.expiresAt as a Date in some versions, an epoch number in
+        // others — handle both. Cap the cache lifetime at min(now+5min, sessionExpiry) so a
+        // cached entry never outlives the underlying Better Auth session.
+        const sessionExpiryRaw = session.session?.expiresAt as Date | number | string | undefined;
+        const parsed =
+          sessionExpiryRaw instanceof Date
+            ? sessionExpiryRaw.getTime()
+            : typeof sessionExpiryRaw === 'string'
+              ? Date.parse(sessionExpiryRaw)
+              : typeof sessionExpiryRaw === 'number'
+                ? sessionExpiryRaw
+                : NaN;
+        // Fall back to the freshness window when the adapter returns an unexpected
+        // shape — never poison the cache with NaN (Math.min(_, NaN) is NaN, which
+        // would write expirationTtl: NaN and reject the KV put).
+        const sessionExpiryMs = Number.isFinite(parsed)
+          ? parsed
+          : Date.now() + SESSION_CACHE_FRESHNESS_MS;
+        // Distinguish "field absent" (legacy fallback — write KV with freshness window) from
+        // "field present but unparseable" (garbage like 'not-a-date' — never persist). The
+        // narrower gate preserves the documented synthetic-expiry fallback for sessions whose
+        // adapter omits expiresAt while still preventing forged values from poisoning later
+        // requests' caches via whitelist + agreement re-cache code paths.
+        kvCacheable = sessionExpiryRaw === undefined || Number.isFinite(parsed);
+        const cacheExpiresAt = Math.min(Date.now() + SESSION_CACHE_FRESHNESS_MS, sessionExpiryMs);
         userData = {
           email: normalizeEmail(sessionUser.email),
           name: sessionUser.name ?? "",
           role: sessionUser.role ?? "student",
+          expiresAt: cacheExpiresAt,
         };
 
-        // Cache session in KV (fire-and-forget, 5-min TTL)
-        if (kvCache) {
+        // Cache session in KV (fire-and-forget). KV expirationTtl floors at 60s.
+        // Skip when kvCacheable is false (synthetic expiry) so a forged expiresAt never persists.
+        if (kvCacheable && kvCache && hashedSessionKey) {
+          const ttlSeconds = Math.max(
+            KV_TTL_MIN_SECONDS,
+            Math.floor((cacheExpiresAt - Date.now()) / 1000),
+          );
           cfContext?.waitUntil(
             kvCache
-              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
               .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
           );
+        } else if (!kvCacheable) {
+          log.warn('middleware-kv-write-skipped-unparseable-expiry');
         }
       }
     }
 
     // No session → 401 JSON for API routes, redirect for pages
     if (!userData) {
-      if (isPortalApi) return jsonError(401, "unauthorized");
+      // JSON response for fetch-based callers (portal API + acceptAgreement Action endpoint).
+      // Astro Actions invoke handlers via fetch and expect a structured response — a 302 to
+      // /auth/login would be opaque to the React client.
+      if (isPortalApi || isAcceptAgreementAction) return jsonError(401, "unauthorized");
       const loginUrl = isPortalPage
         ? `/portal/login?redirect=${encodeURIComponent(pathname)}`
         : `/auth/login?redirect=${encodeURIComponent(pathname)}`;
@@ -207,11 +278,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const isSponsor = await checkSponsorWhitelist(userData.email);
       if (isSponsor) {
         userData.role = "sponsor";
-        // Persist escalated role to KV cache (fire-and-forget)
-        if (kvCache && sessionToken) {
+        // Persist escalated role to KV cache (fire-and-forget). Reuse the original expiresAt so
+        // role escalation cannot extend the cache lifetime past the session window. Skip when
+        // kvCacheable is false (synthetic expiry from unparseable upstream session.expiresAt).
+        if (kvCacheable && kvCache && hashedSessionKey) {
+          const ttlSeconds = Math.max(
+            KV_TTL_MIN_SECONDS,
+            Math.floor((userData.expiresAt - Date.now()) / 1000),
+          );
           cfContext?.waitUntil(
             kvCache
-              .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+              .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
               .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
           );
         }
@@ -226,14 +303,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }
       } else {
         // Non-sponsor on portal: 403 JSON for API, denied-page redirect for pages
-        if (kvCache && sessionToken) {
+        if (kvCache && hashedSessionKey) {
           cfContext?.waitUntil(
             kvCache
-              .delete(sessionToken)
+              .delete(hashedSessionKey)
               .catch((e: unknown) => log.error('middleware-kv-delete-failed', e)),
           );
         }
-        if (isPortalApi) return jsonError(403, "forbidden");
+        if (isPortalApi || isAcceptAgreementAction) return jsonError(403, "forbidden");
         return new Response(null, {
           status: 302,
           headers: {
@@ -250,9 +327,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
 
     // Sponsor Agreement gate — sponsors must accept the CMS agreement once before using the portal.
-    // The accept endpoint itself must remain reachable so the modal can submit acceptance.
+    // The acceptAgreement Action endpoint must remain reachable so the modal can submit acceptance.
     const skipsAgreementPath =
-      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === AGREEMENT_ACCEPT_PATH;
+      PORTAL_PUBLIC_PATHS.has(cleanPath) || cleanPath === ACCEPT_AGREEMENT_ACTION_PATH;
     if (userData.role === "sponsor" && !skipsAgreementPath) {
       let agreementAcceptedAt = userData.agreementAcceptedAt ?? null;
       let agreementVersion = userData.agreementVersion ?? null;
@@ -270,10 +347,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
           agreementVersion = row?.agreement_version ?? null;
           userData.agreementAcceptedAt = agreementAcceptedAt;
           userData.agreementVersion = agreementVersion;
-          if (kvCache && sessionToken) {
+          // Skip the re-cache when kvCacheable is false (synthetic expiry).
+          if (kvCacheable && kvCache && hashedSessionKey) {
+            const ttlSeconds = Math.max(
+              KV_TTL_MIN_SECONDS,
+              Math.floor((userData.expiresAt - Date.now()) / 1000),
+            );
             cfContext?.waitUntil(
               kvCache
-                .put(sessionToken, JSON.stringify(userData), { expirationTtl: 300 })
+                .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
                 .catch((e: unknown) => log.error("middleware-kv-write-failed", e)),
             );
           }
