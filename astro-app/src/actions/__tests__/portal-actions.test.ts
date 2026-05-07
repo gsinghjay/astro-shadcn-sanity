@@ -14,6 +14,8 @@ const {
   mockSelect,
   mockInsertValues,
   mockInsert,
+  mockOnConflictDoUpdate,
+  mockReturning,
   mockUpdateWhere,
   mockUpdateSet,
   mockUpdate,
@@ -38,7 +40,9 @@ const {
   const mockSelectWhere = vi.fn(() => ({ get: mockGet, all: mockAll }));
   const mockSelectFrom = vi.fn(() => ({ where: mockSelectWhere }));
   const mockSelect = vi.fn(() => ({ from: mockSelectFrom }));
-  const mockInsertValues = vi.fn(() => Promise.resolve());
+  const mockReturning = vi.fn(() => Promise.resolve([]));
+  const mockOnConflictDoUpdate = vi.fn(() => ({ returning: mockReturning }));
+  const mockInsertValues = vi.fn(() => ({ onConflictDoUpdate: mockOnConflictDoUpdate }));
   const mockInsert = vi.fn(() => ({ values: mockInsertValues }));
   const mockUpdateWhere = vi.fn(() => Promise.resolve());
   const mockUpdateSet = vi.fn(() => ({ where: mockUpdateWhere }));
@@ -72,6 +76,8 @@ const {
     mockSelect,
     mockInsertValues,
     mockInsert,
+    mockOnConflictDoUpdate,
+    mockReturning,
     mockUpdateWhere,
     mockUpdateSet,
     mockUpdate,
@@ -188,6 +194,8 @@ beforeEach(() => {
   mockSelect.mockClear();
   mockInsertValues.mockClear();
   mockInsert.mockClear();
+  mockOnConflictDoUpdate.mockClear();
+  mockReturning.mockReset();
   mockUpdateWhere.mockClear();
   mockUpdateSet.mockClear();
   mockUpdate.mockClear();
@@ -418,10 +426,10 @@ describe('linkGithubRepo', () => {
     ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
   });
 
-  it('insert path: creates a new row with crypto.randomUUID() id and lowercased email', async () => {
-    mockGet
-      .mockResolvedValueOnce(null) // existing lookup
-      .mockResolvedValueOnce({ id: 'new-id', userEmail: 'sponsor@example.com' }); // post-insert read
+  it('atomic upsert: insert payload carries crypto.randomUUID() id and lowercased email', async () => {
+    mockReturning.mockResolvedValueOnce([
+      { id: 'new-id', userEmail: 'sponsor@example.com', githubRepo: 'owner/repo' },
+    ]);
     const out = await invoke(
       server.linkGithubRepo,
       { projectSanityId: 'p1', githubRepo: 'owner/repo' },
@@ -429,6 +437,8 @@ describe('linkGithubRepo', () => {
     );
     expect(out).toMatchObject({ userEmail: 'sponsor@example.com' });
     expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(mockSelect).not.toHaveBeenCalled(); // no select-then-insert race window
+    expect(mockUpdate).not.toHaveBeenCalled(); // update path goes through onConflictDoUpdate
     const inserted = mockInsertValues.mock.calls[0]?.[0];
     expect(inserted).toMatchObject({
       userEmail: 'sponsor@example.com',
@@ -439,21 +449,27 @@ describe('linkGithubRepo', () => {
     expect(inserted.id.length).toBeGreaterThan(0);
   });
 
-  it('update path: existing row → UPDATE, no INSERT', async () => {
-    mockGet
-      .mockResolvedValueOnce({ id: 'existing-id', userEmail: 'sponsor@example.com' })
-      .mockResolvedValueOnce({ id: 'existing-id', githubRepo: 'owner/repo-new' });
+  it('atomic upsert: onConflictDoUpdate targets the (user_email, project_sanity_id) unique index and updates githubRepo + linkedAt', async () => {
+    mockReturning.mockResolvedValueOnce([
+      { id: 'existing-id', githubRepo: 'owner/repo-new' },
+    ]);
     const out = await invoke(
       server.linkGithubRepo,
       { projectSanityId: 'p1', githubRepo: 'owner/repo-new' },
       makeCtx(),
     );
     expect(out).toMatchObject({ id: 'existing-id', githubRepo: 'owner/repo-new' });
-    expect(mockUpdate).toHaveBeenCalledTimes(1);
-    expect(mockInsert).not.toHaveBeenCalled();
-    const setPayload = mockUpdateSet.mock.calls[0]?.[0];
-    expect(setPayload).toMatchObject({ githubRepo: 'owner/repo-new' });
-    expect(setPayload.linkedAt).toBeInstanceOf(Date);
+    expect(mockOnConflictDoUpdate).toHaveBeenCalledTimes(1);
+    const conflictArg = mockOnConflictDoUpdate.mock.calls[0]?.[0] as {
+      target: unknown[];
+      set: { githubRepo: string; linkedAt: Date };
+    };
+    expect(conflictArg.target).toHaveLength(2); // [userEmail, projectSanityId]
+    const targetSerialized = serializeDrizzlePredicate(conflictArg.target);
+    expect(targetSerialized).toContain('user_email');
+    expect(targetSerialized).toContain('project_sanity_id');
+    expect(conflictArg.set).toMatchObject({ githubRepo: 'owner/repo-new' });
+    expect(conflictArg.set.linkedAt).toBeInstanceOf(Date);
   });
 });
 

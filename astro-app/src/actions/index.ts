@@ -322,47 +322,26 @@ export const server = {
 
       const email = sessionUser.email.toLowerCase();
       const db = getDrizzle();
+      const now = new Date();
 
-      const existing = await db
-        .select()
-        .from(projectGithubRepos)
-        .where(
-          and(
-            eq(projectGithubRepos.userEmail, email),
-            eq(projectGithubRepos.projectSanityId, input.projectSanityId),
-          ),
-        )
-        .get();
-
-      if (existing) {
-        await db
-          .update(projectGithubRepos)
-          .set({ githubRepo: input.githubRepo, linkedAt: new Date() })
-          .where(eq(projectGithubRepos.id, existing.id));
-
-        const updated = await db
-          .select()
-          .from(projectGithubRepos)
-          .where(eq(projectGithubRepos.id, existing.id))
-          .get();
-        return updated;
-      }
-
-      const id = crypto.randomUUID();
-      await db.insert(projectGithubRepos).values({
-        id,
-        userEmail: email,
-        projectSanityId: input.projectSanityId,
-        githubRepo: input.githubRepo,
-        linkedAt: new Date(),
-      });
-
-      const created = await db
-        .select()
-        .from(projectGithubRepos)
-        .where(eq(projectGithubRepos.id, id))
-        .get();
-      return created;
+      // Atomic upsert against the (user_email, project_sanity_id) unique index
+      // — eliminates the select-then-insert race that otherwise surfaces as a
+      // UNIQUE constraint violation under concurrent clicks.
+      const [row] = await db
+        .insert(projectGithubRepos)
+        .values({
+          id: crypto.randomUUID(),
+          userEmail: email,
+          projectSanityId: input.projectSanityId,
+          githubRepo: input.githubRepo,
+          linkedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [projectGithubRepos.userEmail, projectGithubRepos.projectSanityId],
+          set: { githubRepo: input.githubRepo, linkedAt: now },
+        })
+        .returning();
+      return row;
     },
   }),
 
