@@ -332,13 +332,18 @@ export default defineConfig({
     }),
     react(),
     sitemap({
+      // The filter receives full URLs (e.g. "https://www.example.com/search/"),
+      // not paths — the prior 5.15 `page !== '/search'` form silently no-op'd
+      // because Astro emits trailing-slash URLs. Match on path-level substrings
+      // instead. (Story 5.23 fix.)
       filter: (page) =>
         !page.includes('/portal/') &&
         !page.includes('/auth/') &&
         !page.includes('/student/') &&
         !page.includes('/demo/') &&
-        page !== '/search' &&
-        !page.startsWith('/search/'),
+        !page.endsWith('/search') &&
+        !page.endsWith('/search/') &&
+        !page.includes('/search/'),
     }),
     // Gate astro-llms-md on visual editing OFF: stega-encoded HTML leaks
     // private-use Unicode markers into the .md/.txt output otherwise.

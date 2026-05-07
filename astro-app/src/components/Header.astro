@@ -53,7 +53,10 @@ const searchApiUrlValid = (() => {
     return false;
   }
 })();
-const searchEnabled = Boolean(aiSearch?.searchModalEnabled && searchApiUrlValid);
+// Story 5.23: skip-mount SearchModal + triggers on /search so ⌘K + click can't
+// stack the modal over the page that IS the search experience.
+const isSearchPage = currentPath === '/search';
+const searchEnabled = Boolean(aiSearch?.searchModalEnabled && searchApiUrlValid && !isSearchPage);
 
 const logoUrl = safeUrlFor(logo)?.width(160).height(40).fit('max').url() ?? '/logos/njit-logo-plain.svg';
 const logoAlt = logo?.alt || 'NJIT';
