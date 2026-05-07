@@ -68,20 +68,15 @@ export default getViteConfig({
     // worker to keep the transform load serial and let the suite finish.
     //
     // Story 5.23 follow-up: this mitigation works locally but the CI runner
-    // (GitHub Actions ubuntu-latest) appears to hit the same deadlock at
-    // ~10 test files in due to tighter CPU/memory budget. Tried `pool:
-    // "threads"` (commit 2c2ac58, run 25477085506) — failed worse, after
-    // only 3 files in 11s, since threads runtime conflicts with the
-    // @astrojs/cloudflare adapter startup. Tried `isolate: false` — broke
-    // 23 tests locally because some tests rely on fresh module state.
-    // Tried removing @vitejs/plugin-react in favor of esbuild's automatic
-    // JSX — broke 134 of 170 test files.
-    //
-    // Net: keeping the dev's original known-working local baseline. The CI
-    // failure mode is documented; resolving it requires a follow-up that
-    // either (a) splits .tsx tests into a separate vitest project so the
-    // Babel pass is constrained, or (b) bumps the CI runner resource class
-    // so the deadlock threshold isn't reached.
+    // (GitHub Actions ubuntu-latest) hits the same deadlock at ~10 test
+    // files in due to tighter CPU/memory budget. Four mitigations attempted
+    // (commits 2c2ac58 → a9aa8d0): pool: "threads" failed worse on CI
+    // (3 files / 11s); pool: "forks", isolate: false broke 23 tests locally;
+    // removing @vitejs/plugin-react broke 134 of 170 test files; splitting
+    // .tsx tests into a separate vitest project triggered Vite optimizeDep
+    // cache failures across the .test.ts suite. None viable. Resolving
+    // requires bumping the CI runner to a paid larger class (8-core+) or
+    // fundamentally restructuring the test stack. Tracked in deferred-work.md.
     pool: "forks",
     poolOptions: { forks: { singleFork: true } },
     include: [
