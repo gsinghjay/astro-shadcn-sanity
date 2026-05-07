@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "capstone-bot",
+  "main": "src/main.py",
+  "compatibility_date": "2026-02-09",
+  "compatibility_flags": ["python_workers"],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "992346b9e7884c97b3fe652c4da27632"
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "production"
+  }
+}
+
+
