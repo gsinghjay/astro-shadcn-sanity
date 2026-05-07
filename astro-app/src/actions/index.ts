@@ -398,6 +398,9 @@ export const server = {
       if (!sessionUser?.email) {
         throw new ActionError({ code: 'UNAUTHORIZED', message: 'unauthorized' });
       }
+      if (sessionUser.role !== 'sponsor') {
+        throw new ActionError({ code: 'FORBIDDEN', message: 'forbidden' });
+      }
 
       const db = getDrizzle();
       const tokenResult = await getGitHubToken(db, sessionUser.email);

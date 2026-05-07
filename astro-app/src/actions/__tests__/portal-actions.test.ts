@@ -506,6 +506,17 @@ describe('getGithubRepos', () => {
     ).rejects.toMatchObject({ code: 'UNAUTHORIZED' });
   });
 
+  it('returns 403 when role is not sponsor', async () => {
+    await expect(
+      invoke(
+        server.getGithubRepos,
+        {},
+        makeCtx({ user: { email: 'student@example.com', role: 'student' } }),
+      ),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    expect(mockGetGitHubToken).not.toHaveBeenCalled();
+  });
+
   it('maps "no-github-account" → NOT_FOUND', async () => {
     mockGetGitHubToken.mockResolvedValueOnce({ error: 'no-github-account' });
     await expect(invoke(server.getGithubRepos, {}, makeCtx())).rejects.toMatchObject({
