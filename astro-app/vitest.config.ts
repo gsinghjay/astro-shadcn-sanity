@@ -62,20 +62,28 @@ export default getViteConfig({
     // .astro component renders past Vitest's 5s default under suite-wide
     // contention (we hit this on `json-ld-blocks` FaqSection at 5009ms).
     testTimeout: 15_000,
-    // History: Story 5.23 added a third @vitejs/plugin-react-transformed .tsx
-    // test (SearchResults.test.tsx) which pushed the suite over the deadlock
-    // threshold under CI's tighter CPU/memory budget — vitest silent-died with
-    // exit 1 and no summary at the documented "concurrent forks + Babel
-    // transform deadlocks esbuild's Go runtime" failure mode (PR #717 unit-tests
-    // CI run 25475346423, ~04:02:50 UTC after auth-config.test.ts).
+    // Concurrent forks + @vitejs/plugin-react's Babel transform deadlocks
+    // esbuild's Go runtime ("fatal error: all goroutines are asleep") and
+    // kills vitest mid-run with no summary. Run all test files in a single
+    // worker to keep the transform load serial and let the suite finish.
     //
-    // Switched pool from `forks/singleFork` to `threads`. Threads bypass the
-    // goroutine-asleep deadlock entirely (different runtime), and locally:
-    //   - All 2236 tests pass (was 2236 under forks).
-    //   - Total runtime drops to ~76s from ~109s.
-    //   - storybook-1-4 build test that previously approached the 120s
-    //     timeout under forks completes in ~74s.
-    pool: "threads",
+    // Story 5.23 follow-up: this mitigation works locally but the CI runner
+    // (GitHub Actions ubuntu-latest) appears to hit the same deadlock at
+    // ~10 test files in due to tighter CPU/memory budget. Tried `pool:
+    // "threads"` (commit 2c2ac58, run 25477085506) — failed worse, after
+    // only 3 files in 11s, since threads runtime conflicts with the
+    // @astrojs/cloudflare adapter startup. Tried `isolate: false` — broke
+    // 23 tests locally because some tests rely on fresh module state.
+    // Tried removing @vitejs/plugin-react in favor of esbuild's automatic
+    // JSX — broke 134 of 170 test files.
+    //
+    // Net: keeping the dev's original known-working local baseline. The CI
+    // failure mode is documented; resolving it requires a follow-up that
+    // either (a) splits .tsx tests into a separate vitest project so the
+    // Babel pass is constrained, or (b) bumps the CI runner resource class
+    // so the deadlock threshold isn't reached.
+    pool: "forks",
+    poolOptions: { forks: { singleFork: true } },
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",
