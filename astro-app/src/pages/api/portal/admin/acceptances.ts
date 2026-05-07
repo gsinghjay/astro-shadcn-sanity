@@ -81,16 +81,21 @@ function writeCache(userId: string): void {
 
 /**
  * Verify the claimed Sanity user ID is a current `administrator` of the
- * configured project. Calls the project-scoped users endpoint with a
- * Worker-only read token; admits on 200 with matching `id` AND a role entry
- * whose name is `administrator`. Any other outcome (non-admin role, 404,
- * non-2xx, malformed body, network/timeout) returns false so the caller can
- * map it to a single 403.
+ * configured project. Calls the project-scoped resource with a Worker-only
+ * read token; admits on 200 when `members[]` contains an entry whose `id`
+ * matches the claimed user AND whose `roles[]` includes `administrator`. Any
+ * other outcome (non-admin role, member missing, 404, non-2xx, malformed
+ * body, network/timeout) returns false so the caller can map it to a single 403.
  *
  * Mirrors the sponsor-schema `readOnly` gate (Story 24.7 / M-4): both surfaces
  * restrict sensitive sponsor-related operations to project administrators.
- * The Sanity Members API returns membership as `roles: Array<{name: string}>`
- * (machine names, lowercased — `'administrator'`, `'editor'`, etc.).
+ *
+ * NOTE: an earlier revision called `/projects/<id>/users/<userId>`, but that
+ * endpoint's response does NOT include a `roles` field — the role data lives
+ * on `members[]` of the project resource. The previous code path therefore
+ * returned 403 for every caller in production. Members API contract:
+ * `members: Array<{ id: string, roles: Array<{ name: string }> }>` where role
+ * names are lowercased machine names (`'administrator'`, `'editor'`, ...).
  */
 async function verifyProjectMembership(
   userId: string,
@@ -99,24 +104,29 @@ async function verifyProjectMembership(
 ): Promise<boolean> {
   if (readCache(userId)) return true;
   try {
-    // userId is validated against USER_ID_PATTERN upstream so encodeURIComponent
-    // is belt-and-braces — defends against any future relaxation of the regex.
     const res = await fetch(
-      `https://api.sanity.io/${SANITY_API_PATH}/projects/${projectId}/users/${encodeURIComponent(userId)}`,
+      `https://api.sanity.io/${SANITY_API_PATH}/projects/${projectId}`,
       {
         headers: { authorization: `Bearer ${readToken}` },
         signal: AbortSignal.timeout(MEMBERSHIP_TIMEOUT_MS),
       },
     );
     if (!res.ok) return false;
-    const body = (await res.json()) as { id?: unknown; roles?: unknown };
-    if (!body || typeof body !== 'object' || typeof body.id !== 'string') {
+    const body = (await res.json()) as { members?: unknown };
+    if (!body || typeof body !== 'object' || !Array.isArray(body.members)) {
       return false;
     }
-    const responseId = body.id.trim();
-    if (!responseId || responseId !== userId) return false;
-    if (!Array.isArray(body.roles)) return false;
-    const isAdmin = body.roles.some(
+    // Defensive trim: Sanity returns clean ids in practice, but a stray
+    // whitespace would silently 403 every admin without it.
+    const member = body.members.find(
+      (m): m is { id: string; roles?: unknown } =>
+        typeof m === 'object' &&
+        m !== null &&
+        typeof (m as { id?: unknown }).id === 'string' &&
+        (m as { id: string }).id.trim() === userId,
+    );
+    if (!member || !Array.isArray(member.roles)) return false;
+    const isAdmin = member.roles.some(
       (r): boolean =>
         typeof r === 'object' &&
         r !== null &&
