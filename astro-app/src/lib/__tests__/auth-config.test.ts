@@ -125,10 +125,17 @@ describe('createAuth() — unified auth factory', () => {
     });
   });
 
-  it('enables account linking', () => {
+  it('enables account linking but disallows different emails (Story 24.2)', () => {
     createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
-    expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: true });
+    expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: false });
+  });
+
+  it('configures magic-link with disableSignUp + 600s expiry (Story 24.2)', () => {
+    createAuth({ db: mockDb });
+    const magicLinkOpts = mockMagicLink.mock.calls[0][0];
+    expect(magicLinkOpts.disableSignUp).toBe(true);
+    expect(magicLinkOpts.expiresIn).toBe(600);
   });
 
   it('registers Magic Link plugin', () => {
@@ -209,10 +216,49 @@ describe('createAuth() — unified auth factory', () => {
     });
   });
 
-  it('configures trustedOrigins from env', () => {
+  it('static trustedOrigins on capstone returns [BETTER_AUTH_URL] (Story 24.2)', () => {
+    vi.stubEnv('CLOUDFLARE_ENV', 'capstone');
+    try {
+      createAuth({ db: mockDb });
+      const config = mockBetterAuth.mock.calls[0][0];
+      expect(config.trustedOrigins).toEqual(['http://localhost:4321']);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('static trustedOrigins on rwc_us returns [] (Story 24.2)', () => {
+    vi.stubEnv('CLOUDFLARE_ENV', 'rwc_us');
+    try {
+      createAuth({ db: mockDb });
+      const config = mockBetterAuth.mock.calls[0][0];
+      expect(config.trustedOrigins).toEqual([]);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('static trustedOrigins ignores any request-derived origin (Story 24.2 — H-3/M-3 fix)', () => {
+    // Regression: pre-24.2, createAuth({ db, requestOrigin }) pushed requestOrigin
+    // into trustedOrigins. The new signature takes only { db }; even if a caller
+    // tried to pass extra fields they'd be ignored at the type level. This test
+    // documents the invariant: trustedOrigins is BETTER_AUTH_URL or empty, period.
+    vi.stubEnv('CLOUDFLARE_ENV', 'capstone');
+    try {
+      // @ts-expect-error — proving the extra field is rejected by the type system
+      createAuth({ db: mockDb, requestOrigin: 'https://attacker.workers.dev' });
+      const config = mockBetterAuth.mock.calls[0][0];
+      expect(config.trustedOrigins).toEqual(['http://localhost:4321']);
+      expect(config.trustedOrigins).not.toContain('https://attacker.workers.dev');
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it('baseURL is sourced from BETTER_AUTH_URL (no request reflection) (Story 24.2)', () => {
     createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
-    expect(config.trustedOrigins).toContain('http://localhost:4321');
+    expect(config.baseURL).toBe('http://localhost:4321');
   });
 
   it('throws when GITHUB_CLIENT_ID is missing', () => {
@@ -243,6 +289,109 @@ describe('createAuth() — unified auth factory', () => {
   it('throws when env var is whitespace-only', () => {
     serverEnv.BETTER_AUTH_SECRET = '   ';
     expect(() => createAuth({ db: mockDb })).toThrow('BETTER_AUTH_SECRET');
+  });
+});
+
+describe('databaseHooks.user.create.before — verified-email sponsor gate (Story 24.2)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Object.assign(serverEnv, validEnv);
+  });
+
+  /** Pull the configured create-before hook out of the most recent betterAuth() call. */
+  function getCreateBeforeHook() {
+    createAuth({ db: mockDb });
+    const config = mockBetterAuth.mock.calls.at(-1)?.[0];
+    return config.databaseHooks.user.create.before as (
+      user: { email: string; emailVerified?: boolean; name?: string },
+      ctx?: { path?: string },
+    ) => Promise<{ data: { role: 'sponsor' | 'student' } }>;
+  }
+
+  it('returns student when emailVerified is false (Google email_verified === false)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValue(true as never); // even if whitelisted
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const before = getCreateBeforeHook();
+
+    const result = await before(
+      { email: 'attacker@sponsor.com', emailVerified: false, name: 'A' },
+      { path: '/callback/google' },
+    );
+
+    expect(result.data.role).toBe('student');
+    // Whitelist must NOT be queried when verification fails — the gate is upstream.
+    expect(sanityClient.fetch).not.toHaveBeenCalled();
+    const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    expect(parsed.msg).toBe('auth-denied-sponsor-role-unverified-email');
+    expect(parsed.email).toBe('attacker@sponsor.com');
+    expect(parsed.pathSegment).toBe('google');
+    consoleSpy.mockRestore();
+  });
+
+  it('returns student when emailVerified is missing (no provider verification claim)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValue(true as never);
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const before = getCreateBeforeHook();
+
+    const result = await before({ email: 'sponsor@company.com', name: 'X' }, { path: '/callback/github' });
+
+    expect(result.data.role).toBe('student');
+    expect(sanityClient.fetch).not.toHaveBeenCalled();
+    consoleSpy.mockRestore();
+  });
+
+  it('returns sponsor when emailVerified is true AND email is whitelisted', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
+    const before = getCreateBeforeHook();
+
+    const result = await before(
+      { email: 'sponsor@company.com', emailVerified: true, name: 'S' },
+      { path: '/callback/google' },
+    );
+
+    expect(result.data.role).toBe('sponsor');
+    expect(sanityClient.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns student when emailVerified is true but email is NOT whitelisted', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(false as never);
+    const before = getCreateBeforeHook();
+
+    const result = await before(
+      { email: 'student@school.edu', emailVerified: true, name: 'S' },
+      { path: '/callback/google' },
+    );
+
+    expect(result.data.role).toBe('student');
+  });
+
+  it('classifies a magic-link-shaped invocation as verified (documents intended behaviour)', async () => {
+    // Production reachability note: with `disableSignUp: true`, Better Auth rejects unknown
+    // emails on the magic-link click with `new_user_signup_disabled` BEFORE this hook runs,
+    // so a real magic-link click does NOT exercise this branch. The test invokes the hook
+    // directly to document what *would* happen if a future flow created a user via the
+    // magic-link plugin path (e.g. admin pre-provisioning) — the plugin would set
+    // `emailVerified: true` because the click itself proves email control.
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
+    const before = getCreateBeforeHook();
+
+    const result = await before(
+      { email: 'sponsor@company.com', emailVerified: true, name: 'S' },
+      { path: '/sign-in/magic-link' },
+    );
+
+    expect(result.data.role).toBe('sponsor');
+  });
+
+  it('logs unknown pathSegment when context.path is absent', async () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const before = getCreateBeforeHook();
+
+    await before({ email: 'x@y.com', emailVerified: false, name: 'X' });
+
+    const parsed = JSON.parse(consoleSpy.mock.calls[0][0] as string);
+    expect(parsed.pathSegment).toBe('unknown');
+    consoleSpy.mockRestore();
   });
 });
 
@@ -281,6 +430,15 @@ describe('checkSponsorWhitelist()', () => {
     vi.mocked(sanityClient.fetch).mockResolvedValueOnce(undefined as never);
     const result = await checkSponsorWhitelist('sponsor@test.com');
     expect(result).toBe(false);
+  });
+
+  it('lowercases email before GROQ comparison (Story 24.2 review fix)', async () => {
+    vi.mocked(sanityClient.fetch).mockResolvedValueOnce(true as never);
+    await checkSponsorWhitelist('Sponsor@Company.com');
+    // GROQ `==` is case-sensitive; the create-before hook receives raw provider emails
+    // (e.g. Google may return mixed case) while middleware escalation runs through
+    // `normalizeEmail()` first. Folding here keeps both call sites consistent.
+    expect(sanityClient.fetch).toHaveBeenCalledWith(expect.anything(), { email: 'sponsor@company.com' });
   });
 
   it('passes the email through as a GROQ param (not interpolated into the query)', async () => {

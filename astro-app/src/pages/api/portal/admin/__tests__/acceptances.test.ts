@@ -136,8 +136,11 @@ function mockSanityMembership(userId: string): void {
   // Build a fresh Response per call — the route reads the body once, but tests
   // that fire multiple un-cached requests in sequence would otherwise reuse a
   // single (already-consumed) Response.
+  // Story 24.7: route requires the membership response to include a roles entry
+  // with name='administrator'. Mock matches what the Sanity Members API returns
+  // for an administrator-grade project member.
   fetchMock.mockImplementation(async () =>
-    new Response(JSON.stringify({ id: userId }), {
+    new Response(JSON.stringify({ id: userId, roles: [{ name: 'administrator' }] }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     }),
@@ -269,10 +272,76 @@ describe('GET /api/portal/admin/acceptances', () => {
 
   it('admits when Sanity returns id with surrounding whitespace (symmetric trim)', async () => {
     fetchMock.mockImplementation(async () =>
-      new Response(JSON.stringify({ id: `  ${ADMIN_USER_ID}  ` }), {
+      new Response(
+        JSON.stringify({ id: `  ${ADMIN_USER_ID}  `, roles: [{ name: 'administrator' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(200);
+  });
+
+  // Story 24.7 (M-4): membership alone is insufficient — the user must hold the
+  // `administrator` role on the project. Mirrors the new `readOnly` gate on the
+  // sponsor.allowedEmails schema field.
+  it('returns 403 when membership response omits roles entirely', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(JSON.stringify({ id: ADMIN_USER_ID }), {
         status: 200,
         headers: { 'content-type': 'application/json' },
       }),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when roles array does not include administrator', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({ id: ADMIN_USER_ID, roles: [{ name: 'editor' }, { name: 'developer' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('returns 403 when role name has wrong case ("Administrator" — display name, not machine name)', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({ id: ADMIN_USER_ID, roles: [{ name: 'Administrator' }] }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
+    );
+    const ctx = buildCtx({ userId: ADMIN_USER_ID });
+    const res = await GET(ctx as never);
+    expect(res.status).toBe(403);
+  });
+
+  it('admits when administrator is one of multiple roles', async () => {
+    fetchMock.mockImplementation(async () =>
+      new Response(
+        JSON.stringify({
+          id: ADMIN_USER_ID,
+          roles: [{ name: 'editor' }, { name: 'administrator' }],
+        }),
+        {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        },
+      ),
     );
     const ctx = buildCtx({ userId: ADMIN_USER_ID });
     const res = await GET(ctx as never);

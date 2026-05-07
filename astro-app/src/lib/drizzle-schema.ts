@@ -16,6 +16,9 @@ export const user = sqliteTable('user', {
   image: text('image'),
   role: text('role', { enum: ['student', 'sponsor'] }).default('student').notNull(),
   agreementAcceptedAt: integer('agreement_accepted_at', { mode: 'timestamp_ms' }),
+  agreementVersion: text('agreement_version'),
+  agreementAcceptedIp: text('agreement_accepted_ip'),
+  agreementAcceptedUserAgent: text('agreement_accepted_user_agent'),
   createdAt: integer('created_at', { mode: 'timestamp_ms' })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .notNull(),

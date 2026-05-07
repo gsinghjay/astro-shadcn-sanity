@@ -199,8 +199,9 @@ describe('Story 5-2: GA4, Security Headers & Cloudflare Deploy', () => {
     })
 
     test('[P0] 5.8-INT-009 — CSP allows googletagmanager in frame-src (noscript iframe)', () => {
-      // frame-src directive appears in CSP string with googletagmanager domain
-      expect(layoutContent).toMatch(/frame-src[^;]*https:\/\/www\.googletagmanager\.com/)
+      // frame-src is `'self' https:` (broadened by Story 24.6 post-review patches);
+      // `https:` is a strict superset that covers the GTM noscript iframe.
+      expect(layoutContent).toMatch(/frame-src[^;]*\bhttps:(?:\s|;|"|')/)
     })
 
     test('[P0] 5.2-INT-019 — CSP allows cdn.sanity.io in img-src', () => {

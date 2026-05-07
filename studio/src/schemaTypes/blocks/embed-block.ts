@@ -18,15 +18,17 @@ export const embedBlock = defineBlock({
       name: 'embedUrl',
       title: 'Embed URL',
       type: 'url',
-      description: 'URL for iframe-based embeds (e.g., YouTube, Vimeo, Google Maps). Use this OR Raw Embed Code — not both.',
+      description:
+        'Provider URL to embed (must be https://). Renders inside a sandboxed iframe with no first-party cookie or DOM access — only paste embed URLs from trusted providers.',
       validation: (Rule) =>
-        Rule.uri({scheme: ['http', 'https']}).custom((value, context) => {
-          const parent = context.parent as {rawEmbedCode?: string} | undefined
-          if (!value && !parent?.rawEmbedCode) {
-            return 'Either Embed URL or Raw Embed Code is required'
-          }
-          return true
-        }),
+        Rule.uri({scheme: ['https'], allowRelative: false})
+          .custom((value, context) => {
+            const parent = context.parent as {rawEmbedCode?: string} | undefined
+            if (!value && !parent?.rawEmbedCode) {
+              return 'Either Embed URL or Raw Embed Code is required'
+            }
+            return true
+          }),
     }),
     defineField({
       name: 'rawEmbedCode',
@@ -34,7 +36,7 @@ export const embedBlock = defineBlock({
       type: 'text',
       rows: 8,
       description:
-        'Paste raw HTML/script embed code (e.g., Formsite, Typeform). Use this OR Embed URL — not both. If both are set, this takes precedence. WARNING: Only paste embed codes from trusted sources.',
+        'Raw HTML for embeds (e.g., third-party widgets). Renders inside a sandboxed iframe with no access to site cookies or DOM. Use only when no embedUrl is available, and only paste embed codes from trusted sources.',
     }),
     defineField({name: 'caption', title: 'Caption', type: 'string', description: 'Caption displayed below the embed', validation: (Rule) => Rule.max(200)}),
   ],

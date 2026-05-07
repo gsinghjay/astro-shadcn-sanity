@@ -169,6 +169,15 @@ export default defineConfig({
         access: "public",
         default: "",
       }),
+      // Bridges the astro-app portal to platform-api (Epic 12 / Story 12.8a). Optional
+      // because RWC + *-preview Workers don't carry the var; the helper in
+      // src/lib/platform-api-client.ts short-circuits with PlatformApiAuthError
+      // when unset, so callers fail loudly instead of hitting `undefined` at runtime.
+      PUBLIC_PLATFORM_API_BASE_URL: envField.string({
+        context: "client",
+        access: "public",
+        optional: true,
+      }),
 
       // --- Server-side public vars (capstone-only — optional for rwc parity) ---
       // rwc_us / rwc_intl wrangler blocks don't carry these. optional:true

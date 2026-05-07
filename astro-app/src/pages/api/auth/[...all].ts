@@ -13,8 +13,7 @@ export const prerender = false;
 const handleAuth: APIRoute = async ({ request }) => {
   try {
     const db = getDrizzle();
-    const requestOrigin = new URL(request.url).origin;
-    const auth = createAuth({ db, requestOrigin });
+    const auth = createAuth({ db });
     return await auth.handler(request);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown auth error';
