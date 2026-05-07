@@ -205,12 +205,32 @@
 				"global_fetch_strictly_public"
 			],
 			"vars": {
-				// Capstone preview Worker — content-only (no D1/KV/DO bindings).
-				// Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
-				// BETTER_AUTH_URL is set because site code reads it during build, but the
-				// auth flow itself doesn't run without BETTER_AUTH_SECRET + PORTAL_DB.
-				// Studio Presentation tool points iframe at this Worker (studio/.env
-				// SANITY_STUDIO_PREVIEW_ORIGIN). Replaces preview.ywcc-capstone.pages.dev.
+				// Capstone preview Worker — full staging environment. Mirrors
+				// production bindings (PORTAL_DB / SESSION_CACHE / RATE_LIMITER all
+				// shared with capstone prod) so the portal/auth flow can be
+				// exercised end-to-end on a *.workers.dev hostname before pushing
+				// to ywcccapstone1.com. Drafts perspective + stega via
+				// PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true. Studio Presentation
+				// iframe points here (studio/.env SANITY_STUDIO_PREVIEW_ORIGIN).
+				//
+				// TRADE-OFF: D1 is shared with prod (only one ywcc-capstone-portal
+				// database exists in the account), so test signups and acceptances
+				// on preview write to the production database. Cleanup is manual
+				// via `mcp__cloudflare-bindings__d1_database_query`. KV is isolated:
+				// SESSION_CACHE binds to the dedicated `ywcc-capstone-preview-session`
+				// namespace (id dfe44815e6ce4689bc2d868d088c77c1), distinct from the
+				// prod `SESSION_CACHE` namespace (f78af5695075451c9d3d7887368e90dc).
+				//
+				// Secrets shared with capstone prod (re-`wrangler secret put` per
+				// secret with `--name ywcc-capstone-preview`):
+				//   BETTER_AUTH_SECRET, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID,
+				//   GOOGLE_CLIENT_SECRET, RESEND_API_KEY, TURNSTILE_SECRET_KEY,
+				//   SANITY_API_READ_TOKEN, SANITY_API_WRITE_TOKEN,
+				//   SANITY_PROJECT_READ_TOKEN.
+				//
+				// OAuth callback URLs to add (manual, off-repo):
+				//   GitHub OAuth app:  https://ywcc-capstone-preview.js426.workers.dev/api/auth/callback/github
+				//   Google OAuth app:  https://ywcc-capstone-preview.js426.workers.dev/api/auth/callback/google
 				"BETTER_AUTH_URL": "https://ywcc-capstone-preview.js426.workers.dev",
 				"GITHUB_CLIENT_ID": "Ov23liFtOiWIyCqJXJMi",
 				"PUBLIC_GTM_ID": "",
@@ -225,6 +245,28 @@
 				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn",
 				"RESEND_FROM_EMAIL": "YWCC Capstone <noreply@intraphase.com>",
 				"STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
+			},
+			"d1_databases": [
+				{
+					"binding": "PORTAL_DB",
+					"database_name": "ywcc-capstone-portal",
+					"database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "SESSION_CACHE",
+					"id": "dfe44815e6ce4689bc2d868d088c77c1"
+				}
+			],
+			"durable_objects": {
+				"bindings": [
+					{
+						"name": "RATE_LIMITER",
+						"class_name": "SlidingWindowRateLimiter",
+						"script_name": "rate-limiter-worker"
+					}
+				]
 			},
 			"observability": {
 				"enabled": true,
