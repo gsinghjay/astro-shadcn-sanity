@@ -1,11 +1,13 @@
 import { describe, test, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "../../..");
 const astroApp = resolve(repoRoot, "astro-app");
+const sitemapPath = resolve(astroApp, "dist/client/sitemap-0.xml");
+const hasBuildArtifact = existsSync(sitemapPath);
 
 describe("Story 5.23 — /search SEO posture preserved", () => {
   test("astro.config.mjs sitemap filter excludes /search and /search/* (URL-form aware)", () => {
@@ -20,20 +22,16 @@ describe("Story 5.23 — /search SEO posture preserved", () => {
     expect(config).toMatch(/!page\.includes\(['"]\/search\/['"]\)/);
   });
 
-  test("dist sitemap-0.xml omits /search/ (build-output assertion)", () => {
-    const sitemapPath = resolve(
-      astroApp,
-      "dist/client/sitemap-0.xml",
-    );
-    let xml: string;
-    try {
-      xml = readFileSync(sitemapPath, "utf8");
-    } catch {
-      // Build artifact not present — skip in pre-build environments (CI runs vitest before build).
-      return;
-    }
-    expect(xml).not.toMatch(/<loc>[^<]*\/search\/?<\/loc>/);
-  });
+  // Build-artifact assertion. Vitest runs before `astro build` in CI, so this
+  // only fires after a local build. Use `test.skipIf` so the skip is visible in
+  // the output — the prior `try { ... } catch { return; }` was a silent no-op.
+  test.skipIf(!hasBuildArtifact)(
+    "dist sitemap-0.xml omits /search/ (build-output assertion)",
+    () => {
+      const xml = readFileSync(sitemapPath, "utf8");
+      expect(xml).not.toMatch(/<loc>[^<]*\/search\/?<\/loc>/);
+    },
+  );
 
   test("astro-llms-md exclude list omits search and **/search/**", () => {
     const config = readFileSync(
@@ -106,6 +104,36 @@ describe("Story 5.23 — /search SEO posture preserved", () => {
     expect(page).toMatch(/u\.protocol !== ['"]https:['"]/);
     expect(page).toMatch(/u\.username \|\| u\.password/);
     expect(page).toMatch(/u\.origin \+ u\.pathname/);
+  });
+
+  // AC 13g (runtime) — exercise the same predicate against bad inputs to prove
+  // it actually rejects them. The validator is currently inlined as an IIFE in
+  // search.astro frontmatter; this test mirrors that logic so a future drift in
+  // the page's IIFE is caught by the source-text test above. TODO: extract the
+  // validator into `lib/search-api-url.ts` and import in both call sites.
+  test("AC 13g (runtime) — URL allowlist rejects http/credentials/scheme-less", () => {
+    const validate = (raw: string): string => {
+      if (!raw) return "";
+      try {
+        const u = new URL(raw);
+        if (u.protocol !== "https:") return "";
+        if (u.username || u.password) return "";
+        return u.origin + u.pathname;
+      } catch {
+        return "";
+      }
+    };
+    expect(validate("http://example.com/")).toBe("");
+    expect(validate("https://user:pass@example.com/")).toBe("");
+    expect(validate("https://:pass@example.com/")).toBe("");
+    expect(validate("https://user@example.com/")).toBe("");
+    expect(validate("ftp://example.com/")).toBe("");
+    expect(validate("not-a-url")).toBe("");
+    expect(validate("")).toBe("");
+    expect(validate("https://example.com/")).toBe("https://example.com/");
+    expect(validate("https://example.com/api/search")).toBe(
+      "https://example.com/api/search",
+    );
   });
 
   test("search.astro mounts the SearchResults React island via client:load", () => {

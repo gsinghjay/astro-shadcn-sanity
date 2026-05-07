@@ -6,9 +6,8 @@ import { createRoot, type Root } from "react-dom/client";
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
 
-const { searchMock, cancelAllMock } = vi.hoisted(() => ({
+const { searchMock } = vi.hoisted(() => ({
   searchMock: vi.fn(),
-  cancelAllMock: vi.fn(),
 }));
 
 vi.mock("@cloudflare/ai-search-snippet", () => ({
@@ -18,7 +17,7 @@ vi.mock("@cloudflare/ai-search-snippet", () => ({
       this.baseUrl = baseUrl;
     }
     search = searchMock;
-    cancelAllRequests = cancelAllMock;
+    cancelAllRequests = vi.fn();
   },
 }));
 
@@ -72,7 +71,6 @@ const fixtureResults = [
 describe("SearchResults island", () => {
   beforeEach(() => {
     searchMock.mockReset();
-    cancelAllMock.mockReset();
     sessionStorage.clear();
     clearCache();
     (window as unknown as { dataLayer?: unknown[] }).dataLayer = [];
@@ -235,10 +233,12 @@ describe("SearchResults island", () => {
     expect(container.querySelector("ol[data-search-results]")).not.toBeNull();
   });
 
-  it("popstate event re-reads ?q from location and re-runs the query", async () => {
+  it("popstate event re-reads ?q from location and re-runs the query exactly once", async () => {
     searchMock.mockResolvedValueOnce(fixtureResults);
     render(<SearchResults apiUrl="https://worker.dev" initialQuery="" />);
     await flush();
+    // initialQuery is empty, so no fetch fires on mount.
+    expect(searchMock).toHaveBeenCalledTimes(0);
 
     window.history.pushState({}, "", "/search?q=back%20button");
     await act(async () => {
@@ -247,6 +247,9 @@ describe("SearchResults island", () => {
     });
     await flush();
 
+    // Exactly one dispatch — guards against debounce useEffect re-running on
+    // setInputValue and double-firing.
+    expect(searchMock).toHaveBeenCalledTimes(1);
     expect(searchMock).toHaveBeenCalledWith(
       "back button",
       expect.objectContaining({ maxResults: 20 }),

@@ -1,8 +1,13 @@
 import { test, expect } from '../support/fixtures';
 
-async function searchUnavailable(page: import('@playwright/test').Page): Promise<boolean> {
+// Single-shot probe per worker — avoids every test double-loading /search.
+let searchAvailable: boolean | null = null;
+async function probeSearchAvailability(page: import('@playwright/test').Page): Promise<boolean> {
+  if (searchAvailable !== null) return searchAvailable;
   await page.goto('/search');
-  return (await page.getByText('Search is currently unavailable').count()) > 0;
+  searchAvailable =
+    (await page.getByText('Search is currently unavailable').count()) === 0;
+  return searchAvailable;
 }
 
 test.describe('Search Results Page (Story 5.23)', () => {
@@ -14,7 +19,7 @@ test.describe('Search Results Page (Story 5.23)', () => {
   });
 
   test('AC 14a — /search (no ?q) renders empty-state panel and focuses the input', async ({ page }) => {
-    if (await searchUnavailable(page)) {
+    if (!(await probeSearchAvailability(page))) {
       test.skip();
       return;
     }
@@ -34,7 +39,7 @@ test.describe('Search Results Page (Story 5.23)', () => {
   });
 
   test('AC 14b — typing + Enter pushes ?q to URL and renders native <li> results', async ({ page }) => {
-    if (await searchUnavailable(page)) {
+    if (!(await probeSearchAvailability(page))) {
       test.skip();
       return;
     }
@@ -53,7 +58,7 @@ test.describe('Search Results Page (Story 5.23)', () => {
   });
 
   test('AC 14c — popstate (browser back) re-runs the previous query', async ({ page }) => {
-    if (await searchUnavailable(page)) {
+    if (!(await probeSearchAvailability(page))) {
       test.skip();
       return;
     }
@@ -72,7 +77,7 @@ test.describe('Search Results Page (Story 5.23)', () => {
   });
 
   test('AC 14d — Meta+K on /search does NOT open a modal (skip-mounted) + no GTM open event', async ({ page }) => {
-    if (await searchUnavailable(page)) {
+    if (!(await probeSearchAvailability(page))) {
       test.skip();
       return;
     }
@@ -126,54 +131,45 @@ test.describe('Search Results Page (Story 5.23)', () => {
   });
 
   test('AC 14f — repeat query within session hits the cache (only 1 fetch for 2 identical submits)', async ({ page }) => {
-    if (await searchUnavailable(page)) {
+    if (!(await probeSearchAvailability(page))) {
       test.skip();
       return;
     }
 
     await page.goto('/search');
 
-    let workerHostname = '';
-    page.on('request', req => {
-      const url = new URL(req.url());
-      // The AISearchClient hits the configured worker — track only those.
-      if (url.hostname.endsWith('.workers.dev') || url.hostname.includes('search')) {
-        if (!workerHostname) workerHostname = url.hostname;
-      }
-    });
+    // Capture every request after the page is loaded — no hostname heuristic.
+    // This catches the fetch regardless of whether the API is on workers.dev,
+    // a custom domain, or anything else.
+    const allRequests: string[] = [];
+    page.on('request', req => allRequests.push(req.url()));
 
     const input = page.locator('[data-search-page-input]');
     await input.fill('cached query');
     await input.press('Enter');
     await page.locator('main ol[data-search-results] li').first().waitFor({ timeout: 10_000 });
 
-    const beforeCount = page.context().pages().length;
-    void beforeCount;
-
-    let secondFetchCount = 0;
-    page.on('request', req => {
-      const url = new URL(req.url());
-      if (workerHostname && url.hostname === workerHostname) {
-        secondFetchCount++;
-      }
-    });
+    // Snapshot request count after the first submit settles.
+    const requestsAfterFirstSubmit = allRequests.length;
+    expect(requestsAfterFirstSubmit).toBeGreaterThan(0);
 
     // Re-submit the same query — should serve from cache.
     await input.fill('cached query');
     await input.press('Enter');
-    // Wait briefly to allow any spurious fetch to land.
     await page.waitForTimeout(500);
 
-    expect(secondFetchCount).toBe(0);
+    // No new requests after the second submit — the cache served the result.
+    // (Allows trivial telemetry beacons unrelated to /search by asserting
+    // equality rather than zero, since beforeFirst captures the same baseline.)
+    expect(allRequests.length).toBe(requestsAfterFirstSubmit);
   });
 
   test('AC 14g — /search shows unavailable panel when search is disabled', async ({ page }) => {
-    await page.goto('/search');
-    const root = page.locator('[data-search-results-root]');
-    if ((await root.count()) > 0) {
+    if (await probeSearchAvailability(page)) {
       test.skip();
       return;
     }
+    await page.goto('/search');
     await expect(page.getByText('Search is currently unavailable')).toBeVisible();
   });
 });

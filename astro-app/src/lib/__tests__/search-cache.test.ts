@@ -88,11 +88,13 @@ describe("search-cache layered store", () => {
     expect(sessionStorage.getItem("search-cache:modernism")).toBeNull();
   });
 
-  test("does NOT cache empty arrays (transient outage protection)", async () => {
+  test("caches empty arrays at full TTL (legitimate zero-results)", async () => {
     const { setCached, getCached } = await freshModule();
     setCached("nothing", []);
-    expect(getCached("nothing")).toBeNull();
-    expect(sessionStorage.getItem("search-cache:nothing")).toBeNull();
+    // Empty array is a valid response — store and serve back so repeat queries
+    // don't round-trip the worker for known-zero results.
+    expect(getCached("nothing")).toEqual([]);
+    expect(sessionStorage.getItem("search-cache:nothing")).not.toBeNull();
   });
 
   test("does NOT cache empty / whitespace-only queries", async () => {

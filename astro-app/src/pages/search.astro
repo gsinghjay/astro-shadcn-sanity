@@ -51,8 +51,15 @@ const initialQuery = (Astro.url.searchParams.get("q") ?? "").trim().slice(0, 256
 
       {!searchAvailable ? (
         <div class="border-2 border-foreground bg-secondary p-6 text-center">
-          <p class="text-foreground">
+          <p class="text-foreground mb-4">
             Search is currently unavailable. Please try again later.
+          </p>
+          <p class="text-foreground text-sm">
+            In the meantime, you can <a href="/" class="underline-offset-4 hover:underline font-bold">browse the homepage</a>
+            {" "}or jump to <a href="/articles" class="underline-offset-4 hover:underline font-bold">articles</a>,
+            {" "}<a href="/events" class="underline-offset-4 hover:underline font-bold">events</a>,
+            {" "}<a href="/projects" class="underline-offset-4 hover:underline font-bold">projects</a>,
+            {" "}or <a href="/sponsors" class="underline-offset-4 hover:underline font-bold">sponsors</a>.
           </p>
         </div>
       ) : (

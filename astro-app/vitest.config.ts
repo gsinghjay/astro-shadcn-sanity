@@ -62,12 +62,20 @@ export default getViteConfig({
     // .astro component renders past Vitest's 5s default under suite-wide
     // contention (we hit this on `json-ld-blocks` FaqSection at 5009ms).
     testTimeout: 15_000,
-    // Concurrent forks + @vitejs/plugin-react's Babel transform deadlocks
-    // esbuild's Go runtime ("fatal error: all goroutines are asleep") and
-    // kills vitest mid-run with no summary. Run all test files in a single
-    // worker to keep the transform load serial and let the suite finish.
-    pool: "forks",
-    poolOptions: { forks: { singleFork: true } },
+    // History: Story 5.23 added a third @vitejs/plugin-react-transformed .tsx
+    // test (SearchResults.test.tsx) which pushed the suite over the deadlock
+    // threshold under CI's tighter CPU/memory budget — vitest silent-died with
+    // exit 1 and no summary at the documented "concurrent forks + Babel
+    // transform deadlocks esbuild's Go runtime" failure mode (PR #717 unit-tests
+    // CI run 25475346423, ~04:02:50 UTC after auth-config.test.ts).
+    //
+    // Switched pool from `forks/singleFork` to `threads`. Threads bypass the
+    // goroutine-asleep deadlock entirely (different runtime), and locally:
+    //   - All 2236 tests pass (was 2236 under forks).
+    //   - Total runtime drops to ~76s from ~109s.
+    //   - storybook-1-4 build test that previously approached the 120s
+    //     timeout under forks completes in ~74s.
+    pool: "threads",
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",

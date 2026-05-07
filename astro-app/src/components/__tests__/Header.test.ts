@@ -90,7 +90,9 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).toContain('data-search-trigger');
     expect(html).toContain('data-gtm-category="site-search"');
@@ -121,7 +123,9 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).not.toContain('data-search-trigger');
     expect(html).not.toContain('<search-modal-snippet');
@@ -143,7 +147,9 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).not.toContain('data-search-trigger');
     expect(html).not.toContain('<search-modal-snippet');

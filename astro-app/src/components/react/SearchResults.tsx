@@ -33,12 +33,45 @@ function pushDataLayer(payload: Record<string, unknown>): void {
   window.dataLayer.push(payload);
 }
 
-function normalizeRaw(raw: string): string {
-  return raw.trim().slice(0, MAX_QUERY_LENGTH);
+// `slice` cuts at code-unit boundaries; if MAX_QUERY_LENGTH lands between a
+// surrogate pair, the result contains a lone high surrogate and
+// `encodeURIComponent` later throws `URIError`. Step back one if so.
+function clampToCodePointBoundary(s: string, max: number): string {
+  if (s.length <= max) return s;
+  const code = s.charCodeAt(max - 1);
+  return code >= 0xd800 && code <= 0xdbff ? s.slice(0, max - 1) : s.slice(0, max);
 }
 
+function normalizeRaw(raw: string): string {
+  return clampToCodePointBoundary(raw.trim(), MAX_QUERY_LENGTH);
+}
+
+// Build the canonical /search URL. Preserves the current path's trailing-slash
+// form and any other URL params (utm_*, hash, etc.) so navigation analytics +
+// anchor links survive a search refinement.
 function buildSearchUrl(query: string): string {
-  return query ? `/search?q=${encodeURIComponent(query)}` : "/search";
+  if (typeof window === "undefined") {
+    return query ? `/search?q=${encodeURIComponent(query)}` : "/search";
+  }
+  const url = new URL(window.location.href);
+  if (query) {
+    url.searchParams.set("q", query);
+  } else {
+    url.searchParams.delete("q");
+  }
+  return url.pathname + url.search + url.hash;
+}
+
+function safePushState(url: string): void {
+  if (typeof window === "undefined") return;
+  if (window.location.pathname + window.location.search + window.location.hash === url) {
+    return;
+  }
+  try {
+    window.history.pushState({}, "", url);
+  } catch {
+    // Cross-origin iframe / sandboxed context — pushState throws SecurityError.
+  }
 }
 
 export default function SearchResults({
@@ -61,7 +94,7 @@ export default function SearchResults({
   const lastDispatchedRef = useRef<string>("");
 
   const runSearch = useCallback(
-    async (rawQuery: string, source: "input" | "popstate" | "retry" | "initial") => {
+    async (rawQuery: string, _source: "input" | "popstate" | "retry" | "initial") => {
       const trimmed = normalizeRaw(rawQuery);
       const normalized = normalizeQuery(trimmed);
 
@@ -75,6 +108,10 @@ export default function SearchResults({
 
       const cached = getCached(trimmed);
       if (cached) {
+        // Abort any in-flight request — otherwise its later resolve would
+        // overwrite this cache hit (line ~106's `aborted` check returns false).
+        abortRef.current?.abort();
+        abortRef.current = null;
         lastDispatchedRef.current = trimmed;
         setState({ status: "success", results: cached, error: null, query: trimmed });
         pushDataLayer({
@@ -129,7 +166,6 @@ export default function SearchResults({
           error_code: errorCode,
         });
       }
-      void source;
     },
     [client],
   );
@@ -167,10 +203,7 @@ export default function SearchResults({
     if (trimmed === lastDispatchedRef.current) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
-      const url = buildSearchUrl(trimmed);
-      if (typeof window !== "undefined" && window.location.pathname + window.location.search !== url) {
-        window.history.pushState({}, "", url);
-      }
+      safePushState(buildSearchUrl(trimmed));
       runSearch(trimmed, "input");
     }, DEBOUNCE_MS);
     return () => {
@@ -182,10 +215,7 @@ export default function SearchResults({
     e.preventDefault();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     const trimmed = normalizeRaw(inputValue);
-    const url = buildSearchUrl(trimmed);
-    if (typeof window !== "undefined" && window.location.pathname + window.location.search !== url) {
-      window.history.pushState({}, "", url);
-    }
+    safePushState(buildSearchUrl(trimmed));
     runSearch(trimmed, "input");
   };
 
@@ -216,12 +246,11 @@ export default function SearchResults({
           onChange={e => setInputValue(e.target.value)}
           data-search-page-input
         />
-      </form>
-
-      <div className="mt-8" aria-live="polite">
+        {/* Empty-state hint nested inside the input shell per AC 4 (idle).
+            Border-top divider keeps the hint visually attached to the input. */}
         {state.status === "idle" && (
           <div
-            className="border-2 border-foreground bg-secondary p-6"
+            className="border-t-2 border-foreground bg-secondary p-6"
             data-search-empty
           >
             <p className="label-caps mb-2">Search</p>
@@ -230,7 +259,9 @@ export default function SearchResults({
             </p>
           </div>
         )}
+      </form>
 
+      <div className="mt-8" aria-live="polite" aria-busy={state.status === "loading"}>
         {state.status === "loading" && (
           <ol
             aria-busy="true"
