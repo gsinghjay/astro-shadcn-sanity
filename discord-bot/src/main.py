@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import asyncio
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, Request
@@ -13,12 +14,16 @@ APPLICATION_COMMAND = 2
 MESSAGE_COMPONENT = 3
 PONG = 1
 CHANNEL_MESSAGE_WITH_SOURCE = 4
+DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE = 5
 TIMESTAMP_TOLERANCE_SECONDS = 300
 logger = logging.getLogger(__name__)
 
+_current_ctx = None
 
 class Default(WorkerEntrypoint):
     async def fetch(self, request, env, ctx):
+        global _current_ctx
+        _current_ctx = ctx
         import asgi
         return await asgi.fetch(app, request, self.env)
 
@@ -37,6 +42,16 @@ def get_env_value(request: Request, name: str) -> str | None:
 
 def get_worker_env(request: Request):
     return request.scope.get("env")
+
+
+def content_response(content: str) -> dict:
+    return {
+        "type": CHANNEL_MESSAGE_WITH_SOURCE,
+        "data": {
+            "content": content,
+            "allowed_mentions": {"parse": []},
+        },
+    }
 
 
 def verify_timestamp(timestamp: str) -> bool:
@@ -114,10 +129,7 @@ async def build_project_status_response(project_name: str, env=None) -> dict:
     project = await get_project(project_name, env=env)
 
     if not project:
-        return {
-            "type": CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {"content": f"No project found matching **{project_name}**."},
-        }
+        return content_response(f"No project found matching **{project_name}**.")
 
     status = str(project.get("status", "unknown")).capitalize()
     sponsor = project.get("sponsor", {})
@@ -156,10 +168,7 @@ async def build_upcoming_events_response(limit: int = 5, env=None) -> dict:
     events = await get_upcoming_events(limit, env=env)
 
     if not events:
-        return {
-            "type": CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {"content": "No upcoming events found."},
-        }
+        return content_response("No upcoming events found.")
 
     category_colors = {
         "workshop": 0xFEE75C,
@@ -206,26 +215,17 @@ async def build_sponsor_info_response(sponsor_name: str | None = None, env=None)
     if not sponsor_name:
         sponsors = await get_all_sponsors(env=env)
         if not sponsors:
-            return {
-                "type": CHANNEL_MESSAGE_WITH_SOURCE,
-                "data": {"content": "No sponsors found."},
-            }
+            return content_response("No sponsors found.")
 
         lines = []
         for sponsor in sponsors:
             tier = str(sponsor.get("tier") or "unknown").capitalize()
             lines.append(f"**{sponsor.get('name', 'Unknown')}** - {tier}")
-        return {
-            "type": CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {"content": "\n".join(lines)},
-        }
+        return content_response("\n".join(lines))
 
     sponsor = await get_sponsor(sponsor_name, env=env)
     if not sponsor:
-        return {
-            "type": CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {"content": f"No sponsor found matching **{sponsor_name}**."},
-        }
+        return content_response(f"No sponsor found matching **{sponsor_name}**.")
 
     tier = str(sponsor.get("tier") or "unknown")
     tier_colors = {
@@ -300,10 +300,7 @@ async def interactions(request: Request):
             from datetime import timezone, timedelta
             edt = timezone(timedelta(hours=-4))
             now = datetime.now(edt).strftime("%B %d, %Y at %I:%M %p EDT")
-            return {
-                "type": CHANNEL_MESSAGE_WITH_SOURCE,
-                "data": {"content": f"Capstone Bot is online! 🟢 {now}"},
-            }
+            return content_response(f"Capstone Bot is online! 🟢 {now}")
 
         if command_name == "project-status":
             project_name = next(
@@ -332,13 +329,65 @@ async def interactions(request: Request):
                 env=worker_env,
             )
 
+        if command_name == "ask":
+            question = next(
+                (opt.get("value") for opt in options if opt.get("name") == "question"), None
+            )
+            if not question:
+                raise HTTPException(status_code=400, detail="Missing question option")
+
+            if len(str(question)) < 5 or len(str(question)) > 500:
+                return content_response("⚠️ Question must be between 5 and 500 characters.")
+
+            try:
+                from js import Object, Request as JsRequest
+                from pyodide.ffi import to_js
+
+                env = request.scope.get("env")
+                ask_worker = getattr(env, "ASK_WORKER", None)
+
+                payload = json.dumps({
+                    "question": str(question),
+                    "application_id": application_id,
+                    "token": interaction.get("token"),
+                })
+
+                js_request = JsRequest.new(
+                    "https://capstone-ask-worker.js426.workers.dev/",
+                    to_js(
+                        {
+                            "method": "POST",
+                            "headers": {
+                                "Content-Type": "application/json",
+                                "X-Bot-Secret": get_env_value(request, "BOT_SECRET"),
+                            },
+                            "body": payload,
+                        },
+                        dict_converter=Object.fromEntries,
+                    ),
+                )
+
+                response = await ask_worker.fetch(js_request)
+                if not response.ok:
+                    error_body = await response.text()
+                    logger.error(
+                        "ask worker failed with status %s: %s",
+                        response.status,
+                        error_body[:500],
+                    )
+                    return content_response("⚠️ Something went wrong. Please try again.")
+                logger.info("ask worker accepted request with status %s", response.status)
+
+            except Exception as e:
+                logger.exception("ask handler error")
+                return content_response("⚠️ Something went wrong. Please try again.")
+
+            return {"type": DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE}
+
         raise HTTPException(status_code=400, detail=f"Unknown command: {command_name}")
 
     if interaction_type == MESSAGE_COMPONENT:
         custom_id = (interaction.get("data") or {}).get("custom_id")
-        return {
-            "type": CHANNEL_MESSAGE_WITH_SOURCE,
-            "data": {"content": f"You triggered component: {custom_id}"},
-        }
+        return content_response(f"You triggered component: {custom_id}")
 
     raise HTTPException(status_code=400, detail="Unknown interaction type")

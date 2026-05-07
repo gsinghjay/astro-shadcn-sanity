@@ -12,7 +12,11 @@
   ],
   "vars": {
     "ENVIRONMENT": "production"
-  }
+  },
+  "services": [
+    {
+      "binding": "ASK_WORKER",
+      "service": "capstone-ask-worker"
+    }
+  ]
 }
-
-

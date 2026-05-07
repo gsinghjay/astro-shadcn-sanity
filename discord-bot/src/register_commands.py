@@ -65,6 +65,20 @@ def main():
                 }
             ],
         },
+        {
+            "name": "ask",
+            "description": "Ask a question about the YWCC Capstone program",
+            "options": [
+                {
+                    "name": "question",
+                    "description": "Your question",
+                    "type": 3,  # STRING
+                    "required": True,
+                    "min_length": 5,
+                    "max_length": 500,
+                }
+            ],
+        }
     ]
 
     url = f"https://discord.com/api/v10/applications/{application_id}/commands"
