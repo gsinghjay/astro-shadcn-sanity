@@ -147,7 +147,15 @@ export const server = {
 
       const ip = ctx.request.headers.get('cf-connecting-ip');
       const ua = ctx.request.headers.get('user-agent');
-      const rev = await getSponsorAgreementRev();
+      // getSponsorAgreementRev already returns null on inner errors, but wrap defensively so a
+      // future refactor (e.g. throwing a typed error) cannot regress first-time acceptance into
+      // a 500 — the rev === null branch below already implements the documented fail-open path.
+      let rev: string | null = null;
+      try {
+        rev = await getSponsorAgreementRev();
+      } catch (err) {
+        log.error('accept-agreement-rev-fetch-failed', err);
+      }
 
       // Sanity outage (rev === null) → trust the existing accepted_at to avoid double-accept;
       // otherwise re-accept on version drift.

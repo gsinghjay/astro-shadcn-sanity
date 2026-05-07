@@ -980,6 +980,42 @@ describe('middleware — unified auth routing', () => {
       expect(payload.expiresAt).toBeLessThanOrEqual(sessionExpiry.getTime());
     });
 
+    it('handles Better Auth session.expiresAt as an ISO string', async () => {
+      mockKvGet.mockResolvedValue(null);
+      const sessionExpiry = new Date(Date.now() + 5 * 60 * 1000);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'iso@test.com', name: 'Iso', role: 'student' },
+        session: { id: 's1', expiresAt: sessionExpiry.toISOString() },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      // String → Date.parse → finite ms; payload.expiresAt floored at min(now+5min, sessionMs)
+      // and KV expirationTtl falls in the 60..300s band.
+      const [, value, opts] = mockKvPut.mock.calls[0];
+      const payload = JSON.parse(value);
+      expect(payload.expiresAt).toBeLessThanOrEqual(Date.parse(sessionExpiry.toISOString()));
+      expect(opts.expirationTtl).toBeGreaterThanOrEqual(60);
+      expect(opts.expirationTtl).toBeLessThanOrEqual(300);
+    });
+
+    it('skips KV write when session.expiresAt is unparseable (no synthetic expiry persisted)', async () => {
+      mockKvGet.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue({
+        user: { id: '1', email: 'bad@test.com', name: 'Bad', role: 'student' },
+        // Garbage shape — Date.parse('not-a-date') is NaN.
+        session: { id: 's1', expiresAt: 'not-a-date' as unknown as number },
+      });
+      const ctx = createMockContext('/student/dashboard', { headers: { cookie: sessionCookie } });
+
+      await onRequest(ctx as any, mockNext);
+
+      // In-memory request flow proceeds (synthetic expiry covers the request) but no KV write
+      // happens — a forged expiresAt must never poison subsequent requests' caches.
+      expect(mockKvPut).not.toHaveBeenCalled();
+    });
+
     it('floors KV expirationTtl at 60 seconds even when session is about to expire', async () => {
       mockKvGet.mockResolvedValue(null);
       mockGetSession.mockResolvedValue({

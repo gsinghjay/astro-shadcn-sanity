@@ -179,6 +179,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     let userData: CachedSession | null = null;
     // Cache the hashed key per request so we don't re-derive SHA-256 on each KV op.
     const hashedSessionKey = sessionToken ? await hashToken(sessionToken) : null;
+    // When upstream session.expiresAt is unparseable we synthesize a fallback so this request's
+    // in-memory auth flow proceeds, but writing that synthetic value to KV would persist a forged
+    // expiry into later requests' caches (whitelist re-cache, agreement re-cache). Default true so
+    // the KV-cached path keeps working; the new-session branch overrides to Number.isFinite(parsed).
+    let kvCacheable = true;
 
     // KV cache check — skip D1 if session is cached. Stale entries (expiresAt elapsed) are
     // dropped fire-and-forget; the request falls through to the D1 path either way.
@@ -224,6 +229,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const sessionExpiryMs = Number.isFinite(parsed)
           ? parsed
           : Date.now() + SESSION_CACHE_FRESHNESS_MS;
+        // Distinguish "field absent" (legacy fallback — write KV with freshness window) from
+        // "field present but unparseable" (garbage like 'not-a-date' — never persist). The
+        // narrower gate preserves the documented synthetic-expiry fallback for sessions whose
+        // adapter omits expiresAt while still preventing forged values from poisoning later
+        // requests' caches via whitelist + agreement re-cache code paths.
+        kvCacheable = sessionExpiryRaw === undefined || Number.isFinite(parsed);
         const cacheExpiresAt = Math.min(Date.now() + SESSION_CACHE_FRESHNESS_MS, sessionExpiryMs);
         userData = {
           email: normalizeEmail(sessionUser.email),
@@ -233,7 +244,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
         };
 
         // Cache session in KV (fire-and-forget). KV expirationTtl floors at 60s.
-        if (kvCache && hashedSessionKey) {
+        // Skip when kvCacheable is false (synthetic expiry) so a forged expiresAt never persists.
+        if (kvCacheable && kvCache && hashedSessionKey) {
           const ttlSeconds = Math.max(
             KV_TTL_MIN_SECONDS,
             Math.floor((cacheExpiresAt - Date.now()) / 1000),
@@ -243,6 +255,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
               .put(hashedSessionKey, JSON.stringify(userData), { expirationTtl: ttlSeconds })
               .catch((e: unknown) => log.error('middleware-kv-write-failed', e)),
           );
+        } else if (!kvCacheable) {
+          log.warn('middleware-kv-write-skipped-unparseable-expiry');
         }
       }
     }
@@ -265,8 +279,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       if (isSponsor) {
         userData.role = "sponsor";
         // Persist escalated role to KV cache (fire-and-forget). Reuse the original expiresAt so
-        // role escalation cannot extend the cache lifetime past the session window.
-        if (kvCache && hashedSessionKey) {
+        // role escalation cannot extend the cache lifetime past the session window. Skip when
+        // kvCacheable is false (synthetic expiry from unparseable upstream session.expiresAt).
+        if (kvCacheable && kvCache && hashedSessionKey) {
           const ttlSeconds = Math.max(
             KV_TTL_MIN_SECONDS,
             Math.floor((userData.expiresAt - Date.now()) / 1000),
@@ -332,7 +347,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
           agreementVersion = row?.agreement_version ?? null;
           userData.agreementAcceptedAt = agreementAcceptedAt;
           userData.agreementVersion = agreementVersion;
-          if (kvCache && hashedSessionKey) {
+          // Skip the re-cache when kvCacheable is false (synthetic expiry).
+          if (kvCacheable && kvCache && hashedSessionKey) {
             const ttlSeconds = Math.max(
               KV_TTL_MIN_SECONDS,
               Math.floor((userData.expiresAt - Date.now()) / 1000),

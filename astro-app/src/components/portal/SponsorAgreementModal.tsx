@@ -94,11 +94,16 @@ export default function SponsorAgreementModal({
     if (!accepted || submitting || !pdfReady) return;
     setSubmitting(true);
     setError(null);
+    // `error` from render scope is stale across the await; track redirect intent locally
+    // so the success path's 5s submitting fallback isn't defeated and duplicate accepts
+    // can't fire while reload() is pending.
+    let shouldResetSubmitting = true;
     try {
       const { data, error: actionError } = await actions.acceptAgreement({});
       if (data) {
         // 'accepted' and 'already_accepted' both mean "modal can close" — reload to re-run middleware.
         // Defensive: if reload is blocked or delayed, drop the spinner so user can retry.
+        shouldResetSubmitting = false;
         setTimeout(() => setSubmitting(false), 5000);
         window.location.reload();
         return;
@@ -111,8 +116,7 @@ export default function SponsorAgreementModal({
     } catch {
       setError('Network error. Try again.');
     } finally {
-      // Reset on every non-redirect path so the button never gets stuck on "Saving…".
-      if (!error) setSubmitting(false);
+      if (shouldResetSubmitting) setSubmitting(false);
     }
   }
 
