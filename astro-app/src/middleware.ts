@@ -17,9 +17,24 @@ const RATE_LIMIT_MAX_REQUESTS = 100;
 /** Paths under /portal/* that skip auth checks (matched after trailing-slash normalization) */
 const PORTAL_PUBLIC_PATHS = new Set(["/portal/login", "/portal/denied"]);
 
-/** Astro Action endpoint for accepting the sponsor agreement.
- *  Classified as portal so the auth flow runs (otherwise `ctx.locals.user` is unset),
- *  AND skipped from the agreement gate so a not-yet-accepted sponsor can submit. */
+/** Astro Action endpoints that require the portal auth flow (sponsor session + role check).
+ *  All paths here get JSON 401/403 on auth failure (never opaque 302) because Astro Actions
+ *  invoke handlers via fetch and expect structured responses. Public actions (e.g. submitForm)
+ *  are NOT in this Set — they remain unauthenticated by design. */
+const PORTAL_ACTION_PATHS = new Set([
+  "/_actions/acceptAgreement",
+  "/_actions/getSponsorProjects",
+  "/_actions/getSponsorEvents",
+  "/_actions/getMe",
+  "/_actions/getGithubLinks",
+  "/_actions/linkGithubRepo",
+  "/_actions/unlinkGithubRepo",
+  "/_actions/getGithubRepos",
+  "/_actions/disconnectGithub",
+]);
+
+/** Only `acceptAgreement` skips the agreement gate so a not-yet-accepted sponsor can submit.
+ *  Other portal actions stay behind the gate; the modal blocks UI before they're invoked. */
 const ACCEPT_AGREEMENT_ACTION_PATH = "/_actions/acceptAgreement";
 
 const jsonError = (status: number, error: string) =>
@@ -112,12 +127,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
-  // The acceptAgreement Action endpoint runs through the portal auth flow so its handler
-  // sees `ctx.locals.user`; the agreement gate then skips this same path so the not-yet-accepted
-  // sponsor can actually submit. Other Astro Actions (e.g. submitForm on public pages) are NOT
-  // portal-routed — they remain unauthenticated by design.
-  const isAcceptAgreementAction = cleanPath === ACCEPT_AGREEMENT_ACTION_PATH;
-  const isPortal = isPortalPage || isPortalApi || isAcceptAgreementAction;
+  // Portal-scoped Astro Actions run through the portal auth flow so their handlers see
+  // `ctx.locals.user`. Other Astro Actions (e.g. submitForm on public pages) are NOT in
+  // PORTAL_ACTION_PATHS — they remain unauthenticated by design.
+  const isPortalAction = PORTAL_ACTION_PATHS.has(cleanPath);
+  const isPortal = isPortalPage || isPortalApi || isPortalAction;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
   // Branch 1: Public routes (and admin API) — zero auth overhead.
@@ -269,10 +283,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // No session → 401 JSON for API routes, redirect for pages
     if (!userData) {
-      // JSON response for fetch-based callers (portal API + acceptAgreement Action endpoint).
+      // JSON response for fetch-based callers (portal API + portal-scoped Action endpoints).
       // Astro Actions invoke handlers via fetch and expect a structured response — a 302 to
       // /auth/login would be opaque to the React client.
-      if (isPortalApi || isAcceptAgreementAction) return jsonError(401, "unauthorized");
+      if (isPortalApi || isPortalAction) return jsonError(401, "unauthorized");
       const loginUrl = isPortalPage
         ? `/portal/login?redirect=${encodeURIComponent(pathname)}`
         : `/auth/login?redirect=${encodeURIComponent(pathname)}`;
@@ -316,7 +330,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
               .catch((e: unknown) => log.error('middleware-kv-delete-failed', e)),
           );
         }
-        if (isPortalApi || isAcceptAgreementAction) return jsonError(403, "forbidden");
+        if (isPortalApi || isPortalAction) return jsonError(403, "forbidden");
         return new Response(null, {
           status: 302,
           headers: {

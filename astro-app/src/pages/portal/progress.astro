@@ -258,8 +258,6 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
           client:load
           projects={projects}
           links={serializedLinks}
-          linkEndpoint="/portal/api/github/links"
-          reposEndpoint="/portal/api/github/repos"
         />
       </>
     )}
@@ -303,6 +301,7 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
 {/* Client-side scripts for GitHub OAuth connection */}
 <script>
   import { authClient } from '@/lib/auth-client';
+  import { actions } from 'astro:actions';
 
   // Link GitHub (new connection — user has no GitHub account linked)
   document.getElementById('connect-github')?.addEventListener('click', () => {
@@ -321,7 +320,7 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
     });
   });
 
-  // Disconnect GitHub — full unlink. Server endpoint wipes project_github_repos
+  // Disconnect GitHub — full unlink. Server action wipes project_github_repos
   // rows, deletes the Better Auth account row, and invalidates the KV session
   // cache; client then reloads to surface `no-github-account` UI. The static
   // disconnect card above the button carries the github.com/settings/applications
@@ -350,20 +349,14 @@ const pageGraph = buildPageGraph(breadcrumbJsonLd);
     disconnectBtn.disabled = true;
     disconnectBtn.textContent = 'Disconnecting…';
 
-    let res: Response;
-    try {
-      res = await fetch('/portal/api/github/disconnect', { method: 'DELETE' });
-    } catch {
-      showError('Failed to disconnect. Please try again.');
-      return;
-    }
+    const { data, error } = await actions.disconnectGithub({});
 
-    if (res.status === 401) {
+    if (error?.code === 'UNAUTHORIZED') {
       showError('Session expired — please reload the page and sign in again.');
       return;
     }
 
-    if (!res.ok) {
+    if (error || !data?.success) {
       showError('Failed to disconnect. Please try again.');
       return;
     }
