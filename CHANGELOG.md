@@ -1,3 +1,18 @@
+## [2.5.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.4.0...v2.5.0) (2026-05-07)
+
+### Features
+
+* **portal:** migrate sponsor agreement modal to Astro Action (Story 26.2) ([847f8c7](https://github.com/gsinghjay/astro-shadcn-sanity/commit/847f8c77d5c2fd55f6b40d05162eda6a81557f5e))
+* **security:** close H-2 — SESSION_CACHE hashed keys + expiresAt (Story 24.3) ([e2ee4f5](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e2ee4f5ce78c846d57dc4d45b95e8eac568f725e))
+
+### Bug Fixes
+
+* **portal,security:** CodeRabbit findings on Stories 24.3 + 26.2 ([01df2ba](https://github.com/gsinghjay/astro-shadcn-sanity/commit/01df2baa9fb24ccdeb86c26cee2a7462d907a8c4))
+
+### Documentation
+
+* **migrations:** record FK-cascade behavior on 0010 prod apply ([0c6d19a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0c6d19af2821dbe5e4d9a185d019c111fcd8372e))
+
 ## [2.4.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.3.0...v2.4.0) (2026-05-07)
 
 ### Features
