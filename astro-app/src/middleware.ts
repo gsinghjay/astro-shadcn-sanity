@@ -102,6 +102,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // Sanity session JWT (cross-origin Studio caller, no portal session cookie).
   // Skip the portal session gate so the route handler can run its own
   // identity introspection + origin check + CORS emission.
+  // Normalize trailing slash before any path-equality check. Astro Actions in production POST
+  // to `/_actions/acceptAgreement/` (trailing slash, per Astro's default trailingSlash handling
+  // + CF Static Assets `html_handling: "auto-trailing-slash"`); a strict `===` against the
+  // slash-less constant misclassified the request as a public route, skipped the auth flow,
+  // left `ctx.locals.user` unset, and the action handler returned 401 UNAUTHORIZED.
+  const cleanPath =
+    pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const isPortalAdminApi = pathname.startsWith("/api/portal/admin/");
   const isPortalApi = pathname.startsWith("/api/portal/") && !isPortalAdminApi;
   const isPortalPage = pathname.startsWith("/portal/") || pathname === "/portal";
@@ -109,7 +116,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   // sees `ctx.locals.user`; the agreement gate then skips this same path so the not-yet-accepted
   // sponsor can actually submit. Other Astro Actions (e.g. submitForm on public pages) are NOT
   // portal-routed — they remain unauthenticated by design.
-  const isAcceptAgreementAction = pathname === ACCEPT_AGREEMENT_ACTION_PATH;
+  const isAcceptAgreementAction = cleanPath === ACCEPT_AGREEMENT_ACTION_PATH;
   const isPortal = isPortalPage || isPortalApi || isAcceptAgreementAction;
   const isStudent = pathname.startsWith("/student/") || pathname === "/student";
 
@@ -120,8 +127,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return decorateForAgents(context, next);
   }
 
-  // Whitelist login/denied pages from auth check (normalize trailing slash)
-  const cleanPath = pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
+  // Whitelist login/denied pages from auth check
   if (PORTAL_PUBLIC_PATHS.has(cleanPath)) {
     return next();
   }
