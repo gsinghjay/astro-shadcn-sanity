@@ -16,8 +16,8 @@ jobs:
       - run: npm ci
       - name: Verify test tier boundaries (no Astro Container leaks into unit-node)
         run: npm run verify:tiers --workspace=astro-app
-      - name: Run unit tests
-        run: npm run test:unit
+      - name: Run unit tests (per-tier sequential to bound CI memory)
+        run: npm run test:unit:ci --workspace=astro-app
 
   site-health:
     runs-on: ubuntu-latest

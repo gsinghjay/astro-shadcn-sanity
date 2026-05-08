@@ -18,15 +18,19 @@ import react from "@vitejs/plugin-react-swc";
 //   unit-react  .test.tsx React-component tests. jsdom + plugin-react-swc
 //               (Story 27.1; SWC eliminated the Babel-vs-esbuild deadlock).
 //
-// CI maxForks: 1 across every tier. Story 27.2's verification step 6b
-// (PR #720 push #1) reproduced Story 27.1's OOM-shape silent kill on
-// ubuntu-latest under unit-node = 2: ~7 of 134 files completed in ~18s,
-// exit 1, no test summary, no JUnit. Confirms the failure mode is
-// concurrent-fork memory pressure (NOT plugin chain weight) — per-tier
-// caps don't help if any single tier ALSO runs at >1 alongside another.
-// Holding every tier at 1 on CI keeps each file in a fresh fork (no
-// singleFork-style state accumulation) while serializing across the whole
-// suite. Local dev keeps unbounded parallelism on every tier.
+// CI maxForks: 1 per tier — but per-tier caps alone are NOT enough on
+// ubuntu-latest. PR #720 pushes #1 and #2 reproduced Story 27.1's OOM-shape
+// silent kill (~7–9 files in ~14–18s, exit 1, no summary, no JUnit) even
+// with unit-node = 1, because Vitest's projects mode runs the projects
+// THEMSELVES in parallel — a single `vitest run` invocation can hold one
+// fork per project simultaneously (3 concurrent forks at peak), and that
+// total is enough to blow the runner's 7 GB. CI works around this by
+// running projects sequentially via the `test:unit:ci` script (three
+// `vitest run --project <name>` invocations chained with `&&`); local dev
+// keeps the parallel single-invocation form via `npm run test:unit`. The
+// per-tier maxForks: 1 cap stays as defense-in-depth so a future regression
+// to `npm run test:unit` on CI surfaces as one specific tier's silent kill
+// rather than a confusing cross-tier interleave.
 //
 // pool: 'threads' is non-viable here (rolled back in a9aa8d0 — conflicts
 // with @astrojs/cloudflare adapter test surface). singleFork is gone from
