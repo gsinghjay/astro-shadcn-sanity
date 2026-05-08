@@ -18,13 +18,15 @@ import react from "@vitejs/plugin-react-swc";
 //   unit-react  .test.tsx React-component tests. jsdom + plugin-react-swc
 //               (Story 27.1; SWC eliminated the Babel-vs-esbuild deadlock).
 //
-// Per-tier CI maxForks caps replace Story 27.1's blanket top-level cap of 1.
-// The unit-astro tier holds at 1 because Story 27.1's first CI push silent-
-// killed under that profile (getViteConfig + parallel forks + ubuntu-latest
-// 7 GB) — no evidence yet supports relaxing it. unit-node carries no plugin
-// chain and gets maxForks: 2 to reclaim wall-clock; verification protocol
-// 6b watches for the same silent-kill pattern. unit-react serializes 4 files
-// at trivial cost to bound jsdom + React 19 hydration memory.
+// CI maxForks: 1 across every tier. Story 27.2's verification step 6b
+// (PR #720 push #1) reproduced Story 27.1's OOM-shape silent kill on
+// ubuntu-latest under unit-node = 2: ~7 of 134 files completed in ~18s,
+// exit 1, no test summary, no JUnit. Confirms the failure mode is
+// concurrent-fork memory pressure (NOT plugin chain weight) — per-tier
+// caps don't help if any single tier ALSO runs at >1 alongside another.
+// Holding every tier at 1 on CI keeps each file in a fresh fork (no
+// singleFork-style state accumulation) while serializing across the whole
+// suite. Local dev keeps unbounded parallelism on every tier.
 //
 // pool: 'threads' is non-viable here (rolled back in a9aa8d0 — conflicts
 // with @astrojs/cloudflare adapter test surface). singleFork is gone from
@@ -82,7 +84,7 @@ export default defineConfig({
           ...sharedTest,
           name: "unit-node",
           environment: "node",
-          ...forkPool(2),
+          ...forkPool(1),
           include: [
             "src/lib/__tests__/**/*.test.ts",
             "src/cloudflare/__tests__/**/*.test.ts",
