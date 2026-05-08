@@ -136,13 +136,18 @@ describe("Story 5.23 — /search SEO posture preserved", () => {
     );
   });
 
-  test("search.astro mounts the SearchResults React island via client:load", () => {
+  test("search.astro mounts the SearchResults React island as a client-only component", () => {
+    // Story 5.23 originally used client:load, but the SearchResults module
+    // statically imports `@cloudflare/ai-search-snippet` whose web-component
+    // classes (`extends HTMLElement`) crash workerd at SSR time. Switched to
+    // client:only="react" so the vendor module stays out of the SSR bundle —
+    // page is `noIndex` so the brief empty hydration window is acceptable.
     const page = readFileSync(
       resolve(astroApp, "src/pages/search.astro"),
       "utf8",
     );
     expect(page).toContain("SearchResults");
-    expect(page).toContain("client:load");
+    expect(page).toContain('client:only="react"');
     expect(page).toContain("@/components/react/SearchResults");
   });
 
