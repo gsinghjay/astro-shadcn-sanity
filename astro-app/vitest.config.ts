@@ -1,156 +1,86 @@
 /// <reference types="vitest" />
 import { getViteConfig } from "astro/config";
 import { resolve } from "node:path";
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
-// Three-project workspace (Vitest 3.x test.projects):
+// Monolithic getViteConfig wrapper — Story 27.1 shape (post-PR #719).
+// Story 27.2 attempted a Vitest 3 test.projects restructure (PR #720) but
+// reproducibly reproduced Story 27.1's R4 goroutine-deadlock contingency on
+// ubuntu-latest CI even with per-tier maxForks: 1 + sequential `--project`
+// invocations: `fatal error: all goroutines are asleep - deadlock!` in
+// esbuild.RunOnResolvePlugins after ~3 of 88 unit-astro files. Concluded
+// that projects mode is incompatible with the Astro Vite chain in this
+// codebase on this runner; restructure deferred. The failing experiment is
+// captured in story-27-2-vitest-projects-restructure.md Dev Agent Record.
 //
-//   unit-node   pure-Node lib / pages / actions / cloudflare / studio schemas.
-//               No Astro Vite chain, no React plugin.
-//   unit-astro  .astro Container API renders + tests/integration/**. Wrapped
-//               via getViteConfig so the Astro Vite chain compiles .astro
-//               components, resolves astro:env / sanity:client / cloudflare:
-//               workers virtuals, AND handles the .css imports that come in
-//               via tests/integration's `studio/src/...` cross-package paths
-//               (sanity/lib/bundle.css) — those crash unit-node with
-//               "Unknown file extension '.css'" without a Vite plugin chain.
-//   unit-react  .test.tsx React-component tests. jsdom + plugin-react-swc
-//               (Story 27.1; SWC eliminated the Babel-vs-esbuild deadlock).
+// Why SWC: Story 27.1 swapped @vitejs/plugin-react → @vitejs/plugin-react-swc
+// to eliminate the Babel-vs-esbuild deadlock that broke CI under the previous
+// plugin-react setup (Babel JS event loop + esbuild Go scheduler contention).
+// SWC runs the JSX transform in Rust, no Go-runtime interaction.
 //
-// CI maxForks: 1 per tier — but per-tier caps alone are NOT enough on
-// ubuntu-latest. PR #720 pushes #1 and #2 reproduced Story 27.1's OOM-shape
-// silent kill (~7–9 files in ~14–18s, exit 1, no summary, no JUnit) even
-// with unit-node = 1, because Vitest's projects mode runs the projects
-// THEMSELVES in parallel — a single `vitest run` invocation can hold one
-// fork per project simultaneously (3 concurrent forks at peak), and that
-// total is enough to blow the runner's 7 GB. CI works around this by
-// running projects sequentially via the `test:unit:ci` script (three
-// `vitest run --project <name>` invocations chained with `&&`); local dev
-// keeps the parallel single-invocation form via `npm run test:unit`. The
-// per-tier maxForks: 1 cap stays as defense-in-depth so a future regression
-// to `npm run test:unit` on CI surfaces as one specific tier's silent kill
-// rather than a confusing cross-tier interleave.
+// Why CI maxForks: 1 + singleFork: false: Story 27.1 push #1 (commit 5437380)
+// silent-killed at file 3/134 in 13s on ubuntu-latest under unbounded parallel
+// forks (kernel SIGKILL on the parent vitest process from memory pressure).
+// Push #2 (commit 583b581) capped to maxForks: 1 on CI — each file still gets
+// a fresh fork (no singleFork-style esbuild-state accumulation), but only one
+// runs at a time. Two consecutive green CI runs followed.
 //
 // pool: 'threads' is non-viable here (rolled back in a9aa8d0 — conflicts
-// with @astrojs/cloudflare adapter test surface). singleFork is gone from
-// every tier; isolate: true (default) handles vi.resetModules/stubEnv.
+// with @astrojs/cloudflare adapter test surface); do not switch.
 
-const isCI = !!process.env.CI;
-const root = import.meta.dirname;
-
-// Aliases shared by every project — applied via sharedResolve below.
-const sharedAliases = {
-  "@": resolve(root, "./src"),
-  "sanity:client": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/sanity-client.ts",
-  ),
-  "astro:env/client": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/astro-env-client.ts",
-  ),
-  "astro:env/server": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/astro-env-server.ts",
-  ),
-  "cloudflare:workers": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/cloudflare-workers.ts",
-  ),
-};
-
-// Stubs for Astro virtual modules that don't exist outside getViteConfig.
-// MUST NOT be merged into unit-astro's resolve.alias — getViteConfig provides
-// the real virtuals there, and a stub at the same id would shadow them
-// (e.g. defineAction's .orThrow / .safe attachments would disappear,
-// breaking action handler tests). Apply only to unit-node + unit-react.
-const astroVirtualStubs = {
-  "astro:actions": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/astro-actions.ts",
-  ),
-  "astro:middleware": resolve(
-    root,
-    "./src/lib/__tests__/__mocks__/astro-middleware.ts",
-  ),
-};
-
-const sharedResolve = { alias: sharedAliases, dedupe: ["react", "react-dom"] };
-const stubbedResolve = {
-  alias: { ...sharedAliases, ...astroVirtualStubs },
-  dedupe: ["react", "react-dom"],
-};
-const sharedTest = { globals: true, testTimeout: 15_000 };
-
-const forkPool = (ciMaxForks: number) => ({
-  pool: "forks" as const,
-  poolOptions: {
-    forks: {
-      singleFork: false,
-      ...(isCI ? { minForks: 1, maxForks: ciMaxForks } : {}),
+export default getViteConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": resolve(import.meta.dirname, "./src"),
+      "sanity:client": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/sanity-client.ts",
+      ),
+      "astro:env/client": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-client.ts",
+      ),
+      "astro:env/server": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/astro-env-server.ts",
+      ),
+      // The `cloudflare:workers` virtual module exists only inside the
+      // Worker runtime — `@astrojs/cloudflare` v13 makes it the canonical
+      // way to read bindings (`import { env } from "cloudflare:workers"`).
+      // Stub it so tests that import server modules can resolve it; tests
+      // that need a specific binding can vi.mock the same id.
+      "cloudflare:workers": resolve(
+        import.meta.dirname,
+        "./src/lib/__tests__/__mocks__/cloudflare-workers.ts",
+      ),
     },
+    dedupe: ["react", "react-dom"],
   },
-});
-
-export default defineConfig({
+  /* @ts-expect-error — getViteConfig types don't include test but Vitest reads it */
   test: {
-    projects: [
-      {
-        resolve: stubbedResolve,
-        test: {
-          ...sharedTest,
-          name: "unit-node",
-          environment: "node",
-          ...forkPool(1),
-          include: [
-            "src/lib/__tests__/**/*.test.ts",
-            "src/cloudflare/__tests__/**/*.test.ts",
-            "src/__tests__/**/*.test.ts",
-            "src/pages/**/__tests__/**/*.test.ts",
-          ],
-          exclude: ["node_modules", "dist", ".astro"],
-        },
+    globals: true,
+    // Astro 6 Container API + Vite SSR transform on cold start can push
+    // .astro component renders past Vitest's 5s default under suite-wide
+    // contention (we hit this on `json-ld-blocks` FaqSection at 5009ms).
+    testTimeout: 15_000,
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        ...(process.env.CI ? { minForks: 1, maxForks: 1 } : {}),
       },
-      // unit-astro is wrapped via getViteConfig so Astro's Vite chain compiles
-      // .astro components for experimental_AstroContainer renders. Returns an
-      // async fn ({mode, command}) => Promise<UserConfig> — Vitest's projects
-      // array supports that form.
-      getViteConfig({
-        resolve: sharedResolve,
-        // @ts-expect-error — getViteConfig types don't include `test`
-        test: {
-          ...sharedTest,
-          name: "unit-astro",
-          environment: "node",
-          ...forkPool(1),
-          include: [
-            "src/components/**/__tests__/**/*.test.ts",
-            "src/actions/__tests__/**/*.test.ts",
-            "../tests/integration/**/*.test.ts",
-            "../studio/src/__tests__/**/*.test.ts",
-          ],
-          exclude: ["node_modules", "dist", ".astro"],
-        },
-      }),
-      {
-        plugins: [react()],
-        resolve: stubbedResolve,
-        test: {
-          ...sharedTest,
-          name: "unit-react",
-          environment: "jsdom",
-          ...forkPool(1),
-          include: [
-            "src/**/__tests__/**/*.test.tsx",
-            "../studio/src/tools/__tests__/**/*.test.tsx",
-          ],
-          exclude: ["node_modules", "dist", ".astro"],
-        },
-      },
+    },
+    include: [
+      "src/**/__tests__/**/*.test.ts",
+      "src/**/__tests__/**/*.test.tsx",
+      "../tests/integration/**/*.test.ts",
+      "../studio/src/__tests__/**/*.test.ts",
+      "../studio/src/tools/__tests__/**/*.test.tsx",
     ],
-    // Workspace-wide reporter / coverage / output config — applies to every
-    // project (per Vitest 3.x semantics; do NOT duplicate per-project).
+    exclude: ["node_modules", "dist", ".astro"],
+    // Per-file `/** @vitest-environment jsdom */` pragma at the top of each
+    // .test.tsx file replaces the deprecated environmentMatchGlobs.
     coverage: {
       provider: "v8",
       include: ["src/lib/**/*.ts", "src/scripts/**/*.ts"],
@@ -159,6 +89,8 @@ export default defineConfig({
       reportsDirectory: "../test-results/unit-coverage",
     },
     reporters: ["default", "junit"],
-    outputFile: { junit: "../test-results/unit-results.xml" },
+    outputFile: {
+      junit: "../test-results/unit-results.xml",
+    },
   },
 });
