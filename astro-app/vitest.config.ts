@@ -1,30 +1,24 @@
 /// <reference types="vitest" />
 import { getViteConfig } from "astro/config";
 import { resolve } from "path";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 
 export default getViteConfig({
-  // React 19 components in this project rely on the automatic JSX runtime —
-  // they don't `import React from 'react'`. Astro 6's getViteConfig wires
-  // @astrojs/react into the production build, but the test transform falls
-  // back to esbuild's classic runtime, so .tsx components crash at render
-  // time with "ReferenceError: React is not defined". Add the Vite React
-  // plugin so the test transform uses the automatic runtime.
+  // React 19 components in this project rely on the automatic JSX runtime.
+  // Astro's getViteConfig wires @astrojs/react into production builds, but
+  // the Vitest transform path needs its own JSX-aware plugin or .tsx tests
+  // crash at render with "ReferenceError: React is not defined".
   //
-  // Scope to our own src/ + studio/src — @vitejs/plugin-react also runs
-  // React Compiler on whatever it transforms, and inserting `React.c()`
-  // calls into library source like `@sanity/ui/src/...` (which Vite hits
-  // when it follows the package's `source` export) crashes at render with
-  // "Cannot read properties of null (reading 'useMemoCache')".
-  plugins: [
-    react({
-      include: [
-        /\/astro-app\/src\/.*\.[jt]sx$/,
-        /\/studio\/src\/.*\.[jt]sx$/,
-      ],
-      exclude: [/\/node_modules\//],
-    }),
-  ],
+  // Why SWC, not Babel: @vitejs/plugin-react performs JSX transformation in
+  // JavaScript via Babel; under fork contention on GitHub Actions ubuntu-latest
+  // (2 cores / 7 GB) the Babel JS event loop blocks long enough that esbuild's
+  // Go scheduler deadlocks ("fatal error: all goroutines are asleep") and
+  // vitest is killed mid-run with no summary. @vitejs/plugin-react-swc runs
+  // the same transform in Rust — no Go-runtime interaction, no Babel — and
+  // doesn't auto-inject React Compiler, so we no longer need the include/
+  // exclude scoping that previously kept @sanity/ui source out of the
+  // useMemoCache crash path. Resolves Epic 27 / Story 27.1.
+  plugins: [react()],
   resolve: {
     alias: {
       // Project import alias — mirrors tsconfig `paths` so test imports use
@@ -62,23 +56,20 @@ export default getViteConfig({
     // .astro component renders past Vitest's 5s default under suite-wide
     // contention (we hit this on `json-ld-blocks` FaqSection at 5009ms).
     testTimeout: 15_000,
-    // Concurrent forks + @vitejs/plugin-react's Babel transform deadlocks
-    // esbuild's Go runtime ("fatal error: all goroutines are asleep") and
-    // kills vitest mid-run with no summary. Run all test files in a single
-    // worker to keep the transform load serial and let the suite finish.
-    //
-    // Story 5.23 follow-up: this mitigation works locally but the CI runner
-    // (GitHub Actions ubuntu-latest) hits the same deadlock at ~10 test
-    // files in due to tighter CPU/memory budget. Four mitigations attempted
-    // (commits 2c2ac58 → a9aa8d0): pool: "threads" failed worse on CI
-    // (3 files / 11s); pool: "forks", isolate: false broke 23 tests locally;
-    // removing @vitejs/plugin-react broke 134 of 170 test files; splitting
-    // .tsx tests into a separate vitest project triggered Vite optimizeDep
-    // cache failures across the .test.ts suite. None viable. Resolving
-    // requires bumping the CI runner to a paid larger class (8-core+) or
-    // fundamentally restructuring the test stack. Tracked in deferred-work.md.
+    // Forks pool, parallel (singleFork:false). The SWC plugin swap (above)
+    // removes the Babel-vs-esbuild contention; serializing forks on top of
+    // that is actively harmful — local verification under singleFork:true
+    // hit "fatal error: all goroutines are asleep - deadlock!" in
+    // esbuild.RunOnResolvePlugins at ~65 of 134 files because esbuild
+    // service state accumulates inside the single fork until the Go
+    // scheduler saturates. Parallel forks give each file a fresh esbuild
+    // service and run the full suite cleanly (~50s wall, 4–5 cores).
+    // Story 27.1 absorbed this pool change from Story 27.2 per the epic's
+    // R4 contingency; Story 27.2 retains its broader projects-restructure
+    // scope. pool: "threads" remains non-viable under @astrojs/cloudflare's
+    // adapter test surface (rolled back in commit a9aa8d0); do not switch.
     pool: "forks",
-    poolOptions: { forks: { singleFork: true } },
+    poolOptions: { forks: { singleFork: false } },
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",
