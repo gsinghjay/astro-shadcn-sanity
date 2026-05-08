@@ -56,20 +56,30 @@ export default getViteConfig({
     // .astro component renders past Vitest's 5s default under suite-wide
     // contention (we hit this on `json-ld-blocks` FaqSection at 5009ms).
     testTimeout: 15_000,
-    // Forks pool, parallel (singleFork:false). The SWC plugin swap (above)
-    // removes the Babel-vs-esbuild contention; serializing forks on top of
-    // that is actively harmful — local verification under singleFork:true
-    // hit "fatal error: all goroutines are asleep - deadlock!" in
-    // esbuild.RunOnResolvePlugins at ~65 of 134 files because esbuild
-    // service state accumulates inside the single fork until the Go
-    // scheduler saturates. Parallel forks give each file a fresh esbuild
-    // service and run the full suite cleanly (~50s wall, 4–5 cores).
-    // Story 27.1 absorbed this pool change from Story 27.2 per the epic's
-    // R4 contingency; Story 27.2 retains its broader projects-restructure
-    // scope. pool: "threads" remains non-viable under @astrojs/cloudflare's
-    // adapter test surface (rolled back in commit a9aa8d0); do not switch.
+    // Forks pool. Two failure modes shape the config:
+    //
+    // 1. singleFork:true reuses one fork for all files; esbuild service state
+    //    accumulates until the Go scheduler saturates and emits "fatal error:
+    //    all goroutines are asleep - deadlock!" in esbuild.RunOnResolvePlugins
+    //    (locally repro'd at file ~65/134). Do not enable.
+    // 2. Unbounded parallel forks on GitHub Actions ubuntu-latest (constrained
+    //    CPU/memory) trigger silent kernel SIGKILL — vitest exits 1 with no
+    //    summary, no JUnit, and an orphan workerd left in cleanup. First run
+    //    of this story died at file 3 of 134 in 13s.
+    //
+    // Compromise: cap maxForks to 1 on CI so each file still gets a fresh
+    // fork (no singleFork-style state accumulation) but only one runs at a
+    // time (no parallel memory pressure). Local dev keeps unbounded
+    // parallelism and the ~50s wall-clock win. pool:"threads" remains
+    // non-viable under @astrojs/cloudflare's adapter surface (rolled back in
+    // a9aa8d0); do not switch.
     pool: "forks",
-    poolOptions: { forks: { singleFork: false } },
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        ...(process.env.CI ? { minForks: 1, maxForks: 1 } : {}),
+      },
+    },
     include: [
       "src/**/__tests__/**/*.test.ts",
       "src/**/__tests__/**/*.test.tsx",
