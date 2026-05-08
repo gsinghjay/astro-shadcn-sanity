@@ -245,14 +245,18 @@ export default defineConfig({
       }),
 
       // --- Server-side secrets (portal / auth / write paths) ---
-      // Only the prod `capstone` Worker carries these — the rwc + *-preview
-      // Workers are content-only (no D1/KV/DO bindings) and portal/auth/api
-      // routes return 503 there. Marking these `optional` for non-prod envs
-      // lets `astro:env/server` return undefined at runtime instead of
-      // throwing EnvInvalidVariables on every request when the bundle imports
-      // `actions/index.ts` (which transitively reads these). Prod stays strict
-      // so a missing secret still fails the build immediately.
-      ...(process.env.CLOUDFLARE_ENV === "capstone"
+      // The `capstone` (prod) and `capstone_preview` (staging) Workers both
+      // run the portal — capstone_preview shares prod D1/KV bindings so its
+      // build needs the same secrets. RWC + RWC-preview Workers stay
+      // content-only (no D1/KV/DO bindings) and portal/auth/api routes return
+      // 503 there. Marking these `optional` for non-portal envs lets
+      // `astro:env/server` return undefined at runtime instead of throwing
+      // EnvInvalidVariables on every request when the bundle imports
+      // `actions/index.ts` (which transitively reads these). Capstone +
+      // capstone_preview stay strict so a missing secret fails the build
+      // immediately.
+      ...(process.env.CLOUDFLARE_ENV === "capstone" ||
+      process.env.CLOUDFLARE_ENV === "capstone_preview"
         ? {
             BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
             GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),

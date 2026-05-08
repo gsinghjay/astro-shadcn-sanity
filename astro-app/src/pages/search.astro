@@ -64,7 +64,7 @@ const initialQuery = (Astro.url.searchParams.get("q") ?? "").trim().slice(0, 256
         </div>
       ) : (
         <SearchResults
-          client:load
+          client:only="react"
           apiUrl={cleanApiUrl}
           initialQuery={initialQuery}
           placeholder={cleanPlaceholder}
