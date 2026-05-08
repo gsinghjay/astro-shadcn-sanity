@@ -14,6 +14,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Verify test tier boundaries (no Astro Container leaks into unit-node)
+        run: npm run verify:tiers --workspace=astro-app
       - name: Run unit tests
         run: npm run test:unit
 

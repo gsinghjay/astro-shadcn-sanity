@@ -22,7 +22,8 @@
     "deploy:rwc-intl-preview": "npm run predeploy:assert-fresh && CLOUDFLARE_ENV=rwc_intl_preview astro build && npm run postbuild:agent-discovery && npm run postbuild:assert-no-localhost && wrangler deploy",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
-    "test:unit:coverage": "vitest run --coverage"
+    "test:unit:coverage": "vitest run --coverage",
+    "verify:tiers": "node scripts/verify-test-tiers.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
