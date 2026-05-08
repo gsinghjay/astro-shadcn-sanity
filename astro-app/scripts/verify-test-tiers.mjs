@@ -27,8 +27,6 @@ const unitNodeRoots = [
   "astro-app/src/__tests__",
   "astro-app/src/pages/__tests__",
   "astro-app/src/pages/api",
-  "astro-app/src/actions/__tests__",
-  "studio/src/__tests__",
 ];
 
 const forbiddenPatterns = [

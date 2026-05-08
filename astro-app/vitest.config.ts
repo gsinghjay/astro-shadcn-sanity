@@ -39,7 +39,8 @@ import react from "@vitejs/plugin-react-swc";
 const isCI = !!process.env.CI;
 const root = import.meta.dirname;
 
-const aliases = {
+// Aliases shared by every project — applied via sharedResolve below.
+const sharedAliases = {
   "@": resolve(root, "./src"),
   "sanity:client": resolve(
     root,
@@ -57,16 +58,29 @@ const aliases = {
     root,
     "./src/lib/__tests__/__mocks__/cloudflare-workers.ts",
   ),
-  // unit-astro resolves astro:actions via getViteConfig's Astro Vite chain;
-  // unit-node and unit-react don't load that chain, so map the virtual id
-  // to a stub. Tests that exercise actions still vi.mock the same id.
+};
+
+// Stubs for Astro virtual modules that don't exist outside getViteConfig.
+// MUST NOT be merged into unit-astro's resolve.alias — getViteConfig provides
+// the real virtuals there, and a stub at the same id would shadow them
+// (e.g. defineAction's .orThrow / .safe attachments would disappear,
+// breaking action handler tests). Apply only to unit-node + unit-react.
+const astroVirtualStubs = {
   "astro:actions": resolve(
     root,
     "./src/lib/__tests__/__mocks__/astro-actions.ts",
   ),
+  "astro:middleware": resolve(
+    root,
+    "./src/lib/__tests__/__mocks__/astro-middleware.ts",
+  ),
 };
 
-const sharedResolve = { alias: aliases, dedupe: ["react", "react-dom"] };
+const sharedResolve = { alias: sharedAliases, dedupe: ["react", "react-dom"] };
+const stubbedResolve = {
+  alias: { ...sharedAliases, ...astroVirtualStubs },
+  dedupe: ["react", "react-dom"],
+};
 const sharedTest = { globals: true, testTimeout: 15_000 };
 
 const forkPool = (ciMaxForks: number) => ({
@@ -83,7 +97,7 @@ export default defineConfig({
   test: {
     projects: [
       {
-        resolve: sharedResolve,
+        resolve: stubbedResolve,
         test: {
           ...sharedTest,
           name: "unit-node",
@@ -94,8 +108,6 @@ export default defineConfig({
             "src/cloudflare/__tests__/**/*.test.ts",
             "src/__tests__/**/*.test.ts",
             "src/pages/**/__tests__/**/*.test.ts",
-            "src/actions/__tests__/**/*.test.ts",
-            "../studio/src/__tests__/**/*.test.ts",
           ],
           exclude: ["node_modules", "dist", ".astro"],
         },
@@ -114,14 +126,16 @@ export default defineConfig({
           ...forkPool(1),
           include: [
             "src/components/**/__tests__/**/*.test.ts",
+            "src/actions/__tests__/**/*.test.ts",
             "../tests/integration/**/*.test.ts",
+            "../studio/src/__tests__/**/*.test.ts",
           ],
           exclude: ["node_modules", "dist", ".astro"],
         },
       }),
       {
         plugins: [react()],
-        resolve: sharedResolve,
+        resolve: stubbedResolve,
         test: {
           ...sharedTest,
           name: "unit-react",
