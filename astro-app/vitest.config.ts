@@ -66,6 +66,17 @@ export default getViteConfig({
     // esbuild's Go runtime ("fatal error: all goroutines are asleep") and
     // kills vitest mid-run with no summary. Run all test files in a single
     // worker to keep the transform load serial and let the suite finish.
+    //
+    // Story 5.23 follow-up: this mitigation works locally but the CI runner
+    // (GitHub Actions ubuntu-latest) hits the same deadlock at ~10 test
+    // files in due to tighter CPU/memory budget. Four mitigations attempted
+    // (commits 2c2ac58 → a9aa8d0): pool: "threads" failed worse on CI
+    // (3 files / 11s); pool: "forks", isolate: false broke 23 tests locally;
+    // removing @vitejs/plugin-react broke 134 of 170 test files; splitting
+    // .tsx tests into a separate vitest project triggered Vite optimizeDep
+    // cache failures across the .test.ts suite. None viable. Resolving
+    // requires bumping the CI runner to a paid larger class (8-core+) or
+    // fundamentally restructuring the test stack. Tracked in deferred-work.md.
     pool: "forks",
     poolOptions: { forks: { singleFork: true } },
     include: [

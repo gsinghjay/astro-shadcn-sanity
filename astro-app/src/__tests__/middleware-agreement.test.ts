@@ -74,6 +74,8 @@ vi.mock('@/lib/sanity', () => ({ getSponsorAgreementRev: mockGetRev }));
 import { onRequest, _resetAgreementRevCache } from '../middleware';
 
 const CURRENT_REV = 'rev-current-xyz';
+// SHA-256(`tok`) — Story 24.3 hashes every KV key, so KV assertions reference this digest.
+const HASH_TOK = '1a7674eb4ee78df7e1ac439a93c3fa8e3c945784d4dec9fd8e3011738b2f1d62';
 
 function createMockContext(pathname: string, headers?: Record<string, string>) {
   // Story 22.10: middleware uses `cfContext?.waitUntil(...)` for fire-and-forget
@@ -225,12 +227,12 @@ describe('middleware — sponsor agreement gate', () => {
     expect(ctx.locals.requiresAgreement).toBeUndefined();
   });
 
-  it('agreement accept endpoint runs through middleware (populates locals.user) but skips the gate', async () => {
+  it('acceptAgreement action endpoint runs through middleware (populates locals.user) but skips the gate', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
       session: { id: 's1', token: 'tok' },
     });
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     await onRequest(ctx as never, mockNext);
 
     expect(ctx.locals.user?.role).toBe('sponsor');
@@ -238,24 +240,69 @@ describe('middleware — sponsor agreement gate', () => {
     expect(mockNext).toHaveBeenCalled();
   });
 
-  it('portal API route returns 401 JSON (not redirect) when no session present', async () => {
+  it('acceptAgreement action endpoint with trailing slash also routes through portal auth', async () => {
+    // Production POST URL is `/_actions/acceptAgreement/` (Astro default trailingSlash + CF
+    // Static Assets `auto-trailing-slash`). A strict `===` against the slash-less constant
+    // shipped to prod silently misclassified it as a public route, leaving locals.user unset
+    // and the action handler returning 401 UNAUTHORIZED. Lock in the normalization.
+    mockGetSession.mockResolvedValue({
+      user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
+      session: { id: 's1', token: 'tok' },
+    });
+    const ctx = createMockContext('/_actions/acceptAgreement/', { cookie: sessionCookie });
+    await onRequest(ctx as never, mockNext);
+
+    expect(ctx.locals.user?.role).toBe('sponsor');
+    expect(ctx.locals.requiresAgreement).toBe(false);
+    expect(mockNext).toHaveBeenCalled();
+  });
+
+  it('acceptAgreement action returns 401 JSON (not redirect) when no session present', async () => {
     mockGetSession.mockResolvedValue(null);
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     const res = (await onRequest(ctx as never, mockNext)) as Response;
     expect(res.status).toBe(401);
     expect(res.headers.get('content-type')).toContain('application/json');
   });
 
-  it('portal API route returns 403 JSON (not redirect) when non-sponsor hits it', async () => {
+  it('acceptAgreement action returns 403 JSON (not redirect) when non-sponsor hits it', async () => {
     mockGetSession.mockResolvedValue({
       user: { id: '2', email: 'stu@co.com', name: 'Student', role: 'student' },
       session: { id: 's2', token: 'tok' },
     });
     mockCheckSponsorWhitelist.mockResolvedValue(false);
-    const ctx = createMockContext('/api/portal/agreement/accept', { cookie: sessionCookie });
+    const ctx = createMockContext('/_actions/acceptAgreement', { cookie: sessionCookie });
     const res = (await onRequest(ctx as never, mockNext)) as Response;
     expect(res.status).toBe(403);
     expect(res.headers.get('content-type')).toContain('application/json');
+  });
+
+  it('non-acceptAgreement portal action returns 401 JSON (not 302) when no session present', async () => {
+    // AC 13: all 9 portal actions get JSON 401 on auth failure, never opaque 302s.
+    mockGetSession.mockResolvedValue(null);
+    const ctx = createMockContext('/_actions/getSponsorProjects', { cookie: sessionCookie });
+    const res = (await onRequest(ctx as never, mockNext)) as Response;
+    expect(res.status).toBe(401);
+    expect(res.headers.get('content-type')).toContain('application/json');
+  });
+
+  it('agreement gate applies to non-acceptAgreement portal actions (flag set, no redirect)', async () => {
+    // AC 14: only acceptAgreement bypasses the gate. Other portal actions stay behind it,
+    // but the gate just sets requiresAgreement — it never short-circuits or redirects, so
+    // the action handler still runs (the modal blocks UI before invocation in normal flow).
+    mockGetSession.mockResolvedValue({
+      user: { id: '1', email: 's@co.com', name: 'Sponsor', role: 'sponsor' },
+      session: { id: 's1', token: 'tok' },
+    });
+    mockD1First.mockResolvedValueOnce({ agreement_accepted_at: null, agreement_version: null });
+
+    const ctx = createMockContext('/_actions/getSponsorProjects', { cookie: sessionCookie });
+    await onRequest(ctx as never, mockNext);
+
+    expect(ctx.locals.user?.role).toBe('sponsor');
+    expect(ctx.locals.requiresAgreement).toBe(true);
+    expect(mockNext).toHaveBeenCalled();
+    expect(ctx.redirect).not.toHaveBeenCalled();
   });
 
   it('dev mode bypass sets requiresAgreement=false without DB lookup', async () => {
@@ -274,6 +321,7 @@ describe('middleware — sponsor agreement gate', () => {
       email: 's@co.com',
       name: 'Sponsor',
       role: 'sponsor',
+      expiresAt: Date.now() + 5 * 60 * 1000,
       agreementAcceptedAt: 111,
       agreementVersion: CURRENT_REV,
     });
@@ -287,14 +335,16 @@ describe('middleware — sponsor agreement gate', () => {
     );
   });
 
-  it('KV cache missing the version field triggers D1 lookup and re-caches', async () => {
+  it('KV cache missing the version field triggers D1 lookup and re-caches under hashed key', async () => {
     mockEnv.SESSION_CACHE = { get: mockKvGet, put: mockKvPut, delete: mockKvDelete } as unknown;
+    const expiresAt = Date.now() + 5 * 60 * 1000;
     mockKvGet.mockResolvedValue({
       email: 's@co.com',
       name: 'Sponsor',
       role: 'sponsor',
+      expiresAt,
       agreementAcceptedAt: 111,
-      // agreementVersion omitted — simulates pre-story cached session
+      // agreementVersion omitted — simulates a cached session from before the version field landed
     });
     mockD1First.mockResolvedValueOnce({ agreement_accepted_at: 111, agreement_version: CURRENT_REV });
 
@@ -306,10 +356,13 @@ describe('middleware — sponsor agreement gate', () => {
       'SELECT agreement_accepted_at, agreement_version FROM user WHERE LOWER(email) = ?',
     );
     expect(mockKvPut).toHaveBeenCalledWith(
-      'tok',
+      HASH_TOK,
       expect.stringContaining(`"agreementVersion":"${CURRENT_REV}"`),
-      expect.objectContaining({ expirationTtl: 300 }),
+      expect.objectContaining({ expirationTtl: expect.any(Number) }),
     );
+    // Re-cache must reuse the cached entry's expiresAt — never extends the window.
+    const [, value] = mockKvPut.mock.calls[0];
+    expect(JSON.parse(value).expiresAt).toBe(expiresAt);
   });
 
   it('D1 lookup failure fails closed (flag stays true — blocks portal access on outage)', async () => {

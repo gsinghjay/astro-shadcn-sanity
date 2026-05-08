@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { actions } from 'astro:actions';
 import { useCalendarApp, ScheduleXCalendar } from '@schedule-x/react';
 import {
   createViewDay,
@@ -103,25 +104,20 @@ export default function PortalCalendar({ events }: PortalCalendarProps) {
     return () => observer.disconnect();
   }, [calendar]);
 
-  // Fetch additional events when user navigates to a different month
+  // Fetch additional events when user navigates to a different month.
+  // Schedule-X emits Temporal `[UTC]`-suffixed strings on range.start/end;
+  // pass them through unchanged — the action handler strips server-side.
   const fetchEventsForRange = useCallback(
     async (start: string, end: string) => {
-      try {
-        const params = new URLSearchParams({ start, end });
-        const response = await fetch(`/portal/api/events?${params}`);
-        if (!response.ok) return;
+      const { data, error } = await actions.getSponsorEvents({ start, end });
+      if (error || !data) return;
 
-        const newEvents = (await response.json()) as SanityEvent[];
-        const calendarEvents = newEvents.map(toCalendarEvent);
-
-        const existingIds = new Set(eventsService.getAll().map((e: { id: string }) => e.id));
-        for (const event of calendarEvents) {
-          if (!existingIds.has(event.id)) {
-            eventsService.add(event);
-          }
+      const calendarEvents = (data as SanityEvent[]).map(toCalendarEvent);
+      const existingIds = new Set(eventsService.getAll().map((e: { id: string }) => e.id));
+      for (const event of calendarEvents) {
+        if (!existingIds.has(event.id)) {
+          eventsService.add(event);
         }
-      } catch {
-        // Silently fail — calendar will still show initially loaded events
       }
     },
     [eventsService],

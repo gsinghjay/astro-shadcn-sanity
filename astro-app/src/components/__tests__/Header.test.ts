@@ -90,7 +90,9 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).toContain('data-search-trigger');
     expect(html).toContain('data-gtm-category="site-search"');
@@ -121,7 +123,9 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).not.toContain('data-search-trigger');
     expect(html).not.toContain('<search-modal-snippet');
@@ -143,10 +147,60 @@ describe('Header', () => {
     );
 
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Header);
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
 
     expect(html).not.toContain('data-search-trigger');
     expect(html).not.toContain('<search-modal-snippet');
+  });
+
+  test('does NOT render search triggers or snippet on /search (Story 5.23 skip-mount)', async () => {
+    mockGetSiteSettings.mockResolvedValueOnce(
+      makeSiteSettings({
+        aiSearch: {
+          enabled: false,
+          searchModalEnabled: true,
+          apiUrl: 'https://worker.dev',
+          placeholder: 'Search the site…',
+          theme: 'auto',
+          hideBranding: false,
+          openByDefault: false,
+        },
+      }),
+    );
+
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/search'),
+    });
+
+    expect(html).not.toContain('data-search-trigger');
+    expect(html).not.toContain('<search-modal-snippet');
+  });
+
+  test('still renders search triggers + snippet on non-/search routes when feature is enabled', async () => {
+    mockGetSiteSettings.mockResolvedValueOnce(
+      makeSiteSettings({
+        aiSearch: {
+          enabled: false,
+          searchModalEnabled: true,
+          apiUrl: 'https://worker.dev',
+          placeholder: 'Search the site…',
+          theme: 'auto',
+          hideBranding: false,
+          openByDefault: false,
+        },
+      }),
+    );
+
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Header, {
+      request: new Request('http://localhost:4321/'),
+    });
+
+    expect(html).toContain('data-search-trigger');
+    expect(html).toContain('<search-modal-snippet');
   });
 
   describe('stegaClean for Presentation Tool navigation (Story 7.17)', () => {

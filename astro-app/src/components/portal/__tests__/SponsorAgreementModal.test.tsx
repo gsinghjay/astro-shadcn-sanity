@@ -37,6 +37,18 @@ vi.mock('better-auth/client', () => ({
   }),
 }));
 
+// Mock the astro:actions virtual module. Tests override `acceptAgreementMock`
+// per-case to return the action envelope { data, error } the modal expects.
+const { acceptAgreementMock } = vi.hoisted(() => ({
+  acceptAgreementMock: vi.fn(),
+}));
+
+vi.mock('astro:actions', () => ({
+  actions: {
+    acceptAgreement: acceptAgreementMock,
+  },
+}));
+
 import SponsorAgreementModal from '../SponsorAgreementModal';
 
 let container: HTMLDivElement;
@@ -138,12 +150,11 @@ describe('SponsorAgreementModal', () => {
     expect(btn.disabled).toBe(true);
   });
 
-  it('clicking accept POSTs to /api/portal/agreement/accept then reloads on 200', async () => {
-    const fetchSpy = vi.fn().mockResolvedValue({
-      status: 200,
-      json: async () => ({ acceptedAt: 123 }),
+  it('clicking accept calls actions.acceptAgreement then reloads on success', async () => {
+    acceptAgreementMock.mockResolvedValue({
+      data: { status: 'accepted', acceptedAt: 123 },
+      error: undefined,
     });
-    vi.stubGlobal('fetch', fetchSpy);
 
     render(<SponsorAgreementModal {...BASE_PROPS} />);
     const cb = container.querySelector('[data-testid="agreement-checkbox"]');
@@ -151,10 +162,7 @@ describe('SponsorAgreementModal', () => {
     const btn = container.querySelector('[data-testid="agreement-accept"]');
     await click(btn);
 
-    expect(fetchSpy).toHaveBeenCalledWith(
-      '/api/portal/agreement/accept',
-      expect.objectContaining({ method: 'POST', credentials: 'include' }),
-    );
+    expect(acceptAgreementMock).toHaveBeenCalledWith({});
     // Allow microtask queue to drain the promise chain
     await act(async () => {
       await Promise.resolve();
@@ -163,14 +171,28 @@ describe('SponsorAgreementModal', () => {
     expect(reloadSpy).toHaveBeenCalled();
   });
 
-  it('shows inline error on non-200/409 response and re-enables accept button', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        status: 500,
-        json: async () => ({ error: 'server_error' }),
-      }),
-    );
+  it('also reloads when action returns already_accepted (drift-safe re-click)', async () => {
+    acceptAgreementMock.mockResolvedValue({
+      data: { status: 'already_accepted', acceptedAt: 99 },
+      error: undefined,
+    });
+
+    render(<SponsorAgreementModal {...BASE_PROPS} />);
+    await toggleCheckbox(container.querySelector('[data-testid="agreement-checkbox"]'));
+    await click(container.querySelector('[data-testid="agreement-accept"]'));
+
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(reloadSpy).toHaveBeenCalled();
+  });
+
+  it('shows inline error when the action returns an ActionError and re-enables accept button', async () => {
+    acceptAgreementMock.mockResolvedValue({
+      data: undefined,
+      error: { code: 'INTERNAL_SERVER_ERROR', message: 'service_unavailable' },
+    });
 
     render(<SponsorAgreementModal {...BASE_PROPS} />);
     const cb = container.querySelector('[data-testid="agreement-checkbox"]');

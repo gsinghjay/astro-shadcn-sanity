@@ -14,17 +14,19 @@
 -- offending row(s) and re-run the migration; the original `user` table is still intact.
 --
 -- FK handling: `session.user_id` and `account.user_id` reference `user(id) ON DELETE CASCADE`
--- (migration 0001). D1 defaults `foreign_keys = OFF` (per Cloudflare D1 docs), so `DROP TABLE
--- user` does not cascade dependent rows in production today and the rebuilt `user` table
--- inherits the same FK references after the RENAME. `defer_foreign_keys = ON` is set as a
--- forward-compat hedge: if a future D1 default flips FKs to ON, deferral keeps FK *constraint*
--- enforcement at COMMIT instead of mid-rebuild. NOTE: `defer_foreign_keys` does NOT defer the
--- CASCADE *action* — with FKs ON, DROP TABLE user would still cascade-delete session/account
--- rows. If D1 ever flips defaults, this migration must be reissued with the dependent tables
--- pre-bridged (e.g. INSERT OR IGNORE into snapshot tables before DROP) or run via non-migration
--- direct execute with `PRAGMA foreign_keys = OFF` set on the connection.
--- The pragma is per-transaction; D1 wraps each migration file in an implicit transaction, so
--- the deferral resets at COMMIT.
+-- (migration 0001). Cloudflare's D1 docs state `foreign_keys = OFF` by default, but the
+-- `wrangler d1 migrations apply --remote` runner executes with FKs ON in practice — confirmed
+-- on 2026-05-07 prod apply: the `DROP TABLE user` step cascade-deleted all 29 session rows and
+-- all 8 account rows. User rows were preserved (INSERT-SELECT into user_new ran first), and
+-- the rebuilt `user` table inherits the same FK references after the RENAME. `defer_foreign_keys
+-- = ON` only defers *constraint* enforcement to COMMIT — it does NOT defer the CASCADE *action*.
+-- Operational impact accepted as a one-time event (users re-auth via OAuth/magic-link; Better
+-- Auth re-creates account rows on next sign-in keyed by (provider, providerAccountId), so user
+-- history is preserved through the email match). To avoid the cascade on future user-table
+-- rebuilds: pre-bridge dependent rows (INSERT OR IGNORE into snapshot tables before DROP) or
+-- run the rebuild via non-migration `wrangler d1 execute` with `PRAGMA foreign_keys = OFF`
+-- explicitly set on the connection. The pragma is per-transaction; D1 wraps each migration
+-- file in an implicit transaction, so the deferral resets at COMMIT.
 
 PRAGMA defer_foreign_keys = ON;
 

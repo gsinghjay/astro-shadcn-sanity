@@ -1,3 +1,26 @@
+## [2.4.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.3.0...v2.4.0) (2026-05-07)
+
+### Features
+
+* **auth:** harden Better Auth — disable magic-link signup, lock account linking, static trustedOrigins (Story 24.2) ([b4266c3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b4266c3ec2064b818f7a238aa7581edf1c77deca))
+* **blocks:** EmbedBlock sandboxed srcdoc + URL allow-list (Story 24.6) ([eabccc4](https://github.com/gsinghjay/astro-shadcn-sanity/commit/eabccc4b937536010fb50786e528e93a3c635307))
+* **portal:** add platform-api client helper for Better Auth bridge (Story 12.8a) ([01d5bbb](https://github.com/gsinghjay/astro-shadcn-sanity/commit/01d5bbbfa8b03f3293c02352d255acbc1cf4287c))
+* **security:** close M-4 + M-5 — sponsor allowedEmails admin-only + D1 user.role CHECK (Story 24.7) ([2586bf9](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2586bf9b15b9ed10dc856f82eb6f9d5e4c88bdb6))
+* **seo:** close M-7 — JsonLd escape + 16 callsite migration (Story 24.5) ([6bb0146](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6bb01468dff55b0fef91ebd8747657e27ec8c5a7))
+
+### Bug Fixes
+
+* **auth:** apply Story 24.2 code-review patches — lowercase whitelist email, tighten magic-link comments, rename log field ([efa924f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/efa924f2fe2c535b79a3e51930dced2a8787d93c))
+* **blocks:** align ImageGallery test mock with siteSettings.siteName schema ([11af91f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/11af91fc087083882bd0dd136408dfc419c21013))
+* **blocks:** apply Story 24.6 code-review patches — drop URL allow-list, drop popup-escape, sandbox-only defense (+ Sanity 5.23→5.24) ([7d78f2d](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7d78f2d90564e2d982181397bbc985ac5ded461c)), closes [#34](https://github.com/gsinghjay/astro-shadcn-sanity/issues/34)
+* **blocks:** harden gallery JSON-LD + filter test (Story 22.11 second review) ([d133ed1](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d133ed1498436c738b05417d37bd0a0404bfcf07))
+* **security:** apply Story 24.7 code-review patches — migration safety, admin gate, helper extraction ([4222169](https://github.com/gsinghjay/astro-shadcn-sanity/commit/422216906c55b37ff3dd285b351849d139dcd7c4))
+* **seo:** apply Story 24.5 code-review patches — <!-- test, fallback guard, strengthened breakout assertion, dedup test files ([7d643ef](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7d643efb0afad20f99d9b3e094f82298413494c6))
+
+### Miscellaneous
+
+* **infra:** pin per-env compat config on capstone Workers ([5db9c35](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5db9c35255f3320053274eb6b9085d09662d4299))
+
 ## [2.3.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.2.1...v2.3.0) (2026-05-05)
 
 ### Features
