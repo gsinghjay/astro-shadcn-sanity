@@ -51,9 +51,10 @@ This is imported by ``main.py`` (for the Workers runtime) and by
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:4321",      # Astro dev
-        "http://localhost:3333",       # Studio dev
-        "https://capstone.example.com", # Production
+        "https://www.ywcccapstone1.com", 
+        "https://ywcc-capstone-preview.{worker-subdomain}.workers.dev", 
+        "http://localhost:4321", 
+        "http://localhost:3333"
     ],
     # allow_credentials=False,
     allow_methods=["*"],
