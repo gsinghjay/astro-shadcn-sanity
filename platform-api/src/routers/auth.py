@@ -39,6 +39,6 @@ async def authenticate_for_access_token(
     if not result:
         raise HTTPException(status_code=401, detail="Invalid session token or email")
         
-    await settings.kv.put(f"session:{password}", result, expirationTtl=CACHE_EXPIRY_SECONDS)
+    await settings.kv.put(f"session:{password}", result.email, expirationTtl=CACHE_EXPIRY_SECONDS)
 
     return {"access_token": password, "token_type": "bearer"} # swagger schema requirement

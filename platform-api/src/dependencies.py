@@ -278,6 +278,6 @@ async def _resolve_session_email(
         except:
             raise HTTPException(500, "Database query failure")
 
-        email = result["email"]
+        email = result.email
         await settings.kv.put(cache_key, email, expirationTtl=300)
         return email
