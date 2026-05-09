@@ -38,7 +38,7 @@ Usage in route handlers::
         return {"message": "You have access"}
 """
 
-import hmac, jwt
+import hmac
 
 from fastapi import Request, HTTPException, Depends
 
@@ -207,37 +207,77 @@ async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> Sanity
 
     return SanityClient(project_id=project_id, token=token)
 
+# User/Sponsor authentication
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
-async def get_current_admin(
+async def require_authenticated_user(
+        token: str = Depends(oauth2_scheme),
+        settings: WorkerSettings = Depends(get_settings),
+        db = Depends(get_db),
+    ) -> str:
+        email = await _resolve_session_email(token, settings, db)
+        if not email:
+            raise HTTPException(401, "Invalid or expired session")
+        return email
+
+async def require_sponsor(
     token: str = Depends(oauth2_scheme),
     settings: WorkerSettings = Depends(get_settings),
-    db = Depends(get_db)
-) -> str:    
-    if not settings.kv or not db:
-        raise HTTPException(500, "D1 or KV not configured")
-    
-    # check cache first...
-    cached_email = await settings.kv.get(f"session_token:{token}")
-    if cached_email:
-        return cached_email
-
-    query = """
-        SELECT user.email 
-        FROM session 
-        JOIN user ON session.user_id = user.id 
-        WHERE session.token = ? 
-          AND user.role IN ('sponsor', 'admin') 
-          AND session.expires_at > (unixepoch() * 1000)
-    """
-    
-    result = await db.prepare(query).bind(token).first()
-    
-    if not result:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-        
-    email = result["email"]
-
-    await settings.kv.put(f"session_token:{token}", email, expirationTtl=300) # 5 minute expiry time, consider changing to global value
-    
+    db = Depends(get_db),
+) -> str:
+    email = await _resolve_session_email(token, settings, db, require_role="sponsor")
+    if not email:
+        raise HTTPException(401, "Invalid or expired session")
     return email
+
+# TODO: when an 'admin' role is added to drizzle-schema.ts and the
+# CHECK constraint is widened, switch this to require_role="admin".
+require_admin = require_sponsor
+
+async def _resolve_session_email(
+        token: str,
+        settings: WorkerSettings,
+        db,
+        require_role: str | None = None,
+    ) -> str | None:
+        """Look up the email associated with a Better Auth session token.
+
+        Mirrors migration 0010_user_role_check_constraint.sql — role enum is
+        ('student', 'sponsor'). Phase 1 of the bridge gates on 'sponsor';
+        Story 12.9 will introduce 'admin' as a separate role.
+
+        Returns None on miss/expiry/role-mismatch (caller decides on 401).
+        """
+        if not settings.kv or not db:
+            raise HTTPException(500, "D1 or KV not configured")
+
+        cache_key = f"session_token:{token}"
+        cached = await settings.kv.get(cache_key)
+        if cached:
+            # Cached entries are role-validated at write time; trust them.
+            return cached
+
+        role_clause = (
+            "AND user.role = ?" if require_role else "AND user.role IN ('sponsor')"
+        )
+        query = f"""
+            SELECT user.email, user.role
+            FROM session
+            JOIN user ON session.user_id = user.id
+            WHERE session.token = ?
+              {role_clause}
+              AND session.expires_at > (unixepoch() * 1000)
+        """
+        binds = [token, require_role] if require_role else [token]
+
+        try:
+            result = await db.prepare(query).bind(*binds).first()
+            if not result:
+                return None
+        except:
+            raise HTTPException(500, "Database query failure")
+
+        email = result["email"]
+        await settings.kv.put(cache_key, email, expirationTtl=300)
+        return email
