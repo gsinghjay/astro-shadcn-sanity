@@ -29,8 +29,6 @@ def test_health_returns_ok(client):
     assert response.status_code == 200
 
     data = response.json()
-    print("RESPONSE DATA")
-    print(data)
 
     assert data["status"] == "ok"
     assert "timestamp" in data
