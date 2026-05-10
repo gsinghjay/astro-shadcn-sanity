@@ -148,8 +148,16 @@ export default defineConfig([
     dataset: 'production',
     plugins: commonPlugins({
       structure: capstoneDeskStructure,
+      // Story 26.1: Studio Presentation now targets the production Worker via
+      // the @sanity/preview-url-secret cookie flow (set by /api/draft-mode/enable).
+      // We deliberately target the `*.workers.dev` hostname of the production
+      // Worker (not the custom domain `www.ywcccapstone1.com`) during burn-in so
+      // editor cookies are scoped per-hostname and CANNOT leak drafts to real
+      // visitors on the custom domain. Flip to the custom domain in a follow-up
+      // once the cookie-routing wrapper (O-2) and live tests are green.
+      // Local dev still honors SANITY_STUDIO_PREVIEW_ORIGIN if set in studio/.env.
       previewOrigin:
-        process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:4321',
+        process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'https://ywcc-capstone.js426.workers.dev',
       resolve: createResolve(undefined),
     }),
     tools: (prev) => [...prev, sponsorAcceptancesTool()],

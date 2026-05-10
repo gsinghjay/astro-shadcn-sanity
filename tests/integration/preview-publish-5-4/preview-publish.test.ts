@@ -40,10 +40,11 @@ describe('Story 5-4: Preview & Publish Architecture', () => {
       sanityContent = readFileSync(sanityPath, 'utf-8')
     })
 
-    test('[P0] 5.4-INT-004 — getSiteSettings bypasses cache when visualEditingEnabled is true', () => {
-      // AC5: In SSR mode (visualEditingEnabled), cache must be bypassed so editors see fresh data.
-      // The cache check must guard on !visualEditingEnabled before returning cached value.
-      expect(sanityContent).toMatch(/!visualEditingEnabled\s*&&\s*_siteSettingsCache/)
+    test('[P0] 5.4-INT-004 — getSiteSettings bypasses cache when preview mode is on', () => {
+      // AC5: In preview mode, cache must be bypassed so editors see fresh data.
+      // Story 26.1 moved the gate from a build-time `visualEditingEnabled` const
+      // to the request-scoped `getPreviewMode()` helper (lib/preview-mode.ts).
+      expect(sanityContent).toMatch(/!getPreviewMode\(\)\s*&&\s*_siteSettingsCache/)
     })
 
     test('[P0] 5.4-INT-005 — getSiteSettings does NOT unconditionally return cache', () => {

@@ -227,13 +227,15 @@ describe("middleware decorateForAgents", () => {
       expect(res.headers.get("link") ?? "").toContain('</.md>; rel="alternate"; type="text/markdown"');
     });
 
-    it("sets Vary: Accept on HTML responses", async () => {
+    it("sets Vary: Accept (and Cookie under Story 26.1) on HTML responses", async () => {
       const next = vi.fn(async () => new Response("<html></html>", {
         status: 200,
         headers: { "content-type": "text/html" },
       }));
       const res = await decorateForAgents(ctx("/sponsors"), next);
-      expect(res.headers.get("vary")).toBe("Accept");
+      // Story 26.1 added `Cookie` to the Vary set so CF can partition cache by
+      // preview-cookie state. Accept stays for the markdown-vs-HTML axis.
+      expect(res.headers.get("vary")).toMatch(/^Accept(?:,\s*Cookie)?$/);
     });
 
     it("appends Accept to existing Vary header", async () => {

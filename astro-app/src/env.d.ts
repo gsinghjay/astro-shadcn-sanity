@@ -50,5 +50,11 @@ declare namespace App {
      *  the isolate alive past response. The `?.` is required because vitest pool environments
      *  don't inject `cfContext` and the property is only present in the Workers runtime. */
     cfContext?: ExecutionContext;
+    /** Sanity preview mode — true when the request carries the
+     *  `__Secure-sanity-preview` cookie validated by /api/draft-mode/enable.
+     *  Mirrors the `node:async_hooks` AsyncLocalStorage value from
+     *  `lib/preview-mode.ts:getPreviewMode()` so component frontmatter can read it
+     *  without importing the helper. Set by middleware. (Story 26.1.) */
+    previewMode?: boolean;
   }
 }

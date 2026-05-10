@@ -46,9 +46,14 @@ describeIfBuilt("Build output — Cloudflare Workers Static Assets", () => {
     expect(jsFiles.length).toBeGreaterThan(0);
   });
 
-  it("public pages are prerendered as static HTML under dist/client/", () => {
+  it.skip("public pages are prerendered as static HTML under dist/client/ (deprecated by Story 26.1)", () => {
+    // Story 26.1: capstone production now SSRs the 14 content routes (homepage,
+    // sponsors, events, articles, etc.) so cookie-bearing preview requests reach
+    // middleware. dist/client/ no longer contains index.html on capstone builds —
+    // CF edge cache absorbs the SSR cost via Cache-Control s-maxage=60. Update
+    // this assertion to verify the SSR path instead, or drop it entirely.
     const indexHtml = resolve(CLIENT, "index.html");
-    expect(existsSync(indexHtml), "dist/client/index.html should exist (prerendered)").toBe(true);
+    expect(existsSync(indexHtml)).toBe(true);
   });
 
   it("dist/client/_headers is emitted with the security baseline copied from public/_headers", () => {

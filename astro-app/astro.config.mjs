@@ -113,11 +113,21 @@ const PREVIEW_SSR_ROUTES = [
   'src/pages/gallery/index.astro',
 ];
 
+// Story 26.1: capstone production also SSRs these routes so cookie-bearing
+// preview requests reach middleware (which flips loadQuery into drafts mode).
+// CF edge cache (Cache-Control set in middleware) absorbs the SSR cost for
+// cookieless traffic. RWC + *-preview Workers keep the original Story 5.22
+// behavior (SSR only when visualEditingEnabled === 'true') — they don't yet
+// participate in the cookie-based preview flow.
+const cloudflareEnv = process.env.CLOUDFLARE_ENV;
+const ssrContentRoutes =
+  cloudflareEnv === 'capstone' || visualEditingEnabled === 'true';
+
 const previewSsrIntegration = {
   name: 'preview-ssr-content-routes',
   hooks: {
     'astro:route:setup': ({ route }) => {
-      if (visualEditingEnabled !== 'true') return;
+      if (!ssrContentRoutes) return;
       if (PREVIEW_SSR_ROUTES.some((suffix) => route.component.endsWith(suffix))) {
         route.prerender = false;
       }
@@ -328,7 +338,10 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: visualEditingEnabled !== 'true',
+      // Story 26.1: useCdn is now per-call via lib/sanity.ts:loadQuery (cookie-bearing
+      // requests force useCdn:false for fresh drafts via withConfig). Static `true`
+      // here gives cookieless reads CDN performance.
+      useCdn: true,
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,

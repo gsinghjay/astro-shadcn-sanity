@@ -7,11 +7,10 @@ import SanityPageContent from '@/components/SanityPageContent.astro';
 import { sanityClient, ALL_PAGE_SLUGS_QUERY, getPage, getAllSponsors, getAllProjects, getAllTestimonials, getAllEvents, getAllArticles, prefetchPages, getSiteParams } from '@/lib/sanity';
 import type { ALL_PAGE_SLUGS_QUERY_RESULT } from '@/sanity.types';
 import { urlFor } from '@/lib/image';
-import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
-
 import FullWidthTemplate from '@/layouts/templates/FullWidthTemplate.astro';
 
-const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+// Story 26.1: request-scoped preview flag (was build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED).
+const visualEditingEnabled = Astro.locals.previewMode ?? false;
 
 // getStaticPaths generates static routes for all published pages at build time
 export const getStaticPaths: GetStaticPaths = async () => {

@@ -97,7 +97,7 @@
 				"PUBLIC_SANITY_STUDIO_DATASET": "production",
 				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
 				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
-				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
+				// PUBLIC_SANITY_VISUAL_EDITING_ENABLED removed in Story 26.1 — preview mode is now request-scoped via the __Secure-sanity-preview cookie set by /api/draft-mode/enable.
 				"PUBLIC_SITE_ID": "capstone",
 				"PUBLIC_SITE_THEME": "red",
 				"PUBLIC_SITE_URL": "https://www.ywcccapstone1.com",
@@ -193,93 +193,11 @@
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
 		},
-		"capstone_preview": {
-			"name": "ywcc-capstone-preview",
-			// Explicit per-env compat config — mirrors capstone production so the
-			// preview Worker exercises the same runtime semantics editors will see
-			// in prod (drafts perspective + stega differ from prod, but compat
-			// flags MUST match to avoid "works in preview, breaks in prod" gaps).
-			"compatibility_date": "2026-04-01",
-			"compatibility_flags": [
-				"nodejs_compat",
-				"global_fetch_strictly_public"
-			],
-			"vars": {
-				// Capstone preview Worker — full staging environment. Mirrors
-				// production bindings (PORTAL_DB / SESSION_CACHE / RATE_LIMITER all
-				// shared with capstone prod) so the portal/auth flow can be
-				// exercised end-to-end on a *.workers.dev hostname before pushing
-				// to ywcccapstone1.com. Drafts perspective + stega via
-				// PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true. Studio Presentation
-				// iframe points here (studio/.env SANITY_STUDIO_PREVIEW_ORIGIN).
-				//
-				// TRADE-OFF: D1 is shared with prod (only one ywcc-capstone-portal
-				// database exists in the account), so test signups and acceptances
-				// on preview write to the production database. Cleanup is manual
-				// via `mcp__cloudflare-bindings__d1_database_query`. KV is isolated:
-				// SESSION_CACHE binds to the dedicated `ywcc-capstone-preview-session`
-				// namespace (id dfe44815e6ce4689bc2d868d088c77c1), distinct from the
-				// prod `SESSION_CACHE` namespace (f78af5695075451c9d3d7887368e90dc).
-				//
-				// Secrets shared with capstone prod (re-`wrangler secret put` per
-				// secret with `--name ywcc-capstone-preview`):
-				//   BETTER_AUTH_SECRET, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID,
-				//   GOOGLE_CLIENT_SECRET, RESEND_API_KEY, TURNSTILE_SECRET_KEY,
-				//   SANITY_API_READ_TOKEN, SANITY_API_WRITE_TOKEN,
-				//   SANITY_PROJECT_READ_TOKEN.
-				//
-				// OAuth callback URLs to add (manual, off-repo):
-				//   GitHub OAuth app:  https://ywcc-capstone-preview.js426.workers.dev/api/auth/callback/github
-				//   Google OAuth app:  https://ywcc-capstone-preview.js426.workers.dev/api/auth/callback/google
-				"BETTER_AUTH_URL": "https://ywcc-capstone-preview.js426.workers.dev",
-				"GITHUB_CLIENT_ID": "Ov23liFtOiWIyCqJXJMi",
-				"PUBLIC_GTM_ID": "",
-				"PUBLIC_SANITY_DATASET": "production",
-				"PUBLIC_SANITY_STUDIO_DATASET": "production",
-				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
-				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
-				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
-				"PUBLIC_SITE_ID": "capstone",
-				"PUBLIC_SITE_THEME": "red",
-				"PUBLIC_SITE_URL": "https://ywcc-capstone-preview.js426.workers.dev",
-				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn",
-				"RESEND_FROM_EMAIL": "YWCC Capstone <noreply@intraphase.com>",
-				"STUDIO_ORIGIN": "https://ywcccapstone.sanity.studio"
-			},
-			"d1_databases": [
-				{
-					"binding": "PORTAL_DB",
-					"database_name": "ywcc-capstone-portal",
-					"database_id": "76887418-c356-46d8-983b-fa6e395d8b16"
-				}
-			],
-			"kv_namespaces": [
-				{
-					"binding": "SESSION_CACHE",
-					"id": "dfe44815e6ce4689bc2d868d088c77c1"
-				}
-			],
-			"durable_objects": {
-				"bindings": [
-					{
-						"name": "RATE_LIMITER",
-						"class_name": "SlidingWindowRateLimiter",
-						"script_name": "rate-limiter-worker"
-					}
-				]
-			},
-			"observability": {
-				"enabled": true,
-				"logs": {
-					"enabled": true,
-					"head_sampling_rate": 1
-				},
-				"traces": {
-					"enabled": true,
-					"head_sampling_rate": 0.01
-				}
-			}
-		},
+		// [env.capstone_preview] — DELETED in Story 26.1 (2026-05-09). Studio Presentation
+		// now targets the production capstone Worker via @sanity/preview-url-secret cookie;
+		// see _bmad-output/implementation-artifacts/26-1-unify-preview-and-prod-via-preview-url-secret.md.
+		// The `ywcc-capstone-preview` Worker + KV namespace dfe44815e6ce4689bc2d868d088c77c1
+		// will be `wrangler delete`d after the 7-day burn-in period.
 		"rwc_us_preview": {
 			"name": "rwc-us-preview",
 			"vars": {
