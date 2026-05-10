@@ -44,8 +44,7 @@ def client(monkeypatch):
         mock.required_secrets = {"admin_api_key": "test-admin-key", "ADMIN_API_KEY": "test-admin-key"}
         mock.optional_secrets = {
             "sanity_api_write_token": "test-write-token",
-            "turnstile_secret_key": "test-turnstile-secret",
-            "discord_webhook_url": "http://fake-discord.url"
+            "turnstile_secret_key": "test-turnstile-secret"
         }
         mock.env_vars = {"sanity_project_id": "test"}
         
