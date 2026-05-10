@@ -47,6 +47,15 @@ function commonPlugins(opts: CommonPluginsOptions): PluginOptions[] {
       previewUrl: {
         origin: opts.previewOrigin,
         preview: '/',
+        // Story 26.1: route Presentation through the draft-mode endpoint so the
+        // server validates the Sanity-issued secret and sets the preview cookie
+        // BEFORE the iframe loads the target page. Without this Presentation
+        // iframes the origin directly, no cookie is set, previewMode stays
+        // false, and @sanity/visual-editing has no peer to handshake with.
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
+        },
       },
     }),
     visionTool(),
