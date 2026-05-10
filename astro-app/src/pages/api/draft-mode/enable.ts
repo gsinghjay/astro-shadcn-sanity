@@ -54,12 +54,22 @@ export const GET: APIRoute = async ({ request }) => {
   const isHttps = url.protocol === "https:";
   const cookieName = isHttps ? COOKIE_NAME : "sanity-preview";
 
+  // SameSite=None is REQUIRED here. Studio at `sanity.studio` embeds the
+  // production domain in an iframe, which is a cross-site context from the
+  // browser's perspective. SameSite=Lax cookies are NOT sent in cross-site
+  // iframe contexts — even for same-origin requests within the iframe — so
+  // the cookie would never reach middleware on the post-/enable redirect,
+  // and visual editing could never connect. SameSite=None requires Secure,
+  // which is fine over HTTPS; in local-dev HTTP we drop both flags so the
+  // browser accepts the cookie at all (Lax is the dev default).
+  const sameSite = isHttps ? "SameSite=None" : "SameSite=Lax";
+
   const cookie = [
     `${cookieName}=${encodeURIComponent(secret)}`,
     "Path=/",
     "HttpOnly",
     isHttps ? "Secure" : "",
-    "SameSite=Lax",
+    sameSite,
     `Max-Age=${COOKIE_MAX_AGE_SECONDS}`,
   ]
     .filter(Boolean)

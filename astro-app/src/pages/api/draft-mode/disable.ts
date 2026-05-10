@@ -13,13 +13,16 @@ export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const target = url.searchParams.get("redirect") || "/";
 
+  // Match the SameSite policy used on enable.ts so the browser matches the
+  // existing cookie and overwrites it with Max-Age=0. Mismatched attributes
+  // can leave the old cookie alive in some browser implementations.
   const expire = (name: string, secure: boolean) =>
     [
       `${name}=`,
       "Path=/",
       "HttpOnly",
       secure ? "Secure" : "",
-      "SameSite=Lax",
+      secure ? "SameSite=None" : "SameSite=Lax",
       "Max-Age=0",
     ]
       .filter(Boolean)
