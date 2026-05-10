@@ -1,3 +1,45 @@
+## [2.6.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.5.0...v2.6.0) (2026-05-10)
+
+### Features
+
+* add /ask command with AutoRAG integration ([eac8faa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/eac8faad24f9c6b2cb7be1a0cdf62351aea611b1))
+* **infra:** bind capstone-preview to D1/KV/DO for proper staging ([96e2697](https://github.com/gsinghjay/astro-shadcn-sanity/commit/96e26977d2f7f1419411522e663560d94df97d10))
+* **portal,actions:** migrate /portal/api/* REST routes to typed Astro Actions (Story 26.5) ([e285b19](https://github.com/gsinghjay/astro-shadcn-sanity/commit/e285b197dd7c92e7f96432d92035c8c5bb403b4b))
+* **search:** replace /search bar widget with headless React island (Story 5.23) ([7e15b1a](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7e15b1a1867c2f7f66275016a25f9c7f2d8c63a4))
+
+### Bug Fixes
+
+* **actions:** gate getGithubRepos on sponsor role per code review ([709575c](https://github.com/gsinghjay/astro-shadcn-sanity/commit/709575ce984728619314aa7320841860d3861296))
+* add allowed_mentions to all content responses via helper & alidate ask question length and handle ask worker failures ([738377e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/738377e82de1c95ecf068c3b73c92065dbb685dd))
+* add auth to ask worker and disable public access ([1f748bf](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1f748bf3ba8bd2f23a7abea1c2f587c7a7ea5225))
+* add httpx dependency, network error handling, and improved Sanity error messages ([7f40f85](https://github.com/gsinghjay/astro-shadcn-sanity/commit/7f40f85d9a6e84489999735bd837aca4d622cb93))
+* add secret file ignores to discord-bot .gitignore ([b848fa2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/b848fa293e93b2ed2360ebed822f16d55df61380))
+* **auth:** allow GitHub linking with mismatched email ([1e2103f](https://github.com/gsinghjay/astro-shadcn-sanity/commit/1e2103fdd954a3937533ffeba768ed97af93eef9))
+* **env:** re-apply wrangler vars after .dev.vars overwrites them at build ([9c6dfb2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9c6dfb26b7b347a0a44c4370cdffaeeaea296d6b))
+* **portal:** normalize trailing slash on acceptAgreement action path ([c202b26](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c202b26414befa0b9d409d8ce00a281edd056fbc))
+* **portal:** repair admin acceptances 403 — switch to project members endpoint ([71aeec3](https://github.com/gsinghjay/astro-shadcn-sanity/commit/71aeec3ffed15bfbf9a4710f565c639c2778e4ef))
+* **search,test-config:** apply code-review patches + decisions (Story 5.23) ([2c2ac58](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2c2ac580b338bc2c45724a4c4842e02e99161938)), closes [#717](https://github.com/gsinghjay/astro-shadcn-sanity/issues/717)
+* **search:** use client:only="react" to keep vendor web components off SSR path ([c1a6f54](https://github.com/gsinghjay/astro-shadcn-sanity/commit/c1a6f546cf61afadec6aee7bf75da111f75bd79a))
+
+### Documentation
+
+* **env:** add reference for env vars + Wrangler/CF Workers Builds flow ([2293df2](https://github.com/gsinghjay/astro-shadcn-sanity/commit/2293df217300e5bd66bb92fa7dda16d661872e93))
+* **test-config:** document failed CI deadlock mitigations (Story 5.23) ([795f3cd](https://github.com/gsinghjay/astro-shadcn-sanity/commit/795f3cd4fc3756fda278d2f184d9be3ce9e85488))
+
+### Miscellaneous
+
+* **ci:** empty commit to confirm non-flaky CI under SWC + maxForks=1 ([90eab06](https://github.com/gsinghjay/astro-shadcn-sanity/commit/90eab062a3fa2ca026a0d984d1d76840a5b8501f))
+
+### Tests
+
+* **search:** assert client:only="react" instead of client:load ([bcca6aa](https://github.com/gsinghjay/astro-shadcn-sanity/commit/bcca6aae9a38507064a70b4663caede9e77025ff))
+* **unit:** cap forks to 1 on CI to bound memory pressure ([583b581](https://github.com/gsinghjay/astro-shadcn-sanity/commit/583b58138067f2e95228218abe7d4254dd867b31))
+* **unit:** swap to plugin-react-swc and switch forks pool to parallel ([5437380](https://github.com/gsinghjay/astro-shadcn-sanity/commit/5437380f9890fccfffc9977391c0949c82149635)), closes [#717](https://github.com/gsinghjay/astro-shadcn-sanity/issues/717)
+
+### Refactoring
+
+* **actions:** atomic upsert in linkGithubRepo via onConflictDoUpdate ([6c72a32](https://github.com/gsinghjay/astro-shadcn-sanity/commit/6c72a3298dc03d4d6a760adcf9616153b7aa991d))
+
 ## [2.5.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.4.0...v2.5.0) (2026-05-07)
 
 ### Features
