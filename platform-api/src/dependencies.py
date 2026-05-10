@@ -40,11 +40,11 @@ Usage in route handlers::
 
 import hmac
 
-from fastapi import Request, HTTPException, Depends, Security
+from fastapi import Request, HTTPException, Depends
 
 from models.settings import WorkerSettings
 from services.sanity_client import SanityClient
-from fastapi.security import APIKeyHeader
+from fastapi.security import OAuth2PasswordBearer
 
 async def get_env(request: Request):
     """Extract the raw Cloudflare env proxy from the ASGI request scope.
@@ -207,21 +207,77 @@ async def get_sanity(settings: WorkerSettings = Depends(get_settings)) -> Sanity
 
     return SanityClient(project_id=project_id, token=token)
 
-# Looks for 'X-Admin-API-Key' in the request headers
-admin_api_key_header = APIKeyHeader(name="X-Admin-API-Key", auto_error=False)
+# User/Sponsor authentication
 
-async def verify_admin_api_key(
-    api_key_header: str = Security(admin_api_key_header),
-    settings: WorkerSettings = Depends(get_settings)
-) -> bool:
-    """Verifies that the request includes the correct Admin API Key."""
-    expected_key = settings.required_secrets.get("admin_api_key")
-    
-    if not expected_key:
-        # Failsafe: If no key is configured in Cloudflare, block all mutations
-        raise HTTPException(status_code=500, detail="admin_api_key not configured on server")
-        
-    if not api_key_header or not hmac.compare_digest(api_key_header, expected_key):
-        raise HTTPException(status_code=403, detail="Invalid or missing Admin API Key")
-        
-    return True
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
+
+async def require_authenticated_user(
+        token: str = Depends(oauth2_scheme),
+        settings: WorkerSettings = Depends(get_settings),
+        db = Depends(get_db),
+    ) -> str:
+        email = await _resolve_session_email(token, settings, db)
+        if not email:
+            raise HTTPException(401, "Invalid or expired session")
+        return email
+
+async def require_sponsor(
+    token: str = Depends(oauth2_scheme),
+    settings: WorkerSettings = Depends(get_settings),
+    db = Depends(get_db),
+) -> str:
+    email = await _resolve_session_email(token, settings, db, require_role="sponsor")
+    if not email:
+        raise HTTPException(401, "Invalid or expired session")
+    return email
+
+# TODO: when an 'admin' role is added to drizzle-schema.ts and the
+# CHECK constraint is widened, switch this to require_role="admin".
+require_admin = require_sponsor
+
+async def _resolve_session_email(
+        token: str,
+        settings: WorkerSettings,
+        db,
+        require_role: str | None = None,
+    ) -> str | None:
+        """Look up the email associated with a Better Auth session token.
+
+        Mirrors migration 0010_user_role_check_constraint.sql — role enum is
+        ('student', 'sponsor'). Phase 1 of the bridge gates on 'sponsor';
+        Story 12.9 will introduce 'admin' as a separate role.
+
+        Returns None on miss/expiry/role-mismatch (caller decides on 401).
+        """
+        if not settings.kv or not db:
+            raise HTTPException(500, "D1 or KV not configured")
+
+        cache_key = f"session_token:{token}"
+        cached = await settings.kv.get(cache_key)
+        if cached:
+            # Cached entries are role-validated at write time; trust them.
+            return cached
+
+        role_clause = (
+            "AND user.role = ?" if require_role else "AND user.role IN ('sponsor')"
+        )
+        query = f"""
+            SELECT user.email, user.role
+            FROM session
+            JOIN user ON session.user_id = user.id
+            WHERE session.token = ?
+              {role_clause}
+              AND session.expires_at > (unixepoch() * 1000)
+        """
+        binds = [token, require_role] if require_role else [token]
+
+        try:
+            result = await db.prepare(query).bind(*binds).first()
+            if not result:
+                return None
+        except:
+            raise HTTPException(500, "Database query failure")
+
+        email = result.email
+        await settings.kv.put(cache_key, email, expirationTtl=300)
+        return email

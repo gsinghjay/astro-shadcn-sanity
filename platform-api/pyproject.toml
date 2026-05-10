@@ -8,6 +8,7 @@ dependencies = [
     "httpx",
     "pydantic",
     "email-validator",
+    "python-multipart>=0.0.27",
 ]
 
 [dependency-groups]
