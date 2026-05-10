@@ -125,10 +125,10 @@ describe('createAuth() — unified auth factory', () => {
     });
   });
 
-  it('enables account linking but disallows different emails (Story 24.2)', () => {
+  it('enables account linking and allows different emails for repo linking', () => {
     createAuth({ db: mockDb });
     const config = mockBetterAuth.mock.calls[0][0];
-    expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: false });
+    expect(config.account.accountLinking).toEqual({ enabled: true, allowDifferentEmails: true });
   });
 
   it('configures magic-link with disableSignUp + 600s expiry (Story 24.2)', () => {

@@ -131,11 +131,12 @@ export function createAuth({ db }: CreateAuthOptions) {
       },
     },
     account: {
-      // Sponsor role is email-keyed via Sanity whitelist — never link an OAuth
-      // account whose primary email differs from the existing user's email.
+      // Sponsor identity is established by the primary login (whitelist-checked
+      // at sign-in). GitHub is linked only for repo metadata, not authz, so the
+      // OAuth provider email need not match the portal email.
       accountLinking: {
         enabled: true,
-        allowDifferentEmails: false,
+        allowDifferentEmails: true,
       },
     },
     plugins: [

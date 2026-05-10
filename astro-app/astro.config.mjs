@@ -45,6 +45,29 @@ for (const [key, value] of Object.entries(wranglerVars)) {
   }
 }
 
+// @astrojs/cloudflare's astro:config:done hook unconditionally loads .dev.vars
+// into process.env via Object.assign(process.env, parsed) — even for production
+// builds. That fires AFTER this config file returns and silently overwrites
+// wrangler-block values for any key present in both (e.g. BETTER_AUTH_URL),
+// which broke Better Auth's trustedOrigins check on prod (Story 24.2 baked
+// the resolved BETTER_AUTH_URL into the bundle, the .dev.vars `localhost:4321`
+// landed instead of the wrangler `https://www.ywcccapstone1.com`, every
+// sign-in 403'd with "Invalid origin"). Re-apply wrangler vars at
+// astro:build:start — that hook fires AFTER astro:config:done but BEFORE the
+// rollup phase reads process.env to inline astro:env public vars.
+const wranglerOverrideIntegration = {
+  name: "override-from-wrangler-vars",
+  hooks: {
+    "astro:build:start": () => {
+      for (const [key, value] of Object.entries(wranglerVars)) {
+        if (typeof value === "string") {
+          process.env[key] = value;
+        }
+      }
+    },
+  },
+};
+
 // Config-scope vars — astro:env is NOT available here (config runs before init).
 // Precedence: wrangler.jsonc env block > .env / process.env > fallback.
 const pick = (key, fallback) =>
@@ -222,14 +245,18 @@ export default defineConfig({
       }),
 
       // --- Server-side secrets (portal / auth / write paths) ---
-      // Only the prod `capstone` Worker carries these — the rwc + *-preview
-      // Workers are content-only (no D1/KV/DO bindings) and portal/auth/api
-      // routes return 503 there. Marking these `optional` for non-prod envs
-      // lets `astro:env/server` return undefined at runtime instead of
-      // throwing EnvInvalidVariables on every request when the bundle imports
-      // `actions/index.ts` (which transitively reads these). Prod stays strict
-      // so a missing secret still fails the build immediately.
-      ...(process.env.CLOUDFLARE_ENV === "capstone"
+      // The `capstone` (prod) and `capstone_preview` (staging) Workers both
+      // run the portal — capstone_preview shares prod D1/KV bindings so its
+      // build needs the same secrets. RWC + RWC-preview Workers stay
+      // content-only (no D1/KV/DO bindings) and portal/auth/api routes return
+      // 503 there. Marking these `optional` for non-portal envs lets
+      // `astro:env/server` return undefined at runtime instead of throwing
+      // EnvInvalidVariables on every request when the bundle imports
+      // `actions/index.ts` (which transitively reads these). Capstone +
+      // capstone_preview stay strict so a missing secret fails the build
+      // immediately.
+      ...(process.env.CLOUDFLARE_ENV === "capstone" ||
+      process.env.CLOUDFLARE_ENV === "capstone_preview"
         ? {
             BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
             GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
@@ -296,6 +323,7 @@ export default defineConfig({
     },
   },
   integrations: [
+    wranglerOverrideIntegration,
     previewSsrIntegration,
     sanity({
       projectId,
@@ -308,13 +336,18 @@ export default defineConfig({
     }),
     react(),
     sitemap({
+      // The filter receives full URLs (e.g. "https://www.example.com/search/"),
+      // not paths — the prior 5.15 `page !== '/search'` form silently no-op'd
+      // because Astro emits trailing-slash URLs. Match on path-level substrings
+      // instead. (Story 5.23 fix.)
       filter: (page) =>
         !page.includes('/portal/') &&
         !page.includes('/auth/') &&
         !page.includes('/student/') &&
         !page.includes('/demo/') &&
-        page !== '/search' &&
-        !page.startsWith('/search/'),
+        !page.endsWith('/search') &&
+        !page.endsWith('/search/') &&
+        !page.includes('/search/'),
     }),
     // Gate astro-llms-md on visual editing OFF: stega-encoded HTML leaks
     // private-use Unicode markers into the .md/.txt output otherwise.

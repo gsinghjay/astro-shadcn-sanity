@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { actions } from 'astro:actions';
 
 // ── Inline SVG icons (avoid 500KB PortalIcon JSON in hydrated island) ──
 
@@ -53,13 +54,11 @@ interface GitHubRepo {
 interface RepoLinkerProps {
   projects: ProjectInfo[];
   links: RepoLink[];
-  linkEndpoint: string;
-  reposEndpoint: string;
 }
 
 // ── Component ──
 
-export default function RepoLinker({ projects, links, linkEndpoint, reposEndpoint }: RepoLinkerProps) {
+export default function RepoLinker({ projects, links }: RepoLinkerProps) {
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,20 +74,22 @@ export default function RepoLinker({ projects, links, linkEndpoint, reposEndpoin
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch(reposEndpoint)
-      .then(r => {
-        if (!r.ok) throw new Error(`Failed to fetch repos: ${r.status}`);
-        return r.json();
-      })
-      .then((data: GitHubRepo[]) => {
-        setRepos(data);
+    let cancelled = false;
+    (async () => {
+      const { data, error: actionError } = await actions.getGithubRepos({});
+      if (cancelled) return;
+      if (actionError || !data) {
+        setError('Failed to fetch repositories.');
         setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, [reposEndpoint]);
+        return;
+      }
+      setRepos(data as GitHubRepo[]);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredRepos = useMemo(() => {
     if (!searchQuery.trim()) return repos;
@@ -101,48 +102,43 @@ export default function RepoLinker({ projects, links, linkEndpoint, reposEndpoin
     if (!repo) return;
 
     setSaving(prev => ({ ...prev, [projectId]: true }));
-    try {
-      const res = await fetch(linkEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectSanityId: projectId, githubRepo: repo }),
-      });
-      if (!res.ok) throw new Error('Failed to link repository');
-      setLinkMap(prev => ({ ...prev, [projectId]: repo }));
-      setSelections(prev => {
-        const next = { ...prev };
-        delete next[projectId];
-        return next;
-      });
-      // Reload to show dashboard for newly linked project
-      window.location.reload();
-    } catch {
+    const { error: actionError } = await actions.linkGithubRepo({
+      projectSanityId: projectId,
+      githubRepo: repo,
+    });
+    if (actionError) {
       setError('Failed to link repository. Please try again.');
-    } finally {
       setSaving(prev => ({ ...prev, [projectId]: false }));
+      return;
     }
+    setLinkMap(prev => ({ ...prev, [projectId]: repo }));
+    setSelections(prev => {
+      const next = { ...prev };
+      delete next[projectId];
+      return next;
+    });
+    setSaving(prev => ({ ...prev, [projectId]: false }));
+    // Reload to show dashboard for newly linked project
+    window.location.reload();
   };
 
   const handleUnlink = async (projectId: string) => {
     setSaving(prev => ({ ...prev, [projectId]: true }));
-    try {
-      const res = await fetch(linkEndpoint, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectSanityId: projectId }),
-      });
-      if (!res.ok) throw new Error('Failed to unlink repository');
-      setLinkMap(prev => {
-        const next = { ...prev };
-        delete next[projectId];
-        return next;
-      });
-      window.location.reload();
-    } catch {
+    const { error: actionError } = await actions.unlinkGithubRepo({
+      projectSanityId: projectId,
+    });
+    if (actionError) {
       setError('Failed to unlink repository. Please try again.');
-    } finally {
       setSaving(prev => ({ ...prev, [projectId]: false }));
+      return;
     }
+    setLinkMap(prev => {
+      const next = { ...prev };
+      delete next[projectId];
+      return next;
+    });
+    setSaving(prev => ({ ...prev, [projectId]: false }));
+    window.location.reload();
   };
 
   if (loading) {
