@@ -40,6 +40,8 @@ from fastapi import APIRouter, Depends
 from dependencies import get_settings
 from models.common import HealthResponse, ServiceCheck
 from models.settings import WorkerSettings
+from urllib.parse import urlparse
+from services.discord_client import ALLOWED_WEBHOOK_HOSTS
 
 router = APIRouter(tags=["health"])
 
@@ -224,6 +226,46 @@ def _check_optional_secrets(settings: WorkerSettings) -> ServiceCheck:
         message=f"{configured_count} of {total} optional secret(s) configured",
     )
 
+async def _check_discord_webhooks(settings: WorkerSettings) -> ServiceCheck:
+    configured_webhooks = [False, False, False, False]
+
+    async def check_webhook(webhook_role: str):
+        try:
+            webhook = await settings.kv.get(f"discord-webhook:{webhook_role}")
+
+            if not webhook:
+                raise ValueError(f"{webhook_role} discord webhook not configured")
+            webhook = webhook.strip('"')
+            
+
+            parsed = urlparse(webhook)
+            if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
+                raise ValueError("invalid_webhook")
+            if parsed.scheme != "https":
+                raise ValueError("invalid_webhook")
+            if not parsed.path.startswith("/api/webhooks/"):
+                raise ValueError("invalid_webhook")
+        except:
+            return False
+        return True
+    
+    hook_checks = {
+        "announcements": True,
+        "events": True,
+        "bot-audit": True,
+        "form-submissions": True
+    }
+
+    for hook_role in hook_checks:
+        result = await check_webhook(hook_role)
+        hook_checks[hook_role] = result
+
+    all_ok = False not in hook_checks.values()
+
+    return ServiceCheck(
+        status="ok" if all_ok else "degraded",
+        message="All webhooks configured" if all_ok else "Webhooks missing"
+    )
 
 # ---------------------------------------------------------------------------
 # Endpoint
@@ -251,12 +293,14 @@ Returns: A `HealthResponse` with overall status and per-check details.
     checks: dict[str, ServiceCheck] = {}
 
     # I/O probes (async — run concurrently since they're independent)
-    kv_result, d1_result = await asyncio.gather(
+    kv_result, d1_result, discord_result = await asyncio.gather(
         _check_kv(settings),
         _check_d1(settings),
+        _check_discord_webhooks(settings)
     )
     checks["kv"] = kv_result
     checks["d1"] = d1_result
+    checks["discord"] = discord_result
 
     # Binding existence checks (sync — just checks if the proxy is set)
     checks["ai"] = _check_ai(settings)
@@ -265,6 +309,7 @@ Returns: A `HealthResponse` with overall status and per-check details.
     checks["env_vars"] = _check_env_vars(settings)
     checks["secrets"] = _check_secrets(settings)
     checks["optional_secrets"] = _check_optional_secrets(settings)
+
 
     # Determine overall status.
     # "not_configured" is neutral — the template may not use every binding.
