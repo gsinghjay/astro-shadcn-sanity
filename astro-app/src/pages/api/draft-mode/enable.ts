@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
 import { sanityClient } from "sanity:client";
 import { validatePreviewUrl } from "@sanity/preview-url-secret";
 import { log } from "@/lib/log";
@@ -37,9 +38,21 @@ export const GET: APIRoute = async ({ request }) => {
 
   // validatePreviewUrl checks the secret against Sanity's own previewUrlSecret
   // doc; returns { isValid, redirectTo, studioOrigin, studioPreviewPerspective }.
+  // The `sanity.previewUrlSecret` doc is private to the project — it requires
+  // a read token to fetch. The default `sanityClient` from `sanity:client` is
+  // unauthenticated (token is per-call via lib/sanity.ts), so we attach the
+  // read token here via withConfig.
+  if (!SANITY_API_READ_TOKEN) {
+    log.error("draft-mode-enable-missing-read-token", { url: url.pathname });
+    return new Response("Server is missing SANITY_API_READ_TOKEN", { status: 500 });
+  }
   let validation;
   try {
-    validation = await validatePreviewUrl(sanityClient, request.url);
+    const authedClient = sanityClient.withConfig({
+      token: SANITY_API_READ_TOKEN,
+      useCdn: false,
+    });
+    validation = await validatePreviewUrl(authedClient, request.url);
   } catch (err) {
     log.error("draft-mode-enable-validate-failed", err);
     return new Response("Failed to validate preview secret", { status: 502 });

@@ -1,5 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 import type { APIContext, MiddlewareNext } from "astro";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
 import { env } from "cloudflare:workers";
 import { sanityClient } from "sanity:client";
 import {
@@ -60,9 +61,23 @@ async function validatePreviewSecret(secret: string): Promise<boolean> {
   const now = Date.now();
   if (cached && cached.expiresAt > now) return cached.valid;
 
+  // `sanity.previewUrlSecret` is a private doc — needs a read token to fetch.
+  // Without the token the request 401s and we throw, which we then catch and
+  // treat as "invalid" — that fails-closed but is indistinguishable from a
+  // real attacker, so cache misses every time. Guard explicitly instead.
+  if (!SANITY_API_READ_TOKEN) {
+    log.warn("middleware-preview-secret-no-token");
+    return false;
+  }
+
   try {
     const result = await sanityClient
-      .withConfig({ apiVersion: previewSecretApiVersion, useCdn: false, perspective: "raw" })
+      .withConfig({
+        token: SANITY_API_READ_TOKEN,
+        apiVersion: previewSecretApiVersion,
+        useCdn: false,
+        perspective: "raw",
+      })
       .fetch(fetchSecretQuery, { secret }, { tag: previewSecretTag });
     const valid = !!result;
     _previewSecretCache.set(secret, { valid, expiresAt: now + PREVIEW_SECRET_TTL_MS });
