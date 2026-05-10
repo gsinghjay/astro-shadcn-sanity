@@ -24,6 +24,7 @@ DISCORD_PUBLIC_KEY="your-public-key"
 
 # --- Cloudflare API (optional — for workers that call CF APIs) ---
 CF_API_TOKEN="your-cf-api-token"
+CF_ACCOUNT_ID="..."
 TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
 
 # --- Wrangler Auth (for deploy from Docker / CI) ---

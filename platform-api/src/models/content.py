@@ -45,8 +45,8 @@ class EventResponse(SanityBaseModel):
     )
 
     id: str = Field(alias="_id")
-    title: str
-    date: str
+    title: str | None
+    date: str | None
     event_type: str | None = Field(default=None, alias="eventType")
     location: str | None = None
     description: str | None = None
