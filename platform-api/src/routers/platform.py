@@ -76,61 +76,69 @@ async def rebuild(
             message="Rebuild triggered" if success else f"Rebuild failed: {resp.status_code}"
         )
 
-@router.get("/health")
-async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
-    """Unauthenticated aggregated health check across all external services."""
-    checks = {}
+# @router.get("/health")
+# async def aggregated_health(settings: WorkerSettings = Depends(get_settings)):
+#     """Unauthenticated aggregated health check across all external services."""
+#     checks = {}
     
-    async def probe(name: str, coroutine):
-        try:
-            # Enforce 5-second timeout for external probes (AC3)
-            await asyncio.wait_for(coroutine, timeout=5.0)
-            checks[name] = "ok"
-        except Exception as e:
-            # Map exceptions to fixed labels; log detailed error server-side
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.error("Health probe failed for %s: %s", name, str(e), exc_info=True)
-            checks[name] = "error"
+#     async def probe(name: str, coroutine):
+#         try:
+#             # Enforce 5-second timeout for external probes (AC3)
+#             await asyncio.wait_for(coroutine, timeout=5.0)
+#             checks[name] = "ok"
+#         except Exception as e:
+#             # Map exceptions to fixed labels; log detailed error server-side
+#             import logging
+#             logger = logging.getLogger(__name__)
+#             logger.error("Health probe failed for %s: %s", name, str(e), exc_info=True)
+#             checks[name] = "error"
 
-    async def check_sanity():
-        pid = settings.env_vars.get("sanity_project_id")
-        dataset = (settings.env_vars.get("sanity_dataset_capstone") or settings.env_vars.get("sanity_dataset_rwc"))
-        if not pid or not dataset:
-            raise ValueError("No Sanity Project ID or Dataset")
-        async with get_client(timeout=4.0) as client:
-            resp = await client.get(f"https://{pid}.api.sanity.io/v2024-01-01/data/query/{dataset}?query=*[_type=='page'][0]")
-            resp.raise_for_status()
+#     async def check_sanity():
+#         pid = settings.env_vars.get("sanity_project_id")
+#         dataset = (settings.env_vars.get("sanity_dataset_capstone") or settings.env_vars.get("sanity_dataset_rwc"))
+#         if not pid or not dataset:
+#             raise ValueError("No Sanity Project ID or Dataset")
+#         async with get_client(timeout=4.0) as client:
+#             resp = await client.get(f"https://{pid}.api.sanity.io/v2024-01-01/data/query/{dataset}?query=*[_type=='page'][0]")
+#             resp.raise_for_status()
 
-    async def check_discord():
-        from urllib.parse import urlparse
-        from services.discord_client import ALLOWED_WEBHOOK_HOSTS
+#     async def check_discord():
+#         from urllib.parse import urlparse
+#         from services.discord_client import ALLOWED_WEBHOOK_HOSTS
 
-        webhook = settings.optional_secrets.get("discord_webhook_url")
-        if not webhook:
-            raise ValueError("not_configured")
+#         configured_webhooks = [False, False, False, False]
 
-        # Validate webhook URL locally without making a network request
-        parsed = urlparse(webhook)
-        if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
-            raise ValueError("invalid_webhook")
-        if parsed.scheme != "https":
-            raise ValueError("invalid_webhook")
-        if not parsed.path.startswith("/api/webhooks/"):
-            raise ValueError("invalid_webhook")
+#         async def check_webhook(webhook_role: str):
+#             webhook = await settings.kv.get(f"discord_webhook:{webhook_role}")
+#             if not webhook:
+#                 raise ValueError(f"{webhook_role} discord webhook not configured")
+#             webhook = webhook.strip('"')
 
-    # Run network probes concurrently
-    await asyncio.gather(
-        probe("sanity", check_sanity()),
-        probe("discord", check_discord()),
-    )
+#             parsed = urlparse(webhook)
+#             if not parsed.hostname or parsed.hostname not in ALLOWED_WEBHOOK_HOSTS:
+#                 raise ValueError("invalid_webhook")
+#             if parsed.scheme != "https":
+#                 raise ValueError("invalid_webhook")
+#             if not parsed.path.startswith("/api/webhooks/"):
+#                 raise ValueError("invalid_webhook")
+            
+#         await check_webhook("announcements")
+#         await check_webhook("events")
+#         await check_webhook("bot-audit")
+#         await check_webhook("form-submissions")
+
+#     # Run network probes concurrently
+#     await asyncio.gather(
+#         probe("sanity", check_sanity()),
+#         probe("discord", check_discord()),
+#     )
     
-    # Fast local checks
-    checks["kv"] = "ok" if settings.kv else "not_configured"
-    checks["d1"] = "ok" if settings.db else "not_configured"
+#     # Fast local checks
+#     checks["kv"] = "ok" if settings.kv else "not_configured"
+#     checks["d1"] = "ok" if settings.db else "not_configured"
 
-    status = "degraded" if any("error" in v or "not_configured" in v for v in checks.values()) else "ok"
-    return {"status": status, "checks": checks}
+#     status = "degraded" if any("error" in v or "not_configured" in v for v in checks.values()) else "ok"
+#     return {"status": status, "checks": checks}
 
 @router.get("/analytics", response_model=AnalyticsResponse)
 async def analytics(
