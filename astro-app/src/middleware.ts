@@ -1,5 +1,13 @@
 import { defineMiddleware } from "astro:middleware";
+import type { APIContext, MiddlewareNext } from "astro";
+import { SANITY_API_READ_TOKEN } from "astro:env/server";
 import { env } from "cloudflare:workers";
+import { sanityClient } from "sanity:client";
+import {
+  apiVersion as previewSecretApiVersion,
+  fetchSecretQuery,
+  tag as previewSecretTag,
+} from "@sanity/preview-url-secret/constants";
 import {
   AGENT_CONTENT_SIGNAL,
   buildLinkHeader,
@@ -9,6 +17,90 @@ import {
   parseAcceptHeader,
 } from "@/lib/agent-discovery";
 import { log } from "@/lib/log";
+import { runWithPreviewMode } from "@/lib/preview-mode";
+
+/** Story 26.1 — Sanity Preview Mode cookie. Set by `/api/draft-mode/enable`
+ *  after `validatePreviewUrl` succeeds. Production uses the `__Secure-` prefix
+ *  (HTTPS-only); local dev falls back to the bare name because `__Secure-` is
+ *  rejected over HTTP. Either form, when present, flips the request into
+ *  drafts perspective via AsyncLocalStorage. */
+const PREVIEW_COOKIE_NAMES = ["__Secure-sanity-preview", "sanity-preview"];
+
+export function extractPreviewCookie(cookie: string | null): string | null {
+  if (!cookie) return null;
+  for (const name of PREVIEW_COOKIE_NAMES) {
+    const match = cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`));
+    if (!match) continue;
+    // decodeURIComponent throws URIError on malformed input (e.g. a hostile
+    // `Cookie: __Secure-sanity-preview=%` header). Swallow and treat as
+    // "no valid cookie" so middleware can't 500 the entire request on bad input.
+    try {
+      return decodeURIComponent(match[1]);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/** In-isolate cache of preview-secret validation results. Workers reuse isolates
+ *  across requests, so a 5-minute window keeps the steady-state Sanity hit rate
+ *  near zero while bounding the worst-case lag between secret revocation and
+ *  re-validation. Pattern mirrors `_agreementRevCache` below. */
+const _previewSecretCache = new Map<string, { valid: boolean; expiresAt: number }>();
+const PREVIEW_SECRET_TTL_MS = 5 * 60 * 1000;
+
+/** Validate the cookie value against Sanity's `sanity.previewUrlSecret` doc.
+ *  Sanity manages its own TTL on the secret doc (`SECRET_TTL` in the package);
+ *  this helper bounds the per-request cost via in-isolate caching. Fails closed
+ *  on Sanity outage — an attacker can't bypass with a forged cookie, and a real
+ *  editor with a valid cookie just sees the published render until Sanity is
+ *  back. */
+async function validatePreviewSecret(secret: string): Promise<boolean> {
+  const cached = _previewSecretCache.get(secret);
+  const now = Date.now();
+  if (cached && cached.expiresAt > now) return cached.valid;
+
+  // `sanity.previewUrlSecret` is a private doc — needs a read token to fetch.
+  // Without the token the request 401s and we throw, which we then catch and
+  // treat as "invalid" — that fails-closed but is indistinguishable from a
+  // real attacker, so cache misses every time. Guard explicitly instead.
+  if (!SANITY_API_READ_TOKEN) {
+    log.warn("middleware-preview-secret-no-token");
+    return false;
+  }
+
+  try {
+    const result = await sanityClient
+      .withConfig({
+        token: SANITY_API_READ_TOKEN,
+        apiVersion: previewSecretApiVersion,
+        useCdn: false,
+        perspective: "raw",
+      })
+      .fetch(fetchSecretQuery, { secret }, { tag: previewSecretTag });
+    const valid = !!result;
+    _previewSecretCache.set(secret, { valid, expiresAt: now + PREVIEW_SECRET_TTL_MS });
+    // Periodically purge stale entries so the Map doesn't grow unbounded under
+    // attacker-driven cookie churn. Called at write time only — cheap.
+    if (_previewSecretCache.size > 100) {
+      for (const [key, entry] of _previewSecretCache) {
+        if (entry.expiresAt <= now) _previewSecretCache.delete(key);
+      }
+    }
+    return valid;
+  } catch (err) {
+    log.warn("middleware-preview-secret-validation-failed", {
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return false;
+  }
+}
+
+/** Test-only: reset the module-scope preview-secret cache. */
+export function _resetPreviewSecretCache(): void {
+  _previewSecretCache.clear();
+}
 
 /** Rate limiting configuration */
 const RATE_LIMIT_WINDOW_MS = 60_000;
@@ -106,6 +198,27 @@ interface SessionUser {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Story 26.1 — request-scoped preview flag. Set BEFORE the auth/route branches so
+  // every downstream `loadQuery()` call (in components, resolvers, server islands)
+  // sees the right perspective. Cookie value is the Sanity-issued preview secret;
+  // we re-validate via Sanity per request (cached 5min in-isolate via
+  // `_previewSecretCache`) so a revoked secret stops working within the cache TTL.
+  const previewCookie = extractPreviewCookie(context.request.headers.get("cookie"));
+  let previewMode = false;
+  if (previewCookie) {
+    previewMode = await validatePreviewSecret(previewCookie);
+  }
+  context.locals.previewMode = previewMode;
+  if (previewMode) {
+    return runWithPreviewMode(true, () => _handleRequest(context, next));
+  }
+  return _handleRequest(context, next);
+});
+
+async function _handleRequest(
+  context: APIContext,
+  next: MiddlewareNext,
+): Promise<Response> {
   const { pathname } = context.url;
   // Adapter v13 attaches the Workers ExecutionContext as `locals.cfContext`.
   // Calling `cfContext.waitUntil(...)` keeps the isolate alive past response so
@@ -405,14 +518,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     log.error("middleware-auth-error", error);
     return new Response("Service Unavailable", { status: 503 });
   }
-});
+}
 
 /** Public-route handler that adds RFC 8288 `Link` headers to HTML responses
  *  and content-negotiates `Accept: text/markdown` against the static `.md`
  *  twin corpus emitted by `astro-llms-md` (Story 5.19). Pure layering on top
  *  of `next()` — no auth or rate-limiting concerns intrude here. */
 export async function decorateForAgents(
-  context: { url: URL; request: Request },
+  context: { url: URL; request: Request; locals?: { previewMode?: boolean } },
   next: () => Promise<Response>,
 ): Promise<Response> {
   const { pathname } = context.url;
@@ -462,6 +575,25 @@ export async function decorateForAgents(
       response.headers.set("vary", "Accept");
     } else if (!/\baccept\b/i.test(existingVary)) {
       response.headers.set("vary", `${existingVary}, Accept`);
+    }
+
+    // Story 26.1 — CF edge cache for cookieless HTML on the now-SSR content
+    // routes (capstone production). Cookie-bearing requests (preview mode)
+    // bypass cache so editors see fresh drafts. Vary: Cookie ensures CF
+    // partitions cache entries by cookie state — without it, a cached
+    // cookieless response could be served to a cookie-bearing request.
+    const isPreviewMode = context.locals?.previewMode === true;
+    if (isPreviewMode) {
+      response.headers.set("cache-control", "private, no-store");
+    } else if (!response.headers.has("cache-control")) {
+      // 60s edge cache + 5min stale-while-revalidate. Sanity webhook → deploy
+      // hook still rebuilds on publish (within minutes); the 60s window bounds
+      // editor → reader latency without paying the SSR cost on every request.
+      response.headers.set("cache-control", "public, s-maxage=60, stale-while-revalidate=300");
+    }
+    const varyHeader = response.headers.get("vary") ?? "";
+    if (!/\bcookie\b/i.test(varyHeader)) {
+      response.headers.set("vary", varyHeader ? `${varyHeader}, Cookie` : "Cookie");
     }
   }
 

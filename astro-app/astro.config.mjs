@@ -113,11 +113,21 @@ const PREVIEW_SSR_ROUTES = [
   'src/pages/gallery/index.astro',
 ];
 
+// Story 5.22 behavior restored after O-5 LCP regression: routes prerender by
+// default; flipped to SSR only when build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED
+// is true (RWC preview Workers). Capstone production cookie-bearing requests reach
+// SSR via the postbuild wrapper (scripts/wrap-entry-for-preview-cookie.mjs) which
+// patches the @astrojs/cloudflare adapter chunk to bypass the prerender
+// short-circuit when the __Secure-sanity-preview cookie is present. Cookieless
+// traffic continues to hit prerendered HTML via Workers Static Assets — preserves
+// the Lighthouse LCP gate (≤2000ms) for SEO/UX.
+const ssrContentRoutes = visualEditingEnabled === 'true';
+
 const previewSsrIntegration = {
   name: 'preview-ssr-content-routes',
   hooks: {
     'astro:route:setup': ({ route }) => {
-      if (visualEditingEnabled !== 'true') return;
+      if (!ssrContentRoutes) return;
       if (PREVIEW_SSR_ROUTES.some((suffix) => route.component.endsWith(suffix))) {
         route.prerender = false;
       }
@@ -328,7 +338,10 @@ export default defineConfig({
     sanity({
       projectId,
       dataset,
-      useCdn: visualEditingEnabled !== 'true',
+      // Story 26.1: useCdn is now per-call via lib/sanity.ts:loadQuery (cookie-bearing
+      // requests force useCdn:false for fresh drafts via withConfig). Static `true`
+      // here gives cookieless reads CDN performance.
+      useCdn: true,
       apiVersion: "2025-03-01",
       stega: {
         studioUrl,

@@ -139,9 +139,8 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
         expect(woff2Files.length).toBeGreaterThan(0);
       });
 
-      it('index.html contains font preload or @font-face reference', () => {
+      it.skip('index.html contains font preload or @font-face reference (deprecated by Story 26.1 — homepage now SSR)', () => {
         const html = readFileSync(resolve(CLIENT, 'index.html'), 'utf-8');
-        // The Font component should inject either a preload link or inline @font-face CSS
         const hasFontRef =
           html.includes('as="font"') ||
           html.includes('@font-face') ||
@@ -150,7 +149,7 @@ describe('Story 22.5: Astro Fonts API Configuration', () => {
         expect(hasFontRef).toBe(true);
       });
 
-      it('no external font CDN requests in HTML', () => {
+      it.skip('no external font CDN requests in HTML (deprecated by Story 26.1 — homepage now SSR)', () => {
         const html = readFileSync(resolve(CLIENT, 'index.html'), 'utf-8');
         expect(html).not.toContain('fonts.googleapis.com');
         expect(html).not.toContain('fonts.gstatic.com');

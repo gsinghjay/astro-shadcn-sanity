@@ -3,7 +3,8 @@ import type { QueryParams } from "sanity";
 import groq, { defineQuery } from "groq";
 import { stegaClean } from "@sanity/client/stega";
 import { SANITY_API_READ_TOKEN } from "astro:env/server";
-import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_SANITY_DATASET, PUBLIC_SITE_ID } from "astro:env/client";
+import { PUBLIC_SANITY_DATASET, PUBLIC_SITE_ID } from "astro:env/client";
+import { getPreviewMode } from "@/lib/preview-mode";
 import type {
   SITE_SETTINGS_QUERY_RESULT,
   PAGE_BY_SLUG_QUERY_RESULT,
@@ -270,7 +271,10 @@ const BLOCK_FIELDS_PROJECTION = `${INNER_BLOCK_FIELDS_PROJECTION},
       verticalAlign
     }`;
 
-const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+// `visualEditingEnabled` is now request-scoped via AsyncLocalStorage (see Story 26.1
+// + lib/preview-mode.ts). Each function below reads the current value via
+// `getPreviewMode()`. The module-level `PUBLIC_SANITY_VISUAL_EDITING_ENABLED`
+// constant was retired with the per-Worker preview build.
 const token = SANITY_API_READ_TOKEN;
 
 /**
@@ -372,6 +376,10 @@ export async function loadQuery<T>({
   query: string;
   params?: QueryParams;
 }): Promise<{ result: T; syncTags: string[] }> {
+  // Story 26.1: per-request preview flag (was a build-time module const). Read once
+  // per call so concurrent requests in the same isolate get the right perspective.
+  const visualEditingEnabled = getPreviewMode();
+
   if (visualEditingEnabled && !token) {
     throw new Error(
       "The `SANITY_API_READ_TOKEN` environment variable is required during Visual Editing.",
@@ -380,7 +388,15 @@ export async function loadQuery<T>({
 
   const perspective = visualEditingEnabled ? "drafts" : "published";
 
-  const response = await sanityClient.fetch<T>(query, params ?? {}, {
+  // The `sanityClient` from `sanity:client` is configured at build time with
+  // `useCdn: true` (production-default after 26.1). Cookie-bearing preview
+  // requests need `useCdn: false` for fresh drafts; `withConfig({ useCdn: false })`
+  // returns a new client cheaply (object spread, no network init).
+  const client = visualEditingEnabled
+    ? sanityClient.withConfig({ useCdn: false })
+    : sanityClient;
+
+  const response = await client.fetch<T>(query, params ?? {}, {
     filterResponse: false,
     perspective,
     resultSourceMap: visualEditingEnabled ? "withKeyArraySelector" : false,
@@ -422,7 +438,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(groq`*[_type == "siteSettings" &&
 let _siteSettingsCache: NonNullable<SITE_SETTINGS_QUERY_RESULT> | null = null;
 
 export async function getSiteSettings(): Promise<NonNullable<SITE_SETTINGS_QUERY_RESULT>> {
-  if (!visualEditingEnabled && _siteSettingsCache) return _siteSettingsCache;
+  if (!getPreviewMode() && _siteSettingsCache) return _siteSettingsCache;
 
   const { result } = await loadQuery<SITE_SETTINGS_QUERY_RESULT>({
     query: SITE_SETTINGS_QUERY,
@@ -465,7 +481,7 @@ export const ALL_SPONSORS_QUERY = defineQuery(groq`*[_type == "sponsor" && hidde
 let _sponsorsCache: ALL_SPONSORS_QUERY_RESULT | null = null;
 
 export async function getAllSponsors(): Promise<ALL_SPONSORS_QUERY_RESULT> {
-  if (!visualEditingEnabled && _sponsorsCache) return _sponsorsCache;
+  if (!getPreviewMode() && _sponsorsCache) return _sponsorsCache;
   const { result } = await loadQuery<ALL_SPONSORS_QUERY_RESULT>({ query: ALL_SPONSORS_QUERY, params: getSiteParams() });
   _sponsorsCache = result ?? [];
   return _sponsorsCache;
@@ -569,7 +585,7 @@ export const ALL_PROJECTS_QUERY = defineQuery(groq`*[_type == "project" && ($sit
 let _projectsCache: ALL_PROJECTS_QUERY_RESULT | null = null;
 
 export async function getAllProjects(): Promise<ALL_PROJECTS_QUERY_RESULT> {
-  if (!visualEditingEnabled && _projectsCache) return _projectsCache;
+  if (!getPreviewMode() && _projectsCache) return _projectsCache;
   const { result } = await loadQuery<ALL_PROJECTS_QUERY_RESULT>({ query: ALL_PROJECTS_QUERY, params: getSiteParams() });
   _projectsCache = result ?? [];
   return _projectsCache;
@@ -627,7 +643,7 @@ export const ALL_TESTIMONIALS_QUERY = defineQuery(groq`*[_type == "testimonial" 
 let _testimonialsCache: ALL_TESTIMONIALS_QUERY_RESULT | null = null;
 
 export async function getAllTestimonials(): Promise<ALL_TESTIMONIALS_QUERY_RESULT> {
-  if (!visualEditingEnabled && _testimonialsCache) return _testimonialsCache;
+  if (!getPreviewMode() && _testimonialsCache) return _testimonialsCache;
   const { result } = await loadQuery<ALL_TESTIMONIALS_QUERY_RESULT>({ query: ALL_TESTIMONIALS_QUERY, params: getSiteParams() });
   _testimonialsCache = result ?? [];
   return _testimonialsCache;
@@ -668,7 +684,7 @@ export const ALL_EVENTS_QUERY = defineQuery(groq`*[_type == "event" && ($site ==
 let _eventsCache: ALL_EVENTS_QUERY_RESULT | null = null;
 
 export async function getAllEvents(): Promise<ALL_EVENTS_QUERY_RESULT> {
-  if (!visualEditingEnabled && _eventsCache) return _eventsCache;
+  if (!getPreviewMode() && _eventsCache) return _eventsCache;
   const { result } = await loadQuery<ALL_EVENTS_QUERY_RESULT>({ query: ALL_EVENTS_QUERY, params: getSiteParams() });
   _eventsCache = result ?? [];
   return _eventsCache;
@@ -789,7 +805,7 @@ export const ARTICLE_BY_SLUG_QUERY = defineQuery(groq`*[_type == "article" && sl
 let _articlesCache: ALL_ARTICLES_QUERY_RESULT | null = null;
 
 export async function getAllArticles(): Promise<ALL_ARTICLES_QUERY_RESULT> {
-  if (!visualEditingEnabled && _articlesCache) return _articlesCache;
+  if (!getPreviewMode() && _articlesCache) return _articlesCache;
   const { result } = await loadQuery<ALL_ARTICLES_QUERY_RESULT>({ query: ALL_ARTICLES_QUERY, params: getSiteParams() });
   _articlesCache = result ?? [];
   return _articlesCache;
@@ -898,7 +914,7 @@ export const ARTICLES_BY_CATEGORY_QUERY = defineQuery(groq`*[_type == "article" 
 let _articleCategoriesCache: ALL_ARTICLE_CATEGORIES_QUERY_RESULT | null = null;
 
 export async function getAllArticleCategories(): Promise<ALL_ARTICLE_CATEGORIES_QUERY_RESULT> {
-  if (!visualEditingEnabled && _articleCategoriesCache) return _articleCategoriesCache;
+  if (!getPreviewMode() && _articleCategoriesCache) return _articleCategoriesCache;
   const { result } = await loadQuery<ALL_ARTICLE_CATEGORIES_QUERY_RESULT>({
     query: ALL_ARTICLE_CATEGORIES_QUERY,
     params: getSiteParams(),
@@ -1051,7 +1067,7 @@ function parseGalleryAssetTags(asset: GalleryAsset): Pick<GalleryItem, 'featured
 let _galleryAssetsCache: GalleryItem[] | null = null;
 
 export async function getGalleryAssets(): Promise<GalleryItem[]> {
-  if (!visualEditingEnabled && _galleryAssetsCache) return _galleryAssetsCache;
+  if (!getPreviewMode() && _galleryAssetsCache) return _galleryAssetsCache;
   try {
     const { result } = await loadQuery<GalleryAsset[]>({ query: GALLERY_ASSETS_QUERY });
     const assets: GalleryAsset[] = result ?? [];
@@ -1131,7 +1147,7 @@ export const AUTHOR_BY_SLUG_QUERY = defineQuery(groq`*[_type == "author" && slug
 let _authorsCache: ALL_AUTHORS_QUERY_RESULT | null = null;
 
 export async function getAllAuthors(): Promise<ALL_AUTHORS_QUERY_RESULT> {
-  if (!visualEditingEnabled && _authorsCache) return _authorsCache;
+  if (!getPreviewMode() && _authorsCache) return _authorsCache;
   const { result } = await loadQuery<ALL_AUTHORS_QUERY_RESULT>({ query: ALL_AUTHORS_QUERY, params: getSiteParams() });
   _authorsCache = result ?? [];
   return _authorsCache;
@@ -1179,7 +1195,7 @@ function getListingPageId(route: string): string {
 const _listingPageCache = new Map<string, LISTING_PAGE_QUERY_RESULT | null>();
 
 export async function getListingPage(route: string): Promise<LISTING_PAGE_QUERY_RESULT | null> {
-  if (!visualEditingEnabled && _listingPageCache.has(route)) {
+  if (!getPreviewMode() && _listingPageCache.has(route)) {
     return _listingPageCache.get(route)!;
   }
   const id = getListingPageId(route);
@@ -1210,7 +1226,7 @@ function getPortalPageId(route: string): string {
 const _portalPageCache = new Map<string, PORTAL_PAGE_QUERY_RESULT | null>();
 
 export async function getPortalPage(route: string): Promise<PORTAL_PAGE_QUERY_RESULT | null> {
-  if (!visualEditingEnabled && _portalPageCache.has(route)) {
+  if (!getPreviewMode() && _portalPageCache.has(route)) {
     return _portalPageCache.get(route)!;
   }
   const id = getPortalPageId(route);
@@ -1410,7 +1426,7 @@ const _pageCache = new Map<string, PAGE_BY_SLUG_QUERY_RESULT>();
  * Populates the page cache so individual getPage() calls are instant.
  */
 export async function prefetchPages(slugs: string[], concurrency = 6): Promise<void> {
-  if (visualEditingEnabled) return;
+  if (getPreviewMode()) return;
   const chunks: string[][] = [];
   for (let i = 0; i < slugs.length; i += concurrency) {
     chunks.push(slugs.slice(i, i + concurrency));
@@ -1433,7 +1449,7 @@ export async function prefetchPages(slugs: string[], concurrency = 6): Promise<v
  * Returns cached result if available (populated by prefetchPages).
  */
 export async function getPage(slug: string): Promise<PAGE_BY_SLUG_QUERY_RESULT> {
-  if (!visualEditingEnabled && _pageCache.has(slug)) return _pageCache.get(slug)!;
+  if (!getPreviewMode() && _pageCache.has(slug)) return _pageCache.get(slug)!;
   const { result } = await loadQuery<PAGE_BY_SLUG_QUERY_RESULT>({
     query: PAGE_BY_SLUG_QUERY,
     params: { slug, ...getSiteParams() },
