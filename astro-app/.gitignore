@@ -30,3 +30,11 @@ pnpm-debug.log*
 
 # Storybook
 storybook-static/
+
+# Lighthouse CI local-run output (manifest, lhr-*.json/html)
+.lighthouseci/
+
+# WSL-visible Windows-side Lighthouse temp dirs (created when LHCI launches a
+# Windows-resident Chrome from WSL — usually a setup mishap; the proper path is
+# `--collect.settings.chromePath=/usr/bin/google-chrome`).
+C:\\Users\\*\\AppData\\Local\\lighthouse.*/
