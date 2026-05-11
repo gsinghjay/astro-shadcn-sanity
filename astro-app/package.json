@@ -12,7 +12,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "predeploy:assert-fresh": "rimraf dist",
-    "postbuild:agent-discovery": "node scripts/append-agent-headers.mjs && node scripts/wrap-entry-for-agents.mjs && node scripts/wrap-entry-for-preview-cookie.mjs",
+    "postbuild:agent-discovery": "node scripts/append-agent-headers.mjs && node scripts/wrap-entry-for-agents.mjs",
     "postbuild:assert-no-localhost": "node -e \"const f='dist/server/wrangler.json';try{const v=JSON.parse(require('fs').readFileSync(f,'utf8')).vars||{};for(const k of Object.keys(v))if(typeof v[k]==='string'&&v[k].includes('localhost')){console.error('[deploy guard] '+f+' var '+k+' contains localhost: '+v[k]);process.exit(1)}}catch(e){if(e.code!=='ENOENT')throw e}\"",
     "deploy:capstone": "npm run predeploy:assert-fresh && CLOUDFLARE_ENV=capstone astro build && npm run postbuild:agent-discovery && npm run postbuild:assert-no-localhost && wrangler deploy",
     "deploy:rwc-us": "npm run predeploy:assert-fresh && CLOUDFLARE_ENV=rwc_us astro build && npm run postbuild:agent-discovery && npm run postbuild:assert-no-localhost && wrangler deploy",
