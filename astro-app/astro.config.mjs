@@ -113,15 +113,15 @@ const PREVIEW_SSR_ROUTES = [
   'src/pages/gallery/index.astro',
 ];
 
-// Story 26.1: capstone production also SSRs these routes so cookie-bearing
-// preview requests reach middleware (which flips loadQuery into drafts mode).
-// CF edge cache (Cache-Control set in middleware) absorbs the SSR cost for
-// cookieless traffic. RWC + *-preview Workers keep the original Story 5.22
-// behavior (SSR only when visualEditingEnabled === 'true') — they don't yet
-// participate in the cookie-based preview flow.
-const cloudflareEnv = process.env.CLOUDFLARE_ENV;
-const ssrContentRoutes =
-  cloudflareEnv === 'capstone' || visualEditingEnabled === 'true';
+// Story 5.22 behavior restored after O-5 LCP regression: routes prerender by
+// default; flipped to SSR only when build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED
+// is true (RWC preview Workers). Capstone production cookie-bearing requests reach
+// SSR via the postbuild wrapper (scripts/wrap-entry-for-preview-cookie.mjs) which
+// patches the @astrojs/cloudflare adapter chunk to bypass the prerender
+// short-circuit when the __Secure-sanity-preview cookie is present. Cookieless
+// traffic continues to hit prerendered HTML via Workers Static Assets — preserves
+// the Lighthouse LCP gate (≤2000ms) for SEO/UX.
+const ssrContentRoutes = visualEditingEnabled === 'true';
 
 const previewSsrIntegration = {
   name: 'preview-ssr-content-routes',
