@@ -69,18 +69,7 @@ const preloadSrcset = heroImage?.asset
   preloadImageSizes="100vw"
 >
   {visualEditingEnabled ? (
-    <SanityPageContent server:defer slug={slug as string}>
-      <div slot="fallback" class="mx-auto max-w-(--grid-max-width) px-(--grid-margin) py-12">
-        <div class="animate-pulse space-y-8">
-          <div class="h-10 bg-muted rounded w-2/5"></div>
-          <div class="h-64 bg-muted rounded"></div>
-          <div class="space-y-3">
-            <div class="h-4 bg-muted rounded w-3/4"></div>
-            <div class="h-4 bg-muted rounded w-1/2"></div>
-          </div>
-        </div>
-      </div>
-    </SanityPageContent>
+    <SanityPageContent slug={slug as string} />
   ) : (
     <FullWidthTemplate>
       <BlockRenderer blocks={page!.blocks ?? []} sponsors={sponsors} projects={projects} testimonials={testimonials} events={events} articles={articles} />
