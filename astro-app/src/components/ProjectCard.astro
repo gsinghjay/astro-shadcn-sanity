@@ -13,9 +13,12 @@ function sponsorLogoUrl(logo: NonNullable<Project['sponsor']>['logo']) {
 
 function portableTextExcerpt(content: Project['content'], maxLength = 150): string {
   if (!content) return '';
+  // Clean stega before slicing: stega zero-width chars are interleaved through the
+  // string (not appended), so a byte-position slice cuts mid-payload and the visual
+  // editing decoder fails with "invalid length". Excerpt isn't an edit target itself.
   const text = content
     .filter((block) => 'children' in block && block.children)
-    .map((block) => ('children' in block ? block.children : [])?.map((child) => ('text' in child ? child.text : '')).join('') ?? '')
+    .map((block) => ('children' in block ? block.children : [])?.map((child) => ('text' in child ? (stegaClean(child.text) ?? '') : '')).join('') ?? '')
     .join(' ');
   return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
 }
