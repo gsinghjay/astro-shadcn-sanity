@@ -97,7 +97,11 @@
 				"PUBLIC_SANITY_STUDIO_DATASET": "production",
 				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
 				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
-				// PUBLIC_SANITY_VISUAL_EDITING_ENABLED removed in Story 26.1 — preview mode is now request-scoped via the __Secure-sanity-preview cookie set by /api/draft-mode/enable.
+				// Story 26.1: runtime preview is request-scoped via the __Secure-sanity-preview cookie (middleware + AsyncLocalStorage), NOT this flag.
+				// This MUST stay pinned to "false" on capstone: it still drives BUILD-TIME gates (previewSsrIntegration prerender flip + the astro-llms-md
+				// enable gate in astro.config.mjs). Removing it let astro-app/.env's local "true" leak through pick()/loadEnv into the prod build, which
+				// forced all content routes to SSR and disabled astro-llms-md → empty .md agent-discovery corpus (regression fixed by re-pinning here).
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "false",
 				"PUBLIC_SITE_ID": "capstone",
 				"PUBLIC_SITE_THEME": "red",
 				"PUBLIC_SITE_URL": "https://www.ywcccapstone1.com",
