@@ -197,12 +197,14 @@ From `astro-app/`:
 npm run deploy:capstone           # → ywcc-capstone (www.ywcccapstone1.com)
 npm run deploy:rwc-us             # → rwc-us (workers.dev)
 npm run deploy:rwc-intl           # → rwc-intl (workers.dev)
-npm run deploy:capstone-preview   # → ywcc-capstone-preview (Studio Presentation iframe)
+npm run deploy:capstone-preview   # → ywcc-capstone-preview (content-only; Studio Presentation iframe)
 npm run deploy:rwc-us-preview     # → rwc-us-preview
 npm run deploy:rwc-intl-preview   # → rwc-intl-preview
 ```
 
 Each script runs `CLOUDFLARE_ENV=<name> astro build && wrangler deploy`. **The `wrangler deploy --env <name>` flag is no longer applicable** under `@astrojs/cloudflare` v13 — env is owned by the CF Vite plugin and selected by `CLOUDFLARE_ENV` at build time.
+
+> **Automated deploys (Cloudflare Workers Builds, native GitHub CI/CD):** `ywcc-capstone` (production) deploys on push to `main`; `ywcc-capstone-preview` deploys on push to `preview` (Workers Builds config: empty build command — deps auto-installed — deploy command `npm run deploy:capstone-preview -w astro-app`, build variable `SANITY_API_READ_TOKEN`). The above `npm run deploy:*` scripts still work as a manual fallback. The old GitHub Actions deploy workflows (`deploy.yml`, the short-lived `deploy-preview.yml`) have been removed — no remaining workflow deploys Workers.
 
 After any `wrangler.jsonc` edit:
 
@@ -235,9 +237,9 @@ Multi-workspace (single command deploys all three workspaces under https://ywccc
 
 GitHub Pages — handled automatically by `deploy-storybook.yml` on `main`. Manual run: workflow_dispatch in the Actions tab.
 
-### Sanity webhook → content rebuild
+### Sanity webhook → production rebuild
 
-Configure once in Sanity dashboard → API → Webhooks. Filter: `_type in ["page","siteSettings","sponsor","project","team","event"] && !(_id in path("drafts.**"))`. Three deploy hooks (one per production Worker — IDs in `_bmad-output/project-context.md`).
+A publish-only Sanity webhook → Cloudflare deploy hook triggers a production Workers Build (~1-2 min rebuild) so published content appears on the prerendered production routes. Configure once in Sanity dashboard → API → Webhooks. Filter: `_type in ["page","siteSettings","sponsor","project","team","event"] && !(_id in path("drafts.**"))`. Three deploy hooks (one per production Worker — IDs in `_bmad-output/project-context.md`).
 
 ## Environment variables
 
@@ -269,7 +271,7 @@ Stored as Worker secrets (`wrangler secret put <NAME> --name <worker>`) — **ne
 - `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL` (in `vars`)
-- `SANITY_API_READ_TOKEN` (preview Workers only)
+- `SANITY_API_READ_TOKEN` (preview Workers only — on `ywcc-capstone-preview` set BOTH as a runtime Wrangler secret AND as a Cloudflare Workers Builds build variable, since the build prerenders `rss.xml` + the `.ics` endpoint under the drafts perspective)
 - `SANITY_API_WRITE_TOKEN`
 - `TURNSTILE_SECRET_KEY`
 - `DISCORD_WEBHOOK_URL`
