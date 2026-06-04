@@ -17,9 +17,12 @@ const formattedTime = eventDate
   ? eventDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
   : null;
 
-// Truncate description for excerpt
-const excerpt = e.description
-  ? (e.description.length > 150 ? e.description.slice(0, 150) + '...' : e.description)
+// Truncate description for excerpt — clean stega first so the slice doesn't cut
+// through interleaved zero-width payload chars (visual editing decoder fails with
+// "invalid length" otherwise; excerpt isn't an edit target itself).
+const cleanedDescription = e.description ? stegaClean(e.description) : null;
+const excerpt = cleanedDescription
+  ? (cleanedDescription.length > 150 ? cleanedDescription.slice(0, 150) + '...' : cleanedDescription)
   : null;
 
 // Event type badge colors — stegaClean required for Visual Editing compatibility

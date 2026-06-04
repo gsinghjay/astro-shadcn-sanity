@@ -1036,10 +1036,9 @@ describe("prefetchPages() and getPage() cache", () => {
     expect(freshClient.fetch).toHaveBeenCalledOnce();
   });
 
-  it("prefetchPages is a no-op when Visual Editing is enabled", async () => {
+  it("prefetchPages is a no-op when preview mode is on (Story 26.1)", async () => {
     vi.resetModules();
     vi.doMock("astro:env/client", () => ({
-      PUBLIC_SANITY_VISUAL_EDITING_ENABLED: true,
       PUBLIC_SANITY_DATASET: "production",
       PUBLIC_SITE_ID: "capstone",
     }));
@@ -1048,8 +1047,13 @@ describe("prefetchPages() and getPage() cache", () => {
     }));
     const { sanityClient: freshClient } = await import("sanity:client");
     const freshModule = await import("@/lib/sanity");
+    const { runWithPreviewMode } = await import("@/lib/preview-mode");
 
-    await freshModule.prefetchPages(["about", "contact"]);
+    // Story 26.1: preview mode is request-scoped via AsyncLocalStorage, not a
+    // build-time env var. Wrap the call to flip the flag.
+    await runWithPreviewMode(true, async () => {
+      await freshModule.prefetchPages(["about", "contact"]);
+    });
     expect(freshClient.fetch).not.toHaveBeenCalled();
   });
 

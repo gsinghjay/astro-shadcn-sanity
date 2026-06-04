@@ -12,10 +12,12 @@
  * is injected server-side via define:vars — never imported in client JS bundles.
  * The token MUST have viewer (read-only) permissions only.
  */
-import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
 import { SANITY_API_READ_TOKEN } from "astro:env/server";
 
-const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+// Story 26.1: request-scoped preview flag (was build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED).
+// The client-side <script> below reads the flag from a DOM data attribute set
+// at SSR time (build-time inlining no longer works since the value is per-request).
+const visualEditingEnabled = Astro.locals.previewMode ?? false;
 
 // Only pass token to client when visual editing is enabled (non-production)
 const liveToken = visualEditingEnabled ? (SANITY_API_READ_TOKEN ?? '') : '';
@@ -28,11 +30,15 @@ const liveToken = visualEditingEnabled ? (SANITY_API_READ_TOKEN ?? '') : '';
   </script>
 )}
 
+{/* Boot wrapper carries the per-request preview flag to the client script via
+    a data attribute. Build-time `import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED }`
+    can't see request scope after Story 26.1. */}
+<div id="sanity-live-updater-boot" data-preview-mode={String(visualEditingEnabled)} hidden></div>
+
 {/* Bundled client module — processed by Vite, can import from project modules */}
 <script>
   import { createLiveClient, startLiveSubscription } from '@/lib/sanity-live';
   import {
-    PUBLIC_SANITY_VISUAL_EDITING_ENABLED,
     PUBLIC_SANITY_STUDIO_PROJECT_ID,
     PUBLIC_SANITY_STUDIO_DATASET,
   } from "astro:env/client";
@@ -40,10 +46,11 @@ const liveToken = visualEditingEnabled ? (SANITY_API_READ_TOKEN ?? '') : '';
   const projectId = PUBLIC_SANITY_STUDIO_PROJECT_ID;
   const dataset = PUBLIC_SANITY_STUDIO_DATASET || 'production';
   const apiVersion = '2025-03-01';
-  const visualEditing = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+  const bootEl = document.getElementById('sanity-live-updater-boot');
+  const visualEditing = bootEl?.getAttribute('data-preview-mode') === 'true';
 
   if (projectId) {
-    const token = visualEditing ? window.__SANITY_LIVE_TOKEN__ : undefined;
+    const token = visualEditing ? (window as any).__SANITY_LIVE_TOKEN__ : undefined;
 
     const client = createLiveClient({
       projectId,

@@ -10,7 +10,7 @@ import SanityLiveUpdater from "../components/SanityLiveUpdater.astro";
 import { getSiteSettings, getSyncTags } from "../lib/sanity";
 import { urlFor } from "../lib/image";
 import { stegaClean } from "@sanity/client/stega";
-import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED, PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
+import { PUBLIC_GTM_ID, PUBLIC_SITE_THEME, PUBLIC_SANITY_LIVE_CONTENT_ENABLED } from "astro:env/client";
 import type { SeoProps } from "@/lib/types";
 import { buildOrgJsonLd } from "@/lib/org-jsonld";
 import { buildPageGraph } from "@/lib/page-jsonld";
@@ -44,7 +44,9 @@ const cleanDescription = stegaClean(
   seo?.metaDescription ?? defaultDescription
 );
 
-const visualEditingEnabled = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+// Story 26.1: request-scoped preview flag (was build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED).
+// Middleware sets `Astro.locals.previewMode = true` for cookie-bearing requests.
+const visualEditingEnabled = Astro.locals.previewMode ?? false;
 const gtmId = PUBLIC_GTM_ID;
 
 const fullTitle = cleanSeoTitle

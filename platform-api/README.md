@@ -30,6 +30,7 @@ Fork this template, add your routes, and deploy globally in minutes.
 - [Forking This Template](#forking-this-template)
 - [Concepts for Beginners](#concepts-for-beginners)
 - [Troubleshooting](#troubleshooting)
+- [Authentication](#authentication)
 
 ---
 
@@ -872,3 +873,24 @@ async with httpx.AsyncClient(http2=False) as client: ...
 from services.http_client import http_get
 data = await http_get("https://<project-id>.api.sanity.io/...")
 ```
+
+## Authentication
+
+The `platform-api` uses a session-token bridge to authenticate calls from the `astro-app` portal and other consumers. Instead of managing a separate identity provider or standalone JWTs, `platform-api` validates the exact same **Better Auth** session tokens that protect the Astro frontend.
+
+**How it works:**
+- Callers include the session token in the `Authorization: Bearer <better-auth.session_token>` HTTP header.
+- The API's dependencies (`require_authenticated_user`, `require_sponsor`, `require_admin`) query the shared `ywcc-capstone-portal` D1 database to verify the token and enforce access control roles.
+- Valid sessions are aggressively cached in the Worker's KV namespace (5-minute TTL) to minimize redundant D1 reads and optimize edge performance.
+
+**Phase 1 Constraints:**
+Currently, the API gates administrative actions to the `sponsor` role as a stand-in for program administrators. A future upgrade (Story 12.9) will introduce a distinct `admin` role via a Sanity-whitelist escalation. Until then, `require_admin` safely delegates to `require_sponsor`.
+
+**Local Development & Testing:**
+To manually obtain a valid token for local testing:
+1. Start the `astro-app` dev server and sign into the portal via Magic Link or OAuth.
+2. Open your browser's developer tools and copy the value of the `better-auth.session_token` cookie.
+3. Call the bridge's `/auth/token` endpoint to verify it and seed your local KV cache:
+   ```bash
+   curl -X POST http://localhost:8787/api/v1/auth/token \
+     -d "username=your.email@example.com&password=<cookie-value>"

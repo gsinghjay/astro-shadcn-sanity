@@ -83,7 +83,6 @@ class WorkerSettings(BaseModel):
     discord_bot_token: str | None = None
     discord_app_id: str | None = None
     discord_public_key: str | None = None
-    discord_webhook_url: str | None = None
     cf_api_token: str | None = None
     cf_account_id: str | None = None
     turnstile_secret_key: str | None = None
@@ -129,7 +128,6 @@ class WorkerSettings(BaseModel):
             "discord_bot_token": self.discord_bot_token,
             "discord_app_id": self.discord_app_id,
             "discord_public_key": self.discord_public_key,
-            "discord_webhook_url": self.discord_webhook_url,
             "cf_api_token": self.cf_api_token,
             "cf_account_id": self.cf_account_id,
             "turnstile_secret_key": self.turnstile_secret_key,
@@ -240,7 +238,6 @@ class WorkerSettings(BaseModel):
             sanity_api_write_token=_get("SANITY_API_WRITE_TOKEN"),
             discord_bot_token=_get("DISCORD_BOT_TOKEN"),
             discord_app_id=_get("DISCORD_APP_ID"),
-            discord_webhook_url=_get("DISCORD_WEBHOOK_URL"),
             discord_public_key=_get("DISCORD_PUBLIC_KEY"),
             cf_api_token=_get("CF_API_TOKEN"),
             cf_account_id=_get("CF_ACCOUNT_ID"),
