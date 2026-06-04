@@ -59,8 +59,14 @@
 				"global_fetch_strictly_public"
 			],
 			"routes": [
-				{ "pattern": "ywcccapstone1.com", "custom_domain": true },
-				{ "pattern": "www.ywcccapstone1.com", "custom_domain": true }
+				{
+					"pattern": "ywcccapstone1.com",
+					"custom_domain": true
+				},
+				{
+					"pattern": "www.ywcccapstone1.com",
+					"custom_domain": true
+				}
 			],
 			"vars": {
 				// Capstone production Worker — POST-CUTOVER. Canonical host is `www`; the apex
@@ -197,11 +203,43 @@
 			}
 			// Content-only site: no D1, no KV, no DO bindings — portal/auth/api routes return 503 if hit.
 		},
-		// [env.capstone_preview] — DELETED in Story 26.1 (2026-05-09). Studio Presentation
-		// now targets the production capstone Worker via @sanity/preview-url-secret cookie;
-		// see _bmad-output/implementation-artifacts/26-1-unify-preview-and-prod-via-preview-url-secret.md.
-		// The `ywcc-capstone-preview` Worker + KV namespace dfe44815e6ce4689bc2d868d088c77c1
-		// will be `wrangler delete`d after the 7-day burn-in period.
+		// [env.capstone_preview] — RESTORED in Story 26.12 (2026-06-04, hybrid restore).
+		// The 26.1 single-Worker cookie-preview model could not connect Studio Presentation
+		// (prerendered default route deadlocks the overlay + cross-origin third-party cookie
+		// is dropped in the sanity.io→sanity.studio→ywcccapstone1.com embed). Reverting to the
+		// proven separate always-SSR preview Worker: PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true
+		// makes the build mount visual editing unconditionally (NO cookie dependency), with
+		// drafts perspective + stega. Studio capstone previewOrigin points here. The 26.1
+		// cookie machinery on the prod Worker is left DORMANT (prerendered prod ignores the
+		// cookie) — scheduled for removal in a follow-up cleanup.
+		"capstone_preview": {
+			"name": "ywcc-capstone-preview",
+			"vars": {
+				"PUBLIC_GTM_ID": "",
+				"PUBLIC_SANITY_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_DATASET": "production",
+				"PUBLIC_SANITY_STUDIO_PROJECT_ID": "49nk9b0w",
+				"PUBLIC_SANITY_STUDIO_URL": "https://ywcccapstone.sanity.studio",
+				"PUBLIC_SANITY_VISUAL_EDITING_ENABLED": "true",
+				"PUBLIC_SITE_ID": "capstone",
+				"PUBLIC_SITE_THEME": "red",
+				"PUBLIC_SITE_URL": "https://ywcc-capstone-preview.js426.workers.dev",
+				"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAACf0yCNwVePpAiMn"
+			},
+			"observability": {
+				"enabled": true,
+				"logs": {
+					"enabled": true,
+					"head_sampling_rate": 1
+				},
+				"traces": {
+					"enabled": true,
+					"head_sampling_rate": 0.01
+				}
+			}
+			// Content-only preview: no D1/KV/DO. Drafts perspective + stega via PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true.
+			// SANITY_API_READ_TOKEN provided at runtime via `wrangler secret put --name ywcc-capstone-preview`.
+		},
 		"rwc_us_preview": {
 			"name": "rwc-us-preview",
 			"vars": {

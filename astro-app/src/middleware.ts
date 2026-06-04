@@ -1,6 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import type { APIContext, MiddlewareNext } from "astro";
 import { SANITY_API_READ_TOKEN } from "astro:env/server";
+import { PUBLIC_SANITY_VISUAL_EDITING_ENABLED } from "astro:env/client";
 import { env } from "cloudflare:workers";
 import { sanityClient } from "sanity:client";
 import {
@@ -198,15 +199,22 @@ interface SessionUser {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // Story 26.1 — request-scoped preview flag. Set BEFORE the auth/route branches so
-  // every downstream `loadQuery()` call (in components, resolvers, server islands)
-  // sees the right perspective. Cookie value is the Sanity-issued preview secret;
-  // we re-validate via Sanity per request (cached 5min in-isolate via
-  // `_previewSecretCache`) so a revoked secret stops working within the cache TTL.
-  const previewCookie = extractPreviewCookie(context.request.headers.get("cookie"));
-  let previewMode = false;
-  if (previewCookie) {
-    previewMode = await validatePreviewSecret(previewCookie);
+  // Preview flag, set BEFORE the auth/route branches so every downstream `loadQuery()`
+  // (components, resolvers, server islands) sees the right perspective.
+  //
+  // Story 26.12 (hybrid restore): the build-time flag is the primary signal. The
+  // content-only preview Worker (`ywcc-capstone-preview`) is built with
+  // PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true → visual editing mounts unconditionally
+  // with NO cookie dependency (the proven separate-preview-Worker model). On prod
+  // (flag=false) we fall back to the Story 26.1 cookie path — now dormant, since Studio
+  // Presentation targets the preview Worker, not prod; the prerendered prod routes
+  // ignore the cookie anyway. (Cookie machinery scheduled for follow-up removal.)
+  let previewMode = PUBLIC_SANITY_VISUAL_EDITING_ENABLED;
+  if (!previewMode) {
+    const previewCookie = extractPreviewCookie(context.request.headers.get("cookie"));
+    if (previewCookie) {
+      previewMode = await validatePreviewSecret(previewCookie);
+    }
   }
   context.locals.previewMode = previewMode;
   if (previewMode) {
