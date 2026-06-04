@@ -1,3 +1,13 @@
+## [2.6.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.6.0...v2.6.1) (2026-06-04)
+
+### Bug Fixes
+
+* **spike-26-1:** re-pin PUBLIC_SANITY_VISUAL_EDITING_ENABLED=false on capstone ([71499df](https://github.com/gsinghjay/astro-shadcn-sanity/commit/71499df6d4174e3d13db8fec948ea4e220024b30))
+
+### Miscellaneous
+
+* **spike-26-1:** gitignore .lighthouseci/ + WSL-visible Windows lighthouse temp dirs ([9cea4f8](https://github.com/gsinghjay/astro-shadcn-sanity/commit/9cea4f8250a13d0b9e35cbf31d4fa061972d5781))
+
 ## [2.6.0](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.5.0...v2.6.0) (2026-05-10)
 
 ### Features
