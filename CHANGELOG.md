@@ -1,3 +1,17 @@
+## [2.6.2](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.6.1...v2.6.2) (2026-06-04)
+
+### Bug Fixes
+
+* **preview:** restore capstone preview Worker + GitHub Actions deploy ([0807af0](https://github.com/gsinghjay/astro-shadcn-sanity/commit/0807af059575edeed3b0102c56f759f49230393c))
+
+### Documentation
+
+* align preview/deploy docs with 26.12 hybrid restore ([d84bc4e](https://github.com/gsinghjay/astro-shadcn-sanity/commit/d84bc4e1dcd079c93745cc4dc5f69e04cc90ff11))
+
+### Miscellaneous
+
+* **ci:** drop GitHub Actions preview deploy in favor of Cloudflare Workers Builds ([951b29b](https://github.com/gsinghjay/astro-shadcn-sanity/commit/951b29bb3d76de97094d9492943e8c47370acf4e))
+
 ## [2.6.1](https://github.com/gsinghjay/astro-shadcn-sanity/compare/v2.6.0...v2.6.1) (2026-06-04)
 
 ### Bug Fixes
