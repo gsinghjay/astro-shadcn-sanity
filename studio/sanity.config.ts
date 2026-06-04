@@ -47,6 +47,15 @@ function commonPlugins(opts: CommonPluginsOptions): PluginOptions[] {
       previewUrl: {
         origin: opts.previewOrigin,
         preview: '/',
+        // Story 26.1: route Presentation through the draft-mode endpoint so the
+        // server validates the Sanity-issued secret and sets the preview cookie
+        // BEFORE the iframe loads the target page. Without this Presentation
+        // iframes the origin directly, no cookie is set, previewMode stays
+        // false, and @sanity/visual-editing has no peer to handshake with.
+        previewMode: {
+          enable: '/api/draft-mode/enable',
+          disable: '/api/draft-mode/disable',
+        },
       },
     }),
     visionTool(),
@@ -148,8 +157,15 @@ export default defineConfig([
     dataset: 'production',
     plugins: commonPlugins({
       structure: capstoneDeskStructure,
+      // Story 26.1: Studio Presentation targets the production Worker via
+      // the @sanity/preview-url-secret cookie flow (set by /api/draft-mode/enable).
+      // The custom domain `www.ywcccapstone1.com` is the actual Option-A target —
+      // the prerendered-HTML short-circuit guarantees cookie-bearing requests
+      // still get cached HTML until the postbuild cookie-routing wrapper (O-2)
+      // lands, so no draft leakage to real visitors during burn-in.
+      // Local dev still honors SANITY_STUDIO_PREVIEW_ORIGIN if set in studio/.env.
       previewOrigin:
-        process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:4321',
+        process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'https://www.ywcccapstone1.com',
       resolve: createResolve(undefined),
     }),
     tools: (prev) => [...prev, sponsorAcceptancesTool()],
