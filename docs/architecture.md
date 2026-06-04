@@ -13,7 +13,7 @@ A six-Worker fleet on a single Cloudflare account hosts:
 - **Two content-only tenants** (`rwc-us`, `rwc-intl`): same codebase, no D1/KV/DO, no portal — `*.workers.dev`.
 - **Three preview tenants** (`*-preview`): drafts perspective + stega for Sanity Studio's Presentation tool.
 
-The architecture pattern is **edge-first hybrid SSR** with a **block-driven page builder** sourced from Sanity. The codebase is built once per environment (`CLOUDFLARE_ENV=<name> astro build`) — Astro 6 + the Cloudflare Vite plugin bake env vars at build time and emit a `dist/server/wrangler.json` that `wrangler deploy` consumes.
+The architecture pattern is **edge-first hybrid SSR** with a **block-driven page builder** sourced from Sanity. The codebase is built once per environment (`CLOUDFLARE_ENV=<name> astro build`) — Astro 6 + the Cloudflare Vite plugin bake env vars at build time and emit a `dist/server/wrangler.json` that `wrangler deploy` consumes. Production (`ywcc-capstone`) and the editorial preview (`ywcc-capstone-preview`) deploy via **Cloudflare Workers Builds** (native GitHub CI/CD) on push to `main` and `preview` respectively; the other Workers deploy manually.
 
 ## Topology
 
@@ -29,8 +29,8 @@ The architecture pattern is **edge-first hybrid SSR** with a **block-driven page
                           │   webhook (publish-only) │  CDN reads (useCdn=true) │
                           ▼                          │  Live Content API (preview only)
         ┌─────────────────────────────┐              │
-        │   CF Deploy Hooks (×3)      │              │
-        │ → wrangler deploy per env   │              │
+        │   CF Deploy Hook (prod)     │              │
+        │ → Workers Build (prod)      │              │
         └─────────────────────────────┘              │
                           │                          │
                           ▼                          ▼
@@ -64,6 +64,7 @@ The architecture pattern is **edge-first hybrid SSR** with a **block-driven page
             │                                                       │
             │  ┌─ ywcc-capstone-preview ─┐  rwc-us-preview          │
             │  │ stega + drafts          │  rwc-intl-preview        │
+            │  │ content-only (no D1/KV/DO)                          │
             │  │ (Studio Presentation)   │                          │
             │  └─────────────────────────┘                          │
             └───────────────────────────────────────────────────────┘
@@ -226,7 +227,7 @@ Migrations under `astro-app/migrations/` (10 total, 0000-0009):
 | `capstone`               | ywcc-capstone             | www.ywcccapstone1.com (apex 301→www via Single Redirect) | D1 PORTAL_DB, KV SESSION_CACHE, DO RATE_LIMITER, ASSETS | Production. All secrets dashboard-managed |
 | `rwc_us`                 | rwc-us                    | rwc-us.js426.workers.dev                        | ASSETS only                                    | Content-only; portal/auth/api → 503 |
 | `rwc_intl`               | rwc-intl                  | rwc-intl.js426.workers.dev                      | ASSETS only                                    | Content-only; portal/auth/api → 503 |
-| `capstone_preview`       | ywcc-capstone-preview     | ywcc-capstone-preview.js426.workers.dev         | ASSETS only                                    | Drafts + stega; Studio Presentation iframe target |
+| `capstone_preview`       | ywcc-capstone-preview     | ywcc-capstone-preview.js426.workers.dev         | ASSETS only                                    | Content-only (NOT full staging); drafts + stega; Studio Presentation iframe target. Only `SANITY_API_READ_TOKEN` (runtime secret + Workers Builds build var); portal secrets optional. Deploys via Workers Builds on `preview` |
 | `rwc_us_preview`         | rwc-us-preview            | rwc-us-preview.js426.workers.dev                | ASSETS only                                    | Drafts + stega                         |
 | `rwc_intl_preview`       | rwc-intl-preview          | rwc-intl-preview.js426.workers.dev              | ASSETS only                                    | Drafts + stega                         |
 
@@ -245,7 +246,9 @@ CLOUDFLARE_ENV=rwc_intl_preview npm run deploy:rwc-intl-preview
 
 Each script runs `astro build && wrangler deploy`. The `--env <name>` flag is no longer applicable under the CF Vite plugin (env is owned by `CLOUDFLARE_ENV` at build time). After any `wrangler.jsonc` change: regenerate types via `npx wrangler types -C astro-app`.
 
-Sanity webhook (publish-only on `_type in ["page","siteSettings","sponsor","project","team","event"]`) triggers a CF Deploy Hook per environment (~45-75s rebuild). Drafts excluded.
+**Deploy mechanism (Cloudflare Workers Builds, native GitHub CI/CD):** production `ywcc-capstone` deploys on push to `main`; editorial preview `ywcc-capstone-preview` deploys on push to `preview` (Workers Builds config: build command empty — deps auto-installed; deploy command `npm run deploy:capstone-preview -w astro-app`; build variable `SANITY_API_READ_TOKEN`). The old GitHub Actions deploy workflow (`deploy.yml`) has been removed; no remaining workflow deploys Workers. The four RWC Workers are deployed manually via the commands above.
+
+Sanity webhook (publish-only on `_type in ["page","siteSettings","sponsor","project","team","event"]`) → CF Deploy Hook triggers a **production** Workers Build (~1-2 min rebuild). Production content routes stay prerendered, so published content appears after that rebuild. Drafts excluded.
 
 ## Testing strategy
 

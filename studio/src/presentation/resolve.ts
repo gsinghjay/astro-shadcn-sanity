@@ -17,30 +17,41 @@ import {map} from 'rxjs'
  * Without the site scope, `_type == "page" && slug.current == "home"` returns
  * BOTH RWC home documents and Presentation arbitrarily picks one — typically
  * surfacing as "clicking Home in RWC US opens the RWC International page".
+ *
+ * Story 26.12 (hybrid restore): capstone Presentation targets the separate
+ * content-only preview Worker `ywcc-capstone-preview` (always-SSR drafts + stega),
+ * which serves the SAME canonical routes as the public site. So Presentation
+ * navigates capstone docs to canonical paths — no `/preview` prefix, identical to
+ * RWC. (The 26.12 spike's `/preview/[...path]` dedicated route is removed.)
  */
 export function createResolve(siteId?: string) {
   const siteFilter = siteId ? ` && site == "${siteId}"` : ''
 
+  // Hybrid restore: every workspace uses canonical routes; the preview Worker
+  // serves them SSR'd. (Was '/preview' for capstone under the 26.12 spike.)
+  const previewPrefix = ''
+  const pv = (path: string) => `${previewPrefix}${path}`
+
   const mainDocuments = defineDocuments([
     {
-      route: '/',
+      route: pv('/'),
       filter: `_type == "page" && slug.current == "home"${siteFilter}`,
     },
     {
-      route: '/sponsors/:slug',
+      route: pv('/sponsors/:slug'),
       filter: `_type == "sponsor" && slug.current == $slug${siteFilter}`,
     },
     {
-      route: '/projects/:slug',
+      route: pv('/projects/:slug'),
       filter: `_type == "project" && slug.current == $slug${siteFilter}`,
     },
     {
-      route: '/events/:slug',
+      route: pv('/events/:slug'),
       filter: `_type == "event" && slug.current == $slug${siteFilter}`,
     },
     // Catch-all pages — must be last (first match wins)
     {
-      route: '/:slug',
+      route: pv('/:slug'),
       filter: `_type == "page" && slug.current == $slug${siteFilter}`,
     },
   ])
@@ -78,7 +89,7 @@ export function createResolve(siteId?: string) {
           tone: 'caution' as const,
           locations: pages.map((page) => ({
             title: page.title || 'Untitled',
-            href: page.slug === 'home' ? '/' : `/${page.slug}`,
+            href: page.slug === 'home' ? pv('/') : pv(`/${page.slug}`),
           })),
         }
       }),
@@ -100,7 +111,7 @@ export function createResolve(siteId?: string) {
             locations: [
               {
                 title: doc?.title || 'Untitled',
-                href: doc?.slug === 'home' ? '/' : `/${doc?.slug}`,
+                href: doc?.slug === 'home' ? pv('/') : pv(`/${doc?.slug}`),
               },
             ],
           }
@@ -112,7 +123,7 @@ export function createResolve(siteId?: string) {
           locations: [
             {
               title: doc?.title || 'Untitled',
-              href: doc?.slug === 'home' ? '/' : `/${doc?.slug}`,
+              href: doc?.slug === 'home' ? pv('/') : pv(`/${doc?.slug}`),
             },
           ],
         }),
@@ -125,8 +136,8 @@ export function createResolve(siteId?: string) {
           if (doc?.site !== siteId) return null
           return {
             locations: [
-              {title: doc?.title || 'Untitled', href: `/sponsors/${doc?.slug}`},
-              {title: 'All Sponsors', href: '/sponsors'},
+              {title: doc?.title || 'Untitled', href: pv(`/sponsors/${doc?.slug}`)},
+              {title: 'All Sponsors', href: pv('/sponsors')},
             ],
           }
         },
@@ -135,8 +146,8 @@ export function createResolve(siteId?: string) {
         select: {title: 'name', slug: 'slug.current'},
         resolve: (doc) => ({
           locations: [
-            {title: doc?.title || 'Untitled', href: `/sponsors/${doc?.slug}`},
-            {title: 'All Sponsors', href: '/sponsors'},
+            {title: doc?.title || 'Untitled', href: pv(`/sponsors/${doc?.slug}`)},
+            {title: 'All Sponsors', href: pv('/sponsors')},
           ],
         }),
       })
@@ -148,8 +159,8 @@ export function createResolve(siteId?: string) {
           if (doc?.site !== siteId) return null
           return {
             locations: [
-              {title: doc?.title || 'Untitled', href: `/projects/${doc?.slug}`},
-              {title: 'All Projects', href: '/projects'},
+              {title: doc?.title || 'Untitled', href: pv(`/projects/${doc?.slug}`)},
+              {title: 'All Projects', href: pv('/projects')},
             ],
           }
         },
@@ -158,8 +169,8 @@ export function createResolve(siteId?: string) {
         select: {title: 'title', slug: 'slug.current'},
         resolve: (doc) => ({
           locations: [
-            {title: doc?.title || 'Untitled', href: `/projects/${doc?.slug}`},
-            {title: 'All Projects', href: '/projects'},
+            {title: doc?.title || 'Untitled', href: pv(`/projects/${doc?.slug}`)},
+            {title: 'All Projects', href: pv('/projects')},
           ],
         }),
       })
@@ -171,8 +182,8 @@ export function createResolve(siteId?: string) {
           if (doc?.site !== siteId) return null
           return {
             locations: [
-              {title: doc?.title || 'Untitled', href: `/events/${doc?.slug}`},
-              {title: 'All Events', href: '/events'},
+              {title: doc?.title || 'Untitled', href: pv(`/events/${doc?.slug}`)},
+              {title: 'All Events', href: pv('/events')},
             ],
           }
         },
@@ -181,8 +192,8 @@ export function createResolve(siteId?: string) {
         select: {title: 'title', slug: 'slug.current'},
         resolve: (doc) => ({
           locations: [
-            {title: doc?.title || 'Untitled', href: `/events/${doc?.slug}`},
-            {title: 'All Events', href: '/events'},
+            {title: doc?.title || 'Untitled', href: pv(`/events/${doc?.slug}`)},
+            {title: 'All Events', href: pv('/events')},
           ],
         }),
       })

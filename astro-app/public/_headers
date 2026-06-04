@@ -10,8 +10,12 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  # Clickjacking protection via CSP frame-ancestors ONLY (Story 26.12). Do NOT
+  # re-add `X-Frame-Options: SAMEORIGIN` — XFO has no syntax to allow a specific
+  # cross-origin, so it blocks Sanity Studio Presentation from embedding the site
+  # in its preview iframe ("Unable to connect to visual editing"). frame-ancestors
+  # gives equivalent, correctly-scoped protection (self + Sanity Studio origins).
   Content-Security-Policy: frame-ancestors 'self' https://*.sanity.studio https://*.sanity.io
-  X-Frame-Options: SAMEORIGIN
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Link: </llms.txt>; rel="describedby"; type="text/plain", </llms-full.txt>; rel="alternate"; type="text/plain", </sitemap-index.xml>; rel="sitemap"; type="application/xml"
   Vary: Accept

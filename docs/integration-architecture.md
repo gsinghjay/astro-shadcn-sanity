@@ -116,7 +116,7 @@ if (!result.allowed) return new Response('Too many requests', { status: 429 });
 
 **Caching**: module-level caches (`_sponsorsCache`, `_siteSettingsCache`) are bypassed when `visualEditingEnabled === true`. Live subscriptions use exponential backoff (`lib/sanity-live.ts`, max 5 reconnect attempts).
 
-**Webhook → deploy**: a single Sanity webhook (publish-only on `_type in [...]`, drafts excluded) triggers three CF Deploy Hooks (one per production Worker). Rebuild + deploy: ~45-75s per environment.
+**Webhook → deploy**: a single Sanity webhook (publish-only on `_type in [...]`, drafts excluded) → a Cloudflare deploy hook triggers a production Workers Build (~1-2 min rebuild). Production content routes stay prerendered, so published content appears after that rebuild. This flow survived the Story 26.12 migration and is confirmed working.
 
 ### 4. astro-app ↔ Sanity Studio (Visual Editing iframe)
 
@@ -252,7 +252,7 @@ feature/* ─► preview ─► main
 | `enforce-preview-source.yml`   | PR to `preview`       | Blocks `main → preview` PRs                                   |
 | `sync-preview.yml`             | release.yml completion| Auto-merge `main → preview` + Discord notify                  |
 
-There is **no automated CF deploy on `main`** for the astro-app — `wrangler deploy` happens on demand via `npm run deploy:capstone` etc. The Sanity webhook → CF Deploy Hook flow handles content-driven rebuilds.
+CF deploys for the astro-app run via **Cloudflare Workers Builds** (native GitHub CI/CD), not GitHub Actions: push to `main` deploys `ywcc-capstone` (production); push to `preview` deploys `ywcc-capstone-preview` (its Workers Builds config runs `npm run deploy:capstone-preview -w astro-app` with build variable `SANITY_API_READ_TOKEN`). The old `deploy.yml` (and the short-lived 26.12 `deploy-preview.yml`) were removed — none of the remaining workflows deploy Workers. The Sanity webhook → CF Deploy Hook flow handles content-driven production rebuilds.
 
 ## Out-of-tree services (production)
 

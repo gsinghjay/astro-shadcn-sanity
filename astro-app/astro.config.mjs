@@ -113,14 +113,15 @@ const PREVIEW_SSR_ROUTES = [
   'src/pages/gallery/index.astro',
 ];
 
-// Story 5.22 behavior restored after O-5 LCP regression: routes prerender by
+// Story 5.22 behavior (restored in 26.12 hybrid): content routes prerender by
 // default; flipped to SSR only when build-time PUBLIC_SANITY_VISUAL_EDITING_ENABLED
-// is true (RWC preview Workers). Capstone production cookie-bearing requests reach
-// SSR via the postbuild wrapper (scripts/wrap-entry-for-preview-cookie.mjs) which
-// patches the @astrojs/cloudflare adapter chunk to bypass the prerender
-// short-circuit when the __Secure-sanity-preview cookie is present. Cookieless
-// traffic continues to hit prerendered HTML via Workers Static Assets — preserves
-// the Lighthouse LCP gate (≤2000ms) for SEO/UX.
+// is true — i.e. on the content-only preview Workers (ywcc-capstone-preview +
+// rwc-*-preview), which serve drafts + stega to Studio Presentation. On the
+// production Workers (capstone, rwc-us, rwc-intl) these routes stay PRERENDERED for
+// every visitor (LCP gate + .md/llms twins). The 26.1 cookie flow and the 26.12
+// dedicated-route spike (both attempts at per-request preview on the prod Worker)
+// are abandoned: a runtime prerender→SSR flip is impossible (Astro emits no SSR
+// component instance for a prerendered route, so it 500s in `getModuleForRoute`).
 const ssrContentRoutes = visualEditingEnabled === 'true';
 
 const previewSsrIntegration = {
@@ -255,18 +256,17 @@ export default defineConfig({
       }),
 
       // --- Server-side secrets (portal / auth / write paths) ---
-      // The `capstone` (prod) and `capstone_preview` (staging) Workers both
-      // run the portal — capstone_preview shares prod D1/KV bindings so its
-      // build needs the same secrets. RWC + RWC-preview Workers stay
-      // content-only (no D1/KV/DO bindings) and portal/auth/api routes return
-      // 503 there. Marking these `optional` for non-portal envs lets
-      // `astro:env/server` return undefined at runtime instead of throwing
-      // EnvInvalidVariables on every request when the bundle imports
-      // `actions/index.ts` (which transitively reads these). Capstone +
-      // capstone_preview stay strict so a missing secret fails the build
-      // immediately.
-      ...(process.env.CLOUDFLARE_ENV === "capstone" ||
-      process.env.CLOUDFLARE_ENV === "capstone_preview"
+      // Only the `capstone` (prod) Worker runs the portal, so only it keeps
+      // these secrets strict (a missing secret fails the build immediately).
+      // `capstone_preview` (Story 26.12 hybrid restore) is now a CONTENT-ONLY
+      // preview Worker — no D1/KV/DO bindings, no portal — so it joins RWC +
+      // RWC-preview in the optional branch. Marking these `optional` for
+      // non-portal envs lets `astro:env/server` return undefined at runtime
+      // instead of throwing EnvInvalidVariables on every request when the
+      // bundle imports `actions/index.ts` (which transitively reads these).
+      // (`SANITY_API_READ_TOKEN` is optional globally above — the preview
+      // Worker provides it as a runtime `wrangler secret put` for drafts.)
+      ...(process.env.CLOUDFLARE_ENV === "capstone"
         ? {
             BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
             GITHUB_CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),

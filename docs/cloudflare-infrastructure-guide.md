@@ -3,7 +3,7 @@ title: Cloudflare Infrastructure Guide
 description: Complete reference for all Cloudflare services, bindings, and configuration used by the YWCC program websites.
 author: Paige (Tech Writer Agent)
 date: 2026-03-02
-last_revised: 2026-04-29
+last_revised: 2026-06-04
 ---
 
 # Cloudflare Infrastructure Guide
@@ -11,6 +11,8 @@ last_revised: 2026-04-29
 This document describes every Cloudflare resource used by the YWCC program websites. Use it to understand, maintain, or replicate the infrastructure when onboarding new team members or handing off the project.
 
 > **Revised 2026-04-29 for the Cloudflare Workers cutover (PR #681).** All three sites now run as **Cloudflare Workers** with `@astrojs/cloudflare` v13 (Workers-only, full SSR via `output: 'server'`). The legacy Pages projects are scheduled for deletion on **2026-05-03**. This guide describes the post-cutover Workers topology; previous Pages-era guidance is no longer accurate. Cloudflare Access has also been retired in favor of Better Auth.
+
+> **Revised 2026-06-04 (Story 26.12 hybrid restore).** `ywcc-capstone-preview` is now **content-only** (no D1/KV/DO; its `ywcc-capstone-preview-session` KV namespace was deleted) and needs only `SANITY_API_READ_TOKEN`. Deploys run via **Cloudflare Workers Builds** (push to `main` → production, push to `preview` → preview Worker); the old GitHub Actions deploy workflow was removed.
 
 ## Table of Contents
 
@@ -60,7 +62,7 @@ flowchart TD
             Intl["rwc-intl<br/>rwc-intl.js426.workers.dev<br/>green theme · content-only"]
         end
 
-        subgraph Preview["Preview Workers (Studio Presentation)"]
+        subgraph Preview["Preview Workers (Studio Presentation, content-only)"]
             CapP["ywcc-capstone-preview<br/>drafts + stega"]
             USP["rwc-us-preview"]
             IntlP["rwc-intl-preview"]
@@ -138,9 +140,9 @@ You access all Workers, D1 databases, KV namespaces, and Turnstile widgets from 
 
 Cloudflare Workers run JavaScript / WebAssembly on Cloudflare's edge. Each Worker is a single deployable unit configured by `wrangler.jsonc`. The `@astrojs/cloudflare` v13 adapter compiles the Astro app to a server entry (`@astrojs/cloudflare/entrypoints/server`) and emits prerendered files into `astro-app/dist`. The Worker serves SSR routes via the entry; prerendered pages and JS/CSS/images come from the **Static Assets** binding (`ASSETS`), which has unlimited bandwidth on the free plan.
 
-Deploy is explicit: `CLOUDFLARE_ENV=<name> astro build && wrangler deploy`. Astro 6's CF Vite plugin owns env selection and bakes per-env values into the build via `dist/server/wrangler.json` (auto-located by wrangler via `.wrangler/deploy/config.json`). The legacy `wrangler deploy --env <name>` flag is **no longer applicable** under the v13 adapter.
+Deploy runs `CLOUDFLARE_ENV=<name> astro build && wrangler deploy`. Astro 6's CF Vite plugin owns env selection and bakes per-env values into the build via `dist/server/wrangler.json` (auto-located by wrangler via `.wrangler/deploy/config.json`). The legacy `wrangler deploy --env <name>` flag is **no longer applicable** under the v13 adapter.
 
-There is no automatic deploy-on-push for the astro-app — pushes to `main` only trigger `release.yml` (semantic-release versioning) and `deploy-storybook.yml`. Cloudflare deploy is manual / on demand.
+The astro-app deploys via **Cloudflare Workers Builds** (native GitHub CI/CD): a push to `main` triggers a production `ywcc-capstone` build, and a push to `preview` triggers a `ywcc-capstone-preview` build. `release.yml` (semantic-release versioning) and `deploy-storybook.yml` still run on `main` but do not deploy Workers. You can also run the deploy scripts manually / on demand.
 
 ### ywcc-capstone (production)
 
@@ -180,7 +182,7 @@ The Real World Connections US and International program websites. Same codebase 
 
 ### *-preview Workers (Studio Presentation)
 
-Three additional Workers host the Studio Presentation iframe — drafts perspective + stega, no caching, no portal. The Studio's `presentation/resolve.ts` selects the right preview origin per workspace.
+Three additional Workers host the Studio Presentation iframe — drafts perspective + stega, no caching, no portal. All three are **content-only** (no D1, no KV, no DO bindings). Building with `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` flips the content routes to SSR → drafts perspective + stega. The Studio's `presentation/resolve.ts` selects the right preview origin per workspace and maps capstone docs to canonical routes (no `/preview` prefix).
 
 | Worker | Workspace | Preview origin | Notes |
 |---|---|---|---|
@@ -188,7 +190,7 @@ Three additional Workers host the Studio Presentation iframe — drafts perspect
 | `rwc-us-preview` | rwc-us | <https://rwc-us-preview.js426.workers.dev> | `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` |
 | `rwc-intl-preview` | rwc-intl | <https://rwc-intl-preview.js426.workers.dev> | `PUBLIC_SANITY_VISUAL_EDITING_ENABLED=true` |
 
-These Workers have no D1/KV/DO. They carry `BETTER_AUTH_URL` only because shared code reads it during build — the auth flow itself can't run without `BETTER_AUTH_SECRET` + `PORTAL_DB`.
+These Workers have no D1/KV/DO. The only secret they need is `SANITY_API_READ_TOKEN` (for the drafts perspective). On `ywcc-capstone-preview` it must be set **both** as a runtime Wrangler secret **and** as a Cloudflare Workers Builds build variable, because the build prerenders `rss.xml` + the `.ics` endpoint, which under Visual Editing use the drafts perspective and require the read token. The portal secret set (`BETTER_AUTH_SECRET`, `GITHUB_CLIENT_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `RESEND_API_KEY`, `TURNSTILE_SECRET_KEY`, `SANITY_API_WRITE_TOKEN`) is **not** required on these Workers.
 
 ### Standalone Workers
 
@@ -288,15 +290,15 @@ Set via `wrangler secret put <NAME> --name <worker>` or the dashboard. **Never**
 | `PUBLIC_SANITY_VISUAL_EDITING_ENABLED` | `false` | `false` | `false` | `true` |
 | `PUBLIC_GTM_ID` | ✓ (`GTM-NS9N926Q`) | ✓ | ✓ | empty |
 | `PUBLIC_TURNSTILE_SITE_KEY` | ✓ | ✓ | ✓ | ✓ |
-| `BETTER_AUTH_URL` | ✓ | — | — | ✓ (capstone preview only, in vars) |
-| `GITHUB_CLIENT_ID` | ✓ | — | — | ✓ (capstone preview only) |
+| `BETTER_AUTH_URL` | ✓ | — | — | — |
+| `GITHUB_CLIENT_ID` | ✓ | — | — | — |
 | `BETTER_AUTH_SECRET` (secret) | ✓ | — | — | — |
 | `GITHUB_CLIENT_SECRET` (secret) | ✓ | — | — | — |
 | `GOOGLE_CLIENT_ID` (secret) | ✓ | — | — | — |
 | `GOOGLE_CLIENT_SECRET` (secret) | ✓ | — | — | — |
 | `RESEND_API_KEY` (secret) | ✓ | — | — | — |
-| `RESEND_FROM_EMAIL` | ✓ | — | — | ✓ (capstone preview only) |
-| `SANITY_API_READ_TOKEN` (secret) | — | — | — | ✓ |
+| `RESEND_FROM_EMAIL` | ✓ | — | — | — |
+| `SANITY_API_READ_TOKEN` (secret) | — | — | — | ✓ (also a Workers Builds build var on capstone preview) |
 | `SANITY_API_WRITE_TOKEN` (secret) | ✓ | — | — | — |
 | `TURNSTILE_SECRET_KEY` (secret) | ✓ | — | — | — |
 | `DISCORD_WEBHOOK_URL` (secret) | ✓ | — | — | — |
@@ -336,14 +338,15 @@ KV is a global, low-latency key-value store. The capstone Worker uses one for Be
 |---|---|---|---|
 | `SESSION_CACHE` | `SESSION_CACHE` | `f78af5695075451c9d3d7887368e90dc` | `ywcc-capstone` |
 | (unbound) | `ywcc-capstone-session` | `4baee499566e42859dc003213cfffe94` | (cutover-provisioned, not in code) |
-| (unbound) | `ywcc-capstone-preview-session` | `dfe44815e6ce4689bc2d868d088c77c1` | (cutover-provisioned, not in code) |
 | (unbound) | `rwc-us-session` | `6bfebcb0cea7491cbb124d014ce43e43` | (cutover-provisioned) |
 | (unbound) | `rwc-us-preview-session` | `3abcd743fdea4182ba7eedfa19c74e2b` | (cutover-provisioned) |
 | (unbound) | `rwc-intl-session` | `efde9d43ed2e4bac8366374c19917643` | (cutover-provisioned) |
 | (unbound) | `rwc-intl-preview-session` | `402d0ca31cdc4e96b45a4a9398eab218` | (cutover-provisioned) |
 | (unbound) | `KV` | `992346b9e7884c97b3fe652c4da27632` | (legacy from earlier experiments) |
 
-**Cleanup recommendation:** the seven unbound namespaces can be deleted after the Pages projects are removed (2026-05-03), unless any of them is referenced by an out-of-tree Worker — verify before deletion.
+The `ywcc-capstone-preview-session` namespace (id `dfe44815e6ce4689bc2d868d088c77c1`) was **deleted** — `ywcc-capstone-preview` is now content-only and needs no KV.
+
+**Cleanup recommendation:** the remaining unbound namespaces can be deleted after the Pages projects are removed (2026-05-03), unless any of them is referenced by an out-of-tree Worker — verify before deletion.
 
 **Graceful degradation:** if `SESSION_CACHE` is missing, the middleware skips the KV cache and queries D1 directly. The site still works, with slightly higher latency on authenticated routes.
 
@@ -473,8 +476,8 @@ gitGraph
 | Branch | Role |
 |---|---|
 | `feature/*` | Active development. PR target = `preview`. |
-| `preview` | Integration. PR target = `main`. CI runs Vitest + LHCI + Pa11y on every PR here. |
-| `main` | Release. `release.yml` (semantic-release) tags + bumps version + writes `CHANGELOG.md`. `sync-preview.yml` auto-merges back to `preview`. |
+| `preview` | Integration. PR target = `main`. CI runs Vitest + LHCI + Pa11y on every PR here. A push to `preview` triggers a Cloudflare Workers Build that deploys `ywcc-capstone-preview`. |
+| `main` | Release. `release.yml` (semantic-release) tags + bumps version + writes `CHANGELOG.md`. `sync-preview.yml` auto-merges back to `preview`. A push to `main` triggers a Cloudflare Workers Build that deploys production `ywcc-capstone`. |
 
 `enforce-preview-branch.yml` blocks any PR into `main` from a branch other than `preview`. `enforce-preview-source.yml` blocks `main → preview` PRs (auto-sync only). Branch protection is enforced at the workflow level.
 
@@ -495,7 +498,9 @@ Wrangler reads `dist/server/wrangler.json` (auto-generated by the Astro v13 adap
 
 ### How to trigger a deploy
 
-**No automatic Cloudflare deploy on git push.** The astro-app deploys on demand:
+**Automatic via Cloudflare Workers Builds:** pushing to `main` deploys production `ywcc-capstone`; pushing to `preview` deploys `ywcc-capstone-preview`. The preview Workers Build is configured with an empty build command (Workers Builds auto-installs deps), deploy command `npm run deploy:capstone-preview -w astro-app`, and the build variable `SANITY_API_READ_TOKEN`. The old GitHub Actions deploy workflow (`deploy.yml`) has been removed.
+
+You can also deploy on demand:
 
 ```bash
 # From astro-app/

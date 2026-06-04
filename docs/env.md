@@ -57,7 +57,7 @@ Imported as `import { X } from 'astro:env/server'`. Not bundled to browser. Live
 | `STUDIO_ORIGIN` | Allowed origin for `/api/portal/admin/*` CORS check. | optional |
 
 ### Server-secret
-Sensitive values. Set via Wrangler secrets (runtime) **and** Builds env (build-time). Required on capstone + capstone_preview, optional elsewhere — see schema gate in [`astro.config.mjs:258`](../astro-app/astro.config.mjs).
+Sensitive values. Set via Wrangler secrets (runtime) **and** Builds env (build-time). The portal secret set is required only on capstone (production), optional everywhere else (including capstone_preview, which is now content-only). `SANITY_API_READ_TOKEN` is optional in the schema globally — see schema gate in [`astro.config.mjs:258`](../astro-app/astro.config.mjs).
 
 | Var | Purpose | Where created |
 |---|---|---|
@@ -79,12 +79,12 @@ Per [`astro-app/wrangler.jsonc`](../astro-app/wrangler.jsonc), each `[env.<name>
 
 | Worker (`name`) | Build env | Origin | Bindings | Notes |
 |---|---|---|---|---|
-| `ywcc-capstone` | `CLOUDFLARE_ENV=capstone` | ywcccapstone1.com | D1 + KV + DO | Production. All 8 secrets required. |
-| `ywcc-capstone-preview` | `CLOUDFLARE_ENV=capstone_preview` | `*.workers.dev` | D1 (shared with prod) + isolated KV + DO | **Full staging.** All 8 secrets required. Drafts+stega on. |
+| `ywcc-capstone` | `CLOUDFLARE_ENV=capstone` | ywcccapstone1.com | D1 + KV + DO | Production. All 8 portal secrets required. |
+| `ywcc-capstone-preview` | `CLOUDFLARE_ENV=capstone_preview` | `ywcc-capstone-preview.js426.workers.dev` | none | **Content-only.** Only `SANITY_API_READ_TOKEN` needed (runtime secret + Builds var); portal secrets optional. Drafts+stega on. Studio Presentation lands here. |
 | `rwc-us` / `rwc-intl` | `CLOUDFLARE_ENV=rwc_us` / `rwc_intl` | `*.workers.dev` | none | Content-only. Portal/auth routes 503. Secrets optional. |
 | `rwc-us-preview` / `rwc-intl-preview` | `CLOUDFLARE_ENV=rwc_us_preview` / `rwc_intl_preview` | `*.workers.dev` | none | Content-only previews with drafts+stega. |
 
-The schema in `astro.config.mjs` toggles required-vs-optional based on `CLOUDFLARE_ENV` — capstone + capstone_preview fail the build on missing secrets; everything else marks them optional so RWC bundles don't drag the unused portal imports into a 503 path.
+The schema in `astro.config.mjs` toggles required-vs-optional based on `CLOUDFLARE_ENV` — only capstone (production) fails the build on missing portal secrets; everything else (capstone_preview and the RWC envs) marks them optional so those bundles don't drag the unused portal imports into a 503 path.
 
 ---
 
@@ -99,9 +99,11 @@ Build pulls secrets from (in order of precedence at build time):
 1. `astro-app/.dev.vars` — for local `npm run build`
 2. `process.env` — for CI builds (CF Workers Builds injects from its env-var settings)
 
-The build script in CF Workers Builds appends **all 8 required secrets** to `.dev.vars` immediately before `astro build` runs. Both `astro build` itself AND the post-build miniflare worker (used by `postbuild:agent-discovery` to crawl pages for the sitemap) read from `.dev.vars` — writing only one secret causes the static-build phase to pass and then miniflare to fail with `[EnvInvalidVariables]` mid-postbuild.
+On the `ywcc-capstone` (production) trigger, the build script appends **all 8 required secrets** to `.dev.vars` immediately before `astro build` runs. Both `astro build` itself AND the post-build miniflare worker (used by `postbuild:agent-discovery` to crawl pages for the sitemap) read from `.dev.vars` — writing only one secret causes the static-build phase to pass and then miniflare to fail with `[EnvInvalidVariables]` mid-postbuild.
 
-Current build command on both `ywcc-capstone` and `ywcc-capstone-preview` triggers:
+The `ywcc-capstone-preview` (content-only) trigger only needs `SANITY_API_READ_TOKEN` — the build prerenders `rss.xml` + the `.ics` endpoint, which under Visual Editing use the drafts perspective and require the read token. Its Workers Builds config leaves the build command empty (Workers Builds auto-installs deps) with deploy command `npm run deploy:capstone-preview -w astro-app` and a single `SANITY_API_READ_TOKEN` build variable.
+
+Current build command on the `ywcc-capstone` (production) trigger:
 
 ```sh
 npm install --prefer-offline --no-audit --no-fund && \
@@ -110,7 +112,7 @@ for v in SANITY_API_READ_TOKEN SANITY_API_WRITE_TOKEN BETTER_AUTH_SECRET GITHUB_
   if [ -z "$val" ]; then echo "::error::$v is empty in CF Builds env" && exit 1; fi
   printf '%s=%s\n' "$v" "$val" >> astro-app/.dev.vars
 done && \
-CLOUDFLARE_ENV=<capstone|capstone_preview> npm run build --workspace=astro-app
+CLOUDFLARE_ENV=capstone npm run build --workspace=astro-app
 ```
 
 ### Symptoms and fixes
@@ -139,7 +141,7 @@ Currently configured triggers (account `70bc6caa244ede05b7f964c0c2d533bb`):
 | Worker | Trigger UUID | Branch | Build cmd reads |
 |---|---|---|---|
 | `ywcc-capstone` (`9f9250ef...`) | `33ddd1ad-3157-43c5-9457-fd0a130a0036` | `main` | All 8 secrets ✓ |
-| `ywcc-capstone-preview` (`527d8087...`) | `965bd1f7-b553-490d-bcbb-3d881102a78b` | `preview` | All 8 secrets ✓ (added 2026-05-09) |
+| `ywcc-capstone-preview` (`527d8087...`) | `965bd1f7-b553-490d-bcbb-3d881102a78b` | `preview` | `SANITY_API_READ_TOKEN` only (content-only) |
 
 Update env vars on a trigger:
 
@@ -164,10 +166,10 @@ curl -X POST -H "Authorization: Bearer $CF_API_TOKEN" \
 
 ## Adding a new secret
 
-1. **Schema first.** Add to `env.schema` in `astro-app/astro.config.mjs`. Mark required only on capstone + capstone_preview (use the existing conditional spread).
+1. **Schema first.** Add to `env.schema` in `astro-app/astro.config.mjs`. Mark required only on capstone (production); leave it optional on capstone_preview and the RWC envs (use the existing conditional spread).
 2. **Local.** Add to `astro-app/.dev.vars`.
 3. **Wrangler runtime.** `printf '%s' "<value>" | npx wrangler secret put NEW_SECRET --env <env-name>` for each Worker that needs it.
-4. **CF Builds env.** Add via dashboard (Worker → Settings → Build → Build variables) or PATCH endpoint above. Required for both `ywcc-capstone` and `ywcc-capstone-preview` triggers.
+4. **CF Builds env.** Add via dashboard (Worker → Settings → Build → Build variables) or PATCH endpoint above. Required for the `ywcc-capstone` trigger; only add to the `ywcc-capstone-preview` trigger if the content-only preview build actually needs it (it only carries `SANITY_API_READ_TOKEN`).
 5. **Build script.** If the build needs to write the var to `.dev.vars` (it does for any required `astro:env` server secret), append a line to the build command in the trigger config.
 6. **Deploy.** `npm run deploy:capstone -w astro-app` (or the preview flavor). Verify post-deploy.
 
