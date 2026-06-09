@@ -29,7 +29,7 @@
     "react-dom": "^19.2.1",
     "sanity": "^5.24.0",
     "sanity-plugin-media": "^4.1.1",
-    "styled-components": "^6.3.9"
+    "styled-components": "^6.4.2"
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "^5.0.2",
